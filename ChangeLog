@@ -1,0 +1,47 @@
+2004-10-13  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-doc.el (haskell-doc): New group.
+	(haskell-doc-show-reserved, haskell-doc-show-prelude)
+	(haskell-doc-show-strategy, haskell-doc-show-user-defined)
+	(haskell-doc-chop-off-context, haskell-doc-chop-off-fctname):
+	Make them custom vars.
+	(haskell-doc-keymap): Declare and fill it right there.
+	(haskell-doc-mode): Simplify.
+	(haskell-doc-toggle-var): Make it into what it was supposed to be.
+	(haskell-doc-mode-print-current-symbol-info): Simplify.
+	(haskell-doc-current-info): New autoloaded function.
+	(haskell-doc-sym-doc): New fun extracted from haskell-doc-show-type.
+	(haskell-doc-show-type): Use it.
+	(haskell-doc-wrapped-type-p): Remove unused var `lim'.
+	(haskell-doc-forward-sexp-safe, haskell-doc-current-symbol):
+	Remove.  Unused.
+	(haskell-doc-visit-home): Don't require ange-ftp, it's autoloaded.
+	(haskell-doc-install-keymap): Simplify.
+
+	* haskell-decl-scan.el (literate-haskell-ds-create-imenu-index)
+	(haskell-ds-generic-create-imenu-index): Remove.
+	(haskell-ds-bird-p): New function.
+	(haskell-ds-backward-decl, haskell-ds-forward-decl): Use it.
+	(haskell-ds-create-imenu-index): Use it to make it generic.
+	(haskell-ds-imenu): Remove now-unused arg.
+	(turn-on-haskell-decl-scan): Fix up call to haskell-ds-imenu.
+	(haskell-ds-running-xemacs): Remove.
+	(haskell-ds-func-menu-next): Make generic.
+	(literate-haskell-ds-func-menu-next): Delete.
+	(haskell-ds-func-menu): Remove unused arg.
+	(turn-on-haskell-decl-scan): Simplify.
+
+	* haskell-indent.el: Don't load CL at runtime.
+	(haskell-indent-start-of-def, haskell-indent-type-at-point):
+	Don't hardcode point-min == 1.
+	(indent-info): Declare it.
+	(haskell-indent-empty, haskell-indent-ident, haskell-indent-other)
+	(haskell-indent-line-indentation): Use `string'.
+	(haskell-indent-valdef-indentation): Fix `case' arms syntax.
+	(haskell-indent-indentation-info): Remove unused var `pt'.
+	(haskell-indent-align-def): Remove unused var `defpos'.
+	(turn-on-haskell-indent): Don't bind TAB.
+	(turn-off-haskell-indent): Don't unbind TAB and DEL.
+	(hugs-syntax-table): Use the `n' for nested comments.
+	(haskell-stand-alone-indent-mode): Fix `comment-end'.
+
