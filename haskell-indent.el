@@ -1277,7 +1277,8 @@ line with an indentation cycle."
   (interactive)
   (make-local-variable 'indent-line-function)
   (setq indent-line-function 'haskell-indent-cycle)
-  (local-set-key "\177"  'backward-delete-char-untabify)
+;  Removed: remapping DEL seems a bit naughty --SDM
+;  (local-set-key "\177"  'backward-delete-char-untabify)
   (local-set-key "\t"    'haskell-indent-cycle)
   (local-set-key "\C-c=" 'haskell-indent-insert-equal)
   (local-set-key "\C-c|" 'haskell-indent-insert-guard)
