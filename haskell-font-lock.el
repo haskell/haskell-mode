@@ -332,11 +332,11 @@ that should be commented under LaTeX-style literate scripts."
     (?-  . "_ 23")
     (?\` . "$`")
     ,@(mapcar (lambda (x) (cons x "_"))
-	      (concat "!#$%&*+./:<=>?@\\^|~" (enum-from-to ?\241 ?\277)
+	      (concat "!#$%&*+./:<=>?@\\^|~" (haskell-enum-from-to ?\241 ?\277)
 		      "\327\367"))
     ,@(mapcar (lambda (x) (cons x "w"))
-	      (concat (enum-from-to ?\300 ?\326) (enum-from-to ?\330 ?\337)
-		      (enum-from-to ?\340 ?\366) (enum-from-to ?\370 ?\377))))
+	      (concat (haskell-enum-from-to ?\300 ?\326) (haskell-enum-from-to ?\330 ?\337)
+		      (haskell-enum-from-to ?\340 ?\366) (haskell-enum-from-to ?\370 ?\377))))
   "Syntax required for font locking.  Given as a list of pairs for use
 in font-lock-defaults.")
 
