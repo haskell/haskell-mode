@@ -9,11 +9,11 @@
 ;; Temporary Maintainer and Hacker: Graeme E Moss <gem@cs.york.ac.uk>
 ;; Keywords: extensions, minor mode, language mode, Haskell
 ;; Created: 1997-06-17
-;; Revision: $Revision: 1.1 $
+;; Revision: $Revision: 1.2 $
 ;; FTP archive: /ftp@ftp.dcs.gla.ac.uk:/pub/glasgow-fp/authors/Hans_Loidl/Elisp/haskell-doc.el
 ;; Status: Beta version
 
-;; $Id: haskell-doc.el,v 1.1 2001/07/19 16:17:36 rrt Exp $
+;; $Id: haskell-doc.el,v 1.2 2002/04/23 14:45:10 simonmar Exp $
 
 ;;; Copyright:
 ;;  ==========
@@ -41,16 +41,17 @@
 ;; checking the word under the cursor and matching it against a list of
 ;; prelude, library, local and global functions.
 
-;; The preferred usage of this package is in combination with `hugs-mode'.
-;; In that case `haskell-doc' checks an internal variable updated by `imenu'
-;; to access the types of all local functions. In `haskell-mode' this is not 
-;; possible. However, types of prelude functions are still shown.
+;; The preferred usage of this package is in combination with
+;; `haskell-hugs-mode'.
+;; In that case `haskell-doc-mode' checks an internal variable updated by
+;; `imenu' to access the types of all local functions. In `haskell-mode' this
+;; is not possible. However, types of prelude functions are still shown.
 
 ;; To show types of global functions, i.e. functions defined in a module 
 ;; imported by the current module, call the function 
 ;; `turn-on-haskell-doc-global-types'. This automatically loads all modules
 ;; and builds `imenu' tables to get the types of all functions (again this 
-;; currently requires `hugs-mode'). 
+;; currently requires `haskell-hugs-mode'). 
 ;; Note: The modules are loaded recursively, so you might pull in
 ;;       many modules by just turning on global function support.
 ;; This features is currently not very well supported.
@@ -106,7 +107,7 @@
 ;;   M-x turn-on-haskell-doc-mode
 
 ;; These are the names of the functions that can be called directly by the
-;; user (with keybindings in `hugs-mode' and `haskell-mode'):
+;; user (with keybindings in `haskell-hugs-mode' and `haskell-mode'):
 ;;  `haskell-doc-mode' ... toggle haskell-doc-mode; with prefix turn it on
 ;;                        unconditionally if the prefix is greater 0 otherwise
 ;;                        turn it off
@@ -143,6 +144,10 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.2  2002/04/23 14:45:10  simonmar
+;;  Tweaks to the doc strings and support for customization, from
+;;  Ville Skyttä <ville.skytta@xemacs.org>.
+;;
 ;;  Revision 1.1  2001/07/19 16:17:36  rrt
 ;;  Add the current version of the Moss/Thorn/Marlow Emacs mode, along with its
 ;;  web pages and sample files. This is now the preferred mode, and the
@@ -218,14 +223,14 @@
 ;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.1 $"
- "Version of `haskell-doc' as RCS Revision.")
+(defconst haskell-doc-version "$Revision: 1.2 $"
+ "Version of `haskell-doc-mode' as RCS Revision.")
 
 (defconst haskell-doc-maintainer "Hans-Wolfgang Loidl <hwloidl@dcs.glasgow.ac.uk>"
-  "Maintainer of `haskell-doc'.")
+  "Maintainer of `haskell-doc-mode'.")
 
 (defconst haskell-doc-ftp-site "/ftp@ftp.dcs.gla.ac.uk:/pub/glasgow-fp/authors/Hans_Loidl/Elisp/"
-  "Main FTP site with latest version of `haskell-doc' and sample files.")
+  "Main FTP site with latest version of `haskell-doc-mode' and sample files.")
 
 ;@node Mode Variable, Variables, Maintenance stuff, Constants and Variables
 ;@subsection Mode Variable
@@ -246,7 +251,7 @@ to use for type lookup.
 
 If the identifier near point is local \(i.e. defined in this module\) check
 the `imenu' list of functions for the type. This obviously requires that
-your language mode uses `imenu' \(`hugs-mode' 0.6 for example\).
+your language mode uses `imenu' \(`haskell-hugs-mode' 0.6 for example\).
 
 If the identifier near point is global \(i.e. defined in an imported module\) 
 and the variable `haskell-doc-show-global-types' is non-nil show the type of its 
@@ -265,7 +270,7 @@ This variable is buffer-local.")
 (make-variable-buffer-local 'haskell-doc-mode)
 
 (defvar haskell-doc-mode-hook nil
- "Hook invoked when entering haskell-doc-mode.")
+ "Hook invoked when entering `haskell-doc-mode'.")
 
 (defvar haskell-doc-index nil
  "Variable holding an alist matching file names to fct-type alists.
@@ -330,7 +335,7 @@ returns another string is acceptable.")
 
 This is not done for all commands since some print their own
 messages in the echo area, and these functions would instantly overwrite
-them.  But self-insert-command as well as most motion commands are good
+them.  But `self-insert-command' as well as most motion commands are good
 candidates.
 
 It is probably best to manipulate this data structure with the commands
@@ -1001,7 +1006,7 @@ It is probably best to manipulate this data structure with the commands
 ;@cindex haskell-doc-install-keymap
 
 (defun haskell-doc-install-keymap ()
-  "Install a menu for `haskell-doc' as a submenu of `Hugs'."
+  "Install a menu for `haskell-doc-mode' as a submenu of \"Hugs\"."
  (interactive)
  ; define a keymap `haskell-doc-keymap' for the derive menu
  (if nil ; (keymapp haskell-doc-keymap)
@@ -1031,17 +1036,17 @@ It is probably best to manipulate this data structure with the commands
 
  ; add the menu to the hugs menu as last entry
  (cond 
-  ((eq major-mode 'hugs-mode)
-   (let ((hugsmap (lookup-key hugs-mode-map [menu-bar Hugs])))
+  ((eq major-mode 'haskell-hugs-mode)
+   (let ((hugsmap (lookup-key haskell-hugs-mode-map [menu-bar Hugs])))
 	 (if (and (not haskell-doc-xemacs-p) ; XEmacs has problems here
 		  (not (lookup-key hugsmap [haskell-doc])))
 	     (define-key-after hugsmap [haskell-doc] (cons "Haskell-doc" haskell-doc-keymap)
 	       [Haskell-doc mode]))
      ; add shortcuts for these commands
-     (define-key hugs-mode-map "\C-c\e/" 'haskell-doc-check-active) ; for testing 
-     (define-key hugs-mode-map "\C-c\C-o" 'haskell-doc-mode) 
+     (define-key haskell-hugs-mode-map "\C-c\e/" 'haskell-doc-check-active) ; for testing 
+     (define-key haskell-hugs-mode-map "\C-c\C-o" 'haskell-doc-mode) 
      (if (not haskell-doc-xemacs-p) 
-	 (define-key hugs-mode-map [C-S-M-mouse-3] 'haskell-doc-ask-mouse-for-type))))
+	 (define-key haskell-hugs-mode-map [C-S-M-mouse-3] 'haskell-doc-ask-mouse-for-type))))
   ((eq major-mode 'haskell-mode)
    ; add shortcuts for these commands
    (local-set-key "\C-c\e/" 'haskell-doc-check-active) ; for testing 
@@ -1057,7 +1062,8 @@ It is probably best to manipulate this data structure with the commands
 
 ;;;###autoload
 (defun haskell-doc-mode (&optional prefix)
-  "Enter haskell-doc-mode for showing fct types in the echo area (see variable docstring)."
+  "Enter `haskell-doc-mode' for showing fct types in the echo area.
+See variable docstring."
   (interactive "P")
 
   ;; Make sure it's on the post-command-idle-hook if defined, otherwise put
@@ -1177,7 +1183,7 @@ It is probably best to manipulate this data structure with the commands
 
 ;;;###autoload
 (defun turn-on-haskell-doc-mode ()
-  "Unequivocally turn on haskell-doc-mode (see variable documentation)."
+  "Unequivocally turn on `haskell-doc-mode' (see variable documentation)."
   (interactive)
   (haskell-doc-mode 1))
 
@@ -1185,7 +1191,7 @@ It is probably best to manipulate this data structure with the commands
 
 ;;;###autoload
 (defun turn-off-haskell-doc-mode ()
-  "Unequivocally turn off haskell-doc-mode (see variable documentation)."
+  "Unequivocally turn off `haskell-doc-mode' (see variable documentation)."
   (interactive)
   (haskell-doc-mode 0))
 
@@ -1273,7 +1279,9 @@ function. Only the user interface is different."
 (defun haskell-doc-show-type (&optional symbol)
   "Show the type of the function near point.
 For the function under point, show the type in the echo area.
-This information is extracted from the `haskell-doc-prelude-types' alist of prelude functions and their types, or from the local functions in the current buffer."
+This information is extracted from the `haskell-doc-prelude-types' alist
+of prelude functions and their types, or from the local functions in the
+current buffer."
   (interactive)
   (let* ((sym (or symbol (haskell-doc-get-current-word))) 
 	; (haskell-doc-current-symbol))); (haskell-doc-fnsym-in-current-sexp)))
@@ -1492,7 +1500,7 @@ ToDo: Also eliminate leading and trainling whitespace."
 ;@cindex haskell-doc-get-imenu-info
 (defun haskell-doc-get-imenu-info (obj kind)
   "Returns a string describing OBJ of KIND \(Variables, Types, Data\)."
-  (cond ((or (eq major-mode 'hugs-mode)
+  (cond ((or (eq major-mode 'haskell-hugs-mode)
              ;; GEM: Haskell Mode does not work with Haskell Doc
              ;;      under XEmacs 20.x
              (and (eq major-mode 'haskell-mode)
@@ -1713,7 +1721,7 @@ Return distance in buffer moved, or nil."
 ;@cindex haskell-doc-submit-bug-report
 ; send a bug report
 (defun haskell-doc-submit-bug-report ()
-  "Send email to the maintainer of `haskell-doc'."
+  "Send email to the maintainer of `haskell-doc-mode'."
   (interactive)
   ;; In case we can't find reporter...
   (condition-case err
@@ -1725,7 +1733,7 @@ Return distance in buffer moved, or nil."
 	 (concat "haskell-doc.el " haskell-doc-version)       ; package
 	 haskell-doc-varlist                                  ; varlist
          nil nil                                        ; pre-/post-hooks
-        "I have detected the following strange behaviour/bug in `haskell-doc':\n")))
+        "I have detected the following strange behaviour/bug in `haskell-doc-mode':\n")))
     ;; ...fail gracefully.
     (error
      (beep)
@@ -1737,7 +1745,7 @@ Return distance in buffer moved, or nil."
 ;@cindex haskell-doc-visit-home
 
 (defun haskell-doc-visit-home ()
- "Jump to the main FTP site for `haskell-doc'."
+ "Jump to the main FTP site for `haskell-doc-mode'."
  (interactive)
  (if haskell-doc-xemacs-p
     (require 'efs)

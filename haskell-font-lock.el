@@ -338,7 +338,7 @@ that should be commented under LaTeX-style literate scripts."
 	      (concat (haskell-enum-from-to ?\300 ?\326) (haskell-enum-from-to ?\330 ?\337)
 		      (haskell-enum-from-to ?\340 ?\366) (haskell-enum-from-to ?\370 ?\377))))
   "Syntax required for font locking.  Given as a list of pairs for use
-in font-lock-defaults.")
+in `font-lock-defaults'.")
 
 (defun haskell-font-lock-defaults-create (bird-literate latex-literate)
   "Makes local variable `font-lock-defaults' suitable for Haskell font
@@ -405,32 +405,32 @@ LATEX-LITERATE and LaTeX-style literate Haskell scripts."
 Changes the current buffer's `font-lock-defaults', and adds the
 following faces:
 
-   haskell-keyword-face      for reserved keywords and syntax,
-   haskell-constructor-face  for data- and type-constructors, class names,
-                             and module names,
-   haskell-string-char-face  for strings and characters,
-   haskell-operator-face     for symbolic and alphanumeric operators,
-   haskell-comment-face      for comments, and
-   haskell-default-face      for ordinary code.
+   `haskell-keyword-face'      for reserved keywords and syntax,
+   `haskell-constructor-face'  for data- and type-constructors, class names,
+                               and module names,
+   `haskell-string-char-face'  for strings and characters,
+   `haskell-operator-face'     for symbolic and alphanumeric operators,
+   `haskell-comment-face'      for comments, and
+   `haskell-default-face'      for ordinary code.
 
 The faces are initialised to the following font lock defaults:
 
-   haskell-keyword-face      font-lock-keyword-face
-   haskell-constructor-face  font-lock-type-face
-   haskell-string-char-face  font-lock-string-face
-   haskell-operator-face     font-lock-function-name-face
-   haskell-comment-face      font-lock-comment-face
-   haskell-default-face      <default face>
+   `haskell-keyword-face'      `font-lock-keyword-face'
+   `haskell-constructor-face'  `font-lock-type-face'
+   `haskell-string-char-face'  `font-lock-string-face'
+   `haskell-operator-face'     `font-lock-function-name-face'
+   `haskell-comment-face'      `font-lock-comment-face'
+   `haskell-default-face'      <default face>
 
 Two levels of fontification are defined: level one (the default)
 and level two (more colour).  The former does not colour operators.
-Use the variable `font-lock-maximum-decoration' to chose
+Use the variable `font-lock-maximum-decoration' to choose
 non-default levels of fontification.  For example, adding this to
 .emacs:
 
   (setq font-lock-maximum-decoration '((haskell-mode . 2) (t . 0)))
 
-uses level two fontification for haskell-mode and default level for
+uses level two fontification for `haskell-mode' and default level for
 all other modes.  See documentation on this variable for further
 details.
 

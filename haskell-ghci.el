@@ -69,6 +69,11 @@
 ;;; All functions/variables start with `turn-{on,off}-haskell-ghci' or
 ;;; `haskell-ghci-'.
 
+(defgroup haskell-ghci nil
+  "Major mode for interacting with an inferior GHCi session."
+  :group 'haskell
+  :prefix "haskell-ghci-")
+
 (defun turn-on-haskell-ghci ()
   "Turn on Haskell interaction mode with a GHCi interpreter running in an
 another Emacs buffer named *ghci*.
@@ -132,11 +137,15 @@ The commands available from within a Haskell script are:
 (defvar haskell-ghci-last-loaded-file nil
   "The last file loaded into the GHCi process.")
 
-(defvar haskell-ghci-program-name "ghci"
-  "*The name of the GHCi interpreter program.")
+(defcustom haskell-ghci-program-name "ghci"
+  "*The name of the GHCi interpreter program."
+  :type 'string
+  :group 'haskell-ghci)
 
-(defvar haskell-ghci-program-args nil
-  "*A list of string args to pass when starting the GHCi interpreter.")
+(defcustom haskell-ghci-program-args nil
+  "*A list of string args to pass when starting the GHCi interpreter."
+  :type '(repeat string)
+  :group 'haskell-ghci)
 
 (defvar haskell-ghci-load-end nil
   "Position of the end of the last load command.")
@@ -195,7 +204,7 @@ Prompt for a list of args if called with an argument."
     (accept-process-output haskell-ghci-process)))
 
 (defun haskell-ghci-send (&rest string)
-  "Send haskell-ghci-process the arguments (one or more strings).
+  "Send `haskell-ghci-process' the arguments (one or more strings).
 A newline is sent after the strings and they are inserted into the
 current buffer after the last output."
   (haskell-ghci-wait-for-output)        ; wait for prompt

@@ -68,9 +68,9 @@
 
 ;; Version.
 (defconst haskell-simple-indent-version "1.1"
-  "haskell-simple-indent version number.")
+  "`haskell-simple-indent' version number.")
 (defun haskell-simple-indent-version ()
-  "Echo the current version of haskell-simple-indent in the minibuffer."
+  "Echo the current version of `haskell-simple-indent' in the minibuffer."
   (interactive)
   (message "Using haskell-simple-indent version %s"
            haskell-simple-indent-version))
