@@ -1,11 +1,10 @@
-;; haskell-ghci.el --- A GHCi interaction mode
+;;; haskell-ghci.el --- A GHCi interaction mode
 
-;; Copyright (C) 1999 Guy Lapalme, 2001 Chris Webb.
+;; Copyright (C) 2004, 2005  Free Software Foundation, Inc.
+;; Copyright (C) 2001  Chris Webb
+;; Copyright (C) 1998, 1999  Guy Lapalme
 
-;; Authors: 1998-1999 Guy Lapalme <lapalme@iro.umontreal.ca>
-;;          2001 Chris Webb <chris@arachsys.com>
 ;; Keywords: inferior mode, GHCi interaction mode, Haskell
-;; Version: 1.2
 
 ;;; This file is not part of GNU Emacs.
 
@@ -60,14 +59,16 @@
 ;;
 ;; Arguments can be sent to the GHCi interpreter when it is started by
 ;; setting haskell-ghci-program-args (empty by default) to a list of
-;; string args to pass it. This value can be set interactively by
+;; string args to pass it.  This value can be set interactively by
 ;; calling C-c C-s with an argument (i.e. C-u C-c C-s).
 ;;
 ;; `haskell-ghci-hook' is invoked in the *ghci* buffer once GHCi is
 ;; started.
 ;;
-;;; All functions/variables start with `turn-{on,off}-haskell-ghci' or
-;;; `haskell-ghci-'.
+;; All functions/variables start with `turn-{on,off}-haskell-ghci' or
+;; `haskell-ghci-'.
+
+;;; Code:
 
 (defgroup haskell-ghci nil
   "Major mode for interacting with an inferior GHCi session."
@@ -134,9 +135,6 @@ The commands available from within a Haskell script are:
 
 (defvar haskell-ghci-process-buffer nil
   "*Buffer used for communication with GHCi subprocess for current buffer.")
-
-(defvar haskell-ghci-last-loaded-file nil
-  "The last file loaded into the GHCi process.")
 
 (defcustom haskell-ghci-program-name "ghci"
   "*The name of the GHCi interpreter program."
@@ -225,40 +223,37 @@ loaded: as a new file (\":load \") or as a reload (\":reload \").
 If the second argument CD is non-nil, change directory in the GHCi
 process to the current buffer's directory before loading the file.
 
-If the variable \"haskell-ghci-command\" is set then its value will be
+If the variable `haskell-ghci-command' is set then its value will be
 sent to the GHCi process after the load command. This can be used for a
 top-level expression to evaluate."
-  (let (file)
-    (hack-local-variables)              ; in case they've changed
-    (save-buffer)
-    (if (string-equal load-command ":load ")
-        (progn
-          (setq file (buffer-file-name))
-          (setq haskell-ghci-last-loaded-file file))
-      (setq file ""))
-    (let ((dir (expand-file-name default-directory))
-          (cmd (and (boundp 'haskell-ghci-command)
-                    haskell-ghci-command
-                    (if (stringp haskell-ghci-command)
-                        haskell-ghci-command
-                      (symbol-name haskell-ghci-command)))))
-      (if (and haskell-ghci-process-buffer
-               (eq (process-status haskell-ghci-process) 'run))
-          ;; Ensure the GHCi buffer is selected.
-	  (set-buffer haskell-ghci-process-buffer) 
-        ;; Start Haskell-GHCi process.
-        (haskell-ghci-start-process nil))
+  (hack-local-variables)		; in case they've changed
+  (save-buffer)
+  (let ((file (if (string-equal load-command ":load ")
+		  (concat "\"" buffer-file-name "\"")
+		""))
+	(dir (expand-file-name default-directory))
+	(cmd (and (boundp 'haskell-ghci-command)
+		  haskell-ghci-command
+		  (if (stringp haskell-ghci-command)
+		      haskell-ghci-command
+		    (symbol-name haskell-ghci-command)))))
+    (if (and haskell-ghci-process-buffer
+	     (eq (process-status haskell-ghci-process) 'run))
+	;; Ensure the GHCi buffer is selected.
+	(set-buffer haskell-ghci-process-buffer) 
+      ;; Start Haskell-GHCi process.
+      (haskell-ghci-start-process nil))
 
-      (if cd (haskell-ghci-send (concat ":cd " dir)))
-      ;; Wait until output arrives and go to the last input.
-      (haskell-ghci-wait-for-output)
-      (haskell-ghci-send load-command file)
-      ;; Error message search starts from last load command.
-      (setq haskell-ghci-load-end (marker-position comint-last-input-end))
-      (setq haskell-ghci-error-pos haskell-ghci-load-end)
-      (if cmd (haskell-ghci-send cmd))
-      ;; Wait until output arrives and go to the last input.
-      (haskell-ghci-wait-for-output))))
+    (if cd (haskell-ghci-send (concat ":cd " dir)))
+    ;; Wait until output arrives and go to the last input.
+    (haskell-ghci-wait-for-output)
+    (haskell-ghci-send load-command file)
+    ;; Error message search starts from last load command.
+    (setq haskell-ghci-load-end (marker-position comint-last-input-end))
+    (setq haskell-ghci-error-pos haskell-ghci-load-end)
+    (if cmd (haskell-ghci-send cmd))
+    ;; Wait until output arrives and go to the last input.
+    (haskell-ghci-wait-for-output)))
 
 (defun haskell-ghci-load-file (cd)
   "Save a ghci buffer file and load its file.
@@ -343,5 +338,5 @@ error line otherwise show the *ghci* buffer."
       (haskell-ghci-start-process nil))
   (pop-to-buffer  haskell-ghci-process-buffer))
 
-
+(provide 'haskell-ghci)			
 ;;; haskell-ghci.el ends here
