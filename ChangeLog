@@ -1,3 +1,8 @@
+2004-10-20  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-indent.el (haskell-indent-indentation-info): Only use
+	the new `in' indentation rule if the `let' is on the left of the decl.
+
 2004-10-19  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-indent.el (haskell-indent-find-let): New function.
