@@ -6,9 +6,8 @@
               (or (file-name-directory load-file-name) (car load-path)))
 
 
-;;;### (autoloads (haskell-doc-show-type haskell-doc-current-info
-;;;;;;  turn-off-haskell-doc-mode turn-on-haskell-doc-mode haskell-doc-mode)
-;;;;;;  "haskell-doc" "haskell-doc.el" (16749 45058))
+;;;### (autoloads (haskell-doc-show-type turn-on-haskell-doc-mode
+;;;;;;  haskell-doc-mode) "haskell-doc" "haskell-doc.el" (16750 64867))
 ;;; Generated autoloads from haskell-doc.el
 
 (autoload (quote haskell-doc-mode) "haskell-doc" "\
@@ -22,17 +21,6 @@ Unequivocally turn on `haskell-doc-mode' (see variable documentation).
 
 \(fn)" t nil)
 
-(autoload (quote turn-off-haskell-doc-mode) "haskell-doc" "\
-Unequivocally turn off `haskell-doc-mode' (see variable documentation).
-
-\(fn)" t nil)
-
-(autoload (quote haskell-doc-current-info) "haskell-doc" "\
-Return the info about symbol at point.
-Meant for `eldoc-print-current-symbol-info-function'.
-
-\(fn)" nil nil)
-
 (autoload (quote haskell-doc-show-type) "haskell-doc" "\
 Show the type of the function near point.
 For the function under point, show the type in the echo area.
@@ -45,7 +33,7 @@ current buffer.
 ;;;***
 
 ;;;### (autoloads (literate-haskell-mode haskell-mode) "haskell-mode"
-;;;;;;  "haskell-mode.el" (16750 63485))
+;;;;;;  "haskell-mode.el" (16756 5717))
 ;;; Generated autoloads from haskell-mode.el
 
 (autoload (quote haskell-mode) "haskell-mode" "\
@@ -106,7 +94,7 @@ As `haskell-mode' but for literate scripts.
 
 ;;;### (autoloads nil nil ("haskell-decl-scan.el" "haskell-font-lock.el"
 ;;;;;;  "haskell-ghci.el" "haskell-hugs.el" "haskell-indent.el" "haskell-simple-indent.el")
-;;;;;;  (16750 64679 383330))
+;;;;;;  (16756 10020 280142))
 
 ;;;***
 
