@@ -1017,7 +1017,14 @@ These are then used by `haskell-indent-cycle'."
 				      (point) indent-info))))
      ;; Closing the declaration part of a `let'.
      ((and (looking-at "in\\>")
-	   (setq open (save-excursion (haskell-indent-find-let start))))
+	   (setq open (save-excursion (haskell-indent-find-let start)))
+	   ;; For a "dangling let at EOL" we should use a different indentation
+	   ;; scheme.
+	   (save-excursion
+	     (goto-char open)
+	     (let ((letcol (current-column)))
+	       (forward-word 1) (forward-comment 1)
+	       (>= (current-column) letcol))))
       (haskell-indent-push-pos open))
      ;; open structure? ie  ( { [
      ((setq open (haskell-indent-open-structure start end))
