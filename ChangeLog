@@ -1,3 +1,54 @@
+2004-10-14  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-doc.el (turn-off-haskell-doc-mode)
+	(haskell-doc-current-info): Don't autoload.
+
+	* haskell-decl-scan.el (haskell-ds-match-string):
+	Use match-string-no-properties if available.
+	(haskell-ds-syntax-table): Use haskell-mode-syntax-table.
+	(haskell-ds-imenu-label-cmp): Use car-less-than-car if available.
+	(haskell-ds-imenu): Remove obsolete incorrect code.
+
+	* haskell-mode.el: Set things up so that mode-hook functions are not
+	necessary, and generic functions can be used instead, like
+	global-font-lock-mode.
+	(haskell-enum-from-to): Remove.
+	(turn-on-haskell-font-lock): Make obsolete.
+	(haskell-running-xemacs): Remove.
+	(haskell-mode-syntax-table): Fiddle with non-ascii chars.
+	Fix up comment syntax in XEmacs.
+	(haskell-vars): Improve comment-start-skip.
+	Add comment-end-skip.  Setup imenu, eldoc, and font-lock.
+	Tweak handling of tabs to be on the safe side.
+	(haskell-mode-hooks): Declare and mention some useful ideas.
+	(literate-haskell-mode): Simplify.
+	(haskell-comment-indent): Remove.  The default works as well.
+
+	* haskell-font-lock.el: Remove level 1 fontification.
+	(haskell-font-lock-keywords-1, haskell-font-lock-keywords-2)
+	(bird-literate-haskell-font-lock-keywords-1)
+	(bird-literate-haskell-font-lock-keywords-2)
+	(latex-literate-haskell-font-lock-keywords-1)
+	(latex-literate-haskell-font-lock-keywords-2): Remove.
+	(bird-literate-haskell-font-lock-keywords)
+	(latex-literate-haskell-font-lock-keywords): Rename.
+	(haskell-font-lock-keywords-create): Remove `level' arg.
+	(haskell-fl-syntax): Remove.  Assume the major modes sets it right.
+	(haskell-font-lock-choose-keywords)
+	(haskell-font-lock-choose-syntactic-keywords): New funs.
+	(haskell-font-lock-defaults-create): Use them.
+	(turn-off-haskell-font-lock, turn-on-haskell-font-lock): Simplify.
+
+	* haskell-hugs.el (haskell-hugs-mode): Use define-derived-mode.
+	(run-hugs): New alias.
+	(haskell-hugs-wait-for-output): Don't loop if the process is dead.
+
+	* haskell-font-lock.el (haskell-font-lock-compose-symbol): New fun.
+	(haskell-font-lock-symbols-keywords): Use it.
+	(haskell-string-char-face): Remove.
+	(haskell-font-lock-keywords-create): Hardcode font-lock-string-face.
+	(haskell-fl-syntax): Fix typos.  Keep " as a string delimiter.
+
 2004-10-13  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-doc.el (haskell-doc): New group.
