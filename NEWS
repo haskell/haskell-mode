@@ -1,0 +1,20 @@
+Changes since 1.45:
+
+* keybindings C-c <char> have been replaced by C-c C-<char> so as not
+  to collide with minor modes.
+
+* The following modules are now automatically activated without having to
+  add anything to haskell-mode-hook:
+  haskell-font-lock (just turn on global-font-lock-mode).
+  haskell-decl-scan (just bind `imenu' to some key).
+
+* In recent Emacsen, haskell-doc hooks into eldoc-mode.
+
+* haskell-hugs and haskell-ghci are superceded by inf-haskell.
+
+* Indentation rules have been improved when using layout inside parens/braces.
+
+* Symbols like -> and \ can be displayed as actual arrows and lambdas.
+  See haskell-font-lock-symbols.
+
+* New maintainer <monnier@gnu.org>.
