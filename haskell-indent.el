@@ -174,9 +174,9 @@ of a line.")
 followed by NAME (if present). Makes sure that the same indentation info
 is not pushed twice in a row. Uses free var `indent-info'."
   (let ((tmp (cons col name)))
-       (if (and indent-info (equal tmp (car indent-info)))
-           indent-info
-         (push tmp  indent-info))))
+    (if (and indent-info (equal tmp (car indent-info)))
+	indent-info
+      (push tmp indent-info))))
 
 (defun haskell-indent-push-pos (pos &optional name)
   "Pushes indentation information for the column corresponding to POS
@@ -389,10 +389,7 @@ preceding non-empty line."
   "If any structure (list or tuple) is not closed, between START and END,
 returns the location of the opening symbol, nil otherwise."
   (save-excursion
-    (let ((pps (parse-partial-sexp start end)))
-      (if (> (nth 0 pps) 0)
-          (nth 1 pps))
-      )))
+    (nth 1 (parse-partial-sexp start end))))
 
 (defun haskell-indent-in-string (start end)
   "If a string is not closed , between START and END, returns the
@@ -441,23 +438,24 @@ the location of the start of the comment, nil otherwise."
    ((looking-at "\\(\\([a-zA-Z]\\sw*\\)\\|_\\)[ \t\n]*") 'ident)
    ((looking-at "\\(|[^|]\\)[ \t\n]*") 'guard)
    ((looking-at "\\(=[^>=]\\|::\\|->\\|<-\\)[ \t\n]*") 'rhs)
-   ( t 'other)))
+   (t 'other)))
 
 (defvar haskell-indent-current-line-first-ident ""
   "Global variable that keeps track of the first ident of the line to indent.")
 
 
 (defun haskell-indent-contour-line (start end)
-  "Generates contour information between START and END points."
+  "Generate contour information between START and END points."
   (if (< start end)
       (save-excursion
-        (let ((cur-col 1024)            ; maximum column number
+	(goto-char end)
+	(haskell-indent-skip-blanks-and-newlines-backward start)
+        (let ((cur-col (current-column))            ; maximum column number
               (fl 0)     ; number of lines that forward-line could not advance
               contour)
-          (goto-char end)
-          (haskell-indent-skip-blanks-and-newlines-backward start)
           (while (and (> cur-col 0) (= fl 0) (>= (point) start))
             (haskell-indent-back-to-indentation)
+	    (if (< (point) start) (goto-char start))
             (and (not (member (haskell-indent-type-at-point)
                               '(empty comment))) ; skip empty and comment lines
                  (< (current-column) cur-col) ; less indented column found
@@ -942,89 +940,108 @@ and find indentation info for each part."
                                      curr-line-type indent-info))))
   indent-info)
 
+
+(defun haskell-indent-layout-indent-info (start contour-line)
+  (let ((curr-line-type (haskell-indent-type-at-point))
+	line-start line-end end-visible)
+    (save-excursion
+      (if (eq curr-line-type 'ident)
+	  (let				; guess the type of line
+	      ((sep
+		(haskell-indent-separate-valdef
+		 (point) (haskell-indent-get-end-of-line))))
+	    ;; if the first ident is where or the start of a def
+	    ;; keep it in a global variable
+	    (if (string-match "where[ \t]*" (nth 1 sep))
+		(setq haskell-indent-current-line-first-ident (nth 1 sep))
+	      (if (nth 5 sep)		; is there a rhs-sign
+		  (if (= (char-after (nth 5 sep)) ?\:) ;is it a typdef
+		      (setq haskell-indent-current-line-first-ident "::")
+		    (setq haskell-indent-current-line-first-ident
+			  (nth 1 sep)))
+		(setq haskell-indent-current-line-first-ident "")))))
+      (while contour-line		; explore the contour points
+	(setq line-start (pop contour-line))
+	(goto-char line-start)
+	(setq line-end (haskell-indent-get-end-of-line))
+	(setq end-visible		; visible until the column of the
+	      (if contour-line		; next contour point
+		  (save-excursion
+		    (move-to-column
+		     (haskell-indent-point-to-col (car contour-line)))
+		    (point))
+		line-end))
+	(if (and (not (haskell-indent-open-structure start line-start))
+		 (not (haskell-indent-in-comment start line-start)))
+	    (setq indent-info
+		  (haskell-indent-line-indentation line-start line-end
+						   end-visible curr-line-type
+						   indent-info)))
+	))))
+
 (defun haskell-indent-indentation-info ()
-  "Returns a list of possible indentations for the current line that 
-are then used by `haskell-indent-cycle'."
+  "Return a list of possible indentations for the current line.
+These are then used by `haskell-indent-cycle'."
   (let ((start (haskell-indent-start-of-def))
         (end (progn (haskell-indent-back-to-indentation) (point)))
         indent-info open follow contour-line)
-    ;; in string?
-    (if (setq open (haskell-indent-in-string start end))
-        (haskell-indent-push-pos-offset open
-                                 (if (looking-at "\\\\") 0 1))
-      ;; open structure? ie  ( { [  
-      (if (setq open (haskell-indent-open-structure start end))
-          ;; there is an open structure to complete
-          (if (looking-at "\\s)\\|\\s.\\|$ ")
-              (haskell-indent-push-pos open); align a ) or punct with (
-            (progn      
-              (setq follow (save-excursion
-                             (goto-char (1+ open))
-                             (haskell-indent-skip-blanks-and-newlines-forward end)
-                             (point)))
-              (if (= follow end)
-                  (haskell-indent-push-pos-offset open 1)
-                (haskell-indent-push-pos follow))))
-        ;; in comment ?
-        (if (haskell-indent-in-comment start end)
-            (save-excursion
-              (end-of-line 0)  ; put point at the end of preceding line before
-              (setq indent-info         ; computing comment indentation
-                    (haskell-indent-comment (haskell-indent-get-beg-of-line)
-                                            (point) indent-info)))
-          ;; full indentation
-          (setq contour-line (haskell-indent-contour-line start end))
-          (if contour-line
-              (let* ((curr-line-type (haskell-indent-type-at-point))
-                     line-start line-end end-visible)
-                (save-excursion
-                  (if (eq curr-line-type 'ident)
-                      (let		; guess the type of line
-			  ((sep
-			    (haskell-indent-separate-valdef (point)
-							    (haskell-indent-get-end-of-line))))
-                        ;; if the first ident is where or the start of a def
-                        ;; keep it in a global variable
-                        (if (string-match "where[ \t]*" (nth 1 sep))
-                            (setq haskell-indent-current-line-first-ident (nth 1 sep))
-                          (if (nth 5 sep) ; is there a rhs-sign
-                              (if (= (char-after (nth 5 sep)) ?\:) ;is it a typdef
-                                  (setq haskell-indent-current-line-first-ident "::")
-                                (setq haskell-indent-current-line-first-ident
-                                      (nth 1 sep)))
-                            (setq haskell-indent-current-line-first-ident "")))))
-                  (while contour-line   ; explore the contour points
-                    (setq line-start (pop contour-line))
-                    (goto-char line-start)
-                    (setq line-end (haskell-indent-get-end-of-line))
-                    (setq end-visible   ; visible until the column of the
-                          (if contour-line ; next contour point 
-                              (save-excursion 
-                                (move-to-column
-                                 (haskell-indent-point-to-col (car contour-line)))
-                                (point))
-                            line-end))
-                    (if (and (not (haskell-indent-open-structure start line-start))
-                             (not (haskell-indent-in-comment start line-start)))
-                        (setq indent-info
-                              (haskell-indent-line-indentation line-start line-end
-                                                        end-visible curr-line-type
-                                                        indent-info)))
-                    )))
-            ;; simple contour just one indentation at start
-            (if (and (eq haskell-literate 'bird)
-                     (eq (haskell-indent-point-to-col start) 1))
-                ;; for a Bird style literate script put default offset
-                ;; in the case of no indentation
-                (haskell-indent-push-col
-                 (1+ haskell-indent-literate-Bird-default-offset))
-              (haskell-indent-push-pos start)))))
-      indent-info
-      )))
+    (cond
+     ;; in string?
+     ((setq open (haskell-indent-in-string start end))
+      (haskell-indent-push-pos-offset open
+				      (if (looking-at "\\\\") 0 1)))
+     ;; in comment ?
+     ((haskell-indent-in-comment start end)
+      (save-excursion
+	(end-of-line 0)	     ; put point at the end of preceding line before
+	(setq indent-info    ; computing comment indentation
+	      (haskell-indent-comment (haskell-indent-get-beg-of-line)
+				      (point) indent-info))))
+     ;; open structure? ie  ( { [
+     ((setq open (haskell-indent-open-structure start end))
+      ;; there is an open structure to complete
+      (if (looking-at "\\s)\\|\\s.\\|$ ")
+	  (haskell-indent-push-pos open) ; align a ) or punct with (
+	(progn
+	  (setq follow (save-excursion
+			 (goto-char (1+ open))
+			 (haskell-indent-skip-blanks-and-newlines-forward end)
+			 (point)))
+	  (if (= follow end)
+	      (haskell-indent-push-pos-offset open 1)
+	    (haskell-indent-push-pos follow))))
+      ;; There might still be layout within the open sructure.
+      (let ((basic-indent-info (car indent-info))
+	    (open-column (haskell-indent-point-to-col open))
+	    (contour-line (haskell-indent-contour-line (1+ open) end)))
+	(assert (null (cdr indent-info)))
+	(when contour-line
+	  (setq indent-info nil)
+	  (haskell-indent-layout-indent-info (1+ open) contour-line)
+	  ;; Fix up indent info.
+	  (let ((base-elem (assoc open-column indent-info)))
+	    (if base-elem
+		(progn (setcar base-elem (car basic-indent-info))
+		       (setcdr base-elem (cdr basic-indent-info)))
+	      (setq indent-info
+		    (append indent-info (list basic-indent-info))))))))
+     ;; full indentation
+     ((setq contour-line (haskell-indent-contour-line start end))
+      (haskell-indent-layout-indent-info start contour-line))
+     (t
+      ;; simple contour just one indentation at start
+      (if (and (eq haskell-literate 'bird)
+	       (eq (haskell-indent-point-to-col start) 1))
+	  ;; for a Bird style literate script put default offset
+	  ;; in the case of no indentation
+	  (haskell-indent-push-col
+	   (1+ haskell-indent-literate-Bird-default-offset))
+	(haskell-indent-push-pos start))))
+    indent-info))
 
 (defun haskell-indent-event-type (event)
-  "Checks if EVENT is the TAB or RET key before returning the value
-of `event-basic-type'. Needed for dealing with the case that Emacs
+  "Check if EVENT is the TAB or RET key before returning the value
+of `event-basic-type'.  Needed for dealing with the case that Emacs
 is not in a windowing environment."
   (cond ((eq event ?\t) 'tab)
         ((eq event ?\r) 'return)
@@ -1391,7 +1408,7 @@ Invokes `haskell-indent-hook' if not nil."
       (modify-syntax-entry ?\n ">" table)
       )
     table)
-  "Syntax table in use in `hugs-mode'")
+  "Syntax table in use in `hugs-mode'.")
 
 (defvar hugs-mode-map (make-sparse-keymap)
   "Keymap used in `hugs-mode'.")
