@@ -9,11 +9,11 @@
 ;; Temporary Maintainer and Hacker: Graeme E Moss <gem@cs.york.ac.uk>
 ;; Keywords: extensions, minor mode, language mode, Haskell
 ;; Created: 1997-06-17
-;; Revision: $Revision: 1.2 $
+;; Revision: $Revision: 1.3 $
 ;; FTP archive: /ftp@ftp.dcs.gla.ac.uk:/pub/glasgow-fp/authors/Hans_Loidl/Elisp/haskell-doc.el
 ;; Status: Beta version
 
-;; $Id: haskell-doc.el,v 1.2 2002/04/23 14:45:10 simonmar Exp $
+;; $Id: haskell-doc.el,v 1.3 2002/04/30 09:34:37 rrt Exp $
 
 ;;; Copyright:
 ;;  ==========
@@ -128,7 +128,6 @@
 ;;   - Fix byte-compile problems in `haskell-doc-prelude-types' for getArgs etc 
 ;;   - Write a parser for .hi files and make haskell-doc independent from
 ;;     hugs-mode. Read library interfaces via this parser.
-;;   - Support both Haskell 1.4 and 1.2
 ;;   - Indicate kind of object with colours
 ;;   - Handle multi-line types
 ;;   - Encode i-am-fct info in the alist of ids and types.
@@ -144,6 +143,11 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.3  2002/04/30 09:34:37  rrt
+;;  Remove supporting Haskell 1.4 and 1.2 from the ToDo list. It's Far Too Late.
+;;
+;;  Add (require 'imenu). Thanks to N. Y. Kwok.
+;;
 ;;  Revision 1.2  2002/04/23 14:45:10  simonmar
 ;;  Tweaks to the doc strings and support for customization, from
 ;;  Ville Skyttä <ville.skytta@xemacs.org>.
@@ -223,7 +227,7 @@
 ;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.2 $"
+(defconst haskell-doc-version "$Revision: 1.3 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 (defconst haskell-doc-maintainer "Hans-Wolfgang Loidl <hwloidl@dcs.glasgow.ac.uk>"
@@ -997,6 +1001,9 @@ It is probably best to manipulate this data structure with the commands
 
 ;@node Menubar Support, Haskell Doc Mode, Install as minor mode, top
 ;@section Menubar Support
+
+; get imenu
+(require 'imenu)
 
 ; a dummy definition needed for xemacs (I know, it's horrible :-(
 (if (and (string-match "XEmacs" emacs-version)
