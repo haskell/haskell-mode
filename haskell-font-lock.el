@@ -105,7 +105,7 @@
 (require 'font-lock)
 
 ;; Version.
-(defconst haskell-font-lock-version "$Revision: 1.10 $"
+(defconst haskell-font-lock-version "$Revision: 1.11 $"
   "Version number of haskell-font-lock.")
 (defun haskell-font-lock-version ()
   "Echo the current version of haskell-font-lock in the minibuffer."
@@ -155,6 +155,7 @@ and `unicode'."
 ;; `font-lock-function-name-face' with a result that was not consistent with
 ;; other major modes, so I just exchanged with `haskell-definition-face'.
 (defvar haskell-operator-face 'font-lock-variable-name-face)
+(defvar haskell-default-face nil)
 (defvar haskell-literate-comment-face 'font-lock-doc-face
   "Face with which to fontify literate comments.
 Set to `default' to avoid fontification of them.")
