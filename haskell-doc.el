@@ -10,11 +10,11 @@
 ;; Temporary Maintainer and Hacker: Graeme E Moss <gem@cs.york.ac.uk>
 ;; Keywords: extensions, minor mode, language mode, Haskell
 ;; Created: 1997-06-17
-;; Revision: $Revision: 1.6 $
+;; Revision: $Revision: 1.7 $
 ;; FTP archive: /ftp@ftp.dcs.gla.ac.uk:/pub/glasgow-fp/authors/Hans_Loidl/Elisp/haskell-doc.el
 ;; Status: Beta version
 
-;; $Id: haskell-doc.el,v 1.6 2004/10/13 22:45:22 monnier Exp $
+;; $Id: haskell-doc.el,v 1.7 2004/10/14 22:27:47 monnier Exp $
 
 ;;; Copyright:
 ;;  ==========
@@ -144,6 +144,9 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.7  2004/10/14 22:27:47  monnier
+;;  (turn-off-haskell-doc-mode, haskell-doc-current-info): Don't autoload.
+;;
 ;;  Revision 1.6  2004/10/13 22:45:22  monnier
 ;;  (haskell-doc): New group.
 ;;  (haskell-doc-show-reserved, haskell-doc-show-prelude)
@@ -263,7 +266,7 @@
 ;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.6 $"
+(defconst haskell-doc-version "$Revision: 1.7 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 (defconst haskell-doc-maintainer
@@ -1209,7 +1212,6 @@ See variable docstring."
 
 ;@cindex  turn-off-haskell-doc-mode
 
-;;;###autoload
 (defun turn-off-haskell-doc-mode ()
   "Unequivocally turn off `haskell-doc-mode' (see variable documentation)."
   (interactive)
@@ -1261,7 +1263,6 @@ directly to ask for the type of a function."
 ;                (or nil ; (haskell-doc-print-var-docstring current-symbol)
 ;                    (haskell-doc-show-type current-fnsym)))))))
 
-;;;###autoload
 (defun haskell-doc-current-info ()
   "Return the info about symbol at point.
 Meant for `eldoc-print-current-symbol-info-function'."
