@@ -86,6 +86,7 @@ Maps the following commands in the haskell keymap:
   (local-set-key "\C-c\C-s" 'haskell-ghci-start-process)
   (local-set-key "\C-c\C-l" 'haskell-ghci-load-file)
   (local-set-key "\C-c\C-r" 'haskell-ghci-reload-file)
+  (local-set-key "\C-c\C-n" 'haskell-ghci-locate-next-error)
   (local-set-key "\C-c\C-b" 'haskell-ghci-show-ghci-buffer))
 
 (defun turn-off-haskell-ghci ()
@@ -148,6 +149,9 @@ The commands available from within a Haskell script are:
   :group 'haskell-ghci)
 
 (defvar haskell-ghci-load-end nil
+  "Position of the end of the last load command.")
+
+(defvar haskell-ghci-error-pos nil
   "Position of the end of the last load command.")
 
 (defvar haskell-ghci-send-end nil
@@ -251,6 +255,7 @@ top-level expression to evaluate."
       (haskell-ghci-send load-command file)
       ;; Error message search starts from last load command.
       (setq haskell-ghci-load-end (marker-position comint-last-input-end))
+      (setq haskell-ghci-error-pos haskell-ghci-load-end)
       (if cmd (haskell-ghci-send cmd))
       ;; Wait until output arrives and go to the last input.
       (haskell-ghci-wait-for-output))))
@@ -297,27 +302,38 @@ error line otherwise show the *ghci* buffer."
     ;; first error in the file whilst leaving the error visible in the
     ;; *ghci* buffer.
     (goto-char haskell-ghci-load-end)
-    (if (re-search-forward
-         "^\\([^:\n]+\\):\\([0-9]+\\):" nil t)
-        (let ((efile (buffer-substring (match-beginning 1)
-                                       (match-end 1)))
-              (eline (string-to-int (buffer-substring (match-beginning 2)
-                                                      (match-end 2)))))
+    (haskell-ghci-locate-next-error)))
 
-          (recenter 2)
-          (message "GHCi error on line %d of %s."
+
+(defun haskell-ghci-locate-next-error () 
+  "Go to the next error shown in the *ghci* buffer."
+  (interactive)
+  (if (buffer-live-p haskell-ghci-process-buffer)
+      (progn (pop-to-buffer haskell-ghci-process-buffer)
+	     (goto-char haskell-ghci-error-pos)
+	     (if (re-search-forward
+		  "^[^\/]*\\([^:\n]+\\):\\([0-9]+\\)" nil t)
+		 (let ((efile (buffer-substring (match-beginning 1)
+						(match-end 1)))
+		       (eline (string-to-int 
+			       (buffer-substring (match-beginning 2)
+						 (match-end 2)))))
+
+		   (recenter 2)
+		   (setq haskell-ghci-error-pos (point))
+		   (message "GHCi error on line %d of %s."
                    eline (file-name-nondirectory efile))
-          (if (file-exists-p efile)
-              (progn (find-file-other-window efile)
-                     (goto-line eline)
-                     (recenter))))
+		   (if (file-exists-p efile)
+		       (progn (find-file-other-window efile)
+			      (goto-line eline)
+			      (recenter))))
 
       ;; We got an error without a file and line number, so put the
       ;; point at end of the *ghci* buffer ready to deal with it.
-      (pop-to-buffer haskell-ghci-process-buffer)
-      (goto-char (point-max))
-      (recenter -2)
-      (message "GHCi error while loading."))))
+               (goto-char (point-max))
+               (recenter -2)
+	       (message "No more errors found.")))
+    (message "No *ghci* buffer found.")))     
 
 (defun haskell-ghci-show-ghci-buffer ()
   "Go to the *ghci* buffer."
