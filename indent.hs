@@ -11,19 +11,22 @@ bdigits n | n>1       = n `mod` 2 :
 --  Note: the least significant bit is the first element of the list
 bvalue :: [Int]->Int
 bvalue [] = error "bvalue of []"
-bvalue s  = bval 1 s
+bvalue s  = bval 1 s            -- FIXME
     where
       bval e [] = 0           -- FIXME: indentation below `where'.
-      bval e (b:bs) | b==0 || b==1 = b*e + bval (2*e) bs
+      bval e (b:bs) | b==0 || b=="dd of " = b*e + bval (2*e) bs
                     | otherwise    = error "illegal digit"
+                                     foo
+
+-- FIXME: tab on the line above should insert `bvalue' at some point.
 
 {- text
    indentation
    inside comments
  -}
 toto a = ( hello
+         , there                -- indentation of leading , and ;
          -- FIXME: indentation of this comment.
-         , there                -- FIXME: indentation of leading , and ;
          , my friends )         -- FIXME: wrong second indentation.
 
 titi b =
@@ -32,8 +35,10 @@ titi b =
         - indentation
         - inside comments
         -}
-       let foo  = bar
-           foo2 = bar2
+       let foo   = let fro = 1
+                       fri = 2   -- FIXME: can't indent lower than `let'.
+                   in hello
+           foo2 = bar2  -- FIXME: can't align with empty arg in foo.
        expr2            -- FIXME: two possible `let's.
 
 tata c =
