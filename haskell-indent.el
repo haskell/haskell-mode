@@ -1029,31 +1029,33 @@ These are then used by `haskell-indent-cycle'."
      ;; open structure? ie  ( { [
      ((setq open (haskell-indent-open-structure start end))
       ;; there is an open structure to complete
-      (if (looking-at "\\s)\\|\\s.\\|$ ")
-	  (haskell-indent-push-pos open) ; align a ) or punct with (
-	(progn
+      (if (looking-at "\\s)")
+	  (haskell-indent-push-pos open) ; align a ) with (
+	;; Anything else than a ) is subject to layout.
+	(if (looking-at "\\s.\\|$ ")
+	    (haskell-indent-push-pos open) ; align a punct with (
 	  (setq follow (save-excursion
 			 (goto-char (1+ open))
 			 (haskell-indent-skip-blanks-and-newlines-forward end)
 			 (point)))
 	  (if (= follow end)
 	      (haskell-indent-push-pos-offset open 1)
-	    (haskell-indent-push-pos follow))))
-      ;; There might still be layout within the open sructure.
-      (let ((basic-indent-info (car indent-info))
-	    (open-column (haskell-indent-point-to-col open))
-	    (contour-line (haskell-indent-contour-line (1+ open) end)))
-	(assert (null (cdr indent-info)))
-	(when contour-line
-	  (setq indent-info nil)
-	  (haskell-indent-layout-indent-info (1+ open) contour-line)
-	  ;; Fix up indent info.
-	  (let ((base-elem (assoc open-column indent-info)))
-	    (if base-elem
-		(progn (setcar base-elem (car basic-indent-info))
-		       (setcdr base-elem (cdr basic-indent-info)))
-	      (setq indent-info
-		    (append indent-info (list basic-indent-info))))))))
+	    (haskell-indent-push-pos follow)))
+	;; There might still be layout within the open structure.
+	(let ((basic-indent-info (car indent-info))
+	      (open-column (haskell-indent-point-to-col open))
+	      (contour-line (haskell-indent-contour-line (1+ open) end)))
+	  (assert (null (cdr indent-info)))
+	  (when contour-line
+	    (setq indent-info nil)
+	    (haskell-indent-layout-indent-info (1+ open) contour-line)
+	    ;; Fix up indent info.
+	    (let ((base-elem (assoc open-column indent-info)))
+	      (if base-elem
+		  (progn (setcar base-elem (car basic-indent-info))
+			 (setcdr base-elem (cdr basic-indent-info)))
+		(setq indent-info
+		      (append indent-info (list basic-indent-info)))))))))
      ;; full indentation
      ((setq contour-line (haskell-indent-contour-line start end))
       (haskell-indent-layout-indent-info start contour-line))
