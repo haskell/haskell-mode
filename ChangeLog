@@ -1,5 +1,9 @@
 2004-11-25  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* Release version 2.0.
+
+	* .emacs: Remove.
+
 	* haskell-decl-scan.el (haskell-ds-imenu-label-cmp): Undo last
 	idiotic change.
 
