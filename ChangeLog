@@ -1,3 +1,15 @@
+2004-11-22  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-indent.el (turn-on-haskell-indent, turn-off-haskell-indent):
+	Use C-c C-foo rather than C-c foo to follow coding conventions.
+
+	* haskell-font-lock.el (haskell-font-lock-symbols-alist): Add . = ○.
+
+2004-10-25  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-indent.el (haskell-indent-indentation-info): Don't use layout
+	for paren-closing elements.
+
 2004-10-20  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-indent.el (haskell-indent-indentation-info): Only use
@@ -123,3 +135,6 @@
 	(hugs-syntax-table): Use the `n' for nested comments.
 	(haskell-stand-alone-indent-mode): Fix `comment-end'.
 
+;; Local Variables:
+;; coding: utf-8
+;; End:
