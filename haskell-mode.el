@@ -2,12 +2,12 @@
 
 ;; Copyright (C) 1992, 1997-1998 Simon Marlow, Graeme E Moss, and Tommy Thorn
 
-;; Authors: 1997-1998 Graeme E Moss <gem@cs.york.ac.uk> and
+;; Authors: 1992      Simon Marlow
+;;          1997-1998 Graeme E Moss <gem@cs.york.ac.uk> and
 ;;                    Tommy Thorn <thorn@irisa.fr>,
-;;          1992 Simon Marlow
-;;          2001 Reuben Thomas (>=v1.4)
+;;          2001-2002 Reuben Thomas (>=v1.4)
 ;; Keywords: faces files Haskell
-;; Version: 1.41
+;; Version: 1.42
 ;; URL: http://www.haskell.org/haskell-mode/
 
 ;;; This file is not part of GNU Emacs.
@@ -52,6 +52,9 @@
 ;;
 ;; `haskell-hugs', Guy Lapalme
 ;;   Interaction with Hugs interpreter.
+;;
+;; `haskell-ghci', Chris Web
+;;   Interaction with GHCi interpreter.
 ;;
 ;;
 ;; This mode supports full Latin1 Haskell 1.4 including literate scripts.
@@ -114,11 +117,16 @@
 ;; version of emacs you are using, and a small example of the problem
 ;; or suggestion.
 ;;
-;; Version 1.41: improve packaging, and make a couple more variables
+;; Version 1.42:
+;;   Added autoload for GHCi inferior mode (thanks to Scott 
+;;   Williams for the bug report and fix).
+;;
+;; Version 1.41:
+;;   Improved packaging, and made a couple more variables
 ;;   interactively settable.
 ;;
 ;; Version 1.4:
-;;   Add GHCi mode from Chris Webb, and tidy up a little.
+;;   Added GHCi mode from Chris Webb, and tidied up a little.
 ;;
 ;; Version 1.3:
 ;;   The literate or non-literate style of a buffer is now indicated
@@ -216,6 +224,8 @@
   "Turn on simple Haskell indentation." t)
 (autoload 'turn-on-haskell-hugs "haskell-hugs"
   "Turn on interaction with a Hugs interpreter." t)
+(autoload 'turn-on-haskell-ghci "haskell-ghci"
+  "Turn on interaction with a GHCi interpreter." t)
 
 ;; Are we running FSF Emacs or XEmacs?
 (defvar haskell-running-xemacs
