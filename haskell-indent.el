@@ -379,12 +379,13 @@ preceding non-empty line."
       ;; go forward after the empty line
       (if (haskell-indent-empty-line-p)
           (haskell-indent-forward-line 1))
+      (setq start-code (point))
       ;; find the first line of code which is not a comment
-      (while (and (haskell-indent-in-comment start-code (point))
-                  (= 0 (haskell-indent-forward-line 1))))
-      (haskell-indent-skip-blanks-and-newlines-forward save-point)
-      (point)))
-  )
+      (forward-comment (point-max))
+      (if (> (point) save-point)
+	  start-code
+	(point)))))
+
 (defun haskell-indent-open-structure (start end)
   "If any structure (list or tuple) is not closed, between START and END,
 returns the location of the opening symbol, nil otherwise."
@@ -396,36 +397,21 @@ returns the location of the opening symbol, nil otherwise."
 location of the opening symbol, nil otherwise."
   (save-excursion
     (let ((pps (parse-partial-sexp start end)))
-      (if (nth 3 pps)                   ; we are within an open string
-            (progn                      ; go back to the previous
-              (goto-char (or (nth 1 pps);  open parenthesis
-                             (nth 2 pps); complete sexp
-                             start))    ; otherwise to the start
-              (skip-chars-forward "^\""); skip upto the start of the string
-              (point)))
-      )))
+      (if (nth 3 pps) (nth 8 pps)))))
 
 (defun haskell-indent-in-comment (start end)
-  "Checks, starting from START, if END is within a comment, returns
-the location of the start of the comment, nil otherwise."
-  (cond ((> start end) end)
-        ((= start end) nil)
-        ( t
-          (save-excursion
-            (cond
-             ((looking-at "{-\\|--")    ; on the first char of a comment ?
-              (point))
-             ((and (= (following-char) ?\-) ; on the second char ?
-                   (or (= (preceding-char) ?\-)
-                       (= (preceding-char) ?\{)))
-              (1- (point)))
-             (t (let ((pps (parse-partial-sexp start end)))
-                  (if (nth 4 pps)
-                      (re-search-backward "{-" (nth 2 pps) t)
-                    (re-search-backward "--"
-                                        (haskell-indent-get-beg-of-line) t))))
-             ))))
-  )
+  "Check, starting from START, if END is at or within a comment.
+Returns the location of the start of the comment, nil otherwise."
+  (let (pps)
+    (assert (<= start end))
+    (cond ((= start end) nil)
+	  ((nth 4 (save-excursion (setq pps (parse-partial-sexp start end))))
+	   (nth 8 pps))
+	  ;; We also want to say that we are *at* the beginning of a comment.
+	  ((and (not (nth 8 pps))
+		(nth 4 (save-excursion
+			 (setq pps (parse-partial-sexp end (+ end 2))))))
+	   (nth 8 pps)))))
 
 (defvar haskell-indent-off-side-keywords-re
       "\\<\\(do\\|let\\|of\\|where\\)\\>[ \t]*")
@@ -560,28 +546,6 @@ the location of the start of the comment, nil otherwise."
           (if valname                   ; always visible !!
               (haskell-indent-push-pos-offset valname))))))
   indent-info)
-
-(defun haskell-indent-comment (start end indent-info)
-  "Finds indentation information for a comment line.
-If the previous line (between START and END) is also a comment line
-   -- comments are aligned on their start
-   {- comments are aligned on the first non-blank char following the open {
-otherwise
-    indent at the same indentation as the previous line."
-  (save-excursion
-    (let ((comment-start (haskell-indent-in-comment start end)))
-      (if comment-start
-          (if (eq (char-after comment-start) ?-)
-              ;; -- style comment
-              (haskell-indent-push-pos comment-start) 
-            ;;  {- style comment
-            (goto-char (+ 2 comment-start))
-            (haskell-indent-skip-blanks-and-newlines-forward end)
-            (haskell-indent-push-pos (point)))
-        ;; no previous comment indent with previous line
-        (haskell-indent-push-col (haskell-indent-current-indentation)))))
-    indent-info)
-    
 
 (defconst haskell-indent-decision-table
   (let ((or "\\)\\|\\("))
@@ -883,7 +847,7 @@ than an identifier, a guard or rhs."
 
 (defun haskell-indent-valdef-indentation (start end end-visible curr-line-type
                                       indent-info)
-  "Finds indentation information for a value definition."
+  "Find indentation information for a value definition."
   (if (< start end-visible)
       (case curr-line-type
             (empty (haskell-indent-empty start end end-visible indent-info))
@@ -997,24 +961,59 @@ and find indentation info for each part."
 	     (haskell-indent-find-let start)))
        (t (point))))))
 
+(defun haskell-indent-inside-comment (start)
+  "Compute indent info for text inside comment.
+START is the start position of the comment in which point is."
+  ;; Ideally we'd want to guess whether it's commented out code or
+  ;; whether it's text.  Instead, we'll assume it's text.
+  (save-excursion
+    (if (= start (point))
+	;; We're actually not inside the comment.
+	(cond
+	 ((eq (char-after) ?\{) nil)	;Align as if it were code.
+	 ((and (forward-comment -1)
+	       (save-excursion (forward-line 2) (> (point) start)))
+	  ;; We're after another comment and there's no empty line between us.
+	  (haskell-indent-push-pos (point)))
+	 (t nil))			;Else align as if it were code
+     
+      ;; We really are inside a comment.
+      (haskell-indent-push-pos
+       (if (looking-at "-}")
+	   (progn
+	     (forward-char 2)
+	     (forward-comment -1)
+	     (1+ (point)))
+	 (let ((offset (if (looking-at "--?")
+			   (- (match-beginning 0) (match-end 0)))))
+	   (forward-line -1)		;Go to previous line.
+	   (haskell-indent-back-to-indentation)
+	   (if (< (point) start) (goto-char start))
+	   (if (looking-at comment-start-skip)
+	       (if offset (+ (point) 2 offset) (match-end 0))
+	     (point))))))))
+
 (defun haskell-indent-indentation-info ()
   "Return a list of possible indentations for the current line.
 These are then used by `haskell-indent-cycle'."
   (let ((start (haskell-indent-start-of-def))
-        (end (progn (haskell-indent-back-to-indentation) (point)))
+        (end (point))
         indent-info open follow contour-line)
     (cond
      ;; in string?
      ((setq open (haskell-indent-in-string start end))
       (haskell-indent-push-pos-offset open
 				      (if (looking-at "\\\\") 0 1)))
+      
      ;; in comment ?
-     ((haskell-indent-in-comment start end)
-      (save-excursion
-	(end-of-line 0)	     ; put point at the end of preceding line before
-	(setq indent-info    ; computing comment indentation
-	      (haskell-indent-comment (haskell-indent-get-beg-of-line)
-				      (point) indent-info))))
+     ((and (setq open (haskell-indent-in-comment start end))
+	   (progn (haskell-indent-inside-comment open)
+		  (if indent-info t	;We found a comment to align to.
+		    ;; Else indent like following code.
+		    (forward-comment (point-max))
+		    (setq end (point))
+		    nil))))
+
      ;; Closing the declaration part of a `let'.
      ((and (looking-at "in\\>")
 	   (setq open (save-excursion (haskell-indent-find-let start)))
@@ -1082,7 +1081,7 @@ is not in a windowing environment."
 (defun haskell-indent-cycle ()
   "Indentation cycle.
 We stay in the cycle as long as the TAB key is pressed.
-Any other key or mouse click terminates the cycle and is interpreted 
+Any other key or mouse click terminates the cycle and is interpreted
 with the exception of the RET key which merely exits the cycle."
   (interactive "*")
   (if (and haskell-literate
@@ -1092,7 +1091,9 @@ with the exception of the RET key which merely exits the cycle."
              (last-insert-length 0))
       (if (> (current-column) (haskell-indent-current-indentation))
           (setq marker (point-marker)))
-      (setq il (setq indent-list (haskell-indent-indentation-info)))
+      (haskell-indent-back-to-indentation)
+      (save-excursion
+	(setq il (setq indent-list (haskell-indent-indentation-info))))
       ;;(message "Indent-list:%s" indent-list) (read-event) ; uncomment for debug!!
       (setq indent-info (car il))
       (haskell-indent-line-to (car indent-info)) ; insert indentation
