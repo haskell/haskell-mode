@@ -93,7 +93,7 @@
 ;; . XEmacs can support both `--' comments and `{- -}' comments
 ;;   simultaneously.  If XEmacs is detected, this should be used.
 ;; 
-;; . Support for Green Card?
+;; . Support for GreenCard?
 ;;
 ;; . Support for \begin{code}..\end{code} style of literate scripts?
 ;;
