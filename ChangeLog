@@ -1,3 +1,14 @@
+2004-11-24  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-mode.el (turn-on-haskell-hugs, turn-on-haskell-ghci):
+	Mark them as obsolete.
+	(haskell-mode-map): Add bindings for the inferior-haskell commands.
+
+	* inf-haskell.el: New file.
+
+	* haskell-doc.el (haskell-doc-install-keymap): Don't blindly assume
+	there's a Hugs menu.
+
 2004-11-22  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-indent.el (turn-on-haskell-indent, turn-off-haskell-indent):
