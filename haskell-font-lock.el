@@ -105,7 +105,7 @@
 (require 'font-lock)
 
 ;; Version.
-(defconst haskell-font-lock-version "$Revision: 1.9 $"
+(defconst haskell-font-lock-version "$Revision: 1.10 $"
   "Version number of haskell-font-lock.")
 (defun haskell-font-lock-version ()
   "Echo the current version of haskell-font-lock in the minibuffer."
@@ -285,25 +285,25 @@ Returns keywords suitable for `font-lock-keywords'."
 		;; Expensive.
 		`((,string-and-char 1 font-lock-string-face)))
 
-	    (,reservedid 1 haskell-keyword-face)
-	    (,reservedsym 1 haskell-operator-face)
+	    (,reservedid 1 (symbol-value 'haskell-keyword-face))
+	    (,reservedsym 1 (symbol-value 'haskell-operator-face))
 
 	    ;; Toplevel Declarations.
 	    ;; Place them *before* generic id-and-op highlighting.
-	    (,topdecl-var (1 haskell-definition-face))
-	    (,topdecl-var2 (2 haskell-definition-face))
-	    (,topdecl-sym (2 haskell-definition-face))
-	    (,topdecl-sym2 (1 haskell-definition-face))
+	    (,topdecl-var  (1 (symbol-value 'haskell-definition-face)))
+	    (,topdecl-var2 (2 (symbol-value 'haskell-definition-face)))
+	    (,topdecl-sym  (2 (symbol-value 'haskell-definition-face)))
+	    (,topdecl-sym2 (1 (symbol-value 'haskell-definition-face)))
 
 	    ;; These four are debatable...
-	    ("(\\(,*\\|->\\))" 0 haskell-constructor-face)
-	    ("\\[\\]" 0 haskell-constructor-face)
+	    ("(\\(,*\\|->\\))" 0 (symbol-value 'haskell-constructor-face))
+	    ("\\[\\]" 0 (symbol-value 'haskell-constructor-face))
 	    ;; Expensive.
 	    (,qvarid 0 haskell-default-face)
-	    (,qconid 0 haskell-constructor-face)
-	    (,(concat "\`" varid "\`") 0 haskell-operator-face)
+	    (,qconid 0 (symbol-value 'haskell-constructor-face))
+	    (,(concat "\`" varid "\`") 0 (symbol-value 'haskell-operator-face))
 	    ;; Expensive.
-	    (,conid 0 haskell-constructor-face)
+	    (,conid 0 (symbol-value 'haskell-constructor-face))
 
 	    ;; Very expensive.
 	    (,sym 0 (if (eq (char-after (match-beginning 0)) ?:)
@@ -373,10 +373,16 @@ that should be commented under LaTeX-style literate scripts."
             (point))))))
 
 (defconst haskell-basic-syntactic-keywords
-  '(;; Character constants (since apostrophe can't have string syntax)
-    ("\\Sw\\('\\)\\([^\\']\\|\\\\.\\)+\\('\\)" (1 "|") (3 "|"))
+  '(;; Character constants (since apostrophe can't have string syntax).
+    ;; Beware: do not match something like 's-}' or '\n"+' since the first '
+    ;; might be inside a comment or a string.
+    ;; This still gets fooled with "'"'"'"'"'"', but ... oh well.
+    ("\\Sw\\('\\)\\([^\\'\n]\\|\\\\.[^\\'\n \"}]*\\)\\('\\)" (1 "|") (3 "|"))
     ;; The \ is not escaping in \(x,y) -> x + y.
     ("\\(\\\\\\)(" (1 "."))
+    ;; The second \ in a gap does not quote the subsequent char.
+    ;; It's probably not worth the trouble, tho.
+    ;; ("^[ \t]*\\(\\\\\\)" (1 "."))
     ;; Deal with instances of `--' which don't form a comment.
     ("\\s_\\{3,\\}" (0 (if (string-match "\\`-*\\'" (match-string 0))
 			   nil		; Sequence of hyphens.  Do nothing in
