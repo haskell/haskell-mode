@@ -33,7 +33,13 @@
 
 ;; Here I depart from the inferior-haskell- prefix.
 ;; Not sure if it's a good idea.
-(defcustom haskell-program-name "hugs \"+.\""
+(defcustom haskell-program-name
+  ;; Arbitrarily give preference to hugs over ghci.
+  (or (cond
+       ((not (fboundp 'executable-find)) nil)
+       ((executable-find "hugs") "hugs \"+.\"")
+       ((executable-find "ghci") "ghci"))
+      "hugs \"+.\"")
   "The name of the command to start the inferior Haskell process.
 The command can include arguments."
   :options '("hugs \"+.\"" "ghci")
