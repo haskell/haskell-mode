@@ -186,7 +186,7 @@ Prompt for a list of args if called with an argument."
   (setq comint-input-sentinel 'shell-directory-tracker)
 
   ;; GHCi prompt should be of the form `ModuleName> '.
-  (setq comint-prompt-regexp  "^[A-Z][_a-zA-Z0-9]*> ")
+  (setq comint-prompt-regexp  "^\\*?[A-Z][_a-zA-Z0-9]*\\( \\*?[A-Z][_a-zA-Z0-9]*\\)*> ")
 
   ;; History syntax of comint conflicts with Haskell, e.g. !!, so better
   ;; turn it off.
