@@ -17,4 +17,7 @@ Changes since 1.45:
 * Symbols like -> and \ can be displayed as actual arrows and lambdas.
   See haskell-font-lock-symbols.
 
+* Tweaks to the font-lock settings.  Among other things paren-matching
+  with things like \(x,y) should work correctly now.
+
 * New maintainer <monnier@gnu.org>.

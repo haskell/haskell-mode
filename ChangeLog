@@ -1,3 +1,20 @@
+2004-11-25  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-decl-scan.el (haskell-ds-imenu-label-cmp): Undo last
+	idiotic change.
+
+	* haskell-doc.el (haskell-doc-sym-doc): Make even the last char bold.
+
+	* haskell-mode.el (haskell-mode-map): Typo.
+
+	* inf-haskell.el (inferior-haskell-mode): Typo.
+	(inferior-haskell-wait-for-output): Remove.
+	(inferior-haskell-send-command): New function.
+	(inferior-haskell-load-file): Use it.
+
+	* index.html:
+	* installation-guide.html: Partial fixup.
+
 2004-11-24  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-mode.el (turn-on-haskell-hugs, turn-on-haskell-ghci):
