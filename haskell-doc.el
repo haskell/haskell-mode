@@ -1,6 +1,6 @@
 ;;; haskell-doc.el --- show function types in echo area
 
-;; Time-stamp: <Thu Dec 10 1998 17:26:21 Stardate: [-30]2203.42 hwloidl>
+;; Time-stamp: <2004-11-22 10:44:54 simonmar>
 
 ;; Copyright (C) 2004  Free Software Foundation, Inc.
 ;; Copyright (C) 1997 Hans-Wolfgang Loidl
@@ -10,11 +10,11 @@
 ;; Temporary Maintainer and Hacker: Graeme E Moss <gem@cs.york.ac.uk>
 ;; Keywords: extensions, minor mode, language mode, Haskell
 ;; Created: 1997-06-17
-;; Revision: $Revision: 1.7 $
+;; Revision: $Revision: 1.8 $
 ;; FTP archive: /ftp@ftp.dcs.gla.ac.uk:/pub/glasgow-fp/authors/Hans_Loidl/Elisp/haskell-doc.el
 ;; Status: Beta version
 
-;; $Id: haskell-doc.el,v 1.7 2004/10/14 22:27:47 monnier Exp $
+;; $Id: haskell-doc.el,v 1.8 2004/11/22 10:45:35 simonmar Exp $
 
 ;;; Copyright:
 ;;  ==========
@@ -144,6 +144,9 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.8  2004/11/22 10:45:35  simonmar
+;;  Fix type of getLine
+;;
 ;;  Revision 1.7  2004/10/14 22:27:47  monnier
 ;;  (turn-off-haskell-doc-mode, haskell-doc-current-info): Don't autoload.
 ;;
@@ -266,7 +269,7 @@
 ;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.7 $"
+(defconst haskell-doc-version "$Revision: 1.8 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 (defconst haskell-doc-maintainer
@@ -554,7 +557,7 @@ It is probably best to manipulate this data structure with the commands
    '("gcd" . "(Integral a) => a -> a -> a")
    '("getChar" . "IO Char")
    '("getContents" . "IO String")
-   '("getLine" . "IO Char")
+   '("getLine" . "IO String")
    '("head" . "[a] -> a")
    '("id" . "a -> a")
    '("init" . "[a] -> [a]")
