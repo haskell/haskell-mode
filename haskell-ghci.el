@@ -179,7 +179,7 @@ Prompt for a list of args if called with an argument."
   ;; Select GHCi buffer temporarily.
   (set-buffer haskell-ghci-process-buffer)
   (haskell-ghci-mode)
-  (make-variable-buffer-local 'shell-cd-regexp)
+  (make-local-variable 'shell-cd-regexp)
   (make-local-variable 'shell-dirtrackp)
 
   ;; Track directory changes using the `:cd' command.
