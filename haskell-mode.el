@@ -86,7 +86,6 @@
 ;; To turn any of the supported modules on for all buffers, add the
 ;; appropriate line(s) to .emacs:
 ;;
-;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-font-lock)
 ;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
 ;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
 ;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
