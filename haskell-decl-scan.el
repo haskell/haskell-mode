@@ -1,5 +1,6 @@
 ;;; haskell-decl-scan.el --- Declaration scanning module for Haskell Mode
 
+;; Copyright (C) 2004  Free Software Foundation, Inc.
 ;; Copyright (C) 1997-1998 Graeme E Moss
 
 ;; Authors: 1997-1998 Graeme E Moss <gem@cs.york.ac.uk>
@@ -52,7 +53,7 @@
 ;;
 ;; If you have any problems or suggestions, after consulting the list
 ;; below, email gem@cs.york.ac.uk quoting the version of the library
-;; you are using, the version of emacs you are using, and a small
+;; you are using, the version of Emacs you are using, and a small
 ;; example of the problem or suggestion.  Note that this library
 ;; requires a reasonably recent version of Emacs.
 ;;
@@ -119,15 +120,18 @@
 ;;   eg. "fib'" will be grabbed as "fib" since "'" is not a word or
 ;;   symbol constituent under the syntax table `func-menu' uses.
 
-;;; All functions/variables start with
-;;; `(turn-(on/off)-)haskell-decl-scan' or `haskell-ds-'.
+;; All functions/variables start with
+;; `(turn-(on/off)-)haskell-decl-scan' or `haskell-ds-'.
 
-;;; The imenu support is based on code taken from `hugs-mode',
-;;; thanks go to Chris Van Humbeeck.
+;; The imenu support is based on code taken from `hugs-mode',
+;; thanks go to Chris Van Humbeeck.
 
 ;; Version.
-(defconst haskell-decl-scan-version "1.1"
-  "haskell-decl-scan version number.")
+
+;;; Code:
+
+(defconst haskell-decl-scan-version "1.2"
+  "Version number of haskell-decl-scan.")
 (defun haskell-decl-scan-version ()
   "Echo the current version of haskell-decl-scan in the minibuffer."
   (interactive)
@@ -142,11 +146,6 @@
       (progn
 	(require 'cl)
 	(require 'imenu))))
-
-;; Are we running FSF Emacs or XEmacs?
-(defvar haskell-ds-running-xemacs
-  (string-match "Lucid\\|XEmacs" emacs-version)
-  "non-nil if we are running XEmacs, nil otherwise.")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General declaration scanning functions.
@@ -392,6 +391,10 @@ then point does not move if already at the start of a declaration."
     ;; Return the result.
     result))
 
+(defun haskell-ds-bird-p ()
+  (if (boundp 'haskell-literate)
+      (eq haskell-literate 'bird) nil))
+
 (defun haskell-ds-backward-decl ()
   "Move point backward to the first character preceeding the current
 point that starts a top-level declaration.  A series of declarations
@@ -403,18 +406,12 @@ declaration.  Returns point if point is left at the start of a
 declaration, and nil otherwise, ie. because point is at the beginning
 of the buffer and no declaration starts there."
   (interactive)
-  (haskell-ds-move-to-decl nil
-                           (if (boundp 'haskell-literate)
-                               (eq haskell-literate 'bird) nil)
-                           nil))
+  (haskell-ds-move-to-decl nil (haskell-ds-bird-p) nil))
 
 (defun haskell-ds-forward-decl ()
   "As `haskell-ds-backward-decl' but forward."
   (interactive)
-  (haskell-ds-move-to-decl t
-                           (if (boundp 'haskell-literate)
-                               (eq haskell-literate 'bird) nil)
-                           nil))
+  (haskell-ds-move-to-decl t (haskell-ds-bird-p) nil))
 
 (defun haskell-ds-generic-find-next-decl (bird-literate)
   "Find the name, position and type of the declaration at or after
@@ -524,21 +521,13 @@ positions and the type is one of the symbols \"variable\", \"datatype\",
 ;; Declaration scanning via `imenu'.
 
 (defun haskell-ds-create-imenu-index ()
-  "Non-literate Haskell version of `haskell-ds-generic-create-menu-index'."
-  (haskell-ds-generic-create-imenu-index nil))
-
-(defun literate-haskell-ds-create-imenu-index ()
-  "Bird-style literate Haskell version of
-`haskell-ds-generic-create-menu-index'."
-  (haskell-ds-generic-create-imenu-index t))
-
-(defun haskell-ds-generic-create-imenu-index (bird-literate)
-  "Function for finding `imenu' declarations in (BIRD-LITERATE) Haskell mode.
+  "Function for finding `imenu' declarations in Haskell mode.
 Finds all declarations (classes, variables, imports, instances and
 datatypes) in a Haskell file for the `imenu' package."
   ;; Each list has elements of the form `(INDEX-NAME . INDEX-POSITION)'.
   ;; These lists are nested using `(INDEX-TITLE . INDEX-ALIST)'.
-  (let* ((index-alist '())
+  (let* ((bird-literate (haskell-ds-bird-p))
+	 (index-alist '())
 	 (index-class-alist '())   ;; Classes
 	 (index-var-alist '())     ;; Variables
 	 (index-imp-alist '())     ;; Imports
@@ -603,20 +592,17 @@ datatypes) in a Haskell file for the `imenu' package."
 `haskell-ds-create-imenu-index'."
   (string< (car el1) (car el2)))
 
-(defun haskell-ds-imenu (bird-literate)
-  "Install `imenu' for (BIRD-LITERATE) Haskell scripts."
+(defun haskell-ds-imenu ()
+  "Install `imenu' for Haskell scripts."
   ;; Would prefer to toggle imenu but can't see how to turn it off...
   (require 'imenu)
   ;; In emacs-20's imenu we have to bind some functions first -- HWL
-  (if (and  (not haskell-ds-running-xemacs)
+  (if (and  (not (featurep 'xemacs))
 	    (>= (string-to-number (substring emacs-version 0 2)) 20)
 	    (not (fboundp 'imenu-extract-index-name-function)))
-    (setq imenu-extract-index-name-function
-	  (if bird-literate (function literate-haskell-ds-create-imenu-index)
-	    (function haskell-ds-create-imenu-index))))
-  (setq imenu-create-index-function
-	(if bird-literate (function literate-haskell-ds-create-imenu-index)
-	  (function haskell-ds-create-imenu-index)))
+      ;; This looks wrong, but I can't test it.  --Stef
+      (setq imenu-extract-index-name-function 'haskell-ds-create-imenu-index))
+  (setq imenu-create-index-function 'haskell-ds-create-imenu-index)
   (if (fboundp 'imenu-add-to-menubar)
       (imenu-add-to-menubar "Declarations")))
 
@@ -625,14 +611,10 @@ datatypes) in a Haskell file for the `imenu' package."
 
 (defun haskell-ds-func-menu-next (buffer)
   "Non-literate Haskell version of `haskell-ds-generic-func-menu-next'." 
-  (haskell-ds-generic-func-menu-next nil buffer)) 
-
-(defun literate-haskell-ds-func-menu-next (buffer)
-  "Bird-style literate Haskell version of `haskell-ds-generic-func-menu-next'."
-  (haskell-ds-generic-func-menu-next t buffer)) 
+  (haskell-ds-generic-func-menu-next (haskell-ds-bird-p) buffer)) 
 
 (defun haskell-ds-generic-func-menu-next (bird-literate buffer)
-  "Returns `(name . pos)' of next declaration."
+  "Return `(name . pos)' of next declaration."
   (set-buffer buffer)
   (let ((result (haskell-ds-generic-find-next-decl bird-literate)))
     (if result
@@ -664,22 +646,19 @@ datatypes) in a Haskell file for the `imenu' package."
   (concat "^" literate-haskell-ds-start-decl-re)
   "As `haskell-ds-func-menu-regexp' but for Bird-style literate scripts.")
 
-(defun haskell-ds-func-menu (bird-literate)
-  "Uses `func-menu' to establish declaration scanning for (BIRD-LITERATE)
-Haskell scripts."
+(defun haskell-ds-func-menu ()
+  "Use `func-menu' to establish declaration scanning for Haskell scripts."
   (require 'func-menu)
   (make-local-variable 'fume-menubar-menu-name)
   (setq fume-menubar-menu-name "Declarations")
   (make-local-variable 'fume-function-name-regexp-alist)
   (setq fume-function-name-regexp-alist
-	(if bird-literate
+	(if (haskell-ds-bird-p)
             '((haskell-mode . literate-haskell-ds-func-menu-regexp))
           '((haskell-mode . haskell-ds-func-menu-regexp))))
   (make-local-variable 'fume-find-function-name-method-alist)
   (setq fume-find-function-name-method-alist
-        (if bird-literate
-            '((haskell-mode . literate-haskell-ds-func-menu-next))
-          '((haskell-mode . haskell-ds-func-menu-next))))
+	'((haskell-mode . haskell-ds-func-menu-next)))
   (fume-add-menubar-entry)
   (local-set-key "\C-cl" 'fume-list-functions)
   (local-set-key "\C-cg" 'fume-prompt-function-goto)
@@ -737,15 +716,12 @@ Invokes `haskell-decl-scan-hook' if not nil.
 Use `haskell-decl-scan-version' to find out what version this is."
   (interactive)
   (haskell-ds-keys)
-  (let ((bird-literate (if (boundp 'haskell-literate)
-                           (eq haskell-literate 'bird) nil)))
-    (if haskell-ds-running-xemacs
-        (haskell-ds-func-menu bird-literate)
-      (haskell-ds-imenu bird-literate)))
+  (if (fboundp 'imenu)
+      (haskell-ds-imenu)
+    (haskell-ds-func-menu))
   (run-hooks 'haskell-decl-scan-hook))
 
 ;;; Provide ourselves:
 
 (provide 'haskell-decl-scan)
-
-;;; haskell-decl-scan ends here.
+;;; haskell-decl-scan.el ends here
