@@ -1,3 +1,8 @@
+2005-02-02  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-hugs.el (haskell-hugs-mode-map):
+	* haskell-ghci.el (haskell-ghci-mode-map): Remove.
+
 2005-01-26  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-indent.el (haskell-indent-inside-comment): Don't assume that

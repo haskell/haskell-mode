@@ -98,8 +98,6 @@ Maps the following commands in the haskell keymap:
   (local-unset-key  "\C-c\C-r")
   (local-unset-key  "\C-c\C-b"))
 
-(defvar haskell-ghci-mode-map nil)
-
 (defun haskell-ghci-mode ()
   "Major mode for interacting with an inferior GHCi session.
 

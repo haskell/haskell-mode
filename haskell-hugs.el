@@ -103,8 +103,6 @@ Maps the followind commands in the haskell keymap.
   (local-unset-key  "\C-c\C-b")
   )
 
-(defvar haskell-hugs-mode-map nil)
-
 (define-derived-mode haskell-hugs-mode comint-mode "Haskell Hugs"
 ;; called by haskell-hugs-start-process,
 ;; itself called by haskell-hugs-load-file
