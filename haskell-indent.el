@@ -114,6 +114,11 @@
   :type 'integer
   :group 'haskell-indent)
 
+(defcustom haskell-indent-rhs-align-column 0 
+  "*Column on which to align right-hand sides (use 0 for ad-hoc alignment)." 
+  :type 'integer 
+  :group 'haskell-indent) 
+
 (defsubst haskell-indent-get-beg-of-line (&optional arg)
   (save-excursion
     (beginning-of-line arg)
@@ -1099,7 +1104,7 @@ If P-ARG is t align all defs up to the mark.
 TYPE is either 'guard or 'rhs."
   (save-excursion
     (let (start-block end-block
-          (maxcol 0)
+          (maxcol (if (eq type 'rhs) haskell-indent-rhs-align-column 0)) 
           contour sep defname defnamepos
           defpos defcol pos lastpos
           regstack eqns-start start-found)
