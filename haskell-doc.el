@@ -9,11 +9,11 @@
 ;; Temporary Maintainer and Hacker: Graeme E Moss <gem@cs.york.ac.uk>
 ;; Keywords: extensions, minor mode, language mode, Haskell
 ;; Created: 1997-06-17
-;; Revision: $Revision: 1.4 $
+;; Revision: $Revision: 1.5 $
 ;; FTP archive: /ftp@ftp.dcs.gla.ac.uk:/pub/glasgow-fp/authors/Hans_Loidl/Elisp/haskell-doc.el
 ;; Status: Beta version
 
-;; $Id: haskell-doc.el,v 1.4 2002/10/14 09:55:03 simonmar Exp $
+;; $Id: haskell-doc.el,v 1.5 2003/01/09 11:56:26 simonmar Exp $
 
 ;;; Copyright:
 ;;  ==========
@@ -143,6 +143,12 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.5  2003/01/09 11:56:26  simonmar
+;;  Patches from Ville Skyttä <scop@xemacs.org>, the XEmacs maintainer of
+;;  the haskell-mode:
+;;
+;;   - Make the auto-mode-alist modifications autoload-only.
+;;
 ;;  Revision 1.4  2002/10/14 09:55:03  simonmar
 ;;  Patch to update the Prelude/libraries function names and to remove
 ;;  support for older versions of Haskell.
@@ -156,7 +162,7 @@
 ;;
 ;;  Revision 1.2  2002/04/23 14:45:10  simonmar
 ;;  Tweaks to the doc strings and support for customization, from
-;;  Ville Skyttä <ville.skytta@xemacs.org>.
+;;  Ville Skyttä <scop@xemacs.org>.
 ;;
 ;;  Revision 1.1  2001/07/19 16:17:36  rrt
 ;;  Add the current version of the Moss/Thorn/Marlow Emacs mode, along with its
@@ -233,7 +239,7 @@
 ;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.4 $"
+(defconst haskell-doc-version "$Revision: 1.5 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 (defconst haskell-doc-maintainer "Hans-Wolfgang Loidl <hwloidl@dcs.glasgow.ac.uk>"
