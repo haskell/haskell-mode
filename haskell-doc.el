@@ -1,20 +1,13 @@
 ;;; haskell-doc.el --- show function types in echo area
 
-;; Time-stamp: <2004-11-22 10:44:54 simonmar>
-
 ;; Copyright (C) 2004  Free Software Foundation, Inc.
 ;; Copyright (C) 1997 Hans-Wolfgang Loidl
 
 ;; Author: Hans-Wolfgang Loidl <hwloidl@dcs.glasgow.ac.uk>
-;; Maintainer: Hans-Wolfgang Loidl <hwloidl@dcs.glasgow.ac.uk>
 ;; Temporary Maintainer and Hacker: Graeme E Moss <gem@cs.york.ac.uk>
 ;; Keywords: extensions, minor mode, language mode, Haskell
 ;; Created: 1997-06-17
-;; Revision: $Revision: 1.8 $
-;; FTP archive: /ftp@ftp.dcs.gla.ac.uk:/pub/glasgow-fp/authors/Hans_Loidl/Elisp/haskell-doc.el
-;; Status: Beta version
-
-;; $Id: haskell-doc.el,v 1.8 2004/11/22 10:45:35 simonmar Exp $
+;; URL: http://cvs.haskell.org/cgi-bin/cvsweb.cgi/fptools/CONTRIB/haskell-modes/emacs/haskell-doc.el?rev=HEAD
 
 ;;; Copyright:
 ;;  ==========
@@ -144,6 +137,9 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.9  2004/11/24 22:14:36  monnier
+;;  (haskell-doc-install-keymap): Don't blindly assume there's a Hugs menu.
+;;
 ;;  Revision 1.8  2004/11/22 10:45:35  simonmar
 ;;  Fix type of getLine
 ;;
@@ -269,7 +265,7 @@
 ;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.8 $"
+(defconst haskell-doc-version "$Revision: 1.9 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 (defconst haskell-doc-maintainer
@@ -1078,8 +1074,9 @@ It is probably best to manipulate this data structure with the commands
   (interactive)
   ;; Add the menu to the hugs menu as last entry.
   (let ((hugsmap (lookup-key (current-local-map) [menu-bar Hugs])))
-    (if (and (not haskell-doc-xemacs-p) ; XEmacs has problems here
-	     (not (lookup-key hugsmap [haskell-doc])))
+    (if (not (or haskell-doc-xemacs-p ; XEmacs has problems here
+		 (not (keymapp hugsmap))
+		 (lookup-key hugsmap [haskell-doc])))
 	(define-key-after hugsmap [haskell-doc]
 	  (cons "Haskell-doc" haskell-doc-keymap)
 	  [Haskell-doc mode])))
