@@ -88,7 +88,7 @@
 ;; . Would be nice to scan other top-level declarations such as
 ;;   methods of a class, datatype field labels...  any more?
 ;;
-;; . Support for Green Card?
+;; . Support for GreenCard?
 ;;
 ;; . Re-running (literate-)haskell-imenu should not cause the problems
 ;;   that it does.  The ability to turn off scanning would also be

@@ -191,7 +191,7 @@
 ;;   start of a line when previous line starts with ">".  Or would
 ;;   "> " be better?
 ;;
-;; . Support for Green Card?
+;; . Support for GreenCard?
 ;;
 
 ;;; All functions/variables start with `(literate-)haskell-'.
