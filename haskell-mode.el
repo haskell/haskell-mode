@@ -7,7 +7,7 @@
 ;;                    Tommy Thorn <thorn@irisa.fr>,
 ;;          2001-2002 Reuben Thomas (>=v1.4)
 ;; Keywords: faces files Haskell
-;; Version: 1.42
+;; Version: 1.43
 ;; URL: http://www.haskell.org/haskell-mode/
 
 ;;; This file is not part of GNU Emacs.
@@ -197,7 +197,7 @@
 ;;; All functions/variables start with `(literate-)haskell-'.
 
 ;; Version of mode.
-(defconst haskell-version "1.42"
+(defconst haskell-version "1.43"
   "`haskell-mode' version number.")
 (defun haskell-version ()
   "Echo the current version of `haskell-mode' in the minibuffer."
