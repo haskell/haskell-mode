@@ -1,0 +1,74 @@
+<HTML><HEAD>
+
+<TITLE>Haskell Mode for Emacs</TITLE>
+
+</HEAD><BODY>
+
+<H1>Haskell Mode for Emacs</H1>
+
+<P>The Haskell mode itself (version 1.4) is very basic, but provides a
+base on which to build modules.  The currently supported modules
+are:</P>
+
+<UL>
+
+<LI>Font Locking: Colours keywords, comments, strings, etc.
+
+<LI>Declaration Scanning: Scans declarations and places them in a
+menu. <em>Seems to hang on some files.</em>
+
+<LI>Documentation: Echoes types of functions or syntax of keywords
+when the cursor is idle. <em>Not up-to-date for Haskell-98.</em>
+
+<LI><A
+HREF="http://www.iro.umontreal.ca/~lapalme/layout/">Indentation</A>:
+Provides semi-automatic intelligent indentation.
+
+<LI>Simple Indentation: Provides simple indentation.
+
+<LI><A
+HREF="http://www.iro.umontreal.ca/~lapalme/Hugs-interaction.html">Hugs
+Interaction</A>: Allows interaction with the Hugs interpreter.
+
+<LI><A
+HREF="http://home.arachsys.com/~chris/haskell-ghci.el">GHCi
+Interaction</A>: Allows interaction with the GHCi interpreter.
+</UL>
+
+<EM>Work on further modules is encouraged!  Please <A
+HREF="mailto:rrt@sc3d.org">mail</A> if you have an idea, or a
+module we might hook into.</EM>
+
+<P><A HREF="haskell-mode.tar.gz">The latest versions of the basic mode
+and the above modules</A>.</P>
+
+<P>The basic mode is authored by Graeme E Moss, Tommy Thorn and Simon
+Marlow.  Modules with their own links above are maintained by their
+authors; the rest are looking for a maintainer (please volunteer!).
+These modules support Haskell 98, except where stated, and have been
+tested on GNU Emacs version 19.34, GNU Emacs version 20.7 and XEmacs
+version 21.4.  Please mail bugs and suggestions to the maintainer of
+the appropriate module.  General comments can be mailed to <A
+HREF="mailto:rrt@sc3d.org">Reuben Thomas</a>.  When mailing, quote the
+version of the module or mode you are using, the version of Emacs you
+are using, and a small example of the problem or suggestion.  Please
+check the list of known problems (towards the start of each relevant
+file) before doing so.</P>
+
+<P><STRONG><A HREF="installation-guide.html">A guide on how to install
+and customise the mode</A></STRONG>.</P>
+
+<P>To test the mode:</P>
+
+<UL>
+
+<LI>To test font locking, declaration scanning, and documentation
+modules, try them on <A HREF="fontlock.hs">the Haskell
+script</A> used to illustrate these modules in action.
+
+<LI>To test indentation and simple indentation modules, try them on <A
+HREF="indent.hs">this Haskell script</A>.
+
+</UL>
+
+</BODY></HTML>

@@ -1,0 +1,126 @@
+<HTML><HEAD>
+
+<TITLE>Haskell Mode for Emacs: Installation Guide</TITLE>
+
+</HEAD><BODY>
+
+<H1>Haskell Mode for Emacs: Installation Guide</H1>
+
+<P>When Emacs is started up, it normally runs an file called
+<CODE>.emacs</CODE> located in your home directory.  This file should
+contain all of your personal customisations written as a series of
+Elisp commands.  In order to install the Haskell mode, you have to
+tell Emacs where to find it.  This is done by adding some commands to
+the init file.</P>
+
+<H2>Installation</H2>
+
+<UL> <LI><P>Download the and unpack the basic mode and modules into a
+suitable directory, e.g. <CODE>~/lib/emacs</CODE> where <CODE>~</CODE>
+stands for your home directory.</P>
+
+<LI><P>Assuming you have placed the basic mode
+<CODE>haskell-mode.el</CODE> and the modules you want to use in the
+directory <CODE>~/lib/emacs</CODE>, add the following commands to your
+init file (<CODE>~/.emacs</CODE>):</P>
+
+<PRE>
+(setq load-path (cons "~/lib/emacs" load-path))
+(setq auto-mode-alist
+      (append auto-mode-alist
+              '(("\\.[hg]s$"  . haskell-mode)
+                ("\\.hi$"     . haskell-mode)
+                ("\\.l[hg]s$" . literate-haskell-mode))))
+(autoload 'haskell-mode "haskell-mode"
+   "Major mode for editing Haskell scripts." t)
+(autoload 'literate-haskell-mode "haskell-mode"
+   "Major mode for editing literate Haskell scripts." t)
+</PRE>
+
+<P>adding the following lines according to which modules you want to
+use:</P>
+
+<PRE>
+(add-hook 'haskell-mode-hook 'turn-on-haskell-font-lock)
+(add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
+(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+(add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
+(add-hook 'haskell-mode-hook 'turn-on-haskell-hugs)
+</PRE>
+
+<P>Note that the two indentation modules are mutually exclusive - add
+at most one.  You can download the above <A HREF=".emacs">code</A>.
+Note that the line of code for simple indentation is commented out
+(using a preceeding <CODE>;</CODE>) in preference for the more
+advanced indentation module.  Installation is now complete!</P>
+
+</UL>
+
+<P>For those interested, each command above shall now be
+explained.</P>
+
+<OL>
+<LI><P>We must ensure that the directory containing
+<CODE>haskell-mode.el</CODE> is on the <CODE>load-path</CODE> of
+Emacs.  You can examine the value of the <CODE>load-path</CODE> by
+typing <CODE>C-h v load-path</CODE> in an Emacs session.  Supposing
+that you've placed <CODE>haskell-mode.el</CODE> in the directory
+<CODE>~/lib/emacs</CODE>, if this directory is not on the
+<CODE>load-path</CODE> we add it with:</P>
+
+<PRE>(setq load-path (cons "~/lib/emacs" load-path))</PRE>
+
+<P>The function <CODE>setq</CODE> sets the value of a variable, and the
+function <CODE>cons</CODE> takes an element and a list and creates a
+new list with the former as head and the latter as tail, as in
+Haskell.</P>
+
+<LI><P>It is possible (and desirable) for Emacs to enter a specific
+mode according to the name of the file being edited/visited.  The
+variable <CODE>auto-mode-alist</CODE> tells Emacs what mode to run
+according to which regular expression matches the filename.  We wish
+to run the Haskell mode on all files ending in <CODE>.hs</CODE>,
+<CODE>.hi</CODE> (interface file) and <CODE>.gs</CODE> (Gofer file),
+and to run the Haskell mode for literate scripts on all files ending
+in <CODE>.lhs</CODE> and <CODE>.lgs</CODE>.  To do this, we need to
+add pairs of the form <CODE>(<EM>regexp</EM>
+. <EM>mode-function</EM>)</CODE>.  We use the function
+<CODE>append</CODE> to append a list of three such pairs to the end of
+the value of <CODE>auto-mode-alist</CODE>.  A list in Elisp is written
+within round parantheses with elements separated by whitespace.  A
+list is treated as a function application unless it is quoted with
+<CODE>'</CODE>, which is what we do.</P>
+
+<LI><P>In order for Emacs to know where to find the definition of our
+mode functions, <CODE>haskell-mode</CODE> and
+<CODE>literate-haskell-mode</CODE>, we must use the function
+<CODE>autoload</CODE>.  Both mode functions can be found in the file
+<CODE>haskell-mode.el</CODE> which was downloaded in the first
+installation step (the <CODE>.el</CODE> extension is left off and
+assumed by Emacs).  As we have already ensured that this file is on
+the <CODE>load-path</CODE> we need only give the filename and not the
+directory.  Its use is quite straightforward but for further
+information, see its documentation by entering <CODE>C-h f
+autoload</CODE> in an Emacs session.</P>
+
+<LI><P>Each function <CODE>turn-on-haskell-<EM>module</EM></CODE>
+turns on the corresponding module.  Adding such a function as a hook
+to the Haskell mode will turn on that module when the mode is used.
+Note that each of these modules may slow down Emacs, especially for
+large files.</P>
+
+</OL>
+
+<H2>Customisation</H2>
+
+<P>Most customisations are on the functionality of a particular
+module.  See the documentation of that module for information on its
+customisation.</P>
+
+<H2>Support</H2>
+
+<P>Any problems, do <A HREF=mailto:rrt@sc3d.org>mail</A> and we will
+try our best to help you!</P>
+
+<P><A HREF="./"><EM>Haskell Mode Home Page</EM></A>.</P>
