@@ -105,7 +105,7 @@
 (require 'font-lock)
 
 ;; Version.
-(defconst haskell-font-lock-version "$Revision: 1.11 $"
+(defconst haskell-font-lock-version "$Revision: 1.12 $"
   "Version number of haskell-font-lock.")
 (defun haskell-font-lock-version ()
   "Echo the current version of haskell-font-lock in the minibuffer."
@@ -141,7 +141,8 @@ and `unicode'."
 	      (cons "->" (decode-char 'ucs 8594))
 	      (cons "<-" (decode-char 'ucs 8592))
 	      (cons "=>" (decode-char 'ucs 8658))
-	      (cons "::" (decode-char 'ucs 8759))))))
+	      (cons "::" (decode-char 'ucs 8759))
+	      (cons "." (decode-char 'ucs 9675))))))
 
 ;; Use new vars for the font-lock faces.  The indirection allows people to
 ;; use different faces than in other modes, as before.
