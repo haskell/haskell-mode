@@ -137,6 +137,9 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.10  2004/11/25 23:03:23  monnier
+;;  (haskell-doc-sym-doc): Make even the last char bold.
+;;
 ;;  Revision 1.9  2004/11/24 22:14:36  monnier
 ;;  (haskell-doc-install-keymap): Don't blindly assume there's a Hugs menu.
 ;;
@@ -265,7 +268,7 @@
 ;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.9 $"
+(defconst haskell-doc-version "$Revision: 1.10 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 (defconst haskell-doc-maintainer
@@ -1369,7 +1372,7 @@ current buffer."
 			   (t 
 			    (format "%s" type)))) )
 	   (if i-am-prelude
-	       (add-text-properties 0 (1- (length str)) '(face bold) str))
+	       (add-text-properties 0 (length str) '(face bold) str))
 	   str))))
 
 
