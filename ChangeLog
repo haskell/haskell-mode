@@ -1,3 +1,33 @@
+2005-01-26  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-indent.el (haskell-indent-inside-comment): Don't assume that
+	column(pos+2) = column(pos)+2.
+	(haskell-indent-indentation-info): Fix indentation of , and ;.
+	Add arg `start'.  Restrict choice of indentation for comments.
+	(haskell-indent-event-type): Remove.
+	(haskell-indent-last-info): New var.
+	(haskell-indent-cycle): Use it to store info from one invocation to
+	the next, so we can do cycling outside of the function.
+	Don't cycle directly any more.  Instead, recognize repeated invocations
+	via last-command and friends.
+	Use indent-line-function rather than hardcoding indent-to-left-margin.
+	(haskell-indent-insert-where): Don't save excursion.
+	(haskell-indent-layout-indent-info): Minor simplifications.
+	(haskell-indent-line-indentation): Don't ignore code on a line
+	before a string.
+
+	* haskell-hugs.el (haskell-hugs-last-loaded-file): Remove.
+	(haskell-hugs-start-process): Fix misuse of make-variable-buffer-local.
+	(haskell-hugs-go): Quote file name.  Simplify.
+
+	* haskell-ghci.el (haskell-ghci-last-loaded-file): Remove.
+	(haskell-ghci-start-process): Fix misuse of make-variable-buffer-local.
+	(haskell-ghci-go): Quote file name.  Simplify.
+
+	* haskell-mode.el (haskell-version): Keep it up-to-date.
+
+	* inf-haskell.el (inferior-haskell-load-file): Quote file name.
+
 2004-12-10  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-indent.el (haskell-indent-start-of-def): Only go backward.
