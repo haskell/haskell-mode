@@ -259,12 +259,8 @@ Always buffer-local.")
 (defcustom haskell-literate-default 'bird
   "*Default value for `haskell-literate'.
 Used if the style of a literate buffer is ambiguous.  This variable should
-be set to the preferred literate style.  For example, place within
-.emacs:
-
-   (setq haskell-literate-default 'latex)"
-  :type '(choice bird latex nil)
-  :group 'haskell)
+be set to the preferred literate style."
+  :type '(choice (const bird) (const latex) (const nil)))
 
 ;; Mode maps.
 (defvar haskell-mode-map
@@ -368,6 +364,7 @@ be set to the preferred literate style.  For example, place within
   (make-local-variable 'comment-end)
   (setq comment-end "")
   (set (make-local-variable 'comment-end-skip) "[ \t]*\\(-}\\|\\s>\\)")
+  (set (make-local-variable 'parse-sexp-ignore-comments) t)
   ;; Set things up for eldoc-mode.
   (set (make-local-variable 'eldoc-print-current-symbol-info-function)
        'haskell-doc-current-info)
