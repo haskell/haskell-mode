@@ -138,6 +138,10 @@ setting up the inferior-haskell buffer."
       ;;   (inferior-haskell-send-string
       ;;    proc (concat ":cd " (file-name-directory file) "\n")))
       (compilation-forget-errors)
+      (if (boundp 'compilation-parsing-end)
+	  (if (markerp compilation-parsing-end)
+	      (set-marker compilation-parsing-end (point-max))
+	    (setq compilation-parsing-end (point-max))))
       (inferior-haskell-send-command
        proc (if reload ":reload" (concat ":load " file))))))
 
