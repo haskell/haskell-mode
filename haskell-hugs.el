@@ -5,6 +5,7 @@
 ;; In standard Emacs terminology, this would be called
 ;;    inferior-hugs-mode
 ;;    
+;; Copyright 2004  Free Software Foundation, Inc.
 ;; Copyright 1999 Guy Lapalme
 
 ;; Author:1998, 1999 Guy Lapalme <lapalme@iro.umontreal.ca>
@@ -106,7 +107,7 @@ Maps the followind commands in the haskell keymap.
 
 (defvar haskell-hugs-mode-map nil)
 
-(defun haskell-hugs-mode ()
+(define-derived-mode haskell-hugs-mode comint-mode "Haskell Hugs"
 ;; called by haskell-hugs-start-process,
 ;; itself called by haskell-hugs-load-file
 ;; only when the file is loaded the first time
@@ -131,15 +132,6 @@ imitating normal Unix input editing.
 subjob if any.
 \\[comint-stop-subjob] stops, likewise.
  \\[comint-quit-subjob] sends quit signal."
-  (interactive)
-  (comint-mode)
-  (setq major-mode 'haskell-hugs-mode)
-  (setq mode-name "Haskell Hugs")
-  (if haskell-hugs-mode-map
-      nil
-    (setq haskell-hugs-mode-map (copy-keymap comint-mode-map))
-    )
-  (use-local-map haskell-hugs-mode-map)
   )
 
 ;; Hugs-interface
@@ -171,6 +163,8 @@ subjob if any.
 
 (defvar haskell-hugs-send-end nil
   "Position of the end of the last send command.")
+
+(defalias 'run-hugs 'haskell-hugs-start-process)
 
 (defun haskell-hugs-start-process (arg)
   "Start a Hugs process and invokes `haskell-hugs-hook' if not nil.
@@ -205,10 +199,11 @@ Prompts for a list of args if called with an argument."
 
 (defun haskell-hugs-wait-for-output ()
   "Wait until output arrives and go to the last input."
-  (while (progn			
+  (while (progn
 	   (goto-char comint-last-input-end)
-	   (not (re-search-forward comint-prompt-regexp nil t)))
-    (accept-process-output haskell-hugs-process)))
+	   (and
+	    (not (re-search-forward comint-prompt-regexp nil t))
+	    (accept-process-output haskell-hugs-process)))))
 
 (defun haskell-hugs-send (&rest string)
   "Send `haskell-hugs-process' the arguments (one or more strings).
