@@ -5,8 +5,9 @@
 ;; Authors: 1997-1998 Graeme E Moss <gem@cs.york.ac.uk> and
 ;;                    Tommy Thorn <thorn@irisa.fr>,
 ;;          1992 Simon Marlow
+;;          2001 Reuben Thomas (>=v1.4)
 ;; Keywords: faces files Haskell
-;; Version: 1.3
+;; Version: 1.41
 ;; URL: http://www.haskell.org/haskell-mode/
 
 ;;; This file is not part of GNU Emacs.
@@ -112,6 +113,12 @@
 ;; thorn@irisa.fr quoting the version of the mode you are using, the
 ;; version of emacs you are using, and a small example of the problem
 ;; or suggestion.
+;;
+;; Version 1.41: improve packaging, and make a couple more variables
+;;   interactively settable.
+;;
+;; Version 1.4:
+;;   Add GHCi mode from Chris Webb, and tidy up a little.
 ;;
 ;; Version 1.3:
 ;;   The literate or non-literate style of a buffer is now indicated
