@@ -117,6 +117,10 @@
 ;; version of emacs you are using, and a small example of the problem
 ;; or suggestion.
 ;;
+;; Version 1.43:
+;;   Various tweaks to doc strings and customization support from
+;;   Ville Skyttä <ville.skytta@xemacs.org>.
+;;
 ;; Version 1.42:
 ;;   Added autoload for GHCi inferior mode (thanks to Scott 
 ;;   Williams for the bug report and fix).
