@@ -268,7 +268,7 @@ be set to the preferred literate style.  For example, place within
 
 ;; Mode maps.
 (defvar haskell-mode-map
-  (let ((keymap (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
     ;; Bindings for the inferior haskell process:
     ;; (define-key map [?\M-C-x]     'inferior-haskell-send-defun)
     ;; (define-key map [?\C-x ?\C-e] 'inferior-haskell-send-last-sexp)
@@ -281,8 +281,8 @@ be set to the preferred literate style.  For example, place within
     ;; (define-key map [?\C-c ?\C-s] 'inferior-haskell-start-process)
 
     ;; That's what M-; is for.
-    ;; (define-key keymap "\C-c\C-c" 'comment-region)
-    keymap)
+    ;; (define-key map "\C-c\C-c" 'comment-region)
+    map)
   "Keymap used in Haskell mode.")
 
 ;; Syntax table.
