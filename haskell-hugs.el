@@ -196,7 +196,7 @@ Prompts for a list of args if called with an argument."
   (setq shell-dirtrackp         t)
   (setq comint-input-sentinel   'shell-directory-tracker)
                                 ; ? or  module name in Hugs 1.4
-  (setq comint-prompt-regexp  "^\? \\|^[A-Z][_a-zA-Z0-9]*> ")
+  (setq comint-prompt-regexp  "^\? \\|^[A-Z][_a-zA-Z0-9\.]*> ")
     ;; comint's history syntax conflicts with Hugs syntax, eg. !!
   (setq comint-input-autoexpand nil)
   (run-hooks 'haskell-hugs-hook)
