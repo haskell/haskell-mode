@@ -137,6 +137,18 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.11  2004/12/10 17:33:18  monnier
+;;  (haskell-doc-minor-mode-string): Make it dynamic.
+;;  (haskell-doc-install-keymap): Remove conflicting C-c C-o binding.
+;;  (haskell-doc-mode): Make a nil arg turn the mode ON.
+;;  (turn-on-haskell-doc-mode): Make it an alias for haskell-doc-mode.
+;;  (haskell-doc-mode): Don't touch haskell-doc-minor-mode-string.
+;;  (haskell-doc-show-global-types): Don't touch
+;;  haskell-doc-minor-mode-string.  Call haskell-doc-make-global-fct-index.
+;;  (haskell-doc-check-active): Fix message.
+;;  (define-key-after): Don't define.
+;;  (haskell-doc-install-keymap): Check existence of define-key-after.
+;;
 ;;  Revision 1.10  2004/11/25 23:03:23  monnier
 ;;  (haskell-doc-sym-doc): Make even the last char bold.
 ;;
@@ -268,7 +280,7 @@
 ;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.10 $"
+(defconst haskell-doc-version "$Revision: 1.11 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 (defconst haskell-doc-maintainer
@@ -413,7 +425,8 @@ It is probably best to manipulate this data structure with the commands
 ;; be printed again if necessary without reconsing.
 (defvar haskell-doc-last-data '(nil . nil))
 
-(defvar haskell-doc-minor-mode-string " Doc"              ; " Haskell-Doc"
+(defvar haskell-doc-minor-mode-string
+  '(haskell-doc-show-global-types " DOC" " Doc")
   "*String to display in mode line when Haskell-Doc Mode is enabled.")
 
 (defconst haskell-doc-varlist
@@ -1044,8 +1057,6 @@ It is probably best to manipulate this data structure with the commands
 (require 'imenu)
 
 ; a dummy definition needed for xemacs (I know, it's horrible :-(
-(if (not (functionp 'define-key-after))
-    (defun define-key-after (map seq con name)))
 
 ;@cindex haskell-doc-install-keymap
 
@@ -1080,12 +1091,14 @@ It is probably best to manipulate this data structure with the commands
     (if (not (or haskell-doc-xemacs-p ; XEmacs has problems here
 		 (not (keymapp hugsmap))
 		 (lookup-key hugsmap [haskell-doc])))
-	(define-key-after hugsmap [haskell-doc]
-	  (cons "Haskell-doc" haskell-doc-keymap)
-	  [Haskell-doc mode])))
+	(if (functionp 'define-key-after)
+	    (define-key-after hugsmap [haskell-doc]
+	      (cons "Haskell-doc" haskell-doc-keymap)
+	      [Haskell-doc mode]))))
   ;; Add shortcuts for these commands.
   (local-set-key "\C-c\e/" 'haskell-doc-check-active)
-  (local-set-key "\C-c\C-o" 'haskell-doc-mode)
+  ;; Conflicts with the binding of haskell-insert-otherwise.
+  ;; (local-set-key "\C-c\C-o" 'haskell-doc-mode)
   (local-set-key [(control shift meta mouse-3)]
 		 'haskell-doc-ask-mouse-for-type))
 
@@ -1096,18 +1109,18 @@ It is probably best to manipulate this data structure with the commands
 ;@cindex haskell-doc-mode
 
 ;;;###autoload
-(defun haskell-doc-mode (&optional prefix)
+(defun haskell-doc-mode (&optional arg)
   "Enter `haskell-doc-mode' for showing fct types in the echo area.
 See variable docstring."
-  (interactive "P")
+  (interactive (list (or current-prefix-arg 'toggle)))
 
   ;; Make sure it's on the post-command-idle-hook if defined, otherwise put
   ;; it on post-command-hook.  The former first appeared in Emacs 19.30.
   (setq haskell-doc-mode
-  	 (if prefix
-  	     (or (listp prefix);; C-u alone
-  		 (> (prefix-numeric-value prefix) 0))
-  	   (not haskell-doc-mode)))
+	(cond
+	 ((eq arg 'toggle) (not haskell-doc-mode))
+	 (arg (> (prefix-numeric-value arg) 0))
+	 (t)))
 
   (cond
    (haskell-doc-mode
@@ -1120,10 +1133,7 @@ See variable docstring."
 		'post-command-hook)
 	      'haskell-doc-mode-print-current-symbol-info nil 'local)
     (and haskell-doc-show-global-types
-	 (progn
-	   (setq haskell-doc-minor-mode-string " Haskell-DOC")
-	   (haskell-doc-make-global-fct-index))  ; build type index for global fcts
-	 (setq haskell-doc-minor-mode-string " Haskell-Doc"))
+	 (haskell-doc-make-global-fct-index)) ; build type index for global fcts
 
     (haskell-doc-install-keymap)
 
@@ -1141,27 +1151,6 @@ See variable docstring."
 		(if haskell-doc-mode "enabled" "disabled")))
   haskell-doc-mode)
 
-;;@cindex haskell-doc-show-global-types
-
-;;;;###autoload
-;(defun haskell-doc-show-global-types (&optional prefix)
-;  "*If non-nil, then enable display of global types in `haskell-doc-mode'."
-;  (interactive "P")
-;  ;; toggle mode or set it based on prefix value
-;  (setq haskell-doc-show-global-types
-;	(if prefix
-;	    (>= (prefix-numeric-value prefix) 0)
-;	  (not haskell-doc-show-global-types)))
-
-;  (cond (haskell-doc-show-global-types
-;	 ;; set mode string to reflect value of `haskell-doc-show-global-types'
-;	 (setq haskell-doc-minor-mode-string " Haskell-DOC")
-;	 ;; build index (note: this can be quite expensive)
-;	 (haskell-doc-make-global-fct-index))
-;	(t
-;	 (setq haskell-doc-minor-mode-string " Haskell-Doc")) ) )
-
-
 (defmacro haskell-doc-toggle-var (id prefix)
   ;; toggle variable or set it based on prefix value
   `(setq ,id
@@ -1175,8 +1164,7 @@ See variable docstring."
   (interactive "P")
   (haskell-doc-toggle-var haskell-doc-show-global-types prefix)
   (if haskell-doc-show-global-types
-      (setq haskell-doc-minor-mode-string " Haskell-DOC")
-    (setq haskell-doc-minor-mode-string " Haskell-Doc")) )
+      (haskell-doc-make-global-fct-index)))
 
 ;@cindex haskell-doc-show-reserved
 (defun haskell-doc-show-reserved (&optional prefix)
@@ -1208,10 +1196,7 @@ See variable docstring."
 ;@cindex turn-on-haskell-doc-mode
 
 ;;;###autoload
-(defun turn-on-haskell-doc-mode ()
-  "Unequivocally turn on `haskell-doc-mode' (see variable documentation)."
-  (interactive)
-  (haskell-doc-mode 1))
+(defalias 'turn-on-haskell-doc-mode 'haskell-doc-mode)
 
 ;@cindex  turn-off-haskell-doc-mode
 
@@ -1226,17 +1211,18 @@ See variable docstring."
 ;@cindex haskell-doc-check-active
 
 (defun haskell-doc-check-active ()
- "Check whether the print function is hooked in. 
-Should be the same as the value of `haskell-doc-mode' but alas currently it 
+  "Check whether the print function is hooked in.
+Should be the same as the value of `haskell-doc-mode' but alas currently it
 is not."
- (interactive)
- (message 
-  (if (memq 'haskell-doc-mode-print-current-symbol-info 
-	    (if (boundp 'post-command-idle-hook)
-		post-command-idle-hook
-	      post-command-hook))
-      "haskell-doc is ACTIVE"
-    "haskell-doc is not ACTIVE \(Use C-u C-c C-o to turn it on\)")))
+  (interactive)
+  (message
+   (if (memq 'haskell-doc-mode-print-current-symbol-info
+	     (if (boundp 'post-command-idle-hook)
+		 post-command-idle-hook
+	       post-command-hook))
+       "haskell-doc is ACTIVE"
+     (substitute-command-keys
+      "haskell-doc is not ACTIVE \(Use C-u \\[haskell-doc-mode] to turn it on\)"))))
 
 ;@node Top level function, Mouse interface, Check, top
 ;@section Top level function
