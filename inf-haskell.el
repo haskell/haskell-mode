@@ -64,8 +64,8 @@ The format should be the same as for `compilation-error-regexp-alist'.")
   (set (make-local-variable 'compilation-error-regexp-alist)
        inferior-haskell-error-regexp-alist)
   (cond
-   ((fboundp 'compilation-shell-minor-mode) (compilation-shell-minor-mode -1))
-   ((fboundp 'compilation-minor-mode) (compilation-minor-mode -1))))
+   ((fboundp 'compilation-shell-minor-mode) (compilation-shell-minor-mode 1))
+   ((fboundp 'compilation-minor-mode) (compilation-minor-mode 1))))
 
 (defun inferior-haskell-string-to-strings (string &optional separator)
   "Split the STRING into a list of strings.
@@ -118,15 +118,6 @@ setting up the inferior-haskell buffer."
   (let ((proc (inferior-haskell-process arg)))
     (pop-to-buffer (process-buffer proc))))
 
-(defun inferior-haskell-wait-for-output ()
-  "Wait until output arrives and go to the last input."
-  (let ((proc (get-buffer-process (current-buffer))))
-    (while (and
-	    (goto-char comint-last-input-end)
-	    (not (re-search-forward comint-prompt-regexp nil t))
-	    proc
-	    (accept-process-output proc)))))
-
 ;;;###autoload
 (defun inferior-haskell-load-file (&optional reload)
   "Pass the current buffer's file to the inferior haskell process."
@@ -138,11 +129,23 @@ setting up the inferior-haskell buffer."
       ;; Not sure if it's useful/needed and if it actually works.
       ;; (unless (equal (file-name-as-directory default-directory)
       ;;                (file-name-directory file))
-      ;;   (comint-send-string proc (concat ":cd " (file-name-directory file)
-      ;; 					 "\n")))
+      ;;   (inferior-haskell-send-string
+      ;;    proc (concat ":cd " (file-name-directory file) "\n")))
       (compilation-forget-errors)
-      (comint-send-string
-       proc (if reload ":reload\n" (concat ":load " file "\n"))))))
+      (inferior-haskell-send-command
+       proc (if reload ":reload" (concat ":load " file))))))
+
+(defun inferior-haskell-send-command (proc str)
+  (setq str (concat str "\n"))
+  (with-current-buffer (process-buffer proc)
+    (while (and
+	    (goto-char comint-last-input-end)
+	    (not (re-search-forward comint-prompt-regexp nil t))
+	    (accept-process-output proc)))
+    (goto-char (process-mark proc))
+    (insert-before-markers str)
+    (move-marker comint-last-input-end (point))
+    (comint-send-string proc str)))
 
 (defun inferior-haskell-reload-file ()
   "Tell the inferior haskell process to reread the current buffer's file."
