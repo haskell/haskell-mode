@@ -5,8 +5,7 @@
 
 ;; Authors: 1997-1998 Graeme E Moss <gem@cs.york.ac.uk>
 ;; Keywords: declarations menu files Haskell
-;; Version: 1.2
-;; URL: http://www.cs.york.ac.uk/~gem/haskell-mode/decl-scan.html
+;; URL: http://cvs.haskell.org/cgi-bin/cvsweb.cgi/fptools/CONTRIB/haskell-modes/emacs/haskell-decl-scan.el?rev=HEAD
 
 ;;; This file is not part of GNU Emacs.
 
@@ -57,7 +56,7 @@
 ;; example of the problem or suggestion.  Note that this library
 ;; requires a reasonably recent version of Emacs.
 ;;
-;; Uses `imenu' under FSF Emacs, and `func-menu' under XEmacs.
+;; Uses `imenu' under Emacs, and `func-menu' under XEmacs.
 ;;
 ;; Version 1.2:
 ;;   Added support for LaTeX-style literate scripts.
@@ -111,7 +110,7 @@
 ;;   with spaces okay.
 ;;
 ;; . Would like to extend the goto functions given by `func-menu'
-;;   under XEmacs to FSF Emacs.  Would have to implement these
+;;   under XEmacs to Emacs.  Would have to implement these
 ;;   ourselves as `imenu' does not provide them.
 ;;
 ;; . `func-menu' uses its own syntax table when grabbing a declaration
@@ -130,7 +129,9 @@
 
 ;;; Code:
 
-(defconst haskell-decl-scan-version "1.2"
+(require 'haskell-mode)
+
+(defconst haskell-decl-scan-version "$Revision: 1.6 $"
   "Version number of haskell-decl-scan.")
 (defun haskell-decl-scan-version ()
   "Echo the current version of haskell-decl-scan in the minibuffer."
@@ -141,18 +142,20 @@
 ;; As `cl' defines macros that `imenu' uses, we must require them at
 ;; compile time.
 (eval-when-compile
-  ;; `imenu' isn't used in XEmacs.
-  (if (not (string-match "Lucid\\|XEmacs" emacs-version))
-      (progn
-	(require 'cl)
-	(require 'imenu))))
+  (require 'cl)
+  (condition-case nil
+      (require 'imenu)
+    (error nil)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General declaration scanning functions.
 
-(defun haskell-ds-match-string (num)
-  "As `match-string' except that the string is stripped of properties."
-  (format "%s" (match-string num)))
+(defalias 'haskell-ds-match-string
+  (if (fboundp 'match-string-no-properties)
+      'match-string-no-properties
+    (lambda (num)
+      "As `match-string' except that the string is stripped of properties."
+      (format "%s" (match-string num)))))
 
 (defvar haskell-ds-start-keywords-re
   (concat "\\(\\<"
@@ -161,36 +164,14 @@
 	  "\\)\\>")
   "Keywords that may start a declaration.")
 
-(defvar haskell-ds-syntax-table nil
+(defvar haskell-ds-syntax-table
+  (let ((table (copy-syntax-table haskell-mode-syntax-table)))
+    (modify-syntax-entry ?\' "w" table)
+    (modify-syntax-entry ?_  "w" table)
+    (modify-syntax-entry ?\\ "_" table)
+    table)
   "Syntax table used for Haskell declaration scanning.")
 
-(if (not haskell-ds-syntax-table)
-    (progn
-      (setq haskell-ds-syntax-table (make-syntax-table))
-  (modify-syntax-entry ?\  " " haskell-ds-syntax-table)
-  (modify-syntax-entry ?\t " " haskell-ds-syntax-table)
-  (modify-syntax-entry ?\" "\"" haskell-ds-syntax-table)
-  (modify-syntax-entry ?\' "w" haskell-ds-syntax-table)
-  (modify-syntax-entry ?_  "w" haskell-ds-syntax-table)
-  (modify-syntax-entry ?\( "()" haskell-ds-syntax-table)
-  (modify-syntax-entry ?\) ")(" haskell-ds-syntax-table)
-  (modify-syntax-entry ?[  "(]" haskell-ds-syntax-table)
-  (modify-syntax-entry ?]  ")[" haskell-ds-syntax-table)
-  (modify-syntax-entry ?{  "(}1" haskell-ds-syntax-table)
-  (modify-syntax-entry ?}  "){4" haskell-ds-syntax-table)
-  (modify-syntax-entry ?-  "_ 23" haskell-ds-syntax-table)
-  (modify-syntax-entry ?\` "$`" haskell-ds-syntax-table)
-  (mapcar (lambda (x)
-            (modify-syntax-entry x "_" haskell-ds-syntax-table))
-          (concat "!#$%&*+./:<=>?@\\^|~"
-                  (haskell-enum-from-to ?\241 ?\277)
-                  "\327\367"))
-  (mapcar (lambda (x)
-            (modify-syntax-entry x "w" haskell-ds-syntax-table))
-          (concat (haskell-enum-from-to ?\300 ?\326)
-                  (haskell-enum-from-to ?\330 ?\337)
-                  (haskell-enum-from-to ?\340 ?\366)
-                  (haskell-enum-from-to ?\370 ?\377)))))
 
 (defun haskell-ds-get-variable (prefix)
   "Assuming point is looking at the regexp PREFIX followed by the
@@ -587,21 +568,16 @@ datatypes) in a Haskell file for the `imenu' package."
     ;; Return the alist.
     index-alist))
 
-(defun haskell-ds-imenu-label-cmp (el1 el2)
-  "Predicate to compare labels in lists produced by
+(defalias 'haskell-ds-imenu-label-cmp
+  (if (fboundp 'car-less-than-car)
+      'car-less-than-car
+    (lambda (el1 el2)
+      "Predicate to compare labels in lists produced by
 `haskell-ds-create-imenu-index'."
-  (string< (car el1) (car el2)))
+      (string< (car el1) (car el2)))))
 
 (defun haskell-ds-imenu ()
   "Install `imenu' for Haskell scripts."
-  ;; Would prefer to toggle imenu but can't see how to turn it off...
-  (require 'imenu)
-  ;; In emacs-20's imenu we have to bind some functions first -- HWL
-  (if (and  (not (featurep 'xemacs))
-	    (>= (string-to-number (substring emacs-version 0 2)) 20)
-	    (not (fboundp 'imenu-extract-index-name-function)))
-      ;; This looks wrong, but I can't test it.  --Stef
-      (setq imenu-extract-index-name-function 'haskell-ds-create-imenu-index))
   (setq imenu-create-index-function 'haskell-ds-create-imenu-index)
   (if (fboundp 'imenu-add-to-menubar)
       (imenu-add-to-menubar "Declarations")))
@@ -685,7 +661,7 @@ Under XEmacs, the following keys are also defined:
 \\[fume-prompt-function-goto] prompts for a declaration to move to, and
 \\[fume-mouse-function-goto] moves to the declaration whose name is at point.
 
-This may link with `haskell-doc' (only for FSF Emacs currently).
+This may link with `haskell-doc' (only for Emacs currently).
 
 For non-literate and LaTeX-style literate scripts, we assume the
 common convention that top-level declarations start at the first
@@ -721,7 +697,7 @@ Use `haskell-decl-scan-version' to find out what version this is."
     (haskell-ds-func-menu))
   (run-hooks 'haskell-decl-scan-hook))
 
-;;; Provide ourselves:
+;; Provide ourselves:
 
 (provide 'haskell-decl-scan)
 ;;; haskell-decl-scan.el ends here
