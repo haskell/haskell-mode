@@ -7,7 +7,7 @@
 
 
 ;;;### (autoloads (haskell-doc-show-type turn-on-haskell-doc-mode
-;;;;;;  haskell-doc-mode) "haskell-doc" "haskell-doc.el" (16750 64867))
+;;;;;;  haskell-doc-mode) "haskell-doc" "haskell-doc.el" (16805 1996))
 ;;; Generated autoloads from haskell-doc.el
 
 (autoload (quote haskell-doc-mode) "haskell-doc" "\
@@ -32,8 +32,30 @@ current buffer.
 
 ;;;***
 
+;;;### (autoloads (run-ghci) "haskell-ghci" "haskell-ghci.el" (16760
+;;;;;;  9226))
+;;; Generated autoloads from haskell-ghci.el
+
+(autoload (quote run-ghci) "haskell-ghci" "\
+Go to the *ghci* buffer.
+
+\(fn)" t nil)
+
+;;;***
+
+;;;### (autoloads (run-hugs) "haskell-hugs" "haskell-hugs.el" (16760
+;;;;;;  12580))
+;;; Generated autoloads from haskell-hugs.el
+
+(autoload (quote run-hugs) "haskell-hugs" "\
+Goes to the Hugs buffer.
+
+\(fn)" t nil)
+
+;;;***
+
 ;;;### (autoloads (literate-haskell-mode haskell-mode) "haskell-mode"
-;;;;;;  "haskell-mode.el" (16756 5717))
+;;;;;;  "haskell-mode.el" (16806 23859))
 ;;; Generated autoloads from haskell-mode.el
 
 (autoload (quote haskell-mode) "haskell-mode" "\
@@ -51,9 +73,6 @@ details.
 Modules can hook in via `haskell-mode-hook'.  The following modules
 are supported with an `autoload' command:
 
-   `haskell-font-lock', Graeme E Moss and Tommy Thorn
-     Fontifies standard Haskell keywords, symbols, functions, etc.
-
    `haskell-decl-scan', Graeme E Moss
      Scans top-level declarations, and places them in a menu.
 
@@ -65,9 +84,6 @@ are supported with an `autoload' command:
 
    `haskell-simple-indent', Graeme E Moss and Heribert Schuetz
      Simple indentation.
-
-   `haskell-hugs', Guy Lapalme
-     Interaction with Hugs interpreter.
 
 Module X is activated using the command `turn-on-X'.  For example,
 `haskell-font-lock' is activated using `turn-on-haskell-font-lock'.
@@ -92,9 +108,27 @@ As `haskell-mode' but for literate scripts.
 
 ;;;***
 
+;;;### (autoloads (inferior-haskell-load-file switch-to-haskell)
+;;;;;;  "inf-haskell" "inf-haskell.el" (16805 8039))
+;;; Generated autoloads from inf-haskell.el
+
+(defalias (quote run-haskell) (quote switch-to-haskell))
+
+(autoload (quote switch-to-haskell) "inf-haskell" "\
+Show the inferior-haskell buffer.  Start the process if needed.
+
+\(fn &optional ARG)" t nil)
+
+(autoload (quote inferior-haskell-load-file) "inf-haskell" "\
+Pass the current buffer's file to the inferior haskell process.
+
+\(fn &optional RELOAD)" t nil)
+
+;;;***
+
 ;;;### (autoloads nil nil ("haskell-decl-scan.el" "haskell-font-lock.el"
-;;;;;;  "haskell-ghci.el" "haskell-hugs.el" "haskell-indent.el" "haskell-simple-indent.el")
-;;;;;;  (16756 10020 280142))
+;;;;;;  "haskell-indent.el" "haskell-simple-indent.el") (16806 23897
+;;;;;;  580527))
 
 ;;;***
 
