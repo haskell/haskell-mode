@@ -131,7 +131,7 @@
 
 (require 'haskell-mode)
 
-(defconst haskell-decl-scan-version "$Revision: 1.6 $"
+(defconst haskell-decl-scan-version "$Revision: 1.7 $"
   "Version number of haskell-decl-scan.")
 (defun haskell-decl-scan-version ()
   "Echo the current version of haskell-decl-scan in the minibuffer."
@@ -568,13 +568,10 @@ datatypes) in a Haskell file for the `imenu' package."
     ;; Return the alist.
     index-alist))
 
-(defalias 'haskell-ds-imenu-label-cmp
-  (if (fboundp 'car-less-than-car)
-      'car-less-than-car
-    (lambda (el1 el2)
-      "Predicate to compare labels in lists produced by
+(defun haskell-ds-imenu-label-cmp (el1 el2)
+  "Predicate to compare labels in lists produced by
 `haskell-ds-create-imenu-index'."
-      (string< (car el1) (car el2)))))
+  (string< (car el1) (car el2)))
 
 (defun haskell-ds-imenu ()
   "Install `imenu' for Haskell scripts."
