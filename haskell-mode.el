@@ -119,7 +119,7 @@
 ;;
 ;; Version 1.43:
 ;;   Various tweaks to doc strings and customization support from
-;;   Ville Skyttä <ville.skytta@xemacs.org>.
+;;   Ville Skyttä <scop@xemacs.org>.
 ;;
 ;; Version 1.42:
 ;;   Added autoload for GHCi inferior mode (thanks to Scott 
@@ -404,18 +404,12 @@ calls with LITERATE nil.  Latter calls with LITERATE 'bird or 'latex."
   ;; else at comment-column
   (if (bolp) 0 (max (1+ (current-column)) comment-column)))
 
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.\\(?:[gh]s\\|hi\\)$" . haskell-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.l[gh]s$" . literate-haskell-mode))
-;;;###autoload
-(add-hook 'haskell-mode-hook 'turn-on-haskell-font-lock)
-;;;###autoload
-(add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
-;;;###autoload
-(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-;;;###autoload
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+;;;###autoload(add-to-list 'auto-mode-alist '("\\.\\(?:[gh]s\\|hi\\)$" . haskell-mode))
+;;;###autoload(add-to-list 'auto-mode-alist '("\\.l[gh]s$" . literate-haskell-mode))
+;;;###autoload(add-hook 'haskell-mode-hook 'turn-on-haskell-font-lock)
+;;;###autoload(add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
+;;;###autoload(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+;;;###autoload(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 
 ;;; Provide ourselves:
 
