@@ -52,11 +52,11 @@
 ;; `haskell-simple-indent', Graeme E Moss and Heribert Schuetz
 ;;   Simple indentation.
 ;;
-;; `haskell-hugs', Guy Lapalme
-;;   Interaction with Hugs interpreter.
-;;
-;; `haskell-ghci', Chris Web
-;;   Interaction with GHCi interpreter.
+;; `inf-haskell'
+;;   Interaction with an inferior Haskell process.
+;;   It replaces the previous two modules:
+;;     `haskell-hugs', Guy Lapalme
+;;     `haskell-ghci', Chris Web
 ;;
 ;;
 ;; This mode supports full Haskell 1.4 including literate scripts.
@@ -90,7 +90,6 @@
 ;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
 ;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 ;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
-;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-hugs)
 ;;
 ;; Make sure the module files are also on the load-path.  Note that
 ;; the two indentation modules are mutually exclusive: Use only one.
@@ -221,10 +220,6 @@
   "Turn on Haskell indentation." t)
 (autoload 'turn-on-haskell-simple-indent "haskell-simple-indent"
   "Turn on simple Haskell indentation." t)
-(autoload 'turn-on-haskell-hugs "haskell-hugs"
-  "Turn on interaction with a Hugs interpreter." t)
-(autoload 'turn-on-haskell-ghci "haskell-ghci"
-  "Turn on interaction with a GHCi interpreter." t)
 
 ;; Functionality provided in other files.
 (autoload 'haskell-ds-create-imenu-index "haskell-decl-scan")
@@ -236,6 +231,17 @@
   (interactive)
   (turn-on-font-lock)
   (message "turn-on-haskell-font-lock is obsolete.  Use turn-on-font-lock instead."))
+(defun turn-on-haskell-hugs ()
+  (interactive)
+  (message "haskell-hugs is obsolete.")
+  (load "haskell-hugs")
+  (turn-on-haskell-hugs))
+(defun turn-on-haskell-ghci ()
+  (interactive)
+  (message "haskell-ghci is obsolete.")
+  (load "haskell-ghci")
+  (turn-on-haskell-ghci))
+
 
 ;; Are we looking at a literate script?
 (defvar haskell-literate nil
@@ -261,9 +267,22 @@ be set to the preferred literate style.  For example, place within
   :group 'haskell)
 
 ;; Mode maps.
-(defvar haskell-mode-map (let ((keymap (make-sparse-keymap)))
-			   (define-key keymap "\C-c\C-c" 'comment-region)
-			   keymap)
+(defvar haskell-mode-map
+  (let ((keymap (make-sparse-keymap)))
+    ;; Bindings for the inferior haskell process:
+    ;; (define-key map [?\M-C-x]     'inferior-haskell-send-defun)
+    ;; (define-key map [?\C-x ?\C-e] 'inferior-haskell-send-last-sexp)
+    ;; (define-key map [?\C-c ?\C-r] 'inferior-haskell-send-region)
+    (define-key map [?\C-c ?\C-z] 'switch-to-haskell)
+    (define-key map [?\C-c ?\C-l] 'inferior-haskell-load-file)
+    ;; Non standard in other inferior-modes, but traditional in haskell.
+    (define-key map [?\C-c ?\C-r] 'inferior-haskell-reload-file)
+    (define-key map [?\C-c ?\C-b] 'switch-to-haskell)
+    ;; (define-key map [?\C-c ?\C-s] 'inferior-haskell-start-process)
+
+    ;; That's what M-; is for.
+    ;; (define-key keymap "\C-c\C-c" 'comment-region)
+    keymap)
   "Keymap used in Haskell mode.")
 
 ;; Syntax table.
@@ -394,9 +413,6 @@ details.
 Modules can hook in via `haskell-mode-hook'.  The following modules
 are supported with an `autoload' command:
 
-   `haskell-font-lock', Graeme E Moss and Tommy Thorn
-     Fontifies standard Haskell keywords, symbols, functions, etc.
-
    `haskell-decl-scan', Graeme E Moss
      Scans top-level declarations, and places them in a menu.
 
@@ -408,9 +424,6 @@ are supported with an `autoload' command:
 
    `haskell-simple-indent', Graeme E Moss and Heribert Schuetz
      Simple indentation.
-
-   `haskell-hugs', Guy Lapalme
-     Interaction with Hugs interpreter.
 
 Module X is activated using the command `turn-on-X'.  For example,
 `haskell-font-lock' is activated using `turn-on-haskell-font-lock'.
