@@ -1,11 +1,13 @@
-;;; haskell-mode.el --- A Haskell editing mode
+;;; haskell-mode.el --- A Haskell editing mode    -*-coding: iso-8859-1;-*-
 
 ;; Copyright (C) 1992, 1997-1998 Simon Marlow, Graeme E Moss, and Tommy Thorn
+;; Copyright (C) 2003 Free Software Foundation, Inc
 
 ;; Authors: 1992      Simon Marlow
 ;;          1997-1998 Graeme E Moss <gem@cs.york.ac.uk> and
 ;;                    Tommy Thorn <thorn@irisa.fr>,
 ;;          2001-2002 Reuben Thomas (>=v1.4)
+;;          2003      Dave Love <fx@gnu.org>
 ;; Keywords: faces files Haskell
 ;; Version: 1.43
 ;; URL: http://www.haskell.org/haskell-mode/
@@ -57,7 +59,8 @@
 ;;   Interaction with GHCi interpreter.
 ;;
 ;;
-;; This mode supports full Latin1 Haskell 1.4 including literate scripts.
+;; This mode supports full Haskell 1.4 including literate scripts.
+;; In some versions of (X)Emacs it may only support Latin-1, not Unicode.
 ;;
 ;; Installation:
 ;; 
@@ -122,7 +125,7 @@
 ;;   Ville Skyttä <scop@xemacs.org>.
 ;;
 ;; Version 1.42:
-;;   Added autoload for GHCi inferior mode (thanks to Scott 
+;;   Added autoload for GHCi inferior mode (thanks to Scott
 ;;   Williams for the bug report and fix).
 ;;
 ;; Version 1.41:
@@ -183,9 +186,6 @@
 ;;   First official release.
 
 ;; Present Limitations/Future Work (contributions are most welcome!):
-;;
-;; . Unicode is still a mystery...  has anyone used it yet?  We still
-;;   support Latin-ISO-8859-1 though (the character set of Haskell 1.3).
 ;;
 ;; . Would like RET in Bird-style literate mode to add a ">" at the
 ;;   start of a line when previous line starts with ">".  Or would
@@ -249,58 +249,72 @@ of `haskell-literate-default' is used.
 Always buffer-local.")
 (make-variable-buffer-local 'haskell-literate)
 ;; Default literate style for ambiguous literate buffers.
-(defvar haskell-literate-default 'bird
-  "*If the style of a literate buffer is ambiguous, then this variable
-gives the default value for `haskell-literate'.  This variable should
+(defcustom haskell-literate-default 'bird
+  "*Default value for `haskell-literate'.
+Used if the style of a literate buffer is ambiguous.  This variable should
 be set to the preferred literate style.  For example, place within
 .emacs:
 
-   (setq haskell-literate-default 'latex)")
+   (setq haskell-literate-default 'latex)"
+  :type '(choice bird latex nil)
+  :group 'haskell)
 
 ;; Mode maps.
-(defvar haskell-mode-map ()
+(defvar haskell-mode-map (let ((keymap (make-sparse-keymap)))
+			   (define-key keymap "\C-c\C-c" 'comment-region)
+			   keymap)
   "Keymap used in Haskell mode.")
-(make-variable-buffer-local 'haskell-mode-map)
-
-(if (not (default-value 'haskell-mode-map))
-    (set-default 'haskell-mode-map
-                 (progn
-                   (let ((keymap (make-sparse-keymap)))
-                     (define-key keymap "\C-c\C-c" 'comment-region)
-                     keymap))))
 
 ;; Syntax table.
-(defvar haskell-mode-syntax-table nil
-  "Syntax table used in Haskell mode.")
+(defvar haskell-mode-syntax-table
+  (let ((table (make-syntax-table)))
+    (modify-syntax-entry ?\  " " table)
+    (modify-syntax-entry ?\t " " table)
+    (modify-syntax-entry ?\" "\"" table)
+    (modify-syntax-entry ?\' "\'" table)
+    (modify-syntax-entry ?_  "w" table)
+    (modify-syntax-entry ?\( "()" table)
+    (modify-syntax-entry ?\) ")(" table)
+    (modify-syntax-entry ?\[  "(]" table)
+    (modify-syntax-entry ?\]  ")[" table)
 
-(if (not haskell-mode-syntax-table)
-    (progn
-      (setq haskell-mode-syntax-table (make-syntax-table))
-  (modify-syntax-entry ?\  " " haskell-mode-syntax-table)
-  (modify-syntax-entry ?\t " " haskell-mode-syntax-table)
-  (modify-syntax-entry ?\" "\"" haskell-mode-syntax-table)
-  (modify-syntax-entry ?\' "\'" haskell-mode-syntax-table)
-  (modify-syntax-entry ?_  "w" haskell-mode-syntax-table)
-  (modify-syntax-entry ?\( "()" haskell-mode-syntax-table)
-  (modify-syntax-entry ?\) ")(" haskell-mode-syntax-table)
-  (modify-syntax-entry ?[  "(]" haskell-mode-syntax-table)
-  (modify-syntax-entry ?]  ")[" haskell-mode-syntax-table)
-  (modify-syntax-entry ?{  "(}1" haskell-mode-syntax-table)
-  (modify-syntax-entry ?}  "){4" haskell-mode-syntax-table)
-  (modify-syntax-entry ?-  "_ 23" haskell-mode-syntax-table)
-  (modify-syntax-entry ?\` "$`" haskell-mode-syntax-table)
-  (modify-syntax-entry ?\\ "\\" haskell-mode-syntax-table)
-  (mapcar (lambda (x)
-            (modify-syntax-entry x "_" haskell-mode-syntax-table))
-          (concat "!#$%&*+./:<=>?@^|~"
-                  (haskell-enum-from-to ?\241 ?\277)
-                  "\327\367"))
-  (mapcar (lambda (x)
-            (modify-syntax-entry x "w" haskell-mode-syntax-table))
-          (concat (haskell-enum-from-to ?\300 ?\326)
-                  (haskell-enum-from-to ?\330 ?\337)
-                  (haskell-enum-from-to ?\340 ?\366)
-                  (haskell-enum-from-to ?\370 ?\377)))))
+    (cond ((featurep 'xemacs)
+	   ;; I don't know whether this is equivalent to the below
+	   ;; (modulo nesting).  -- fx
+	   (modify-syntax-entry ?{  "(}1" table)
+	   (modify-syntax-entry ?}  "){4" table)
+	   (modify-syntax-entry ?-  "_ 23" table))
+	  (t
+	   ;; The following get comment syntax right, similarly to C++
+	   ;; (but the `b' style needs to be the other way round).  In
+	   ;; Emacs 21, the `n' indicates that they nest.  Proper
+	   ;; treatment of comments requires syntactic font-lock
+	   ;; support.
+	   (modify-syntax-entry ?\{  "(}1nb" table)
+	   (modify-syntax-entry ?\}  "){4nb" table)
+	   (modify-syntax-entry ?-  "_ 123" table)
+	   (modify-syntax-entry ?\n ">" table)))
+
+    (modify-syntax-entry ?\` "$`" table)
+    (modify-syntax-entry ?\\ "\\" table)
+    (mapcar (lambda (x)
+	      (modify-syntax-entry x "_" table))
+	    ;; Some of these are actually OK by default.
+	    "!#$%&*+./:<=>?@^|~")
+    (unless (featurep 'mule)
+      ;; Non-ASCII syntax should be OK, at least in Emacs.
+      (mapcar (lambda (x)
+		(modify-syntax-entry x "_" table))
+	      (concat (haskell-enum-from-to ?\241 ?\277)
+		      "\327\367"))
+      (mapcar (lambda (x)
+		(modify-syntax-entry x "w" table))
+	      (concat (haskell-enum-from-to ?\300 ?\326)
+		      (haskell-enum-from-to ?\330 ?\337)
+		      (haskell-enum-from-to ?\340 ?\366)
+		      (haskell-enum-from-to ?\370 ?\377))))
+    table)
+  "Syntax table used in Haskell mode.")
 
 ;; Various mode variables.
 (defun haskell-vars ()
@@ -329,7 +343,7 @@ be set to the preferred literate style.  For example, place within
 Blank lines separate paragraphs, comments start with `-- '.
 
 \\<haskell-mode-map>\\[indent-for-comment] will place a comment at an appropriate place on the current line.
-\\<haskell-mode-map>\\[comment-region] comments (or with prefix arg, uncomments) each line in the region.
+\\[comment-region] comments (or with prefix arg, uncomments) each line in the region.
 
 Literate scripts are supported via `literate-haskell-mode'.  The
 variable `haskell-literate' indicates the style of the script in the
@@ -386,8 +400,9 @@ Invokes `haskell-mode-hook' if not nil."
          haskell-literate-default)))))
 
 (defun haskell-mode-generic (literate)
-  "Common part of `haskell-mode' and `literate-haskell-mode'.  Former
-calls with LITERATE nil.  Latter calls with LITERATE 'bird or 'latex."
+  "Common part of `haskell-mode' and `literate-haskell-mode'.
+Former calls this with LITERATE nil.  Latter calls with LITERATE `bird' or
+`latex'."
 
   (haskell-vars)
   (setq major-mode 'haskell-mode)
