@@ -184,14 +184,14 @@
   (mapcar (lambda (x)
             (modify-syntax-entry x "_" haskell-ds-syntax-table))
           (concat "!#$%&*+./:<=>?@\\^|~"
-                  (enum-from-to ?\241 ?\277)
+                  (haskell-enum-from-to ?\241 ?\277)
                   "\327\367"))
   (mapcar (lambda (x)
             (modify-syntax-entry x "w" haskell-ds-syntax-table))
-          (concat (enum-from-to ?\300 ?\326)
-                  (enum-from-to ?\330 ?\337)
-                  (enum-from-to ?\340 ?\366)
-                  (enum-from-to ?\370 ?\377)))))
+          (concat (haskell-enum-from-to ?\300 ?\326)
+                  (haskell-enum-from-to ?\330 ?\337)
+                  (haskell-enum-from-to ?\340 ?\366)
+                  (haskell-enum-from-to ?\370 ?\377)))))
 
 (defun haskell-ds-get-variable (prefix)
   "Assuming point is looking at the regexp PREFIX followed by the
