@@ -185,12 +185,17 @@
 ;;; All functions/variables start with `(literate-)haskell-'.
 
 ;; Version of mode.
-(defconst haskell-version "1.41"
-  "haskell-mode version number.")
+(defconst haskell-version "1.42"
+  "`haskell-mode' version number.")
 (defun haskell-version ()
-  "Echo the current version of haskell-mode in the minibuffer."
+  "Echo the current version of `haskell-mode' in the minibuffer."
   (interactive)
   (message "Using haskell-mode version %s" haskell-version))
+
+(defgroup haskell nil
+  "Major mode for editing Haskell programs."
+  :group 'languages
+  :prefix "haskell-")
 
 ;; Haskell-like function for creating [from..to].
 (defun haskell-enum-from-to (from to)
@@ -304,6 +309,7 @@ be set to the preferred literate style.  For example, place within
   (setq comment-end ""))
 
 ;; The main mode functions
+;;;###autoload
 (defun haskell-mode ()
   "Major mode for editing Haskell programs.  Last adapted for Haskell 1.4.
 Blank lines separate paragraphs, comments start with `-- '.
@@ -350,6 +356,7 @@ Invokes `haskell-mode-hook' if not nil."
   (interactive)
   (haskell-mode-generic nil))
 
+;;;###autoload
 (defun literate-haskell-mode ()
   "As `haskell-mode' but for literate scripts."
 
@@ -365,7 +372,7 @@ Invokes `haskell-mode-hook' if not nil."
          haskell-literate-default)))))
 
 (defun haskell-mode-generic (literate)
-  "Common part of haskell-mode and literate-haskell-mode.  Former
+  "Common part of `haskell-mode' and `literate-haskell-mode'.  Former
 calls with LITERATE nil.  Latter calls with LITERATE 'bird or 'latex."
 
   (haskell-vars)
@@ -382,6 +389,19 @@ calls with LITERATE nil.  Latter calls with LITERATE 'bird or 'latex."
   ;; if the line is blank, put the comment at the beginning,
   ;; else at comment-column
   (if (bolp) 0 (max (1+ (current-column)) comment-column)))
+
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.\\(?:[gh]s\\|hi\\)$" . haskell-mode))
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.l[gh]s$" . literate-haskell-mode))
+;;;###autoload
+(add-hook 'haskell-mode-hook 'turn-on-haskell-font-lock)
+;;;###autoload
+(add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
+;;;###autoload
+(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+;;;###autoload
+(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 
 ;;; Provide ourselves:
 

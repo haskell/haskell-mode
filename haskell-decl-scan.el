@@ -244,7 +244,7 @@ otherwise returns nil.  Point is not moved in either case."
 
 (defun haskell-ds-move-to-start-regexp (inc regexp)
   "Move to beginning of line that succeeds/preceeds (INC = 1/-1)
-current line that starts with REGEXP and is not in font-lock-comment-face."
+current line that starts with REGEXP and is not in `font-lock-comment-face'."
   ;; Making this defsubst instead of defun appears to have little or
   ;; no effect on efficiency.  It is probably not called enough to do
   ;; so.
@@ -255,10 +255,10 @@ current line that starts with REGEXP and is not in font-lock-comment-face."
 
 (defvar literate-haskell-ds-line-prefix "> "
   "The regexp that matches the start of a line of Bird-style literate
-code for the purposes of imenu support.  Current value is \"> \" as we
+code for the purposes of `imenu' support.  Current value is \"> \" as we
 assume top-level declarations start at column 3.  Must not contain the
 special \"^\" regexp as we may not use the regexp at the start of a
-regexp string.  Note this is only for imenu support.")
+regexp string.  Note this is only for `imenu' support.")
 
 (defvar haskell-ds-start-decl-re "\\(\\sw\\|(\\)"
   "The regexp that starts a Haskell declaration.")
@@ -422,8 +422,8 @@ point.  Returns `((name . (start-position . name-position)) . type)'
 if one exists and nil otherwise.  The start-position is at the start
 of the declaration, and the name-position is at the start of the name
 of the declaration.  The name is a string, the positions are buffer
-positions and the type is one of the symbols `variable', `datatype',
-`class', `import' and `instance'."
+positions and the type is one of the symbols \"variable\", \"datatype\",
+\"class\", \"import\" and \"instance\"."
   (let (;; The name, type and name-position of the declaration to
 	;; return.
 	name
@@ -533,9 +533,9 @@ positions and the type is one of the symbols `variable', `datatype',
   (haskell-ds-generic-create-imenu-index t))
 
 (defun haskell-ds-generic-create-imenu-index (bird-literate)
-  "Function for finding imenu declarations in (BIRD-LITERATE) Haskell mode.
+  "Function for finding `imenu' declarations in (BIRD-LITERATE) Haskell mode.
 Finds all declarations (classes, variables, imports, instances and
-datatypes) in a Haskell file for the imenu package."
+datatypes) in a Haskell file for the `imenu' package."
   ;; Each list has elements of the form `(INDEX-NAME . INDEX-POSITION)'.
   ;; These lists are nested using `(INDEX-TITLE . INDEX-ALIST)'.
   (let* ((index-alist '())
@@ -604,7 +604,7 @@ datatypes) in a Haskell file for the imenu package."
   (string< (car el1) (car el2)))
 
 (defun haskell-ds-imenu (bird-literate)
-  "Install imenu for (BIRD-LITERATE) Haskell scripts."
+  "Install `imenu' for (BIRD-LITERATE) Haskell scripts."
   ;; Would prefer to toggle imenu but can't see how to turn it off...
   (require 'imenu)
   ;; In emacs-20's imenu we have to bind some functions first -- HWL
