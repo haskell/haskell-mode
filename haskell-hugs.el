@@ -135,16 +135,16 @@ Return not at end copies rest of line to end and sends it.
   "The active Hugs subprocess corresponding to current buffer.")
 
 (defvar haskell-hugs-process-buffer nil
-  "Buffer used for communication with Hugs subprocess for current buffer.")
+  "*Buffer used for communication with Hugs subprocess for current buffer.")
 
 (defvar haskell-hugs-last-loaded-file nil
   "The last file loaded into the Hugs process.")
 
 (defvar haskell-hugs-program-name "hugs"
-  "The name of the command to start the Hugs interpreter.")
+  "*The name of the command to start the Hugs interpreter.")
 
 (defvar haskell-hugs-program-args '("+.")
-  "A list of string args to send to the hugs process")
+  "*A list of string args to send to the hugs process")
 
 (defvar haskell-hugs-load-end nil
   "Position of the end of the last load command")

@@ -127,16 +127,16 @@ The commands available from within a Haskell script are:
   "The active GHCi subprocess corresponding to current buffer.")
 
 (defvar haskell-ghci-process-buffer nil
-  "Buffer used for communication with GHCi subprocess for current buffer.")
+  "*Buffer used for communication with GHCi subprocess for current buffer.")
 
 (defvar haskell-ghci-last-loaded-file nil
   "The last file loaded into the GHCi process.")
 
 (defvar haskell-ghci-program-name "ghci"
-  "The name of the GHCi interpreter program.")
+  "*The name of the GHCi interpreter program.")
 
 (defvar haskell-ghci-program-args nil
-  "A list of string args to pass when starting the GHCi interpreter.")
+  "*A list of string args to pass when starting the GHCi interpreter.")
 
 (defvar haskell-ghci-load-end nil
   "Position of the end of the last load command.")
