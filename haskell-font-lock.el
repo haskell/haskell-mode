@@ -7,7 +7,6 @@
 ;;                    Tommy Thorn <thorn@irisa.fr>
 ;;          2003  Dave Love <fx@gnu.org>
 ;; Keywords: faces files Haskell
-;; Version: 1.4
 
 ;;; This file is not part of GNU Emacs.
 
@@ -55,7 +54,7 @@
 ;;
 ;; If you have any problems or suggestions, after consulting the list
 ;; below, email gem@cs.york.ac.uk and thorn@irisa.fr quoting the
-;; version of the mode you are using, the version of emacs you are
+;; version of the mode you are using, the version of Emacs you are
 ;; using, and a small example of the problem or suggestion.  Note that
 ;; this module requires a reasonably recent version of Emacs.  It
 ;; requires Emacs 21 to cope with Unicode characters and to do proper
@@ -98,14 +97,16 @@
 ;;; All functions/variables start with
 ;;; `(turn-(on/off)-)haskell-font-lock' or `haskell-fl-'.
 
+;;; Code:
+
 (eval-when-compile
   (require 'haskell-mode)
   (require 'cl))
 (require 'font-lock)
 
 ;; Version.
-(defconst haskell-font-lock-version "1.4"
-  "haskell-font-lock version number.")
+(defconst haskell-font-lock-version "$Revision: 1.9 $"
+  "Version number of haskell-font-lock.")
 (defun haskell-font-lock-version ()
   "Echo the current version of haskell-font-lock in the minibuffer."
   (interactive)
@@ -158,39 +159,6 @@ and `unicode'."
   "Face with which to fontify literate comments.
 Set to `default' to avoid fontification of them.")
 
-(defvar haskell-font-lock-keywords ()
-  "The default definitions used by font lock for fontification of
-non-literate Haskell scripts.  This variable is set by
-`turn-on-haskell-font-lock' and then used by `font-lock-defaults'.")
-
-(defvar haskell-font-lock-keywords-1 ()
-  "Medium level font lock definitions for non-literate Haskell.")
-
-(defvar haskell-font-lock-keywords-2 ()
-  "High level font lock definitions for non-literate Haskell.")
-
-(defvar bird-literate-haskell-font-lock-keywords ()
-  "The default definitions used by font lock for fontification of
-Bird-style literate Haskell scripts.  This variable is set by
-`turn-on-haskell-font-lock' and then used by `font-lock-defaults'.")
-
-(defvar bird-literate-haskell-font-lock-keywords-1 ()
-  "Medium level font lock definitions for Bird-style literate Haskell.")
-
-(defvar bird-literate-haskell-font-lock-keywords-2 ()
-  "High level font lock definitions for Bird-style literate Haskell.")
-
-(defvar latex-literate-haskell-font-lock-keywords ()
-  "The default definitions used by font lock for fontification of
-LaTeX-style literate Haskell scripts.  This variable is set by
-`turn-on-haskell-font-lock' and then used by `font-lock-defaults'.")
-
-(defvar latex-literate-haskell-font-lock-keywords-1 ()
-  "Medium level font lock definitions for LaTeX-style literate Haskell.")
-
-(defvar latex-literate-haskell-font-lock-keywords-2 ()
-  "High level font lock definitions for LaTeX-style literate Haskell.")
-
 (defconst haskell-emacs21-features (string-match "[[:alpha:]]" "x")
   "Non-nil if we have regexp char classes.
 Assume this means we have other useful features from Emacs 21.")
@@ -228,7 +196,7 @@ Regexp match data 0 points to the chars."
 	   (0 (haskell-font-lock-compose-symbol ',alist))))))))
 
 ;; The font lock regular expressions.
-(defun haskell-font-lock-keywords-create (literate level)
+(defun haskell-font-lock-keywords-create (literate)
   "Create fontification definitions for Haskell scripts.
 Returns keywords suitable for `font-lock-keywords'."
   (let* (;; Bird-style literate scripts start a line of code with
@@ -333,15 +301,14 @@ Returns keywords suitable for `font-lock-keywords'."
 	    ;; Expensive.
 	    (,qvarid 0 haskell-default-face)
 	    (,qconid 0 haskell-constructor-face)
-	    ,@(if (eq level 2)
-		  `(,`(,(concat "\`" varid "\`") 0 haskell-operator-face)))
+	    (,(concat "\`" varid "\`") 0 haskell-operator-face)
 	    ;; Expensive.
 	    (,conid 0 haskell-constructor-face)
 
 	    ;; Very expensive.
 	    (,sym 0 (if (eq (char-after (match-beginning 0)) ?:)
 			haskell-constructor-face
-		      ,@(if (eq level 2) '(haskell-operator-face))))
+		      haskell-operator-face))
 	    ,@(haskell-font-lock-symbols-keywords)))
     (unless haskell-emacs21-features
       (case literate
@@ -405,62 +372,6 @@ that should be commented under LaTeX-style literate scripts."
             ;; If one found, mark it as a comment, otherwise finish.
             (point))))))
 
-(defvar haskell-fl-syntax
-  (if haskell-emacs21-features
-      ;; The mode syntax table will basically DTRT.  However, it's
-      ;; convenient to treat the non-ASCII punctuation characters as
-      ;; symbol.  (We probably have to keep `,' and `;' as
-      ;; punctuation, so we can't just consider sequences of
-      ;; punctuation and symbol syntax.  We could also use
-      ;; categories.)
-      `((?_ . "w")			; in case _ has normal syntax
-	(?' . "w")
-	,@(let (cs i lim)
-	    (map-char-table
-	     (lambda (k v)
-	       (when (equal v '(1))
-		 ;; The current Emacs 22 codebase can pass either a char
-		 ;; or a char range.
-		 (if (consp k)
-		     (setq i (car k)
-			   lim (cdr k))
-		   (setq i k 
-			 lim k))
-		 (while (<= i lim)
-		   (when (> i 127)
-		     (push (cons i "_") cs))
-		   (setq i (1+ i)))))
-	     (standard-syntax-table))
-	    cs))
-    ;; It's easier for us to manually set the ISO Latin1 syntax as I'm
-    ;; not sure what libraries are available and how they differ from
-    ;; Haskell, eg. the iso-syntax library of Emacs 19.34 defines \241
-    ;; as punctuation for good reasons but this conflicts with Haskell
-    ;; so we would have to redefine it.  It's simpler for us to set the
-    ;; syntax table according to the Haskell report for all of the 8-bit
-    ;; characters.
-    `((?\  . " ")
-      (?\t . " ")
-      (?\" . "\"")
-      (?\' . "w")
-      (?_  . "w")
-      (?\( . "()")
-      (?\) . ")(")
-      (?\[  . "(]")
-      (?\]  . ")[")
-      (?\{  . "(}1")
-      (?\}  . "){4")
-      (?-  . "_ 23")
-      (?\` . "$`")
-      ,@(mapcar (lambda (x) (cons x "_"))
-		(concat "!#$%&*+./:<=>?@\\^|~" (haskell-enum-from-to ?\241 ?\277)
-			"\327\367"))
-      ,@(mapcar (lambda (x) (cons x "w"))
-		(concat (haskell-enum-from-to ?\300 ?\326) (haskell-enum-from-to ?\330 ?\337)
-			(haskell-enum-from-to ?\340 ?\366) (haskell-enum-from-to ?\370 ?\377)))))
-  "Syntax required for font locking.  Given as a list of pairs for use
-in `font-lock-defaults'.")
-
 (defconst haskell-basic-syntactic-keywords
   '(;; Character constants (since apostrophe can't have string syntax)
     ("\\Sw\\('\\)\\([^\\']\\|\\\\.\\)+\\('\\)" (1 "|") (3 "|"))
@@ -495,52 +406,43 @@ in `font-lock-defaults'.")
     haskell-literate-comment-face)
    (t font-lock-comment-face)))
 
-(defun haskell-font-lock-defaults-create (literate)
-  "Locally set `font-lock-defaults' for Haskell.
-If LITERATE is non-nil then the font locking is made
-suitable for literate Haskell scripts, using Bird-style if LITERATE
-is `bird' and LaTeX-style if it is `latex'."
-  (setq haskell-font-lock-keywords-1
-	(haskell-font-lock-keywords-create nil 1))
-  (setq haskell-font-lock-keywords-2
-	(haskell-font-lock-keywords-create nil 2))
-  (setq haskell-font-lock-keywords
-	haskell-font-lock-keywords-1)
-  (setq bird-literate-haskell-font-lock-keywords-1
-	(haskell-font-lock-keywords-create 'bird 1))
-  (setq bird-literate-haskell-font-lock-keywords-2
-	(haskell-font-lock-keywords-create 'bird 2))
-  (setq bird-literate-haskell-font-lock-keywords
-	bird-literate-haskell-font-lock-keywords-1)
-  (setq latex-literate-haskell-font-lock-keywords-1
-	(haskell-font-lock-keywords-create 'latex 1))
-  (setq latex-literate-haskell-font-lock-keywords-2
-	(haskell-font-lock-keywords-create 'latex 2))
-  (setq latex-literate-haskell-font-lock-keywords
-	latex-literate-haskell-font-lock-keywords-1)
-  (make-local-variable 'font-lock-defaults)
-  (setq font-lock-defaults
-	(list
-	 (case literate
-	  (bird
-	   '(bird-literate-haskell-font-lock-keywords
-			    bird-literate-haskell-font-lock-keywords-1
-	     bird-literate-haskell-font-lock-keywords-2))
-	  (latex
-	   '(latex-literate-haskell-font-lock-keywords
-		       latex-literate-haskell-font-lock-keywords-1
-	     latex-literate-haskell-font-lock-keywords-2))
-	  (t '(haskell-font-lock-keywords
-	       haskell-font-lock-keywords-1
-	       haskell-font-lock-keywords-2)))
-	 nil nil haskell-fl-syntax nil
-			 (cons 'font-lock-syntactic-keywords
-	       (case literate
-		(bird haskell-bird-syntactic-keywords)
-		(latex haskell-latex-syntactic-keywords)
-		(t haskell-basic-syntactic-keywords)))
-			 '(font-lock-syntactic-face-function
-			   . haskell-syntactic-face-function))))
+(defconst haskell-font-lock-keywords
+  (haskell-font-lock-keywords-create nil)
+  "Font lock definitions for non-literate Haskell.")
+
+(defconst haskell-font-lock-bird-literate-keywords
+  (haskell-font-lock-keywords-create 'bird)
+  "Font lock definitions for Bird-style literate Haskell.")
+
+(defconst haskell-font-lock-latex-literate-keywords
+  (haskell-font-lock-keywords-create 'latex)
+  "Font lock definitions for LaTeX-style literate Haskell.")
+
+(defun haskell-font-lock-choose-keywords ()
+  (let ((literate (if (boundp 'haskell-literate) haskell-literate)))
+    (case literate
+      (bird haskell-font-lock-bird-literate-keywords)
+      (latex haskell-font-lock-latex-literate-keywords)
+      (t haskell-font-lock-keywords))))
+
+(defun haskell-font-lock-choose-syntactic-keywords ()
+  (let ((literate (if (boundp 'haskell-literate) haskell-literate)))
+    (case literate
+      (bird haskell-bird-syntactic-keywords)
+      (latex haskell-latex-syntactic-keywords)
+      (t haskell-basic-syntactic-keywords))))
+
+(defun haskell-font-lock-defaults-create ()
+  "Locally set `font-lock-defaults' for Haskell."
+  (set (make-local-variable 'font-lock-defaults)
+       '(haskell-font-lock-choose-keywords
+	 nil nil ((?\' . "w") (?_  . "w")) nil
+	 (font-lock-syntactic-keywords
+	  . haskell-font-lock-choose-syntactic-keywords)
+	 (font-lock-syntactic-face-function
+	  . haskell-syntactic-face-function)
+	 ;; Get help from font-lock-syntactic-keywords.
+	 (parse-sexp-lookup-properties . t))))
 
 ;; The main functions.
 (defun turn-on-haskell-font-lock ()
@@ -603,22 +505,17 @@ Invokes `haskell-font-lock-hook' if not nil.
 Use `haskell-font-lock-version' to find out what version this is."
 
   (interactive)
-  (require 'font-lock)
-  (let ((literate (if (boundp 'haskell-literate) haskell-literate)))
-    (haskell-font-lock-defaults-create literate))
-  ;; Get help from font-lock-syntactic-keywords.
-  (set (make-local-variable 'parse-sexp-lookup-properties) t)
+  (haskell-font-lock-defaults-create)
   (run-hooks 'haskell-font-lock-hook)
   (turn-on-font-lock))
 
 (defun turn-off-haskell-font-lock ()
   "Turns off font locking in current buffer."
   (interactive)
-  (if (and (boundp 'font-lock-mode) font-lock-mode)
-      (font-lock-mode -1)))
+  (font-lock-mode -1))
 
 ;;; Provide ourselves:
 
 (provide 'haskell-font-lock)
 
-;;; haskell-font-lock ends here.
+;;; haskell-font-lock.el ends here
