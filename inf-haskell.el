@@ -1,6 +1,6 @@
 ;;; inf-haskell.el --- Interaction with an inferior Haskell process.
 
-;; Copyright (C) 2004  Free Software Foundation, Inc.
+;; Copyright (C) 2004, 2005  Free Software Foundation, Inc.
 
 ;; Author: Stefan Monnier <monnier@iro.umontreal.ca>
 ;; Keywords: Haskell
@@ -23,7 +23,7 @@
 ;;; Commentary:
 
 ;; The code is made of 2 parts: a major mode for the buffer that holds the
-;; infeiror process's session and a minor mode for use in source buffers.
+;; inferior process's session and a minor mode for use in source buffers.
 
 ;;; Code:
 
@@ -143,7 +143,7 @@ setting up the inferior-haskell buffer."
 	      (set-marker compilation-parsing-end (point-max))
 	    (setq compilation-parsing-end (point-max))))
       (inferior-haskell-send-command
-       proc (if reload ":reload" (concat ":load " file))))))
+       proc (if reload ":reload" (concat ":load \"" file "\""))))))
 
 (defun inferior-haskell-send-command (proc str)
   (setq str (concat str "\n"))
