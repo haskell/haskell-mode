@@ -175,10 +175,12 @@ suitable for `font-lock-keywords'."
           (concat "\\b\\([" small "_][" small large "0-9'_]*\\)\\b"))
          (conid
           (concat "\\b\\([" large "][" small large "0-9'_]*\\)\\b"))
+	 (modid
+	  (concat "\\b" conid "\\(\\." conid "\\)*\\b"))
          (qvarid
-          (concat conid "\\." varid))
+          (concat modid "\\." varid))
          (qconid
-          (concat conid "\\." conid))
+          (concat modid "\\." conid))
 	 (sym
 	  (concat "[" symbol ":]+"))
 
@@ -232,8 +234,8 @@ suitable for `font-lock-keywords'."
 	    ("(->)" 0 'haskell-constructor-face)
 	    ;; Expensive.
 	    ,`(,reservedid 1 'haskell-keyword-face)
-	    ,`(,qvarid 1 'haskell-default-face)
-	    ,`(,qconid 1 'haskell-constructor-face)
+	    ,`(,qvarid 0 'haskell-default-face)
+	    ,`(,qconid 0 'haskell-constructor-face)
 	    ,@(if (eq level 2)
 		  `(,`(,(concat "\`" varid "\`") 0 'haskell-operator-face))
 		'())
