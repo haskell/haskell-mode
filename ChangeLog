@@ -1,3 +1,34 @@
+2004-12-10  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-indent.el (haskell-indent-start-of-def): Only go backward.
+	(haskell-indent-in-string): Simplify.
+	(haskell-indent-in-comment): Simplify.
+	(haskell-indent-comment): Remove.
+	(haskell-indent-inside-comment): New fun.
+	(haskell-indent-indentation-info): Assume we're at the indentation.
+	Handle comments differently.
+	(haskell-indent-cycle): Go to indentation and then save excursion
+	around haskell-indent-indentation-info.
+
+	* haskell-doc.el (haskell-doc-minor-mode-string): Make it dynamic.
+	(haskell-doc-install-keymap): Remove conflicting C-c C-o binding.
+	(haskell-doc-mode): Make a nil arg turn the mode ON.
+	(turn-on-haskell-doc-mode): Make it an alias for haskell-doc-mode.
+	(haskell-doc-mode): Don't touch haskell-doc-minor-mode-string.
+	(haskell-doc-show-global-types): Don't touch
+	haskell-doc-minor-mode-string.  Call haskell-doc-make-global-fct-index.
+	(haskell-doc-check-active): Fix message.
+	(define-key-after): Don't define.
+	(haskell-doc-install-keymap): Check existence of define-key-after.
+
+	* haskell-mode.el (haskell-literate-default): Fix custom type.
+	(haskell-vars): Ignore comments when doing C-M-f.
+
+	* indent.hs: More test cases.
+
+	* inf-haskell.el (haskell-program-name): Use ghci if hugs is absent.
+	(inferior-haskell-load-file): Reset compilation-parsing-end.
+
 2004-11-25  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* Release version 2.0.
