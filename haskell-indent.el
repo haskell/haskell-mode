@@ -979,6 +979,24 @@ and find indentation info for each part."
 						   indent-info)))
 	))))
 
+(defun haskell-indent-find-let (start)
+  (let ((open (haskell-indent-open-structure start (point))))
+    (if open (setq start (1+ open))))
+  (if (not (re-search-backward "\\<\\(in\\|let\\)\\>" start t))
+      nil
+    (let ((outer (or (haskell-indent-in-string start (point))
+		     (haskell-indent-in-comment start (point))
+		     (haskell-indent-open-structure start (point)))))
+      (cond
+       (outer
+	(goto-char outer)
+	(haskell-indent-find-let start))
+       ((eq (char-after) ?i)
+	;; Nested let.
+	(and (haskell-indent-find-let start)
+	     (haskell-indent-find-let start)))
+       (t (point))))))
+
 (defun haskell-indent-indentation-info ()
   "Return a list of possible indentations for the current line.
 These are then used by `haskell-indent-cycle'."
@@ -997,6 +1015,10 @@ These are then used by `haskell-indent-cycle'."
 	(setq indent-info    ; computing comment indentation
 	      (haskell-indent-comment (haskell-indent-get-beg-of-line)
 				      (point) indent-info))))
+     ;; Closing the declaration part of a `let'.
+     ((and (looking-at "in\\>")
+	   (setq open (save-excursion (haskell-indent-find-let start))))
+      (haskell-indent-push-pos open))
      ;; open structure? ie  ( { [
      ((setq open (haskell-indent-open-structure start end))
       ;; there is an open structure to complete
