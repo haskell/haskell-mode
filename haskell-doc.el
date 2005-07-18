@@ -137,6 +137,10 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.12  2005/07/18 21:04:14  monnier
+;;  (haskell-doc-message): Remove.
+;;  (haskell-doc-show-type): inline it.  Do nothing for if there's no doc to show.
+;;
 ;;  Revision 1.11  2004/12/10 17:33:18  monnier
 ;;  (haskell-doc-minor-mode-string): Make it dynamic.
 ;;  (haskell-doc-install-keymap): Remove conflicting C-c C-o binding.
@@ -280,7 +284,7 @@
 ;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.11 $"
+(defconst haskell-doc-version "$Revision: 1.12 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 (defconst haskell-doc-maintainer
@@ -1034,21 +1038,6 @@ It is probably best to manipulate this data structure with the commands
                   (append (default-value 'minor-mode-alist)
                           '((haskell-doc-mode haskell-doc-minor-mode-string)))))
 
-;; In emacs 19.29 and later, and XEmacs 19.13 and later, all messages are
-;; recorded in a log.  Do not put haskell-doc messages in that log since
-;; they are Legion.
-
-;@cindex haskell-doc-message
-
-(defmacro haskell-doc-message (&rest args)
-  (if (fboundp 'display-message)
-      ;; XEmacs 19.13 way of preventing log messages.
-      ;(list 'display-message '(quote no-log) (apply 'list 'format args))
-      ;; XEmacs 19.15 seems to be a bit different
-      (list 'display-message '(quote message) (apply 'list 'format args))
-    (list 'let (list (list 'message-log-max 'nil))
-          (apply 'list 'message args))))
-
 
 ;@node Menubar Support, Haskell Doc Mode, Install as minor mode, top
 ;@section Menubar Support
@@ -1300,7 +1289,22 @@ current buffer."
   ;; if printed before do not print it again
   (unless (string= sym (car haskell-doc-last-data))
     (let ((doc (haskell-doc-sym-doc sym)))
-      (haskell-doc-message "%s" doc))))
+      (when doc
+        ;; In emacs 19.29 and later, and XEmacs 19.13 and later, all
+        ;; messages are recorded in a log.  Do not put haskell-doc messages
+        ;; in that log since they are legion.
+        (if (fboundp 'display-message)
+            ;; XEmacs 19.13 way of preventing log messages.
+            ;;(display-message 'no-log (format <args>))
+            ;; XEmacs 19.15 seems to be a bit different.
+            (display-message 'message (format "%s" doc))
+          (let ((message-log-max nil))
+            (message "%s" doc)))))))
+
+
+;@cindex haskell-doc-message
+
+(defmacro haskell-doc-message (&rest args)
 
 (defun haskell-doc-sym-doc (sym)
   "Show the type of the function near point.
@@ -1752,7 +1756,6 @@ This function switches to and potentially loads many buffers."
 ;* haskell-doc-is-id-char-at::
 ;* haskell-doc-is-of::
 ;* haskell-doc-make-global-fct-index::
-;* haskell-doc-message::
 ;* haskell-doc-mode::
 ;* haskell-doc-mode-print-current-symbol-info::
 ;* haskell-doc-prelude-types::
