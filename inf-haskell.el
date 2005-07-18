@@ -42,7 +42,9 @@
       "hugs \"+.\"")
   "The name of the command to start the inferior Haskell process.
 The command can include arguments."
-  :options '("hugs \"+.\"" "ghci")
+  ;; Custom only supports the :options keyword for a few types, e.g. not
+  ;; for string.
+  ;; :options '("hugs \"+.\"" "ghci")
   :group 'haskell
   :type '(choice string (repeat string)))
 
