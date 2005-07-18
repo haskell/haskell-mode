@@ -1,3 +1,11 @@
+2005-07-18  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (haskell-program-name): Fix defcustom delcaration.
+
+	* haskell-doc.el (haskell-doc-message): Remove.
+	(haskell-doc-show-type): inline it.  Don't do anything for if there's
+	no doc to show.
+
 2005-02-02  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-hugs.el (haskell-hugs-mode-map):
