@@ -137,6 +137,10 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.13  2005/08/23 19:23:27  monnier
+;;  (haskell-doc-show-type): Assume that the availability
+;;  of display-message won't change at runtime.
+;;
 ;;  Revision 1.12  2005/07/18 21:04:14  monnier
 ;;  (haskell-doc-message): Remove.
 ;;  (haskell-doc-show-type): inline it.  Do nothing for if there's no doc to show.
@@ -284,7 +288,7 @@
 ;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.12 $"
+(defconst haskell-doc-version "$Revision: 1.13 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 (defconst haskell-doc-maintainer
@@ -1293,7 +1297,7 @@ current buffer."
         ;; In emacs 19.29 and later, and XEmacs 19.13 and later, all
         ;; messages are recorded in a log.  Do not put haskell-doc messages
         ;; in that log since they are legion.
-        (if (fboundp 'display-message)
+        (if (eval-when-compile (fboundp 'display-message))
             ;; XEmacs 19.13 way of preventing log messages.
             ;;(display-message 'no-log (format <args>))
             ;; XEmacs 19.15 seems to be a bit different.
