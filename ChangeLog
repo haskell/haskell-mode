@@ -1,9 +1,18 @@
+2005-08-23  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-doc.el (haskell-doc-show-type): Assume that the availability
+	of display-message won't change at runtime.
+
+	* haskell-font-lock.el (haskell-font-lock-keywords-create): Try and
+	work around a bug that seems to be in Emacs-21.3 rather than in
+	haskell-font-lock.el.  Reported by Steve Chamberlain <sac@pobox.com>.
+
 2005-07-18  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* inf-haskell.el (haskell-program-name): Fix defcustom delcaration.
 
 	* haskell-doc.el (haskell-doc-message): Remove.
-	(haskell-doc-show-type): inline it.  Don't do anything for if there's
+	(haskell-doc-show-type): Inline it.  Don't do anything for if there's
 	no doc to show.
 
 2005-02-02  Stefan Monnier  <monnier@iro.umontreal.ca>
