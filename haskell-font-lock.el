@@ -1,6 +1,6 @@
 ;;; haskell-font-lock.el --- Font locking module for Haskell Mode
 
-;; Copyright 2003, 2004  Free Software Foundation, Inc.
+;; Copyright 2003, 2004, 2005  Free Software Foundation, Inc.
 ;; Copyright 1997-1998 Graeme E Moss, and Tommy Thorn
 
 ;; Authors: 1997-1998 Graeme E Moss <gem@cs.york.ac.uk> and
@@ -105,7 +105,7 @@
 (require 'font-lock)
 
 ;; Version.
-(defconst haskell-font-lock-version "$Revision: 1.12 $"
+(defconst haskell-font-lock-version "$Revision: 1.13 $"
   "Version number of haskell-font-lock.")
 (defun haskell-font-lock-version ()
   "Echo the current version of haskell-font-lock in the minibuffer."
@@ -287,6 +287,13 @@ Returns keywords suitable for `font-lock-keywords'."
 		;; Expensive.
 		`((,string-and-char 1 font-lock-string-face)))
 
+            ;; This was originally at the very end (and needs to be after
+            ;; all the comment/string/doc highlighting) but it seemed to
+            ;; trigger a bug in Emacs-21.3 which caused the compositions to
+            ;; be "randomly" dropped.  Moving it earlier seemed to reduce
+            ;; the occurrence of the bug.
+	    ,@(haskell-font-lock-symbols-keywords)
+
 	    (,reservedid 1 (symbol-value 'haskell-keyword-face))
 	    (,reservedsym 1 (symbol-value 'haskell-operator-face))
 
@@ -310,8 +317,7 @@ Returns keywords suitable for `font-lock-keywords'."
 	    ;; Very expensive.
 	    (,sym 0 (if (eq (char-after (match-beginning 0)) ?:)
 			haskell-constructor-face
-		      haskell-operator-face))
-	    ,@(haskell-font-lock-symbols-keywords)))
+		      haskell-operator-face))))
     (unless haskell-emacs21-features
       (case literate
 	(bird
