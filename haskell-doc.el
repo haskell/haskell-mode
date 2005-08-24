@@ -1,6 +1,6 @@
 ;;; haskell-doc.el --- show function types in echo area
 
-;; Copyright (C) 2004  Free Software Foundation, Inc.
+;; Copyright (C) 2004, 2005  Free Software Foundation, Inc.
 ;; Copyright (C) 1997 Hans-Wolfgang Loidl
 
 ;; Author: Hans-Wolfgang Loidl <hwloidl@dcs.glasgow.ac.uk>
@@ -137,6 +137,9 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.14  2005/08/24 11:36:32  monnier
+;;  (haskell-doc-message): Paren typo.
+;;
 ;;  Revision 1.13  2005/08/23 19:23:27  monnier
 ;;  (haskell-doc-show-type): Assume that the availability
 ;;  of display-message won't change at runtime.
@@ -288,7 +291,7 @@
 ;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.13 $"
+(defconst haskell-doc-version "$Revision: 1.14 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 (defconst haskell-doc-maintainer
@@ -1308,7 +1311,7 @@ current buffer."
 
 ;@cindex haskell-doc-message
 
-(defmacro haskell-doc-message (&rest args)
+(defmacro haskell-doc-message (&rest args))
 
 (defun haskell-doc-sym-doc (sym)
   "Show the type of the function near point.
