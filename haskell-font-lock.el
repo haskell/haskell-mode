@@ -105,7 +105,7 @@
 (require 'font-lock)
 
 ;; Version.
-(defconst haskell-font-lock-version "$Revision: 1.13 $"
+(defconst haskell-font-lock-version "$Revision: 1.14 $"
   "Version number of haskell-font-lock.")
 (defun haskell-font-lock-version ()
   "Echo the current version of haskell-font-lock in the minibuffer."
@@ -127,6 +127,10 @@ and `unicode'."
 
 (defconst haskell-font-lock-symbols-alist
   (append
+   ;; Prefer single-width Unicode font for lambda.
+   (and (fboundp 'decode-char)
+	(memq haskell-font-lock-symbols '(t unicode))
+	(list (cons "\\" (decode-char 'ucs 955))))
    ;; The symbols can come from a JIS0208 font.
    (and (fboundp 'make-char) (charsetp 'japanese-jisx0208)
 	(memq haskell-font-lock-symbols '(t japanese-jisx0208))
@@ -137,10 +141,13 @@ and `unicode'."
    ;; Or a unicode font.
    (and (fboundp 'decode-char)
 	(memq haskell-font-lock-symbols '(t unicode))
-	(list (cons "\\" (decode-char 'ucs 955))
-	      (cons "->" (decode-char 'ucs 8594))
+	(list (cons "->" (decode-char 'ucs 8594))
 	      (cons "<-" (decode-char 'ucs 8592))
 	      (cons "=>" (decode-char 'ucs 8658))
+              (cons "~>" (decode-char 'ucs 8669)) ;; Omega language
+              ;; (cons "~>" (decode-char 'ucs 8605)) ;; less desirable
+              (cons "-<" (decode-char 'ucs 8610)) ;; Paterson's arrow syntax
+              ;; (cons "-<" (decode-char 'ucs 10521)) ;; nicer but uncommon
 	      (cons "::" (decode-char 'ucs 8759))
 	      (cons "." (decode-char 'ucs 9675))))))
 
