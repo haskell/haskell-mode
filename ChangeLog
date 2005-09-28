@@ -1,3 +1,11 @@
+2005-09-28  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-indent.el (haskell-indent-in-comment): Don't fail at EOB.
+
+	* haskell-font-lock.el (haskell-font-lock-symbols-alist): Add "not".
+	(haskell-font-lock-compose-symbol): Handle alphanum identifiers.
+	Fix incorrect handling of . when used for qualified names.
+
 2005-09-26  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-font-lock.el (haskell-font-lock-symbols-alist): Prefer the
