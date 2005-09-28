@@ -409,6 +409,7 @@ Returns the location of the start of the comment, nil otherwise."
 	   (nth 8 pps))
 	  ;; We also want to say that we are *at* the beginning of a comment.
 	  ((and (not (nth 8 pps))
+                (>= (point-max) (+ end 2))
 		(nth 4 (save-excursion
 			 (setq pps (parse-partial-sexp end (+ end 2))))))
 	   (nth 8 pps)))))
