@@ -105,7 +105,7 @@
 (require 'font-lock)
 
 ;; Version.
-(defconst haskell-font-lock-version "$Revision: 1.14 $"
+(defconst haskell-font-lock-version "$Revision: 1.15 $"
   "Version number of haskell-font-lock.")
 (defun haskell-font-lock-version ()
   "Echo the current version of haskell-font-lock in the minibuffer."
@@ -134,14 +134,16 @@ and `unicode'."
    ;; The symbols can come from a JIS0208 font.
    (and (fboundp 'make-char) (charsetp 'japanese-jisx0208)
 	(memq haskell-font-lock-symbols '(t japanese-jisx0208))
-	(list (cons "\\" (make-char 'japanese-jisx0208 38 75))
+	(list (cons "not" (make-char 'japanese-jisx0208 34 76))
+	      (cons "\\" (make-char 'japanese-jisx0208 38 75))
 	      (cons "->" (make-char 'japanese-jisx0208 34 42))
 	      (cons "<-" (make-char 'japanese-jisx0208 34 43))
 	      (cons "=>" (make-char 'japanese-jisx0208 34 77))))
    ;; Or a unicode font.
    (and (fboundp 'decode-char)
 	(memq haskell-font-lock-symbols '(t unicode))
-	(list (cons "->" (decode-char 'ucs 8594))
+	(list (cons "not" (decode-char 'ucs 172))
+              (cons "->" (decode-char 'ucs 8594))
 	      (cons "<-" (decode-char 'ucs 8592))
 	      (cons "=>" (decode-char 'ucs 8658))
               (cons "~>" (decode-char 'ucs 8669)) ;; Omega language
@@ -176,10 +178,16 @@ Assume this means we have other useful features from Emacs 21.")
   "Compose a sequence of ascii chars into a symbol.
 Regexp match data 0 points to the chars."
   ;; Check that the chars should really be composed into a symbol.
-  (let ((start (match-beginning 0))
-	(end (match-end 0)))
-    (if (or (memq (char-syntax (or (char-before start) ?\ )) '(?_ ?\\))
-	    (memq (char-syntax (or (char-after end) ?\ )) '(?_ ?\\))
+  (let* ((start (match-beginning 0))
+         (end (match-end 0))
+	 (syntaxes (cond
+                    ((eq (char-syntax (char-after start)) ?w) '(?w))
+                    ;; Special case for the . used for qualified names.
+                    ((and (eq (char-after start) ?\.) (= end (1+ start)))
+                     '(?_ ?\\ ?w))
+                    (t '(?_ ?\\)))))
+    (if (or (memq (char-syntax (or (char-before start) ?\ )) syntaxes)
+	    (memq (char-syntax (or (char-after end) ?\ )) syntaxes)
 	    (memq (get-text-property start 'face)
 		  '(font-lock-doc-face font-lock-string-face
 		    font-lock-comment-face)))
