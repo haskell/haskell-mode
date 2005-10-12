@@ -138,10 +138,10 @@
     (current-column)))
 
 (defconst haskell-indent-start-keywords-re 
-  (concat "\\<\\("
-	  "class\\|data\\|i\\(mport\\|n\\(fix\\(\\|[lr]\\)\\|stance\\)\\)\\|"
-	  "module\\|newtype\\|primitive\\|type"
-	  "\\)\\>")
+  (concat "\\<"
+          (regexp-opt '("class" "data" "import" "infix" "infixl" "infixr"
+                        "instance" "module" "newtype" "primitive" "type") t)
+          "\\>")
   "Regexp describing keywords to complete when standing at the first word
 of a line.")
 
@@ -422,7 +422,7 @@ Returns the location of the start of the comment, nil otherwise."
   (cond
    ((haskell-indent-empty-line-p) 'empty)
    ((haskell-indent-in-comment (point-min) (point)) 'comment)
-   ((looking-at "\\(\\([a-zA-Z]\\sw*\\)\\|_\\)[ \t\n]*") 'ident)
+   ((looking-at "\\(\\([a-zA-Z]\\(\\sw\\|'\\)*\\)\\|_\\)[ \t\n]*") 'ident)
    ((looking-at "\\(|[^|]\\)[ \t\n]*") 'guard)
    ((looking-at "\\(=[^>=]\\|::\\|->\\|<-\\)[ \t\n]*") 'rhs)
    (t 'other)))
@@ -473,20 +473,19 @@ Returns the location of the start of the comment, nil otherwise."
       ;; "parse" a valdef separating important parts
       (goto-char start)
       (setq type (haskell-indent-type-at-point))
-      (if (or (eq type 'ident) (eq type 'other)) ; possible start of a value def
+      (if (or (memq type '(ident other))) ; possible start of a value def
           (progn
             (if (eq type 'ident)
                 (progn
                   (setq valname (match-beginning 0))
-                  (setq valname-string (buffer-substring (match-beginning 0)
-                                                         (match-end 0)))
+                  (setq valname-string (match-string 0))
                   (goto-char (match-end 0)))
               (skip-chars-forward " \t" end)
               (setq valname (point))    ; type = other
               (haskell-indent-next-symbol end))
             (while (and (< (point) end)
                         (setq type (haskell-indent-type-at-point))
-                        (or (eq type 'ident) (eq type 'other)))
+                        (or (memq type '(ident other))))
               (if (null aft-valname)
                   (setq aft-valname (point)))
               (haskell-indent-next-symbol end))))
@@ -574,7 +573,7 @@ Returns the location of the start of the comment, nil otherwise."
       ;; use the fact that the resulting match-data is a list of the form
       ;; (0 6 [2*(n-1) nil] 0 6) where n is the number of the matching regexp
       ;; so n= ((length match-data)/2)-1
-      (- (/ (length (match-data)) 2) 1)
+      (- (/ (length (match-data 'integers)) 2) 1)
     (error "haskell-indent-find-case: impossible case: %s" test)
     ))
 
@@ -872,7 +871,9 @@ and find indentation info for each part."
       (if start                         ; if comment at the end
           (setq line-end start))  ; end line before it
       ;; loop on all parts separated by off-side-keywords
-      (while (re-search-forward haskell-indent-off-side-keywords-re line-end t)
+      (while (and (re-search-forward haskell-indent-off-side-keywords-re line-end t)
+                  (not (or (haskell-indent-in-comment line-start (point))
+                           (haskell-indent-in-string line-start (point)))))
 	(let ((beg-match (match-beginning 0)) ; save beginning of match
 	      (end-match (match-end 0)))      ; save end of match
 	  (cond
@@ -951,22 +952,22 @@ and find indentation info for each part."
 						 end-visible curr-line-type
 						 indent-info)))))))
 
-(defun haskell-indent-find-let (start)
-  (let ((open (haskell-indent-open-structure start (point))))
-    (if open (setq start (1+ open))))
-  (if (not (re-search-backward "\\<\\(in\\|let\\)\\>" start t))
-      nil
-    (let ((outer (or (haskell-indent-in-string start (point))
-		     (haskell-indent-in-comment start (point))
-		     (haskell-indent-open-structure start (point)))))
+(defun haskell-indent-find-matching-start (regexp limit)
+  (let ((open (haskell-indent-open-structure limit (point))))
+    (if open (setq limit (1+ open))))
+  (when (re-search-backward regexp limit t)
+    (let ((nestedcase (match-end 1))
+          (outer (or (haskell-indent-in-string limit (point))
+		     (haskell-indent-in-comment limit (point))
+		     (haskell-indent-open-structure limit (point)))))
       (cond
        (outer
 	(goto-char outer)
-	(haskell-indent-find-let start))
-       ((eq (char-after) ?i)
-	;; Nested let.
-	(and (haskell-indent-find-let start)
-	     (haskell-indent-find-let start)))
+	(haskell-indent-find-matching-start regexp limit))
+       (nestedcase
+	;; Nested case.
+	(and (haskell-indent-find-matching-start regexp limit)
+	     (haskell-indent-find-matching-start regexp limit)))
        (t (point))))))
 
 (defun haskell-indent-inside-comment (start)
@@ -1034,11 +1035,18 @@ START if non-nil is a presumed start pos of the current definition."
 		   (abs (- col (caar indent-info))))
 		(setq indent-info (cons info (delq info indent-info))))))))
 
-     ;; Closing the declaration part of a `let'.
-     ((and (looking-at "in\\>")
-	   (setq open (save-excursion (haskell-indent-find-let start)))
-	   ;; For a "dangling let at EOL" we should use a different indentation
-	   ;; scheme.
+     ;; Closing the declaration part of a `let' or the test exp part of a case.
+     ((and (looking-at "\\(?:in\\|of\\|then\\|else\\)\\>")
+	   (setq open (save-excursion
+                        (haskell-indent-find-matching-start
+                         (case (char-after)
+                          (?i "\\<\\(?:\\(in\\)\\|let\\)\\>")
+                          (?o "\\<\\(?:\\(of\\)\\|case\\)\\>")
+                          (?t "\\<\\(?:\\(then\\)\\|if\\)\\>")
+                          (?e "\\<\\(?:\\(else\\)\\|if\\)\\>"))
+                         start)))
+	   ;; For a "dangling let/case/if at EOL" we should use a different
+	   ;; indentation scheme.
 	   (save-excursion
 	     (goto-char open)
 	     (let ((letcol (current-column)))

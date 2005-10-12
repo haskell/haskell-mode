@@ -15,7 +15,7 @@ bvalue s  = bval 1 s            -- FIXME
     where
       bval e [] = 0           -- FIXME: indentation below `where'.
       bval e (b:bs) | b==0 || b=="dd of " = b*e + bval (2*e) bs
-                    | otherwise    = error "illegal digit"
+                    | otherwise    = error "illegal digit" -- Spurious 3rd step.
                                      foo
 
 -- FIXME: tab on the line above should insert `bvalue' at some point.
@@ -27,7 +27,10 @@ bvalue s  = bval 1 s            -- FIXME
 toto a = ( hello
          , there                -- indentation of leading , and ;
          -- FIXME: indentation of this comment.
-         , my friends )         -- FIXME: wrong second indentation.
+         , my friends )
+
+lili x = do let x = 1
+            print x     -- FIXME: align with `let'
 
 titi b =
     do expr1
@@ -48,7 +51,30 @@ tata c =
         bar = case foo of
                 _ -> blabla     -- FIXME: indentation below `case'.
         bar' = case foo
-           of _ -> blabla       -- FIXME: confused by the ' in bar'.
+               of _ -> blabla
+                  toto -> plulu
+    
+turlu d = if test               -- FIXME: indentation below if
+          then
+            ifturl               -- FIXME: indentation below then
+          else
+              adfaf             -- FIXME
+
+turlu d = if test then
+             ifturl               -- FIXME: indentation below then
+          else
+              sg                -- FIXME
+
+turly fg = toto
+    where
+      hello = 2                 -- FIXME: indentation below where
+           
+
+-- test from John Goerzen
+
+x myVariableThing = case myVariablething of
+                         Just z -> z
+                         Nothing -> 0
 
 data Toto = Foo
           | Bar

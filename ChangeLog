@@ -1,3 +1,14 @@
+2005-10-12  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-indent.el (haskell-indent-start-keywords-re): Use regexp-opt.
+	(haskell-indent-type-at-point): Accept ' in identifiers.
+	(haskell-indent-find-case): Tell match-data to not generate markers.
+	(haskell-indent-line-indentation): Ignore off-side keywords in comments
+	and strings.
+	(haskell-indent-find-matching-start): Generalize.
+	Rename from haskell-indent-find-let.
+	(haskell-indent-indentation-info): Use it for of, then, and else.
+
 2005-09-28  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-indent.el (haskell-indent-in-comment): Don't fail at EOB.
