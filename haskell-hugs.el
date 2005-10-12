@@ -1,7 +1,7 @@
 ;;; haskell-hugs.el --- simplistic interaction mode with a
 
 ;; Copyright 2004, 2005  Free Software Foundation, Inc.
-;; Copyright 1998, 1999 Guy Lapalme
+;; Copyright 1998, 1999  Guy Lapalme
 
 ;; Hugs interpreter for Haskell developped by 
 ;;    The University of Nottingham and Yale University, 1994-1997.
