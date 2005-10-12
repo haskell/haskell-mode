@@ -46,6 +46,13 @@ tata c =
               of 1 -> blabla
                  2 -> blibli    -- FIXME: only one possible indentation here.
         bar = case foo of
-                _ -> blabla    -- FIXME: indentation below `case'.
+                _ -> blabla     -- FIXME: indentation below `case'.
         bar' = case foo
            of _ -> blabla       -- FIXME: confused by the ' in bar'.
+
+data Toto = Foo
+          | Bar
+          deriving (Show)     -- FIXME
+
+eval env (Llambda x e) = Vfun (\v -> eval (\y -> if (x == y) then v else env y)
+                                          e) -- FIXME
