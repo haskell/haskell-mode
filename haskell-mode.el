@@ -357,6 +357,8 @@ be set to the preferred literate style."
   :options '(turn-on-haskell-indent turn-on-font-lock turn-on-eldoc-mode
 	     imenu-add-menubar-index))
 
+(defvar eldoc-print-current-symbol-info-function)
+
 ;; The main mode functions
 ;;;###autoload
 (define-derived-mode haskell-mode fundamental-mode "Haskell"
@@ -423,7 +425,7 @@ Invokes `haskell-mode-hook' if not nil."
   ;; The safer option is to avoid TABs.  The second best is to make sure
   ;; TABs stops are 8 chars apart, as mandated by the Haskell Report.  --Stef
   (set (make-local-variable 'indent-tabs-mode) nil)
-  (set (make-local-variable 'tab-width) 8))
+  (set (make-local-variable 'tab-width) 8)
   (setq haskell-literate nil))
 
 ;;;###autoload
