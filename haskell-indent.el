@@ -1105,7 +1105,7 @@ START if non-nil is a presumed start pos of the current definition."
 	   (save-excursion
 	     (goto-char open)
 	     (let ((letcol (current-column)))
-	       (forward-word 1) (forward-comment 1)
+	       (forward-word 1) (forward-comment (point-max))
 	       (>= (current-column) letcol))))
       (haskell-indent-push-pos open)
       indent-info)
