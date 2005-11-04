@@ -1,5 +1,12 @@
 2005-11-04  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* haskell-indent.el (haskell-indent-indentation-info): Fix detection of
+	hanging let/if/case statements.
+
+	* haskell-mode.el (haskell-mode): Fix typo.
+
+2005-11-04  Stefan Monnier  <monnier@iro.umontreal.ca>
+
 	* inf-haskell.el (inferior-haskell-mode): Hide compilation-mode bindings.
 
 	* haskell-indent.el (haskell-indent-after-keywords): New var.
