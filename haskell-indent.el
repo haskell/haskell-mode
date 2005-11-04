@@ -1003,6 +1003,45 @@ START is the start position of the comment in which point is."
 		(haskell-indent-push-pos (match-end 0)))
 	    (haskell-indent-push-pos (point))))))))
 
+(defcustom haskell-indent-after-keywords
+  '(("where" 2 0)
+    ("of" . 2)
+    ("do" . 2)
+    "if"
+    "then"
+    "else"
+    "let"
+    "in")
+  ".")
+
+(defun haskell-indent-virtual-indentation ()
+  "Compute the \"virtual indentation\" of text at point.
+The \"virtual indentation\" is the indentation that text at point would have
+had, if it had been placed on its own line."
+  (let ((col (current-column)))
+    (if (save-excursion (skip-chars-backward " \t") (bolp))
+        ;; If the text is indeed on its own line, than the virtual indent is
+        ;; the current indentation.
+        col
+      ;; Else, compute the indentation that it would have had.
+      (let ((info (haskell-indent-indentation-info start))
+            (max -1))
+        ;; `info' is a list of possible indent points.  Each indent point is
+        ;; assumed to correspond to a different parse.  So we need to find
+        ;; the parse that corresponds to the case at hand (where there's no
+        ;; line break), which is assumed to always be the
+        ;; deepest indentation.
+        (dolist (x info)
+          (setq x (car x))
+          ;; Sometimes `info' includes the current indentation (or yet
+          ;; deeper) by mistake, because haskell-indent-indentation-info
+          ;; wasn't designed to be called on a piece of text that is not at
+          ;; BOL.  So ignore points past `col'.
+          (if (and (> x max) (not (>= x col)))
+              (setq max x)))
+        ;; In case all the indent points are past `col', just use `col'.
+        (if (>= max 0) max col)))))
+
 (defun haskell-indent-indentation-info (&optional start)
   "Return a list of possible indentations for the current line.
 These are then used by `haskell-indent-cycle'.
@@ -1013,8 +1052,8 @@ START if non-nil is a presumed start pos of the current definition."
     (cond
      ;; in string?
      ((setq open (haskell-indent-in-string start end))
-      (haskell-indent-push-pos-offset open
-				      (if (looking-at "\\\\") 0 1)))
+      (haskell-indent-push-pos-offset open (if (looking-at "\\\\") 0 1))
+      indent-info)
       
      ;; in comment ?
      ((setq open (haskell-indent-in-comment start end))
@@ -1033,7 +1072,8 @@ START if non-nil is a presumed start pos of the current definition."
 	  (dolist (info indent-info)
 	    (if (< (abs (- col (car info)))
 		   (abs (- col (caar indent-info))))
-		(setq indent-info (cons info (delq info indent-info))))))))
+		(setq indent-info (cons info (delq info indent-info)))))))
+      indent-info)
 
      ;; Closing the declaration part of a `let' or the test exp part of a case.
      ((and (looking-at "\\(?:in\\|of\\|then\\|else\\)\\>")
@@ -1052,7 +1092,25 @@ START if non-nil is a presumed start pos of the current definition."
 	     (let ((letcol (current-column)))
 	       (forward-word 1) (forward-comment 1)
 	       (>= (current-column) letcol))))
-      (haskell-indent-push-pos open))
+      (haskell-indent-push-pos open)
+      indent-info)
+
+     ;; Right after a special keyword.
+     ((save-excursion
+        (forward-comment (- (point-max)))
+        (let ((id (buffer-substring (point) (progn (forward-word -1) (point)))))
+          (when (setq open (or (assoc id haskell-indent-after-keywords)
+                               (car (member id haskell-indent-after-keywords))))
+            (setq open (if (consp open) (cdr open) haskell-indent-offset))
+            (if (consp open)
+                (setq open
+                      (if (save-excursion (skip-syntax-backward " \t") (bolp))
+                          (car open)
+                        (cadr open))))
+            (haskell-indent-push-col
+             (+ (haskell-indent-virtual-indentation) open)))))
+      indent-info)
+
      ;; open structure? ie  ( { [
      ((setq open (haskell-indent-open-structure start end))
       ;; there is an open structure to complete
@@ -1090,10 +1148,12 @@ START if non-nil is a presumed start pos of the current definition."
 		  (progn (setcar base-elem (car basic-indent-info))
 			 (setcdr base-elem (cdr basic-indent-info)))
 		(setq indent-info
-		      (append indent-info (list basic-indent-info)))))))))
+		      (append indent-info (list basic-indent-info))))))))
+      indent-info)
      ;; full indentation
      ((setq contour-line (haskell-indent-contour-line start end))
-      (haskell-indent-layout-indent-info start contour-line))
+      (haskell-indent-layout-indent-info start contour-line)
+      indent-info)
      (t
       ;; simple contour just one indentation at start
       (if (and (eq haskell-literate 'bird)
@@ -1102,8 +1162,8 @@ START if non-nil is a presumed start pos of the current definition."
 	  ;; in the case of no indentation
 	  (haskell-indent-push-col
 	   (1+ haskell-indent-literate-Bird-default-offset))
-	(haskell-indent-push-pos start))))
-    indent-info))
+	(haskell-indent-push-pos start))
+      indent-info))))
 
 (defvar haskell-indent-last-info nil)
 
@@ -1506,4 +1566,6 @@ is non-nil."
 )
 
 (provide 'haskell-indent)
+
+;; arch-tag: e4e5e90a-12e2-4002-b5cb-7b2375710013
 ;;; haskell-indent.el ends here
