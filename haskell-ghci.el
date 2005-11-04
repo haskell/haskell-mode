@@ -337,4 +337,6 @@ error line otherwise show the *ghci* buffer."
   (pop-to-buffer  haskell-ghci-process-buffer))
 
 (provide 'haskell-ghci)			
+
+;; arch-tag: f0bade4b-288d-4329-9791-98c1e24167ac
 ;;; haskell-ghci.el ends here

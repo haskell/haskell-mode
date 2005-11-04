@@ -8,7 +8,7 @@
 ;;          2003  Dave Love <fx@gnu.org>
 ;; Keywords: faces files Haskell
 
-;;; This file is not part of GNU Emacs.
+;; This file is not part of GNU Emacs.
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -94,8 +94,8 @@
 ;; . Support for GreenCard?
 ;;
 
-;;; All functions/variables start with
-;;; `(turn-(on/off)-)haskell-font-lock' or `haskell-fl-'.
+;; All functions/variables start with
+;; `(turn-(on/off)-)haskell-font-lock' or `haskell-fl-'.
 
 ;;; Code:
 
@@ -105,7 +105,7 @@
 (require 'font-lock)
 
 ;; Version.
-(defconst haskell-font-lock-version "$Revision: 1.15 $"
+(defconst haskell-font-lock-version "$Revision: 1.16 $"
   "Version number of haskell-font-lock.")
 (defun haskell-font-lock-version ()
   "Echo the current version of haskell-font-lock in the minibuffer."
@@ -547,4 +547,5 @@ Use `haskell-font-lock-version' to find out what version this is."
 
 (provide 'haskell-font-lock)
 
+;; arch-tag: 89fd122e-8378-4c7f-83a3-1f49a64e458d
 ;;; haskell-font-lock.el ends here

@@ -137,6 +137,9 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.15  2005/11/04 17:11:12  monnier
+;;  Add arch-tag.
+;;
 ;;  Revision 1.14  2005/08/24 11:36:32  monnier
 ;;  (haskell-doc-message): Paren typo.
 ;;
@@ -291,7 +294,7 @@
 ;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.14 $"
+(defconst haskell-doc-version "$Revision: 1.15 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 (defconst haskell-doc-maintainer
@@ -1788,4 +1791,5 @@ This function switches to and potentially loads many buffers."
 
 (provide 'haskell-doc)
 
+;; arch-tag: 6492eb7e-7048-47ac-a331-da09e1eb6254
 ;;; haskell-doc.el ends here
