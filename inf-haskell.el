@@ -71,9 +71,21 @@ The format should be the same as for `compilation-error-regexp-alist'.")
   ;; Setup `compile' support so you can just use C-x ` and friends.
   (set (make-local-variable 'compilation-error-regexp-alist)
        inferior-haskell-error-regexp-alist)
-  (cond
-   ((fboundp 'compilation-shell-minor-mode) (compilation-shell-minor-mode 1))
-   ((fboundp 'compilation-minor-mode) (compilation-minor-mode 1))))
+  (if (and (not (boundp 'minor-mode-overriding-map-alist))
+           (fboundp 'compilation-shell-minor-mode))
+      ;; If we can't remove compilation-minor-mode bindings, at least try to
+      ;; use compilation-shell-minor-mode, so there are fewer
+      ;; annoying bindings.
+      (compilation-shell-minor-mode 1)
+    ;; Else just use compilation-minor-mode but without its bindings because
+    ;; things like mouse-2 are simply too annoying.
+    (compilation-minor-mode 1)
+    (let ((map (make-sparse-keymap)))
+      (dolist (keys '([menu-bar] [follow-link]))
+        ;; Preserve some of the bindings.
+        (define-key map keys (lookup-key compilation-minor-mode-map keys)))
+      (add-to-list 'minor-mode-overriding-map-alist
+                   (cons 'compilation-minor-mode map)))))
 
 (defun inferior-haskell-string-to-strings (string &optional separator)
   "Split the STRING into a list of strings.
@@ -165,4 +177,6 @@ setting up the inferior-haskell buffer."
   (inferior-haskell-load-file 'reload))
 
 (provide 'inf-haskell)
+
+;; arch-tag: 61804287-63dd-4052-bc0e-90f691b34b40
 ;;; inf-haskell.el ends here
