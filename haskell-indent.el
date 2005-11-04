@@ -1005,14 +1005,29 @@ START is the start position of the comment in which point is."
 
 (defcustom haskell-indent-after-keywords
   '(("where" 2 0)
-    ("of" . 2)
-    ("do" . 2)
+    ("of" 2)
+    ("do" 2)
     "if"
     "then"
     "else"
     "let"
     "in")
-  ".")
+  "Keywords after which indentation should be indented by some offset.
+Each keyword info can have the following forms:
+
+   KEYWORD | (KEYWORD OFFSET [OFFSET-HANGING])
+
+If absent OFFSET-PENDING defaults to OFFSET.
+If absent OFFSET defaults to `haskell-indent-offset'.
+
+OFFSET-PENDING is the offset to use in the case where the keyword
+is at the end of an otherwise-non-empty line."
+  :type '(repeat (choice string
+                         (cons :tag "" (string :tag "keyword:")
+                         (cons :tag "" (integer :tag "offset")
+                         (choice (const nil)
+                                 (list :tag ""
+                                       (integer :tag "offset-pending"))))))))
 
 (defun haskell-indent-virtual-indentation ()
   "Compute the \"virtual indentation\" of text at point.
@@ -1101,14 +1116,14 @@ START if non-nil is a presumed start pos of the current definition."
         (let ((id (buffer-substring (point) (progn (forward-word -1) (point)))))
           (when (setq open (or (assoc id haskell-indent-after-keywords)
                                (car (member id haskell-indent-after-keywords))))
-            (setq open (if (consp open) (cdr open) haskell-indent-offset))
-            (if (consp open)
-                (setq open
-                      (if (save-excursion (skip-syntax-backward " \t") (bolp))
-                          (car open)
-                        (cadr open))))
+            (setq open (cdr-safe open))
+            (setq open
+                  (if (save-excursion (skip-syntax-backward " \t") (bolp))
+                      (car open)
+                    (or (cadr open) (car open))))
             (haskell-indent-push-col
-             (+ (haskell-indent-virtual-indentation) open)))))
+             (+ (haskell-indent-virtual-indentation)
+                (or open haskell-indent-offset))))))
       indent-info)
 
      ;; open structure? ie  ( { [
