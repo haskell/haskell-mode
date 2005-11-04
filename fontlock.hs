@@ -16,6 +16,13 @@ recognize +++ infix :: Operator Declarations
 as `well` as = This Form
 (+) and this one = as well
 
+instance Show Toto where
+    fun1 arg1 = foo             -- FIXME: `fun1' should be highlighted.
+
+constStr = "hello \
+           \asdgfasgf\
+           \asf"
+
 {-
 map :: (a -> b) -> [a] -> [b]           -- Commenting out large sections of
 map f []     = []                       -- code can be misleading.  Coloured
