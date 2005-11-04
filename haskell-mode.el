@@ -1,6 +1,6 @@
 ;;; haskell-mode.el --- A Haskell editing mode    -*-coding: iso-8859-1;-*-
 
-;; Copyright (C) 2003, 2004  Free Software Foundation, Inc
+;; Copyright (C) 2003, 2004, 2005  Free Software Foundation, Inc
 ;; Copyright (C) 1992, 1997-1998 Simon Marlow, Graeme E Moss, and Tommy Thorn
 
 ;; Authors: 1992      Simon Marlow
@@ -350,44 +350,8 @@ be set to the preferred literate style."
   "Syntax table used in Haskell mode.")
 
 ;; Various mode variables.
-(defun haskell-vars ()
-  (kill-all-local-variables)
-  (make-local-variable 'paragraph-start)
-  (setq paragraph-start (concat "^$\\|" page-delimiter))
-  (make-local-variable 'paragraph-separate)
-  (setq paragraph-separate paragraph-start)
-  (make-local-variable 'comment-start)
-  (setq comment-start "-- ")
-  (make-local-variable 'comment-padding)
-  (setq comment-padding 0)
-  (set (make-local-variable 'comment-start-skip) "[-{]-[ \t]*")
-  (make-local-variable 'comment-end)
-  (setq comment-end "")
-  (set (make-local-variable 'comment-end-skip) "[ \t]*\\(-}\\|\\s>\\)")
-  (set (make-local-variable 'parse-sexp-ignore-comments) t)
-  ;; Set things up for eldoc-mode.
-  (set (make-local-variable 'eldoc-print-current-symbol-info-function)
-       'haskell-doc-current-info)
-  ;; Set things up for imenu.
-  (set (make-local-variable 'imenu-create-index-function)
-       'haskell-ds-create-imenu-index)
-  ;; Set things up for font-lock.
-  (set (make-local-variable 'font-lock-defaults)
-       '(haskell-font-lock-choose-keywords
-	 nil nil ((?\' . "w") (?_  . "w")) nil
-	 (font-lock-syntactic-keywords
-	  . haskell-font-lock-choose-syntactic-keywords)
-	 (font-lock-syntactic-face-function
-	  . haskell-syntactic-face-function)
-	 ;; Get help from font-lock-syntactic-keywords.
-	 (parse-sexp-lookup-properties . t)))
-  ;; Haskell's layout rules mean that TABs have to be handled with extra care.
-  ;; The safer option is to avoid TABs.  The second best is to make sure
-  ;; TABs stops are 8 chars apart, as mandated by the Haskell Report.  --Stef
-  (set (make-local-variable 'indent-tabs-mode) nil)
-  (set (make-local-variable 'tab-width) 8))
 
-(defcustom haskell-mode-hooks nil
+(defcustom haskell-mode-hook nil
   "Hook run after entering Haskell mode."
   :type 'hook
   :options '(turn-on-haskell-indent turn-on-font-lock turn-on-eldoc-mode
@@ -395,7 +359,7 @@ be set to the preferred literate style."
 
 ;; The main mode functions
 ;;;###autoload
-(defun haskell-mode ()
+(define-derived-mode haskell-mode fundamental-mode "Haskell"
   "Major mode for editing Haskell programs.  Last adapted for Haskell 1.4.
 Blank lines separate paragraphs, comments start with `-- '.
 
@@ -431,35 +395,47 @@ that `haskell-doc' is irregular in using `turn-(on/off)-haskell-doc-mode'.)
 Use `haskell-version' to find out what version this is.
 
 Invokes `haskell-mode-hook' if not nil."
-
-  (interactive)
-  (haskell-mode-generic nil))
+  (set (make-local-variable 'paragraph-start) (concat "^$\\|" page-delimiter))
+  (set (make-local-variable 'paragraph-separate) paragraph-start)
+  (set (make-local-variable 'comment-start) "-- ")
+  (set (make-local-variable 'comment-padding) 0)
+  (set (make-local-variable 'comment-start-skip) "[-{]-[ \t]*")
+  (set (make-local-variable 'comment-end) "")
+  (set (make-local-variable 'comment-end-skip) "[ \t]*\\(-}\\|\\s>\\)")
+  (set (make-local-variable 'parse-sexp-ignore-comments) t)
+  ;; Set things up for eldoc-mode.
+  (set (make-local-variable 'eldoc-print-current-symbol-info-function)
+       'haskell-doc-current-info)
+  ;; Set things up for imenu.
+  (set (make-local-variable 'imenu-create-index-function)
+       'haskell-ds-create-imenu-index)
+  ;; Set things up for font-lock.
+  (set (make-local-variable 'font-lock-defaults)
+       '(haskell-font-lock-choose-keywords
+	 nil nil ((?\' . "w") (?_  . "w")) nil
+	 (font-lock-syntactic-keywords
+	  . haskell-font-lock-choose-syntactic-keywords)
+	 (font-lock-syntactic-face-function
+	  . haskell-syntactic-face-function)
+	 ;; Get help from font-lock-syntactic-keywords.
+	 (parse-sexp-lookup-properties . t)))
+  ;; Haskell's layout rules mean that TABs have to be handled with extra care.
+  ;; The safer option is to avoid TABs.  The second best is to make sure
+  ;; TABs stops are 8 chars apart, as mandated by the Haskell Report.  --Stef
+  (set (make-local-variable 'indent-tabs-mode) nil)
+  (set (make-local-variable 'tab-width) 8))
+  (setq haskell-literate nil))
 
 ;;;###autoload
-(defun literate-haskell-mode ()
+(define-derived-mode literate-haskell-mode haskell-mode "LitHaskell"
   "As `haskell-mode' but for literate scripts."
-
-  (interactive)
-  (haskell-mode-generic
-   (save-excursion
-     (goto-char (point-min))
-     (cond
-      ((re-search-forward "^\\\\\\(begin\\|end\\){code}$" nil t) 'latex)
-      ((re-search-forward "^>" nil t) 'bird)
-      (t haskell-literate-default)))))
-
-(defun haskell-mode-generic (literate)
-  "Common part of `haskell-mode' and `literate-haskell-mode'.
-Former calls this with LITERATE nil.  Latter calls with LITERATE `bird' or
-`latex'."
-
-  (haskell-vars)
-  (setq major-mode 'haskell-mode)
-  (setq mode-name "Haskell")
-  (setq haskell-literate literate)
-  (use-local-map haskell-mode-map)
-  (set-syntax-table haskell-mode-syntax-table)
-  (run-hooks 'haskell-mode-hook))
+  (setq haskell-literate
+        (save-excursion
+          (goto-char (point-min))
+          (cond
+           ((re-search-forward "^\\\\\\(begin\\|end\\){code}$" nil t) 'latex)
+           ((re-search-forward "^>" nil t) 'bird)
+           (t haskell-literate-default)))))
 
 ;;;###autoload(add-to-list 'auto-mode-alist '("\\.\\(?:[gh]s\\|hi\\)\\'" . haskell-mode))
 ;;;###autoload(add-to-list 'auto-mode-alist '("\\.l[gh]s\\'" . literate-haskell-mode))
@@ -470,4 +446,5 @@ Former calls this with LITERATE nil.  Latter calls with LITERATE `bird' or
 
 (provide 'haskell-mode)
 
+;; arch-tag: b2237ec0-ddb0-4c86-9339-52d410264980
 ;;; haskell-mode.el ends here
