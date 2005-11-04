@@ -315,4 +315,6 @@ error line otherwise show the Hugs buffer."
   )
 
 (provide 'haskell-hugs)
+
+;; arch-tag: c2a621e9-d743-4361-a459-983fbf1d4589
 ;;; haskell-hugs.el ends here

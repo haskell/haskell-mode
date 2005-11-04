@@ -40,7 +40,8 @@ titi b =
         -}
        let foo   = let fro = 1
                        fri = 2   -- FIXME: can't indent lower than `let'.
-                   in hello
+                   in
+                     hello      -- FIXME
            foo2 = bar2  -- FIXME: can't align with empty arg in foo.
        expr2            -- FIXME: two possible `let's.
 
@@ -56,9 +57,9 @@ tata c =
     
 turlu d = if test               -- FIXME: indentation below if
           then
-            ifturl               -- FIXME: indentation below then
+              ifturl               -- FIXME: indentation below then
           else
-              adfaf             -- FIXME
+             adfaf             -- FIXME
 
 turlu d = if test then
              ifturl               -- FIXME: indentation below then
@@ -67,18 +68,39 @@ turlu d = if test then
 
 turly fg = toto
     where
-      hello = 2                 -- FIXME: indentation below where
+      hello = 2
            
 
 -- test from John Goerzen
 
 x myVariableThing = case myVariablething of
-                         Just z -> z
-                         Nothing -> 0
+                      Just z -> z
+                      Nothing -> 0
 
+foo = let x = 1 in toto
+              titi              -- FIXME
+
+foo = let foo x y = toto
+              where
+                toto =
+      if blabla then
+
+instance Show Toto where
+    foo x 4 = 50
+         
 data Toto = Foo
           | Bar
-          deriving (Show)     -- FIXME
+            deriving (Show)     -- FIXME
 
-eval env (Llambda x e) = Vfun (\v -> eval (\y -> if (x == y) then v else env y)
-                                          e) -- FIXME
+    eval env (Llambda x e) =    -- FIXME: sole indentation?
+        Vfun (\v -> eval (\y -> if (x == y) then v else env y)
+                     e) -- FIXME
+
+foo = case findprop attr props of
+                               Just x -> x -- FIXME: useless option
+
+
+       data T = T { granularity :: (Int, Int, Int, Int) -- FIXME: sole indentation?
+           , items :: Map (Int, Int, Int, Int) [Item] }
+
+-- arch-tag: de0069e3-c0a0-495c-b441-d4ff6e0509b1

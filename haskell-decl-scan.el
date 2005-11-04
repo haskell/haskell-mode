@@ -1,6 +1,6 @@
 ;;; haskell-decl-scan.el --- Declaration scanning module for Haskell Mode
 
-;; Copyright (C) 2004  Free Software Foundation, Inc.
+;; Copyright (C) 2004, 2005  Free Software Foundation, Inc.
 ;; Copyright (C) 1997-1998 Graeme E Moss
 
 ;; Authors: 1997-1998 Graeme E Moss <gem@cs.york.ac.uk>
@@ -131,7 +131,7 @@
 
 (require 'haskell-mode)
 
-(defconst haskell-decl-scan-version "$Revision: 1.7 $"
+(defconst haskell-decl-scan-version "$Revision: 1.8 $"
   "Version number of haskell-decl-scan.")
 (defun haskell-decl-scan-version ()
   "Echo the current version of haskell-decl-scan in the minibuffer."
@@ -697,4 +697,6 @@ Use `haskell-decl-scan-version' to find out what version this is."
 ;; Provide ourselves:
 
 (provide 'haskell-decl-scan)
+
+;; arch-tag: f4335fd8-4b6c-472e-9899-004d47d94818
 ;;; haskell-decl-scan.el ends here

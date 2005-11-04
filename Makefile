@@ -49,3 +49,5 @@ dist:
 	rm -rf $(PACKAGE)-$(VERSION)
 	mv $(TMP)/$(PACKAGE)-$(VERSION).tar.gz $(ftpdir)/
 	ln -sf $(PACKAGE)-$(VERSION).tar.gz $(ftpdir)/$(PACKAGE).tar.gz
+
+# arch-tag: 1ab314c8-3821-44fb-b533-dd58f5d75ba4
