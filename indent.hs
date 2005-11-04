@@ -1,3 +1,10 @@
+-------------------------------------------------------------------------
+-- Comments with allcaps `FIXME' indicate places where the indentation --
+-- fails to find the correct indentation, whereas comments with        --
+-- lowercase `fixme' indicate places where impossible indentations     --
+-- are uselessly proposed.                                             --
+-------------------------------------------------------------------------
+
 -- compute the list of binary digits corresponding to an integer
 -- Note: the least significant bit is the first element of the list
 bdigits               :: Int -> [Int]
@@ -11,14 +18,14 @@ bdigits n | n>1       = n `mod` 2 :
 --  Note: the least significant bit is the first element of the list
 bvalue :: [Int]->Int
 bvalue [] = error "bvalue of []"
-bvalue s  = bval 1 s            -- FIXME
+bvalue s  = bval 1 s
     where
-      bval e [] = 0           -- FIXME: indentation below `where'.
+      bval e [] = 0
       bval e (b:bs) | b==0 || b=="dd of " = b*e + bval (2*e) bs
                     | otherwise    = error "illegal digit" -- Spurious 3rd step.
                                      foo
 
--- FIXME: tab on the line above should insert `bvalue' at some point.
+-- fixme: tab on the line above should insert `bvalue' at some point.
 
 {- text
    indentation
@@ -33,38 +40,45 @@ lili x = do let x = 1
             print x     -- FIXME: align with `let'
 
 titi b =
+    let                         -- fixme: can't indent at column 0
+        x = let toto = 1
+                tata = 2        -- fixme: can't indent lower than `toto'.
+            in
+                toto
+    in
     do expr1
        {- text
         - indentation
         - inside comments
         -}
-       let foo   = let fro = 1
-                       fri = 2   -- FIXME: can't indent lower than `let'.
-                   in
-                     hello      -- FIXME
-           foo2 = bar2  -- FIXME: can't align with empty arg in foo.
-       expr2            -- FIXME: two possible `let's.
+       let foo s  = let fro = 1
+                        fri = 2   -- fixme: can't indent lower than `fro'.
+                    in
+                        hello
+           foo2 = bar2  -- fixme: can't align with arg `s' in foo.
+           foo1 = bar2  -- fixme: Can't be column 0.
+       expr2            -- FIXME
 
 tata c =
     let bar = case foo
               of 1 -> blabla
-                 2 -> blibli    -- FIXME: only one possible indentation here.
+                 2 -> blibli    -- fixme: only one possible indentation here.
         bar = case foo of
-                _ -> blabla     -- FIXME: indentation below `case'.
+                _ -> blabla
         bar' = case foo
                of _ -> blabla
                   toto -> plulu
     
-turlu d = if test               -- FIXME: indentation below if
+turlu d = if test
           then
-              ifturl               -- FIXME: indentation below then
+              ifturl
           else
-             adfaf             -- FIXME
+              adfaf
 
 turlu d = if test then
-             ifturl               -- FIXME: indentation below then
+              ifturl
           else
-              sg                -- FIXME
+              sg
 
 turly fg = toto
     where
@@ -75,32 +89,31 @@ turly fg = toto
 
 x myVariableThing = case myVariablething of
                       Just z -> z
-                      Nothing -> 0
+                      Nothing -> 0 -- fixme: "spurious" additional indents.
 
 foo = let x = 1 in toto
-              titi              -- FIXME
+                       titi     -- FIXME
 
 foo = let foo x y = toto
               where
-                toto =
-      if blabla then
+                toto = 2
 
 instance Show Toto where
     foo x 4 = 50
          
 data Toto = Foo
           | Bar
-            deriving (Show)     -- FIXME
+          deriving (Show)     -- FIXME
 
-    eval env (Llambda x e) =    -- FIXME: sole indentation?
-        Vfun (\v -> eval (\y -> if (x == y) then v else env y)
-                     e) -- FIXME
+  eval env (Llambda x e) =    -- FIXME: sole indentation is self???
+  Vfun (\v -> eval (\y -> if (x == y) then v else env y)
+                   e) -- FIXME
 
 foo = case findprop attr props of
-                               Just x -> x -- FIXME: useless option
+        Just x -> x
 
 
-       data T = T { granularity :: (Int, Int, Int, Int) -- FIXME: sole indentation?
-           , items :: Map (Int, Int, Int, Int) [Item] }
+ data T = T { granularity :: (Int, Int, Int, Int) -- FIXME: self indentation?
+            , items :: Map (Int, Int, Int, Int) [Item] }
 
 -- arch-tag: de0069e3-c0a0-495c-b441-d4ff6e0509b1
