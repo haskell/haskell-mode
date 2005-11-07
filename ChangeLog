@@ -1,5 +1,13 @@
 2005-11-07  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* Release version 2.1.
+
+	* haskell-indent.el (haskell-indent-inside-comment): Rename `start' arg
+	into `open' and add a new `start' arg.
+	(haskell-indent-after-keywords): Change defaults for `in'.
+	(haskell-indent-indentation-info): Fix confusion between pos and col.
+	(haskell-indent-mode): Autoload.
+
 	* haskell-indent.el (haskell-indent-find-matching-start):
 	Add `pred' and `start' arguments.
 	(haskell-indent-filter-let-no-in): New fun.

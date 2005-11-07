@@ -21,8 +21,9 @@ bvalue [] = error "bvalue of []"
 bvalue s  = bval 1 s
     where
       bval e [] = 0
+      bval e [] = 0             -- fixme: can't align with `where'.
       bval e (b:bs) | b==0 || b=="dd of " = b*e + bval (2*e) bs
-                    | otherwise    = error "illegal digit" -- Spurious 3rd step.
+                    | otherwise    = error "ill digit" -- Spurious 3rd step.
                                      foo
 
 -- fixme: tab on the line above should insert `bvalue' at some point.
@@ -44,8 +45,7 @@ titi b =
         x = let toto = 1
                 tata = 2        -- fixme: can't indent lower than `toto'.
             in
-                toto
-    in
+                toto in
     do expr1
        {- text
         - indentation
@@ -60,7 +60,7 @@ titi b =
        expr2
 
 tata c =
-    let bar = case foo
+    let bar = case foo          -- fixme: can't be col 0.
               of 1 -> blabla
                  2 -> blibli    -- fixme: only one possible indentation here.
         bar = case foo of
@@ -109,15 +109,14 @@ foo = let toto x = do let bar = 2
                       return 1
       in 3
 
-eval env (Llambda x e) =    -- FIXME: sole indentation is self???
-    Vfun (\v -> eval (\y -> if (x == y) then v else env y) -- FIXME
-                     e) -- FIXME
+ eval env (Llambda x e) =    -- FIXME: sole indentation is self???
+     Vfun (\v -> eval (\y -> if (x == y) then v else env y) -- FIXME
+                      e) -- FIXME
 
 foo = case findprop attr props of
         Just x -> x
 
-
 data T = T { granularity :: (Int, Int, Int, Int) -- FIXME: self indentation?
-            , items :: Map (Int, Int, Int, Int) [Item] }
+           , items :: Map (Int, Int, Int, Int) [Item] }
 
 -- arch-tag: de0069e3-c0a0-495c-b441-d4ff6e0509b1
