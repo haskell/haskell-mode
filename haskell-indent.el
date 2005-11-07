@@ -937,20 +937,20 @@ START is the position of the presumed `in'."
                 (goto-char start)))
             (null col)))))))
 
-(defun haskell-indent-inside-comment (start)
+(defun haskell-indent-inside-comment (open start)
   "Compute indent info for text inside comment.
-START is the start position of the comment in which point is."
+OPEN is the start position of the comment in which point is."
   ;; Ideally we'd want to guess whether it's commented out code or
   ;; whether it's text.  Instead, we'll assume it's text.
   (save-excursion
-    (if (= start (point))
+    (if (= open (point))
 	;; We're actually just in front of a comment: align with following
 	;; code or with comment on previous line.
         (let ((prev-line-info
                (cond
                 ((eq (char-after) ?\{) nil) ;Align as if it were code.
                 ((and (forward-comment -1)
-                      (> (line-beginning-position 3) start))
+                      (> (line-beginning-position 3) open))
                  ;; We're after another comment and there's no empty line
                  ;; between us.
                  (list (list (haskell-indent-point-to-col (point)))))
@@ -1002,11 +1002,11 @@ START is the start position of the comment in which point is."
   '(("where" 2 0)
     ("of" 2)
     ("do" 2)
+    ("in" 2 0)
     "if"
     "then"
     "else"
-    "let"
-    "in")
+    "let")
   "Keywords after which indentation should be indented by some offset.
 Each keyword info can have the following forms:
 
@@ -1067,7 +1067,7 @@ START if non-nil is a presumed start pos of the current definition."
 
      ;; in comment ?
      ((setq open (haskell-indent-in-comment start end))
-      (haskell-indent-inside-comment open))
+      (haskell-indent-inside-comment open start))
 
      ;; Closing the declaration part of a `let' or the test exp part of a case.
      ((and (looking-at "\\(?:in\\|of\\|then\\|else\\)\\>")
@@ -1103,8 +1103,7 @@ START if non-nil is a presumed start pos of the current definition."
                       (car open)
                     (or (cadr open) (car open))))
             (list (list
-                   (+ (haskell-indent-point-to-col
-                       (haskell-indent-virtual-indentation start))
+                   (+ (haskell-indent-virtual-indentation start)
                       (or open haskell-indent-offset))))))))
 
      ;; open structure? ie  ( { [
@@ -1440,6 +1439,7 @@ the layout rule of Haskell."
                   (append (default-value 'minor-mode-alist)
                           '((haskell-indent-mode " Ind")))))
 
+;;;###autoload
 (defun haskell-indent-mode (&optional arg)
   "``intelligent'' Haskell indentation mode that deals with
 the layout rule of Haskell.  \\[haskell-indent-cycle] starts the cycle
