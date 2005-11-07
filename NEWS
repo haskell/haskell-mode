@@ -1,6 +1,6 @@
 Changes since 2.0:
 
-* inf-haskell uses ghci is hugs is absent.
+* inf-haskell uses ghci if hugs is absent.
 
 * Fix up some binding conflicts (C-c C-o in haskell-doc)
 
