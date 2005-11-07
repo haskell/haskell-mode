@@ -7,7 +7,7 @@
 ;; Keywords: declarations menu files Haskell
 ;; URL: http://cvs.haskell.org/cgi-bin/cvsweb.cgi/fptools/CONTRIB/haskell-modes/emacs/haskell-decl-scan.el?rev=HEAD
 
-;;; This file is not part of GNU Emacs.
+;; This file is not part of GNU Emacs.
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -131,7 +131,7 @@
 
 (require 'haskell-mode)
 
-(defconst haskell-decl-scan-version "$Revision: 1.8 $"
+(defconst haskell-decl-scan-version "$Revision: 1.9 $"
   "Version number of haskell-decl-scan.")
 (defun haskell-decl-scan-version ()
   "Echo the current version of haskell-decl-scan in the minibuffer."
@@ -595,18 +595,18 @@ datatypes) in a Haskell file for the `imenu' package."
 	       (name (car name-posns))
 	       (posns (cdr name-posns))
 	       (name-pos (cdr posns))
-	       ;(type (cdr result))
+               ;;(type (cdr result))
 	       )
 	  (cons ;(concat
 		 ;; func-menu has problems with spaces, and adding a
 		 ;; qualifying keyword will not allow the "goto fn"
 		 ;; functions to work properly.  Sigh.
-;		 (cond
-;		  ((eq type 'variable) "")
-;		  ((eq type 'datatype) "datatype ")
-;		  ((eq type 'class) "class ")
-;		  ((eq type 'import) "import ")
-;		  ((eq type 'instance) "instance "))
+		 ;; (cond
+		 ;;  ((eq type 'variable) "")
+		 ;;  ((eq type 'datatype) "datatype ")
+		 ;;  ((eq type 'class) "class ")
+		 ;;  ((eq type 'import) "import ")
+		 ;;  ((eq type 'instance) "instance "))
 		 name;)
 		name-pos))
       nil)))
@@ -622,16 +622,13 @@ datatypes) in a Haskell file for the `imenu' package."
 (defun haskell-ds-func-menu ()
   "Use `func-menu' to establish declaration scanning for Haskell scripts."
   (require 'func-menu)
-  (make-local-variable 'fume-menubar-menu-name)
-  (setq fume-menubar-menu-name "Declarations")
-  (make-local-variable 'fume-function-name-regexp-alist)
-  (setq fume-function-name-regexp-alist
-	(if (haskell-ds-bird-p)
-            '((haskell-mode . literate-haskell-ds-func-menu-regexp))
-          '((haskell-mode . haskell-ds-func-menu-regexp))))
-  (make-local-variable 'fume-find-function-name-method-alist)
-  (setq fume-find-function-name-method-alist
-	'((haskell-mode . haskell-ds-func-menu-next)))
+  (set (make-local-variable 'fume-menubar-menu-name) "Declarations")
+  (set (make-local-variable 'fume-function-name-regexp-alist)
+       (if (haskell-ds-bird-p)
+           '((haskell-mode . literate-haskell-ds-func-menu-regexp))
+         '((haskell-mode . haskell-ds-func-menu-regexp))))
+  (set (make-local-variable 'fume-find-function-name-method-alist)
+       '((haskell-mode . haskell-ds-func-menu-next)))
   (fume-add-menubar-entry)
   (local-set-key "\C-cl" 'fume-list-functions)
   (local-set-key "\C-cg" 'fume-prompt-function-goto)
