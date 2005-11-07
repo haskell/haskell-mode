@@ -41,11 +41,11 @@
 ;; `imenu' to access the types of all local functions.  In `haskell-mode' this
 ;; is not possible.  However, types of prelude functions are still shown.
 
-;; To show types of global functions, i.e. functions defined in a module 
-;; imported by the current module, call the function 
+;; To show types of global functions, i.e. functions defined in a module
+;; imported by the current module, call the function
 ;; `turn-on-haskell-doc-global-types'.  This automatically loads all modules
-;; and builds `imenu' tables to get the types of all functions (again this 
-;; currently requires `haskell-hugs-mode'). 
+;; and builds `imenu' tables to get the types of all functions (again this
+;; currently requires `haskell-hugs-mode').
 ;; Note: The modules are loaded recursively, so you might pull in
 ;;       many modules by just turning on global function support.
 ;; This features is currently not very well supported.
@@ -77,20 +77,20 @@
 ;;  `haskell-doc-show-user-defined' (default: t)
 
 ;; If you want to define your own strings for some identifiers define an
-;; alist of (ID . STRING) and set `haskell-doc-show-user-defined' to t. 
+;; alist of (ID . STRING) and set `haskell-doc-show-user-defined' to t.
 ;; E.g:
 ;;
 ;;   (setq haskell-doc-show-user-defined t)
-;;   (setq haskell-doc-user-defined-ids 
-;;	(list 
+;;   (setq haskell-doc-user-defined-ids
+;;	(list
 ;;	   '("main" . "just another pathetic main function")
 ;;	   '("foo" . "a very dummy name")
 ;;	   '("bar" . "another dummy name")))
 
 ;;  The following two variables are useful to make the type fit on one line:
 ;;  If `haskell-doc-chop-off-context' is non-nil the context part of the type
-;;  of a local fct will be eliminated (default: t). 
-;;  If `haskell-doc-chop-off-fctname' is non-nil the function name is not 
+;;  of a local fct will be eliminated (default: t).
+;;  If `haskell-doc-chop-off-fctname' is non-nil the function name is not
 ;;  shown together with the type (default: nil).
 
 ;;; Internals:
@@ -112,14 +112,14 @@
 ;;  `haskell-doc-show-prelude'      ... toggle echoing of prelude id's types
 ;;  `haskell-doc-show-strategy'     ... toggle echoing of strategy id's types
 ;;  `haskell-doc-show-user-defined' ... toggle echoing of user def id's types
-;;  `haskell-doc-check-active' ... check whether haskell-doc is active via the 
-;;                                `post-command-idle-hook' (for testing); 
+;;  `haskell-doc-check-active' ... check whether haskell-doc is active via the
+;;                                `post-command-idle-hook' (for testing);
 ;;                                 Key: CTRL-c ESC-/
 
 ;;; ToDo:
 ;;  =====
 
-;;   - Fix byte-compile problems in `haskell-doc-prelude-types' for getArgs etc 
+;;   - Fix byte-compile problems in `haskell-doc-prelude-types' for getArgs etc
 ;;   - Write a parser for .hi files and make haskell-doc independent from
 ;;     hugs-mode. Read library interfaces via this parser.
 ;;   - Indicate kind of object with colours
@@ -130,13 +130,19 @@
 ;;; Bugs:
 ;;  =====
 
-;;   - Some prelude fcts aren't displayed properly. This might be due to a 
+;;   - Some prelude fcts aren't displayed properly. This might be due to a
 ;;     name clash of Haskell and Elisp functions (e.g. length) which
 ;;     confuses emacs when reading `haskell-doc-prelude-types'
 
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.16  2005/11/07 01:28:16  monnier
+;;  (haskell-doc-xemacs-p, haskell-doc-emacs-p)
+;;  (haskell-doc-message): Remove.
+;;  (haskell-doc-is-id-char-at): Remove.
+;;  (haskell-doc-get-current-word): Rewrite.
+;;
 ;;  Revision 1.15  2005/11/04 17:11:12  monnier
 ;;  Add arch-tag.
 ;;
@@ -243,58 +249,50 @@
 ;;; Code:
 ;;  =====
 
-;@menu
-;* Constants and Variables::	
-;* Install as minor mode::	
-;* Menubar Support::		
-;* Haskell Doc Mode::		
-;* Switch it on or off::	
-;* Check::			
-;* Top level function::		
-;* Mouse interface::		
-;* Print fctsym::		
-;* Movement::			
-;* Bug Reports::		
-;* Visit home site::		
-;* Index::			
-;* Token::			
-;@end menu
+;;@menu
+;;* Constants and Variables::
+;;* Install as minor mode::
+;;* Menubar Support::
+;;* Haskell Doc Mode::
+;;* Switch it on or off::
+;;* Check::
+;;* Top level function::
+;;* Mouse interface::
+;;* Print fctsym::
+;;* Movement::
+;;* Bug Reports::
+;;* Visit home site::
+;;* Index::
+;;* Token::
+;;@end menu
 
-;@node top, Constants and Variables, (dir), (dir)
-;@top
+;;@node top, Constants and Variables, (dir), (dir)
+;;@top
 
-;@node Constants and Variables, Install as minor mode, top, top
-;@section Constants and Variables
+;;@node Constants and Variables, Install as minor mode, top, top
+;;@section Constants and Variables
 
-;@menu
-;* Emacs portability::		
-;* Maintenance stuff::		
-;* Mode Variable::		
-;* Variables::			
-;* Prelude types::		
-;* Test membership::		
-;@end menu
+;;@menu
+;;* Emacs portability::
+;;* Maintenance stuff::
+;;* Mode Variable::
+;;* Variables::
+;;* Prelude types::
+;;* Test membership::
+;;@end menu
 
-;@node Emacs portability, Maintenance stuff, Constants and Variables, Constants and Variables
-;@subsection Emacs portability
+;;@node Emacs portability, Maintenance stuff, Constants and Variables, Constants and Variables
+;;@subsection Emacs portability
 
 (defgroup haskell-doc nil
   "Show Haskell function types in echo area."
   :group 'haskell
   :prefix "haskell-doc-")
 
-(defconst haskell-doc-xemacs-p (string-match "XEmacs\\|Lucid" emacs-version)
-  "Running under XEmacs?")
+;;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
+;;@subsection Maintenance stuff
 
-(defconst haskell-doc-emacs-p (and (or (string-match "^19" emacs-version)
-				       (string-match "^20" emacs-version))
-				(not haskell-doc-xemacs-p))
-  "Running under Emacs?")
-
-;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
-;@subsection Maintenance stuff
-
-(defconst haskell-doc-version "$Revision: 1.15 $"
+(defconst haskell-doc-version "$Revision: 1.16 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 (defconst haskell-doc-maintainer
@@ -305,8 +303,8 @@
   "/ftp@ftp.dcs.gla.ac.uk:/pub/glasgow-fp/authors/Hans_Loidl/Elisp/"
   "Main FTP site with latest version of `haskell-doc-mode' and sample files.")
 
-;@node Mode Variable, Variables, Maintenance stuff, Constants and Variables
-;@subsection Mode Variable
+;;@node Mode Variable, Variables, Maintenance stuff, Constants and Variables
+;;@subsection Mode Variable
 
 (defvar haskell-doc-mode nil
   "*If non-nil, show the type of the function near point or a related comment.
@@ -315,15 +313,15 @@ If the identifier near point is a Haskell keyword and the variable
 `haskell-doc-show-reserved' is non-nil show a one line summary
 of the syntax.
 
-If the identifier near point is a Prelude or one of the standard library 
+If the identifier near point is a Prelude or one of the standard library
 functions and `haskell-doc-show-prelude' is non-nil show its type.
 
 If the identifier near point is local \(i.e. defined in this module\) check
 the `imenu' list of functions for the type. This obviously requires that
 your language mode uses `imenu' \(`haskell-hugs-mode' 0.6 for example\).
 
-If the identifier near point is global \(i.e. defined in an imported module\) 
-and the variable `haskell-doc-show-global-types' is non-nil show the type of its 
+If the identifier near point is global \(i.e. defined in an imported module\)
+and the variable `haskell-doc-show-global-types' is non-nil show the type of its
 function.
 
 If the identifier near point is a standard strategy or a function, type related
@@ -332,7 +330,7 @@ of the function. Strategies are special to the parallel execution of Haskell.
 If you're not interested in that just turn it off.
 
 If the identifier near point is a user defined function that occurs as key
-in the alist `haskell-doc-user-defined-ids' and the variable 
+in the alist `haskell-doc-user-defined-ids' and the variable
 `haskell-doc-show-user-defined' is non-nil show the type of the function.
 
 This variable is buffer-local.")
@@ -389,8 +387,8 @@ This variable is buffer-local."
 (defvar haskell-doc-search-distance 40  ; distance in characters
  "*How far to search when looking for the type declaration of fct under cursor.")
 
-;@node Variables, Prelude types, Mode Variable, Constants and Variables
-;@subsection Variables
+;;@node Variables, Prelude types, Mode Variable, Constants and Variables
+;;@subsection Variables
 
 (defvar haskell-doc-idle-delay 0.50
   "*Number of seconds of idle time to wait before printing.
@@ -416,23 +414,23 @@ candidates.
 It is probably best to manipulate this data structure with the commands
 `haskell-doc-add-command' and `haskell-doc-remove-command'.")
 
-;(cond ((null haskell-doc-mode-message-commands)
-;       ;; If you increase the number of buckets, keep it a prime number.
-;       (setq haskell-doc-mode-message-commands (make-vector 31 0))
-;       (let ((list '("self-insert-command"
-;                     "next-"         "previous-"
-;                     "forward-"      "backward-"
-;                     "beginning-of-" "end-of-"
-;                     "goto-"
-;                     "recenter"
-;                     "scroll-"))
-;             (syms nil))
-;         (while list
-;           (setq syms (all-completions (car list) obarray 'fboundp))
-;           (setq list (cdr list))
-;           (while syms
-;             (set (intern (car syms) haskell-doc-mode-message-commands) t)
-;             (setq syms (cdr syms)))))))
+;;(cond ((null haskell-doc-mode-message-commands)
+;;       ;; If you increase the number of buckets, keep it a prime number.
+;;       (setq haskell-doc-mode-message-commands (make-vector 31 0))
+;;       (let ((list '("self-insert-command"
+;;                     "next-"         "previous-"
+;;                     "forward-"      "backward-"
+;;                     "beginning-of-" "end-of-"
+;;                     "goto-"
+;;                     "recenter"
+;;                     "scroll-"))
+;;             (syms nil))
+;;         (while list
+;;           (setq syms (all-completions (car list) obarray 'fboundp))
+;;           (setq list (cdr list))
+;;           (while syms
+;;             (set (intern (car syms) haskell-doc-mode-message-commands) t)
+;;             (setq syms (cdr syms)))))))
 
 ;; Bookkeeping; the car contains the last symbol read from the buffer.
 ;; The cdr contains the string last displayed in the echo area, so it can
@@ -445,8 +443,6 @@ It is probably best to manipulate this data structure with the commands
 
 (defconst haskell-doc-varlist
   (list
-   'haskell-doc-xemacs-p
-   'haskell-doc-emacs-p
    'haskell-doc-version
    'haskell-doc-mode
    'haskell-doc-mode-hook
@@ -462,10 +458,10 @@ It is probably best to manipulate this data structure with the commands
   )
   "List of variables sent via `haskell-doc-submit-bug-report'.")
 
-;@node Prelude types, Test membership, Variables, Constants and Variables
-;@subsection Prelude types
+;;@node Prelude types, Test membership, Variables, Constants and Variables
+;;@subsection Prelude types
 
-;@cindex haskell-doc-reserved-ids
+;;@cindex haskell-doc-reserved-ids
 
 (defvar haskell-doc-reserved-ids
  (list
@@ -496,7 +492,7 @@ It is probably best to manipulate this data structure with the commands
  )
  "An alist of reserved identifiers and a string describing the construct they are used in.")
 
-;@cindex haskell-doc-prelude-types
+;;@cindex haskell-doc-prelude-types
 
 (defvar haskell-doc-prelude-types
   (list
@@ -969,7 +965,7 @@ It is probably best to manipulate this data structure with the commands
    '("getStdRandom" . "(StdGen -> (a, StdGen)) -> IO a"))
   "alist of prelude functions and their types.")
 
-;@cindex haskell-doc-strategy-ids
+;;@cindex haskell-doc-strategy-ids
 
 (defvar haskell-doc-strategy-ids
  (list
@@ -1031,16 +1027,16 @@ It is probably best to manipulate this data structure with the commands
 (defvar haskell-doc-user-defined-ids nil
  "alist of functions and strings defined by the user.")
 
-;@node Test membership,  , Prelude types, Constants and Variables
-;@subsection Test membership
+;;@node Test membership,  , Prelude types, Constants and Variables
+;;@subsection Test membership
 
-;@cindex haskell-doc-is-of
+;;@cindex haskell-doc-is-of
 (defsubst haskell-doc-is-of (fn types)
   "Check whether FN is one of the functions in the alist TYPES and return the type."
   (assoc fn types) )
 
-;@node Install as minor mode, Menubar Support, Constants and Variables, top
-;@section Install as minor mode
+;;@node Install as minor mode, Menubar Support, Constants and Variables, top
+;;@section Install as minor mode
 
 ;; Put this minor mode on the global minor-mode-alist.
 (or (assq 'haskell-doc-mode (default-value 'minor-mode-alist))
@@ -1049,15 +1045,15 @@ It is probably best to manipulate this data structure with the commands
                           '((haskell-doc-mode haskell-doc-minor-mode-string)))))
 
 
-;@node Menubar Support, Haskell Doc Mode, Install as minor mode, top
-;@section Menubar Support
+;;@node Menubar Support, Haskell Doc Mode, Install as minor mode, top
+;;@section Menubar Support
 
-; get imenu
+;; get imenu
 (require 'imenu)
 
-; a dummy definition needed for xemacs (I know, it's horrible :-(
+;; a dummy definition needed for xemacs (I know, it's horrible :-(
 
-;@cindex haskell-doc-install-keymap
+;;@cindex haskell-doc-install-keymap
 
 (defvar haskell-doc-keymap
   (let ((map (make-sparse-keymap)))
@@ -1087,7 +1083,7 @@ It is probably best to manipulate this data structure with the commands
   (interactive)
   ;; Add the menu to the hugs menu as last entry.
   (let ((hugsmap (lookup-key (current-local-map) [menu-bar Hugs])))
-    (if (not (or haskell-doc-xemacs-p ; XEmacs has problems here
+    (if (not (or (featurep 'xemacs) ; XEmacs has problems here
 		 (not (keymapp hugsmap))
 		 (lookup-key hugsmap [haskell-doc])))
 	(if (functionp 'define-key-after)
@@ -1102,10 +1098,10 @@ It is probably best to manipulate this data structure with the commands
 		 'haskell-doc-ask-mouse-for-type))
 
 
-;@node Haskell Doc Mode, Switch it on or off, Menubar Support, top
-;@section Haskell Doc Mode
+;;@node Haskell Doc Mode, Switch it on or off, Menubar Support, top
+;;@section Haskell Doc Mode
 
-;@cindex haskell-doc-mode
+;;@cindex haskell-doc-mode
 
 ;;;###autoload
 (defun haskell-doc-mode (&optional arg)
@@ -1137,7 +1133,7 @@ See variable docstring."
     (haskell-doc-install-keymap)
 
     (run-hooks 'haskell-doc-mode-hook))
-   
+
    ((not haskell-doc-mode)
 
     (remove-hook (if (boundp 'post-command-idle-hook)
@@ -1157,7 +1153,7 @@ See variable docstring."
 	     (>= (prefix-numeric-value ,prefix) 0)
 	   (not ,id))) )
 
-;@cindex haskell-doc-show-global-types
+;;@cindex haskell-doc-show-global-types
 (defun haskell-doc-show-global-types (&optional prefix)
   "Turn on global types information in `haskell-doc-mode'."
   (interactive "P")
@@ -1165,49 +1161,49 @@ See variable docstring."
   (if haskell-doc-show-global-types
       (haskell-doc-make-global-fct-index)))
 
-;@cindex haskell-doc-show-reserved
+;;@cindex haskell-doc-show-reserved
 (defun haskell-doc-show-reserved (&optional prefix)
   "Toggle the automatic display of a doc string for reserved ids."
   (interactive "P")
   (haskell-doc-toggle-var haskell-doc-show-reserved prefix))
 
-;@cindex haskell-doc-show-prelude
+;;@cindex haskell-doc-show-prelude
 (defun haskell-doc-show-prelude (&optional prefix)
   "Toggle the automatic display of a doc string for reserved ids."
   (interactive "P")
   (haskell-doc-toggle-var haskell-doc-show-prelude prefix))
 
-;@cindex haskell-doc-show-strategy
+;;@cindex haskell-doc-show-strategy
 (defun haskell-doc-show-strategy (&optional prefix)
   "Toggle the automatic display of a doc string for strategy ids."
   (interactive "P")
   (haskell-doc-toggle-var haskell-doc-show-strategy prefix))
 
-;@cindex haskell-doc-show-user-defined
+;;@cindex haskell-doc-show-user-defined
 (defun haskell-doc-show-user-defined (&optional prefix)
   "Toggle the automatic display of a doc string for user defined ids."
   (interactive "P")
   (haskell-doc-toggle-var haskell-doc-show-user-defined prefix))
 
-;@node Switch it on or off, Check, Haskell Doc Mode, top
-;@section Switch it on or off
+;;@node Switch it on or off, Check, Haskell Doc Mode, top
+;;@section Switch it on or off
 
-;@cindex turn-on-haskell-doc-mode
+;;@cindex turn-on-haskell-doc-mode
 
 ;;;###autoload
 (defalias 'turn-on-haskell-doc-mode 'haskell-doc-mode)
 
-;@cindex  turn-off-haskell-doc-mode
+;;@cindex  turn-off-haskell-doc-mode
 
 (defun turn-off-haskell-doc-mode ()
   "Unequivocally turn off `haskell-doc-mode' (see variable documentation)."
   (interactive)
   (haskell-doc-mode 0))
 
-;@node Check, Top level function, Switch it on or off, top
-;@section Check
+;;@node Check, Top level function, Switch it on or off, top
+;;@section Check
 
-;@cindex haskell-doc-check-active
+;;@cindex haskell-doc-check-active
 
 (defun haskell-doc-check-active ()
   "Check whether the print function is hooked in.
@@ -1223,16 +1219,16 @@ is not."
      (substitute-command-keys
       "haskell-doc is not ACTIVE \(Use C-u \\[haskell-doc-mode] to turn it on\)"))))
 
-;@node Top level function, Mouse interface, Check, top
-;@section Top level function
+;;@node Top level function, Mouse interface, Check, top
+;;@section Top level function
 
-;@cindex haskell-doc-mode-print-current-symbol-info
+;;@cindex haskell-doc-mode-print-current-symbol-info
 ;; This is the function hooked into the elisp command engine
 (defun haskell-doc-mode-print-current-symbol-info ()
- "Print the type of the symbol under the cursor. 
+ "Print the type of the symbol under the cursor.
 
 This function is hooked into the `post-command-idle-hook' to print the type
-automatically if `haskell-doc-mode' is turned on. It can also be called 
+automatically if `haskell-doc-mode' is turned on. It can also be called
 directly to ask for the type of a function."
   (interactive)
   (and haskell-doc-mode
@@ -1240,16 +1236,16 @@ directly to ask for the type of a function."
        ;; Having this mode operate in the minibuffer makes it impossible to
        ;; see what you're doing.
        (not (eq (selected-window) (minibuffer-window)))
-       ; take a nap
+       ;; take a nap
        (sit-for haskell-doc-idle-delay)
-       ; good morning! read the word under the cursor for breakfast
+       ;; good morning! read the word under the cursor for breakfast
        (haskell-doc-show-type)))
-;	 ; ToDo: find surrounding fct
-;         (cond ((eq current-symbol current-fnsym)
-;                (haskell-doc-show-type current-fnsym))
-;               (t
-;                (or nil ; (haskell-doc-print-var-docstring current-symbol)
-;                    (haskell-doc-show-type current-fnsym)))))))
+       ;; ;; ToDo: find surrounding fct
+       ;; (cond ((eq current-symbol current-fnsym)
+       ;;        (haskell-doc-show-type current-fnsym))
+       ;;       (t
+       ;;        (or nil ; (haskell-doc-print-var-docstring current-symbol)
+       ;;            (haskell-doc-show-type current-fnsym)))))))
 
 (defun haskell-doc-current-info ()
   "Return the info about symbol at point.
@@ -1257,10 +1253,10 @@ Meant for `eldoc-print-current-symbol-info-function'."
   (haskell-doc-sym-doc (haskell-doc-get-current-word)))
 
 
-;@node Mouse interface, Print fctsym, Top level function, top
-;@section Mouse interface for interactive query
+;;@node Mouse interface, Print fctsym, Top level function, top
+;;@section Mouse interface for interactive query
 
-;@cindex haskell-doc-ask-mouse-for-type
+;;@cindex haskell-doc-ask-mouse-for-type
 (defun haskell-doc-ask-mouse-for-type (event)
  "Read the identifier under the mouse and echo its type.
 This uses the same underlying function `haskell-doc-show-type' as the hooked
@@ -1270,22 +1266,22 @@ function. Only the user interface is different."
    (select-window (posn-window (event-end event)))
    (goto-char (posn-point (event-end event)))
    (haskell-doc-show-type)))
- 
 
-;@node Print fctsym, Movement, Mouse interface, top
-;@section Print fctsym
 
-;@menu
-;* Show type::			
-;* Aux::			
-;* Global fct type::		
-;* Local fct type::		
-;@end menu
+;;@node Print fctsym, Movement, Mouse interface, top
+;;@section Print fctsym
 
-;@node Show type, Aux, Print fctsym, Print fctsym
-;@subsection Show type
+;;@menu
+;;* Show type::
+;;* Aux::
+;;* Global fct type::
+;;* Local fct type::
+;;@end menu
 
-;@cindex haskell-doc-show-type
+;;@node Show type, Aux, Print fctsym, Print fctsym
+;;@subsection Show type
+
+;;@cindex haskell-doc-show-type
 
 ;;;###autoload
 (defun haskell-doc-show-type (&optional sym)
@@ -1311,10 +1307,6 @@ current buffer."
           (let ((message-log-max nil))
             (message "%s" doc)))))))
 
-
-;@cindex haskell-doc-message
-
-(defmacro haskell-doc-message (&rest args))
 
 (defun haskell-doc-sym-doc (sym)
   "Show the type of the function near point.
@@ -1352,7 +1344,7 @@ current buffer."
            (setcdr haskell-doc-last-data type))
 	  ((and haskell-doc-show-user-defined
 	       is-user-defined)
-	   ; (setq i-am-fct t)
+	   ;; (setq i-am-fct t)
 	   (setq type (cdr is-user-defined))
            (setcdr haskell-doc-last-data type))
           (t
@@ -1366,10 +1358,10 @@ current buffer."
 	       (setcdr haskell-doc-last-data type)))) )
     ;; ToDo: encode i-am-fct info into alist of types
     (and type
-	 ; drop `::' if it's not a fct
+	 ;; drop `::' if it's not a fct
 	 (let ( (str (cond ((and i-am-fct (not haskell-doc-chop-off-fctname))
 			    (format "%s :: %s" sym type))
-			   (t 
+			   (t
 			    (format "%s" type)))) )
 	   (if i-am-prelude
 	       (add-text-properties 0 (length str) '(face bold) str))
@@ -1377,41 +1369,41 @@ current buffer."
 
 
 ;; ToDo: define your own notion of `near' to find surrounding fct
-;(defun haskell-doc-fnsym-in-current-sexp ()
-;  (let* ((p (point))
-;         (sym (progn
-;		(forward-word -1)
+;;(defun haskell-doc-fnsym-in-current-sexp ()
+;;  (let* ((p (point))
+;;         (sym (progn
+;;		(forward-word -1)
 ;;                (while (and (forward-word -1) ; (haskell-doc-forward-sexp-safe -1)
 ;;                            (> (point) (point-min))))
-;                (cond ((or (= (point) (point-min))
-;                           (memq (or (char-after (point)) 0)
-;                                 '(?\( ?\"))
-;                           ;; If we hit a quotation mark before a paren, we
-;                           ;; are inside a specific string, not a list of
-;                           ;; symbols.
-;                           (eq (or (char-after (1- (point))) 0) ?\"))
-;                       nil)
-;                      (t (condition-case nil
-;                             (read (current-buffer))
-;                           (error nil)))))))
-;    (goto-char p)
-;    (if sym
-;	(format "%s" sym)
-;      sym) ) )
+;;                (cond ((or (= (point) (point-min))
+;;                           (memq (or (char-after (point)) 0)
+;;                                 '(?\( ?\"))
+;;                           ;; If we hit a quotation mark before a paren, we
+;;                           ;; are inside a specific string, not a list of
+;;                           ;; symbols.
+;;                           (eq (or (char-after (1- (point))) 0) ?\"))
+;;                       nil)
+;;                      (t (condition-case nil
+;;                             (read (current-buffer))
+;;                           (error nil)))))))
+;;    (goto-char p)
+;;    (if sym
+;;	(format "%s" sym)
+;;      sym)))
 
 ;;    (and (symbolp sym)
 ;;         sym)))
 
-;@node Aux, Global fct type, Show type, Print fctsym
-;@subsection Aux
+;;@node Aux, Global fct type, Show type, Print fctsym
+;;@subsection Aux
 
 ;; ToDo: handle open brackets to decide if it's a wrapped type
 
-;@cindex haskell-doc-grab-line
+;;@cindex haskell-doc-grab-line
 (defun haskell-doc-grab-line (fct-and-pos)
  "Get the type of an \(FCT POSITION\) pair from the current buffer."
-; (if (null fct-and-pos)
-;     "" ; fn is not a local fct
+ ;; (if (null fct-and-pos)
+ ;;     "" ; fn is not a local fct
   (let ( (str ""))
    (goto-char (cdr fct-and-pos))
    (beginning-of-line)
@@ -1425,28 +1417,28 @@ current buffer."
        (skip-chars-forward " \t")
        (setq str (concat str (haskell-doc-grab))))
      (haskell-doc-string-nub-ws           ; squeeze string
-      (if haskell-doc-chop-off-context    ; no context 
+      (if haskell-doc-chop-off-context    ; no context
 	  (haskell-doc-chop-off-context str)
 	str)))))
-  ; (concat (car fct-and-pos) "::" (haskell-doc-string-nub-ws str))))
+ ;; (concat (car fct-and-pos) "::" (haskell-doc-string-nub-ws str))))
 
-;@cindex haskell-doc-wrapped-type-p
+;;@cindex haskell-doc-wrapped-type-p
 (defun haskell-doc-wrapped-type-p ()
  "Check whether the type under the cursor is wrapped over several lines.
 The cursor must be at the end of a line, which contains the type.
 Currently, only the following is checked:
-If this line ends with a `->' or the next starts with an `->' it is a 
+If this line ends with a `->' or the next starts with an `->' it is a
 multi-line type \(same for `=>'\).
 `--' comments are ignored.
 ToDo: Check for matching parenthesis!. "
  (save-excursion
    (let ( (here (point))
 	  (lim (progn (beginning-of-line) (point)))
-	  ; (foo "")
+	  ;; (foo "")
 	  (res nil)
 	  )
    (goto-char here)
-   (search-backward "--" lim t) ; skip over `--' comment 
+   (search-backward "--" lim t) ; skip over `--' comment
    (skip-chars-backward " \t")
    (if (bolp)                   ; skip empty lines
       (progn
@@ -1454,7 +1446,7 @@ ToDo: Check for matching parenthesis!. "
        (end-of-line)
        (setq res (haskell-doc-wrapped-type-p)))
    (forward-char -1)
-   ; (setq foo (concat foo (char-to-string (preceding-char)) (char-to-string (following-char))))
+   ;; (setq foo (concat foo (char-to-string (preceding-char)) (char-to-string (following-char))))
    (if (or (and (or (char-equal (preceding-char) ?-) (char-equal (preceding-char) ?=))
 		(char-equal (following-char) ?>)) ; (or -!> =!>
 	   (char-equal (following-char) ?,))      ;     !,)
@@ -1469,14 +1461,14 @@ ToDo: Check for matching parenthesis!. "
 	     (end-of-line)
 	     (setq res (haskell-doc-wrapped-type-p)))
 	 (forward-char 1)
-	 ; (setq foo (concat foo (char-to-string (preceding-char)) (char-to-string (following-char))))
-	 ; (message "|%s|" foo)
+	 ;; (setq foo (concat foo (char-to-string (preceding-char)) (char-to-string (following-char))))
+	 ;; (message "|%s|" foo)
 	 (if (and (or (char-equal (preceding-char) ?-) (char-equal (preceding-char) ?=))
 		  (char-equal (following-char) ?>)) ; -!> or =!>
 	     (setq res t))))))
    res)))
 
-;@cindex haskell-doc-grab
+;;@cindex haskell-doc-grab
 (defun haskell-doc-grab ()
  "Return the text from point to the end of the line, chopping off comments.
 Leaves point at end of line."
@@ -1486,7 +1478,7 @@ Leaves point at end of line."
        str
      (substring str 0 i))))
 
-;@cindex haskell-doc-string-nub-ws
+;;@cindex haskell-doc-string-nub-ws
 (defun haskell-doc-string-nub-ws (str)
   "Replace all sequences of whitespaces in STR by just one whitespace.
 ToDo: Also eliminate leading and trainling whitespace."
@@ -1494,66 +1486,65 @@ ToDo: Also eliminate leading and trainling whitespace."
  (let (
        (res str)
        (i 0)
-       ) 
+       )
   (setq i (string-match "\\(\\s-+\\)" res i))
   (while (not (null i))
     (setq res (replace-match " " t t res))
     (setq i (string-match "\\(\\s-+\\)" res (1+ i))) )
   res) )
 
-; ToDo: make this more efficient!!
-;(defun haskell-doc-string-nub-ws (str)
-;  "Replace all sequences of whitespaces in STR by just one whitespace."
-;  (let ( (res "") 
-;	 (l (length str))
-;	 (i 0)
-;	 (j 0)
-;	 (in-ws nil))
-;   (while (< i l)
-;     (let* ( (c (string-to-char (substring str i (1+ i))))
-;	    (is-ws (eq (char-syntax c) ? )) )
-;       (if (not (and in-ws is-ws))
-;	     (setq res (concat res (char-to-string c))))
-;       (setq in-ws is-ws)
-;       (setq i (1+ i))))
-;   res))
+;; ToDo: make this more efficient!!
+;;(defun haskell-doc-string-nub-ws (str)
+;;  "Replace all sequences of whitespaces in STR by just one whitespace."
+;;  (let ( (res "")
+;;	 (l (length str))
+;;	 (i 0)
+;;	 (j 0)
+;;	 (in-ws nil))
+;;   (while (< i l)
+;;     (let* ( (c (string-to-char (substring str i (1+ i))))
+;;	    (is-ws (eq (char-syntax c) ? )) )
+;;       (if (not (and in-ws is-ws))
+;;	     (setq res (concat res (char-to-string c))))
+;;       (setq in-ws is-ws)
+;;       (setq i (1+ i))))
+;;   res))
 
-;@cindex haskell-doc-chop-off-context
+;;@cindex haskell-doc-chop-off-context
 (defun haskell-doc-chop-off-context (str)
  "Eliminate the contex in a type represented by the string STR."
- (let ((i (string-match "=>" str)) ) 
+ (let ((i (string-match "=>" str)) )
    (if (null i)
        str
      (substring str (+ i 2)))))
 
-;@cindex haskell-doc-get-imenu-info
+;;@cindex haskell-doc-get-imenu-info
 (defun haskell-doc-get-imenu-info (obj kind)
   "Returns a string describing OBJ of KIND \(Variables, Types, Data\)."
   (cond ((or (eq major-mode 'haskell-hugs-mode)
              ;; GEM: Haskell Mode does not work with Haskell Doc
              ;;      under XEmacs 20.x
              (and (eq major-mode 'haskell-mode)
-                  (not (and haskell-doc-xemacs-p
+                  (not (and (featurep 'xemacs)
                             (string-match "^20" emacs-version)))))
-	 (let* ( (imenu-info-alist (cdr (assoc kind imenu--index-alist)))
-		 ; (names (mapcar (lambda (x) (car x)) imenu-info-alist))
-		 (x (assoc obj imenu-info-alist))
-	       )
+	 (let* ((imenu-info-alist (cdr (assoc kind imenu--index-alist)))
+                ;; (names (mapcar 'car imenu-info-alist))
+                (x (assoc obj imenu-info-alist)))
 	     (if x
 		 (haskell-doc-grab-line x)
-	       nil)) )
+	       nil)))
 	  (t
-	   ; (error "Cannot get local functions in %s mode, sorry" major-mode))) )
+           ;; (error "Cannot get local functions in %s mode, sorry" major-mode))) )
 	   nil)))
 
-;@node Global fct type, Local fct type, Aux, Print fctsym
-;@subsection Global fct type
+;;@node Global fct type, Local fct type, Aux, Print fctsym
+;;@subsection Global fct type
 
 ;; ToDo:
 ;;  - modular way of defining a mapping of module name to file
 ;;  - use a path to search for file (not just current directory)
 
-;@cindex haskell-doc-imported-list
+;;@cindex haskell-doc-imported-list
 
 (defun haskell-doc-imported-list (outer-file)
   "Return a list of the imported modules in OUTER-FILE."
@@ -1579,12 +1570,12 @@ ToDo: Also eliminate leading and trainling whitespace."
 		    (cons file imported-file-list))))
       )
       (nreverse imported-file-list)
-      ;(message imported-file-list)
-)))
+      ;;(message imported-file-list)
+      )))
 
 ;; ToDo: generalise this to "Types" etc (not just "Variables")
 
-;@cindex haskell-doc-rescan-files
+;;@cindex haskell-doc-rescan-files
 
 (defun haskell-doc-rescan-files (filelist)
  "Does an `imenu' rescan on every file in FILELIST and returns the fct-list.
@@ -1599,7 +1590,7 @@ This function switches to and potentially loads many buffers."
 			     fn-alist)) ) )
    filelist ) )
 
-;@cindex haskell-doc-make-global-fct-index
+;;@cindex haskell-doc-make-global-fct-index
 
 (defun haskell-doc-make-global-fct-index ()
  "Scan imported files for types of global fcts and update `haskell-doc-index'."
@@ -1613,17 +1604,17 @@ This function switches to and potentially loads many buffers."
 
 ;; ToDo: use a separate munge-type function to format type concisely
 
-;@cindex haskell-doc-get-global-fct-type
+;;@cindex haskell-doc-get-global-fct-type
 
 (defun haskell-doc-get-global-fct-type (&optional sym)
  "Get type for function symbol SYM by examining `haskell-doc-index'."
   (interactive) ;  "fName of outer `include' file: \nsFct:")
   (save-excursion
-  ; (switch-to-buffer "*scratch*")
-  ; (goto-char (point-max))
-  ;; Produces a list of fct-type alists
-;  (if (null sym)
-;      (setq sym (progn (forward-word -1) (read (current-buffer)))))
+    ;; (switch-to-buffer "*scratch*")
+    ;; (goto-char (point-max))
+    ;; ;; Produces a list of fct-type alists
+    ;; (if (null sym)
+    ;;     (setq sym (progn (forward-word -1) (read (current-buffer)))))
   (or sym
       (current-word))
   (let* ( (fn sym) ; (format "%s" sym))
@@ -1643,10 +1634,10 @@ This function switches to and potentially loads many buffers."
 	  (setq fal (cdr fal))))
     res))) ; (message res)) )
 
-;@node Local fct type,  , Global fct type, Print fctsym
-;@subsection Local fct type
+;;@node Local fct type,  , Global fct type, Print fctsym
+;;@subsection Local fct type
 
-;@cindex haskell-doc-get-and-format-fct-type
+;;@cindex haskell-doc-get-and-format-fct-type
 
 (defun haskell-doc-get-and-format-fct-type (fn)
  "Get the type and kind of FN by checking local and global functions."
@@ -1655,65 +1646,46 @@ This function switches to and potentially loads many buffers."
      (let ((docstring "")
 	   (doc nil)
 	   )
-       ; is it a local function?
+       ;; is it a local function?
        (setq docstring (haskell-doc-get-imenu-info fn "Variables"))
        (if (not (null docstring))
-		; (string-match (format "^%s\\s-+::\\s-+\\(.*\\)$" fn) docstring))
+		;; (string-match (format "^%s\\s-+::\\s-+\\(.*\\)$" fn) docstring))
 	   (setq doc `(,docstring . "Variables"))) ; `(,(match-string 1 docstring) . "Variables") ))
-       ; is it a type declaration?
+       ;; is it a type declaration?
        (setq docstring (haskell-doc-get-imenu-info fn "Types"))
        (if (not (null docstring))
-		; (string-match (format "^\\s-*type\\s-+%s.*$" fn) docstring))
+		;; (string-match (format "^\\s-*type\\s-+%s.*$" fn) docstring))
 	     (setq doc `(,docstring . "Types"))) ; `(,(match-string 0 docstring) . "Types")) )
        (if (not (null docstring))
-		; (string-match (format "^\\s-*data.*%s.*$" fn) docstring))
+		;; (string-match (format "^\\s-*data.*%s.*$" fn) docstring))
 	 (setq doc `(,docstring . "Data"))) ; (setq doc `(,(match-string 0 docstring) . "Data")) )
-       ; return the result
+       ;; return the result
        doc ))))
 
 
-;@node Movement, Bug Reports, Print fctsym, top
-;@section Movement
-; Functions for moving in text and extracting the current word under the cursor
+;;@node Movement, Bug Reports, Print fctsym, top
+;;@section Movement
+;; Functions for moving in text and extracting the current word under the cursor
 
 ;; HWL: my attempt at more efficient (current-word)
-
-;@cindex haskell-doc-is-id-char-at
-(defsubst haskell-doc-is-id-char-at (x)
- (let ( (c (char-syntax (char-after x))) )
-   (or (eq c ?w) (eq c ?_))) )
 
 ;; NB: this function is called from within the hooked print function;
 ;;     therefore this function must not fail, otherwise the function will
 ;;     be de-installed;
 ;;     if no word under the cursor return an empty string
-;@cindex haskell-doc-get-current-word
+;;@cindex haskell-doc-get-current-word
 (defun haskell-doc-get-current-word ()
- "Return the word under the cursor, or empty string if no word found."
- ; (interactive)
- (if (bobp)
-     ""
- (let ((x (1- (point)))
-       (beg)
-       (end)
-       )
- ; go back to first non-word char 
- (while (and (> x (point-min)) (haskell-doc-is-id-char-at x))  ; (not (bobp))
-   (setq x (1- x)) )
- (if (= x (point-min))
-     (setq beg x)
-   (setq beg (1+ x)))
- (setq x (1+ x))
- (while (and (< x (point-max)) (haskell-doc-is-id-char-at x)) ; (not (eobp))
-   (setq x (1+ x)) )
- (setq end x)
- (buffer-substring-no-properties beg end))))
+  "Return the word under the cursor, or empty string if no word found."
+  (save-excursion
+    (buffer-substring-no-properties
+     (progn (skip-syntax-backward "w_") (point))
+     (progn (skip-syntax-forward "w_") (point)))))
 
-;@node Bug Reports, Visit home site, Movement, top
-;@section Bug Reports
+;;@node Bug Reports, Visit home site, Movement, top
+;;@section Bug Reports
 
-;@cindex haskell-doc-submit-bug-report
-; send a bug report
+;;@cindex haskell-doc-submit-bug-report
+;; send a bug report
 (defun haskell-doc-submit-bug-report ()
   "Send email to the maintainer of `haskell-doc-mode'."
   (interactive)
@@ -1733,61 +1705,60 @@ This function switches to and potentially loads many buffers."
      (beep)
      (message "Sorry, reporter.el not found."))))
 
-;@node Visit home site, Index, Bug Reports, top
-;@section Visit home site
+;;@node Visit home site, Index, Bug Reports, top
+;;@section Visit home site
 
-;@cindex haskell-doc-visit-home
+;;@cindex haskell-doc-visit-home
 
 (defun haskell-doc-visit-home ()
  "Jump to the main FTP site for `haskell-doc-mode'."
  (interactive)
- (if haskell-doc-xemacs-p
-    (require 'efs))
+ (if (featurep 'xemacs)
+     (require 'efs))
  (require 'dired)
  (dired-other-window haskell-doc-ftp-site))
 
-;@appendix
+;;@appendix
 
-;@node Index, Token, Visit home site, top
-;@section Index
+;;@node Index, Token, Visit home site, top
+;;@section Index
 
-;@index
-;* haskell-doc-ask-mouse-for-type::
-;* haskell-doc-check-active::
-;* haskell-doc-chop-off-context::
-;* haskell-doc-get-and-format-fct-type::
-;* haskell-doc-get-current-word::
-;* haskell-doc-get-global-fct-type::
-;* haskell-doc-get-imenu-info::
-;* haskell-doc-grab::
-;* haskell-doc-grab-line::
-;* haskell-doc-imported-list::
-;* haskell-doc-install-keymap::
-;* haskell-doc-is-id-char-at::
-;* haskell-doc-is-of::
-;* haskell-doc-make-global-fct-index::
-;* haskell-doc-mode::
-;* haskell-doc-mode-print-current-symbol-info::
-;* haskell-doc-prelude-types::
-;* haskell-doc-rescan-files::
-;* haskell-doc-reserved-ids::
-;* haskell-doc-show-global-types::
-;* haskell-doc-show-prelude::
-;* haskell-doc-show-reserved::
-;* haskell-doc-show-strategy::
-;* haskell-doc-show-type::
-;* haskell-doc-show-user-defined::
-;* haskell-doc-strategy-ids::
-;* haskell-doc-string-nub-ws::
-;* haskell-doc-submit-bug-report::
-;* haskell-doc-visit-home::
-;* haskell-doc-wrapped-type-p::
-;* turn-off-haskell-doc-mode::
-;* turn-on-haskell-doc-mode::
-;@end index
+;;@index
+;;* haskell-doc-ask-mouse-for-type::
+;;* haskell-doc-check-active::
+;;* haskell-doc-chop-off-context::
+;;* haskell-doc-get-and-format-fct-type::
+;;* haskell-doc-get-current-word::
+;;* haskell-doc-get-global-fct-type::
+;;* haskell-doc-get-imenu-info::
+;;* haskell-doc-grab::
+;;* haskell-doc-grab-line::
+;;* haskell-doc-imported-list::
+;;* haskell-doc-install-keymap::
+;;* haskell-doc-is-of::
+;;* haskell-doc-make-global-fct-index::
+;;* haskell-doc-mode::
+;;* haskell-doc-mode-print-current-symbol-info::
+;;* haskell-doc-prelude-types::
+;;* haskell-doc-rescan-files::
+;;* haskell-doc-reserved-ids::
+;;* haskell-doc-show-global-types::
+;;* haskell-doc-show-prelude::
+;;* haskell-doc-show-reserved::
+;;* haskell-doc-show-strategy::
+;;* haskell-doc-show-type::
+;;* haskell-doc-show-user-defined::
+;;* haskell-doc-strategy-ids::
+;;* haskell-doc-string-nub-ws::
+;;* haskell-doc-submit-bug-report::
+;;* haskell-doc-visit-home::
+;;* haskell-doc-wrapped-type-p::
+;;* turn-off-haskell-doc-mode::
+;;* turn-on-haskell-doc-mode::
+;;@end index
 
-;@node Token,  , Index, top
-;@section Token
+;;@node Token,  , Index, top
+;;@section Token
 
 (provide 'haskell-doc)
 
