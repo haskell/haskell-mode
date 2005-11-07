@@ -1,3 +1,11 @@
+2005-11-07  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-indent.el (haskell-indent-find-matching-start):
+	Add `pred' and `start' arguments.
+	(haskell-indent-filter-let-no-in): New fun.
+	(haskell-indent-indentation-info): Use them to correctly match `let's
+	with `in's even when some of the `let's have no matching `in'.
+
 2005-11-06  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-indent.el: Reduce the use of dyn-bound haskell-indent-info.
