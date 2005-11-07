@@ -33,11 +33,11 @@ bvalue s  = bval 1 s
  -}
 toto a = ( hello
          , there                -- indentation of leading , and ;
-         -- FIXME: indentation of this comment.
+         -- indentation of this comment.
          , my friends )
 
-lili x = do let x = 1
-            print x     -- FIXME: align with `let'
+lili x = do let ofs x = 1
+            print x
 
 titi b =
     let                         -- fixme: can't indent at column 0
@@ -57,7 +57,7 @@ titi b =
                         hello
            foo2 = bar2  -- fixme: can't align with arg `s' in foo.
            foo1 = bar2  -- fixme: Can't be column 0.
-       expr2            -- FIXME
+       expr2
 
 tata c =
     let bar = case foo
@@ -105,15 +105,19 @@ data Toto = Foo
           | Bar
           deriving (Show)     -- FIXME
 
-  eval env (Llambda x e) =    -- FIXME: sole indentation is self???
-  Vfun (\v -> eval (\y -> if (x == y) then v else env y)
-                   e) -- FIXME
+foo = let toto x = do let bar = 2
+                      return 1
+      in 3                      -- FIXME
+
+eval env (Llambda x e) =    -- FIXME: sole indentation is self???
+    Vfun (\v -> eval (\y -> if (x == y) then v else env y) -- FIXME
+                     e) -- FIXME
 
 foo = case findprop attr props of
         Just x -> x
 
 
- data T = T { granularity :: (Int, Int, Int, Int) -- FIXME: self indentation?
+data T = T { granularity :: (Int, Int, Int, Int) -- FIXME: self indentation?
             , items :: Map (Int, Int, Int, Int) [Item] }
 
 -- arch-tag: de0069e3-c0a0-495c-b441-d4ff6e0509b1
