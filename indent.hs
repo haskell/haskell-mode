@@ -107,7 +107,7 @@ data Toto = Foo
 
 foo = let toto x = do let bar = 2
                       return 1
-      in 3                      -- FIXME
+      in 3
 
 eval env (Llambda x e) =    -- FIXME: sole indentation is self???
     Vfun (\v -> eval (\y -> if (x == y) then v else env y) -- FIXME

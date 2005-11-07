@@ -89,12 +89,10 @@
 ;;(autoload 'haskell-indent-cycle "hindent" "Indentation cycle for Haskell" t)
 ;;
 
-(eval-when-compile (require 'cl))	;need defs of push and pop
-
-;; Maybe we should (require 'haskell-mode) instead.
-(defvar haskell-literate)
-
 ;;; Code:
+
+(eval-when-compile (require 'cl))	;need defs of push and pop
+(defvar haskell-literate)
 
 (defgroup haskell-indent nil
   "Haskell indentation."
@@ -895,23 +893,49 @@ and find indentation info for each part."
 						 haskell-indent-info)))))
     haskell-indent-info))
 
-(defun haskell-indent-find-matching-start (regexp limit)
+(defun haskell-indent-find-matching-start (regexp limit &optional pred start)
   (let ((open (haskell-indent-open-structure limit (point))))
     (if open (setq limit (1+ open))))
+  (unless start (setq start (point)))
   (when (re-search-backward regexp limit t)
     (let ((nestedcase (match-end 1))
           (outer (or (haskell-indent-in-string limit (point))
-		     (haskell-indent-in-comment limit (point))
-		     (haskell-indent-open-structure limit (point)))))
+                     (haskell-indent-in-comment limit (point))
+                     (haskell-indent-open-structure limit (point))
+                     (if (and pred (funcall pred start)) (point)))))
       (cond
        (outer
-	(goto-char outer)
-	(haskell-indent-find-matching-start regexp limit))
+        (goto-char outer)
+        (haskell-indent-find-matching-start regexp limit pred start))
        (nestedcase
-	;; Nested case.
-	(and (haskell-indent-find-matching-start regexp limit)
-	     (haskell-indent-find-matching-start regexp limit)))
+        ;; Nested case.
+        (and (haskell-indent-find-matching-start regexp limit pred)
+             (haskell-indent-find-matching-start regexp limit pred start)))
        (t (point))))))
+
+(defun haskell-indent-filter-let-no-in (start)
+  "Return non-nil if point is in front of a `let' that has no `in'.
+START is the position of the presumed `in'."
+  ;; We're looking at either `in' or `let'.
+  (when (looking-at "let")
+    (ignore-errors
+      (save-excursion
+        (forward-word 1)
+        (forward-comment (point-max))
+        (if (looking-at "{")
+            (progn
+              (forward-sexp 1)
+              (forward-comment (point-max))
+              (< (point) start))
+          ;; Use the layout rule to see whether this let is already closed
+          ;; without an `in'.
+          (let ((col (current-column)))
+            (while (progn (forward-line 1) (haskell-indent-back-to-indentation)
+                          (< (point) start))
+              (when (< (current-column) col)
+                (setq col nil)
+                (goto-char start)))
+            (null col)))))))
 
 (defun haskell-indent-inside-comment (start)
   "Compute indent info for text inside comment.
@@ -1054,7 +1078,10 @@ START if non-nil is a presumed start pos of the current definition."
                           (?o "\\<\\(?:\\(of\\)\\|case\\)\\>")
                           (?t "\\<\\(?:\\(then\\)\\|if\\)\\>")
                           (?e "\\<\\(?:\\(else\\)\\|if\\)\\>"))
-                         start)))
+                         start
+                         (if (eq (char-after) ?i)
+                             ;; Filter out the `let's that have no `in'.
+                             'haskell-indent-filter-let-no-in))))
 	   ;; For a "dangling let/case/if at EOL" we should use a different
 	   ;; indentation scheme.
 	   (save-excursion
