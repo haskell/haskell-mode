@@ -1,3 +1,33 @@
+2005-11-06  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-indent.el: Reduce the use of dyn-bound haskell-indent-info.
+	(haskell-indent-push-col): Don't duplicate info.
+	(haskell-indent-line-indentation): Handle let-in-do.  Remove dead code.
+	(haskell-indent-inside-comment): Move rest of code from
+	haskell-indent-indentation-info.
+
+	* haskell-indent.el (haskell-literate): Declare.
+	(haskell-running-xemacs, event-basic-type, read-event): Remove.
+	(haskell-indent-get-beg-of-line, haskell-indent-get-end-of-line):
+	Remove.  Use line-(beginning|end)-position instead.
+	(haskell-indent-mark-active): Move the xemacs test inside the defun.
+	(haskell-indent-info): Rename from indent-info.  Update users.
+	(haskell-indent-bolp, haskell-indent-inside-comment):
+	Use line-beginning-position.
+	(haskell-indent-within-literate-code): Use `case'.
+	(haskell-indent-put-region-in-literate): Bind more comment-* vars.
+	(haskell-indent-virtual-indentation): Add the missing `start' arg.
+	(haskell-indent-mode): Move before first use.
+	(haskell-indent-stand-alone-mode): Use haskell-indent-mode.
+	Rename from haskell-stand-alone-indent-mode.  Use define-derived-mode.
+	(hugs-mode-map, hugs-syntax-table):
+	Rename to haskell-stand-alone-indent-mode-(map|syntax-table).
+
+	* haskell-doc.el (haskell-doc-xemacs-p, haskell-doc-emacs-p)
+	(haskell-doc-message): Remove.
+	(haskell-doc-is-id-char-at): Remove.
+	(haskell-doc-get-current-word): Rewrite.
+
 2005-11-04  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-indent.el (haskell-indent-indentation-info): Fix detection of
@@ -7,13 +37,13 @@
 
 2005-11-04  Stefan Monnier  <monnier@iro.umontreal.ca>
 
-	* inf-haskell.el (inferior-haskell-mode): Hide compilation-mode bindings.
+	* inf-haskell.el (inferior-haskell-mode): Hide compilation bindings.
 
 	* haskell-indent.el (haskell-indent-after-keywords): New var.
 	(haskell-indent-virtual-indentation): New fun.
 	(haskell-indent-indentation-info): Use them to indent after keywords.
 
-	* haskell-simple-indent.el (haskell-simple-indent): Minor simplifications.
+	* haskell-simple-indent.el (haskell-simple-indent): Minor simplif.
 	(turn-on-haskell-simple-indent): Don't bind \t and \n.
 
 	* haskell-mode.el (haskell-vars, haskell-mode-generic): Remove.
