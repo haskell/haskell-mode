@@ -6,20 +6,17 @@
               (or (file-name-directory load-file-name) (car load-path)))
 
 
-;;;### (autoloads (haskell-doc-show-type turn-on-haskell-doc-mode
-;;;;;;  haskell-doc-mode) "haskell-doc" "haskell-doc.el" (16805 1996))
+;;;### (autoloads (haskell-doc-show-type haskell-doc-mode) "haskell-doc"
+;;;;;;  "haskell-doc.el" (17263 33718))
 ;;; Generated autoloads from haskell-doc.el
 
 (autoload (quote haskell-doc-mode) "haskell-doc" "\
 Enter `haskell-doc-mode' for showing fct types in the echo area.
 See variable docstring.
 
-\(fn &optional PREFIX)" t nil)
+\(fn &optional ARG)" t nil)
 
-(autoload (quote turn-on-haskell-doc-mode) "haskell-doc" "\
-Unequivocally turn on `haskell-doc-mode' (see variable documentation).
-
-\(fn)" t nil)
+(defalias (quote turn-on-haskell-doc-mode) (quote haskell-doc-mode))
 
 (autoload (quote haskell-doc-show-type) "haskell-doc" "\
 Show the type of the function near point.
@@ -32,30 +29,45 @@ current buffer.
 
 ;;;***
 
-;;;### (autoloads (run-ghci) "haskell-ghci" "haskell-ghci.el" (16760
-;;;;;;  9226))
-;;; Generated autoloads from haskell-ghci.el
+;;;### (autoloads (haskell-indent-mode) "haskell-indent" "haskell-indent.el"
+;;;;;;  (17263 44010))
+;;; Generated autoloads from haskell-indent.el
 
-(autoload (quote run-ghci) "haskell-ghci" "\
-Go to the *ghci* buffer.
+(autoload (quote haskell-indent-mode) "haskell-indent" "\
+``intelligent'' Haskell indentation mode that deals with
+the layout rule of Haskell.  \\[haskell-indent-cycle] starts the cycle
+which proposes new possibilities as long as the TAB key is pressed.
+Any other key or mouse click terminates the cycle and is interpreted
+except for RET which merely exits the cycle.
+Other special keys are:
+    \\[haskell-indent-insert-equal]
+      inserts an =
+    \\[haskell-indent-insert-guard]
+      inserts an |
+    \\[haskell-indent-insert-otherwise]
+      inserts an | otherwise =
+these functions also align the guards and rhs of the current definition
+    \\[haskell-indent-insert-where]
+      inserts a where keyword
+    \\[haskell-indent-align-guards-and-rhs]
+      aligns the guards and rhs of the region
+    \\[haskell-indent-put-region-in-literate]
+      makes the region a piece of literate code in a literate script
 
-\(fn)" t nil)
+Note: \\[indent-region] which applies \\[haskell-indent-cycle] for each line
+of the region also works but it stops and asks for any line having more
+than one possible indentation.
+Use TAB to cycle until the right indentation is found and then RET to go the
+next line to indent.
 
-;;;***
-
-;;;### (autoloads (run-hugs) "haskell-hugs" "haskell-hugs.el" (16760
-;;;;;;  12580))
-;;; Generated autoloads from haskell-hugs.el
+Invokes `haskell-indent-hook' if not nil.
 
-(autoload (quote run-hugs) "haskell-hugs" "\
-Goes to the Hugs buffer.
-
-\(fn)" t nil)
+\(fn &optional ARG)" t nil)
 
 ;;;***
 
 ;;;### (autoloads (literate-haskell-mode haskell-mode) "haskell-mode"
-;;;;;;  "haskell-mode.el" (16806 23859))
+;;;;;;  "haskell-mode.el" (17259 54545))
 ;;; Generated autoloads from haskell-mode.el
 
 (autoload (quote haskell-mode) "haskell-mode" "\
@@ -109,7 +121,7 @@ As `haskell-mode' but for literate scripts.
 ;;;***
 
 ;;;### (autoloads (inferior-haskell-load-file switch-to-haskell)
-;;;;;;  "inf-haskell" "inf-haskell.el" (16805 8039))
+;;;;;;  "inf-haskell" "inf-haskell.el" (17259 53134))
 ;;; Generated autoloads from inf-haskell.el
 
 (defalias (quote run-haskell) (quote switch-to-haskell))
@@ -127,8 +139,7 @@ Pass the current buffer's file to the inferior haskell process.
 ;;;***
 
 ;;;### (autoloads nil nil ("haskell-decl-scan.el" "haskell-font-lock.el"
-;;;;;;  "haskell-indent.el" "haskell-simple-indent.el") (16806 23897
-;;;;;;  580527))
+;;;;;;  "haskell-simple-indent.el") (17263 44033 117543))
 
 ;;;***
 
