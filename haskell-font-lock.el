@@ -105,7 +105,7 @@
 (require 'font-lock)
 
 ;; Version.
-(defconst haskell-font-lock-version "$Revision: 1.16 $"
+(defconst haskell-font-lock-version "$Revision: 1.17 $"
   "Version number of haskell-font-lock.")
 (defun haskell-font-lock-version ()
   "Echo the current version of haskell-font-lock in the minibuffer."
@@ -408,8 +408,9 @@ that should be commented under LaTeX-style literate scripts."
     ;; ("^[ \t]*\\(\\\\\\)" (1 "."))
     ;; Deal with instances of `--' which don't form a comment.
     ("\\s_\\{3,\\}" (0 (if (string-match "\\`-*\\'" (match-string 0))
-			   nil		; Sequence of hyphens.  Do nothing in
-					; case of things like `{---'.
+                           ;; Sequence of hyphens.  Do nothing in
+                           ;; case of things like `{---'.
+			   nil
 			 "_")))))	; other symbol sequence
 
 (defconst haskell-bird-syntactic-keywords
@@ -543,7 +544,7 @@ Use `haskell-font-lock-version' to find out what version this is."
   (interactive)
   (font-lock-mode -1))
 
-;;; Provide ourselves:
+;; Provide ourselves:
 
 (provide 'haskell-font-lock)
 
