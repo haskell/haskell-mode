@@ -1,5 +1,11 @@
 2005-11-11  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* Makefile (dist): Remove profile file and avoid ztar.
+
+	* inf-haskell.el (inferior-haskell-command): Provide a default.
+	(with-selected-window): Define if necessary.
+	(inferior-haskell-load-file): Display the buffer.
+
 	* haskell-indent.el (haskell-indent-indentation-info): Typo.
 
 	* haskell-ghci.el (haskell-ghci-mode): Use define-derived-mode.
