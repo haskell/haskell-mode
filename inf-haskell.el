@@ -102,7 +102,7 @@ The SEPARATOR regexp defaults to \"\\s-+\"."
 (defun inferior-haskell-command (arg)
   (inferior-haskell-string-to-strings
    (if (null arg) haskell-program-name
-     (read-string "Command to run haskell: "))))
+     (read-string "Command to run haskell: " haskell-program-name))))
 
 (defvar inferior-haskell-buffer nil
   "The buffer in which the inferior process is running.")
@@ -138,6 +138,12 @@ setting up the inferior-haskell buffer."
   (let ((proc (inferior-haskell-process arg)))
     (pop-to-buffer (process-buffer proc))))
 
+(unless (fboundp 'with-selected-window)
+  (defmacro with-selected-window (win &rest body)
+    `(save-selected-window
+       (select-window ,win)
+       ,@body)))
+
 ;;;###autoload
 (defun inferior-haskell-load-file (&optional reload)
   "Pass the current buffer's file to the inferior haskell process."
@@ -157,7 +163,10 @@ setting up the inferior-haskell buffer."
 	      (set-marker compilation-parsing-end (point-max))
 	    (setq compilation-parsing-end (point-max))))
       (inferior-haskell-send-command
-       proc (if reload ":reload" (concat ":load \"" file "\""))))))
+       proc (if reload ":reload" (concat ":load \"" file "\"")))
+      (display-buffer (current-buffer))
+      (with-selected-window (get-buffer-window (current-buffer) 0)
+        (goto-char (point-max))))))
 
 (defun inferior-haskell-send-command (proc str)
   (setq str (concat str "\n"))
