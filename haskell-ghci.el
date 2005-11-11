@@ -98,7 +98,7 @@ Maps the following commands in the haskell keymap:
   (local-unset-key  "\C-c\C-r")
   (local-unset-key  "\C-c\C-b"))
 
-(defun haskell-ghci-mode ()
+(define-derived-mode haskell-ghci-mode comint-mode "Haskell GHCi"
   "Major mode for interacting with an inferior GHCi session.
 
 The commands available from within a Haskell script are:
@@ -112,15 +112,7 @@ The commands available from within a Haskell script are:
 \\[comint-send-input] before end of GHCI output copies rest of line and sends it to GHCI as input.
 \\[comint-kill-input] and \\[backward-kill-word] are kill commands, imitating normal Unix input editing.
 \\[comint-interrupt-subjob] interrupts the comint or its current subjob if any.
-\\[comint-stop-subjob] stops, likewise. \\[comint-quit-subjob] sends quit signal."
-  (interactive)
-  (comint-mode)
-  (setq major-mode 'haskell-ghci-mode)
-  (setq mode-name "Haskell GHCi")
-  (if haskell-ghci-mode-map
-      nil
-    (setq haskell-ghci-mode-map (copy-keymap comint-mode-map)))
-  (use-local-map haskell-ghci-mode-map))
+\\[comint-stop-subjob] stops, likewise. \\[comint-quit-subjob] sends quit signal.")
 
 
 ;; GHCi interface:
