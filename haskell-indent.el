@@ -1099,7 +1099,7 @@ START if non-nil is a presumed start pos of the current definition."
                                (car (member id haskell-indent-after-keywords))))
             (setq open (cdr-safe open))
             (setq open
-                  (if (save-excursion (skip-syntax-backward " \t") (bolp))
+                  (if (save-excursion (skip-chars-backward " \t") (bolp))
                       (car open)
                     (or (cadr open) (car open))))
             (list (list
