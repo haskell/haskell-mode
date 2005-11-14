@@ -105,7 +105,7 @@
 (require 'font-lock)
 
 ;; Version.
-(defconst haskell-font-lock-version "$Revision: 1.17 $"
+(defconst haskell-font-lock-version "$Revision: 1.18 $"
   "Version number of haskell-font-lock.")
 (defun haskell-font-lock-version ()
   "Echo the current version of haskell-font-lock in the minibuffer."
@@ -285,7 +285,11 @@ Returns keywords suitable for `font-lock-keywords'."
 	 ;; Top-level declarations
 	 (topdecl-var
 	  (concat line-prefix "\\(" varid "\\)\\s-*\\("
-		  varid "\\|" conid "\\|::\\|=\\||\\|\\s(\\)"))
+                  ;; A toplevel declaration can be followed by a definition
+                  ;; (=), a type (::), a guard, or a pattern which can
+                  ;; either be a variable, a constructor, a parenthesized
+                  ;; thingy, or an integer or a string.
+		  varid "\\|" conid "\\|::\\|=\\||\\|\\s(\\|[0-9\"']\\)"))
 	 (topdecl-var2
 	  (concat line-prefix "\\(" varid "\\|" conid "\\)\\s-*`\\(" varid "\\)`"))
 	 (topdecl-sym
