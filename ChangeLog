@@ -1,3 +1,8 @@
+2005-11-14  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (inferior-haskell-error-regexp-alist): Fix GHCi
+	regexp, add support for warnings.
+
 2005-11-11  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* Makefile (dist): Remove profile file and avoid ztar.
