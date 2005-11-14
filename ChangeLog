@@ -1,3 +1,8 @@
+2005-11-14  Dave Love  <fx@gnu.org>
+
+	* haskell-font-lock.el (haskell-font-lock-keywords-create): Add pattern
+	for numbers and strings for arguments to toplevel declarations.
+
 2005-11-14  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* inf-haskell.el (inferior-haskell-error-regexp-alist): Fix GHCi
