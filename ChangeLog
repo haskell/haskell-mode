@@ -1,4 +1,15 @@
+2005-11-14  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-decl-scan.el (haskell-ds-get-variable): Massage.
+	(haskell-ds-move-to-decl, haskell-ds-generic-find-next-decl):
+	Use with-syntax-table.
+
 2005-11-14  Dave Love  <fx@gnu.org>
+
+	* haskell-decl-scan.el: Docstring fixes.
+	(haskell-ds-keys): Delete.
+	(turn-on-haskell-decl-scan): Inline it here.
+	Use beginning-of-defun-function if available.
 
 	* haskell-font-lock.el (haskell-font-lock-keywords-create): Add pattern
 	for numbers and strings for arguments to toplevel declarations.
