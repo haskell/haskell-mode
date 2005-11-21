@@ -1,5 +1,8 @@
 2005-11-21  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* haskell-doc.el (haskell-doc-extract-types): Get labelled data working.
+	(haskell-doc-prelude-types): Update via auto-generation.
+
 	* haskell-doc.el (haskell-doc-extract-types): Get it partly working.
 	(haskell-doc-fetch-lib-urls): Don't use a literal if we apply
 	`nreverse' on it later on.
