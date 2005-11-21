@@ -1403,7 +1403,6 @@ in the current buffer.")
 
 (defun turn-on-haskell-indent ()
   "Turn on ``intelligent'' haskell indentation mode."
-  (interactive)
   (set (make-local-variable 'indent-line-function) 'haskell-indent-cycle)
   ;; Removed: remapping DEL seems a bit naughty --SDM
   ;; (local-set-key "\177"  'backward-delete-char-untabify)
@@ -1421,7 +1420,6 @@ in the current buffer.")
 (defun turn-off-haskell-indent ()
   "Turn off ``intelligent'' haskell indentation mode that deals with
 the layout rule of Haskell."
-  (interactive)
   (kill-local-variable 'indent-line-function)
   ;; (local-unset-key "\t")
   ;; (local-unset-key "\177")

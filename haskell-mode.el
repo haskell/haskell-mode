@@ -228,16 +228,13 @@
 
 ;; Obsolete functions.
 (defun turn-on-haskell-font-lock ()
-  (interactive)
   (turn-on-font-lock)
   (message "turn-on-haskell-font-lock is obsolete.  Use turn-on-font-lock instead."))
 (defun turn-on-haskell-hugs ()
-  (interactive)
   (message "haskell-hugs is obsolete.")
   (load "haskell-hugs")
   (turn-on-haskell-hugs))
 (defun turn-on-haskell-ghci ()
-  (interactive)
   (message "haskell-ghci is obsolete.")
   (load "haskell-ghci")
   (turn-on-haskell-ghci))

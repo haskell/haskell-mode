@@ -87,21 +87,17 @@ Maps the followind commands in the haskell keymap.
        to send the :reload command to Hugs without saving the buffer.
      \\[haskell-hugs-show-hugs-buffer]
        to show the Hugs buffer and go to it."
-  (interactive)
   (local-set-key "\C-c\C-s" 'haskell-hugs-start-process)
   (local-set-key "\C-c\C-l" 'haskell-hugs-load-file)
   (local-set-key "\C-c\C-r" 'haskell-hugs-reload-file)
-  (local-set-key "\C-c\C-b" 'haskell-hugs-show-hugs-buffer)
-  )
+  (local-set-key "\C-c\C-b" 'haskell-hugs-show-hugs-buffer))
 
 (defun turn-off-haskell-hugs ()
   "Turn off Haskell interaction mode with a Hugs interpreter within a buffer."
-  (interactive)
   (local-unset-key  "\C-c\C-s")
   (local-unset-key  "\C-c\C-l")
   (local-unset-key  "\C-c\C-r")
-  (local-unset-key  "\C-c\C-b")
-  )
+  (local-unset-key  "\C-c\C-b"))
 
 (define-derived-mode haskell-hugs-mode comint-mode "Haskell Hugs"
 ;; called by haskell-hugs-start-process,
