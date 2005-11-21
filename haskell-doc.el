@@ -137,6 +137,10 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.20  2005/11/21 21:27:57  monnier
+;;  (haskell-doc-extract-types): Get labelled data working.
+;;  (haskell-doc-prelude-types): Update via auto-generation.
+;;
 ;;  Revision 1.19  2005/11/21 20:44:13  monnier
 ;;  (haskell-doc-extract-types): Get it partly working.
 ;;  (haskell-doc-fetch-lib-urls): Don't use a literal if we apply
@@ -310,7 +314,7 @@
 ;;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.19 $"
+(defconst haskell-doc-version "$Revision: 1.20 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 ;;@node Mode Variable, Variables, Maintenance stuff, Constants and Variables
@@ -540,29 +544,42 @@ the keyword is used.")
       ;; Finally, extract the actual data.
       (goto-char (point-min))
       (let* ((elems nil)
+             (space-re "[ \t\n]*\\(?:--.*\n[ \t\n]*\\)*")
+             (comma-re (concat " *," space-re))
+             ;; A list of identifiers.  We have to be careful to weed out
+             ;; entries like "ratPrec = 7 :: Int".  Also ignore entries
+             ;; which start with a < since they're actually in the HTML text
+             ;; part.  And the list may be spread over several lines, cut
+             ;; after a comma.
+             (idlist-re
+              (concat "\\([^< \t\n][^ \t\n]*"
+                      "\\(?:" comma-re "[^ \t\n]+\\)*\\)"))
+             ;; A type.  A few types are spread over 2 lines,
+             ;; cut after the "=>", so we have to handle these as well.
+             (type-re "\\(.*[^\n>]\\(?:>[ \t\n]+.*[^\n>]\\)*\\) *$")
+             ;; A decl of a list of values, possibly indented.
+             (val-decl-re
+              (concat "^\\( +\\)?" idlist-re "[ \t\n]*::[ \t\n]*" type-re))
              (re (concat
-                 ;; Two possibilities: a class decl or a val decl.
+                 ;; 3 possibilities: a class decl, a data decl, or val decl.
                  ;; First, let's match a class decl.
-                 "^class\\(?:.*=>\\)? *\\(.*[^ \t\n]\\)[ \t\n]*where\\|"
-                 ;; Then a value decl, which we decompose:
-                 ;; First a leading space to indicate it's within a class decl.
-                 "^\\( +\\)?"
-                 ;; Then a list of identifiers.  We have to be careful to
-                 ;; weed out entries like "ratPrec = 7 :: Int".  Also ignore
-                 ;; entries which start with a < since they're actually in
-                 ;; the HTML text part.  And the list may be spread over
-                 ;; several lines, cut after a comma.
-                 "\\([^< \t\n][^ \t\n]*\\(?: *,[ \t\n]*[^ \t\n]+\\)*\\)"
-                 ;; The type separator.
-                 "[ \t\n]*:: *"
-                 ;; And finally a type.  A few types are spread over 2 lines,
-                 ;; cut after the "=>", so we have to handle these as well. :-(
-                 "\\(.*[^\n>]\\(>[ \t\n]+.*[^\n>]\\)*\\) *$"))
+                 "^class \\(?:.*=>\\)? *\\(.*[^ \t\n]\\)[ \t\n]*where"
+
+                 ;; Or a value decl:
+                 "\\|" val-decl-re
+
+                 "\\|" ;; Or a data decl.  We only handle single-arm
+                 ;; datatypes with labels.
+                 "^data +\\([[:alnum:]][[:alnum:] ]*[[:alnum:]]\\)"
+                 " *=.*{\\([^}]+\\)}"
+                 ))
              (re-class (concat "^[^ \t\n]\\|" re))
              curclass)
         (while (re-search-forward (if curclass re-class re) nil t)
           (cond
+           ;; A class decl.
            ((match-end 1) (setq curclass (match-string 1)))
+           ;; A value decl.
            ((match-end 4)
             (let ((type (match-string 4))
                   (vars (match-string 3))
@@ -587,9 +604,33 @@ the keyword is used.")
                     ;;        module vars)
                     nil)
                 (setq curclass nil))
-              (dolist (var (split-string vars "[ \t\n]*,[ \t\n]*" t))
+              (dolist (var (split-string vars comma-re t))
                 (if (string-match "(.*)" var) (setq var (substring var 1 -1)))
                 (push (cons var type) elems))))
+           ;; A datatype decl.
+           ((match-end 5)
+            (setq curclass nil)
+            (let ((name (match-string 5)))
+              (save-excursion
+                (save-restriction
+                  (narrow-to-region (match-beginning 6) (match-end 6))
+                  (goto-char (point-min))
+                  (while (re-search-forward val-decl-re nil t)
+                    (let ((vars (match-string 2))
+                          (type (match-string 3)))
+                      (if (string-match "[ \t\n][ \t\n]+" type)
+                          (setq type (replace-match " " t t type)))
+                      (if (string-match " *\\(--.*\\)?\\'" type)
+                          (setq type (substring type 0 (match-beginning 0))))
+                      (if (string-match ",\\'" type)
+                          (setq type (substring type 0 -1)))
+                      (setq type (concat name " -> " type))
+                      (dolist (var (split-string vars comma-re t))
+                        (if (string-match "(.*)" var)
+                            (setq var (substring var 1 -1)))
+                        (push (cons var type) elems))))))))
+
+           ;; The end of a class declaration.
            (t (setq curclass nil) (beginning-of-line))))
         (cons (car (last modules)) elems)))))
 
@@ -623,10 +664,7 @@ URL is the URL of the online doc."
           (indent-according-to-mode) (newline))))))
 
 (defvar haskell-doc-prelude-types
-  ;; This list was partly auto generated by
-  ;; `haskell-doc-extract-and-insert-types'.  There are still things not
-  ;; working (i.e. the labelled datatypes), so the Locale, Directory, and
-  ;; Time parts are still hand-generated.
+  ;; This list was auto generated by `haskell-doc-extract-and-insert-types'.
   '(
     ;; Prelude
     ("!!" . "[a] -> Int -> a")
@@ -1026,23 +1064,23 @@ URL is the URL of the online doc."
     ("stdout" . "Handle")
     ("try" . "IO a -> IO (Either IOError a)")
     ;; Directory
-    ("readable" . "Permissions -> Bool")
-    ("writable" . "Permissions -> Bool")
-    ("executable" . "Permissions -> Bool")
-    ("searchable" . "Permissions -> Bool")
     ("createDirectory" . "FilePath -> IO ()")
+    ("doesDirectoryExist" . "FilePath -> IO Bool")
+    ("doesFileExist" . "FilePath -> IO Bool")
+    ("executable" . "Permissions -> Bool")
+    ("getCurrentDirectory" . "IO FilePath")
+    ("getDirectoryContents" . "FilePath -> IO [FilePath]")
+    ("getModificationTime" . "FilePath -> IO ClockTime")
+    ("getPermissions" . "FilePath -> IO Permissions")
+    ("readable" . "Permissions -> Bool")
     ("removeDirectory" . "FilePath -> IO ()")
     ("removeFile" . "FilePath -> IO ()")
     ("renameDirectory" . "FilePath -> FilePath -> IO ()")
     ("renameFile" . "FilePath -> FilePath -> IO ()")
-    ("getDirectoryContents" . "FilePath -> IO [FilePath]")
-    ("getCurrentDirectory" . "IO FilePath")
+    ("searchable" . "Permissions -> Bool")
     ("setCurrentDirectory" . "FilePath -> IO ()")
-    ("doesFileExist" . "FilePath -> IO Bool")
-    ("doesDirectoryExist" . "FilePath -> IO Bool")
-    ("getPermissions" . "FilePath -> IO Permissions")
     ("setPermissions" . "FilePath -> Permissions -> IO ()")
-    ("getModificationTime" . "FilePath -> IO ClockTime")
+    ("writable" . "Permissions -> Bool")
     ;; System
     ("exitFailure" . "IO a")
     ("exitWith" . "ExitCode -> IO a")
@@ -1051,42 +1089,42 @@ URL is the URL of the online doc."
     ("getProgName" . "IO String")
     ("system" . "String -> IO ExitCode")
     ;; Time
-    ("ctYear" . "CalendarTime -> Int")
-    ("ctMonth" . "CalendarTime -> Month")
+    ("addToClockTime" . "TimeDiff -> ClockTime -> ClockTime")
+    ("calendarTimeToString" . "CalendarTime -> String")
     ("ctDay" . "CalendarTime -> Int")
     ("ctHour" . "CalendarTime -> Int")
+    ("ctIsDST" . "CalendarTime -> Bool")
     ("ctMin" . "CalendarTime -> Int")
-    ("ctSec" . "CalendarTime -> Int")
+    ("ctMonth" . "CalendarTime -> Month")
     ("ctPicosec" . "CalendarTime -> Integer")
+    ("ctSec" . "CalendarTime -> Int")
+    ("ctTZ" . "CalendarTime -> Int")
+    ("ctTZName" . "CalendarTime -> String")
     ("ctWDay" . "CalendarTime -> Day")
     ("ctYDay" . "CalendarTime -> Int")
-    ("ctTZName" . "CalendarTime -> String")
-    ("ctTZ" . "CalendarTime -> Int")
-    ("ctIsDST" . "CalendarTime -> Bool")
-    ("tdYear" . "TimeDiff -> Int")
-    ("tdMonth" . "TimeDiff -> Int")
+    ("ctYear" . "CalendarTime -> Int")
+    ("diffClockTimes" . "ClockTime -> ClockTime -> TimeDiff")
+    ("formatCalendarTime" . "TimeLocale -> String -> CalendarTime -> String")
+    ("getClockTime" . "IO ClockTime")
     ("tdDay" . "TimeDiff -> Int")
     ("tdHour" . "TimeDiff -> Int")
     ("tdMin" . "TimeDiff -> Int")
-    ("tdSec" . "TimeDiff -> Int")
+    ("tdMonth" . "TimeDiff -> Int")
     ("tdPicosec" . "TimeDiff -> Integer")
-    ("getClockTime" . "IO ClockTime")
-    ("addToClockTime" . "TimeDiff -> ClockTime -> ClockTime")
-    ("diffClockTimes" . "ClockTime -> ClockTime -> TimeDiff")
+    ("tdSec" . "TimeDiff -> Int")
+    ("tdYear" . "TimeDiff -> Int")
     ("toCalendarTime" . "ClockTime -> IO CalendarTime")
-    ("toUTCTime" . "ClockTime -> CalendarTime")
     ("toClockTime" . "CalendarTime -> ClockTime")
-    ("calendarTimeToString" . "CalendarTime -> String")
-    ("formatCalendarTime" . "TimeLocale -> String -> CalendarTime -> String")
+    ("toUTCTime" . "ClockTime -> CalendarTime")
     ;; Locale
-    ("wDays" . "TimeLocale -> [(String, String)]")
-    ("months" . "TimeLocale -> [(String, String)]")
     ("amPm" . "TimeLocale -> (String, String)")
-    ("dateTimeFmt" . "TimeLocale -> String")
     ("dateFmt" . "TimeLocale -> String")
-    ("timeFmt" . "TimeLocale -> String")
-    ("time12Fmt" . "TimeLocale -> String")
+    ("dateTimeFmt" . "TimeLocale -> String")
     ("defaultTimeLocale" . "TimeLocale")
+    ("months" . "TimeLocale -> [(String, String)]")
+    ("time12Fmt" . "TimeLocale -> String")
+    ("timeFmt" . "TimeLocale -> String")
+    ("wDays" . "TimeLocale -> [(String, String)]")
     ;; CPUTime
     ("cpuTimePrecision" . "Integer")
     ("getCPUTime" . "IO Integer")
