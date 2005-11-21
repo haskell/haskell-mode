@@ -1,4 +1,4 @@
-;;; haskell-doc.el --- show function types in echo area
+;;; haskell-doc.el --- show function types in echo area  -*- coding: iso-8859-1 -*-
 
 ;; Copyright (C) 2004, 2005  Free Software Foundation, Inc.
 ;; Copyright (C) 1997 Hans-Wolfgang Loidl
@@ -137,6 +137,9 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.17  2005/11/20 23:55:09  monnier
+;;  Add coding cookie.
+;;
 ;;  Revision 1.16  2005/11/07 01:28:16  monnier
 ;;  (haskell-doc-xemacs-p, haskell-doc-emacs-p)
 ;;  (haskell-doc-message): Remove.
@@ -292,7 +295,7 @@
 ;;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.16 $"
+(defconst haskell-doc-version "$Revision: 1.17 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 (defconst haskell-doc-maintainer
