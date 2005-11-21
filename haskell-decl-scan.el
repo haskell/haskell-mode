@@ -129,7 +129,7 @@
 
 (require 'haskell-mode)
 
-(defconst haskell-decl-scan-version "$Revision: 1.10 $"
+(defconst haskell-decl-scan-version "$Revision: 1.11 $"
   "Version number of haskell-decl-scan.")
 (defun haskell-decl-scan-version ()
   "Echo the current version of haskell-decl-scan in the minibuffer."
@@ -616,7 +616,15 @@ datatypes) in a Haskell file for the `imenu' package."
 
 ;; The main functions to turn on declaration scanning.
 (defun turn-on-haskell-decl-scan ()
-  "Turn on declaration scanning for Haskell mode.
+  "Unconditionally activate `haskell-decl-scan-mode'."
+  (haskell-decl-scan-mode 1))
+
+(defvar haskell-decl-scan-mode nil)
+(make-variable-buffer-local 'haskell-decl-scan-mode)
+
+;;;###autoload
+(defun haskell-decl-scan-mode (&optional arg)
+  "Minor mode for declaration scanning for Haskell mode.
 Top-level declarations are scanned and listed in the menu item \"Declarations\".
 Selecting an item from this menu will take point to the start of the
 declaration.
@@ -658,19 +666,26 @@ assumed, respectively.
 Invokes `haskell-decl-scan-hook' if not nil.
 
 Use `haskell-decl-scan-version' to find out what version this is."
-  (interactive)
   (if (boundp 'beginning-of-defun-function)
-      (progn
-       (set (make-local-variable 'beginning-of-defun-function)
-            'haskell-ds-backward-decl)
-       (set (make-local-variable 'end-of-defun-function)
-            'haskell-ds-forward-decl))
-    (local-set-key "\M-\C-e" 'haskell-ds-forward-decl)
-    (local-set-key "\M-\C-a" 'haskell-ds-backward-decl))
-  (if (fboundp 'imenu)
-      (haskell-ds-imenu)
-    (haskell-ds-func-menu))
-  (run-hooks 'haskell-decl-scan-hook))
+      (if haskell-decl-scan-mode
+          (progn
+            (set (make-local-variable 'beginning-of-defun-function)
+                 'haskell-ds-backward-decl)
+            (set (make-local-variable 'end-of-defun-function)
+                 'haskell-ds-forward-decl))
+        (kill-local-variable 'beginning-of-defun-function)
+        (kill-local-variable 'end-of-defun-function))
+    (local-set-key "\M-\C-e"
+                   (if haskell-decl-scan-mode 'haskell-ds-forward-decl))
+    (local-set-key "\M-\C-a"
+                   (if haskell-decl-scan-mode 'haskell-ds-backward-decl)))
+  (if haskell-decl-scan-mode
+      (if (fboundp 'imenu)
+          (haskell-ds-imenu)
+        (haskell-ds-func-menu))
+    ;; How can we cleanly remove that menus?
+    (local-set-key [menu-bar index] nil))
+  (run-hooks 'haskell-decl-scan-mode-hook))
 
 ;; Provide ourselves:
 
