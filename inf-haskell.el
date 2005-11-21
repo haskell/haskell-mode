@@ -158,12 +158,18 @@ setting up the inferior-haskell buffer."
       ;;   (inferior-haskell-send-string
       ;;    proc (concat ":cd " (file-name-directory file) "\n")))
       (compilation-forget-errors)
-      (if (boundp 'compilation-parsing-end)
-	  (if (markerp compilation-parsing-end)
-	      (set-marker compilation-parsing-end (point-max))
-	    (setq compilation-parsing-end (point-max))))
-      (inferior-haskell-send-command
-       proc (if reload ":reload" (concat ":load \"" file "\"")))
+      (let ((parsing-end (marker-position (process-mark proc))))
+	(inferior-haskell-send-command
+	 proc (if reload ":reload" (concat ":load \"" file "\"")))
+	;; Move the parsing-end marker after sending the command so
+	;; that it doesn't point just to the insertion point.
+	;; Otherwise insertion may move the marker (if done with
+	;; insert-before-markers) and we'd then miss some errors.
+	(message "Moving parsing-end to %d" parsing-end)
+	(if (boundp 'compilation-parsing-end)
+	    (if (markerp compilation-parsing-end)
+		(set-marker compilation-parsing-end parsing-end)
+	      (setq compilation-parsing-end parsing-end))))
       (display-buffer (current-buffer))
       (with-selected-window (get-buffer-window (current-buffer) 0)
         (goto-char (point-max))))))
