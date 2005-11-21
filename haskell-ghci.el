@@ -83,7 +83,6 @@ Maps the following commands in the haskell keymap:
     \\[haskell-ghci-load-file] to save the current buffer and load it by sending the :load command to GHCi.
     \\[haskell-ghci-reload-file] to send the :reload command to GHCi without saving the buffer.
     \\[haskell-ghci-show-ghci-buffer] to show the GHCi buffer and go to it."
-  (interactive)
   (local-set-key "\C-c\C-s" 'haskell-ghci-start-process)
   (local-set-key "\C-c\C-l" 'haskell-ghci-load-file)
   (local-set-key "\C-c\C-r" 'haskell-ghci-reload-file)
@@ -92,7 +91,6 @@ Maps the following commands in the haskell keymap:
 
 (defun turn-off-haskell-ghci ()
   "Turn off Haskell interaction mode with a GHCi interpreter within a buffer."
-  (interactive)
   (local-unset-key  "\C-c\C-s")
   (local-unset-key  "\C-c\C-l")
   (local-unset-key  "\C-c\C-r")

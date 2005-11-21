@@ -137,6 +137,23 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.21  2005/11/21 21:48:52  monnier
+;;  * haskell-doc.el (haskell-doc-extract-types): Get labelled data working.
+;;  (haskell-doc-prelude-types): Update via auto-generation.
+;;
+;;  * haskell-doc.el (haskell-doc-extract-types): Get it partly working.
+;;  (haskell-doc-fetch-lib-urls): Don't use a literal if we apply
+;;  `nreverse' on it later on.
+;;  (haskell-doc-prelude-types): Update some parts by auto-generation.
+;;  (haskell-doc-grab, haskell-doc-string-nub-ws): Simplify.
+;;
+;;  * haskell-doc.el (haskell-doc-maintainer, haskell-doc-varlist)
+;;  (haskell-doc-submit-bug-report, haskell-doc-ftp-site)
+;;  (haskell-doc-visit-home): Remove.
+;;  (haskell-doc-reserved-ids, haskell-doc-fetch-lib-urls)
+;;  (haskell-doc-extract-and-insert-types): New funs.
+;;  (haskell-doc-reserved-ids): Fix type of `map'.
+;;
 ;;  Revision 1.20  2005/11/21 21:27:57  monnier
 ;;  (haskell-doc-extract-types): Get labelled data working.
 ;;  (haskell-doc-prelude-types): Update via auto-generation.
@@ -314,7 +331,7 @@
 ;;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.20 $"
+(defconst haskell-doc-version "$Revision: 1.21 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 ;;@node Mode Variable, Variables, Maintenance stuff, Constants and Variables
@@ -1377,8 +1394,7 @@ See variable docstring."
 ;;@cindex  turn-off-haskell-doc-mode
 
 (defun turn-off-haskell-doc-mode ()
-  "Unequivocally turn off `haskell-doc-mode' (see variable documentation)."
-  (interactive)
+  "Unequivocally turn off `haskell-doc-mode' (which see)."
   (haskell-doc-mode 0))
 
 ;;@node Check, Top level function, Switch it on or off, top

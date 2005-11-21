@@ -1,5 +1,10 @@
 2005-11-21  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* haskell-*.el (turn-(on|off)-*): Make non-interactive.
+
+	* haskell-decl-scan.el (haskell-decl-scan-mode): New minor mode.
+	(turn-on-haskell-decl-scan): Use it.
+
 	* haskell-doc.el (haskell-doc-extract-types): Get labelled data working.
 	(haskell-doc-prelude-types): Update via auto-generation.
 
