@@ -1,3 +1,12 @@
+2005-11-21  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-doc.el (haskell-doc-maintainer, haskell-doc-varlist)
+	(haskell-doc-submit-bug-report, haskell-doc-ftp-site)
+	(haskell-doc-visit-home): Remove.
+	(haskell-doc-reserved-ids, haskell-doc-fetch-lib-urls)
+	(haskell-doc-extract-and-insert-types): New funs.
+	(haskell-doc-reserved-ids): Fix type of `map'.
+
 2005-11-20  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* inf-haskell.el (inferior-haskell-load-file): Fix the
