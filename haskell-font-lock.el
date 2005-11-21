@@ -105,7 +105,7 @@
 (require 'font-lock)
 
 ;; Version.
-(defconst haskell-font-lock-version "$Revision: 1.18 $"
+(defconst haskell-font-lock-version "$Revision: 1.19 $"
   "Version number of haskell-font-lock.")
 (defun haskell-font-lock-version ()
   "Echo the current version of haskell-font-lock in the minibuffer."
@@ -132,7 +132,7 @@ and `unicode'."
 	(memq haskell-font-lock-symbols '(t unicode))
 	(list (cons "\\" (decode-char 'ucs 955))))
    ;; The symbols can come from a JIS0208 font.
-   (and (fboundp 'make-char) (charsetp 'japanese-jisx0208)
+   (and (fboundp 'make-char) (fboundp 'charsetp) (charsetp 'japanese-jisx0208)
 	(memq haskell-font-lock-symbols '(t japanese-jisx0208))
 	(list (cons "not" (make-char 'japanese-jisx0208 34 76))
 	      (cons "\\" (make-char 'japanese-jisx0208 38 75))
@@ -210,7 +210,11 @@ Regexp match data 0 points to the chars."
 	  (push x alist)))
       (when alist
 	`((,(regexp-opt (mapcar 'car alist) t)
-	   (0 (haskell-font-lock-compose-symbol ',alist))))))))
+	   (0 (haskell-font-lock-compose-symbol ',alist)
+              ;; In Emacs-21, if the `override' field is nil, the face
+              ;; expressions is only evaluated if the text has currently
+              ;; no face.  So force evaluation by using `keep'.
+              keep)))))))
 
 ;; The font lock regular expressions.
 (defun haskell-font-lock-keywords-create (literate)
