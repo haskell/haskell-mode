@@ -1,3 +1,15 @@
+2005-11-20  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (inferior-haskell-load-file): Fix the
+	compilation-parsing-end fiddling so it doesn't get moved inadvertently.
+
+	* haskell-font-lock.el (haskell-font-lock-symbols-alist): Some XEmacs
+	versions define make-char but not charsetp.
+	(haskell-font-lock-symbols-keywords): Add a `keep' arg so
+	de-highlighting in strings works correctly even in Emacs-21.
+
+	* haskell-doc.el: Add coding cookie.
+
 2005-11-14  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-decl-scan.el (haskell-ds-get-variable): Massage.
