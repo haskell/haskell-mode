@@ -1,3 +1,8 @@
+2005-11-23  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-font-lock.el (haskell-font-lock-keywords-create): `as' is not
+	a reserved keyword, apparently, and is used as var name.
+
 2005-11-21  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-*.el (turn-(on|off)-*): Make non-interactive.
