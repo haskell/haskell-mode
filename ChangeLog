@@ -1,5 +1,17 @@
 2005-11-23  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* haskell-indent.el (haskell-indent-next-symbol): Simplify.
+	(haskell-indent-comment): Rename from haskell-indent-inside-comment.
+	(haskell-indent-skip-lexeme-forward)
+	(haskell-indent-offset-after-info, haskell-indent-hanging-p): New funs.
+	(haskell-indent-inhibit-after-offset, haskell-indent-dont-hang):
+	New variables.
+	(haskell-indent-closing-keyword, haskell-indent-after-keyword-column)
+	(haskell-indent-inside-paren): New functions, extracted
+	from haskell-indent-indentation-info.  Use the above new functions.
+	(haskell-indent-indentation-info): Use them.
+	(haskell-indent-after-keywords): Add data for ( and {.
+
 	* haskell-font-lock.el (haskell-font-lock-keywords-create): `as' is not
 	a reserved keyword, apparently, and is used as var name.
 
