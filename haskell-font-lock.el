@@ -105,7 +105,7 @@
 (require 'font-lock)
 
 ;; Version.
-(defconst haskell-font-lock-version "$Revision: 1.20 $"
+(defconst haskell-font-lock-version "$Revision: 1.21 $"
   "Version number of haskell-font-lock.")
 (defun haskell-font-lock-version ()
   "Echo the current version of haskell-font-lock in the minibuffer."
@@ -267,14 +267,16 @@ Returns keywords suitable for `font-lock-keywords'."
          ;; Reserved identifiers
 	 (reservedid
 	  (concat "\\b"
-		  ;; ?? `as' and `qualified' aren't in the Haskell98 list.
+		  ;; `as' and `qualified' are part of the import spec
+                  ;; syntax, but `as' doesn't seem to be reserved.  Don't
+                  ;; know about `qualified'.
 		  ;; `_' can go in here since it has temporary word syntax.
 		  ;; (regexp-opt
-		  ;;  '("as" "case" "class" "data" "default" "deriving" "do"
+		  ;;  '("case" "class" "data" "default" "deriving" "do"
 		  ;;    "else" "hiding" "if" "import" "in" "infix" "infixl"
 		  ;;    "infixr" "instance" "let" "module" "newtype" "of"
 		  ;;    "qualified" "then" "type" "where" "_") t)
-		  "\\(_\\|as\\|c\\(ase\\|lass\\)\\|d\\(ata\\|e\\(fault\\|riving\\)\\|o\\)\\|else\\|hiding\\|i\\(mport\\|n\\(fix[lr]?\\|stance\\)\\|[fn]\\)\\|let\\|module\\|newtype\\|of\\|qualified\\|t\\(hen\\|ype\\)\\|where\\)"
+		  "\\(_\\|c\\(ase\\|lass\\)\\|d\\(ata\\|e\\(fault\\|riving\\)\\|o\\)\\|else\\|hiding\\|i\\(mport\\|n\\(fix[lr]?\\|stance\\)\\|[fn]\\)\\|let\\|module\\|newtype\\|of\\|qualified\\|t\\(hen\\|ype\\)\\|where\\)"
 		  "\\b"))
 
          ;; This unreadable regexp matches strings and character
