@@ -105,7 +105,7 @@
 (require 'font-lock)
 
 ;; Version.
-(defconst haskell-font-lock-version "$Revision: 1.21 $"
+(defconst haskell-font-lock-version "$Revision: 1.22 $"
   "Version number of haskell-font-lock.")
 (defun haskell-font-lock-version ()
   "Echo the current version of haskell-font-lock in the minibuffer."
@@ -266,7 +266,7 @@ Returns keywords suitable for `font-lock-keywords'."
 		  "\\S_"))
          ;; Reserved identifiers
 	 (reservedid
-	  (concat "\\b"
+	  (concat "\\<"
 		  ;; `as' and `qualified' are part of the import spec
                   ;; syntax, but `as' doesn't seem to be reserved.  Don't
                   ;; know about `qualified'.
@@ -277,7 +277,7 @@ Returns keywords suitable for `font-lock-keywords'."
 		  ;;    "infixr" "instance" "let" "module" "newtype" "of"
 		  ;;    "qualified" "then" "type" "where" "_") t)
 		  "\\(_\\|c\\(ase\\|lass\\)\\|d\\(ata\\|e\\(fault\\|riving\\)\\|o\\)\\|else\\|hiding\\|i\\(mport\\|n\\(fix[lr]?\\|stance\\)\\|[fn]\\)\\|let\\|module\\|newtype\\|of\\|qualified\\|t\\(hen\\|ype\\)\\|where\\)"
-		  "\\b"))
+		  "\\>"))
 
          ;; This unreadable regexp matches strings and character
          ;; constants.  We need to do this with one regexp to handle
