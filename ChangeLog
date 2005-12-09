@@ -1,3 +1,10 @@
+2005-12-09  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* indent.hs: Add some erroneous cases.
+
+	* haskell-font-lock.el (haskell-font-lock-keywords-create):
+	Minor regexp fiddling.
+
 2005-11-23  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-indent.el (haskell-indent-next-symbol): Simplify.
