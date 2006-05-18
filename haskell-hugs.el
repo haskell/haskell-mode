@@ -1,6 +1,6 @@
 ;;; haskell-hugs.el --- simplistic interaction mode with a
 
-;; Copyright 2004, 2005  Free Software Foundation, Inc.
+;; Copyright 2004, 2005, 2006  Free Software Foundation, Inc.
 ;; Copyright 1998, 1999  Guy Lapalme
 
 ;; Hugs interpreter for Haskell developped by 
@@ -177,7 +177,7 @@ Prompts for a list of args if called with an argument."
   (make-local-variable 'shell-dirtrackp)
   (setq shell-cd-regexp         ":cd")
   (setq shell-dirtrackp         t)
-  (setq comint-input-sentinel   'shell-directory-tracker)
+  (add-hook 'comint-input-filter-functions 'shell-directory-tracker nil 'local)
                                 ; ? or  module name in Hugs 1.4
   (setq comint-prompt-regexp  "^\? \\|^[A-Z][_a-zA-Z0-9\.]*> ")
     ;; comint's history syntax conflicts with Hugs syntax, eg. !!
