@@ -30,6 +30,7 @@
 (require 'comint)
 (require 'shell)			;For directory tracking.
 (require 'compile)
+(eval-when-compile (require 'cl))
 
 ;; Here I depart from the inferior-haskell- prefix.
 ;; Not sure if it's a good idea.
@@ -148,6 +149,20 @@ setting up the inferior-haskell buffer."
        (select-window ,win)
        ,@body)))
 
+(defcustom inferior-haskell-wait-and-jump nil
+  "If non-nil, wait for file loading to terminate and jump to the error."
+  :type 'boolean
+  :group 'haskell)
+
+(defun inferior-haskell-wait-for-prompt (proc)
+  "Wait until PROC sends us a prompt.
+The process PROC should be associated to a comint buffer."
+  (with-current-buffer (process-buffer proc)
+    (while (progn
+             (goto-char comint-last-input-end)
+             (and (not (re-search-forward comint-prompt-regexp nil t))
+                  (accept-process-output proc))))))
+
 ;;;###autoload
 (defun inferior-haskell-load-file (&optional reload)
   "Pass the current buffer's file to the inferior haskell process."
@@ -169,22 +184,22 @@ setting up the inferior-haskell buffer."
 	;; that it doesn't point just to the insertion point.
 	;; Otherwise insertion may move the marker (if done with
 	;; insert-before-markers) and we'd then miss some errors.
-	(message "Moving parsing-end to %d" parsing-end)
 	(if (boundp 'compilation-parsing-end)
 	    (if (markerp compilation-parsing-end)
 		(set-marker compilation-parsing-end parsing-end)
 	      (setq compilation-parsing-end parsing-end))))
       (display-buffer (current-buffer))
       (with-selected-window (get-buffer-window (current-buffer) 0)
-        (goto-char (point-max))))))
+        (goto-char (point-max)))
+      (when inferior-haskell-wait-and-jump
+        (inferior-haskell-wait-for-prompt proc)
+        (ignore-errors                  ;Don't beep if there were no errors.
+          (next-error))))))
 
 (defun inferior-haskell-send-command (proc str)
   (setq str (concat str "\n"))
   (with-current-buffer (process-buffer proc)
-    (while (and
-	    (goto-char comint-last-input-end)
-	    (not (re-search-forward comint-prompt-regexp nil t))
-	    (accept-process-output proc)))
+    (inferior-haskell-wait-for-prompt proc)
     (goto-char (process-mark proc))
     (insert-before-markers str)
     (move-marker comint-last-input-end (point))

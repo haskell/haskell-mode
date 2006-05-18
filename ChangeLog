@@ -1,3 +1,11 @@
+2006-05-18  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (inferior-haskell-wait-for-prompt): New fun, extracted
+	from inferior-haskell-send-command.
+	(inferior-haskell-send-command): Use it.
+	(inferior-haskell-wait-and-jump): New custom var.
+	(inferior-haskell-load-file): Use it.
+
 2006-05-17  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* inf-haskell.el (inferior-haskell-mode): Use shell-dirtrack-mode
