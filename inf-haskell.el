@@ -1,6 +1,6 @@
 ;;; inf-haskell.el --- Interaction with an inferior Haskell process.
 
-;; Copyright (C) 2004, 2005  Free Software Foundation, Inc.
+;; Copyright (C) 2004, 2005, 2006  Free Software Foundation, Inc.
 
 ;; Author: Stefan Monnier <monnier@iro.umontreal.ca>
 ;; Keywords: Haskell
@@ -64,9 +64,13 @@ The format should be the same as for `compilation-error-regexp-alist'.")
   (set (make-local-variable 'comint-input-autoexpand) nil)
 
   ;; Setup directory tracking.
-  (set (make-local-variable 'shell-dirtrackp) t)
   (set (make-local-variable 'shell-cd-regexp) ":cd")
-  (add-hook 'comint-input-filter-functions 'shell-directory-tracker nil 'local)
+  (condition-case nil
+      (shell-dirtrack-mode 1)
+    (error      ;The minor mode function may not exist or not accept an arg.
+     (set (make-local-variable 'shell-dirtrackp) t)
+     (add-hook 'comint-input-filter-functions 'shell-directory-tracker
+               nil 'local)))
 
   ;; Setup `compile' support so you can just use C-x ` and friends.
   (set (make-local-variable 'compilation-error-regexp-alist)
