@@ -1,3 +1,13 @@
+2006-05-17  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (inferior-haskell-mode): Use shell-dirtrack-mode
+	if possible.
+
+	* haskell-hugs.el (haskell-hugs-start-process):
+	* haskell-ghci.el (haskell-ghci-start-process):
+	Use comint-input-filter-functions rather than the outdated
+	comint-input-sentinel.  Reported by Jerry James <james@xemacs.org>.
+
 2005-12-09  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* indent.hs: Add some erroneous cases.
