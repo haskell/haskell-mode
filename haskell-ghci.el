@@ -1,6 +1,6 @@
 ;;; haskell-ghci.el --- A GHCi interaction mode
 
-;; Copyright (C) 2004, 2005  Free Software Foundation, Inc.
+;; Copyright (C) 2004, 2005, 2006  Free Software Foundation, Inc.
 ;; Copyright (C) 2001  Chris Webb
 ;; Copyright (C) 1998, 1999  Guy Lapalme
 
@@ -173,7 +173,7 @@ Prompt for a list of args if called with an argument."
   ;; Track directory changes using the `:cd' command.
   (setq shell-cd-regexp ":cd")
   (setq shell-dirtrackp t)
-  (setq comint-input-sentinel 'shell-directory-tracker)
+  (add-hook 'comint-input-filter-functions 'shell-directory-tracker nil 'local)
 
   ;; GHCi prompt should be of the form `ModuleName> '.
   (setq comint-prompt-regexp  "^\\*?[A-Z][\\._a-zA-Z0-9]*\\( \\*?[A-Z][\\._a-zA-Z0-9]*\\)*> ")
