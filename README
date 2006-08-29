@@ -63,8 +63,8 @@ Known problems
 
 It seems that some version of XEmacs come without the fsf-compat package
 (which provides functions such as `line-end-position') and it seems that
-even if your XEmacs does have the fsf-compat package installed it may fail
-to autoload it properly.  Thus you may have to add (require 'fsf-compat)
+even if your XEmacs does have the fsf-compat package installed it does not
+autoload its part.  Thus you may have to add (require 'goto-addr)
 in your .emacs.
 
 
