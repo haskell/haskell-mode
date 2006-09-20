@@ -1,6 +1,6 @@
 ;;; haskell-font-lock.el --- Font locking module for Haskell Mode
 
-;; Copyright 2003, 2004, 2005  Free Software Foundation, Inc.
+;; Copyright 2003, 2004, 2005, 2006  Free Software Foundation, Inc.
 ;; Copyright 1997-1998 Graeme E Moss, and Tommy Thorn
 
 ;; Authors: 1997-1998 Graeme E Moss <gem@cs.york.ac.uk> and
@@ -105,7 +105,7 @@
 (require 'font-lock)
 
 ;; Version.
-(defconst haskell-font-lock-version "$Revision: 1.22 $"
+(defconst haskell-font-lock-version "$Revision: 1.23 $"
   "Version number of haskell-font-lock.")
 (defun haskell-font-lock-version ()
   "Echo the current version of haskell-font-lock in the minibuffer."
@@ -308,7 +308,7 @@ Returns keywords suitable for `font-lock-keywords'."
 	  `(;; NOTICE the ordering below is significant
 	    ;;
 	    ("^#.*$" 0 'font-lock-warning-face t)
-	    ,@(unless haskell-emacs21-features
+	    ,@(unless haskell-emacs21-features ;Supports nested comments?
 		;; Expensive.
 		`((,string-and-char 1 font-lock-string-face)))
 
@@ -343,7 +343,7 @@ Returns keywords suitable for `font-lock-keywords'."
 	    (,sym 0 (if (eq (char-after (match-beginning 0)) ?:)
 			haskell-constructor-face
 		      haskell-operator-face))))
-    (unless haskell-emacs21-features
+    (unless (boundp 'font-lock-syntactic-keywords)
       (case literate
 	(bird
 	 (setq keywords
