@@ -1,6 +1,6 @@
 ;;; haskell-doc.el --- show function types in echo area  -*- coding: iso-8859-1 -*-
 
-;; Copyright (C) 2004, 2005  Free Software Foundation, Inc.
+;; Copyright (C) 2004, 2005, 2006  Free Software Foundation, Inc.
 ;; Copyright (C) 1997 Hans-Wolfgang Loidl
 
 ;; Author: Hans-Wolfgang Loidl <hwloidl@dcs.glasgow.ac.uk>
@@ -137,6 +137,9 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.22  2006/09/20 18:42:35  monnier
+;;  Doc fix.
+;;
 ;;  Revision 1.21  2005/11/21 21:48:52  monnier
 ;;  * haskell-doc.el (haskell-doc-extract-types): Get labelled data working.
 ;;  (haskell-doc-prelude-types): Update via auto-generation.
@@ -331,7 +334,7 @@
 ;;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.21 $"
+(defconst haskell-doc-version "$Revision: 1.22 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 ;;@node Mode Variable, Variables, Maintenance stuff, Constants and Variables
@@ -1446,7 +1449,7 @@ directly to ask for the type of a function."
 
 (defun haskell-doc-current-info ()
   "Return the info about symbol at point.
-Meant for `eldoc-print-current-symbol-info-function'."
+Meant for `eldoc-documentation-function'."
   (haskell-doc-sym-doc (haskell-doc-get-current-word)))
 
 
