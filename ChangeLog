@@ -1,3 +1,11 @@
+2006-09-20  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-font-lock.el (haskell-font-lock-keywords-create): Use a more
+	precise test for literate haskell highlighting.
+
+	* haskell-mode.el (haskell-mode-menu): New menu.
+	(haskell-mode): Use new name `eldoc-documentation-function'.
+
 2006-05-18  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* inf-haskell.el (inferior-haskell-wait-for-prompt): New fun, extracted
