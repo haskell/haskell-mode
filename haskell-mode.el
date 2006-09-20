@@ -1,6 +1,6 @@
 ;;; haskell-mode.el --- A Haskell editing mode    -*-coding: iso-8859-1;-*-
 
-;; Copyright (C) 2003, 2004, 2005  Free Software Foundation, Inc
+;; Copyright (C) 2003, 2004, 2005, 2006  Free Software Foundation, Inc
 ;; Copyright (C) 1992, 1997-1998 Simon Marlow, Graeme E Moss, and Tommy Thorn
 
 ;; Authors: 1992      Simon Marlow
@@ -12,7 +12,7 @@
 ;; Version: $Name:  $
 ;; URL: http://www.haskell.org/haskell-mode/
 
-;;; This file is not part of GNU Emacs.
+;; This file is not part of GNU Emacs.
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -278,6 +278,27 @@ be set to the preferred literate style."
     map)
   "Keymap used in Haskell mode.")
 
+(easy-menu-define haskell-mode-menu haskell-mode-map
+  "Menu for the Haskell major mode."
+  ;; Suggestions from Pupeno <pupeno@pupeno.com>:
+  ;; - choose the underlying interpreter
+  ;; - look up docs
+  `("Haskell"
+    ["Indent line" indent-according-to-mode]
+    ["Indent region" indent-region mark-active]
+    ["(Un)Comment region" comment-region mark-active]
+    "---"
+    ["Start interpreter" switch-to-haskell]
+    ["Load file" inferior-haskell-load-file]
+    "---"
+    ,(if (default-boundp 'eldoc-documentation-function)
+         ["Doc mode" eldoc-mode
+          :style toggle :selected (bound-and-true-p 'eldoc-mode)]
+       ["Doc mode" haskell-doc-mode
+        :style toggle :selected (and (boundp 'haskell-doc-mode) haskell-doc-mode)])
+    ["Customize" (customize-group 'haskell)]
+    ))
+
 ;; Syntax table.
 (defvar haskell-mode-syntax-table
   (let ((table (make-syntax-table)))
@@ -298,7 +319,6 @@ be set to the preferred literate style."
 	   (modify-syntax-entry ?}  "){8" table)
 	   (modify-syntax-entry ?-  "_ 1267" table))
 	  (t
-	   ;; The following get comment syntax right, similarly to C++
 	   ;; In Emacs 21, the `n' indicates that they nest.
 	   ;; The `b' annotation is actually ignored because it's only
 	   ;; meaningful on the second char of a comment-starter, so
@@ -403,7 +423,7 @@ Invokes `haskell-mode-hook' if not nil."
   (set (make-local-variable 'comment-end-skip) "[ \t]*\\(-}\\|\\s>\\)")
   (set (make-local-variable 'parse-sexp-ignore-comments) t)
   ;; Set things up for eldoc-mode.
-  (set (make-local-variable 'eldoc-print-current-symbol-info-function)
+  (set (make-local-variable 'eldoc-documentation-function)
        'haskell-doc-current-info)
   ;; Set things up for imenu.
   (set (make-local-variable 'imenu-create-index-function)
