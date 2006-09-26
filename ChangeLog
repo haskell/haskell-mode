@@ -1,3 +1,7 @@
+2006-09-25  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-mode.el (haskell-mode-menu): Fix typo.
+
 2006-09-20  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-font-lock.el (haskell-font-lock-keywords-create): Use a more
