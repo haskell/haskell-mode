@@ -293,7 +293,7 @@ be set to the preferred literate style."
     "---"
     ,(if (default-boundp 'eldoc-documentation-function)
          ["Doc mode" eldoc-mode
-          :style toggle :selected (bound-and-true-p 'eldoc-mode)]
+          :style toggle :selected (bound-and-true-p eldoc-mode)]
        ["Doc mode" haskell-doc-mode
         :style toggle :selected (and (boundp 'haskell-doc-mode) haskell-doc-mode)])
     ["Customize" (customize-group 'haskell)]
