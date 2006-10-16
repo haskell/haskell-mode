@@ -37,7 +37,7 @@
 ;; To send a Haskell buffer to another buffer running a Hugs interpreter
 ;; The functions are adapted from  the Hugs Mode developed by
 ;;         Chris Van Humbeeck <chris.vanhumbeeck@cs.kuleuven.ac.be>
-;; which can be obtained at:
+;; which used to be available at:
 ;; http://www-i2.informatik.rwth-aachen.de/Forschung/FP/Haskell/hugs-mode.el
 ;;
 ;; Installation:
