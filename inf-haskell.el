@@ -188,8 +188,7 @@ The process PROC should be associated to a comint buffer."
 	    (if (markerp compilation-parsing-end)
 		(set-marker compilation-parsing-end parsing-end)
 	      (setq compilation-parsing-end parsing-end))))
-      (display-buffer (current-buffer))
-      (with-selected-window (get-buffer-window (current-buffer) 0)
+      (with-selected-window (display-buffer (current-buffer))
         (goto-char (point-max)))
       (when inferior-haskell-wait-and-jump
         (inferior-haskell-wait-for-prompt proc)
