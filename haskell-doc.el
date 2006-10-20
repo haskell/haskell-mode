@@ -112,8 +112,7 @@
 ;;  `haskell-doc-show-prelude'      ... toggle echoing of prelude id's types
 ;;  `haskell-doc-show-strategy'     ... toggle echoing of strategy id's types
 ;;  `haskell-doc-show-user-defined' ... toggle echoing of user def id's types
-;;  `haskell-doc-check-active' ... check whether haskell-doc is active via the
-;;                                `post-command-idle-hook' (for testing);
+;;  `haskell-doc-check-active' ... check whether haskell-doc is active;
 ;;                                 Key: CTRL-c ESC-/
 
 ;;; ToDo:
@@ -125,7 +124,6 @@
 ;;   - Indicate kind of object with colours
 ;;   - Handle multi-line types
 ;;   - Encode i-am-fct info in the alist of ids and types.
-;;   - Replace the usage of `post-command-idle-hook' with idle timers
 
 ;;; Bugs:
 ;;  =====
@@ -137,6 +135,14 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.23  2006/10/20 03:12:31  monnier
+;;  Drop post-command-idle-hook in favor of run-with-idle-timer.
+;;  (haskell-doc-timer, haskell-doc-buffers): New vars.
+;;  (haskell-doc-mode): Use them.
+;;  (haskell-doc-check-active): Update the check.
+;;  (haskell-doc-mode-print-current-symbol-info): Remove the interactive spec.
+;;  Don't sit-for unless it's really needed.
+;;
 ;;  Revision 1.22  2006/09/20 18:42:35  monnier
 ;;  Doc fix.
 ;;
@@ -334,7 +340,7 @@
 ;;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.22 $"
+(defconst haskell-doc-version "$Revision: 1.23 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 ;;@node Mode Variable, Variables, Maintenance stuff, Constants and Variables
@@ -1304,43 +1310,54 @@ URL is the URL of the online doc."
 
 ;;@cindex haskell-doc-mode
 
+(defvar haskell-doc-timer nil)
+(defvar haskell-doc-buffers nil)
+
 ;;;###autoload
 (defun haskell-doc-mode (&optional arg)
   "Enter `haskell-doc-mode' for showing fct types in the echo area.
 See variable docstring."
   (interactive (list (or current-prefix-arg 'toggle)))
 
-  ;; Make sure it's on the post-command-idle-hook if defined, otherwise put
-  ;; it on post-command-hook.  The former first appeared in Emacs 19.30.
   (setq haskell-doc-mode
 	(cond
 	 ((eq arg 'toggle) (not haskell-doc-mode))
 	 (arg (> (prefix-numeric-value arg) 0))
 	 (t)))
 
-  (cond
-   (haskell-doc-mode
-    ;; Turning the mode ON.
+  ;; First, unconditionally turn the mode OFF.
 
-    ;; ToDo: replace binding of `post-command-idle-hook' by
-    ;; `run-with-idle-timer'
-    (add-hook (if (boundp 'post-command-idle-hook)
-		  'post-command-idle-hook
-		'post-command-hook)
-	      'haskell-doc-mode-print-current-symbol-info nil 'local)
+  (setq haskell-doc-buffers (delq (current-buffer) haskell-doc-buffers))
+  ;; Refresh the buffers list.
+  (dolist (buf haskell-doc-buffers)
+    (unless (and (buffer-live-p buf)
+                 (with-current-buffer buf haskell-doc-mode))
+      (setq haskell-doc-buffers (delq buf haskell-doc-buffers))))
+  ;; Turn off the idle timer (or idle post-command-hook).
+  (when (and haskell-doc-timer (null haskell-doc-buffers))
+    (cancel-timer haskell-doc-timer)
+    (setq haskell-doc-timer nil))
+  (remove-hook 'post-command-hook
+               'haskell-doc-mode-print-current-symbol-info 'local)
+
+  (when haskell-doc-mode
+    ;; Turning the mode ON.
+    (push (current-buffer) haskell-doc-buffers)
+
+    (if (fboundp 'run-with-idle-timer)
+        (unless haskell-doc-timer
+          (setq haskell-doc-timer
+                (run-with-idle-timer
+                 haskell-doc-idle-delay t
+                 'haskell-doc-mode-print-current-symbol-info)))
+      (add-hook 'post-command-hook
+                'haskell-doc-mode-print-current-symbol-info nil 'local))
     (and haskell-doc-show-global-types
 	 (haskell-doc-make-global-fct-index)) ; build type index for global fcts
 
     (haskell-doc-install-keymap)
 
     (run-hooks 'haskell-doc-mode-hook))
-
-   ((not haskell-doc-mode)
-
-    (remove-hook (if (boundp 'post-command-idle-hook)
-		     'post-command-idle-hook
-		   'post-command-hook)
-		 'haskell-doc-mode-print-current-symbol-info 'local)))
 
   (and (interactive-p)
        (message "haskell-doc-mode is %s"
@@ -1410,14 +1427,13 @@ See variable docstring."
 Should be the same as the value of `haskell-doc-mode' but alas currently it
 is not."
   (interactive)
-  (message
-   (if (memq 'haskell-doc-mode-print-current-symbol-info
-	     (if (boundp 'post-command-idle-hook)
-		 post-command-idle-hook
-	       post-command-hook))
+  (message "%s"
+   (if (or (and haskell-doc-mode haskell-doc-timer)
+           (memq 'haskell-doc-mode-print-current-symbol-info
+                 post-command-hook))
        "haskell-doc is ACTIVE"
      (substitute-command-keys
-      "haskell-doc is not ACTIVE \(Use C-u \\[haskell-doc-mode] to turn it on\)"))))
+      "haskell-doc is not ACTIVE \(Use \\[haskell-doc-mode] to turn it on\)"))))
 
 ;;@node Top level function, Mouse interface, Check, top
 ;;@section Top level function
@@ -1425,19 +1441,18 @@ is not."
 ;;@cindex haskell-doc-mode-print-current-symbol-info
 ;; This is the function hooked into the elisp command engine
 (defun haskell-doc-mode-print-current-symbol-info ()
- "Print the type of the symbol under the cursor.
+  "Print the type of the symbol under the cursor.
 
-This function is hooked into the `post-command-idle-hook' to print the type
-automatically if `haskell-doc-mode' is turned on. It can also be called
-directly to ask for the type of a function."
-  (interactive)
+This function is run by an idle timer to print the type
+ automatically if `haskell-doc-mode' is turned on."
   (and haskell-doc-mode
        (not executing-kbd-macro)
        ;; Having this mode operate in the minibuffer makes it impossible to
        ;; see what you're doing.
        (not (eq (selected-window) (minibuffer-window)))
-       ;; take a nap
-       (sit-for haskell-doc-idle-delay)
+       ;; take a nap, if run straight from post-command-hook.
+       (unless (fboundp 'run-with-idle-timer)
+         (sit-for haskell-doc-idle-delay))
        ;; good morning! read the word under the cursor for breakfast
        (haskell-doc-show-type)))
        ;; ;; ToDo: find surrounding fct

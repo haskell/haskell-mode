@@ -1,3 +1,15 @@
+2006-10-19  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (inferior-haskell-load-file): Simplify and make more
+	robust at the same time.
+
+	* haskell-doc.el: Drop p-c-idle-h in favor of run-with-idle-timer.
+	(haskell-doc-timer, haskell-doc-buffers): New vars.
+	(haskell-doc-mode): Use them.
+	(haskell-doc-check-active): Update the check.
+	(haskell-doc-mode-print-current-symbol-info): Don't sit-for unless it's
+	really needed.  Remove the interactive spec.
+
 2006-09-25  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-mode.el (haskell-mode-menu): Fix typo.
