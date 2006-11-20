@@ -1,3 +1,9 @@
+Changes since 2.1:
+
+* inf-haskell can wait until a file load completes and jump directly to the
+  first error, like haskell-ghci and haskell-hugs used to do.  See the var
+  inferior-haskell-wait-and-jump.
+
 Changes since 2.0:
 
 * inf-haskell uses ghci if hugs is absent.
