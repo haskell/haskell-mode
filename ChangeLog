@@ -1,3 +1,7 @@
+2006-11-20  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-doc.el (haskell-doc-mode-print-current-symbol-info): Fix thinko.
+
 2006-10-19  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* inf-haskell.el (inferior-haskell-load-file): Simplify and make more

@@ -135,6 +135,9 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.24  2006/11/20 20:18:24  monnier
+;;  (haskell-doc-mode-print-current-symbol-info): Fix thinko.
+;;
 ;;  Revision 1.23  2006/10/20 03:12:31  monnier
 ;;  Drop post-command-idle-hook in favor of run-with-idle-timer.
 ;;  (haskell-doc-timer, haskell-doc-buffers): New vars.
@@ -340,7 +343,7 @@
 ;;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
 ;;@subsection Maintenance stuff
 
-(defconst haskell-doc-version "$Revision: 1.23 $"
+(defconst haskell-doc-version "$Revision: 1.24 $"
  "Version of `haskell-doc-mode' as RCS Revision.")
 
 ;;@node Mode Variable, Variables, Maintenance stuff, Constants and Variables
@@ -1451,7 +1454,7 @@ This function is run by an idle timer to print the type
        ;; see what you're doing.
        (not (eq (selected-window) (minibuffer-window)))
        ;; take a nap, if run straight from post-command-hook.
-       (unless (fboundp 'run-with-idle-timer)
+       (if (fboundp 'run-with-idle-timer) t
          (sit-for haskell-doc-idle-delay))
        ;; good morning! read the word under the cursor for breakfast
        (haskell-doc-show-type)))
