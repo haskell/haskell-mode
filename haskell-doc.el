@@ -1,6 +1,6 @@
 ;;; haskell-doc.el --- show function types in echo area  -*- coding: iso-8859-1 -*-
 
-;; Copyright (C) 2004, 2005, 2006  Free Software Foundation, Inc.
+;; Copyright (C) 2004, 2005, 2006, 2007  Free Software Foundation, Inc.
 ;; Copyright (C) 1997 Hans-Wolfgang Loidl
 
 ;; Author: Hans-Wolfgang Loidl <hwloidl@dcs.glasgow.ac.uk>
@@ -135,6 +135,13 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.25  2007/02/09 21:53:42  monnier
+;;  (haskell-doc-get-current-word): Correctly distinguish
+;;  variable identifiers and infix identifiers.
+;;  (haskell-doc-rescan-files): Avoid switch-to-buffer.
+;;  (haskell-doc-imported-list): Operate on current buffer.
+;;  (haskell-doc-make-global-fct-index): Adjust call.
+;;
 ;;  Revision 1.24  2006/11/20 20:18:24  monnier
 ;;  (haskell-doc-mode-print-current-symbol-info): Fix thinko.
 ;;
@@ -335,16 +342,12 @@
 ;;@node Emacs portability, Maintenance stuff, Constants and Variables, Constants and Variables
 ;;@subsection Emacs portability
 
+(eval-when-compile (require 'cl))
+
 (defgroup haskell-doc nil
   "Show Haskell function types in echo area."
   :group 'haskell
   :prefix "haskell-doc-")
-
-;;@node Maintenance stuff, Mode Variable, Emacs portability, Constants and Variables
-;;@subsection Maintenance stuff
-
-(defconst haskell-doc-version "$Revision: 1.24 $"
- "Version of `haskell-doc-mode' as RCS Revision.")
 
 ;;@node Mode Variable, Variables, Maintenance stuff, Constants and Variables
 ;;@subsection Mode Variable
@@ -1758,32 +1761,21 @@ ToDo: Also eliminate leading and trainling whitespace."
 
 ;;@cindex haskell-doc-imported-list
 
-(defun haskell-doc-imported-list (outer-file)
-  "Return a list of the imported modules in OUTER-FILE."
+(defun haskell-doc-imported-list ()
+  "Return a list of the imported modules in current buffer"
   (interactive "fName of outer `include' file: ") ;  (buffer-file-name))
-  (let ((imported-file-list (list outer-file))
-        start)
-    (save-excursion
-      (switch-to-buffer (find-file-noselect outer-file))
-      (widen)
-      (goto-char (point-min))
-      (while (re-search-forward "^\\s-*import\\s-+" nil t)
-        (skip-chars-forward " \t")
-        (setq start (point))
-        (end-of-line)
-        (skip-chars-backward " \t")
-	(let ( (file (concat (buffer-substring start (point)) ".hs")) )
-	  (if (file-exists-p file)
-	      (setq imported-file-list
-		    (cons file imported-file-list))))
-	(let ( (file (concat (buffer-substring start (point)) ".lhs")) )
-	  (if (file-exists-p file)
-	      (setq imported-file-list
-		    (cons file imported-file-list))))
-      )
-      (nreverse imported-file-list)
-      ;;(message imported-file-list)
-      )))
+  (let ((imported-file-list (list buffer-file-name)))
+    (widen)
+    (goto-char (point-min))
+    (while (re-search-forward "^\\s-*import\\s-+\\([^ \t\n]+\\)" nil t)
+      (let ((basename (match-string 1)))
+        (dolist (ext '(".hs" ".lhs"))
+          (let ((file (concat basename ext)))
+            (if (file-exists-p file)
+                (push file imported-file-list))))))
+    (nreverse imported-file-list)
+    ;;(message imported-file-list)
+    ))
 
 ;; ToDo: generalise this to "Types" etc (not just "Variables")
 
@@ -1792,27 +1784,23 @@ ToDo: Also eliminate leading and trainling whitespace."
 (defun haskell-doc-rescan-files (filelist)
  "Does an `imenu' rescan on every file in FILELIST and returns the fct-list.
 This function switches to and potentially loads many buffers."
+ (save-current-buffer
    (mapcar (lambda (f)
-	     (switch-to-buffer (find-file-noselect f))
-	     (imenu--make-index-alist)
-	     (let ( (fn-alist (cdr (assoc "Variables" imenu--index-alist)) ) )
-	       (cons f
-		     (mapcar (lambda (x)
-			       `(,(car x) . ,(haskell-doc-grab-line x)) )
-			     fn-alist)) ) )
-   filelist ) )
+             (set-buffer (find-file-noselect f))
+             (imenu--make-index-alist)
+             (cons f
+                   (mapcar (lambda (x)
+                             `(,(car x) . ,(haskell-doc-grab-line x)))
+                           (cdr (assoc "Variables" imenu--index-alist)))))
+           filelist)))
 
 ;;@cindex haskell-doc-make-global-fct-index
 
 (defun haskell-doc-make-global-fct-index ()
  "Scan imported files for types of global fcts and update `haskell-doc-index'."
  (interactive)
- (let* ( (this-buffer (current-buffer))
-	 (this-file (buffer-file-name))
-	 (x (haskell-doc-rescan-files (haskell-doc-imported-list this-file) )) )
-   (switch-to-buffer this-buffer)
-   ;; haskell-doc-index is buffer local => switch-buffer before setq
-   (setq haskell-doc-index x) ) )
+ (setq haskell-doc-index
+       (haskell-doc-rescan-files (haskell-doc-imported-list))))
 
 ;; ToDo: use a separate munge-type function to format type concisely
 
@@ -1889,9 +1877,13 @@ This function switches to and potentially loads many buffers."
 (defun haskell-doc-get-current-word ()
   "Return the word under the cursor, or empty string if no word found."
   (save-excursion
-    (buffer-substring-no-properties
-     (progn (skip-syntax-backward "w_") (point))
-     (progn (skip-syntax-forward "w_") (point)))))
+    (if (looking-at "\\s_")
+        (buffer-substring-no-properties
+         (progn (skip-syntax-backward "_") (point))
+         (progn (skip-syntax-forward "_") (point)))
+      (buffer-substring-no-properties
+       (progn (skip-syntax-backward "w'") (skip-syntax-forward "'") (point))
+       (progn (skip-syntax-forward "w'") (point))))))
 
 ;;@appendix
 
