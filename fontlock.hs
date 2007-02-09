@@ -29,4 +29,10 @@ map f []     = []                       -- code can be misleading.  Coloured
 map f (x:xs) = f x : map f xs           -- comments reveal unused definitions.
 -}
 
+-- Note: the least significant bit is the first element of the list
+bdigits               :: Int -> [Int]
+bdigits 0             = [0]
+bdigits 1             = [1]
+bdigits n | n>1       = n `mod` 2 :
+
 -- arch-tag: a0d08cc2-4a81-4139-93bc-b3c6be0b5fb2
