@@ -1,6 +1,6 @@
 ;;; haskell-font-lock.el --- Font locking module for Haskell Mode
 
-;; Copyright 2003, 2004, 2005, 2006  Free Software Foundation, Inc.
+;; Copyright 2003, 2004, 2005, 2006, 2007  Free Software Foundation, Inc.
 ;; Copyright 1997-1998 Graeme E Moss, and Tommy Thorn
 
 ;; Authors: 1997-1998 Graeme E Moss <gem@cs.york.ac.uk> and
@@ -103,14 +103,6 @@
   (require 'haskell-mode)
   (require 'cl))
 (require 'font-lock)
-
-;; Version.
-(defconst haskell-font-lock-version "$Revision: 1.23 $"
-  "Version number of haskell-font-lock.")
-(defun haskell-font-lock-version ()
-  "Echo the current version of haskell-font-lock in the minibuffer."
-  (interactive)
-  (message "Using haskell-font-lock version %s" haskell-font-lock-version))
 
 (defcustom haskell-font-lock-symbols nil
   "Display \\ and -> and such using symbols in fonts.
@@ -540,9 +532,7 @@ Bird-style literate Haskell scripts are supported: If the value of
 `haskell-literate-bird-style' (automatically set by the Haskell mode
 of Moss&Thorn) is non-nil, a Bird-style literate script is assumed.
 
-Invokes `haskell-font-lock-hook' if not nil.
-
-Use `haskell-font-lock-version' to find out what version this is."
+Invokes `haskell-font-lock-hook' if not nil."
   (haskell-font-lock-defaults-create)
   (run-hooks 'haskell-font-lock-hook)
   (turn-on-font-lock))
