@@ -259,16 +259,15 @@ Returns keywords suitable for `font-lock-keywords'."
          ;; Reserved identifiers
 	 (reservedid
 	  (concat "\\<"
-		  ;; `as' and `qualified' are part of the import spec
-                  ;; syntax, but `as' doesn't seem to be reserved.  Don't
-                  ;; know about `qualified'.
+		  ;; `as', `hiding', and `qualified' are part of the import
+                  ;; spec syntax, but they are not reserved.
 		  ;; `_' can go in here since it has temporary word syntax.
 		  ;; (regexp-opt
 		  ;;  '("case" "class" "data" "default" "deriving" "do"
-		  ;;    "else" "hiding" "if" "import" "in" "infix" "infixl"
-		  ;;    "infixr" "instance" "let" "module" "newtype" "of"
-		  ;;    "qualified" "then" "type" "where" "_") t)
-		  "\\(_\\|c\\(ase\\|lass\\)\\|d\\(ata\\|e\\(fault\\|riving\\)\\|o\\)\\|else\\|hiding\\|i\\(mport\\|n\\(fix[lr]?\\|stance\\)\\|[fn]\\)\\|let\\|module\\|newtype\\|of\\|qualified\\|t\\(hen\\|ype\\)\\|where\\)"
+		  ;;    "else" "if" "import" "in" "infix" "infixl"
+                  ;;    "infixr" "instance" "let" "module" "newtype" "of"
+                  ;;    "then" "type" "where" "_") t)
+		  "\\(_\\|c\\(ase\\|lass\\)\\|d\\(ata\\|e\\(fault\\|riving\\)\\|o\\)\\|else\\|i\\(mport\\|n\\(fix[lr]?\\|stance\\)\\|[fn]\\)\\|let\\|module\\|newtype\\|of\\|t\\(hen\\|ype\\)\\|where\\)"
 		  "\\>"))
 
          ;; This unreadable regexp matches strings and character
@@ -313,6 +312,12 @@ Returns keywords suitable for `font-lock-keywords'."
 
 	    (,reservedid 1 (symbol-value 'haskell-keyword-face))
 	    (,reservedsym 1 (symbol-value 'haskell-operator-face))
+            ;; Special case for `as', `hiding', and `qualified', which are
+            ;; keywords in import statements but are not otherwise reserved.
+            ("\\<import[ \t]+\\(?:\\(qualified\\>\\)[ \t]*\\)?[^ \t\n()]+[ \t]*\\(?:\\(\\<as\\>\\)[ \t]*[^ \t\n()]+[ \t]*\\)?\\(\\<hiding\\>\\)?"
+             (1 (symbol-value 'haskell-keyword-face) nil lax)
+             (2 (symbol-value 'haskell-keyword-face) nil lax)
+             (3 (symbol-value 'haskell-keyword-face) nil lax))
 
 	    ;; Toplevel Declarations.
 	    ;; Place them *before* generic id-and-op highlighting.
