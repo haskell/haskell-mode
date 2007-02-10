@@ -1,6 +1,6 @@
 Haskell Mode for Emacs
 ----------------------
-Version number: $Name $.
+Version number: $Name:  $.
 
 This is the Haskell mode package for Emacs.  Its use should be mostly
 self-explanatory if you're accustomed to Emacs.
