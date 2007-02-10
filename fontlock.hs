@@ -1,5 +1,16 @@
 -- Comments are coloured brightly and stand out clearly.
 
+import qualified Foo as F hiding (toto)
+import qualified Foo hiding (toto)
+import qualified Foo as F (toto)
+import Foo as F hiding (toto)
+import Foo hiding (toto)
+import Foo as F (toto)
+
+hiding = 1
+qualified = 3
+as = 2
+
 repeat :: a -> [a]
 repeat xs = xs where xs = x:xs          -- Keywords are also bright.
 
