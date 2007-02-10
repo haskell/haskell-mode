@@ -135,6 +135,10 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.26  2007/02/10 06:28:55  monnier
+;;  (haskell-doc-get-current-word): Remove.
+;;  Change all refs to it, to use haskell-ident-at-point instead.
+;;
 ;;  Revision 1.25  2007/02/09 21:53:42  monnier
 ;;  (haskell-doc-get-current-word): Correctly distinguish
 ;;  variable identifiers and infix identifiers.
@@ -342,6 +346,7 @@
 ;;@node Emacs portability, Maintenance stuff, Constants and Variables, Constants and Variables
 ;;@subsection Emacs portability
 
+(require 'haskell-mode)
 (eval-when-compile (require 'cl))
 
 (defgroup haskell-doc nil
@@ -1471,7 +1476,7 @@ This function is run by an idle timer to print the type
 (defun haskell-doc-current-info ()
   "Return the info about symbol at point.
 Meant for `eldoc-documentation-function'."
-  (haskell-doc-sym-doc (haskell-doc-get-current-word)))
+  (haskell-doc-sym-doc (haskell-ident-at-point)))
 
 
 ;;@node Mouse interface, Print fctsym, Top level function, top
@@ -1512,7 +1517,7 @@ This information is extracted from the `haskell-doc-prelude-types' alist
 of prelude functions and their types, or from the local functions in the
 current buffer."
   (interactive)
-  (unless sym (setq sym (haskell-doc-get-current-word)))
+  (unless sym (setq sym (haskell-ident-at-point)))
   ;; if printed before do not print it again
   (unless (string= sym (car haskell-doc-last-data))
     (let ((doc (haskell-doc-sym-doc sym)))
@@ -1863,28 +1868,6 @@ This function switches to and potentially loads many buffers."
        doc ))))
 
 
-;;@node Movement, Bug Reports, Print fctsym, top
-;;@section Movement
-;; Functions for moving in text and extracting the current word under the cursor
-
-;; HWL: my attempt at more efficient (current-word)
-
-;; NB: this function is called from within the hooked print function;
-;;     therefore this function must not fail, otherwise the function will
-;;     be de-installed;
-;;     if no word under the cursor return an empty string
-;;@cindex haskell-doc-get-current-word
-(defun haskell-doc-get-current-word ()
-  "Return the word under the cursor, or empty string if no word found."
-  (save-excursion
-    (if (looking-at "\\s_")
-        (buffer-substring-no-properties
-         (progn (skip-syntax-backward "_") (point))
-         (progn (skip-syntax-forward "_") (point)))
-      (buffer-substring-no-properties
-       (progn (skip-syntax-backward "w'") (skip-syntax-forward "'") (point))
-       (progn (skip-syntax-forward "w'") (point))))))
-
 ;;@appendix
 
 ;;@node Index, Token, Visit home site, top
@@ -1895,7 +1878,6 @@ This function switches to and potentially loads many buffers."
 ;;* haskell-doc-check-active::
 ;;* haskell-doc-chop-off-context::
 ;;* haskell-doc-get-and-format-fct-type::
-;;* haskell-doc-get-current-word::
 ;;* haskell-doc-get-global-fct-type::
 ;;* haskell-doc-get-imenu-info::
 ;;* haskell-doc-grab::
