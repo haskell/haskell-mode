@@ -316,7 +316,7 @@ It deals with both Bird style and non Bird-style scripts."
 
 (defcustom haskell-indent-look-past-empty-line t
   "If nil, indentation engine will not look past an empty line for layout points."
-  :trype 'boolean)
+  :type 'boolean)
 
 (defun haskell-indent-start-of-def ()
   "Return the position of the start of a definition.
