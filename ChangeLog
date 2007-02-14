@@ -1,3 +1,11 @@
+2007-02-14  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-cabal.el: New file.
+
+	* haskell-indent.el (haskell-indent-look-past-empty-line): Typo.
+
+	* inf-haskell.el (with-selected-window): Define while compiling.
+
 2007-02-10  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-font-lock.el (haskell-font-lock-keywords-create):

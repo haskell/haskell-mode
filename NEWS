@@ -1,3 +1,9 @@
+Changes since 2.2:
+
+* Trivial support for Cabal package description files.
+
+* Minor bug fixes.
+
 Changes since 2.1:
 
 * There are now commands to find type and info of identifiers by querying an
