@@ -151,11 +151,12 @@ setting up the inferior-haskell buffer."
   (let ((proc (inferior-haskell-process arg)))
     (pop-to-buffer (process-buffer proc))))
 
-(unless (fboundp 'with-selected-window)
-  (defmacro with-selected-window (win &rest body)
-    `(save-selected-window
-       (select-window ,win)
-       ,@body)))
+(eval-when-compile
+  (unless (fboundp 'with-selected-window)
+    (defmacro with-selected-window (win &rest body)
+      `(save-selected-window
+         (select-window ,win)
+         ,@body))))
 
 (defcustom inferior-haskell-wait-and-jump nil
   "If non-nil, wait for file loading to terminate and jump to the error."
