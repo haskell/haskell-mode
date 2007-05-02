@@ -1,3 +1,8 @@
+2007-05-01  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-mode.el (haskell-hoogle-command, haskell-hoogle): New var
+	and command.
+
 2007-03-05  Ken Takusagawa  <ken.takusagawa.2@gmail.com>  (tiny change)
 
 	* haskell-font-lock.el (haskell-font-lock-keywords-create):

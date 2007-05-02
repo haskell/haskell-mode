@@ -475,6 +475,33 @@ Invokes `haskell-mode-hook' if not nil."
 ;;;###autoload(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
 ;;;###autoload(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 
+(defcustom haskell-hoogle-command
+  (if (executable-find "hoogle") "hoogle")
+  "Name of the command to use to query Hoogle.
+If nil, use the Hoogle web-site."
+  :type '(choice (const :tag "Use Web-site" nil)
+                 string))
+
+;;;###autoload
+(defun haskell-hoogle (query)
+  "Do a Hoogle search for QUERY."
+  (interactive
+   (let ((def (haskell-ident-at-point)))
+     (if (and def (symbolp def)) (setq def (symbol-name def)))
+     (list (read-string (if def
+                            (format "Hoogle query (default %s): " def)
+                          "Hoogle query: ")
+                        nil nil def))))
+  (if (null haskell-hoogle-command)
+      (browse-url (format "http://haskell.org/hoogle/?q=%s" query))
+    (if (fboundp 'help-setup-xref)
+        (help-setup-xref (list 'haskell-hoogle query) (interactive-p)))
+    (with-output-to-temp-buffer
+        (if (fboundp 'help-buffer) (help-buffer) "*Help*")
+      (with-current-buffer standard-output
+        (start-process "hoogle" (current-buffer) haskell-hoogle-command
+                       query)))))
+
 ;; Provide ourselves:
 
 (provide 'haskell-mode)
