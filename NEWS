@@ -1,3 +1,7 @@
+Changes since 2.3:
+
+* The new command haskell-hoogle helps you query Hoogle from Emacs.
+
 Changes since 2.2:
 
 * Trivial support for Cabal package description files.
