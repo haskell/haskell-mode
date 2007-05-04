@@ -176,9 +176,10 @@ The process PROC should be associated to a comint buffer."
 (defun inferior-haskell-load-file (&optional reload)
   "Pass the current buffer's file to the inferior haskell process."
   (interactive)
+  ;; Save first, so we're sure that `buffer-file-name' is non-nil afterward.
+  (save-buffer)
   (let ((file buffer-file-name)
 	(proc (inferior-haskell-process)))
-    (save-buffer)
     (with-current-buffer (process-buffer proc)
       ;; Not sure if it's useful/needed and if it actually works.
       ;; (unless (equal (file-name-as-directory default-directory)
