@@ -100,17 +100,15 @@ The format should be the same as for `compilation-error-regexp-alist'.")
       (add-to-list 'minor-mode-overriding-map-alist
                    (cons 'compilation-minor-mode map)))))
 
-(defun inferior-haskell-string-to-strings (string &optional separator)
-  "Split the STRING into a list of strings.
-The SEPARATOR regexp defaults to \"\\s-+\"."
-  (let ((sep (or separator "\\s-+"))
-	(i (string-match "[\"]" string)))
-    (if (null i) (split-string string sep)	; no quoting:  easy
-      (append (unless (eq i 0) (split-string (substring string 0 i) sep))
+(defun inferior-haskell-string-to-strings (string)
+  "Split the STRING into a list of strings."
+  (let ((i (string-match "[\"]" string)))
+    (if (null i) (split-string string)	; no quoting:  easy
+      (append (unless (eq i 0) (split-string (substring string 0 i)))
 	      (let ((rfs (read-from-string string i)))
 		(cons (car rfs)
 		      (inferior-haskell-string-to-strings
-		       (substring string (cdr rfs)) sep)))))))
+		       (substring string (cdr rfs)))))))))
 
 (defun inferior-haskell-command (arg)
   (inferior-haskell-string-to-strings
@@ -122,7 +120,7 @@ The SEPARATOR regexp defaults to \"\\s-+\"."
 
 (defun inferior-haskell-start-process (command)
   "Start an inferior haskell process.
-With universal prefix \\[universal-argument], prompts for a command,
+With universal prefix \\[universal-argument], prompts for a COMMAND,
 otherwise uses `haskell-program-name'.
 It runs the hook `inferior-haskell-hook' after starting the process and
 setting up the inferior-haskell buffer."
