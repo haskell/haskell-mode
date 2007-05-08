@@ -42,6 +42,8 @@
 ;;          (fields (mapcar (lambda (sym) (substring-no-properties sym 0 -1)) syms)))
 ;;     fields))
 
+(eval-when-compile (require 'cl))
+
 (defconst haskell-cabal-general-fields
   ;; Extracted with (haskell-cabal-extract-fields-from-doc "general-fields")
   '("name" "version" "cabal-version" "license" "license-file" "copyright"
@@ -76,6 +78,33 @@
 
 (defvar haskell-cabal-buffers nil
   "List of Cabal buffers.")
+
+(defsubst* inferior-haskell-string-prefix-p (str1 str2)
+  "Return non-nil if STR1 is a prefix of STR2"
+  (eq t (compare-strings str2 nil (length str1) str1 nil nil)))
+
+(defun haskell-cabal-find-file ()
+  "Return a buffer visiting the cabal file of the current directory, or nil."
+  (catch 'found
+    ;; ;; First look for it in haskell-cabal-buffers.
+    ;; (dolist (buf haskell-cabal-buffers)
+    ;;   (if (inferior-haskell-string-prefix-p
+    ;;        (with-current-buffer buf default-directory) default-directory)
+    ;;       (throw 'found buf)))
+    ;; Then look up the directory hierarchy.
+    (let ((user (nth 2 (file-attributes default-directory)))
+          ;; Abbreviate, so as to stop when we cross ~/.
+          (root (abbreviate-file-name default-directory))
+          files)
+      (while (and root (equal user (nth 2 (file-attributes root))))
+        (if (setq files (directory-files root 'full "\\.cabal\\'"))
+            (throw 'found (find-file-noselect (car files)))
+          (if (equal root
+                     (setq root (file-name-directory
+                                 (directory-file-name root))))
+              (setq root nil))))
+      nil)))
+
 
 (defun haskell-cabal-buffers-clean (&optional buffer)
   (let ((bufs ()))
