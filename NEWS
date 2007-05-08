@@ -1,5 +1,10 @@
 Changes since 2.3:
 
+* inf-haskell.el looks for a Cabal file to determine the root of a project.
+  If all works well, this will make C-c C-l automatically switch to the root
+  dir, so that dependencies in other directories are automatically found.
+  If it doesn't, complain and/or set inferior-haskell-use-cabal to nil.
+
 * The new command haskell-hoogle helps you query Hoogle from Emacs.
 
 Changes since 2.2:

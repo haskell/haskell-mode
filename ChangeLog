@@ -1,5 +1,13 @@
 2007-05-08  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* inf-haskell.el (inferior-haskell-use-cabal): New custom var.
+	(inferior-haskell-cabal-of-buf): New fun.
+	(inferior-haskell-load-file): Use it to try and do the right thing in
+	multi-directory projects using a Cabal file.
+
+	* haskell-cabal.el (inferior-haskell-string-prefix-p)
+	(haskell-cabal-find-file): New functions.
+
 	* inf-haskell.el (inferior-haskell-string-to-strings):
 	Remove `separator' argument.  Call split string without separator arg
 	either, so that it drops null strings.
