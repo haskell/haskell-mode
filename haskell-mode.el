@@ -98,9 +98,9 @@
 ;; Customisation:
 ;;
 ;; Set the value of `haskell-literate-default' to your preferred
-;; literate style: 'bird or 'latex, within .emacs as follows:
+;; literate style: `bird' or `tex', within .emacs as follows:
 ;;
-;;    (setq haskell-literate-default 'latex)
+;;    (setq haskell-literate-default 'tex)
 ;;
 ;; Also see the customisations of the modules.
 ;;
@@ -135,7 +135,7 @@
 ;;
 ;; Version 1.3:
 ;;   The literate or non-literate style of a buffer is now indicated
-;;   by just the variable haskell-literate: nil, 'bird, or 'latex.
+;;   by just the variable haskell-literate: nil, `bird', or `tex'.
 ;;   For literate buffers with ambiguous style, the value of
 ;;   haskell-literate-default is used.
 ;;
@@ -243,21 +243,20 @@
 ;; Are we looking at a literate script?
 (defvar haskell-literate nil
   "*If not nil, the current buffer contains a literate Haskell script.
-Possible values are: `bird' and `latex', for Bird-style and LaTeX-style
+Possible values are: `bird' and `tex', for Bird-style and LaTeX-style
 literate scripts respectively.  Set by `haskell-mode' and
 `literate-haskell-mode'.  For an ambiguous literate buffer -- ie. does
 not contain either \"\\begin{code}\" or \"\\end{code}\" on a line on
 its own, nor does it contain \">\" at the start of a line -- the value
-of `haskell-literate-default' is used.
-
-Always buffer-local.")
+of `haskell-literate-default' is used.")
 (make-variable-buffer-local 'haskell-literate)
+(put 'haskell-literate 'safe-local-variable 'symbolp)
 ;; Default literate style for ambiguous literate buffers.
 (defcustom haskell-literate-default 'bird
-  "*Default value for `haskell-literate'.
+  "Default value for `haskell-literate'.
 Used if the style of a literate buffer is ambiguous.  This variable should
 be set to the preferred literate style."
-  :type '(choice (const bird) (const latex) (const nil)))
+  :type '(choice (const bird) (const tex) (const nil)))
 
 ;; Mode maps.
 (defvar haskell-mode-map
@@ -393,16 +392,12 @@ be set to the preferred literate style."
 ;; The main mode functions
 ;;;###autoload
 (define-derived-mode haskell-mode fundamental-mode "Haskell"
-  "Major mode for editing Haskell programs.  Last adapted for Haskell 1.4.
+  "Major mode for editing Haskell programs.
 Blank lines separate paragraphs, comments start with `-- '.
-
-\\<haskell-mode-map>\\[indent-for-comment] will place a comment at an appropriate place on the current line.
-\\[comment-region] comments (or with prefix arg, uncomments) each line in the region.
-
-Literate scripts are supported via `literate-haskell-mode'.  The
-variable `haskell-literate' indicates the style of the script in the
-current buffer.  See the documentation on this variable for more
-details.
+\\<haskell-mode-map>
+Literate scripts are supported via `literate-haskell-mode'.
+The variable `haskell-literate' indicates the style of the script in the
+current buffer.  See the documentation on this variable for more details.
 
 Modules can hook in via `haskell-mode-hook'.  The following modules
 are supported with an `autoload' command:
@@ -420,14 +415,14 @@ are supported with an `autoload' command:
      Simple indentation.
 
 Module X is activated using the command `turn-on-X'.  For example,
-`haskell-font-lock' is activated using `turn-on-haskell-font-lock'.
-For more information on a module, see the help for its `turn-on-X'
+`haskell-indent' is activated using `turn-on-haskell-indent'.
+For more information on a module, see the help for its `X-mode'
 function.  Some modules can be deactivated using `turn-off-X'.  (Note
 that `haskell-doc' is irregular in using `turn-(on/off)-haskell-doc-mode'.)
 
 Use `haskell-version' to find out what version this is.
 
-Invokes `haskell-mode-hook' if not nil."
+Invokes `haskell-mode-hook'."
   (set (make-local-variable 'paragraph-start) (concat "^$\\|" page-delimiter))
   (set (make-local-variable 'paragraph-separate) paragraph-start)
   (set (make-local-variable 'comment-start) "-- ")
@@ -466,9 +461,10 @@ Invokes `haskell-mode-hook' if not nil."
         (save-excursion
           (goto-char (point-min))
           (cond
-           ((re-search-forward "^\\\\\\(begin\\|end\\){code}$" nil t) 'latex)
+           ((re-search-forward "^\\\\\\(begin\\|end\\){code}$" nil t) 'tex)
            ((re-search-forward "^>" nil t) 'bird)
-           (t haskell-literate-default)))))
+           (t haskell-literate-default))))
+  (set (make-local-variable 'mode-line-process) '("/" haskell-literate)))
 
 ;;;###autoload(add-to-list 'auto-mode-alist '("\\.\\(?:[gh]s\\|hi\\)\\'" . haskell-mode))
 ;;;###autoload(add-to-list 'auto-mode-alist '("\\.l[gh]s\\'" . literate-haskell-mode))
