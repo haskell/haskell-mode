@@ -157,12 +157,23 @@ Uses free var `haskell-indent-info'."
 followed by NAME (if present)."
   (haskell-indent-push-col (haskell-indent-point-to-col pos) name))
 
+;; (defvar haskell-indent-tab-align nil
+;;   "Align all indentations on TAB stops.")
+
+(defun haskell-indent-column+offset (column offset)
+  (unless offset (setq offset haskell-indent-offset))
+  (setq column (+ column offset))
+  ;; (if (and haskell-indent-tab-align (> offset 0))
+  ;;     (* 8 (/ (+ column 7) 8))
+    column) ;; )
+
 (defun haskell-indent-push-pos-offset (pos &optional offset)
   "Pushes indentation information for the column corresponding to POS
 followed by an OFFSET (if present use its value otherwise use
 `haskell-indent-offset')."
-  (haskell-indent-push-col (+ (haskell-indent-point-to-col pos)
-                              (or offset haskell-indent-offset))))
+  (haskell-indent-push-col (haskell-indent-column+offset
+                            (haskell-indent-point-to-col pos)
+                            offset)))
 
 ;; redefinition of some Emacs function for dealing with
 ;; Bird Style literate scripts
@@ -272,7 +283,7 @@ otherwise returns the ending position \\begin{code}."
                  (forward-line))
              (point))))
       ;;  Look for a \begin{code} or \end{code} line.
-      (latex
+      ((latex tex)
        (if (re-search-backward
             "^\\(\\\\begin{code}$\\)\\|\\(\\\\end{code}$\\)" nil t)
            ;; within a literate code part if it was a \\begin{code}.
@@ -1087,10 +1098,12 @@ is at the end of an otherwise-non-empty line."
   (setq offset-info
         (if haskell-indent-inhibit-after-offset '(0) (cdr-safe offset-info)))
   (if (not (haskell-indent-hanging-p))
-      (+ (current-column) (or (car offset-info) default))
+      (haskell-indent-column+offset (current-column)
+                                    (or (car offset-info) default))
     ;; The keyword is hanging at the end of the line.
-    (+ (haskell-indent-virtual-indentation start)
-       (or (cadr offset-info) (car offset-info) default))))
+    (haskell-indent-column+offset
+     (haskell-indent-virtual-indentation start)
+     (or (cadr offset-info) (car offset-info) default))))
 
 (defun haskell-indent-inside-paren (open)
   ;; there is an open structure to complete
