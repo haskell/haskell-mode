@@ -59,6 +59,13 @@ The command can include arguments."
     ;; Format of error messages used by GHCi.
     ("^\\(.+?\\):\\([0-9]+\\):\\(\\([0-9]+\\):\\)?\\( \\|\n +\\)\\(Warning\\)?"
      1 2 4 ,@(if (fboundp 'compilation-fake-loc) '((6))))
+    ;; Runtime exceptions, from ghci.
+    ("^\\*\\*\\* Exception: \\(.+?\\):(\\([0-9]+\\),\\([0-9]+\\))-(\\([0-9]+\\),\\([0-9]+\\)): .*"
+     1 ,@(if (fboundp 'compilation-fake-loc) '((2 . 4) (3 . 5)) '(2 3)))
+    ;; GHCI uses two different forms for line/col ranges, depending on
+    ;; whether it's all on the same line or not :-(
+    ("^\\*\\*\\* Exception: \\(.+?\\):\\([0-9]+\\):\\([0-9]+\\)-\\([0-9]+\\): .*"
+     1 2 ,(if (fboundp 'compilation-fake-loc) '(3 . 4) 3))
     ;; Info xrefs.
     ,@(if (fboundp 'compilation-fake-loc)
           `((,inferior-haskell-info-xref-re
@@ -88,6 +95,7 @@ The format should be the same as for `compilation-error-regexp-alist'.")
   ;; Setup `compile' support so you can just use C-x ` and friends.
   (set (make-local-variable 'compilation-error-regexp-alist)
        inferior-haskell-error-regexp-alist)
+  (set (make-local-variable 'compilation-first-column) 0) ;GHCI counts from 0.
   (if (and (not (boundp 'minor-mode-overriding-map-alist))
            (fboundp 'compilation-shell-minor-mode))
       ;; If we can't remove compilation-minor-mode bindings, at least try to
