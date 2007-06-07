@@ -347,7 +347,7 @@ Returns keywords suitable for `font-lock-keywords'."
 	       `(("^[^>\n].*$" 0 haskell-comment-face t)
 		 ,@keywords
 		 ("^>" 0 haskell-default-face t))))
-	(latex
+	((latex tex)
 	 (setq keywords
 	       `((haskell-fl-latex-comments 0 'font-lock-comment-face t)
 		 ,@keywords)))))
@@ -459,14 +459,14 @@ that should be commented under LaTeX-style literate scripts."
   (let ((literate (if (boundp 'haskell-literate) haskell-literate)))
     (case literate
       (bird haskell-font-lock-bird-literate-keywords)
-      (latex haskell-font-lock-latex-literate-keywords)
+      ((latex tex) haskell-font-lock-latex-literate-keywords)
       (t haskell-font-lock-keywords))))
 
 (defun haskell-font-lock-choose-syntactic-keywords ()
   (let ((literate (if (boundp 'haskell-literate) haskell-literate)))
     (case literate
       (bird haskell-bird-syntactic-keywords)
-      (latex haskell-latex-syntactic-keywords)
+      ((latex tex) haskell-latex-syntactic-keywords)
       (t haskell-basic-syntactic-keywords))))
 
 (defun haskell-font-lock-defaults-create ()
