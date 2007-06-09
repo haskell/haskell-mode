@@ -4,6 +4,24 @@
 	GHCI's exceptions.
 	(inferior-haskell-mode): Set compilation-first-column.
 
+2007-06-07  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-indent.el (haskell-indent-column+offset): New function.
+	(haskell-indent-push-pos-offset, haskell-indent-after-keyword-column):
+	Use it.
+	(haskell-indent-within-literate-code): Accept `tex' as well as `latex'
+	for literate style.
+
+	* haskell-mode.el (haskell-literate): Use `tex' rather than `latex'.
+	Declare as safe-local-variable.
+	(literate-haskell-mode): Use `tex' rather than `latex'.
+	Make it visible in the modeline.
+
+	* haskell-font-lock.el (haskell-font-lock-keywords-create):
+	Accept `tex' as well as `latex' for literate style.
+
+	* haskell-decl-scan.el (haskell-decl-scan-version): Remove.
+
 2007-05-08  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* inf-haskell.el (inferior-haskell-use-cabal): New custom var.
