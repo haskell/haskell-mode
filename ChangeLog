@@ -1,3 +1,12 @@
+2007-06-10  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-font-lock.el (haskell-font-lock-dot-is-not-composition):
+	New function.
+	(haskell-font-lock-symbols-alist): Change rule for the "." symbol to
+	use that new function, so as to check it's not a "forall <foo> .".
+	(haskell-font-lock-compose-symbol)
+	(haskell-font-lock-symbols-keywords): Adjust to understand the new syntax.
+
 2007-06-07  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* inf-haskell.el (inferior-haskell-error-regexp-alist): Add entries for
