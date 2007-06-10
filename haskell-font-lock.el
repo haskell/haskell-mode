@@ -143,7 +143,25 @@ and `unicode'."
               (cons "-<" (decode-char 'ucs 8610)) ;; Paterson's arrow syntax
               ;; (cons "-<" (decode-char 'ucs 10521)) ;; nicer but uncommon
 	      (cons "::" (decode-char 'ucs 8759))
-	      (cons "." (decode-char 'ucs 9675))))))
+	      (list "." (decode-char 'ucs 9675)
+                    ;; Need a predicate here to distinguish the . used by
+                    ;; forall <foo> . <bar>.
+                    'haskell-font-lock-dot-is-not-composition))))
+  "Alist mapping Haskell symbols to chars.
+Each element has the form (STRING . CHAR) or (STRING CHAR PREDICATE).
+STRING is the Haskell symbol.
+CHAR is the character with which to represent this symbol.
+PREDICATE if present is a function of one argument (the start position
+of the symbol) which should return non-nil if this mapping should be disabled
+at that position.")
+
+(defun haskell-font-lock-dot-is-not-composition (start)
+  "Return non-nil if the \".\" at START is not a composition operator.
+This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
+  (save-excursion
+    (goto-char start)
+    (re-search-backward "\\<forall\\>[^.\"]*\\="
+                        (line-beginning-position) t)))
 
 ;; Use new vars for the font-lock faces.  The indirection allows people to
 ;; use different faces than in other modes, as before.
@@ -177,17 +195,22 @@ Regexp match data 0 points to the chars."
                     ;; Special case for the . used for qualified names.
                     ((and (eq (char-after start) ?\.) (= end (1+ start)))
                      '(?_ ?\\ ?w))
-                    (t '(?_ ?\\)))))
+                    (t '(?_ ?\\))))
+         sym-data)
     (if (or (memq (char-syntax (or (char-before start) ?\ )) syntaxes)
 	    (memq (char-syntax (or (char-after end) ?\ )) syntaxes)
 	    (memq (get-text-property start 'face)
 		  '(font-lock-doc-face font-lock-string-face
-		    font-lock-comment-face)))
+		    font-lock-comment-face))
+            (and (consp (setq sym-data (cdr (assoc (match-string 0) alist))))
+                 (let ((pred (cadr sym-data)))
+                   (setq sym-data (car sym-data))
+                   (funcall pred start))))
 	;; No composition for you.  Let's actually remove any composition
 	;; we may have added earlier and which is now incorrect.
 	(remove-text-properties start end '(composition))
       ;; That's a symbol alright, so add the composition.
-      (compose-region start end (cdr (assoc (match-string 0) alist)))))
+      (compose-region start end sym-data)))
   ;; Return nil because we're not adding any face property.
   nil)
 
@@ -196,7 +219,7 @@ Regexp match data 0 points to the chars."
     (let ((alist nil))
       (dolist (x haskell-font-lock-symbols-alist)
 	(when (and (if (fboundp 'char-displayable-p)
-		       (char-displayable-p (cdr x))
+		       (char-displayable-p (if (consp (cdr x)) (cadr x) (cdr x)))
 		     t)
 		   (not (assoc (car x) alist)))	;Not yet in alist.
 	  (push x alist)))
