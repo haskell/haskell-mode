@@ -1,3 +1,10 @@
+2007-06-12  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-font-lock.el (haskell-font-lock-symbols-alist): Add `forall'.
+
+	* inf-haskell.el (inferior-haskell-error-regexp-alist): Be more careful
+	with multiline patterns.  Add pattern for GHCi's type error messages.
+
 2007-06-10  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-font-lock.el (haskell-font-lock-dot-is-not-composition):
