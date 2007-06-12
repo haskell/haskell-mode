@@ -130,7 +130,8 @@ and `unicode'."
 	      (cons "\\" (make-char 'japanese-jisx0208 38 75))
 	      (cons "->" (make-char 'japanese-jisx0208 34 42))
 	      (cons "<-" (make-char 'japanese-jisx0208 34 43))
-	      (cons "=>" (make-char 'japanese-jisx0208 34 77))))
+	      (cons "=>" (make-char 'japanese-jisx0208 34 77))
+              (cons "forall" (make-char 'japanese-jisx0208 34 79))))
    ;; Or a unicode font.
    (and (fboundp 'decode-char)
 	(memq haskell-font-lock-symbols '(t unicode))
@@ -146,7 +147,8 @@ and `unicode'."
 	      (list "." (decode-char 'ucs 9675)
                     ;; Need a predicate here to distinguish the . used by
                     ;; forall <foo> . <bar>.
-                    'haskell-font-lock-dot-is-not-composition))))
+                    'haskell-font-lock-dot-is-not-composition)
+              (cons "forall" (decode-char 'ucs 8704)))))
   "Alist mapping Haskell symbols to chars.
 Each element has the form (STRING . CHAR) or (STRING CHAR PREDICATE).
 STRING is the Haskell symbol.
