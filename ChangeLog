@@ -1,3 +1,9 @@
+2007-06-20  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-font-lock.el (haskell-font-lock-haddock): New custom.
+	(haskell-font-lock-seen-haddock): New internal var.
+	(haskell-syntactic-face-function): Highlight Haddock comments.
+
 2007-06-12  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-font-lock.el (haskell-font-lock-symbols-alist): Add `forall'.
