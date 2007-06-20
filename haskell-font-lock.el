@@ -457,15 +457,55 @@ that should be commented under LaTeX-style literate scripts."
      ("^\\(\\\\\\)end{code}$" 1 "!"))
    haskell-basic-syntactic-keywords))
 
+(defcustom haskell-font-lock-haddock (boundp 'font-lock-doc-face)
+  "If non-nil try to highlight Haddock comments specially."
+  :type 'boolean
+  :group 'haskell)
+
+(defvar haskell-font-lock-seen-haddock nil)
+(make-variable-buffer-local 'haskell-font-lock-seen-haddock)
+
 (defun haskell-syntactic-face-function (state)
   "`font-lock-syntactic-face-function' for Haskell."
   (cond
    ((nth 3 state) font-lock-string-face)		; as normal
-    ;; Else comment.  If it's from syntax table, use default face.
+   ;; Else comment.  If it's from syntax table, use default face.
    ((or (eq 'syntax-table (nth 7 state))
 	(and (eq haskell-literate 'bird)
 	     (memq (char-before (nth 8 state)) '(nil ?\n))))
     haskell-literate-comment-face)
+   ;; Try and recognize Haddock comments.  From what I gather from its
+   ;; documentation, its comments can take the following forms:
+   ;; a) {-| ... -}
+   ;; b) {-^ ... -}
+   ;; c) -- | ...
+   ;; d) -- ^ ...
+   ;; e) -- ...
+   ;; Where `e' is the tricky one: it is only a Haddock comment if it
+   ;; follows immediately another Haddock comment.  Even an empty line
+   ;; breaks such a sequence of Haddock comments.  It is not clear if `e'
+   ;; can follow any other case, so I interpreted it as following only cases
+   ;; c,d,e (not a or b).  In any case, this `e' is expensive since it
+   ;; requires extra work for each and every non-Haddock comment, so I only
+   ;; go through the more expensive check if we've already seen a Haddock
+   ;; comment in the buffer.
+   ((and haskell-font-lock-haddock
+         (save-excursion
+           (goto-char (nth 8 state))
+           (or (looking-at "\\(-- \\|{-\\)[|^]")
+               (and haskell-font-lock-seen-haddock
+                    (looking-at "-- ")
+                    (let ((doc nil)
+                          pos)
+                      (while (and (not doc)
+                                  (setq pos (line-beginning-position))
+                                  (forward-comment -1)
+                                  (eq (line-beginning-position 2) pos)
+                                  (looking-at "--\\( [|^]\\)?"))
+                        (setq doc (match-beginning 1)))
+                      doc)))))
+    (set (make-local-variable 'haskell-font-lock-seen-haddock) t)
+    font-lock-doc-face)
    (t font-lock-comment-face)))
 
 (defconst haskell-font-lock-keywords
