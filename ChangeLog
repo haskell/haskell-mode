@@ -1,3 +1,8 @@
+2007-06-26  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (inferior-haskell-error-regexp-alist):
+	Add more regexps for GHC's ever expanding variety of formats.
+
 2007-06-20  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-font-lock.el (haskell-font-lock-haddock): New custom.
