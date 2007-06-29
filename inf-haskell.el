@@ -250,6 +250,19 @@ The process PROC should be associated to a comint buffer."
         (ignore-errors                  ;Don't beep if there were no errors.
           (next-error))))))
 
+(defvar inferior-haskell-run-command ":main")
+
+(defun inferior-haskell-load-and-run (command)
+  "Pass the current buffer's file  to haskell and then run a COMMAND."
+  (interactive
+   (list
+    (if (and inferior-haskell-run-command (not current-prefix-arg))
+        inferior-haskell-run-command
+      (read-string "Command to run: " nil nil inferior-haskell-run-command))))
+  (setq inferior-haskell-run-command command)
+  (inferior-haskell-load-file)          ;FIXME: Shouldn't that be reload?
+  (inferior-haskell-send-command (inferior-haskell-process) command))
+
 (defun inferior-haskell-send-command (proc str)
   (setq str (concat str "\n"))
   (with-current-buffer (process-buffer proc)
@@ -520,6 +533,25 @@ so that it can be obtained more quickly next time.")
                              'ok-if-already-exists)))
             alist)))))
 
+(defvar inferior-haskell-ghc-internal-ident-alist
+  ;; FIXME: Fill this table, ideally semi-automatically.
+  '(("GHC.Base.return" . "Control.Monad.return")
+    ("GHC.List" . "Data.List")))
+
+(defun inferior-haskell-map-internal-ghc-ident (ident)
+  "Try to translate some internal GHC identifier to its alter ego in haskell docs."
+  (let ((head ident)
+        (tail "")
+        remapped)
+    (while (and (not
+                 (setq remapped
+                       (cdr (assoc head
+                                   inferior-haskell-ghc-internal-ident-alist))))
+                (string-match "\\.[^.]+\\'" head))
+      (setq tail (concat (match-string 0 head) tail))
+      (setq head (substring head 0 (match-beginning 0))))
+    (concat (or remapped head) tail)))
+
 ;;;###autoload
 (defun inferior-haskell-find-haddock (sym)
   "Find and open the Haddock documentation of SYM.
@@ -541,6 +573,7 @@ we load it."
                             (format "Find documentation of (default %s): " sym)
                           "Find documentation of: ")
                         nil nil sym))))
+  (setq sym (inferior-haskell-map-internal-ghc-ident sym))
   (let* (;; Find the module and look it up in the alist
          (module (inferior-haskell-get-module sym))
          (alist-record (assoc module (inferior-haskell-module-alist)))

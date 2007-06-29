@@ -1,5 +1,12 @@
 2007-06-29  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* inf-haskell.el (inferior-haskell-run-command): New var.
+	(inferior-haskell-load-and-run): New command.
+
+	* inf-haskell.el (inferior-haskell-map-internal-ghc-ident): New var.
+	(inferior-haskell-map-internal-ghc-ident): New fun.
+	(inferior-haskell-find-haddock): Use it.
+
 	* inf-haskell.el (inferior-haskell-module-alist-file): Use a file in
 	/tmp rather than ~/ by default.
 	(inferior-haskell-compute-module-alist):
