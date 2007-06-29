@@ -1,3 +1,15 @@
+2007-06-29  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (inferior-haskell-module-alist-file): Use a file in
+	/tmp rather than ~/ by default.
+	(inferior-haskell-compute-module-alist):
+	Rename from inferior-haskell-populate-module-alist.
+	Just return the result without saving it in any cache.
+	(inferior-haskell-read-module-alist-cache): Delete.
+	(inferior-haskell-module-alist): New function which replaces it, taking
+	care of the caching (both store&read).
+	(inferior-haskell-find-haddock): Adjust to this new arrangement.
+
 2007-06-29  David House  <dmhouse@gmail.com>
 
 	* haskell-mode.el (haskell-mode-map): Add binding to the new
