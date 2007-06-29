@@ -1,5 +1,7 @@
 Changes since 2.3:
 
+* C-c C-d looks up the symbol at point in the Haddock docs.
+
 * Haddock comments are highlighted with font-lock-doc-face if it exists.
 
 * Use `tex' rather than `latex' for haskell-literate.

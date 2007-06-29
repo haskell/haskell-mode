@@ -1,3 +1,26 @@
+2007-06-29  David House  <dmhouse@gmail.com>
+
+	* haskell-mode.el (haskell-mode-map): Add binding to the new
+	inferior-haskell-find-haddock command.
+
+2007-06-29  David House  <dmhouse@gmail.com>
+
+	* inf-haskell.el (inferior-haskell-module-alist-file)
+	(inferior-haskell-module-re, inferior-haskell-use-web-docs)
+	(inferior-haskell-web-docs-base, haskell-package-manager-name)
+	(haskell-package-conf-file, inferior-haskell-module-alist): New vars.
+	(inferior-haskell-get-module, inferior-haskell-query-ghc-pkg)
+	(inferior-haskell-get-package-list)
+	(inferior-haskell-populate-module-alist)
+	(inferior-haskell-read-module-alist-cache)
+	(inferior-haskell-find-haddock): New functions to lookup Haddock docs.
+
+2007-06-29  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (inferior-haskell-type, inferior-haskell-info)
+	(inferior-haskell-find-definition): Add missing autoload cookies since
+	they're used in haskell-mode-map.
+
 2007-06-26  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* inf-haskell.el (inferior-haskell-error-regexp-alist):
@@ -23,7 +46,7 @@
 	(haskell-font-lock-symbols-alist): Change rule for the "." symbol to
 	use that new function, so as to check it's not a "forall <foo> .".
 	(haskell-font-lock-compose-symbol)
-	(haskell-font-lock-symbols-keywords): Adjust to understand the new syntax.
+	(haskell-font-lock-symbols-keywords): Adjust to the new syntax.
 
 2007-06-07  Stefan Monnier  <monnier@iro.umontreal.ca>
 
