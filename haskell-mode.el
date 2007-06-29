@@ -277,6 +277,7 @@ be set to the preferred literate style."
     (define-key map (kbd "C-c C-t") 'inferior-haskell-type)
     (define-key map (kbd "C-c C-i") 'inferior-haskell-info)
     (define-key map (kbd "C-c M-.") 'inferior-haskell-find-definition)
+    (define-key map (kbd "C-c C-d") 'inferior-haskell-find-haddock)
     map)
   "Keymap used in Haskell mode.")
 
