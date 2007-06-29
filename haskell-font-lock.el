@@ -131,6 +131,9 @@ and `unicode'."
 	      (cons "->" (make-char 'japanese-jisx0208 34 42))
 	      (cons "<-" (make-char 'japanese-jisx0208 34 43))
 	      (cons "=>" (make-char 'japanese-jisx0208 34 77))
+              ;; FIXME: I'd like to either use ∀ or ∃ depending on how the
+              ;; `forall' keyword is used, but currently the rest of the
+              ;; code assumes that such ambiguity doesn't happen :-(
               (cons "forall" (make-char 'japanese-jisx0208 34 79))))
    ;; Or a unicode font.
    (and (fboundp 'decode-char)

@@ -1,5 +1,7 @@
 Changes since 2.3:
 
+* Haddock comments are highlighted with font-lock-doc-face if it exists.
+
 * Use `tex' rather than `latex' for haskell-literate.
 
 * inf-haskell.el looks for a Cabal file to determine the root of a project.
