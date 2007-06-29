@@ -378,13 +378,6 @@ The returned info is cached for reuse by `haskell-doc-mode'."
 ;; * Support fetching of local Haddock docs pulled directly from source files.
 ;; * Display docs locally? w3m?
 
-(defcustom inferior-haskell-module-alist-file
-  (expand-file-name "~/.inf-haskell-module-alist")
-  "Where to save the module -> package lookup table. Set this to
-`nil' to never cache to a file."
-  :group 'haskell
-  :type '(choice (const :tag "Don't cache to file" nil) string))
-
 (defcustom inferior-haskell-use-web-docs
   'fallback
   "Whether to use the online documentation. Possible values:
@@ -422,17 +415,6 @@ By default this is set to `ghc --print-libdir`/package.conf."
   :group 'haskell
   :type 'string)
 
-(defvar inferior-haskell-module-alist nil
-  "Association list of modules to their packages. Each element is
-of the form (MODULE PACKAGE HADDOCK), where MODULE is the name of
-a module, PACKAGE is the package it belongs to, and HADDOCK is
-the path to that pacakage's Haddock documentation.
-
-This is calculated on-demand using `inferior-haskell-populate-module-alist',
-which also writes it out to a file, `inferior-haskell-module-alist-file',
-so that it can be read in quicker next time.  See the documentation of
-`inferior-haskell-populate-module-alist' for more information.")
-
 (defun inferior-haskell-get-module (sym)
   "Fetch the module in which SYM is defined."
   (let ((info (inferior-haskell-info sym)))
@@ -454,59 +436,89 @@ buffer."
     (inferior-haskell-query-ghc-pkg "--simple-output" "list")
     (split-string (buffer-substring (point-min) (point-max)))))
 
-(defun inferior-haskell-populate-module-alist ()
-  "Populate the inferior-haskell-module-alist variable by
-querying ghc-pkg, or whatever is `haskell-package-manager-name',
-for a list of packages, and then for each package the list of
-modules it exposes.  Will also write the computed alist to the
-file `inferior-haskell-module-alist-file', to save time the next
-time around, unless that variable is nil."
+(defun inferior-haskell-compute-module-alist ()
+  "Compute a list mapping modules to package names and haddock URLs using ghc-pkg."
   (message "Generating module alist...")
-  (with-temp-buffer
-    (dolist (package (inferior-haskell-get-package-list))
-      (let ((package-w/o-version
-             (replace-regexp-in-string "[-.0-9]*\\'" "" package))
-            (case-fold-search nil) ; Uppercase letters delimit modules.
-            modules-string haddock)
+  (let ((module-alist ()))
+    (with-temp-buffer
+      (dolist (package (inferior-haskell-get-package-list))
+        (erase-buffer)
         (inferior-haskell-query-ghc-pkg "describe" package)
-        
-        ;; Find the Haddock documentation URL for this package
-        (goto-char (point-min))
-        (when (re-search-forward "haddock-html:[ \t]+\\(.*[^ \t]\\)" nil t)
-          (setq haddock (match-string 1)))
 
-        ;; Fetch the list of exposed modules for this package
-        (goto-char (point-min))
-        (when (re-search-forward "^exposed-modules: " nil t)
-          (while (looking-at "[[:upper:]]\\(\\sw\\|\\.\\)+")
-            (let ((module-trim (match-string 0)))
-              (when (> (length module-trim) 0)
-                (add-to-list
-                 'inferior-haskell-module-alist
-                 (list module-trim package-w/o-version haddock))))
-            (goto-char (match-end 0))
-            (skip-chars-forward "\n \t")))
-        
-        (erase-buffer)))
-    (when inferior-haskell-module-alist-file
-      (print inferior-haskell-module-alist (current-buffer))
-      (write-file inferior-haskell-module-alist-file))
-    (message "Generating module alist... done")
-    inferior-haskell-module-alist))
+        (let ((package-w/o-version
+               (replace-regexp-in-string "[-.0-9]*\\'" "" package))
+              (case-fold-search nil)    ; Uppercase letters delimit modules.
+              ;; Find the Haddock documentation URL for this package
+              (haddock
+               (progn
+                 (goto-char (point-min))
+                 (when (re-search-forward "haddock-html:[ \t]+\\(.*[^ \t]\\)"
+                                          nil t)
+                   (match-string 1)))))
 
-(defun inferior-haskell-read-module-alist-cache ()
-  "Read the contents of `inferior-haskell-module-alist-file', if
-it is newer than ghc-pkg's package file (referenced by
-`haskell-package-conf-file'). If not, return nil."
-  (if (file-newer-than-file-p inferior-haskell-module-alist-file
-                              haskell-package-conf-file)
-      (with-temp-buffer
-        (insert-file-contents-literally inferior-haskell-module-alist-file)
-        (goto-char (point-min))
-        (let ((alist (read (current-buffer))))
-          (setq inferior-haskell-module-alist alist)
-          (message "Read module alist from file cache.")
-          alist))))
+          ;; Fetch the list of exposed modules for this package
+          (goto-char (point-min))
+          (when (re-search-forward "^exposed-modules:[ \t]+" nil t)
+            (while (looking-at "\\([[:upper:]]\\(\\sw\\|\\.\\)+\\)[ \n\t]*")
+              (push (list (match-string 1) package-w/o-version haddock)
+                    module-alist)
+              (goto-char (match-end 0))))))
+
+      (message "Generating module alist... done")
+      module-alist)))
+
+
+(defcustom inferior-haskell-module-alist-file
+  ;; (expand-file-name "~/.inf-haskell-module-alist")
+  (expand-file-name (concat "inf-haskell-module-alist-" (user-uid))
+                    temporary-file-directory)
+  "Where to save the module -> package lookup table.
+Set this to `nil' to never cache to a file."
+  :group 'haskell
+  :type '(choice (const :tag "Don't cache to file" nil) string))
+
+(defvar inferior-haskell-module-alist nil
+  "Association list of modules to their packages.
+Each element is of the form (MODULE PACKAGE HADDOCK), where
+MODULE is the name of a module,
+PACKAGE is the package it belongs to, and
+HADDOCK is the path to that package's Haddock documentation.
+
+This is calculated on-demand using `inferior-haskell-compute-module-alist'.
+It's also cached in the file `inferior-haskell-module-alist-file',
+so that it can be obtained more quickly next time.")
+
+(defun inferior-haskell-module-alist ()
+  "Get the module alist from cache or ghc-pkg's info."
+  (or
+   ;; If we already have computed the alist, use it...
+   inferior-haskell-module-alist
+   (setq inferior-haskell-module-alist
+         (or
+          ;; ...otherwise try to read it from the cache file...
+          (and
+           inferior-haskell-module-alist-file
+           (file-readable-p inferior-haskell-module-alist-file)
+           (file-newer-than-file-p inferior-haskell-module-alist-file
+                                   haskell-package-conf-file)
+           (with-temp-buffer
+             (insert-file-contents inferior-haskell-module-alist-file)
+             (goto-char (point-min))
+             (prog1 (read (current-buffer))
+               (message "Read module alist from file cache."))))
+
+          ;; ...or generate it again and save it in a file for later.
+          (let ((alist (inferior-haskell-compute-module-alist)))
+            (when inferior-haskell-module-alist-file
+              (print alist (current-buffer))
+              ;; Do the write to a temp file first, then rename it.
+              ;; This makes it more atomic, and suffers from fewer security
+              ;; holes related to race conditions if the file is in /tmp.
+              (let ((tmp (make-temp-file inferior-haskell-module-alist-file)))
+                (write-region (point-min) (point-max) tmp)
+                (rename-file tmp inferior-haskell-module-alist-file
+                             'ok-if-already-exists)))
+            alist)))))
 
 ;;;###autoload
 (defun inferior-haskell-find-haddock (sym)
@@ -529,20 +541,9 @@ we load it."
                             (format "Find documentation of (default %s): " sym)
                           "Find documentation of: ")
                         nil nil sym))))
-  (let* ((module-alist
-          (or
-           ;; If we already have computed the module → package lookup, use it...
-           inferior-haskell-module-alist
-           ;; ...otherwise read it from the cache file...
-           (and
-            inferior-haskell-module-alist-file
-            (file-exists-p inferior-haskell-module-alist-file)
-            (inferior-haskell-read-module-alist-cache))
-           ;; ...or generate it again.
-           (inferior-haskell-populate-module-alist)))
-         ;; Find the module and look it up in the alist
+  (let* (;; Find the module and look it up in the alist
          (module (inferior-haskell-get-module sym))
-         (alist-record (assoc module module-alist))
+         (alist-record (assoc module (inferior-haskell-module-alist)))
          (package (nth 1 alist-record))
          (file-name (concat (subst-char-in-string ?. ?- module) ".html"))
          (local-path (concat (nth 2 alist-record) "/" file-name))
@@ -550,7 +551,7 @@ we load it."
                       (and (not (file-exists-p local-path))
                            (eq inferior-haskell-use-web-docs 'fallback)))
                   (concat inferior-haskell-web-docs-base package "/" file-name)
-                (and (file-exists-p local-path) 
+                (and (file-exists-p local-path)
                      (concat "file://" local-path)))))
     (if url (browse-url url) (error "Local file doesn't exist."))))
 
