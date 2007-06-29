@@ -1,5 +1,8 @@
 2007-06-29  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* inf-haskell.el (inferior-haskell-compute-module-alist): Fix regexps.
+	(inferior-haskell-module-alist-file): Thinko.
+
 	* inf-haskell.el (inferior-haskell-run-command): New var.
 	(inferior-haskell-load-and-run): New command.
 
