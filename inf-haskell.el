@@ -460,22 +460,21 @@ buffer."
 
         (let ((package-w/o-version
                (replace-regexp-in-string "[-.0-9]*\\'" "" package))
-              (case-fold-search nil)    ; Uppercase letters delimit modules.
               ;; Find the Haddock documentation URL for this package
               (haddock
                (progn
                  (goto-char (point-min))
-                 (when (re-search-forward "haddock-html:[ \t]+\\(.*[^ \t]\\)"
+                 (when (re-search-forward "haddock-html:[ \t]+\\(.*[^ \t\n]\\)"
                                           nil t)
                    (match-string 1)))))
 
           ;; Fetch the list of exposed modules for this package
           (goto-char (point-min))
-          (when (re-search-forward "^exposed-modules:[ \t]+" nil t)
-            (while (looking-at "\\([[:upper:]]\\(\\sw\\|\\.\\)+\\)[ \n\t]*")
-              (push (list (match-string 1) package-w/o-version haddock)
-                    module-alist)
-              (goto-char (match-end 0))))))
+          (when (re-search-forward "^exposed-modules:\\(.*\\(\n[ \t].*\\)*\\)"
+                                   nil t)
+            (dolist (module (split-string (match-string 1)))
+              (push (list module package-w/o-version haddock)
+                    module-alist)))))
 
       (message "Generating module alist... done")
       module-alist)))
@@ -483,7 +482,8 @@ buffer."
 
 (defcustom inferior-haskell-module-alist-file
   ;; (expand-file-name "~/.inf-haskell-module-alist")
-  (expand-file-name (concat "inf-haskell-module-alist-" (user-uid))
+  (expand-file-name (concat "inf-haskell-module-alist-"
+                            (number-to-string (user-uid)))
                     temporary-file-directory)
   "Where to save the module -> package lookup table.
 Set this to `nil' to never cache to a file."
