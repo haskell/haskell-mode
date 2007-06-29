@@ -53,6 +53,10 @@ The command can include arguments."
 (defconst inferior-haskell-info-xref-re
   "\t-- Defined at \\(.+\\):\\([0-9]+\\):\\([0-9]+\\)$")
 
+(defconst inferior-haskell-module-re
+  "\t-- Defined in \\(.+\\)$"
+  "Regular expression for matching module names in :info.")
+
 (defconst inferior-haskell-error-regexp-alist
   ;; The format of error messages used by Hugs.
   `(("^ERROR \"\\(.+?\\)\"\\(:\\| line \\)\\([0-9]+\\) - " 1 3)
@@ -260,6 +264,7 @@ The process PROC should be associated to a comint buffer."
   (interactive)
   (inferior-haskell-load-file 'reload))
 
+;;;###autoload
 (defun inferior-haskell-type (expr &optional insert-value)
   "Query the haskell process for the type of the given expression.
 If optional argument `insert-value' is non-nil, insert the type above point
@@ -311,6 +316,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
         (insert type "\n"))
       type)))
 
+;;;###autoload
 (defun inferior-haskell-info (sym)
   "Query the haskell process for the info of the given expression."
   (interactive
@@ -339,6 +345,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
           (if (interactive-p) (message "%s" result))
           result)))))
 
+;;;###autoload
 (defun inferior-haskell-find-definition (sym)
   "Attempt to locate and jump to the definition of the given expression."
   (interactive
@@ -363,6 +370,189 @@ The returned info is cached for reuse by `haskell-doc-mode'."
           (when line
             (goto-line line)
             (when col (move-to-column col))))))))
+
+;;; Functions to find the documentation of a given function.
+;;
+;; TODO for this section: 
+;; 
+;; * Support fetching of local Haddock docs pulled directly from source files.
+;; * Display docs locally? w3m?
+
+(defcustom inferior-haskell-module-alist-file
+  (expand-file-name "~/.inf-haskell-module-alist")
+  "Where to save the module -> package lookup table. Set this to
+`nil' to never cache to a file."
+  :group 'haskell
+  :type '(choice (const :tag "Don't cache to file" nil) string))
+
+(defcustom inferior-haskell-use-web-docs
+  'fallback
+  "Whether to use the online documentation. Possible values:
+`never', meaning always use local documentation, unless the local
+file doesn't exist, when do nothing, `fallback', which means only
+use the online documentation when the local file doesn't exist,
+or `always', meaning always use the online documentation,
+regardless of existance of local files. Default is `fallback'."
+  :group 'haskell
+  :type '(choice (const :tag "Never" never)
+                 (const :tag "As fallback" fallback)
+                 (const :tag "Always" always)))
+
+(defcustom inferior-haskell-web-docs-base
+  "http://haskell.org/ghc/docs/latest/html/libraries/"
+  "The base URL of the online libraries documentation. This will
+only be used if the value of `inferior-haskell-use-web-docs' is
+`always' or `fallback'."
+  :group 'haskell
+  :type 'string)
+
+(defcustom haskell-package-manager-name "ghc-pkg"
+  "Name of the program to consult regarding package details."
+  :group 'haskell
+  :type 'string)
+
+(defcustom haskell-package-conf-file
+  (ignore-errors
+    (with-temp-buffer
+      (call-process "ghc" nil t nil "--print-libdir")
+      (expand-file-name "package.conf"
+                        (buffer-substring (point-min) (1- (point-max))))))
+  "Where the package configuration file for the package manager resides.
+By default this is set to `ghc --print-libdir`/package.conf."
+  :group 'haskell
+  :type 'string)
+
+(defvar inferior-haskell-module-alist nil
+  "Association list of modules to their packages. Each element is
+of the form (MODULE PACKAGE HADDOCK), where MODULE is the name of
+a module, PACKAGE is the package it belongs to, and HADDOCK is
+the path to that pacakage's Haddock documentation.
+
+This is calculated on-demand using `inferior-haskell-populate-module-alist',
+which also writes it out to a file, `inferior-haskell-module-alist-file',
+so that it can be read in quicker next time.  See the documentation of
+`inferior-haskell-populate-module-alist' for more information.")
+
+(defun inferior-haskell-get-module (sym)
+  "Fetch the module in which SYM is defined."
+  (let ((info (inferior-haskell-info sym)))
+    (unless (string-match inferior-haskell-module-re info)
+      (error 
+       "No documentation information available. Did you forget to C-c C-l?"))
+    (match-string-no-properties 1 info)))
+
+(defun inferior-haskell-query-ghc-pkg (&rest args)
+  "Send ARGS to ghc-pkg, or whatever the value of
+`haskell-package-manager' is.  Insert the output into the current
+buffer."
+  (apply 'call-process haskell-package-manager-name nil t nil args))
+
+(defun inferior-haskell-get-package-list ()
+  "Get the list of packages from ghc-pkg, or whatever
+`haskell-package-manager-name' is."
+  (with-temp-buffer
+    (inferior-haskell-query-ghc-pkg "--simple-output" "list")
+    (split-string (buffer-substring (point-min) (point-max)))))
+
+(defun inferior-haskell-populate-module-alist ()
+  "Populate the inferior-haskell-module-alist variable by
+querying ghc-pkg, or whatever is `haskell-package-manager-name',
+for a list of packages, and then for each package the list of
+modules it exposes.  Will also write the computed alist to the
+file `inferior-haskell-module-alist-file', to save time the next
+time around, unless that variable is nil."
+  (message "Generating module alist...")
+  (with-temp-buffer
+    (dolist (package (inferior-haskell-get-package-list))
+      (let ((package-w/o-version
+             (replace-regexp-in-string "[-.0-9]*\\'" "" package))
+            (case-fold-search nil) ; Uppercase letters delimit modules.
+            modules-string haddock)
+        (inferior-haskell-query-ghc-pkg "describe" package)
+        
+        ;; Find the Haddock documentation URL for this package
+        (goto-char (point-min))
+        (when (re-search-forward "haddock-html:[ \t]+\\(.*[^ \t]\\)" nil t)
+          (setq haddock (match-string 1)))
+
+        ;; Fetch the list of exposed modules for this package
+        (goto-char (point-min))
+        (when (re-search-forward "^exposed-modules: " nil t)
+          (while (looking-at "[[:upper:]]\\(\\sw\\|\\.\\)+")
+            (let ((module-trim (match-string 0)))
+              (when (> (length module-trim) 0)
+                (add-to-list
+                 'inferior-haskell-module-alist
+                 (list module-trim package-w/o-version haddock))))
+            (goto-char (match-end 0))
+            (skip-chars-forward "\n \t")))
+        
+        (erase-buffer)))
+    (when inferior-haskell-module-alist-file
+      (print inferior-haskell-module-alist (current-buffer))
+      (write-file inferior-haskell-module-alist-file))
+    (message "Generating module alist... done")
+    inferior-haskell-module-alist))
+
+(defun inferior-haskell-read-module-alist-cache ()
+  "Read the contents of `inferior-haskell-module-alist-file', if
+it is newer than ghc-pkg's package file (referenced by
+`haskell-package-conf-file'). If not, return nil."
+  (if (file-newer-than-file-p inferior-haskell-module-alist-file
+                              haskell-package-conf-file)
+      (with-temp-buffer
+        (insert-file-contents-literally inferior-haskell-module-alist-file)
+        (goto-char (point-min))
+        (let ((alist (read (current-buffer))))
+          (setq inferior-haskell-module-alist alist)
+          (message "Read module alist from file cache.")
+          alist))))
+
+;;;###autoload
+(defun inferior-haskell-find-haddock (sym)
+  "Find and open the Haddock documentation of SYM.
+Make sure to load the file into GHCi or Hugs first by using C-c C-l.
+Only works for functions in a package installed with ghc-pkg, or
+whatever the value of `haskell-package-manager-name' is.
+
+This function needs to find which package a given module belongs
+to.  In order to do this, it computes a module-to-package lookup
+alist, which is expensive to compute (it takes upwards of five
+seconds with more than about thirty installed packages).  As a
+result, we cache it across sessions using the cache file
+referenced by `inferior-haskell-module-alist-file'. We test to
+see if this is newer than `haskell-package-conf-file' every time
+we load it."
+  (interactive
+   (let ((sym (haskell-ident-at-point)))
+     (list (read-string (if (> (length sym) 0)
+                            (format "Find documentation of (default %s): " sym)
+                          "Find documentation of: ")
+                        nil nil sym))))
+  (let* ((module-alist
+          (or
+           ;; If we already have computed the module → package lookup, use it...
+           inferior-haskell-module-alist
+           ;; ...otherwise read it from the cache file...
+           (and
+            inferior-haskell-module-alist-file
+            (file-exists-p inferior-haskell-module-alist-file)
+            (inferior-haskell-read-module-alist-cache))
+           ;; ...or generate it again.
+           (inferior-haskell-populate-module-alist)))
+         ;; Find the module and look it up in the alist
+         (module (inferior-haskell-get-module sym))
+         (alist-record (assoc module module-alist))
+         (package (nth 1 alist-record))
+         (file-name (concat (subst-char-in-string ?. ?- module) ".html"))
+         (local-path (concat (nth 2 alist-record) "/" file-name))
+         (url (if (or (eq inferior-haskell-use-web-docs 'always)
+                      (and (not (file-exists-p local-path))
+                           (eq inferior-haskell-use-web-docs 'fallback)))
+                  (concat inferior-haskell-web-docs-base package "/" file-name)
+                (and (file-exists-p local-path) 
+                     (concat "file://" local-path)))))
+    (if url (browse-url url) (error "Local file doesn't exist."))))
 
 (provide 'inf-haskell)
 
