@@ -210,7 +210,7 @@ The process PROC should be associated to a comint buffer."
                   (haskell-cabal-find-file))))))
 
 ;;;###autoload
-(defun inferior-haskell-load-file (&optional reload)
+(defun inferior-haskell-load-file ()
   "Pass the current buffer's file to the inferior haskell process."
   (interactive)
   ;; Save first, so we're sure that `buffer-file-name' is non-nil afterward.
@@ -233,8 +233,7 @@ The process PROC should be associated to a comint buffer."
             (inferior-haskell-send-command
              proc (concat ":cd " default-directory)))
           (setq file (file-relative-name file)))
-	(inferior-haskell-send-command
-	 proc (if reload ":reload" (concat ":load \"" file "\"")))
+	(inferior-haskell-send-command proc (concat ":load \"" file "\""))
 	;; Move the parsing-end marker after sending the command so
 	;; that it doesn't point just to the insertion point.
 	;; Otherwise insertion may move the marker (if done with
@@ -260,7 +259,8 @@ The process PROC should be associated to a comint buffer."
         inferior-haskell-run-command
       (read-string "Command to run: " nil nil inferior-haskell-run-command))))
   (setq inferior-haskell-run-command command)
-  (inferior-haskell-load-file)          ;FIXME: Shouldn't that be reload?
+  (inferior-haskell-load-file)
+  ;; FIXME: if the load encountered errors, we should not `run'.
   (inferior-haskell-send-command (inferior-haskell-process) command))
 
 (defun inferior-haskell-send-command (proc str)
@@ -271,11 +271,6 @@ The process PROC should be associated to a comint buffer."
     (insert-before-markers str)
     (move-marker comint-last-input-end (point))
     (comint-send-string proc str)))
-
-(defun inferior-haskell-reload-file ()
-  "Tell the inferior haskell process to reread the current buffer's file."
-  (interactive)
-  (inferior-haskell-load-file 'reload))
 
 ;;;###autoload
 (defun inferior-haskell-type (expr &optional insert-value)
