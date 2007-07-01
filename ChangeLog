@@ -1,3 +1,10 @@
+2007-06-30  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-mode.el (haskell-mode-map): Remove C-c C-r binding.
+
+	* inf-haskell.el (inferior-haskell-load-file): Remove reload arg.
+	(inferior-haskell-reload-file): Remove.
+
 2007-06-29  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* inf-haskell.el (inferior-haskell-compute-module-alist): Fix regexps.

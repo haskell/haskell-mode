@@ -1,5 +1,7 @@
 Changes since 2.3:
 
+* Removed support for :reload (e.g. removed the C-c C-r binding).
+
 * C-c C-d looks up the symbol at point in the Haddock docs.
 
 * Haddock comments are highlighted with font-lock-doc-face if it exists.
