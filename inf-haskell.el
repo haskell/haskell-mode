@@ -7,7 +7,7 @@
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 2, or (at your option)
+;; the Free Software Foundation; either version 3, or (at your option)
 ;; any later version.
 
 ;; This file is distributed in the hope that it will be useful,
@@ -234,7 +234,7 @@ The process PROC should be associated to a comint buffer."
              proc (concat ":cd " default-directory)))
           (setq file (file-relative-name file)))
 	(inferior-haskell-send-command proc (concat ":load \"" file "\""))
-	;; Move the parsing-end marker after sending the command so
+	;; Move the parsing-end marker *after* sending the command so
 	;; that it doesn't point just to the insertion point.
 	;; Otherwise insertion may move the marker (if done with
 	;; insert-before-markers) and we'd then miss some errors.
@@ -244,10 +244,15 @@ The process PROC should be associated to a comint buffer."
 	      (setq compilation-parsing-end parsing-end))))
       (with-selected-window (display-buffer (current-buffer))
         (goto-char (point-max)))
-      (when inferior-haskell-wait-and-jump
-        (inferior-haskell-wait-for-prompt proc)
-        (ignore-errors                  ;Don't beep if there were no errors.
-          (next-error))))))
+      ;; Use compilation-auto-jump-to-first-error if available.
+      ;; (if (and (boundp 'compilation-auto-jump-to-first-error)
+      ;;          compilation-auto-jump-to-first-error
+      ;;          (boundp 'compilation-auto-jump-to-next))
+      ;;     (setq compilation-auto-jump-to-next t)
+        (when inferior-haskell-wait-and-jump
+          (inferior-haskell-wait-for-prompt proc)
+          (ignore-errors                  ;Don't beep if there were no errors.
+            (next-error)))))) ;; )
 
 (defvar inferior-haskell-run-command ":main")
 

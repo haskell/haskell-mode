@@ -14,7 +14,7 @@
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 2, or (at your option)
+;; the Free Software Foundation; either version 3, or (at your option)
 ;; any later version.
 ;;
 ;; This program is distributed in the hope that it will be useful,
@@ -135,6 +135,9 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.27  2007/07/30 17:36:50  monnier
+;;  (displayed-month): Remove declaration since it's not used here.
+;;
 ;;  Revision 1.26  2007/02/10 06:28:55  monnier
 ;;  (haskell-doc-get-current-word): Remove.
 ;;  Change all refs to it, to use haskell-ident-at-point instead.
