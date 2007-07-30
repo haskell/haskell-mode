@@ -1,3 +1,10 @@
+2007-07-30  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* Update license to GPLv3.
+
+	* haskell-mode.el (haskell-ident-at-point): Extend it to cover
+	all elements of a qualified name.
+
 2007-06-30  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-mode.el (haskell-mode-map): Remove C-c C-r binding.

@@ -6,7 +6,7 @@
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 2, or (at your option)
+;; the Free Software Foundation; either version 3, or (at your option)
 ;; any later version.
 
 ;; This file is distributed in the hope that it will be useful,
@@ -79,9 +79,9 @@
 (defvar haskell-cabal-buffers nil
   "List of Cabal buffers.")
 
-(defsubst* inferior-haskell-string-prefix-p (str1 str2)
-  "Return non-nil if STR1 is a prefix of STR2"
-  (eq t (compare-strings str2 nil (length str1) str1 nil nil)))
+;; (defsubst* inferior-haskell-string-prefix-p (str1 str2)
+;;   "Return non-nil if STR1 is a prefix of STR2"
+;;   (eq t (compare-strings str2 nil (length str1) str1 nil nil)))
 
 (defun haskell-cabal-find-file ()
   "Return a buffer visiting the cabal file of the current directory, or nil."

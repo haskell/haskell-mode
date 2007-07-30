@@ -16,7 +16,7 @@
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 2, or (at your option)
+;; the Free Software Foundation; either version 3, or (at your option)
 ;; any later version.
 
 ;; This file is distributed in the hope that it will be useful,
@@ -372,15 +372,40 @@ be set to the preferred literate style."
   "Syntax table used in Haskell mode.")
 
 (defun haskell-ident-at-point ()
-  "Return the identifier under point, or nil if none found."
+  "Return the identifier under point, or nil if none found.
+May return a qualified name."
   (save-excursion
-    (if (looking-at "\\s_")
-        (buffer-substring-no-properties
-         (progn (skip-syntax-backward "_") (point))
-         (progn (skip-syntax-forward "_") (point)))
-      (buffer-substring-no-properties
-       (progn (skip-syntax-backward "w'") (skip-syntax-forward "'") (point))
-       (progn (skip-syntax-forward "w'") (point))))))
+    (let ((case-fold-search nil))
+      (multiple-value-bind (start end)
+          (if (looking-at "\\s_")
+              (values (progn (skip-syntax-backward "_") (point))
+                      (progn (skip-syntax-forward "_") (point)))
+            (values
+             (progn (skip-syntax-backward "w'")
+                    (skip-syntax-forward "'") (point))
+             (progn (skip-syntax-forward "w'") (point))))
+        ;; If we're looking at a module ID that qualifies further IDs, add
+        ;; those IDs.
+        (goto-char start)
+        (while (and (looking-at "[[:upper:]]") (eq (char-after end) ?.)
+                    ;; It's a module ID that qualifies further IDs.
+                    (goto-char (1+ end))
+                    (save-excursion
+                      (when (not (zerop (skip-syntax-forward
+                                         (if (looking-at "\\s_") "_" "w'"))))
+                        (setq end (point))))))
+        ;; If we're looking at an ID that's itself qualified by previous
+        ;; module IDs, add those too.
+        (goto-char start)
+        (if (eq (char-after) ?.) (forward-char 1)) ;Special case for "."
+        (while (and (eq (char-before) ?.)
+                    (progn (forward-char -1)
+                           (not (zerop (skip-syntax-backward "w'"))))
+                    (skip-syntax-forward "'")
+                    (looking-at "[[:upper:]]"))
+          (setq start (point)))
+        ;; This is it.
+        (buffer-substring-no-properties start end)))))
 
 ;; Various mode variables.
 
