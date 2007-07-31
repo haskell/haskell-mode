@@ -323,7 +323,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
                       (remove-if (lambda (item) (equal (car item) sym))
                                  haskell-doc-user-defined-ids)))))
 
-      (if (interactive-p) (message type))
+      (if (interactive-p) (message "%s" type))
       (when insert-value
         (beginning-of-line)
         (insert type "\n"))
