@@ -1,3 +1,7 @@
+2007-07-31  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (inferior-haskell-type): Fix call to message.
+
 2007-07-30  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* Update license to GPLv3.
