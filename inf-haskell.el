@@ -25,6 +25,13 @@
 ;; The code is made of 2 parts: a major mode for the buffer that holds the
 ;; inferior process's session and a minor mode for use in source buffers.
 
+;; Todo:
+
+;; - Obey the Hs-Source-Dirs setting in the Cabal file.
+;; - If there's no Cabal file, look for a "module" line at the beginning of
+;;   the file to determine how many times to "cd .." in order to get to the
+;;   root of the project (count the number of "." in the module name).
+
 ;;; Code:
 
 (require 'comint)
