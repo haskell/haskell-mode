@@ -1,3 +1,12 @@
+2007-08-29  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-indent.el (haskell-indent-map): New var.
+	(turn-on-haskell-indent, turn-off-haskell-indent): Use it together with
+	keymap inheritance instead of inplace modifications.
+
+	* haskell-indent.el (turn-on-haskell-indent): Add alternate binding for
+	C-c C-|.  Suggested by David House <dmhouse@gmail.com>.
+
 2007-07-31  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* inf-haskell.el (inferior-haskell-type): Fix call to message.
