@@ -35,17 +35,10 @@
 ;; checking the word under the cursor and matching it against a list of
 ;; prelude, library, local and global functions.
 
-;; The preferred usage of this package is in combination with
-;; `haskell-hugs-mode'.
-;; In that case `haskell-doc-mode' checks an internal variable updated by
-;; `imenu' to access the types of all local functions.  In `haskell-mode' this
-;; is not possible.  However, types of prelude functions are still shown.
-
 ;; To show types of global functions, i.e. functions defined in a module
 ;; imported by the current module, call the function
 ;; `turn-on-haskell-doc-global-types'.  This automatically loads all modules
-;; and builds `imenu' tables to get the types of all functions (again this
-;; currently requires `haskell-hugs-mode').
+;; and builds `imenu' tables to get the types of all functions.
 ;; Note: The modules are loaded recursively, so you might pull in
 ;;       many modules by just turning on global function support.
 ;; This features is currently not very well supported.
@@ -135,6 +128,9 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.28  2007/08/30 03:10:08  monnier
+;;  Comment/docs fixes.
+;;
 ;;  Revision 1.27  2007/07/30 17:36:50  monnier
 ;;  (displayed-month): Remove declaration since it's not used here.
 ;;
@@ -372,7 +368,7 @@ functions and `haskell-doc-show-prelude' is non-nil show its type.
 
 If the identifier near point is local \(i.e. defined in this module\) check
 the `imenu' list of functions for the type. This obviously requires that
-your language mode uses `imenu' \(`haskell-hugs-mode' 0.6 for example\).
+your language mode uses `imenu'.
 
 If the identifier near point is global \(i.e. defined in an imported module\)
 and the variable `haskell-doc-show-global-types' is non-nil show the type of its
