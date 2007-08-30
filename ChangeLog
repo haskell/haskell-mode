@@ -1,5 +1,8 @@
 2007-08-29  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* haskell-mode.el (turn-on-haskell-hugs, turn-on-haskell-ghci):
+	Make people work harder to use those obsolete packages.,
+
 	* haskell-indent.el (haskell-indent-map): New var.
 	(turn-on-haskell-indent, turn-off-haskell-indent): Use it together with
 	keymap inheritance instead of inplace modifications.

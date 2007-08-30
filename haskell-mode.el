@@ -230,14 +230,8 @@
 (defun turn-on-haskell-font-lock ()
   (turn-on-font-lock)
   (message "turn-on-haskell-font-lock is obsolete.  Use turn-on-font-lock instead."))
-(defun turn-on-haskell-hugs ()
-  (message "haskell-hugs is obsolete.")
-  (load "haskell-hugs")
-  (turn-on-haskell-hugs))
-(defun turn-on-haskell-ghci ()
-  (message "haskell-ghci is obsolete.")
-  (load "haskell-ghci")
-  (turn-on-haskell-ghci))
+(defun turn-on-haskell-hugs () (message "haskell-hugs is obsolete."))
+(defun turn-on-haskell-ghci () (message "haskell-ghci is obsolete."))
 
 
 ;; Are we looking at a literate script?
