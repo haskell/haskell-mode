@@ -1,5 +1,8 @@
 2007-08-29  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* inf-haskell.el (inferior-haskell-load-file): Re-add the `reload' arg.
+	(inferior-haskell-reload-file): Re-instate the command.
+
 	* haskell-mode.el (turn-on-haskell-hugs, turn-on-haskell-ghci):
 	Make people work harder to use those obsolete packages.,
 

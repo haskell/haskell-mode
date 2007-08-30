@@ -27,6 +27,7 @@
 
 ;; Todo:
 
+;; - i-h-load-buffer and i-h-send-region.
 ;; - Obey the Hs-Source-Dirs setting in the Cabal file.
 ;; - If there's no Cabal file, look for a "module" line at the beginning of
 ;;   the file to determine how many times to "cd .." in order to get to the
@@ -217,7 +218,7 @@ The process PROC should be associated to a comint buffer."
                   (haskell-cabal-find-file))))))
 
 ;;;###autoload
-(defun inferior-haskell-load-file ()
+(defun inferior-haskell-load-file (&optional reload)
   "Pass the current buffer's file to the inferior haskell process."
   (interactive)
   ;; Save first, so we're sure that `buffer-file-name' is non-nil afterward.
@@ -240,7 +241,8 @@ The process PROC should be associated to a comint buffer."
             (inferior-haskell-send-command
              proc (concat ":cd " default-directory)))
           (setq file (file-relative-name file)))
-	(inferior-haskell-send-command proc (concat ":load \"" file "\""))
+	(inferior-haskell-send-command
+         proc (if reload ":reload" (concat ":load \"" file "\"")))
 	;; Move the parsing-end marker *after* sending the command so
 	;; that it doesn't point just to the insertion point.
 	;; Otherwise insertion may move the marker (if done with
@@ -264,7 +266,7 @@ The process PROC should be associated to a comint buffer."
 (defvar inferior-haskell-run-command ":main")
 
 (defun inferior-haskell-load-and-run (command)
-  "Pass the current buffer's file  to haskell and then run a COMMAND."
+  "Pass the current buffer's file to haskell and then run a COMMAND."
   (interactive
    (list
     (if (and inferior-haskell-run-command (not current-prefix-arg))
@@ -272,7 +274,7 @@ The process PROC should be associated to a comint buffer."
       (read-string "Command to run: " nil nil inferior-haskell-run-command))))
   (setq inferior-haskell-run-command command)
   (inferior-haskell-load-file)
-  ;; FIXME: if the load encountered errors, we should not `run'.
+  ;; FIXME: if the :load encountered errors, we should not `run'.
   (inferior-haskell-send-command (inferior-haskell-process) command))
 
 (defun inferior-haskell-send-command (proc str)
@@ -283,6 +285,11 @@ The process PROC should be associated to a comint buffer."
     (insert-before-markers str)
     (move-marker comint-last-input-end (point))
     (comint-send-string proc str)))
+
+(defun inferior-haskell-reload-file ()
+  "Tell the inferior haskell process to reread the current buffer's file."
+  (interactive)
+  (inferior-haskell-load-file 'reload))
 
 ;;;###autoload
 (defun inferior-haskell-type (expr &optional insert-value)
