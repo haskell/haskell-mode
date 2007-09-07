@@ -1,3 +1,12 @@
+2007-09-06  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (inferior-haskell-find-project-root): New var, to
+	replace inferior-haskell-use-cabal.
+	(inferior-haskell-find-project-root): New function.
+	(inferior-haskell-load-file): Use them.
+	(inferior-haskell-module-alist): Use a temp buffer so as not to write
+	out random junk before/after the actual module alist.
+
 2007-08-29  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* inf-haskell.el (inferior-haskell-load-file): Re-add the `reload' arg.
