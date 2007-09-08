@@ -1499,7 +1499,7 @@ in the current buffer.")
       ;; easier, but it's harder for the user to override it.  This approach
       ;; is the closest in behavior compared to the previous code that just
       ;; used a bunch of local-set-key.
-      (set-keymap-parent haskell-indent-map map)
+      (set-keymap-parent haskell-indent-map (current-local-map))
       ;; Protect our keymap.
       (setq map (make-sparse-keymap))
       (set-keymap-parent map haskell-indent-map)
