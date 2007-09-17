@@ -270,8 +270,9 @@ The process PROC should be associated to a comint buffer."
 
 ;;;###autoload
 (defun inferior-haskell-load-file (&optional reload)
-  "Pass the current buffer's file to the inferior haskell process."
-  (interactive)
+  "Pass the current buffer's file to the inferior haskell process.
+If prefix arg \\[universal-argument] is given, just reload the previous file."
+  (interactive "p")
   ;; Save first, so we're sure that `buffer-file-name' is non-nil afterward.
   (save-buffer)
   (let ((buf (current-buffer))

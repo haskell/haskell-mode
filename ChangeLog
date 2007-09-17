@@ -1,3 +1,7 @@
+2007-09-17  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (inferior-haskell-load-file): Do reload if prefix arg.
+
 2007-09-07  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-indent.el (turn-on-haskell-indent): Fix keymap setup code.
