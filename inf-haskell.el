@@ -229,8 +229,7 @@ The process PROC should be associated to a comint buffer."
                   ;; dir (otherwise, it may be a list of dirs and we don't
                   ;; know what to do with those).  If it doesn't exist, then
                   ;; give up.
-                  (setq hsd (expand-file-name hsd))
-                  (if (file-directory-p hsd) hsd)))))
+                  (if (file-directory-p hsd) (expand-file-name hsd))))))
           ;; If there's no Cabal file or it's not helpful, try to look for
           ;; a "module" statement and count the number of "." in the
           ;; module name.
