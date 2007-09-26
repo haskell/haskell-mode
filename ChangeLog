@@ -1,5 +1,7 @@
 2007-09-26  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* haskell-cabal.el (haskell-cabal-get-setting): New function.
+
 	* haskell-c.el: New file.
 
 2007-09-17  Stefan Monnier  <monnier@iro.umontreal.ca>
