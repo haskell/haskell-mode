@@ -220,11 +220,8 @@ The process PROC should be associated to a comint buffer."
     (let ((cabal (inferior-haskell-cabal-of-buf buf)))
       (or (when cabal
             (with-current-buffer cabal
-              (save-excursion
-                (goto-char (point-min))
-                (if (let ((case-fold-search t))
-                      (not (re-search-forward "^hs-source-dirs:[ \t]*\\(.*\\)"
-                                              nil t)))
+              (let ((hsd (haskell-cabal-get-setting "hs-source-dirs")))
+                (if (null hsd)
                     ;; If there's a Cabal file with no Hs-Source-Dirs, then
                     ;; just use the Cabal file's directory.
                     default-directory
@@ -232,8 +229,8 @@ The process PROC should be associated to a comint buffer."
                   ;; dir (otherwise, it may be a list of dirs and we don't
                   ;; know what to do with those).  If it doesn't exist, then
                   ;; give up.
-                  (let ((hsd (expand-file-name (match-string 1))))
-                    (if (file-directory-p hsd) hsd))))))
+                  (setq hsd (expand-file-name hsd))
+                  (if (file-directory-p hsd) hsd)))))
           ;; If there's no Cabal file or it's not helpful, try to look for
           ;; a "module" statement and count the number of "." in the
           ;; module name.
