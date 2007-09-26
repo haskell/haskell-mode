@@ -1,5 +1,7 @@
 Changes since 2.3:
 
+* New derived major mode for .hsc files.
+
 * Removed the C-c C-r binding to reload a file.  You can still call
   inferior-haskell-reload-file (and/or bind it to your favorite key,
   including C-c C-r) or you can now use C-u C-c C-l.
