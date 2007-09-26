@@ -129,6 +129,15 @@
   (add-hook 'change-major-mode-hook 'haskell-cabal-unregister-buffer nil 'local)
   (add-hook 'kill-buffer-hook 'haskell-cabal-unregister-buffer nil 'local))
 
+(defun haskell-cabal-get-setting (name)
+  (save-excursion
+    (let ((case-fold-search t))
+      (goto-char (point-min))
+      (when (re-search-forward
+             (concat "^" (regexp-quote name) ":[ \t]*\\(.*\\)")
+             nil t)
+        (match-string 1)))))
+
 (provide 'haskell-cabal)
 
 ;; arch-tag: d455f920-5e4d-42b6-a2c7-4a7e84a05c29
