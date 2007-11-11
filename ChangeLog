@@ -1,3 +1,7 @@
+2007-11-11  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (inferior-haskell-load-file): Typo.
+
 2007-09-26  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-cabal.el (haskell-cabal-get-setting): New function.
