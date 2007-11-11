@@ -134,9 +134,23 @@
     (let ((case-fold-search t))
       (goto-char (point-min))
       (when (re-search-forward
-             (concat "^" (regexp-quote name) ":[ \t]*\\(.*\\)")
+             (concat "^" (regexp-quote name)
+                     ":[ \t]*\\(.*\\(\n[ \t]+[ \t\n].*\\)*\\)")
              nil t)
-        (match-string 1)))))
+        (let ((val (match-string 1))
+              (start 1))
+          (when (match-end 2)             ;Multiple lines.
+            ;; The documentation is not very precise about what to do about
+            ;; the \n and the indentation: are they part of the value or
+            ;; the encoding?  I take the point of view that \n is part of
+            ;; the value (so that values can span multiple lines as well),
+            ;; and that only the first char in the indentation is part of
+            ;; the encoding, the rest is part of the value (otherwise, lines
+            ;; in the value cannot start with spaces or tabs).
+            (while (string-match "^[ \t]\\(?:\\.$\\)?" val start)
+              (setq start (1+ (match-beginning 0)))
+              (setq val (replace-match "" t t val))))
+          val)))))
 
 (provide 'haskell-cabal)
 
