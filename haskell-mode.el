@@ -274,6 +274,8 @@ be set to the preferred literate style."
     (define-key map (kbd "C-c C-i") 'inferior-haskell-info)
     (define-key map (kbd "C-c M-.") 'inferior-haskell-find-definition)
     (define-key map (kbd "C-c C-d") 'inferior-haskell-find-haddock)
+
+    (define-key [remap delete-indentation] 'haskell-delete-indentation)
     map)
   "Keymap used in Haskell mode.")
 
@@ -400,6 +402,12 @@ May return a qualified name."
           (setq start (point)))
         ;; This is it.
         (buffer-substring-no-properties start end)))))
+
+(defun haskell-delete-indentation (&optional arg)
+  "Like `delete-indentation' but ignoring Bird-stlye \">\"."
+  (interactive "*P")
+  (let ((fill-prefix (or fill-prefix (if (eq haskell-literate 'bird) ">"))))
+    (delete-indentation arg)))
 
 ;; Various mode variables.
 
