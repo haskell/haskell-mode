@@ -478,11 +478,13 @@ only be used if the value of `inferior-haskell-use-web-docs' is
   :type 'string)
 
 (defcustom haskell-package-conf-file
-  (ignore-errors
-    (with-temp-buffer
-      (call-process "ghc" nil t nil "--print-libdir")
-      (expand-file-name "package.conf"
-                        (buffer-substring (point-min) (1- (point-max))))))
+  (condition-case nil
+      (with-temp-buffer
+        (call-process "ghc" nil t nil "--print-libdir")
+        (expand-file-name "package.conf"
+                          (buffer-substring (point-min) (1- (point-max)))))
+    ;; Don't use `ignore-errors' because this form is not byte-compiled :-(
+    (error nil))
   "Where the package configuration file for the package manager resides.
 By default this is set to `ghc --print-libdir`/package.conf."
   :group 'haskell
