@@ -348,22 +348,22 @@ be set to the preferred literate style."
     
     (modify-syntax-entry ?\` "$`" table)
     (modify-syntax-entry ?\\ "\\" table)
-    (mapcar (lambda (x)
-	      (modify-syntax-entry x "_" table))
-	    ;; Some of these are actually OK by default.
-	    "!#$%&*+./:<=>?@^|~")
+    (mapc (lambda (x)
+            (modify-syntax-entry x "_" table))
+          ;; Some of these are actually OK by default.
+          "!#$%&*+./:<=>?@^|~")
     (unless (featurep 'mule)
       ;; Non-ASCII syntax should be OK, at least in Emacs.
-      (mapcar (lambda (x)
-		(modify-syntax-entry x "_" table))
-	      (concat "¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿"
-		      "×÷"))
-      (mapcar (lambda (x)
-		(modify-syntax-entry x "w" table))
-	      (concat "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ"
-		      "ØÙÚÛÜİŞß"
-		      "àáâãäåæçèéêëìíîïğñòóôõö"
-		      "øùúûüışÿ")))
+      (mapc (lambda (x)
+              (modify-syntax-entry x "_" table))
+            (concat "¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿"
+                    "×÷"))
+      (mapc (lambda (x)
+              (modify-syntax-entry x "w" table))
+            (concat "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ"
+                    "ØÙÚÛÜİŞß"
+                    "àáâãäåæçèéêëìíîïğñòóôõö"
+                    "øùúûüışÿ")))
     table)
   "Syntax table used in Haskell mode.")
 
