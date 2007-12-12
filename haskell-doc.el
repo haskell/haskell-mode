@@ -128,6 +128,10 @@
 ;;; Changelog:
 ;;  ==========
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.29  2007/12/12 04:04:19  monnier
+;;  (haskell-doc-in-code-p): New function.
+;;  (haskell-doc-show-type): Use it.
+;;
 ;;  Revision 1.28  2007/08/30 03:10:08  monnier
 ;;  Comment/docs fixes.
 ;;
@@ -1508,6 +1512,14 @@ function. Only the user interface is different."
 
 ;;@cindex haskell-doc-show-type
 
+(defun haskell-doc-in-code-p ()
+  (not (or (and (eq haskell-literate 'bird)
+                ;; Copied from haskell-indent-bolp.
+                (<= (current-column) 2)
+                (eq (char-after (line-beginning-position)) ?\>))
+           (if (fboundp 'syntax-ppss)
+               (nth 8 (syntax-ppss))))))
+
 ;;;###autoload
 (defun haskell-doc-show-type (&optional sym)
   "Show the type of the function near point.
@@ -1520,7 +1532,7 @@ current buffer."
   ;; if printed before do not print it again
   (unless (string= sym (car haskell-doc-last-data))
     (let ((doc (haskell-doc-sym-doc sym)))
-      (when doc
+      (when (and doc (haskell-doc-in-code-p))
         ;; In emacs 19.29 and later, and XEmacs 19.13 and later, all
         ;; messages are recorded in a log.  Do not put haskell-doc messages
         ;; in that log since they are legion.
