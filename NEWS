@@ -1,5 +1,7 @@
 Changes since 2.3:
 
+* Update license to GPLv3.
+
 * New derived major mode for .hsc files.
 
 * Removed the C-c C-r binding to reload a file.  You can still call
@@ -12,10 +14,12 @@ Changes since 2.3:
 
 * Use `tex' rather than `latex' for haskell-literate.
 
-* inf-haskell.el looks for a Cabal file to determine the root of a project.
-  If all works well, this will make C-c C-l automatically switch to the root
-  dir, so that dependencies in other directories are automatically found.
-  If it doesn't, complain and/or set inferior-haskell-use-cabal to nil.
+* inf-haskell.el tries to find the root of the module hierarchy to determine
+  the root of a project (either by looking for a Cabal file or relying on
+  the `module' declaration line).  If all works well, this will make C-c C-l
+  automatically switch to the root dir, so that dependencies in other
+  directories are automatically found.  If it doesn't, complain and/or set
+  inferior-haskell-find-project-root to nil.
 
 * The new command haskell-hoogle helps you query Hoogle from Emacs.
 
