@@ -49,7 +49,7 @@
 ;; mode of Moss&Thorn <http://www.haskell.org/haskell-mode/>
 ;; add this to .emacs:
 ;;
-;;    (add-hook haskell-mode-hook 'turn-on-haskell-indent)
+;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 ;;
 ;; Otherwise, call `turn-on-haskell-indent'.
 ;;
