@@ -1,3 +1,7 @@
+2007-12-11  Florian Lorenzen  <lorenzen@physik.fu-berlin.de>  (tiny change)
+
+	* haskell-mode.el (haskell-mode-map): Fix last change.
+
 2007-12-11  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-mode.el (haskell-delete-indentation): New command.
