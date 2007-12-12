@@ -1,3 +1,8 @@
+2007-12-12  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (haskell-package-conf-file): Don't use `ignore-errors'
+	because this form is not byte-compiled :-(.
+
 2007-12-11  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* Release version 2.4.
