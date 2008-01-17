@@ -1,6 +1,6 @@
 ;;; haskell-cabal.el --- Support for Cabal packages
 
-;; Copyright (C) 2007  Stefan Monnier
+;; Copyright (C) 2007, 2008  Stefan Monnier
 
 ;; Author: Stefan Monnier <monnier@iro.umontreal.ca>
 
@@ -21,7 +21,11 @@
 
 ;;; Commentary:
 
-;; 
+;; Todo:
+
+;; - distinguish continued lines from indented lines.
+;; - indent-line-function.
+;; - outline-minor-mode.
 
 ;;; Code:
 
@@ -68,13 +72,25 @@
 
 (defvar haskell-cabal-mode-syntax-table
   (let ((st (make-syntax-table)))
+    ;; The comment syntax can't be described simply in syntax-table.
+    ;; We could use font-lock-syntactic-keywords, but is it worth it?
+    ;; (modify-syntax-entry ?-  ". 12" st)
+    (modify-syntax-entry ?\n ">" st)
     st))
 
 (defvar haskell-cabal-font-lock-keywords
-  ;; The comment syntax can't be described simply in syntax-table.  We could
-  ;; use font-lock-syntactic-keywords, but is it worth it?
-  '(("^--.*" . font-lock-comment-face)
-    ("^\\([^ :]+\\):" (1 font-lock-keyword-face))))
+  ;; The comment syntax can't be described simply in syntax-table.
+  ;; We could use font-lock-syntactic-keywords, but is it worth it?
+  '(("^[ \t]*--.*" . font-lock-comment-face)
+    ("^ *\\([^ \t:]+\\):" (1 font-lock-keyword-face))
+    ("^\\(Library\\)[ \t]*\\({\\|$\\)" (1 font-lock-keyword-face))
+    ("^\\(Executable\\)[ \t]+\\([^\n \t]*\\)"
+     (1 font-lock-keyword-face) (2 font-lock-function-name-face))
+    ("^\\(Flag\\)[ \t]+\\([^\n \t]*\\)"
+     (1 font-lock-keyword-face) (2 font-lock-constant-face))
+    ("^ *\\(if\\)[ \t]+.*\\({\\|$\\)" (1 font-lock-keyword-face))
+    ("^ *\\(}[ \t]*\\)?\\(else\\)[ \t]*\\({\\|$\\)"
+     (2 font-lock-keyword-face))))
 
 (defvar haskell-cabal-buffers nil
   "List of Cabal buffers.")
@@ -127,7 +143,12 @@
        '(haskell-cabal-font-lock-keywords t t nil nil))
   (add-to-list 'haskell-cabal-buffers (current-buffer))
   (add-hook 'change-major-mode-hook 'haskell-cabal-unregister-buffer nil 'local)
-  (add-hook 'kill-buffer-hook 'haskell-cabal-unregister-buffer nil 'local))
+  (add-hook 'kill-buffer-hook 'haskell-cabal-unregister-buffer nil 'local)
+  (set (make-local-variable 'comment-start) "-- ")
+  (set (make-local-variable 'comment-start-skip) "\\(^[ \t]*\\)--[ \t]*")
+  (set (make-local-variable 'comment-end) "")
+  (set (make-local-variable 'comment-end-skip) "[ 	]*\\(\\s>\\|\n\\)")
+)
 
 (defun haskell-cabal-get-setting (name)
   (save-excursion
