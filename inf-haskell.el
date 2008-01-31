@@ -1,6 +1,6 @@
 ;;; inf-haskell.el --- Interaction with an inferior Haskell process.
 
-;; Copyright (C) 2004, 2005, 2006, 2007  Free Software Foundation, Inc.
+;; Copyright (C) 2004, 2005, 2006, 2007, 2008  Free Software Foundation, Inc.
 
 ;; Author: Stefan Monnier <monnier@iro.umontreal.ca>
 ;; Keywords: Haskell
@@ -211,7 +211,9 @@ The process PROC should be associated to a comint buffer."
   (require 'haskell-cabal)
   (with-current-buffer buf
     (or inferior-haskell-cabal-buffer
-        (and (not (local-variable-p 'inferior-haskell-cabal-buffer))
+        (and (not (local-variable-p 'inferior-haskell-cabal-buffer
+                                    ;; XEmacs needs this argument.
+                                    (curent-buffer)))
              (set (make-local-variable 'inferior-haskell-cabal-buffer)
                   (haskell-cabal-find-file))))))
 
@@ -546,7 +548,9 @@ buffer."
   ;; (expand-file-name "~/.inf-haskell-module-alist")
   (expand-file-name (concat "inf-haskell-module-alist-"
                             (number-to-string (user-uid)))
-                    temporary-file-directory)
+                    (if (fboundp 'temp-directory)
+                        (temp-directory)
+                      temporary-file-directory))
   "Where to save the module -> package lookup table.
 Set this to `nil' to never cache to a file."
   :group 'haskell
