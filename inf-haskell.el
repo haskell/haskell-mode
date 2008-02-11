@@ -196,14 +196,17 @@ setting up the inferior-haskell buffer."
   :type 'boolean
   :group 'haskell)
 
-(defun inferior-haskell-wait-for-prompt (proc)
+(defun inferior-haskell-wait-for-prompt (proc &optional timeout)
   "Wait until PROC sends us a prompt.
 The process PROC should be associated to a comint buffer."
   (with-current-buffer (process-buffer proc)
-    (while (progn
-             (goto-char comint-last-input-end)
-             (and (not (re-search-forward comint-prompt-regexp nil t))
-                  (accept-process-output proc))))))
+    (let ((found nil))
+      (while (progn
+               (goto-char comint-last-input-end)
+               (and (not (setq found
+                               (re-search-forward comint-prompt-regexp nil t)))
+                    (accept-process-output proc timeout))))
+      (unless found (error "Can't find the prompt.")))))
 
 (defvar inferior-haskell-cabal-buffer nil)
 
@@ -438,6 +441,9 @@ The returned info is cached for reuse by `haskell-doc-mode'."
             (col (string-to-number
                   (match-string-no-properties 3 info))))
         (when file
+          (with-current-buffer (process-buffer (inferior-haskell-process))
+            ;; The file name is relative to the process's cwd.
+            (setq file (expand-file-name file)))
           ;; Push current location marker on the ring used by `find-tag'
           (require 'etags)
           (ring-insert find-tag-marker-ring (point-marker))
