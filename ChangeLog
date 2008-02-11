@@ -1,3 +1,8 @@
+2008-02-11  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (inferior-haskell-wait-for-prompt): Add timeout arg.
+	(inferior-haskell-find-definition): Expand file name in the right cwd.
+
 2008-01-30  Greg Steuck  <greg@nest.cx>  (tiny change)
 
 	* inf-haskell.el (inferior-haskell-cabal-of-buf)
