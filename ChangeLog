@@ -1,3 +1,8 @@
+2008-02-18  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (inferior-haskell-cabal-of-buf): Fix typo.
+	Reported by Bas van Dijk <v.dijk.bas@gmail.com>.
+
 2008-02-11  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* inf-haskell.el (inferior-haskell-wait-for-prompt): Add timeout arg.
