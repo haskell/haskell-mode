@@ -216,7 +216,7 @@ The process PROC should be associated to a comint buffer."
     (or inferior-haskell-cabal-buffer
         (and (not (local-variable-p 'inferior-haskell-cabal-buffer
                                     ;; XEmacs needs this argument.
-                                    (curent-buffer)))
+                                    (current-buffer)))
              (set (make-local-variable 'inferior-haskell-cabal-buffer)
                   (haskell-cabal-find-file))))))
 
