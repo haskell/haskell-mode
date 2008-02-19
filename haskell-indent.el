@@ -1,6 +1,6 @@
 ;;; haskell-indent.el --- "semi-intelligent" indentation module for Haskell Mode
 
-;; Copyright 2004, 2005, 2007  Free Software Foundation, Inc.
+;; Copyright 2004, 2005, 2007, 2008  Free Software Foundation, Inc.
 ;; Copyright 1997-1998  Guy Lapalme
 
 ;; Author: 1997-1998 Guy Lapalme <lapalme@iro.umontreal.ca>
@@ -433,6 +433,11 @@ Returns the location of the start of the comment, nil otherwise."
        (forward-sexp 1)
        (haskell-indent-skip-blanks-and-newlines-forward end))))
 
+(defun haskell-indent-next-symbol-safe (end)
+  "Puts point to the next following symbol, or to end if there are no more symbols in the sexp."
+  (condition-case errlist (haskell-indent-next-symbol end)
+      (error (goto-char end))))
+
 (defun haskell-indent-separate-valdef (start end)
   "Returns a list of positions for important parts of a valdef."
   (save-excursion
@@ -452,13 +457,13 @@ Returns the location of the start of the comment, nil otherwise."
                   (goto-char (match-end 0)))
               (skip-chars-forward " \t" end)
               (setq valname (point))    ; type = other
-              (haskell-indent-next-symbol end))
+              (haskell-indent-next-symbol-safe end))
             (while (and (< (point) end)
                         (setq type (haskell-indent-type-at-point))
                         (or (memq type '(ident other))))
               (if (null aft-valname)
                   (setq aft-valname (point)))
-              (haskell-indent-next-symbol end))))
+              (haskell-indent-next-symbol-safe end))))
       (if (and (< (point) end) (eq type 'guard)) ; start of a guard
           (progn
             (setq guard (match-beginning 0))
@@ -468,7 +473,7 @@ Returns the location of the start of the comment, nil otherwise."
                         (not (eq type 'rhs)))
               (if (null aft-guard)
                   (setq aft-guard (point)))
-              (haskell-indent-next-symbol end))))
+              (haskell-indent-next-symbol-safe end))))
       (if (and (< (point) end) (eq type 'rhs)) ; start of a rhs
           (progn
             (setq rhs-sign (match-beginning 0))
