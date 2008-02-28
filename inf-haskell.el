@@ -656,7 +656,9 @@ we load it."
          (url (if (or (eq inferior-haskell-use-web-docs 'always)
                       (and (not (file-exists-p local-path))
                            (eq inferior-haskell-use-web-docs 'fallback)))
-                  (concat inferior-haskell-web-docs-base package "/" file-name)
+                  (concat inferior-haskell-web-docs-base package "/" file-name
+                          ;; Jump to the symbol anchor within Haddock.
+                          "#v:" sym)
                 (and (file-exists-p local-path)
                      (concat "file://" local-path)))))
     (if url (browse-url url) (error "Local file doesn't exist."))))
