@@ -54,6 +54,27 @@ The other modules are automatically loaded when needed in the following way:
 - Interaction with inferior Haskell interpreter: just hit C-c C-z  or  C-c C-l.
 
 
+Setup
+-----
+
+Normally, inf-haskell automatically finds ghci or hugs in your PATH, but if
+that's not the case (common under Windows), or if you need to specify your
+preference, just tell Emacs which executable to use with:
+
+   (setq haskell-program-name "/some/where/ghci.exe")
+
+If you want to use different settings when you use Cygwin Emacs and NTEmacs,
+you can test the value of `system-type':
+
+   (setq haskell-program-name
+         (if (eq system-type 'cygwin)
+             "/cygdrive/c/ghc/ghc-6.8.1/bin/ghcii.sh"
+           "c:/ghc/ghc-6.8.1/bin/ghci.exe"))
+
+Note that Cygwin binaries tend to interact poorly with NTEmacs, especially
+w.r.t signal-handling.
+
+
 Customization
 -------------
 
