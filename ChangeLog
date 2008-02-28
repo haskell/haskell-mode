@@ -1,5 +1,8 @@
 2008-02-28  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* haskell-indent.el (haskell-indent-region): New dummy function.
+	(turn-on-haskell-indent): Use it to be more honest.
+
 	* haskell-mode.el (literate-haskell-mode): Fix up mode line.
 	Disable fill-comment-paragraph in Bird style.
 
