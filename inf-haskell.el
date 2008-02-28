@@ -38,6 +38,26 @@
 (require 'haskell-mode)
 (eval-when-compile (require 'cl))
 
+;; XEmacs compatibility.
+
+(unless (fboundp 'subst-char-in-string)
+  (defun subst-char-in-string (fromchar tochar string &optional inplace)
+    ;; This is Haskell-mode, we don't want no stinkin' `aset'.
+    (apply 'string (mapcar (lambda (c) (if (eq c fromchar) tochar c)) string))))
+
+(unless (fboundp 'make-temp-file)
+  (defun make-temp-file (prefix &optional dir-flag)
+    (catch 'done
+      (while t
+        (let ((f (make-temp-name (expand-file-name prefix (temp-directory)))))
+          (condition-case ()
+              (progn
+                (if dir-flag (make-directory f)
+                  (write-region "" nil f nil 'silent nil))
+                (throw 'done f))
+            (file-already-exists t)))))))
+    
+
 ;; Here I depart from the inferior-haskell- prefix.
 ;; Not sure if it's a good idea.
 (defcustom haskell-program-name
