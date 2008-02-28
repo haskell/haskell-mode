@@ -1,3 +1,7 @@
+2008-02-28  Kristof Bastiaensen  <kristof@vleeuwen.org>
+
+	* haskell-indentation.el: New file.
+
 2008-02-28  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-indent.el (haskell-indent-region): New dummy function.
