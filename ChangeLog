@@ -1,3 +1,8 @@
+2008-02-28  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (subst-char-in-string, make-temp-file):
+	Add fallback definitions for XEmacs-21.4.
+
 2008-02-28  Greg Steuck  <greg@nest.cx>  (tiny change)
 
 	* inf-haskell.el (inferior-haskell-find-haddock): Jump to the symbol
