@@ -1,6 +1,6 @@
 ;;; haskell-mode.el --- A Haskell editing mode    -*-coding: iso-8859-1;-*-
 
-;; Copyright (C) 2003, 2004, 2005, 2006, 2007  Free Software Foundation, Inc
+;; Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008  Free Software Foundation, Inc
 ;; Copyright (C) 1992, 1997-1998 Simon Marlow, Graeme E Moss, and Tommy Thorn
 
 ;; Authors: 1992      Simon Marlow
@@ -494,7 +494,13 @@ Invokes `haskell-mode-hook'."
            ((re-search-forward "^\\\\\\(begin\\|end\\){code}$" nil t) 'tex)
            ((re-search-forward "^>" nil t) 'bird)
            (t haskell-literate-default))))
-  (set (make-local-variable 'mode-line-process) '("/" haskell-literate)))
+  (if (eq haskell-literate 'bird)
+      ;; fill-comment-paragraph isn't much use there, and even gets confused
+      ;; by the syntax-table text-properties we add to mark the first char
+      ;; of each line as a comment-starter.
+      (set (make-local-variable 'fill-paragraph-handle-comment) nil))
+  (set (make-local-variable 'mode-line-process)
+       '("/" (:eval (symbol-name haskell-literate)))))
 
 ;;;###autoload(add-to-list 'auto-mode-alist '("\\.\\(?:[gh]s\\|hi\\)\\'" . haskell-mode))
 ;;;###autoload(add-to-list 'auto-mode-alist '("\\.l[gh]s\\'" . literate-haskell-mode))
