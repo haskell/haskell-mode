@@ -1276,6 +1276,9 @@ We stay in the cycle as long as the TAB key is pressed."
 	(if marker
 	    (goto-char (marker-position marker)))))))
 
+(defun haskell-indent-region (start end)
+  (error "Auto-reindentation of a region is not supported"))
+
 ;;; alignment functions
 
 (defun haskell-indent-shift-columns (dest-column region-stack)
@@ -1491,6 +1494,7 @@ in the current buffer.")
 (defun turn-on-haskell-indent ()
   "Turn on ``intelligent'' haskell indentation mode."
   (set (make-local-variable 'indent-line-function) 'haskell-indent-cycle)
+  (set (make-local-variable 'indent-region-function) 'haskell-indent-region)
   (setq haskell-indent-mode t)
   ;; Activate our keymap.
   (let ((map (current-local-map)))
@@ -1551,12 +1555,6 @@ these functions also align the guards and rhs of the current definition
       aligns the guards and rhs of the region
     \\[haskell-indent-put-region-in-literate]
       makes the region a piece of literate code in a literate script
-
-Note: \\[indent-region] which applies \\[haskell-indent-cycle] for each line
-of the region also works but it stops and asks for any line having more
-than one possible indentation.
-Use TAB to cycle until the right indentation is found and then RET to go the
-next line to indent.
 
 Invokes `haskell-indent-hook' if not nil."
   (interactive "P")
