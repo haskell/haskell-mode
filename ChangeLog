@@ -1,5 +1,8 @@
 2008-02-28  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* haskell-mode.el (literate-haskell-mode): Fix up mode line.
+	Disable fill-comment-paragraph in Bird style.
+
 	* inf-haskell.el (subst-char-in-string, make-temp-file):
 	Add fallback definitions for XEmacs-21.4.
 
