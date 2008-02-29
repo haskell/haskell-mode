@@ -1,3 +1,10 @@
+2008-02-28  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-indentation.el: Fix up general coding convention stuff.
+	(haskell-indentation-mode): Use define-minor-mode.
+	(turn-on-haskell-indentation, turn-off-haskell-indentation):
+	Remove, fold into haskell-indentation-mode.
+
 2008-02-28  Kristof Bastiaensen  <kristof@vleeuwen.org>
 
 	* haskell-indentation.el: New file.

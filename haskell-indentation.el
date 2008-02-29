@@ -4,11 +4,11 @@
 
 ;; Author: 2008 Kristof Bastiaensen <kristof.bastiaensen@vleeuwen.org>
 
-;;; This file is not part of GNU Emacs.
+;; This file is not part of GNU Emacs.
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 2, or (at your option)
+;; the Free Software Foundation; either version 3, or (at your option)
 ;; any later version.
 
 ;; This file is distributed in the hope that it will be useful,
@@ -21,6 +21,8 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
+;;; Commentary:
+
 ;; Installation:
 ;;
 ;; To turn indentation on for all Haskell buffers under Haskell mode
@@ -30,6 +32,8 @@
 ;;
 ;; Otherwise, call `haskell-indentation-mode'.
 ;;
+
+;;; Code:
 
 (defgroup haskell-indentation nil
   "Haskell indentation."
@@ -67,39 +71,25 @@
     (define-key keymap [?\C-d] 'haskell-indentation-delete-char)
     keymap))
 
-(defun turn-on-haskell-indentation ()
-  "Turn on haskell indentation mode."
-  (set (make-local-variable 'indent-line-function) 'haskell-indent-line)
-  (set (make-local-variable 'normal-auto-fill-function) 'haskell-indentation-auto-fill-function)
-  (set (make-local-variable 'haskell-indentation-mode) t)
-  (run-hooks 'haskell-indentation-hook)
-  (add-to-list 'minor-mode-alist '(haskell-indentation-mode " Ind"))
-  (add-to-list 'minor-mode-map-alist (cons 'haskell-indentation-mode haskell-indentation-mode-map)))
-
-(defun turn-off-haskell-indentation ()
-  "Turn on haskell indentation mode."
-  (kill-local-variable 'indent-line-function)
-  (kill-local-variable 'normal-auto-fill-function)
-  (setq haskell-indentation-mode nil))
-
-(defun haskell-indentation-mode (&optional arg)
+;;;###autoload
+(define-minor-mode haskell-indentation-mode
   "Haskell indentation mode that deals with the layout rule.
 It rebinds RET, DEL and BACKSPACE, so that indentations can be
 set and deleted as if they were real tabs.  It supports
-autofill-mode.
-
-Invokes `haskell-indentation-hook' if not nil."
-  (interactive "P")
-  (setq haskell-indentation-mode
-        (if (null arg) (not haskell-indentation-mode)
-          (> (prefix-numeric-value arg) 0)))
-  (if haskell-indentation-mode
-      (turn-on-haskell-indentation)
-    (turn-off-haskell-indentation)))
+autofill-mode."
+  :lighter " Ind"
+  :keymap haskell-indentation-mode-map
+  (kill-local-variable 'indent-line-function)
+  (kill-local-variable 'normal-auto-fill-function)
+  (when haskell-indentation-mode
+    (set (make-local-variable 'indent-line-function)
+         'haskell-indentation-indent-line)
+    (set (make-local-variable 'normal-auto-fill-function)
+         'haskell-indentation-auto-fill-function)))
 
 (defun kill-indented-line (&optional arg)
-  "kill-line for indented text.
-preserves indentation and removes extra whitespace"
+  "`kill-line' for indented text.
+Preserves indentation and removes extra whitespace"
   (interactive "P")
   (let ((col (current-column))
 	(old-point (point)))
@@ -183,7 +173,7 @@ preserves indentation and removes extra whitespace"
   (car indentations))
 
 (defun haskell-indentation-next-indentation (col indentations)
-  "Find the lefmost indentation which is greater than col"
+  "Find the lefmost indentation which is greater than COL."
   (catch 'return
     (while indentations
       (if (or (< col (car indentations))
@@ -193,7 +183,7 @@ preserves indentation and removes extra whitespace"
     col))
 
 (defun haskell-indentation-previous-indentation (col indentations)
-  "Find the rightmost indentation which is less than col"
+  "Find the rightmost indentation which is less than COL."
   (and indentations
        (> col (car indentations))
        (catch 'return
@@ -205,8 +195,7 @@ preserves indentation and removes extra whitespace"
 	 col)))
 
 (defun haskell-indentation-matching-indentation (col indentations)
-  "Find the leftmost indentation which is greater than or
-equal to col"
+  "Find the leftmost indentation which is greater than or equal to COL."
   (catch 'return
     (while indentations
       (if (or (<= col (car indentations))
@@ -215,8 +204,7 @@ equal to col"
 	(setq indentations (cdr indentations))))
     col))
 
-(defun haskell-indent-line ()
-  (interactive)
+(defun haskell-indentation-indent-line ()
   (when (save-excursion
 	  (beginning-of-line)
 	  (not (nth 8 (syntax-ppss))))
@@ -288,6 +276,17 @@ equal to col"
 	(throw 'return nil))))
   (when (bobp)
     (forward-comment (buffer-size))))
+
+;; Dynamically scoped variables.
+(defvar following-token)
+(defvar current-token)
+(defvar left-indent)
+(defvar starter-indent)
+(defvar current-indent)
+(defvar layout-indent)
+(defvar parse-line-number)
+(defvar possible-indentations)
+(defvar indentation-point)
 
 (defun haskell-indentation-parse-to-indentations ()
   (save-excursion
@@ -482,14 +481,13 @@ equal to col"
 	))
 
 (defun haskell-indentation-statement-right (parser)
-  (let ((start-column (current-column)))
-    (haskell-indentation-read-next-token)
-    (when (equal current-token 'end-tokens)
-      (haskell-indentation-add-indentation
-       (+ left-indent haskell-indentation-left-offset))
-      (throw 'parse-end nil))
-    (let ((current-indent (current-column)))
-      (funcall parser))))
+  (haskell-indentation-read-next-token)
+  (when (equal current-token 'end-tokens)
+    (haskell-indentation-add-indentation
+     (+ left-indent haskell-indentation-left-offset))
+    (throw 'parse-end nil))
+  (let ((current-indent (current-column)))
+    (funcall parser)))
 
 (defun haskell-indentation-simple-declaration ()
   (haskell-indentation-expression)
@@ -747,3 +745,6 @@ equal to col"
     ;; otherwise skip until space found
     (skip-syntax-forward "^-"))
   (forward-comment (buffer-size)))
+
+(provide 'haskell-indentation)
+;;; haskell-indentation.el ends here
