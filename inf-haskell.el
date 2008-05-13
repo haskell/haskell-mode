@@ -125,6 +125,7 @@ This will either look for a Cabal file or a \"module\" statement in the file."
   (set (make-local-variable 'comint-prompt-regexp)
        "^\\*?[A-Z][\\._a-zA-Z0-9]*\\( \\*?[A-Z][\\._a-zA-Z0-9]*\\)*> ")
   (set (make-local-variable 'comint-input-autoexpand) nil)
+  (add-hook 'comint-output-filter-functions 'inferior-haskell-spot-prompt nil t)
 
   ;; Setup directory tracking.
   (set (make-local-variable 'shell-cd-regexp) ":cd")
@@ -216,17 +217,30 @@ setting up the inferior-haskell buffer."
   :type 'boolean
   :group 'haskell)
 
+(defvar inferior-haskell-seen-prompt nil)
+(make-variable-buffer-local 'inferior-haskell-seen-prompt)
+
+(defun inferior-haskell-spot-prompt (string)
+  (let ((proc (get-buffer-process (current-buffer))))
+    (when proc
+      (save-excursion
+        (goto-char (process-mark proc))
+        (if (re-search-backward comint-prompt-regexp
+                                (line-beginning-position) t)
+            (setq inferior-haskell-seen-prompt t))))))
+
 (defun inferior-haskell-wait-for-prompt (proc &optional timeout)
   "Wait until PROC sends us a prompt.
 The process PROC should be associated to a comint buffer."
   (with-current-buffer (process-buffer proc)
-    (let ((found nil))
-      (while (progn
-               (goto-char comint-last-input-end)
-               (and (not (setq found
-                               (re-search-forward comint-prompt-regexp nil t)))
-                    (accept-process-output proc timeout))))
-      (unless found (error "Can't find the prompt.")))))
+    (while (progn
+             (goto-char comint-last-input-end)
+             (not (or inferior-haskell-seen-prompt
+                      (setq inferior-haskell-seen-prompt
+                            (re-search-forward comint-prompt-regexp nil t))
+                      (not (accept-process-output proc timeout))))))
+    (unless inferior-haskell-seen-prompt
+      (error "Can't find the prompt."))))
 
 (defvar inferior-haskell-cabal-buffer nil)
 
@@ -355,6 +369,7 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
     (goto-char (process-mark proc))
     (insert-before-markers str)
     (move-marker comint-last-input-end (point))
+    (setq inferior-haskell-seen-prompt nil)
     (comint-send-string proc str)))
 
 (defun inferior-haskell-reload-file ()
@@ -405,8 +420,8 @@ The returned info is cached for reuse by `haskell-doc-mode'."
         (let ((sym (match-string 1 type)))
           (setq haskell-doc-user-defined-ids
                 (cons (cons sym (substring type (match-end 0)))
-                      (remove-if (lambda (item) (equal (car item) sym))
-                                 haskell-doc-user-defined-ids)))))
+                      (delq (assoc sym haskell-doc-user-defined-ids)
+                            haskell-doc-user-defined-ids)))))
 
       (if (interactive-p) (message "%s" type))
       (when insert-value
