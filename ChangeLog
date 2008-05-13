@@ -1,3 +1,10 @@
+2008-05-12  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (inferior-haskell-info-xref-re): Allow a column-range.
+	Reported by Jose A. Ortega Ruiz <jao@google.com>.
+	(inferior-haskell-error-regexp-alist): Use the extra column-end info
+	if available.
+
 2008-02-28  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-indentation.el: Fix up general coding convention stuff.
