@@ -1,5 +1,12 @@
 2008-05-12  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* inf-haskell.el (inferior-haskell-spot-prompt): New function.
+	(inferior-haskell-mode): Use it.
+	(inferior-haskell-seen-prompt): New var.
+	(inferior-haskell-wait-for-prompt): Use it.
+	(inferior-haskell-send-command): Reset it.
+	(inferior-haskell-type): Avoid use of remove-it.
+
 	* inf-haskell.el (inferior-haskell-info-xref-re): Allow a column-range.
 	Reported by Jose A. Ortega Ruiz <jao@google.com>.
 	(inferior-haskell-error-regexp-alist): Use the extra column-end info
