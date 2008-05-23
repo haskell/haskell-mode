@@ -114,7 +114,10 @@
           files)
       (while (and root (equal user (nth 2 (file-attributes root))))
         (if (setq files (directory-files root 'full "\\.cabal\\'"))
-            (throw 'found (find-file-noselect (car files)))
+            ;; Avoid the .cabal directory.
+            (dolist (file files (throw 'found nil))
+              (unless (file-directory-p file)
+                (throw 'found (find-file-noselect file))))
           (if (equal root
                      (setq root (file-name-directory
                                  (directory-file-name root))))
