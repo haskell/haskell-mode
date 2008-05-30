@@ -1484,7 +1484,8 @@ in the current buffer.")
     (define-key map [?\C-c ?\C-=] 'haskell-indent-insert-equal)
     (define-key map [?\C-c ?\C-|] 'haskell-indent-insert-guard)
     ;; Alternate binding, in case C-c C-| is too inconvenient to type.
-    (define-key map [?\C-c ?\C-g] 'haskell-indent-insert-guard)
+    ;; Duh, C-g is a special key, let's not use it here.
+    ;; (define-key map [?\C-c ?\C-g] 'haskell-indent-insert-guard)
     (define-key map [?\C-c ?\C-o] 'haskell-indent-insert-otherwise)
     (define-key map [?\C-c ?\C-w] 'haskell-indent-insert-where)
     (define-key map [?\C-c ?\C-.] 'haskell-indent-align-guards-and-rhs)
