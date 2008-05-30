@@ -1,3 +1,8 @@
+2008-05-30  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* haskell-indent.el (haskell-indent-map): Disable C-c C-g binding since
+	C-g is a special key not to be used like that.
+
 2008-05-23  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-cabal.el (haskell-cabal-find-file): Ignore directories.
