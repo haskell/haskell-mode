@@ -1,5 +1,8 @@
 2008-05-30  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* haskell-font-lock.el (haskell-font-lock-symbols-alist): Change the
+	character used for the composition operator.
+
 	* haskell-indent.el (haskell-indent-map): Disable C-c C-g binding since
 	C-g is a special key not to be used like that.
 
