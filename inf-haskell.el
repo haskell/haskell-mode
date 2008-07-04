@@ -57,6 +57,9 @@
                 (throw 'done f))
             (file-already-exists t)))))))
 
+(unless (fboundp 'replace-regexp-in-string)
+  (defun replace-regexp-in-string (regexp rep string)
+    (replace-in-string string regexp rep)))
 
 ;; Here I depart from the inferior-haskell- prefix.
 ;; Not sure if it's a good idea.
@@ -247,7 +250,8 @@ The process PROC should be associated to a comint buffer."
 (defun inferior-haskell-cabal-of-buf (buf)
   (require 'haskell-cabal)
   (with-current-buffer buf
-    (or inferior-haskell-cabal-buffer
+    (or (and (buffer-live-p inferior-haskell-cabal-buffer)
+             inferior-haskell-cabal-buffer)
         (and (not (local-variable-p 'inferior-haskell-cabal-buffer
                                     ;; XEmacs needs this argument.
                                     (current-buffer)))
