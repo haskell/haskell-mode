@@ -1,3 +1,9 @@
+2008-07-04  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* inf-haskell.el (inferior-haskell-cabal-of-buf): Don't return
+	a dead buffer.  Reported by Conal Elliott <conal@conal.net>.
+	(replace-regexp-in-string): Add XEmacs compatibility.
+
 2008-05-30  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* haskell-font-lock.el (haskell-font-lock-symbols-alist): Change the
