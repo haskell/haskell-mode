@@ -1,5 +1,8 @@
 2008-07-04  Stefan Monnier  <monnier@iro.umontreal.ca>
 
+	* inf-haskell.el (inferior-haskell-load-and-run): Don't run if there
+	were compilation errors.  Switch to inf-haskell buffer after run.
+
 	* inf-haskell.el (inferior-haskell-cabal-of-buf): Don't return
 	a dead buffer.  Reported by Conal Elliott <conal@conal.net>.
 	(replace-regexp-in-string): Add XEmacs compatibility.

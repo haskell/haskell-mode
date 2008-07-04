@@ -362,9 +362,16 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
         inferior-haskell-run-command
       (read-string "Command to run: " nil nil inferior-haskell-run-command))))
   (setq inferior-haskell-run-command command)
-  (inferior-haskell-load-file)
-  ;; FIXME: if the :load encountered errors, we should not `run'.
-  (inferior-haskell-send-command (inferior-haskell-process) command))
+  (let* ((inferior-haskell-errors nil)
+         (neh (lambda () (setq inferior-haskell-errors t))))
+    (unwind-protect
+        (let ((inferior-haskell-wait-and-jump t))
+          (add-hook 'next-error-hook neh)
+          (inferior-haskell-load-file))
+      (remove-hook 'next-error-hook neh))
+    (unless inferior-haskell-errors
+      (inferior-haskell-send-command (inferior-haskell-process) command)
+      (switch-to-haskell))))
 
 (defun inferior-haskell-send-command (proc str)
   (setq str (concat str "\n"))
