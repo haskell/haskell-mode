@@ -34,10 +34,11 @@ Otherwise:
   adding the following lines according to which modules you want to use:
 
     (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-    (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+    ;;(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
     ;;(add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
 
-  Note that the two indentation modules are mutually exclusive - add at
+  Note that the three indentation modules are mutually exclusive - add at
   most one.  Note that the line of code for simple indentation is commented
   out (using a preceeding ;) in preference for the more advanced
   indentation module.  Installation is now complete!
@@ -96,7 +97,7 @@ add (require 'goto-addr) in your .emacs.
 Support
 -------
 
-Any problems, do mail me <monnier@iro.umontreal.ca> and I will try my best
+Any problems, do mail me <svein.ove@aas.no> and I will try my best
 to help you!
 
 

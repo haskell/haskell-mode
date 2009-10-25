@@ -46,6 +46,9 @@
 ;; `haskell-doc', Hans-Wolfgang Loidl
 ;;   Echoes types of functions or syntax of keywords when the cursor is idle.
 ;;
+;; `haskell-indentation', Kristof Bastiaensen
+;;   Intelligent semi-automatic indentation, mark two.
+;;
 ;; `haskell-indent', Guy Lapalme
 ;;   Intelligent semi-automatic indentation.
 ;;
@@ -88,11 +91,12 @@
 ;;
 ;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
 ;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 ;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 ;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
 ;;
 ;; Make sure the module files are also on the load-path.  Note that
-;; the two indentation modules are mutually exclusive: Use only one.
+;; the three indentation modules are mutually exclusive: Use only one.
 ;;
 ;;
 ;; Customisation:
@@ -117,6 +121,9 @@
 ;; thorn@irisa.fr quoting the version of the mode you are using, the
 ;; version of Emacs you are using, and a small example of the problem
 ;; or suggestion.
+;;
+;; Version 1.5
+;;   Added autoload for haskell-indentation
 ;;
 ;; Version 1.43:
 ;;   Various tweaks to doc strings and customization support from
@@ -216,6 +223,8 @@
   "Turn on Haskell declaration scanning." t)
 (autoload 'turn-on-haskell-doc-mode "haskell-doc"
   "Turn on Haskell Doc minor mode." t)
+(autoload 'turn-on-haskell-indentation "haskell-indentation"
+  "Turn on advanced Haskell indentation." t)
 (autoload 'turn-on-haskell-indent "haskell-indent"
   "Turn on Haskell indentation." t)
 (autoload 'turn-on-haskell-simple-indent "haskell-simple-indent"
