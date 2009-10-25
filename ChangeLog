@@ -1,3 +1,11 @@
+2009-10-25  Svein Ove Aas   <svein.ove@aas.no>
+	* New maintainer, as above
+	* Repository converted to the use of Darcs
+	* haskell-indentation.el updated from http://kuribas.hcoop.net
+	* haskell-indentation.el now supports view patterns
+	* Autoload added for haskell-indentation, haskell-site-file updated
+	* Documentation updated to reflect above changes
+
 2009-02-02  Stefan Monnier  <monnier@iro.umontreal.ca>
 
 	* inf-haskell.el (inferior-haskell-type, inferior-haskell-info):
