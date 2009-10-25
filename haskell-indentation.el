@@ -381,7 +381,7 @@ Preserves indentation and removes extra whitespace"
     ("="     . (lambda () (haskell-indentation-statement-right #'haskell-indentation-expression)))
     ("<-"    . (lambda () (haskell-indentation-statement-right #'haskell-indentation-expression)))
     ("("     . (lambda () (haskell-indentation-list #'haskell-indentation-expression
-						    ")" "," nil)))
+						    ")" '(list "," "->") nil)))
     ("["     . (lambda () (haskell-indentation-list #'haskell-indentation-expression
 						    "]" "," "|")))
     ("{"     . (lambda () (haskell-indentation-list #'haskell-indentation-expression
@@ -629,7 +629,7 @@ Preserves indentation and removes extra whitespace"
   (catch 'return
     (while t
       (funcall parser)
-      (cond ((equal current-token separator)
+      (cond ((if (listp separator) (member current-token separator) (equal current-token separator))
 	     (haskell-indentation-at-separator))
 
 	    ((equal current-token stmt-separator)
