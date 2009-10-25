@@ -93,6 +93,21 @@ autofill-mode."
   (interactive)
   (haskell-indentation-mode t))
 
+(put 'parse-error
+     'error-conditions
+     '(error parse-error))
+(put 'parse-error 'error-message "Parse error")
+
+(defun parse-error (&rest args)
+  (signal 'parse-error (apply 'format args)))
+
+(defmacro on-parse-error (except &rest body)
+  `(condition-case parse-error-string
+       (progn ,@body)
+     (parse-error
+      ,except
+      (message "%s" (cdr parse-error-string)))))
+
 (defun kill-indented-line (&optional arg)
   "`kill-line' for indented text.
 Preserves indentation and removes extra whitespace"
@@ -148,19 +163,20 @@ Preserves indentation and removes extra whitespace"
 
 (defun haskell-newline-and-indent ()
   (interactive)
-  (let* ((cc (current-column))
-	 (ci (current-indentation))
-	 (indentations (haskell-indentation-find-indentations)))
-    (skip-syntax-forward "-")
-    (if (prog1 (and (eolp)
-		    (not (= (current-column) ci)))
-	  (newline))
-	(haskell-indentation-reindent
-	 (max (haskell-indentation-butlast indentations)
-	      (haskell-indentation-matching-indentation
-	       ci indentations)))
-      (haskell-indentation-reindent (haskell-indentation-matching-indentation
-				     cc indentations)))))
+  (on-parse-error (newline)
+     (let* ((cc (current-column))
+            (ci (current-indentation))
+            (indentations (haskell-indentation-find-indentations)))
+       (skip-syntax-forward "-")
+       (if (prog1 (and (eolp)
+                       (not (= (current-column) ci)))
+             (newline))
+           (haskell-indentation-reindent
+            (max (haskell-indentation-butlast indentations)
+                 (haskell-indentation-matching-indentation
+                  ci indentations)))
+         (haskell-indentation-reindent (haskell-indentation-matching-indentation
+                                        cc indentations))))))
 
 (defun haskell-indentation-one-indentation (col indentations)
   (let* ((last-pair (last indentations)))
@@ -234,51 +250,53 @@ Preserves indentation and removes extra whitespace"
 
 (defun haskell-indentation-delete-backward-char (n)
   (interactive "p")
-  (cond
-   ((and delete-selection-mode
-		 mark-active
-		 (not (= (point) (mark))))
-	(delete-region (mark) (point)))
-   ((or (= (current-column) 0)
-		(> (current-column) (current-indentation))
-		(nth 8 (syntax-ppss)))
-	(delete-backward-char n))
-   (t (let* ((ci (current-indentation))
-			 (pi (haskell-indentation-previous-indentation
-				  ci (haskell-indentation-find-indentations))))
-		(save-excursion
-		  (cond (pi
-				 (move-to-column pi)
-				 (delete-region (point)
-								(progn (move-to-column ci)
-									   (point))))
-				(t 
-				 (beginning-of-line)
-				 (delete-region (max (point-min) (- (point) 1))
-								(progn (move-to-column ci)
-									   (point))))))))))
+  (on-parse-error (backward-delete-char)
+     (cond
+      ((and delete-selection-mode
+            mark-active
+            (not (= (point) (mark))))
+       (delete-region (mark) (point)))
+      ((or (= (current-column) 0)
+           (> (current-column) (current-indentation))
+           (nth 8 (syntax-ppss)))
+       (delete-backward-char n))
+      (t (let* ((ci (current-indentation))
+                (pi (haskell-indentation-previous-indentation
+                     ci (haskell-indentation-find-indentations))))
+           (save-excursion
+             (cond (pi
+                    (move-to-column pi)
+                    (delete-region (point)
+                                   (progn (move-to-column ci)
+                                          (point))))
+                   (t 
+                    (beginning-of-line)
+                    (delete-region (max (point-min) (- (point) 1))
+                                   (progn (move-to-column ci)
+                                          (point)))))))))))
 
 (defun haskell-indentation-delete-char (n)
   (interactive "p")
-  (cond
-   ((and delete-selection-mode
-		 mark-active
-		 (not (= (point) (mark))))
-	(delete-region (mark) (point)))
-   ((or (eolp)
-		(>= (current-column) (current-indentation))
-		(nth 8 (syntax-ppss)))
-	(delete-char n))
-   (t
-	(let* ((ci (current-indentation))
-		   (pi (haskell-indentation-previous-indentation
-				ci (haskell-indentation-find-indentations))))
-      (save-excursion
-		(if (and pi (> pi (current-column)))
-			(move-to-column pi))
-		(delete-region (point)
-					   (progn (move-to-column ci)
-							  (point))))))))
+  (on-parse-error (delete-char)
+    (cond
+     ((and delete-selection-mode
+           mark-active
+           (not (= (point) (mark))))
+      (delete-region (mark) (point)))
+     ((or (eolp)
+          (>= (current-column) (current-indentation))
+          (nth 8 (syntax-ppss)))
+      (delete-char n))
+     (t
+      (let* ((ci (current-indentation))
+             (pi (haskell-indentation-previous-indentation
+                  ci (haskell-indentation-find-indentations))))
+        (save-excursion
+          (if (and pi (> pi (current-column)))
+              (move-to-column pi))
+          (delete-region (point)
+                         (progn (move-to-column ci)
+                                (point)))))))))
 
 (defun haskell-indentation-goto-least-indentation ()
   (beginning-of-line)
@@ -326,7 +344,7 @@ Preserves indentation and removes extra whitespace"
 	(catch 'parse-end
 	  (haskell-indentation-toplevel)
 	  (when (not (equal current-token 'end-tokens))
-	    (error "illegal token: %s" current-token)))
+	    (parse-error "illegal token: %s" current-token)))
 	possible-indentations))))
 
 (defun haskell-indentation-find-indentations ()
@@ -529,7 +547,7 @@ Preserves indentation and removes extra whitespace"
 			 (when end (throw 'parse-end nil))) ;; add no indentations
 			((equal current-token end)
 			 (haskell-indentation-read-next-token)) ;; continue
-			(end (error "Illegal token: %s" current-token))))))
+			(end (parse-error "Illegal token: %s" current-token))))))
 
 (defun haskell-indentation-case ()
   (haskell-indentation-expression)
@@ -727,7 +745,7 @@ Preserves indentation and removes extra whitespace"
 	(haskell-indentation-phrase-rest (cddr phrase))))
 
      ((equal (cadr phrase) "in")) ;; fallthrough
-     (t (error "Expecting %s" (cadr phrase))))))
+     (t (parse-error "Expecting %s" (cadr phrase))))))
 
 (defun haskell-indentation-add-indentation (indent)
   (haskell-indentation-push-indentation
