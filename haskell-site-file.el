@@ -138,7 +138,7 @@ Invokes `haskell-indent-hook' if not nil.
 ;;;***
 
 ;;;### (autoloads (haskell-indentation-mode) "haskell-indentation"
-;;;;;;  "haskell-indentation.el" (19171 24743))
+;;;;;;  "haskell-indentation.el" (19172 38780))
 ;;; Generated autoloads from haskell-indentation.el
 
 (autoload 'haskell-indentation-mode "haskell-indentation" "\
@@ -152,7 +152,7 @@ autofill-mode.
 ;;;***
 
 ;;;### (autoloads (haskell-hoogle literate-haskell-mode haskell-mode)
-;;;;;;  "haskell-mode" "haskell-mode.el" (19172 23932))
+;;;;;;  "haskell-mode" "haskell-mode.el" (19172 39700))
 ;;; Generated autoloads from haskell-mode.el
 
 (autoload 'haskell-mode "haskell-mode" "\
@@ -171,6 +171,9 @@ are supported with an `autoload' command:
 
    `haskell-doc', Hans-Wolfgang Loidl
      Echoes types of functions or syntax of keywords when the cursor is idle.
+
+   `haskell-indentation', Kristof Bastiaensen
+     Intelligent semi-automatic indentation Mk2
 
    `haskell-indent', Guy Lapalme
      Intelligent semi-automatic indentation.
@@ -196,8 +199,6 @@ As `haskell-mode' but for literate scripts.
 \(fn)" t nil)
 (add-to-list 'auto-mode-alist '("\\.\\(?:[gh]s\\|hi\\)\\'" . haskell-mode))
 (add-to-list 'auto-mode-alist '("\\.l[gh]s\\'" . literate-haskell-mode))
-(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 
 (autoload 'haskell-hoogle "haskell-mode" "\
 Do a Hoogle search for QUERY.
@@ -262,9 +263,9 @@ we load it.
 
 ;;;***
 
-;;;### (autoloads nil nil ("foo.el" "haskell-font-lock.el" "haskell-ghci.el"
-;;;;;;  "haskell-hugs.el" "haskell-simple-indent.el") (19172 24370
-;;;;;;  539590))
+;;;### (autoloads nil nil ("haskell-font-lock.el" "haskell-ghci.el"
+;;;;;;  "haskell-hugs.el" "haskell-simple-indent.el") (19172 39728
+;;;;;;  795831))
 
 ;;;***
 

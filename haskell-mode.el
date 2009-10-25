@@ -65,50 +65,6 @@
 ;; This mode supports full Haskell 1.4 including literate scripts.
 ;; In some versions of (X)Emacs it may only support Latin-1, not Unicode.
 ;;
-;; Installation:
-;; 
-;; Put in your ~/.emacs:
-;;
-;;    (setq auto-mode-alist
-;;          (append auto-mode-alist
-;;                  '(("\\.[hg]s$"  . haskell-mode)
-;;                    ("\\.hi$"     . haskell-mode)
-;;                    ("\\.l[hg]s$" . literate-haskell-mode))))
-;;
-;;    (autoload 'haskell-mode "haskell-mode"
-;;       "Major mode for editing Haskell scripts." t)
-;;    (autoload 'literate-haskell-mode "haskell-mode"
-;;       "Major mode for editing literate Haskell scripts." t)
-;;
-;; with `haskell-mode.el' accessible somewhere on the load-path.
-;; To add a directory `~/lib/emacs' (for example) to the load-path,
-;; add the following to .emacs:
-;;
-;;    (setq load-path (cons "~/lib/emacs" load-path))
-;;
-;; To turn any of the supported modules on for all buffers, add the
-;; appropriate line(s) to .emacs:
-;;
-;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
-;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
-;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
-;;
-;; Make sure the module files are also on the load-path.  Note that
-;; the three indentation modules are mutually exclusive: Use only one.
-;;
-;;
-;; Customisation:
-;;
-;; Set the value of `haskell-literate-default' to your preferred
-;; literate style: `bird' or `tex', within .emacs as follows:
-;;
-;;    (setq haskell-literate-default 'tex)
-;;
-;; Also see the customisations of the modules.
-;;
-;;
 ;; History:
 ;;
 ;; This mode is based on an editing mode by Simon Marlow 11/1/92
@@ -421,10 +377,10 @@ May return a qualified name."
 ;; Various mode variables.
 
 (defcustom haskell-mode-hook nil
-  "Hook run after entering Haskell mode."
+  "Hook run after entering Haskell mode. Do not select more than one of the three indentation modes."
   :type 'hook
-  :options '(turn-on-haskell-indent turn-on-font-lock turn-on-eldoc-mode
-	     imenu-add-menubar-index))
+  :options '(turn-on-haskell-indent turn-on-haskell-indentation turn-on-font-lock turn-on-eldoc-mode
+	     turn-on-simple-indent turn-on-haskell-doc-mode imenu-add-menubar-index))
 
 (defvar eldoc-print-current-symbol-info-function)
 
@@ -446,6 +402,9 @@ are supported with an `autoload' command:
 
    `haskell-doc', Hans-Wolfgang Loidl
      Echoes types of functions or syntax of keywords when the cursor is idle.
+
+   `haskell-indentation', Kristof Bastiaensen
+     Intelligent semi-automatic indentation Mk2
 
    `haskell-indent', Guy Lapalme
      Intelligent semi-automatic indentation.
@@ -513,8 +472,6 @@ Invokes `haskell-mode-hook'."
 
 ;;;###autoload(add-to-list 'auto-mode-alist '("\\.\\(?:[gh]s\\|hi\\)\\'" . haskell-mode))
 ;;;###autoload(add-to-list 'auto-mode-alist '("\\.l[gh]s\\'" . literate-haskell-mode))
-;;;###autoload(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-;;;###autoload(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 
 (defcustom haskell-hoogle-command
   (if (executable-find "hoogle") "hoogle")

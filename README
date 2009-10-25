@@ -31,6 +31,9 @@ Otherwise:
 
     (load "~/lib/emacs/haskell-mode/haskell-site-file")
 
+  This only loads the bare-bones haskell-mode. To make it useful, you
+  need additional modules; you can use the haskell customize-group
+  to edit the Haskell mode hook or, if you prefer manual setup, try
   adding the following lines according to which modules you want to use:
 
     (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
