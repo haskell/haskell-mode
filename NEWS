@@ -1,3 +1,7 @@
+Changes since 2.4:
+
+* haskell-indentation, a new minor mode for indentation.
+
 Changes since 2.3:
 
 * Update license to GPLv3.
