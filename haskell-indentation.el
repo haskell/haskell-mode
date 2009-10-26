@@ -250,7 +250,7 @@ Preserves indentation and removes extra whitespace"
 
 (defun haskell-indentation-delete-backward-char (n)
   (interactive "p")
-  (on-parse-error (backward-delete-char)
+  (on-parse-error (backward-delete-char 1)
      (cond
       ((and delete-selection-mode
             mark-active
@@ -277,7 +277,7 @@ Preserves indentation and removes extra whitespace"
 
 (defun haskell-indentation-delete-char (n)
   (interactive "p")
-  (on-parse-error (delete-char)
+  (on-parse-error (delete-char 1)
     (cond
      ((and delete-selection-mode
            mark-active
