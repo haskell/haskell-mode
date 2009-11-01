@@ -1,11 +1,3 @@
-;;; haskell-site-file.el --- automatically extracted autoloads
-;;
-;;; Code:
-
-(add-to-list 'load-path
-              (or (file-name-directory load-file-name) (car load-path)))
-
-
 
 ;;;### (autoloads (haskell-c-mode) "haskell-c" "haskell-c.el" (18170
 ;;;;;;  47169))
@@ -138,7 +130,7 @@ Invokes `haskell-indent-hook' if not nil.
 ;;;***
 
 ;;;### (autoloads (haskell-indentation-mode) "haskell-indentation"
-;;;;;;  "haskell-indentation.el" (19172 38780))
+;;;;;;  "haskell-indentation.el" (19181 56295))
 ;;; Generated autoloads from haskell-indentation.el
 
 (autoload 'haskell-indentation-mode "haskell-indentation" "\
@@ -151,8 +143,8 @@ autofill-mode.
 
 ;;;***
 
-;;;### (autoloads (haskell-hoogle literate-haskell-mode haskell-mode)
-;;;;;;  "haskell-mode" "haskell-mode.el" (19172 39700))
+;;;### (autoloads (haskell-hayoo haskell-hoogle literate-haskell-mode
+;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (19181 51602))
 ;;; Generated autoloads from haskell-mode.el
 
 (autoload 'haskell-mode "haskell-mode" "\
@@ -205,12 +197,21 @@ Do a Hoogle search for QUERY.
 
 \(fn QUERY)" t nil)
 
+(defalias 'hoogle 'haskell-hoogle)
+
+(autoload 'haskell-hayoo "haskell-mode" "\
+Do a Hayoo search for QUERY.
+
+\(fn QUERY)" t nil)
+
+(defalias 'hayoo 'haskell-hayoo)
+
 ;;;***
 
 ;;;### (autoloads (inferior-haskell-find-haddock inferior-haskell-find-definition
 ;;;;;;  inferior-haskell-info inferior-haskell-type inferior-haskell-load-file
-;;;;;;  switch-to-haskell) "inf-haskell" "inf-haskell.el" (19171
-;;;;;;  22861))
+;;;;;;  switch-to-haskell) "inf-haskell" "inf-haskell.el" (19181
+;;;;;;  47090))
 ;;; Generated autoloads from inf-haskell.el
 
 (defalias 'run-haskell 'switch-to-haskell)
@@ -264,14 +265,8 @@ we load it.
 ;;;***
 
 ;;;### (autoloads nil nil ("haskell-font-lock.el" "haskell-ghci.el"
-;;;;;;  "haskell-hugs.el" "haskell-simple-indent.el") (19172 39728
-;;;;;;  795831))
+;;;;;;  "haskell-hugs.el" "haskell-simple-indent.el") (19181 56484
+;;;;;;  142042))
 
 ;;;***
 
-;; Local Variables:
-;; version-control: never
-;; no-byte-compile: t
-;; no-update-autoloads: t
-;; End:
-;;; haskell-site-file.el ends here
