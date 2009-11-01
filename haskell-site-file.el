@@ -144,8 +144,10 @@ autofill-mode.
 ;;;***
 
 ;;;### (autoloads (haskell-hayoo haskell-hoogle literate-haskell-mode
-;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (19181 51602))
+;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (19182 30))
 ;;; Generated autoloads from haskell-mode.el
+
+(add-to-list 'load-path (or (file-name-directory load-file-name) (car load-path)))
 
 (autoload 'haskell-mode "haskell-mode" "\
 Major mode for editing Haskell programs.
@@ -265,8 +267,7 @@ we load it.
 ;;;***
 
 ;;;### (autoloads nil nil ("haskell-font-lock.el" "haskell-ghci.el"
-;;;;;;  "haskell-hugs.el" "haskell-simple-indent.el") (19181 56484
-;;;;;;  142042))
+;;;;;;  "haskell-hugs.el" "haskell-simple-indent.el") (19182 33 984749))
 
 ;;;***
 

@@ -174,6 +174,11 @@
   :group 'languages
   :prefix "haskell-")
 
+;; Set load-path
+;;;###autoload
+(add-to-list 'load-path
+   (or (file-name-directory load-file-name) (car load-path)))
+
 ;; Set up autoloads for the modules we supply
 (autoload 'turn-on-haskell-decl-scan "haskell-decl-scan"
   "Turn on Haskell declaration scanning." t)
