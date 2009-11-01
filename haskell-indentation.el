@@ -40,6 +40,11 @@
   :group 'haskell
   :prefix "haskell-indentation-")
 
+(defcustom haskell-indentation-cycle-warn t
+  "Warn before moving to the leftmost indentation, if you tab at the rightmost one."
+  :type 'boolean
+  :group 'haskell-indentation)
+
 (defcustom haskell-indentation-layout-offset 2
   "Extra indentation to add before expressions in a haskell layout list."
   :type 'integer
@@ -86,7 +91,9 @@ autofill-mode."
     (set (make-local-variable 'indent-line-function)
          'haskell-indentation-indent-line)
     (set (make-local-variable 'normal-auto-fill-function)
-         'haskell-indentation-auto-fill-function)))
+         'haskell-indentation-auto-fill-function)
+    (set (make-local-variable 'haskell-indent-last-position)
+         nil)))
 
 (defun turn-on-haskell-indentation ()
   "Turn on the haskell-indentation minor mode"
@@ -230,7 +237,8 @@ Preserves indentation and removes extra whitespace"
   (when (save-excursion
 	  (beginning-of-line)
 	  (not (nth 8 (syntax-ppss))))
-    (let ((ci (current-indentation)))
+    (let ((ci (current-indentation))
+          (start-column (current-column)))
       (cond ((> (current-column) ci)
 	     (save-excursion
 	       (move-to-column ci)
@@ -246,7 +254,22 @@ Preserves indentation and removes extra whitespace"
 	    (t (move-to-column ci)
 	       (haskell-indentation-reindent
 		(haskell-indentation-matching-indentation
-		 ci (haskell-indentation-find-indentations))))))))
+		 ci (haskell-indentation-find-indentations)))))
+      (cond ((not (= (current-column) start-column))
+             (setq haskell-indent-last-position nil))
+            ((not haskell-indentation-cycle-warn)
+             (haskell-indentation-reindent
+              (haskell-indentation-next-indentation
+               -1
+               (haskell-indentation-find-indentations))))
+            ((not (eql (point) haskell-indent-last-position))
+             (message "Press TAB again to go to the leftmost indentation")
+             (setq haskell-indent-last-position (point)))
+            (t
+             (haskell-indentation-reindent
+              (haskell-indentation-next-indentation
+               -1
+               (haskell-indentation-find-indentations))))))))
 
 (defun haskell-indentation-delete-backward-char (n)
   (interactive "p")
