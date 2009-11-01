@@ -481,7 +481,7 @@ If nil, use the Hoogle web-site."
                  string))
 
 ;;;###autoload
-(defun hoogle (query)
+(defun haskell-hoogle (query)
   "Do a Hoogle search for QUERY."
   (interactive
    (let ((def (haskell-ident-at-point)))
@@ -501,7 +501,10 @@ If nil, use the Hoogle web-site."
                        query)))))
 
 ;;;###autoload
-(defun hayoo (query)
+(defalias 'hoogle 'haskell-hoogle)
+
+;;;###autoload
+(defun haskell-hayoo (query)
   "Do a Hayoo search for QUERY."
   (interactive
    (let ((def (haskell-ident-at-point)))
@@ -511,6 +514,9 @@ If nil, use the Hoogle web-site."
                           "Hayoo query: ")
                         nil nil def))))
   (browse-url (format "http://holumbus.fh-wedel.de/hayoo/hayoo.html?query=%s" query)))
+
+;;;###autoload
+(defalias 'hayoo 'haskell-hayoo)
 
 
 ;; Provide ourselves:
