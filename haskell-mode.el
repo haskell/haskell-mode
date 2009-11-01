@@ -500,6 +500,19 @@ If nil, use the Hoogle web-site."
         (start-process "hoogle" (current-buffer) haskell-hoogle-command
                        query)))))
 
+;;;###autoload
+(defun haskell-hayoo (query)
+  "Do a Hayoo search for QUERY."
+  (interactive
+   (let ((def (haskell-ident-at-point)))
+     (if (and def (symbolp def)) (setq def (symbol-name def)))
+     (list (read-string (if def
+                            (format "Hayoo query (default %s): " def)
+                          "Hayoo query: ")
+                        nil nil def))))
+  (browse-url (format "http://holumbus.fh-wedel.de/hayoo/hayoo.html?query=%s" query)))
+
+
 ;; Provide ourselves:
 
 (provide 'haskell-mode)

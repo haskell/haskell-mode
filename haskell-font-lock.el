@@ -142,6 +142,15 @@ and `unicode'."
               (cons "->" (decode-char 'ucs 8594))
 	      (cons "<-" (decode-char 'ucs 8592))
 	      (cons "=>" (decode-char 'ucs 8658))
+              (cons "()" (decode-char 'ucs #X2205))
+              (cons "==" (decode-char 'ucs #X2261))
+              (cons "/=" (decode-char 'ucs #X2262))
+              (cons ">=" (decode-char 'ucs #X2265))
+              (cons "<=" (decode-char 'ucs #X2264))
+              (cons "!!" (decode-char 'ucs #X203C))
+              (cons "&&" (decode-char 'ucs #X2227))
+              (cons "||" (decode-char 'ucs #X2228))
+              (cons "sqrt" (decode-char 'ucs #X221A))
               (cons "~>" (decode-char 'ucs 8669)) ;; Omega language
               ;; (cons "~>" (decode-char 'ucs 8605)) ;; less desirable
               (cons "-<" (decode-char 'ucs 8610)) ;; Paterson's arrow syntax

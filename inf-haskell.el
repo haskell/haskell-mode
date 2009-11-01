@@ -422,10 +422,11 @@ The returned info is cached for reuse by `haskell-doc-mode'."
                (save-excursion (goto-char parsing-end)
                                (line-beginning-position 2))
                (point))))))
-    (if (not (string-match (concat "\\`" (regexp-quote expr) "[ \t]+::[ \t]*")
+    (if (not (string-match (concat "^\\(" (regexp-quote expr) "[ \t\n]+::[ \t\n]*\\(.\\|\n\\)*\\)")
                            type))
         (error "No type info: %s" type)
-
+      (progn
+        (setf type (match-string 1 type))
       ;; Cache for reuse by haskell-doc.
       (when (and (boundp 'haskell-doc-mode) haskell-doc-mode
                  (boundp 'haskell-doc-user-defined-ids)
@@ -442,7 +443,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
       (when insert-value
         (beginning-of-line)
         (insert type "\n"))
-      type)))
+        type))))
 
 ;;;###autoload
 (defun inferior-haskell-info (sym)
