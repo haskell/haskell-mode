@@ -481,7 +481,7 @@ If nil, use the Hoogle web-site."
                  string))
 
 ;;;###autoload
-(defun haskell-hoogle (query)
+(defun hoogle (query)
   "Do a Hoogle search for QUERY."
   (interactive
    (let ((def (haskell-ident-at-point)))
@@ -501,7 +501,7 @@ If nil, use the Hoogle web-site."
                        query)))))
 
 ;;;###autoload
-(defun haskell-hayoo (query)
+(defun hayoo (query)
   "Do a Hayoo search for QUERY."
   (interactive
    (let ((def (haskell-ident-at-point)))
