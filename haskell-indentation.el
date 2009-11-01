@@ -48,7 +48,7 @@
 (defcustom haskell-indentation-starter-offset 1
   "Extra indentation after an opening keyword (e.g. let)."
   :type 'integer
-  :group 'haskell-ntation)
+  :group 'haskell-indentation)
 
 (defcustom haskell-indentation-left-offset 2
   "Extra indentation after an indentation to the left (e.g. after do)."
