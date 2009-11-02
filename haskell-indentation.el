@@ -841,8 +841,8 @@ Preserves indentation and removes extra whitespace"
   "Skip to the next token."
   (if (or (looking-at "'\\([^\\']\\|\\\\.\\)*'")
 	  (looking-at "\"\\([^\\\"]\\|\\\\.\\)*\"")
-	  (looking-at "[A-Z][A-Z_a-z0-9']*\\(\\.[A-Z_a-z][A-Z_a-z0-9']*\\)?") ; Allows qualified import
-          (looking-at "[A-Z_a-z][A-Z_a-z0-9']*") ; Only unqualified ones can start with lowercase
+          (looking-at "[A-Z][A-Z_a-z0-9']*\\(\\.[A-Z_a-z][A-Z_a-z0-9']*\\)*")  ; Allows hierarchical modules
+          (looking-at "[A-Z_a-z][A-Z_a-z0-9']*") ; Only unqualified vars can start with lowercase
 	  (looking-at "[0-9][0-9oOxXeE+-]*")
 	  (looking-at "[-:!#$%&*+./<=>?@\\\\^|~]+")
 	  (looking-at "[](){}[,;]")
