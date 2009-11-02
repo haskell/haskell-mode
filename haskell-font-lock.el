@@ -151,6 +151,8 @@ and `unicode'."
               (cons "&&" (decode-char 'ucs #X2227))
               (cons "||" (decode-char 'ucs #X2228))
               (cons "sqrt" (decode-char 'ucs #X221A))
+              (cons "undefined" (decode-char 'ucs #X22A5))
+              (cons "pi" (decode-char 'ucs #X3C0))
               (cons "~>" (decode-char 'ucs 8669)) ;; Omega language
               ;; (cons "~>" (decode-char 'ucs 8605)) ;; less desirable
               (cons "-<" (decode-char 'ucs 8610)) ;; Paterson's arrow syntax
