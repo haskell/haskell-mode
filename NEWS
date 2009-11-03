@@ -1,5 +1,7 @@
 Changes since 2.5.1
 
+* Parser corrections for haskell-indentation and haskell-decl-scan
+
 * haskell-indentation: Pressing tab in the rightmost position now
   moves to the leftmost, by default with a warning.
 
