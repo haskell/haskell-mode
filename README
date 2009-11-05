@@ -25,6 +25,11 @@ Otherwise:
 - Download and unpack the basic mode and modules into a suitable directory,
   e.g. ~/lib/emacs/haskell-mode/ where ~ stands for your home directory.
 
+- If you are using Emacs 21, you need an additional library, "syntax", from
+  a later version of Emacs.  The one you can get as
+  http://cvs.savannah.gnu.org/viewcvs/*checkout*/emacs/emacs/lisp/emacs-lisp/syntax.el?rev=1.16
+  definitely works.
+
 - Assuming you have placed the basic mode haskell-mode.el and the modules
   you want to use in the directory ~/lib/emacs/haskell-mode/, add the
   following command to your init file (~/.emacs):

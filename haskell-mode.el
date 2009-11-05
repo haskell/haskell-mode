@@ -158,6 +158,13 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(eval-when-compile
+  ;; Emacs 21 defines `values' as a (run-time) alias for list.
+  ;; Don't maerge this with the pervious clause.
+  (if (string-match "values"
+		    (pp (byte-compile (lambda () (values t)))))
+      (defsubst values (&rest values)
+	values)))
 
 ;; All functions/variables start with `(literate-)haskell-'.
 
@@ -385,8 +392,14 @@ May return a qualified name."
   "Hook run after entering Haskell mode.
 Do not select more than one of the three indentation modes."
   :type 'hook
-  :options '(turn-on-haskell-indent turn-on-haskell-indentation turn-on-font-lock turn-on-eldoc-mode
-	     turn-on-simple-indent turn-on-haskell-doc-mode imenu-add-menubar-index))
+  :group 'haskell
+  :options `(turn-on-haskell-indent turn-on-haskell-indentation
+	     turn-on-font-lock
+	     ,(if (boundp 'eldoc-documentation-function)
+		  'turn-on-eldoc-mode
+		'turn-on-haskell-doc-mode) ; Emacs 21
+	     turn-on-simple-indent turn-on-haskell-doc-mode
+	     imenu-add-menubar-index))
 
 (defvar eldoc-print-current-symbol-info-function)
 

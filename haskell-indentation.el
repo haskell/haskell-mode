@@ -35,6 +35,8 @@
 
 ;;; Code:
 
+(require 'syntax nil t)			; Emacs 21 add-on
+
 (defgroup haskell-indentation nil
   "Haskell indentation."
   :group 'haskell
@@ -265,7 +267,7 @@ Preserves indentation and removes extra whitespace"
               (haskell-indentation-next-indentation
                -1
                (haskell-indentation-find-indentations))))
-            ((not (eql (point) haskell-indent-last-position))
+            ((not (equal (point) haskell-indent-last-position))
              (message "Press TAB again to go to the leftmost indentation")
              (setq haskell-indent-last-position (point)))
             (t

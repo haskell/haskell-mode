@@ -230,13 +230,20 @@ Regexp match data 0 points to the chars."
   ;; Return nil because we're not adding any face property.
   nil)
 
+(unless (fboundp 'char-displayable-p)
+  (require 'latin1-disp nil t))
+
 (defun haskell-font-lock-symbols-keywords ()
   (when (fboundp 'compose-region)
     (let ((alist nil))
       (dolist (x haskell-font-lock-symbols-alist)
 	(when (and (if (fboundp 'char-displayable-p)
 		       (char-displayable-p (if (consp (cdr x)) (cadr x) (cdr x)))
-		     t)
+		     (if (fboundp 'latin1-char-displayable-p)
+			 (latin1-char-displayable-p (if (consp (cdr x))
+							(cadr x)
+						      (cdr x)))
+		       t))
 		   (not (assoc (car x) alist)))	;Not yet in alist.
 	  (push x alist)))
       (when alist
