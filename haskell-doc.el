@@ -31,7 +31,7 @@
 ;;  ===========
 
 ;; This program shows the type of the Haskell function under the cursor in the
-;; minibuffer.  It acts as a kind of "emacs background process", by regularly
+;; minibuffer.  It acts as a kind of "Emacs background process", by regularly
 ;; checking the word under the cursor and matching it against a list of
 ;; prelude, library, local and global functions.
 
@@ -123,7 +123,7 @@
 
 ;;   - Some prelude fcts aren't displayed properly. This might be due to a
 ;;     name clash of Haskell and Elisp functions (e.g. length) which
-;;     confuses emacs when reading `haskell-doc-prelude-types'
+;;     confuses Emacs when reading `haskell-doc-prelude-types'
 
 ;;; Changelog:
 ;;  ==========
@@ -543,7 +543,7 @@ the keyword is used.")
     (goto-char (point-min))
     (while (search-forward "&nbsp;" nil t) (replace-match " " t t))
 
-    ;; First, focus on the actual code, removing the surrouding HTML text.
+    ;; First, focus on the actual code, removing the surrounding HTML text.
     (goto-char (point-min))
     (let ((last (point-min))
           (modules nil))
@@ -1276,7 +1276,7 @@ URL is the URL of the online doc."
 ;; get imenu
 (require 'imenu)
 
-;; a dummy definition needed for xemacs (I know, it's horrible :-(
+;; a dummy definition needed for XEmacs (I know, it's horrible :-(
 
 ;;@cindex haskell-doc-install-keymap
 
@@ -1537,7 +1537,7 @@ current buffer."
   (unless (string= sym (car haskell-doc-last-data))
     (let ((doc (haskell-doc-sym-doc sym)))
       (when (and doc (haskell-doc-in-code-p))
-        ;; In emacs 19.29 and later, and XEmacs 19.13 and later, all
+        ;; In Emacs 19.29 and later, and XEmacs 19.13 and later, all
         ;; messages are recorded in a log.  Do not put haskell-doc messages
         ;; in that log since they are legion.
         (if (eval-when-compile (fboundp 'display-message))
@@ -1721,8 +1721,8 @@ Leaves point at end of line."
 
 ;;@cindex haskell-doc-string-nub-ws
 (defun haskell-doc-string-nub-ws (str)
-  "Replace all sequences of whitespaces in STR by just one whitespace.
-ToDo: Also eliminate leading and trainling whitespace."
+  "Replace all sequences of whitespace in STR by just one space.
+ToDo: Also eliminate leading and trailing whitespace."
   (let ((i -1))
     (while (setq i (string-match " [ \t\n]+\\|[\t\n]+" str (1+ i)))
       (setq str (replace-match " " t t str)))
@@ -1747,7 +1747,7 @@ ToDo: Also eliminate leading and trainling whitespace."
 
 ;;@cindex haskell-doc-chop-off-context
 (defun haskell-doc-chop-off-context (str)
- "Eliminate the contex in a type represented by the string STR."
+ "Eliminate the context in a type represented by the string STR."
  (let ((i (string-match "=>" str)) )
    (if (null i)
        str

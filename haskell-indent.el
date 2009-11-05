@@ -32,7 +32,7 @@
 ;; Purpose:
 ;;
 ;; To support automatic indentation of Haskell programs using
-;; the layout rule descrived in section 1.5 and appendix B.3 of the
+;; the layout rule described in section 1.5 and appendix B.3 of the
 ;; the Haskell report.  The rationale and the implementation principles
 ;; are described in an article to appear in Journal of Functional Programming.
 ;;   "Dynamic tabbing for automatic indentation with the layout rule"
@@ -125,8 +125,7 @@
           (regexp-opt '("class" "data" "import" "infix" "infixl" "infixr"
                         "instance" "module" "newtype" "primitive" "type") t)
           "\\>")
-  "Regexp describing keywords to complete when standing at the first word
-of a line.")
+  "Regexp for keywords to complete when standing at the first word of a line.")
 
 
 ;; Customizations for different kinds of environments
@@ -153,8 +152,7 @@ Uses free var `haskell-indent-info'."
       (push tmp haskell-indent-info))))
 
 (defun haskell-indent-push-pos (pos &optional name)
-  "Pushes indentation information for the column corresponding to POS
-followed by NAME (if present)."
+  "Push indentation information for POS followed by NAME (if present)."
   (haskell-indent-push-col (haskell-indent-point-to-col pos) name))
 
 ;; (defvar haskell-indent-tab-align nil
@@ -204,8 +202,7 @@ followed by an OFFSET (if present use its value otherwise use
     (back-to-indentation)))
 
 (defun haskell-indent-current-indentation ()
-  "`current-indentation' function but dealing with Bird-style literate
-scripts."
+  "`current-indentation' function dealing with Bird-style literate scripts."
   (if (eq haskell-literate 'bird)
       (save-excursion
         (haskell-indent-back-to-indentation)
@@ -213,8 +210,7 @@ scripts."
     (current-indentation)))
 
 (defun haskell-indent-backward-to-indentation (n)
-  "`backward-to-indentation' function but dealing with Bird-style literate
-scripts."
+  "`backward-to-indentation' function dealing with Bird-style literate scripts."
   (if (eq haskell-literate 'bird)
       (progn
         (forward-line (- n))
@@ -245,8 +241,8 @@ scripts."
     (indent-line-to n)))
 
 (defun haskell-indent-skip-blanks-and-newlines-forward (end)
-  "Skips forward blanks, tabs and newlines until END taking
-account of Bird style literate scripts."
+  "Skip forward blanks, tabs and newlines until END.
+Take account of Bird-style literate scripts."
   (skip-chars-forward " \t\n" end)
   (if (eq haskell-literate 'bird)
       (while (and (bolp) (eq (following-char) ?\>))
@@ -254,8 +250,8 @@ account of Bird style literate scripts."
         (skip-chars-forward " \t\n" end))))
 
 (defun haskell-indent-skip-blanks-and-newlines-backward (start)
-  "Skips backward blanks, tabs and newlines upto START
-taking account of Bird style literate scripts."
+  "Skip backward blanks, tabs and newlines up to START.
+Take account of Bird-style literate scripts."
   (skip-chars-backward " \t\n" start)
   (if (eq haskell-literate 'bird)
       (while (and (eq (current-column) 1)
@@ -266,10 +262,10 @@ taking account of Bird style literate scripts."
 ;; specific functions for literate code
 
 (defun haskell-indent-within-literate-code ()
-  "Checks if point is within a part of literate Haskell code and if so
-returns its start otherwise returns NIL:
-If it is Bird Style, then returns the position of the >
-otherwise returns the ending position \\begin{code}."
+  "Check if point is within a part of literate Haskell code.
+If so, return its start; otherwise return nil:
+If it is Bird-style, then return the position of the >;
+otherwise return the ending position of \\begin{code}."
   (save-excursion
     (case haskell-literate
       (bird
@@ -292,7 +288,7 @@ otherwise returns the ending position \\begin{code}."
 
 (defun haskell-indent-put-region-in-literate (beg end &optional arg)
   "Put lines of the region as a piece of literate code.
-With C-u prefix arg, remove indication that the region is literate code.
+With prefix arg, remove indication that the region is literate code.
 It deals with both Bird style and non Bird-style scripts."
   (interactive "r\nP")
   (unless haskell-literate
@@ -426,7 +422,7 @@ Returns the location of the start of the comment, nil otherwise."
           contour))))
 
 (defun haskell-indent-next-symbol (end)
-  "Puts point to the next following symbol."
+  "Move point to the next symbol."
   (skip-syntax-forward ")" end)
   (if (< (point) end)
      (progn
@@ -439,7 +435,7 @@ Returns the location of the start of the comment, nil otherwise."
       (error (goto-char end))))
 
 (defun haskell-indent-separate-valdef (start end)
-  "Returns a list of positions for important parts of a valdef."
+  "Return a list of positions for important parts of a valdef."
   (save-excursion
     (let (valname valname-string aft-valname
                   guard aft-guard
@@ -491,7 +487,7 @@ Returns the location of the start of the comment, nil otherwise."
 
 
 (defun haskell-indent-guard (start end end-visible indent-info)
-  "Finds indentation information for a line starting with a guard."
+  "Find indentation information for a line starting with a guard."
   (save-excursion
     (let* ((haskell-indent-info indent-info)
            (sep (haskell-indent-separate-valdef start end))
@@ -508,7 +504,7 @@ Returns the location of the start of the comment, nil otherwise."
       haskell-indent-info)))
 
 (defun haskell-indent-rhs (start end end-visible indent-info)
-  "Finds indentation information for a line starting with a rhs."
+  "Find indentation information for a line starting with a rhs."
   (save-excursion
     (let* ((haskell-indent-info indent-info)
            (sep (haskell-indent-separate-valdef start end))
@@ -545,7 +541,7 @@ Returns the location of the start of the comment, nil otherwise."
             "\\)")))
 
 (defun haskell-indent-find-case (test)
-  "Find the index that matches in the decision table."
+  "Find the index that matches TEST in the decision table."
   (if (string-match haskell-indent-decision-table test)
       ;; use the fact that the resulting match-data is a list of the form
       ;; (0 6 [2*(n-1) nil] 0 6) where n is the number of the matching regexp
@@ -554,7 +550,7 @@ Returns the location of the start of the comment, nil otherwise."
     (error "haskell-indent-find-case: impossible case: %s" test)))
 
 (defun haskell-indent-empty (start end end-visible indent-info)
-  "Finds indentation points for an empty line."
+  "Find indentation points for an empty line."
   (save-excursion
     (let* ((haskell-indent-info indent-info)
            (sep (haskell-indent-separate-valdef start end))
@@ -640,7 +636,7 @@ Returns the location of the start of the comment, nil otherwise."
       haskell-indent-info)))
 
 (defun haskell-indent-ident (start end end-visible indent-info)
-  "Finds indentation points for a line starting with an identifier."
+  "Find indentation points for a line starting with an identifier."
   (save-excursion
     (let*
         ((haskell-indent-info indent-info)
@@ -752,7 +748,7 @@ Returns the location of the start of the comment, nil otherwise."
       haskell-indent-info)))
 
 (defun haskell-indent-other (start end end-visible indent-info)
-  "Finds indentation points for a non-empty line starting with something other
+  "Find indentation points for a non-empty line starting with something other
 than an identifier, a guard or rhs."
   (save-excursion
     (let* ((haskell-indent-info indent-info)
@@ -1291,7 +1287,7 @@ We stay in the cycle as long as the TAB key is pressed."
 ;;; alignment functions
 
 (defun haskell-indent-shift-columns (dest-column region-stack)
-  "Shifts columns in region-stack to go to DEST-COLUMN.
+  "Shift columns in REGION-STACK to go to DEST-COLUMN.
 Elements of the stack are pairs of points giving the start and end
 of the regions to move."
   (let (reg col diffcol reg-end)
@@ -1424,7 +1420,7 @@ TYPE is either 'guard or 'rhs."
                 (haskell-indent-shift-columns maxcol regstack)))))))
 
 (defun haskell-indent-align-guards-and-rhs (start end)
-  "Align the guards and rhs of functions in the region which must be active."
+  "Align the guards and rhs of functions in the region, which must be active."
   ;; The `start' and `end' args are dummys right now: they're just there so
   ;; we can use the "r" interactive spec which properly signals an error.
   (interactive "*r")
@@ -1463,15 +1459,15 @@ Alignment works only if all guards are to the south-east of their |."
     (haskell-indent-align-def (haskell-indent-mark-active) 'guard)))
 
 (defun haskell-indent-insert-otherwise ()
-  "Insert a guard sign (|) followed by 'otherwise' and align the
-previous guards of the current function."
+  "Insert a guard sign (|) followed by `otherwise'.
+Also align the previous guards of the current function."
   (interactive "*")
   (haskell-indent-insert-guard "otherwise")
   (haskell-indent-insert-equal))
 
 (defun haskell-indent-insert-where ()
-  "Insert and a where keyword at point and indent the resulting
-line with an indentation cycle."
+  "Insert a where keyword at point and indent resulting line.
+One indentation cycle is used."
   (interactive "*")
   (insert "where ")
   (haskell-indent-cycle))
@@ -1480,8 +1476,7 @@ line with an indentation cycle."
 ;;; haskell-indent-mode
 
 (defvar haskell-indent-mode nil
-  "Indicates if the semi-intelligent Haskell indentation mode is in effect
-in the current buffer.")
+  "Non-nil if the semi-intelligent Haskell indentation mode is in effect.")
 (make-variable-buffer-local 'haskell-indent-mode)
 
 (defvar haskell-indent-map
@@ -1502,7 +1497,7 @@ in the current buffer.")
     map))
 
 (defun turn-on-haskell-indent ()
-  "Turn on ``intelligent'' haskell indentation mode."
+  "Turn on ``intelligent'' Haskell indentation mode."
   (set (make-local-variable 'indent-line-function) 'haskell-indent-cycle)
   (set (make-local-variable 'indent-region-function) 'haskell-indent-region)
   (setq haskell-indent-mode t)
@@ -1526,8 +1521,7 @@ in the current buffer.")
   (run-hooks 'haskell-indent-hook))
 
 (defun turn-off-haskell-indent ()
-  "Turn off ``intelligent'' haskell indentation mode that deals with
-the layout rule of Haskell."
+  "Turn off ``intelligent'' Haskell indentation mode."
   (kill-local-variable 'indent-line-function)
   ;; Remove haskell-indent-map from the local map.
   (let ((map (current-local-map)))
@@ -1546,11 +1540,12 @@ the layout rule of Haskell."
 
 ;;;###autoload
 (defun haskell-indent-mode (&optional arg)
-  "``intelligent'' Haskell indentation mode that deals with
-the layout rule of Haskell.  \\[haskell-indent-cycle] starts the cycle
-which proposes new possibilities as long as the TAB key is pressed.
-Any other key or mouse click terminates the cycle and is interpreted
-except for RET which merely exits the cycle.
+  "``Intelligent'' Haskell indentation mode.
+This deals with the layout rule of Haskell.
+\\[haskell-indent-cycle] starts the cycle which proposes new
+possibilities as long as the TAB key is pressed.  Any other key
+or mouse click terminates the cycle and is interpreted except for
+RET which merely exits the cycle.
 Other special keys are:
     \\[haskell-indent-insert-equal]
       inserts an =

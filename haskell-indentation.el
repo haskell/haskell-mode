@@ -96,7 +96,7 @@ autofill-mode."
          nil)))
 
 (defun turn-on-haskell-indentation ()
-  "Turn on the haskell-indentation minor mode"
+  "Turn on the haskell-indentation minor mode."
   (interactive)
   (haskell-indentation-mode t))
 
@@ -292,7 +292,7 @@ Preserves indentation and removes extra whitespace"
                     (delete-region (point)
                                    (progn (move-to-column ci)
                                           (point))))
-                   (t 
+                   (t
                     (beginning-of-line)
                     (delete-region (max (point-min) (- (point) 1))
                                    (progn (move-to-column ci)
@@ -367,7 +367,7 @@ Preserves indentation and removes extra whitespace"
 	(catch 'parse-end
 	  (haskell-indentation-toplevel)
 	  (when (not (equal current-token 'end-tokens))
-	    (parse-error "illegal token: %s" current-token)))
+	    (parse-error "Illegal token: %s" current-token)))
 	possible-indentations))))
 
 (defun haskell-indentation-find-indentations ()
@@ -382,7 +382,7 @@ Preserves indentation and removes extra whitespace"
 		 (not (nth 4 (syntax-ppss)))))
 	  (haskell-indentation-parse-to-indentations)
 	'(0)))
-     (t 
+     (t
       (haskell-indentation-parse-to-indentations)))))
 
 (defconst haskell-indentation-toplevel-list

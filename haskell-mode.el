@@ -209,7 +209,7 @@
   "*If not nil, the current buffer contains a literate Haskell script.
 Possible values are: `bird' and `tex', for Bird-style and LaTeX-style
 literate scripts respectively.  Set by `haskell-mode' and
-`literate-haskell-mode'.  For an ambiguous literate buffer -- ie. does
+`literate-haskell-mode'.  For an ambiguous literate buffer -- i.e. does
 not contain either \"\\begin{code}\" or \"\\end{code}\" on a line on
 its own, nor does it contain \">\" at the start of a line -- the value
 of `haskell-literate-default' is used.")
@@ -232,7 +232,7 @@ be set to the preferred literate style."
     (define-key map [?\C-c ?\C-z] 'switch-to-haskell)
     (define-key map [?\C-c ?\C-l] 'inferior-haskell-load-file)
     ;; I think it makes sense to bind inferior-haskell-load-and-run to C-c
-    ;; C-r, but since it used to be bound to `reload' until june 2007, I'm
+    ;; C-r, but since it used to be bound to `reload' until June 2007, I'm
     ;; going to leave it out for now.
     ;; (define-key map [?\C-c ?\C-r] 'inferior-haskell-load-and-run)
     (define-key map [?\C-c ?\C-b] 'switch-to-haskell)
@@ -308,7 +308,7 @@ be set to the preferred literate style."
 	   (if (consp k)
 	       (setq i (car k)
 		     lim (cdr k))
-	     (setq i k 
+	     (setq i k
 		   lim k))
 	   (while (<= i lim)
 	     (when (> i 127)
@@ -374,7 +374,7 @@ May return a qualified name."
         (buffer-substring-no-properties start end)))))
 
 (defun haskell-delete-indentation (&optional arg)
-  "Like `delete-indentation' but ignoring Bird-stlye \">\"."
+  "Like `delete-indentation' but ignoring Bird-style \">\"."
   (interactive "*P")
   (let ((fill-prefix (or fill-prefix (if (eq haskell-literate 'bird) ">"))))
     (delete-indentation arg)))
@@ -382,7 +382,8 @@ May return a qualified name."
 ;; Various mode variables.
 
 (defcustom haskell-mode-hook nil
-  "Hook run after entering Haskell mode. Do not select more than one of the three indentation modes."
+  "Hook run after entering Haskell mode.
+Do not select more than one of the three indentation modes."
   :type 'hook
   :options '(turn-on-haskell-indent turn-on-haskell-indentation turn-on-font-lock turn-on-eldoc-mode
 	     turn-on-simple-indent turn-on-haskell-doc-mode imenu-add-menubar-index))

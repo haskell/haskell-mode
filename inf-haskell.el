@@ -243,7 +243,7 @@ The process PROC should be associated to a comint buffer."
                             (re-search-forward comint-prompt-regexp nil t))
                       (not (accept-process-output proc timeout))))))
     (unless inferior-haskell-seen-prompt
-      (error "Can't find the prompt."))))
+      (error "Can't find the prompt"))))
 
 (defvar inferior-haskell-cabal-buffer nil)
 
@@ -512,12 +512,12 @@ The returned info is cached for reuse by `haskell-doc-mode'."
 
 (defcustom inferior-haskell-use-web-docs
   'fallback
-  "Whether to use the online documentation. Possible values:
+  "Whether to use the online documentation.  Possible values:
 `never', meaning always use local documentation, unless the local
 file doesn't exist, when do nothing, `fallback', which means only
 use the online documentation when the local file doesn't exist,
 or `always', meaning always use the online documentation,
-regardless of existance of local files. Default is `fallback'."
+regardless of existance of local files.  Default is `fallback'."
   :group 'haskell
   :type '(choice (const :tag "Never" never)
                  (const :tag "As fallback" fallback)
@@ -525,9 +525,9 @@ regardless of existance of local files. Default is `fallback'."
 
 (defcustom inferior-haskell-web-docs-base
   "http://haskell.org/ghc/docs/latest/html/libraries/"
-  "The base URL of the online libraries documentation. This will
-only be used if the value of `inferior-haskell-use-web-docs' is
-`always' or `fallback'."
+  "The base URL of the online libraries documentation.
+This will only be used if the value of `inferior-haskell-use-web-docs'
+is `always' or `fallback'."
   :group 'haskell
   :type 'string)
 
@@ -554,18 +554,16 @@ By default this is set to `ghc --print-libdir`/package.conf."
   (let ((info (inferior-haskell-info sym)))
     (unless (string-match inferior-haskell-module-re info)
       (error
-       "No documentation information available. Did you forget to C-c C-l?"))
+       "No documentation information available.  Did you forget to C-c C-l?"))
     (match-string-no-properties 1 info)))
 
 (defun inferior-haskell-query-ghc-pkg (&rest args)
-  "Send ARGS to ghc-pkg, or whatever the value of
-`haskell-package-manager' is.  Insert the output into the current
-buffer."
+  "Send ARGS to `haskell-package-manager-name'.
+Insert the output into the current buffer."
   (apply 'call-process haskell-package-manager-name nil t nil args))
 
 (defun inferior-haskell-get-package-list ()
-  "Get the list of packages from ghc-pkg, or whatever
-`haskell-package-manager-name' is."
+  "Get the list of packages from `haskell-package-manager-name'."
   (with-temp-buffer
     (inferior-haskell-query-ghc-pkg "--simple-output" "list")
     (split-string (buffer-substring (point-min) (point-max)))))
@@ -609,7 +607,7 @@ buffer."
                         (temp-directory)
                       temporary-file-directory))
   "Where to save the module -> package lookup table.
-Set this to `nil' to never cache to a file."
+Set this to nil to never cache to a file."
   :group 'haskell
   :type '(choice (const :tag "Don't cache to file" nil) string))
 
@@ -712,7 +710,7 @@ we load it."
                           "#v:" sym)
                 (and (file-exists-p local-path)
                      (concat "file://" local-path)))))
-    (if url (browse-url url) (error "Local file doesn't exist."))))
+    (if url (browse-url url) (error "Local file doesn't exist"))))
 
 (provide 'inf-haskell)
 

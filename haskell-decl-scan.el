@@ -304,7 +304,7 @@ then point does not move if already at the start of a declaration."
           (if (and start (bobp))
               (setq abyss t)
             ;; Otherwise we move to the start of the first declaration
-            ;; on a line preceeding the current one, skipping comments
+            ;; on a line preceding the current one, skipping comments
             (haskell-ds-move-to-start-regexp-skipping-comments -1 start-decl-re))))
       ;; If we are in the abyss, position and return as appropriate.
       (if abyss
@@ -321,7 +321,7 @@ then point does not move if already at the start of a declaration."
             (if direction
                 (haskell-ds-move-to-start-regexp-skipping-comments 1 start-decl-re))
           ;; If there is a variable, find the first
-          ;; succeeding/preceeding declaration that does not type or
+          ;; succeeding/preceding declaration that does not type or
           ;; bind it.  Check for reaching start/end of buffer and
           ;; comments.
           (haskell-ds-move-to-start-regexp-skipping-comments increment start-decl-re)
@@ -362,15 +362,15 @@ then point does not move if already at the start of a declaration."
   (and (boundp 'haskell-literate) (eq haskell-literate 'bird)))
 
 (defun haskell-ds-backward-decl ()
-  "Move point backward to the first character preceding the current
-point that starts a top-level declaration.  A series of declarations
-concerning one variable is treated as one declaration by this
-function.  So, if point is within a top-level declaration then move it
-to the start of that declaration.  If point is already at the start of
-a top-level declaration, then move it to the start of the preceding
-declaration.  Returns point if point is left at the start of a
-declaration, and nil otherwise, ie. because point is at the beginning
-of the buffer and no declaration starts there."
+  "Move backward to the first character that starts a top-level declaration.
+A series of declarations concerning one variable is treated as one
+declaration by this function.  So, if point is within a top-level
+declaration then move it to the start of that declaration.  If point
+is already at the start of a top-level declaration, then move it to
+the start of the preceding declaration.  Returns point if point is
+left at the start of a declaration, and nil otherwise, ie. because
+point is at the beginning of the buffer and no declaration starts
+there."
   (interactive)
   (haskell-ds-move-to-decl nil (haskell-ds-bird-p) nil))
 
