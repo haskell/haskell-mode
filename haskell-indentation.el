@@ -834,7 +834,7 @@ Preserves indentation and removes extra whitespace"
 		 (t (setq current-token (haskell-indentation-peek-token))))))))
 
 (defun haskell-indentation-peek-token ()
-  (cond ((looking-at "\\(if\\|then\\|else\\|let\\|in\\|mdo\\|do\\|case\\|of\\|where\\|module\\|deriving\\|data\\|type\\|newtype\\|class\\|instance\\)\\([^A-Za-z']\\|$\\)")
+  (cond ((looking-at "\\(if\\|then\\|else\\|let\\|in\\|do\\|case\\|of\\|where\\|module\\|deriving\\|data\\|type\\|newtype\\|class\\|instance\\)\\([^A-Za-z']\\|$\\)")
 	 (match-string 1))
 	((looking-at "[][(){}[,;]")
 	 (match-string 0))
@@ -848,12 +848,14 @@ Preserves indentation and removes extra whitespace"
   "Skip to the next token."
   (if (or (looking-at "'\\([^\\']\\|\\\\.\\)*'")
 	  (looking-at "\"\\([^\\\"]\\|\\\\.\\)*\"")
-          (looking-at "[A-Z][A-Z_a-z0-9']*\\(\\.[A-Z_a-z][A-Z_a-z0-9']*\\)*")  ; Allows hierarchical modules
-          (looking-at "[A-Z_a-z][A-Z_a-z0-9']*") ; Only unqualified vars can start with lowercase
+          (looking-at			; Allows hierarchical modules
+	   "[[:upper:]][[:alnum:]_']]*\\(\\.[[:alpha:]_][[:alnum:]_']*\\)*")
+          (looking-at ; Only unqualified vars can start with lowercase
+	   "[[:alnum:]_'][[:alnum:]_']*")
 	  (looking-at "[0-9][0-9oOxXeE+-]*")
 	  (looking-at "[-:!#$%&*+./<=>?@\\\\^|~]+")
 	  (looking-at "[](){}[,;]")
-	  (looking-at "`[A-Za-z0-9']*`"))
+	  (looking-at "`[[:alnum:]']*`"))
       (goto-char (match-end 0))
     ;; otherwise skip until space found
     (skip-syntax-forward "^-"))

@@ -392,7 +392,8 @@ Returns the location of the start of the comment, nil otherwise."
   (cond
    ((haskell-indent-empty-line-p) 'empty)
    ((haskell-indent-in-comment (point-min) (point)) 'comment)
-   ((looking-at "\\(\\([a-zA-Z]\\(\\sw\\|'\\)*\\)\\|_\\)[ \t\n]*") 'ident)
+   ((looking-at "\\(\\([[:alpha:]]\\(\\sw\\|'\\)*\\)\\|_\\)[ \t\n]*")
+    'ident)
    ((looking-at "\\(|[^|]\\)[ \t\n]*") 'guard)
    ((looking-at "\\(=[^>=]\\|::\\|->\\|<-\\)[ \t\n]*") 'rhs)
    (t 'other)))

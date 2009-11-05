@@ -126,7 +126,8 @@ This will either look for a Cabal file or a \"module\" statement in the file."
 (define-derived-mode inferior-haskell-mode comint-mode "Inf-Haskell"
   "Major mode for interacting with an inferior Haskell process."
   (set (make-local-variable 'comint-prompt-regexp)
-       "^\\*?[A-Z][\\._a-zA-Z0-9]*\\( \\*?[A-Z][\\._a-zA-Z0-9]*\\)*> ")
+       ;; Whay the backslash in [\\._[:alnum:]]?
+       "^\\*?[[:upper:]][\\._[:alnum:]]*\\(?: \\*?[[:upper:]][\\._[:alnum:]]*\\)*> ")
   (set (make-local-variable 'comint-input-autoexpand) nil)
   (add-hook 'comint-output-filter-functions 'inferior-haskell-spot-prompt nil t)
 

@@ -269,21 +269,10 @@ Returns keywords suitable for `font-lock-keywords'."
 
 	 ;; (ASCsymbol "-!#$%&*+./<=>?@\\\\^|~")
          ;; Put the minus first to make it work in ranges.
-         ;; (ISOsymbol "\241-\277\327\367")
-         (ISOlarge  "\300-\326\330-\337")
-         (ISOsmall  "\340-\366\370-\377")
-         (small
-          (if haskell-emacs21-features "[:lower:]" (concat "a-z" ISOsmall)))
-         (large
-          (if haskell-emacs21-features "[:upper:]" (concat "A-Z" ISOlarge)))
-	 (alnum
-	  (if haskell-emacs21-features "[:alnum:]" (concat small large "0-9")))
-         ;; (symbol
-         ;;  (concat ASCsymbol ISOsymbol))
 
          ;; We allow _ as the first char to fit GHC
-         (varid (concat "\\b[" small "_][" alnum "'_]*\\b"))
-         (conid (concat "\\b[" large "][" alnum "'_]*\\b"))
+         (varid "\\b[[:lower:]_][[:alnum:]'_]*\\b")
+         (conid "\\b[[:upper:]][[:alnum:]'_]*\\b")
 	 (modid (concat "\\b" conid "\\(\\." conid "\\)*\\b"))
          (qvarid (concat modid "\\." varid))
          (qconid (concat modid "\\." conid))
