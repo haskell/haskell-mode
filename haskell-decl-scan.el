@@ -191,9 +191,9 @@ Point is not changed."
                     "\\(\\'\\)?\\s-*\\(\\s_+\\|`\\(\\sw+\\)`\\)")
                 "\\(\\sw+\\)?\\s-*\\(\\s_+\\|`\\(\\sw+\\)`\\)"))
              (let ((match2 (haskell-ds-match-string 2)))
-               ;; Weed out `::', `=' and `|' from potential infix
+               ;; Weed out `::', `∷',`=' and `|' from potential infix
                ;; symbolic variable.
-               (if (member match2 '("::" "=" "|"))
+               (if (member match2 '("::" "∷" "=" "|"))
                    ;; Variable identifier.
                    (haskell-ds-match-string 1)
                  (if (eq (aref match2 0) ?\`)
