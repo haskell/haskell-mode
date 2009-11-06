@@ -253,6 +253,8 @@ be set to the preferred literate style."
     (define-key map (kbd "C-c M-.") 'inferior-haskell-find-definition)
     (define-key map (kbd "C-c C-d") 'inferior-haskell-find-haddock)
 
+    (define-key map [?\C-c ?\C-v] 'haskell-check)
+
     (define-key map [remap delete-indentation] 'haskell-delete-indentation)
     map)
   "Keymap used in Haskell mode.")
@@ -538,8 +540,50 @@ If nil, use the Hoogle web-site."
 
 ;;;###autoload
 (defalias 'hayoo 'haskell-hayoo)
+
+(defcustom haskell-check-command "hlint"
+  "*Command used to check a Haskell file."
+  :type '(choice (const "hlint")
+		 (const "ghc -fno-code")
+		 (string :tag "Other command")))
 
+(defvar haskell-saved-check-command nil
+  "Internal use.")
 
+;; Like Python.  Should be abstracted, sigh.
+(defun haskell-check (command)
+  "Check a Haskell file (default current buffer's file).
+Runs COMMAND, a shell command, as if by `compile'.
+See `haskell-check-command' for the default."
+  (interactive
+   (list (read-string "Checker command: "
+		      (or haskell-saved-check-command
+			  (concat haskell-check-command " "
+				  (let ((name (buffer-file-name)))
+				    (if name
+					(file-name-nondirectory name))))))))
+  (setq haskell-saved-check-command command)
+  (require 'compile)
+  (save-some-buffers (not compilation-ask-about-save) nil)
+  (if (fboundp 'compilation-start)
+      (compilation-start command)
+    (compile-internal command "No more errors")))
+
+(autoload 'flymake-init-create-temp-buffer-copy "flymake")
+
+(defun haskell-flymake-init ()
+  "Flymake init function for Haskell.
+To be added to `flymake-init-create-temp-buffer-copy'."
+  (let ((checker-elts (split-string haskell-saved-check-command)))
+    (list (car checker-elts)
+	  (append (cdr checker-elts)
+		  (list (flymake-init-create-temp-buffer-copy
+			 'flymake-create-temp-inplace))))))
+
+(eval-after-load "flymake"
+  '(add-to-list 'flymake-allowed-file-name-masks
+		'("\\.l?hs\\'" haskell-flymake-init)))
+
 ;; Provide ourselves:
 
 (provide 'haskell-mode)
