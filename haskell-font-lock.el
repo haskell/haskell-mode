@@ -293,7 +293,7 @@ Returns keywords suitable for `font-lock-keywords'."
 	  (concat "\\S_"
 		  ;; (regexp-opt '(".." "::" "=" "\\" "|" "<-" "->"
 		  ;; 		"@" "~" "=>") t)
-		  "\\(->\\|\\.\\.\\|::\\|<-\\|=>\\|[=@\\|~]\\)"
+		  "\\(->\\|\\.\\.\\|::\\|∷\\|<-\\|=>\\|[=@\\|~]\\)"
 		  "\\S_"))
          ;; Reserved identifiers
 	 (reservedid
@@ -322,10 +322,10 @@ Returns keywords suitable for `font-lock-keywords'."
 	 (topdecl-var
 	  (concat line-prefix "\\(" varid "\\)\\s-*\\("
                   ;; A toplevel declaration can be followed by a definition
-                  ;; (=), a type (::), a guard, or a pattern which can
+                  ;; (=), a type (::) or (∷), a guard, or a pattern which can
                   ;; either be a variable, a constructor, a parenthesized
                   ;; thingy, or an integer or a string.
-		  varid "\\|" conid "\\|::\\|=\\||\\|\\s(\\|[0-9\"']\\)"))
+		  varid "\\|" conid "\\|::\\|∷\\|=\\||\\|\\s(\\|[0-9\"']\\)"))
 	 (topdecl-var2
 	  (concat line-prefix "\\(" varid "\\|" conid "\\)\\s-*`\\(" varid "\\)`"))
 	 (topdecl-sym
