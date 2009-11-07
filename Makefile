@@ -51,10 +51,9 @@ dist:
 	rm -r _darcs &&\
 	sed -i 's/\$$Name:  \$$/$(TAG)/g' * &&\
 	make $(AUTOLOADS) &&\
-	make $(ELCFILES) &&\
 	darcs changes > ChangeLog &&\
 	rm Makefile &&\
 	cd .. &&\
 	tar czf $(PACKAGE)-$(VERSION).tar.gz $(PACKAGE)-$(VERSION) &&\
 	rm -rf $(PACKAGE)-$(VERSION) &&\
-	cp $(PACKAGE)-$(VERSION).tar.gz ../haskellmode-emacs-web/
+	mv $(PACKAGE)-$(VERSION).tar.gz ../haskellmode-emacs-web/

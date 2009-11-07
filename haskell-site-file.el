@@ -26,7 +26,7 @@ Major mode for Cabal package description files.
 ;;;***
 
 ;;;### (autoloads (haskell-decl-scan-mode) "haskell-decl-scan" "haskell-decl-scan.el"
-;;;;;;  (19171 22855))
+;;;;;;  (19184 11012))
 ;;; Generated autoloads from haskell-decl-scan.el
 
 (autoload 'haskell-decl-scan-mode "haskell-decl-scan" "\
@@ -71,7 +71,7 @@ assumed, respectively.
 
 Invokes `haskell-decl-scan-mode-hook'.
 
-\(fn &optional ARG)" nil nil)
+\(fn &optional ARG)" t nil)
 
 ;;;***
 
@@ -130,7 +130,7 @@ Invokes `haskell-indent-hook' if not nil.
 ;;;***
 
 ;;;### (autoloads (haskell-indentation-mode) "haskell-indentation"
-;;;;;;  "haskell-indentation.el" (19181 56295))
+;;;;;;  "haskell-indentation.el" (19183 7319))
 ;;; Generated autoloads from haskell-indentation.el
 
 (autoload 'haskell-indentation-mode "haskell-indentation" "\
@@ -144,7 +144,7 @@ autofill-mode.
 ;;;***
 
 ;;;### (autoloads (haskell-hayoo haskell-hoogle literate-haskell-mode
-;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (19182 30))
+;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (19184 9020))
 ;;; Generated autoloads from haskell-mode.el
 
 (add-to-list 'load-path (or (file-name-directory load-file-name) (car load-path)))
@@ -267,7 +267,8 @@ we load it.
 ;;;***
 
 ;;;### (autoloads nil nil ("haskell-font-lock.el" "haskell-ghci.el"
-;;;;;;  "haskell-hugs.el" "haskell-simple-indent.el") (19182 33 984749))
+;;;;;;  "haskell-hugs.el" "haskell-simple-indent.el") (19189 20651
+;;;;;;  303543))
 
 ;;;***
 
