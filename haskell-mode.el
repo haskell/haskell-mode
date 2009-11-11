@@ -227,6 +227,7 @@ of `haskell-literate-default' is used.")
   "Default value for `haskell-literate'.
 Used if the style of a literate buffer is ambiguous.  This variable should
 be set to the preferred literate style."
+  :group 'haskell
   :type '(choice (const bird) (const tex) (const nil)))
 
 ;; Mode maps.
@@ -496,6 +497,7 @@ Invokes `haskell-mode-hook'."
   (if (executable-find "hoogle") "hoogle")
   "Name of the command to use to query Hoogle.
 If nil, use the Hoogle web-site."
+  :group 'haskell
   :type '(choice (const :tag "Use Web-site" nil)
                  string))
 

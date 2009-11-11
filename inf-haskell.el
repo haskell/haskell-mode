@@ -121,6 +121,7 @@ The format should be the same as for `compilation-error-regexp-alist'.")
 (defcustom inferior-haskell-find-project-root t
   "If non-nil, try and find the project root directory of this file.
 This will either look for a Cabal file or a \"module\" statement in the file."
+  :group 'haskell
   :type 'boolean)
 
 (define-derived-mode inferior-haskell-mode comint-mode "Inf-Haskell"

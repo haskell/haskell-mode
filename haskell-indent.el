@@ -323,6 +323,7 @@ It deals with both Bird style and non Bird-style scripts."
 
 (defcustom haskell-indent-look-past-empty-line t
   "If nil, indentation engine will not look past an empty line for layout points."
+  :group 'haskell-indent
   :type 'boolean)
 
 (defun haskell-indent-start-of-def ()
@@ -1015,6 +1016,7 @@ OPEN is the start position of the comment in which point is."
   "If non-nil, \"then\" and \"else\" are indented.
 This is necessary in the \"do\" layout under Haskell-98.
 See http://hackage.haskell.org/trac/haskell-prime/wiki/DoAndIfThenElse"
+  :group 'haskell-indent
   :type 'integer)
 
 (defun haskell-indent-closing-keyword (start)
@@ -1060,6 +1062,7 @@ If absent OFFSET defaults to `haskell-indent-offset'.
 
 OFFSET-HANGING is the offset to use in the case where the keyword
 is at the end of an otherwise-non-empty line."
+  :group 'haskell-indent
   :type '(repeat (choice string
                          (cons :tag "" (string :tag "keyword:")
                          (cons :tag "" (integer :tag "offset")
@@ -1087,6 +1090,7 @@ is at the end of an otherwise-non-empty line."
 
 (defcustom haskell-indent-dont-hang '("(")
   "Lexemes that should never be considered as hanging."
+  :group 'haskell-indent
   :type '(repeat string))
 
 (defun haskell-indent-hanging-p ()
