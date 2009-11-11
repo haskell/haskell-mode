@@ -65,9 +65,12 @@
   :type 'integer
   :group 'haskell-indentation)
 
-(when (featurep 'xemacs)
-  (defun syntax-ppss (&rest pos)
-    (parse-partial-sexp (point-min) (or pos (point)))))
+;; Avoid a global bogus definition (which the original run-time
+;; `defun' made), and support Emacs 21 without the syntax.el add-on.
+(eval-when-compile
+  (unless (fboundp 'syntax-ppss)
+    (defsubst syntax-ppss (&rest pos)
+      (parse-partial-sexp (point-min) (or pos (point))))))
 
 (defconst haskell-indentation-mode-map
   (let ((keymap (make-sparse-keymap)))
