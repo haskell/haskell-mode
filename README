@@ -1,4 +1,4 @@
-Haskell Mode for Emacs
+Haskell Mode for Emacs                                        -*-text-*-
 ----------------------
 Version number: $Name:  $.
 
@@ -95,11 +95,19 @@ customisation.
 Known problems
 --------------
 
-It seems that some version of XEmacs come without the fsf-compat package
+It seems that some versions of XEmacs come without the fsf-compat package
 (which provides functions such as `line-end-position') and it seems that
 even if your XEmacs does have the fsf-compat package installed it does not
 autoload its part.  Thus you may have to install the fsf-compat package and
 add (require 'goto-addr) in your .emacs.
+
+
+Multi-mode editing
+------------------
+
+For LaTeX-based literate Haskell, you might be interested in the
+multiple major mode package haskell-latex.el (plus multi-mode.el) from
+http://www.loveshack.ukfsn.org/emacs/.
 
 
 Support
