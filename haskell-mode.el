@@ -543,6 +543,7 @@ If nil, use the Hoogle web-site."
 
 (defcustom haskell-check-command "hlint"
   "*Command used to check a Haskell file."
+  :group 'haskell
   :type '(choice (const "hlint")
 		 (const "ghc -fno-code")
 		 (string :tag "Other command")))
