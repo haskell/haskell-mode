@@ -282,7 +282,7 @@ The process PROC should be associated to a comint buffer."
             (goto-char (point-min))
             (let ((case-fold-search nil))
               (when (re-search-forward
-                     "^module[ \t]+\\([^- \t\n]+\\.[^- \t\n]+\\)[ \t]+where\\>" nil t)
+                     "^module[ \t]+\\([^- \t\n]+\\.[^- \t\n]+\\)[ \t]+" nil t)
                 (let* ((dir default-directory)
                        (module (match-string 1))
                        (pos 0))
