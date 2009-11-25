@@ -846,18 +846,20 @@ Preserves indentation and removes extra whitespace"
 
 (defun haskell-indentation-skip-token ()
   "Skip to the next token."
-  (if (or (looking-at "'\\([^\\']\\|\\\\.\\)*'")
-	  (looking-at "\"\\([^\\\"]\\|\\\\.\\)*\"")
-          (looking-at "[A-Z][A-Z_a-z0-9']*\\(\\.[A-Z_a-z][A-Z_a-z0-9']*\\)*")  ; Allows hierarchical modules
-          (looking-at "[A-Z_a-z][A-Z_a-z0-9']*") ; Only unqualified vars can start with lowercase
-	  (looking-at "[0-9][0-9oOxXeE+-]*")
-	  (looking-at "[-:!#$%&*+./<=>?@\\\\^|~]+")
-	  (looking-at "[](){}[,;]")
-	  (looking-at "`[A-Za-z0-9']*`"))
-      (goto-char (match-end 0))
+  (let ((case-fold-search nil))
+    (if (or (looking-at "'\\([^\\']\\|\\\\.\\)*'")
+            (looking-at "\"\\([^\\\"]\\|\\\\.\\)*\"")
+            (looking-at	; Hierarchical names always start with uppercase
+             "[[:upper:]]\\sw*\\(\\.\\sw+\\)*")
+            (looking-at "\\sw+") ; Only unqualified vars can start with lowercase
+            (looking-at "[0-9][0-9oOxXeE+-]*")
+            (looking-at "[-:!#$%&*+./<=>?@\\\\^|~]+")
+            (looking-at "[](){}[,;]")
+            (looking-at "`[[:alnum:]']*`"))
+        (goto-char (match-end 0))
     ;; otherwise skip until space found
-    (skip-syntax-forward "^-"))
-  (forward-comment (buffer-size)))
+      (skip-syntax-forward "^-"))
+    (forward-comment (buffer-size))))
 
 (provide 'haskell-indentation)
 ;;; haskell-indentation.el ends here
