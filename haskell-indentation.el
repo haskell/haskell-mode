@@ -850,7 +850,7 @@ Preserves indentation and removes extra whitespace"
     (if (or (looking-at "'\\([^\\']\\|\\\\.\\)*'")
             (looking-at "\"\\([^\\\"]\\|\\\\.\\)*\"")
             (looking-at	; Hierarchical names always start with uppercase
-             "[[:upper:]]\\(\\sw\\|'\\))*\\(\\.\\(\\sw\\|'\\)+\\)*")
+             "[[:upper:]]\\(\\sw\\|'\\)*\\(\\.\\(\\sw\\|'\\)+\\)*")
             (looking-at "\\sw\\(\\sw\\|'\\)*") ; Only unqualified vars can start with lowercase
             (looking-at "[0-9][0-9oOxXeE+-]*")
             (looking-at "[-:!#$%&*+./<=>?@\\\\^|~]+")
