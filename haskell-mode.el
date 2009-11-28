@@ -445,6 +445,9 @@ Use `haskell-version' to find out what version this is.
 Invokes `haskell-mode-hook'."
   (set (make-local-variable 'paragraph-start) (concat "^$\\|" page-delimiter))
   (set (make-local-variable 'paragraph-separate) paragraph-start)
+  (set (make-local-variable 'fill-paragraph-function) 'haskell-fill-paragraph)
+  ;; (set (make-local-variable 'adaptive-fill-function) 'haskell-adaptive-fill)
+  (set (make-local-variable 'adaptive-fill-mode) nil)
   (set (make-local-variable 'comment-start) "-- ")
   (set (make-local-variable 'comment-padding) 0)
   (set (make-local-variable 'comment-start-skip) "[-{]-[ \t]*")
@@ -473,6 +476,30 @@ Invokes `haskell-mode-hook'."
   (set (make-local-variable 'indent-tabs-mode) nil)
   (set (make-local-variable 'tab-width) 8)
   (setq haskell-literate nil))
+
+(defun in-comment () (nth 4 (syntax-ppss)))
+
+(defun haskell-fill-paragraph (justify)
+  (save-excursion
+    ;; We don't want to reflow code.
+    (unless (in-comment)
+      (end-of-line)) ; Try to get inside a comment
+    (if (in-comment) nil t)))
+
+;; (defun haskell-adaptive-fill ()
+;;   ;; We want to use "--  " as the prefix of "-- |", etc.
+;;   (let* ((line-end (save-excursion (end-of-line) (point)))
+;;          (line-start (point)))
+;;     (save-excursion
+;;       (unless (in-comment)
+;;         ;; Try to find the start of a comment. We only fill comments.
+;;         (search-forward-regexp comment-start-skip line-end t))
+;;       (when (in-comment)
+;;         (let ();(prefix-start (point)))
+;;           (skip-syntax-forward "^w")
+;;           (make-string (- (point) line-start) ?\s))))))
+          
+
 
 ;;;###autoload
 (define-derived-mode literate-haskell-mode haskell-mode "LitHaskell"

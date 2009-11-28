@@ -13,7 +13,7 @@ Major mode for Haskell FFI files.
 ;;;***
 
 ;;;### (autoloads (haskell-cabal-mode) "haskell-cabal" "haskell-cabal.el"
-;;;;;;  (19171 22843))
+;;;;;;  (19206 35523))
 ;;; Generated autoloads from haskell-cabal.el
 
 (add-to-list 'auto-mode-alist '("\\.cabal\\'" . haskell-cabal-mode))
@@ -26,7 +26,7 @@ Major mode for Cabal package description files.
 ;;;***
 
 ;;;### (autoloads (haskell-decl-scan-mode) "haskell-decl-scan" "haskell-decl-scan.el"
-;;;;;;  (19184 11012))
+;;;;;;  (19206 35523))
 ;;; Generated autoloads from haskell-decl-scan.el
 
 (autoload 'haskell-decl-scan-mode "haskell-decl-scan" "\
@@ -76,7 +76,7 @@ Invokes `haskell-decl-scan-mode-hook'.
 ;;;***
 
 ;;;### (autoloads (haskell-doc-show-type haskell-doc-mode) "haskell-doc"
-;;;;;;  "haskell-doc.el" (19171 22859))
+;;;;;;  "haskell-doc.el" (19206 35819))
 ;;; Generated autoloads from haskell-doc.el
 
 (autoload 'haskell-doc-mode "haskell-doc" "\
@@ -99,15 +99,16 @@ current buffer.
 ;;;***
 
 ;;;### (autoloads (haskell-indent-mode) "haskell-indent" "haskell-indent.el"
-;;;;;;  (19171 22857))
+;;;;;;  (19206 35819))
 ;;; Generated autoloads from haskell-indent.el
 
 (autoload 'haskell-indent-mode "haskell-indent" "\
-``intelligent'' Haskell indentation mode that deals with
-the layout rule of Haskell.  \\[haskell-indent-cycle] starts the cycle
-which proposes new possibilities as long as the TAB key is pressed.
-Any other key or mouse click terminates the cycle and is interpreted
-except for RET which merely exits the cycle.
+``Intelligent'' Haskell indentation mode.
+This deals with the layout rule of Haskell.
+\\[haskell-indent-cycle] starts the cycle which proposes new
+possibilities as long as the TAB key is pressed.  Any other key
+or mouse click terminates the cycle and is interpreted except for
+RET which merely exits the cycle.
 Other special keys are:
     \\[haskell-indent-insert-equal]
       inserts an =
@@ -130,7 +131,7 @@ Invokes `haskell-indent-hook' if not nil.
 ;;;***
 
 ;;;### (autoloads (haskell-indentation-mode) "haskell-indentation"
-;;;;;;  "haskell-indentation.el" (19183 7319))
+;;;;;;  "haskell-indentation.el" (19216 1488))
 ;;; Generated autoloads from haskell-indentation.el
 
 (autoload 'haskell-indentation-mode "haskell-indentation" "\
@@ -144,7 +145,7 @@ autofill-mode.
 ;;;***
 
 ;;;### (autoloads (haskell-hayoo haskell-hoogle literate-haskell-mode
-;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (19184 9020))
+;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (19217 23751))
 ;;; Generated autoloads from haskell-mode.el
 
 (add-to-list 'load-path (or (file-name-directory load-file-name) (car load-path)))
@@ -212,8 +213,8 @@ Do a Hayoo search for QUERY.
 
 ;;;### (autoloads (inferior-haskell-find-haddock inferior-haskell-find-definition
 ;;;;;;  inferior-haskell-info inferior-haskell-type inferior-haskell-load-file
-;;;;;;  switch-to-haskell) "inf-haskell" "inf-haskell.el" (19181
-;;;;;;  47090))
+;;;;;;  switch-to-haskell) "inf-haskell" "inf-haskell.el" (19214
+;;;;;;  18334))
 ;;; Generated autoloads from inf-haskell.el
 
 (defalias 'run-haskell 'switch-to-haskell)
@@ -267,8 +268,8 @@ we load it.
 ;;;***
 
 ;;;### (autoloads nil nil ("haskell-font-lock.el" "haskell-ghci.el"
-;;;;;;  "haskell-hugs.el" "haskell-simple-indent.el") (19189 20651
-;;;;;;  303543))
+;;;;;;  "haskell-hugs.el" "haskell-simple-indent.el") (19217 23753
+;;;;;;  561352))
 
 ;;;***
 
