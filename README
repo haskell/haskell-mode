@@ -91,6 +91,8 @@ Most customizations are on the functionality of a particular module.
 See the documentation of that module for information on its
 customisation.
 
+There is also a wiki page listing tips and tricks at
+http://trac.haskell.org/haskellmode-emacs/wiki/Tips
 
 Known problems
 --------------
@@ -113,9 +115,5 @@ http://www.loveshack.ukfsn.org/emacs/.
 Support
 -------
 
-Any problems, do mail me <svein.ove@aas.no> and I will try my best
-to help you!
-
-
-
-<!-- arch-tag: 25fc8494-611d-459f-9919-579c97f6313e -->
+Mailing list: http://projects.haskell.org/cgi-bin/mailman/listinfo/haskellmode-emacs
+Bug tracker:  http://trac.haskell.org/haskellmode-emacs/
