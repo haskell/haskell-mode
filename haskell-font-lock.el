@@ -448,12 +448,16 @@ that should be commented under LaTeX-style literate scripts."
     ;; The second \ in a gap does not quote the subsequent char.
     ;; It's probably not worth the trouble, tho.
     ;; ("^[ \t]*\\(\\\\\\)" (1 "."))
-    ;; Deal with instances of `--' which don't form a comment.
-    ("\\s_\\{3,\\}" (0 (if (string-match "\\`-*\\'" (match-string 0))
-                           ;; Sequence of hyphens.  Do nothing in
-                           ;; case of things like `{---'.
-			   nil
-			 "_")))))	; other symbol sequence
+    ;; Deal with instances of `--' which don't form a comment
+    ("\\s_\\{3,\\}" (0 (cond ((nth 4 (syntax-ppss))
+                              ;; There are no such instances inside an existing comment
+                              nil)
+                             ((string-match "\\`-*\\'" (match-string 0))
+                              ;; Sequence of hyphens.  Do nothing in
+                              ;; case of things like `{---'.
+                              nil)
+                             (t "_"))))	; other symbol sequence
+    ))
 
 (defconst haskell-bird-syntactic-keywords
   (cons '("^[^\n>]"  (0 "<"))
