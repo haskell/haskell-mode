@@ -453,7 +453,7 @@ Invokes `haskell-mode-hook'."
   (set (make-local-variable 'comment-start-skip) "[-{]-[ \t]*")
   (set (make-local-variable 'comment-end) "")
   (set (make-local-variable 'comment-end-skip) "[ \t]*\\(-}\\|\\s>\\)")
-  (set (make-local-variable 'parse-sexp-ignore-comments) t)
+  (set (make-local-variable 'parse-sexp-ignore-comments) nil)
   ;; Set things up for eldoc-mode.
   (set (make-local-variable 'eldoc-documentation-function)
        'haskell-doc-current-info)
