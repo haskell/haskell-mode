@@ -449,8 +449,8 @@ that should be commented under LaTeX-style literate scripts."
     ;; It's probably not worth the trouble, tho.
     ;; ("^[ \t]*\\(\\\\\\)" (1 "."))
     ;; Deal with instances of `--' which don't form a comment
-    ("\\s_\\{3,\\}" (0 (cond ((nth 4 (syntax-ppss))
-                              ;; There are no such instances inside an existing comment
+    ("\\s_\\{3,\\}" (0 (cond ((numberp (nth 4 (syntax-ppss)))
+                              ;; There are no such instances inside nestable comments
                               nil)
                              ((string-match "\\`-*\\'" (match-string 0))
                               ;; Sequence of hyphens.  Do nothing in
