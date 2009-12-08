@@ -401,8 +401,10 @@ Do not select more than one of the three indentation modes."
 	     ,(if (boundp 'eldoc-documentation-function)
 		  'turn-on-eldoc-mode
 		'turn-on-haskell-doc-mode) ; Emacs 21
+	     ,@(if (fboundp 'capitalized-words-mode)
+		   '(capitalized-words-mode))
 	     turn-on-simple-indent turn-on-haskell-doc-mode
-	     imenu-add-menubar-index))
+	     turn-on-haskell-decl-scan imenu-add-menubar-index))
 
 (defvar eldoc-print-current-symbol-info-function)
 
