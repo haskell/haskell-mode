@@ -521,8 +521,10 @@ Invokes `haskell-mode-hook'."
   (set (make-local-variable 'mode-line-process)
        '("/" (:eval (symbol-name haskell-literate)))))
 
-;;;###autoload(add-to-list 'auto-mode-alist '("\\.\\(?:[gh]s\\|hi\\)\\'" . haskell-mode))
-;;;###autoload(add-to-list 'auto-mode-alist '("\\.l[gh]s\\'" . literate-haskell-mode))
+;;;###autoload(add-to-list 'auto-mode-alist        '("\\.\\(?:[gh]s\\|hi\\)\\'" . haskell-mode))
+;;;###autoload(add-to-list 'auto-mode-alist        '("\\.l[gh]s\\'" . literate-haskell-mode))
+;;;###autoload(add-to-list 'interpreter-mode-alist '("runghc" . haskell-mode))
+;;;###autoload(add-to-list 'interpreter-mode-alist '("runhaskell" . haskell-mode))
 
 (defcustom haskell-hoogle-command
   (if (executable-find "hoogle") "hoogle")

@@ -192,8 +192,10 @@ Invokes `haskell-mode-hook'.
 As `haskell-mode' but for literate scripts.
 
 \(fn)" t nil)
-(add-to-list 'auto-mode-alist '("\\.\\(?:[gh]s\\|hi\\)\\'" . haskell-mode))
-(add-to-list 'auto-mode-alist '("\\.l[gh]s\\'" . literate-haskell-mode))
+(add-to-list 'auto-mode-alist        '("\\.\\(?:[gh]s\\|hi\\)\\'" . haskell-mode))
+(add-to-list 'auto-mode-alist        '("\\.l[gh]s\\'" . literate-haskell-mode))
+(add-to-list 'interpreter-mode-alist '("runghc" . haskell-mode))
+(add-to-list 'interpreter-mode-alist '("runhaskell" . haskell-mode))
 
 (autoload 'haskell-hoogle "haskell-mode" "\
 Do a Hoogle search for QUERY.
