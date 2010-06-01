@@ -67,6 +67,16 @@
   :type 'integer
   :group 'haskell-indentation)
 
+(defcustom haskell-indentation-where-pre-offset 2
+  "Extra indentation before the keyword `where'."
+  :type 'integer
+  :group 'haskell-indentation)
+
+(defcustom haskell-indentation-where-post-offset 2
+  "Extra indentation after the keyword `where'."
+  :type 'integer
+  :group 'haskell-indentation)
+
 ;; Avoid a global bogus definition (which the original run-time
 ;; `defun' made), and support Emacs 21 without the syntax.el add-on.
 (eval-when-compile
@@ -446,7 +456,7 @@ Preserves indentation and removes extra whitespace"
 			   '(haskell-indentation-expression
 			     "->" haskell-indentation-expression))))
     ("where" . (lambda () (haskell-indentation-with-starter
-			   #'haskell-indentation-declaration-layout nil)))
+			   #'haskell-indentation-declaration-layout nil t)))
     ("::"    . (lambda () (haskell-indentation-statement-right #'haskell-indentation-type)))
     ("="     . (lambda () (haskell-indentation-statement-right #'haskell-indentation-expression)))
     ("<-"    . (lambda () (haskell-indentation-statement-right #'haskell-indentation-expression)))
@@ -571,7 +581,7 @@ Preserves indentation and removes extra whitespace"
 											  ,stmt-sep))
    end))
 
-(defun haskell-indentation-with-starter (parser end)
+(defun haskell-indentation-with-starter (parser end &optional where-expr?)
   (let ((starter-column (haskell-current-column))
 		(current-indent current-indent)
 		(left-indent (if (= (haskell-current-column) (current-indentation))
@@ -580,8 +590,10 @@ Preserves indentation and removes extra whitespace"
     (when (equal current-token 'end-tokens)
       (if (equal following-token end)
 	  (haskell-indentation-add-indentation starter-column)
+        (if where-expr?
+            (haskell-indentation-add-where-post-indent left-indent)
 	  (haskell-indentation-add-indentation
-	   (+ left-indent haskell-indentation-left-offset)))
+	   (+ left-indent haskell-indentation-left-offset))))
       (throw 'parse-end nil))
     (let* ((current-indent (haskell-current-column))
 		   (starter-indent (min starter-column current-indent))
@@ -659,8 +671,7 @@ Preserves indentation and removes extra whitespace"
 
 	 ((equal current-token 'end-tokens)
 	  (cond ((equal following-token "where")
-		 (haskell-indentation-add-indentation
-		  (+ left-indent haskell-indentation-left-offset)))
+		 (haskell-indentation-add-where-pre-indent))
 		((haskell-indentation-expression-token following-token)
 		 (haskell-indentation-add-indentation
 		  current-indent)))
@@ -802,6 +813,17 @@ Preserves indentation and removes extra whitespace"
 
 (defun haskell-indentation-add-layout-indent ()
   (haskell-indentation-push-indentation layout-indent))
+
+(defun haskell-indentation-add-where-pre-indent ()
+  (haskell-indentation-push-indentation
+   (+ layout-indent haskell-indentation-where-pre-offset))
+  (if (= layout-indent haskell-indentation-layout-offset)
+      (haskell-indentation-push-indentation
+       haskell-indentation-where-pre-offset)))
+
+(defun haskell-indentation-add-where-post-indent (indent)
+  (haskell-indentation-push-indentation
+   (+ indent haskell-indentation-where-post-offset)))
 
 (defun haskell-indentation-push-indentation (indent)
   (when (or (null possible-indentations)
