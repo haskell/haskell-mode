@@ -442,6 +442,9 @@ Preserves indentation and removes extra whitespace"
     ("\\"    . (lambda () (haskell-indentation-phrase
 			   '(haskell-indentation-expression
 			     "->" haskell-indentation-expression))))
+    ("proc"  . (lambda () (haskell-indentation-phrase
+			   '(haskell-indentation-expression
+			     "->" haskell-indentation-expression))))
     ("where" . (lambda () (haskell-indentation-with-starter
 			   #'haskell-indentation-declaration-layout nil)))
     ("::"    . (lambda () (haskell-indentation-statement-right #'haskell-indentation-type)))
@@ -848,7 +851,7 @@ Preserves indentation and removes extra whitespace"
 		 (t (setq current-token (haskell-indentation-peek-token))))))))
 
 (defun haskell-indentation-peek-token ()
-  (cond ((looking-at "\\(if\\|then\\|else\\|let\\|in\\|mdo\\|do\\|case\\|of\\|where\\|module\\|deriving\\|data\\|type\\|newtype\\|class\\|instance\\)\\([^[:alpha:]']\\|$\\)")
+  (cond ((looking-at "\\(if\\|then\\|else\\|let\\|in\\|mdo\\|do\\|proc\\|case\\|of\\|where\\|module\\|deriving\\|data\\|type\\|newtype\\|class\\|instance\\)\\([^[:alpha:]']\\|$\\)")
 	 (match-string 1))
 	((looking-at "[][(){}[,;]")
 	 (match-string 0))
