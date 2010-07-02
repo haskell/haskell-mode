@@ -1,10 +1,10 @@
 
 ;;;### (autoloads (ghc-core-mode ghc-core-create-core) "ghc-core"
-;;;;;;  "ghc-core.el" (19501 53915))
+;;;;;;  "ghc-core.el" (19501 54140))
 ;;; Generated autoloads from ghc-core.el
 
 (autoload 'ghc-core-create-core "ghc-core" "\
-Not documented
+Compiled and load the current buffer as tidy core
 
 \(fn)" t nil)
 
@@ -149,7 +149,7 @@ Invokes `haskell-indent-hook' if not nil.
 ;;;***
 
 ;;;### (autoloads (haskell-indentation-mode) "haskell-indentation"
-;;;;;;  "haskell-indentation.el" (19291 17344))
+;;;;;;  "haskell-indentation.el" (19501 54761))
 ;;; Generated autoloads from haskell-indentation.el
 
 (autoload 'haskell-indentation-mode "haskell-indentation" "\
@@ -294,7 +294,7 @@ we load it.
 
 ;;;### (autoloads nil nil ("haskell-font-lock.el" "haskell-ghci.el"
 ;;;;;;  "haskell-hugs.el" "haskell-simple-indent.el" "test.el") (19501
-;;;;;;  53924 514127))
+;;;;;;  54762 893427))
 
 ;;;***
 

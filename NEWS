@@ -1,3 +1,21 @@
+Changes since 2.7.0
+
+* Minimal indentation support for arrow syntax
+
+* Avoid opening a new inf-haskell window if one is already visible.
+  Windows on other virtual desktops or iconified frames don't count.
+
+* Force comint-process-echoes to nil
+
+* Autolaunch haskell-mode for files starting with #!/usr/bin/runghc
+  and similar
+
+* Added minimal major mode for parsing GHC core files, courtesy of Johan Tibell.
+  There is a corresponding Haskell menu entry.
+
+* Allow configuration of where-clause indentation; M-x customize-group
+  haskell-indentation.
+  
 Changes since 2.6.4
 
 * fill-paragraph (M-q) now only affects comments, and correctly
