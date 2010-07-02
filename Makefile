@@ -12,6 +12,7 @@ ELFILES = \
 	haskell-indentation.el \
 	haskell-mode.el \
 	haskell-simple-indent.el \
+	ghc-core.el \
 	inf-haskell.el
 
 ELCFILES = $(ELFILES:.el=.elc)

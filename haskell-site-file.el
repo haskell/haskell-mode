@@ -1,4 +1,22 @@
 
+;;;### (autoloads (ghc-core-mode ghc-core-create-core) "ghc-core"
+;;;;;;  "ghc-core.el" (19501 53915))
+;;; Generated autoloads from ghc-core.el
+
+(autoload 'ghc-core-create-core "ghc-core" "\
+Not documented
+
+\(fn)" t nil)
+
+(add-to-list 'auto-mode-alist '("\\.hcr\\'" . ghc-core-mode))
+
+(autoload 'ghc-core-mode "ghc-core" "\
+Major mode for GHC Core files.
+
+\(fn)" t nil)
+
+;;;***
+
 ;;;### (autoloads (haskell-c-mode) "haskell-c" "haskell-c.el" (18170
 ;;;;;;  47169))
 ;;; Generated autoloads from haskell-c.el
@@ -13,7 +31,7 @@ Major mode for Haskell FFI files.
 ;;;***
 
 ;;;### (autoloads (haskell-cabal-mode) "haskell-cabal" "haskell-cabal.el"
-;;;;;;  (19222 37798))
+;;;;;;  (19501 51598))
 ;;; Generated autoloads from haskell-cabal.el
 
 (add-to-list 'auto-mode-alist '("\\.cabal\\'" . haskell-cabal-mode))
@@ -131,7 +149,7 @@ Invokes `haskell-indent-hook' if not nil.
 ;;;***
 
 ;;;### (autoloads (haskell-indentation-mode) "haskell-indentation"
-;;;;;;  "haskell-indentation.el" (19222 37798))
+;;;;;;  "haskell-indentation.el" (19291 17344))
 ;;; Generated autoloads from haskell-indentation.el
 
 (autoload 'haskell-indentation-mode "haskell-indentation" "\
@@ -145,7 +163,7 @@ autofill-mode.
 ;;;***
 
 ;;;### (autoloads (haskell-hayoo haskell-hoogle literate-haskell-mode
-;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (19222 37798))
+;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (19501 53079))
 ;;; Generated autoloads from haskell-mode.el
 
 (add-to-list 'load-path (or (file-name-directory load-file-name) (car load-path)))
@@ -214,9 +232,9 @@ Do a Hayoo search for QUERY.
 ;;;***
 
 ;;;### (autoloads (inferior-haskell-find-haddock inferior-haskell-find-definition
-;;;;;;  inferior-haskell-info inferior-haskell-type inferior-haskell-load-file
-;;;;;;  switch-to-haskell) "inf-haskell" "inf-haskell.el" (19222
-;;;;;;  37798))
+;;;;;;  inferior-haskell-info inferior-haskell-type inferior-haskell-load-and-run
+;;;;;;  inferior-haskell-load-file switch-to-haskell) "inf-haskell"
+;;;;;;  "inf-haskell.el" (19501 52491))
 ;;; Generated autoloads from inf-haskell.el
 
 (defalias 'run-haskell 'switch-to-haskell)
@@ -231,6 +249,11 @@ Pass the current buffer's file to the inferior haskell process.
 If prefix arg \\[universal-argument] is given, just reload the previous file.
 
 \(fn &optional RELOAD)" t nil)
+
+(autoload 'inferior-haskell-load-and-run "inf-haskell" "\
+Pass the current buffer's file to haskell and then run a COMMAND.
+
+\(fn COMMAND)" t nil)
 
 (autoload 'inferior-haskell-type "inf-haskell" "\
 Query the haskell process for the type of the given expression.
@@ -270,8 +293,8 @@ we load it.
 ;;;***
 
 ;;;### (autoloads nil nil ("haskell-font-lock.el" "haskell-ghci.el"
-;;;;;;  "haskell-hugs.el" "haskell-simple-indent.el" "test.el") (19222
-;;;;;;  37817 315467))
+;;;;;;  "haskell-hugs.el" "haskell-simple-indent.el" "test.el") (19501
+;;;;;;  53924 514127))
 
 ;;;***
 

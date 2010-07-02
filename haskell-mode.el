@@ -272,6 +272,8 @@ be set to the preferred literate style."
     ["Start interpreter" switch-to-haskell]
     ["Load file" inferior-haskell-load-file]
     "---"
+    ["Load tidy core" ghc-core-create-core]
+    "---"
     ,(if (default-boundp 'eldoc-documentation-function)
          ["Doc mode" eldoc-mode
           :style toggle :selected (bound-and-true-p eldoc-mode)]

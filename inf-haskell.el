@@ -348,7 +348,7 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
                     (set-marker compilation-parsing-end parsing-end)
                   (setq compilation-parsing-end parsing-end))))
           (with-selected-window (display-buffer (current-buffer) nil 'visible)
-            (goto-char (point-max)))
+            (end-of-buffer))
           ;; Use compilation-auto-jump-to-first-error if available.
           ;; (if (and (boundp 'compilation-auto-jump-to-first-error)
           ;;          compilation-auto-jump-to-first-error
@@ -362,6 +362,7 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
 
 (defvar inferior-haskell-run-command ":main")
 
+;;;###autoload
 (defun inferior-haskell-load-and-run (command)
   "Pass the current buffer's file to haskell and then run a COMMAND."
   (interactive
