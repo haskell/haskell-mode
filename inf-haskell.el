@@ -319,44 +319,46 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
   (let ((buf (current-buffer))
         (file buffer-file-name)
 	(proc (inferior-haskell-process)))
-    (with-current-buffer (process-buffer proc)
-      (compilation-forget-errors)
-      (let ((parsing-end (marker-position (process-mark proc)))
-            root)
-        ;; Go to the root of the Cabal project, if applicable.
-        (when (and inferior-haskell-find-project-root
-                   (setq root (inferior-haskell-find-project-root buf)))
-          ;; Not sure if it's useful/needed and if it actually works.
-          (unless (equal default-directory root)
-            (setq default-directory root)
+    (if file
+        (with-current-buffer (process-buffer proc)
+          (compilation-forget-errors)
+          (let ((parsing-end (marker-position (process-mark proc)))
+                root)
+            ;; Go to the root of the Cabal project, if applicable.
+            (when (and inferior-haskell-find-project-root
+                       (setq root (inferior-haskell-find-project-root buf)))
+              ;; Not sure if it's useful/needed and if it actually works.
+              (unless (equal default-directory root)
+                (setq default-directory root)
+                (inferior-haskell-send-command
+                 proc (concat ":cd " default-directory)))
+              (setq file (file-relative-name file)))
             (inferior-haskell-send-command
-             proc (concat ":cd " default-directory)))
-          (setq file (file-relative-name file)))
-	(inferior-haskell-send-command
-         proc (if reload ":reload"
-                (concat ":load \""
-                        ;; Espace the backslashes that may occur in file names.
-                        (replace-regexp-in-string "[\\\"]" "\\\\\&" file)
-                        "\"")))
-	;; Move the parsing-end marker *after* sending the command so
-	;; that it doesn't point just to the insertion point.
-	;; Otherwise insertion may move the marker (if done with
-	;; insert-before-markers) and we'd then miss some errors.
-	(if (boundp 'compilation-parsing-end)
-	    (if (markerp compilation-parsing-end)
-		(set-marker compilation-parsing-end parsing-end)
-	      (setq compilation-parsing-end parsing-end))))
-      (with-selected-window (display-buffer (current-buffer) nil 'visible)
-        (goto-char (point-max)))
-      ;; Use compilation-auto-jump-to-first-error if available.
-      ;; (if (and (boundp 'compilation-auto-jump-to-first-error)
-      ;;          compilation-auto-jump-to-first-error
-      ;;          (boundp 'compilation-auto-jump-to-next))
-      ;;     (setq compilation-auto-jump-to-next t)
-        (when inferior-haskell-wait-and-jump
-          (inferior-haskell-wait-for-prompt proc)
-          (ignore-errors                  ;Don't beep if there were no errors.
-            (next-error)))))) ;; )
+             proc (if reload ":reload"
+                    (concat ":load \""
+                            ;; Espace the backslashes that may occur in file names.
+                            (replace-regexp-in-string "[\\\"]" "\\\\\&" file)
+                            "\"")))
+            ;; Move the parsing-end marker *after* sending the command so
+            ;; that it doesn't point just to the insertion point.
+            ;; Otherwise insertion may move the marker (if done with
+            ;; insert-before-markers) and we'd then miss some errors.
+            (if (boundp 'compilation-parsing-end)
+                (if (markerp compilation-parsing-end)
+                    (set-marker compilation-parsing-end parsing-end)
+                  (setq compilation-parsing-end parsing-end))))
+          (with-selected-window (display-buffer (current-buffer) nil 'visible)
+            (goto-char (point-max)))
+          ;; Use compilation-auto-jump-to-first-error if available.
+          ;; (if (and (boundp 'compilation-auto-jump-to-first-error)
+          ;;          compilation-auto-jump-to-first-error
+          ;;          (boundp 'compilation-auto-jump-to-next))
+          ;;     (setq compilation-auto-jump-to-next t)
+          (when inferior-haskell-wait-and-jump
+            (inferior-haskell-wait-for-prompt proc)
+            (ignore-errors                  ;Don't beep if there were no errors.
+              (next-error))))
+      (error "No file associated with buffer"))))
 
 (defvar inferior-haskell-run-command ":main")
 
