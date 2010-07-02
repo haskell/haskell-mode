@@ -182,6 +182,7 @@ Prompt for a list of args if called with an argument."
   ;; History syntax of comint conflicts with Haskell, e.g. !!, so better
   ;; turn it off.
   (setq comint-input-autoexpand nil)
+  (setq comint-process-echoes nil)
   (run-hooks 'haskell-ghci-hook)
 
   ;; Clear message area.
