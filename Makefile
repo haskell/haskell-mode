@@ -52,6 +52,7 @@ dist:
 	rm -r _darcs &&\
 	sed -i 's/\$$Name:  \$$/$(TAG)/g' * &&\
 	make $(AUTOLOADS) &&\
+	rm *~ &&\
 	darcs changes > ChangeLog &&\
 	rm Makefile &&\
 	cd .. &&\
