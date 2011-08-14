@@ -10,6 +10,7 @@ ELFILES = \
 	haskell-hugs.el \
 	haskell-indent.el \
 	haskell-indentation.el \
+	haskell-checkers.el \
 	haskell-mode.el \
 	haskell-simple-indent.el \
 	ghc-core.el \
