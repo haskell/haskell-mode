@@ -84,9 +84,11 @@
   '(("^[ \t]*--.*" . font-lock-comment-face)
     ("^ *\\([^ \t:]+\\):" (1 font-lock-keyword-face))
     ("^\\(Library\\)[ \t]*\\({\\|$\\)" (1 font-lock-keyword-face))
-    ("^\\(Executable\\)[ \t]+\\([^\n \t]*\\)"
+    ("^\\(Executable\\|Test-Suite\\|Benchmark\\)[ \t]+\\([^\n \t]*\\)"
      (1 font-lock-keyword-face) (2 font-lock-function-name-face))
     ("^\\(Flag\\)[ \t]+\\([^\n \t]*\\)"
+     (1 font-lock-keyword-face) (2 font-lock-constant-face))
+    ("^\\(Source-Repository\\)[ \t]+\\(head\\|this\\)"
      (1 font-lock-keyword-face) (2 font-lock-constant-face))
     ("^ *\\(if\\)[ \t]+.*\\({\\|$\\)" (1 font-lock-keyword-face))
     ("^ *\\(}[ \t]*\\)?\\(else\\)[ \t]*\\({\\|$\\)"
