@@ -548,13 +548,15 @@ If nil, use the Hoogle web-site."
                         nil nil def))))
   (if (null haskell-hoogle-command)
       (browse-url (format "http://haskell.org/hoogle/?q=%s" query))
-    (if (fboundp 'help-setup-xref)
-        (help-setup-xref (list 'haskell-hoogle query) (interactive-p)))
-    (with-output-to-temp-buffer
-        (if (fboundp 'help-buffer) (help-buffer) "*Help*")
-      (with-current-buffer standard-output
-        (start-process "hoogle" (current-buffer) haskell-hoogle-command
-                       query)))))
+    (lexical-let ((temp-buffer (if (fboundp 'help-buffer) (help-buffer) "*Help*")))
+      (with-output-to-temp-buffer temp-buffer
+	(with-current-buffer standard-output
+	  (let ((hoogle-process
+		 (start-process "hoogle" (current-buffer) haskell-hoogle-command query))
+		(scroll-to-top
+		 (lambda (process event)
+		   (set-window-start (get-buffer-window temp-buffer t) 1))))
+	    (set-process-sentinel hoogle-process scroll-to-top)))))))
 
 ;;;###autoload
 (defalias 'hoogle 'haskell-hoogle)
