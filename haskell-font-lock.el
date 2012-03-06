@@ -347,9 +347,27 @@ Returns keywords suitable for `font-lock-keywords'."
 
 	    (,reservedid 1 (symbol-value 'haskell-keyword-face))
 	    (,reservedsym 1 (symbol-value 'haskell-operator-face))
-            ;; Special case for `as', `hiding', and `qualified', which are
+            ;; Special case for `as', `hiding', `safe' and `qualified', which are
             ;; keywords in import statements but are not otherwise reserved.
-            ("\\<import[ \t]+\\(?:\\(qualified\\>\\)[ \t]*\\)?[^ \t\n()]+[ \t]*\\(?:\\(\\<as\\>\\)[ \t]*[^ \t\n()]+[ \t]*\\)?\\(\\<hiding\\>\\)?"
+            ("\\<import[ \t]+\\(?:\\(safe\\>\\)[ \t]*\\)?\\(?:\\(qualified\\>\\)[ \t]*\\)?[^ \t\n()]+[ \t]*\\(?:\\(\\<as\\>\\)[ \t]*[^ \t\n()]+[ \t]*\\)?\\(\\<hiding\\>\\)?"
+             (1 (symbol-value 'haskell-keyword-face) nil lax)
+             (2 (symbol-value 'haskell-keyword-face) nil lax)
+             (3 (symbol-value 'haskell-keyword-face) nil lax)
+             (4 (symbol-value 'haskell-keyword-face) nil lax))
+
+	    (,reservedsym 1 (symbol-value 'haskell-operator-face))
+            ;; Special case for `foreign import'
+            ;; keywords in foreign import statements but are not otherwise reserved.
+            ("\\<\\(foreign\\)[ \t]+\\(import\\)[ \t]+\\(?:\\(ccall\\|stdcall\\|cplusplus\\|jvm\\|dotnet\\)[ \t]+\\)?\\(?:\\(safe\\|unsafe\\|interruptible\\)[ \t]+\\)?"
+             (1 (symbol-value 'haskell-keyword-face) nil lax)
+             (2 (symbol-value 'haskell-keyword-face) nil lax)
+             (3 (symbol-value 'haskell-keyword-face) nil lax)
+             (4 (symbol-value 'haskell-keyword-face) nil lax))
+
+	    (,reservedsym 1 (symbol-value 'haskell-operator-face))
+            ;; Special case for `foreign export'
+            ;; keywords in foreign export statements but are not otherwise reserved.
+            ("\\<\\(foreign\\)[ \t]+\\(export\\)[ \t]+\\(?:\\(ccall\\|stdcall\\|cplusplus\\|jvm\\|dotnet\\)[ \t]+\\)?"
              (1 (symbol-value 'haskell-keyword-face) nil lax)
              (2 (symbol-value 'haskell-keyword-face) nil lax)
              (3 (symbol-value 'haskell-keyword-face) nil lax))
