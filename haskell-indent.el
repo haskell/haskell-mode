@@ -386,7 +386,7 @@ Returns the location of the start of the comment, nil otherwise."
 	   (nth 8 pps)))))
 
 (defvar haskell-indent-off-side-keywords-re
-      "\\<\\(do\\|let\\|of\\|where\\)\\>[ \t]*")
+      "\\<\\(do\\|let\\|of\\|where\\|mdo\\|rec\\)\\>[ \t]*")
 
 (defun haskell-indent-type-at-point ()
   "Return the type of the line (also puts information in `match-data')."
@@ -1046,6 +1046,8 @@ See http://hackage.haskell.org/trac/haskell-prime/wiki/DoAndIfThenElse"
   '(("where" 2 0)
     ("of" 2)
     ("do" 2)
+    ("mdo" 2)
+    ("rec" 2)
     ("in" 2 0)
     ("{" 2)
     "if"
