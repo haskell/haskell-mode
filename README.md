@@ -36,7 +36,7 @@ Otherwise:
         (load "~/lib/emacs/haskell-mode/haskell-site-file")
   
     This only loads the bare-bones haskell-mode. To make it useful, you
-    need additional modules; you can use the haskell customize-group
+    need additional modules; you can use the haskell `customize-group`
     to edit the Haskell mode hook or, if you prefer manual setup, try
     adding the following lines according to which modules you want to use:
 
@@ -47,7 +47,7 @@ Otherwise:
 
     Note that the three indentation modules are mutually exclusive - add at
     most one.  Note that the line of code for simple indentation is commented
-    out (using a preceeding ;) in preference for the more advanced
+    out (using a preceeding `;`) in preference for the more advanced
     indentation module.  Installation is now complete!
 
 The other modules are automatically loaded when needed in the following way:
