@@ -35,6 +35,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl)) ;needed for def of incf
 (require 'syntax nil t)			; Emacs 21 add-on
 
 (defgroup haskell-indentation nil
