@@ -387,8 +387,50 @@ May return a qualified name."
 ;; Various mode variables.
 
 (defcustom haskell-mode-hook nil
-  "Hook run after entering Haskell mode.
-Do not select more than one of the three indentation modes."
+  "
+Hook run after entering Haskell mode.
+
+--------------------------------------------------------------------------------
+
+CONFIGURING INDENTATION
+
+  Using this you can configure the Haskell indentation mode. There
+  are three major Haskell indentation modes:
+
+  `haskell-indentation', Kristof Bastiaensen
+    Intelligent semi-automatic indentation, mark two. How to enable:
+    (custom-set-variables
+     '(haskell-mode-hook '(turn-on-haskell-indentation)))
+
+  `haskell-indent', Guy Lapalme
+    Intelligent semi-automatic indentation. How to enable:
+    (custom-set-variables
+     '(haskell-mode-hook '(turn-on-haskell-indentation)))
+
+  `haskell-simple-indent', Graeme E Moss and Heribert Schuetz
+    Simple indentation. How to enable:
+    (custom-set-variables
+     '(haskell-mode-hook '(turn-on-haskell-simple-indent)))
+
+  You can either:
+
+   1) Use the code above if you're more Elisp savvy, and put it
+      in your .emacs or similar file (type C-M-x to run each
+      one), or
+
+   2) customize the variable by ``M-x customize-group'' (see the
+      link below), or
+
+   3) some people prefer to add custom hooks like the below:
+ 
+      (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+
+  In order to test each one after enabling you can re-run M-x
+  haskell-mode in the same buffer.
+
+  Do not select more than one of the three indentation modes.
+
+--------------------------------------------------------------------------------"
   :type 'hook
   :group 'haskell
   :options `(turn-on-haskell-indent turn-on-haskell-indentation
