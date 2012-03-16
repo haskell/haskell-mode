@@ -493,6 +493,7 @@ Invokes `haskell-mode-hook'."
   (set (make-local-variable 'comment-end) "")
   (set (make-local-variable 'comment-end-skip) "[ \t]*\\(-}\\|\\s>\\)")
   (set (make-local-variable 'parse-sexp-ignore-comments) nil)
+  (set (make-local-variable 'indent-line-function) 'haskell-mode-suggest-indent-choice)
   ;; Set things up for eldoc-mode.
   (set (make-local-variable 'eldoc-documentation-function)
        'haskell-doc-current-info)
@@ -649,6 +650,11 @@ To be added to `flymake-init-create-temp-buffer-copy'."
 	  (append (cdr checker-elts)
 		  (list (flymake-init-create-temp-buffer-copy
 			 'flymake-create-temp-inplace))))))
+
+(defun haskell-mode-suggest-indent-choice ()
+  "Ran when the user tries to indent in the buffer but no indentation mode has been selected.
+Brings up the documentation for haskell-mode-hook."
+  (describe-variable 'haskell-mode-hook))
 
 (eval-after-load "flymake"
   '(add-to-list 'flymake-allowed-file-name-masks
