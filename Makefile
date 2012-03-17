@@ -15,6 +15,7 @@ ELFILES = \
 	haskell-simple-indent.el \
 	haskell-sort-imports.el \
 	haskell-align-imports.el \
+	haskell-move-nested.el \
 	ghc-core.el \
 	inf-haskell.el
 
