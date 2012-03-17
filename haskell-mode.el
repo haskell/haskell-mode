@@ -177,7 +177,7 @@
 ;; Set load-path
 ;;;###autoload
 (add-to-list 'load-path
-   (or (file-name-directory load-file-name) (car load-path)))
+             (or (file-name-directory load-file-name) (car load-path)))
 
 ;; Set up autoloads for the modules we supply
 (autoload 'turn-on-haskell-decl-scan "haskell-decl-scan"
@@ -434,14 +434,14 @@ CONFIGURING INDENTATION
   :type 'hook
   :group 'haskell
   :options `(turn-on-haskell-indent turn-on-haskell-indentation
-	     turn-on-font-lock
-	     ,(if (boundp 'eldoc-documentation-function)
-		  'turn-on-eldoc-mode
-		'turn-on-haskell-doc-mode) ; Emacs 21
-	     ,@(if (fboundp 'capitalized-words-mode)
-		   '(capitalized-words-mode))
-	     turn-on-simple-indent turn-on-haskell-doc-mode
-	     turn-on-haskell-decl-scan imenu-add-menubar-index))
+                                    turn-on-font-lock
+                                    ,(if (boundp 'eldoc-documentation-function)
+                                         'turn-on-eldoc-mode
+                                       'turn-on-haskell-doc-mode) ; Emacs 21
+                                    ,@(if (fboundp 'capitalized-words-mode)
+                                          '(capitalized-words-mode))
+                                    turn-on-simple-indent turn-on-haskell-doc-mode
+                                    turn-on-haskell-decl-scan imenu-add-menubar-index))
 
 (defvar eldoc-print-current-symbol-info-function)
 
