@@ -13,6 +13,8 @@ ELFILES = \
 	haskell-checkers.el \
 	haskell-mode.el \
 	haskell-simple-indent.el \
+	haskell-sort-imports.el \
+	haskell-align-imports.el \
 	ghc-core.el \
 	inf-haskell.el
 

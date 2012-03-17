@@ -1,6 +1,6 @@
 
 ;;;### (autoloads (ghc-core-mode ghc-core-create-core) "ghc-core"
-;;;;;;  "ghc-core.el" (19501 54140))
+;;;;;;  "ghc-core.el" (20322 21303))
 ;;; Generated autoloads from ghc-core.el
 
 (autoload 'ghc-core-create-core "ghc-core" "\
@@ -17,8 +17,19 @@ Major mode for GHC Core files.
 
 ;;;***
 
-;;;### (autoloads (haskell-c-mode) "haskell-c" "haskell-c.el" (18170
-;;;;;;  47169))
+;;;### (autoloads (haskell-align-imports) "haskell-align-imports"
+;;;;;;  "haskell-align-imports.el" (20324 24254))
+;;; Generated autoloads from haskell-align-imports.el
+
+(autoload 'haskell-align-imports "haskell-align-imports" "\
+Align all the imports in the buffer.
+
+\(fn)" t nil)
+
+;;;***
+
+;;;### (autoloads (haskell-c-mode) "haskell-c" "haskell-c.el" (20322
+;;;;;;  21303))
 ;;; Generated autoloads from haskell-c.el
 
 (add-to-list 'auto-mode-alist '("\\.hsc\\'" . haskell-c-mode))
@@ -31,7 +42,7 @@ Major mode for Haskell FFI files.
 ;;;***
 
 ;;;### (autoloads (haskell-cabal-mode) "haskell-cabal" "haskell-cabal.el"
-;;;;;;  (19501 51598))
+;;;;;;  (20322 21303))
 ;;; Generated autoloads from haskell-cabal.el
 
 (add-to-list 'auto-mode-alist '("\\.cabal\\'" . haskell-cabal-mode))
@@ -44,7 +55,7 @@ Major mode for Cabal package description files.
 ;;;***
 
 ;;;### (autoloads (haskell-decl-scan-mode) "haskell-decl-scan" "haskell-decl-scan.el"
-;;;;;;  (19222 37798))
+;;;;;;  (20322 21303))
 ;;; Generated autoloads from haskell-decl-scan.el
 
 (autoload 'haskell-decl-scan-mode "haskell-decl-scan" "\
@@ -94,7 +105,7 @@ Invokes `haskell-decl-scan-mode-hook'.
 ;;;***
 
 ;;;### (autoloads (haskell-doc-show-type haskell-doc-mode) "haskell-doc"
-;;;;;;  "haskell-doc.el" (19222 37798))
+;;;;;;  "haskell-doc.el" (20322 21303))
 ;;; Generated autoloads from haskell-doc.el
 
 (autoload 'haskell-doc-mode "haskell-doc" "\
@@ -117,7 +128,7 @@ current buffer.
 ;;;***
 
 ;;;### (autoloads (haskell-indent-mode) "haskell-indent" "haskell-indent.el"
-;;;;;;  (19222 37798))
+;;;;;;  (20322 21303))
 ;;; Generated autoloads from haskell-indent.el
 
 (autoload 'haskell-indent-mode "haskell-indent" "\
@@ -149,7 +160,7 @@ Invokes `haskell-indent-hook' if not nil.
 ;;;***
 
 ;;;### (autoloads (haskell-indentation-mode) "haskell-indentation"
-;;;;;;  "haskell-indentation.el" (19501 54761))
+;;;;;;  "haskell-indentation.el" (20322 21303))
 ;;; Generated autoloads from haskell-indentation.el
 
 (autoload 'haskell-indentation-mode "haskell-indentation" "\
@@ -163,7 +174,7 @@ autofill-mode.
 ;;;***
 
 ;;;### (autoloads (haskell-hayoo haskell-hoogle literate-haskell-mode
-;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (19501 53079))
+;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (20324 24147))
 ;;; Generated autoloads from haskell-mode.el
 
 (add-to-list 'load-path (or (file-name-directory load-file-name) (car load-path)))
@@ -231,10 +242,21 @@ Do a Hayoo search for QUERY.
 
 ;;;***
 
+;;;### (autoloads (haskell-sort-imports) "haskell-sort-imports" "haskell-sort-imports.el"
+;;;;;;  (20324 24248))
+;;; Generated autoloads from haskell-sort-imports.el
+
+(autoload 'haskell-sort-imports "haskell-sort-imports" "\
+Sort the import list at the point.
+
+\(fn)" t nil)
+
+;;;***
+
 ;;;### (autoloads (inferior-haskell-find-haddock inferior-haskell-find-definition
 ;;;;;;  inferior-haskell-info inferior-haskell-type inferior-haskell-load-and-run
 ;;;;;;  inferior-haskell-load-file switch-to-haskell) "inf-haskell"
-;;;;;;  "inf-haskell.el" (19501 52491))
+;;;;;;  "inf-haskell.el" (20322 21303))
 ;;; Generated autoloads from inf-haskell.el
 
 (defalias 'run-haskell 'switch-to-haskell)
@@ -292,9 +314,9 @@ we load it.
 
 ;;;***
 
-;;;### (autoloads nil nil ("haskell-font-lock.el" "haskell-ghci.el"
-;;;;;;  "haskell-hugs.el" "haskell-simple-indent.el" "test.el") (19501
-;;;;;;  54762 893427))
+;;;### (autoloads nil nil ("haskell-checkers.el" "haskell-font-lock.el"
+;;;;;;  "haskell-ghci.el" "haskell-hugs.el" "haskell-simple-indent.el"
+;;;;;;  "init.el") (20324 24258 990475))
 
 ;;;***
 
