@@ -158,13 +158,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-(eval-when-compile
-  ;; Emacs 21 defines `values' as a (run-time) alias for list.
-  ;; Don't maerge this with the pervious clause.
-  (if (string-match "values"
-		    (pp (byte-compile (lambda () (values t)))))
-      (defsubst values (&rest values)
-	values)))
 
 ;; All functions/variables start with `(literate-)haskell-'.
 
@@ -356,9 +349,9 @@ May return a qualified name."
     (let ((case-fold-search nil))
       (multiple-value-bind (start end)
           (if (looking-at "\\s_")
-              (values (progn (skip-syntax-backward "_") (point))
-                      (progn (skip-syntax-forward "_") (point)))
-            (values
+              (list (progn (skip-syntax-backward "_") (point))
+                    (progn (skip-syntax-forward "_") (point)))
+            (list
              (progn (skip-syntax-backward "w'")
                     (skip-syntax-forward "'") (point))
              (progn (skip-syntax-forward "w'") (point))))
