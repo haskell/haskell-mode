@@ -16,6 +16,7 @@ ELFILES = \
 	haskell-sort-imports.el \
 	haskell-align-imports.el \
 	haskell-move-nested.el \
+	haskell-navigate-imports.el \
 	ghc-core.el \
 	inf-haskell.el
 

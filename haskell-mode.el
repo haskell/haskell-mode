@@ -247,6 +247,7 @@ be set to the preferred literate style."
     (define-key map (kbd "C-c C-d") 'inferior-haskell-find-haddock)
     
     (define-key map (kbd "C-c C-.") 'haskell-mode-format-imports)
+    (define-key map (kbd "C-c i") 'haskell-navigate-imports)
 
     (define-key map [?\C-c ?\C-v] 'haskell-check)
 
