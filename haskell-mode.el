@@ -245,6 +245,8 @@ be set to the preferred literate style."
     (define-key map (kbd "C-c C-i") 'inferior-haskell-info)
     (define-key map (kbd "C-c M-.") 'inferior-haskell-find-definition)
     (define-key map (kbd "C-c C-d") 'inferior-haskell-find-haddock)
+    
+    (define-key map (kbd "C-c C-.") 'haskell-mode-format-imports)
 
     (define-key map [?\C-c ?\C-v] 'haskell-check)
 
@@ -666,6 +668,15 @@ This function will be called with no arguments.")
   (interactive)
   (when unindent-line-function
     (funcall unindent-line-function)))
+
+(defun haskell-mode-format-imports ()
+  "Format the imports by aligning and sorting them."
+  (interactive)
+  (let ((col (current-column)))
+    (hs-sort-imports)
+    (hs-align-imports)
+    (goto-char (+ (line-beginning-position)
+                  col))))
 
 (eval-after-load "flymake"
   '(add-to-list 'flymake-allowed-file-name-masks
