@@ -667,6 +667,15 @@ This function will be called with no arguments.")
   (when unindent-line-function
     (funcall unindent-line-function)))
 
+(defun haskell-mode-format-imports ()
+  "Format the imports by aligning and sorting them."
+  (interactive)
+  (let ((col (current-column)))
+    (hs-sort-imports)
+    (hs-align-imports)
+    (goto-char (+ (line-beginning-position)
+                  col))))
+
 (eval-after-load "flymake"
   '(add-to-list 'flymake-allowed-file-name-masks
 		'("\\.l?hs\\'" haskell-flymake-init)))
