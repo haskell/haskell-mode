@@ -85,6 +85,10 @@ The command can include arguments."
   "\t-- Defined in \\(.+\\)$"
   "Regular expression for matching module names in :info.")
 
+(defvar inferior-haskell-multiline-prompt-re
+  "^\\*?[[:upper:]][\\._[:alnum:]]*\\(?: \\*?[[:upper:]][\\._[:alnum:]]*\\)*| "
+  "Regular expression for matching multiline prompt (the one inside :{ ... :} blocks).")
+
 (defconst inferior-haskell-error-regexp-alist
   ;; The format of error messages used by Hugs.
   `(("^ERROR \"\\(.+?\\)\"\\(:\\| line \\)\\([0-9]+\\) - " 1 3)
@@ -130,6 +134,8 @@ This will either look for a Cabal file or a \"module\" statement in the file."
        ;; Whay the backslash in [\\._[:alnum:]]?
        "^\\*?[[:upper:]][\\._[:alnum:]]*\\(?: \\*?[[:upper:]][\\._[:alnum:]]*\\)*> \\|^> $")
   (set (make-local-variable 'comint-input-autoexpand) nil)
+  (add-hook 'comint-preoutput-filter-functions
+            'inferior-haskell-multiline-prompt-filter)
   (add-hook 'comint-output-filter-functions 'inferior-haskell-spot-prompt nil t)
 
   ;; Setup directory tracking.
@@ -221,6 +227,21 @@ setting up the inferior-haskell buffer."
   "If non-nil, wait for file loading to terminate and jump to the error."
   :type 'boolean
   :group 'haskell)
+
+(defvar inferior-haskell-cut-multiline-prompt nil)
+(make-variable-buffer-local 'inferior-haskell-cut-multiline-prompt)
+
+(defun inferior-haskell-multiline-prompt-filter (string)
+  (when (and inferior-haskell-cut-multiline-prompt
+             #1=(string-match inferior-haskell-multiline-prompt-re string))
+    ;; deleting sequence of `%s|' multiline promts
+    (while #1#
+      #2=(setq string (substring string (match-end 0))))
+    ;; deleting one standard prompt after them
+    (when (eq 0 (string-match comint-prompt-regexp string))
+      #2#)
+    (setq inferior-haskell-cut-multiline-prompt nil))
+  string)
 
 (defvar inferior-haskell-seen-prompt nil)
 (make-variable-buffer-local 'inferior-haskell-seen-prompt)
@@ -396,6 +417,56 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
   "Tell the inferior haskell process to reread the current buffer's file."
   (interactive)
   (inferior-haskell-load-file 'reload))
+
+(defun inferior-haskell-wrap-decl (code)
+  (concat ":{\n"
+          (if (string-match (concat "^\\s-*"
+                                    haskell-ds-start-keywords-re)
+                            code)
+              ;; non-fun-decl
+              code
+            ;; fun-decl, wrapping into let { .. (; ..)* }
+            (concat "let {\n"
+                    (mapconcat
+                     ;; adding 2 whitespaces to each line
+                     (lambda (decl)
+                       (mapconcat (lambda (s)
+                                    (concat "  " s))
+                                  (split-string decl "\n")
+                                  "\n"))
+                     ;; splitting function case-decls
+                     (let (decls)
+                       (while (string-match "^\\(\\w+\\).*\n*\\(?:\\s-+.*\n+\\)*" code)
+                         (push (match-string 0 code) decls)
+                         (setq code (substring code (match-end 0))))
+                       (reverse decls))
+                     "\n;\n")
+                    "\n}"))
+          "\n:}\n"))
+
+;;;###autoload
+(defun inferior-haskell-send-decl ()
+  "Eval current declaration in inferior-haskell process."
+  (interactive)
+  (require 'haskell-decl-scan)  
+  (save-excursion
+    (goto-char (1+ (point)))
+    (let ((proc (inferior-haskell-process))
+          (raw-decl (buffer-substring (haskell-ds-backward-decl)
+                                      (haskell-ds-forward-decl))))
+      ;; enter multiline-prompt-cutting-mode
+      (with-current-buffer (process-buffer proc)
+        (setq inferior-haskell-cut-multiline-prompt t))
+      ;; send decl
+      (comint-send-string proc (inferior-haskell-wrap-decl raw-decl))
+      ;; send preview
+      (inferior-haskell-send-command
+       proc
+       (let ((preview-string (remove ?\n raw-decl)))
+         (concat "-- evaluating: "
+                 (substring preview-string
+                            0 (min 25 (length preview-string)))
+                 ".. :}"))))))
 
 ;;;###autoload
 (defun inferior-haskell-type (expr &optional insert-value)

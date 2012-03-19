@@ -230,6 +230,7 @@ be set to the preferred literate style."
     ;; (define-key map [?\M-C-x]     'inferior-haskell-send-defun)
     ;; (define-key map [?\C-x ?\C-e] 'inferior-haskell-send-last-sexp)
     ;; (define-key map [?\C-c ?\C-r] 'inferior-haskell-send-region)
+    (define-key map [?\C-x ?\C-d] 'inferior-haskell-send-decl)
     (define-key map [?\C-c ?\C-z] 'switch-to-haskell)
     (define-key map [?\C-c ?\C-l] 'inferior-haskell-load-file)
     ;; I think it makes sense to bind inferior-haskell-load-and-run to C-c
