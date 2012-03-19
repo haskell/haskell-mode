@@ -135,7 +135,7 @@ This will either look for a Cabal file or a \"module\" statement in the file."
        "^\\*?[[:upper:]][\\._[:alnum:]]*\\(?: \\*?[[:upper:]][\\._[:alnum:]]*\\)*> \\|^> $")
   (set (make-local-variable 'comint-input-autoexpand) nil)
   (add-hook 'comint-preoutput-filter-functions
-            'inferior-haskell-multiline-prompt-filter)
+            'inferior-haskell-send-decl-post-filter)
   (add-hook 'comint-output-filter-functions 'inferior-haskell-spot-prompt nil t)
 
   ;; Setup directory tracking.
@@ -228,19 +228,19 @@ setting up the inferior-haskell buffer."
   :type 'boolean
   :group 'haskell)
 
-(defvar inferior-haskell-cut-multiline-prompt nil)
-(make-variable-buffer-local 'inferior-haskell-cut-multiline-prompt)
+(defvar inferior-haskell-send-decl-post-filter-on nil)
+(make-variable-buffer-local 'inferior-haskell-send-decl-post-filter-on)
 
-(defun inferior-haskell-multiline-prompt-filter (string)
-  (when (and inferior-haskell-cut-multiline-prompt
+(defun inferior-haskell-send-decl-post-filter (string)
+  (when (and inferior-haskell-send-decl-post-filter-on
              #1=(string-match inferior-haskell-multiline-prompt-re string))
     ;; deleting sequence of `%s|' multiline promts
     (while #1#
-      #2=(setq string (substring string (match-end 0))))
-    ;; deleting one standard prompt after them
-    (when (eq 0 (string-match comint-prompt-regexp string))
-      #2#)
-    (setq inferior-haskell-cut-multiline-prompt nil))
+      (setq string (substring string (match-end 0))))    
+    ;; deleting regular prompts
+    (setq string (replace-regexp-in-string comint-prompt-regexp "" string)
+          ;; turning off this post-filter
+          inferior-haskell-send-decl-post-filter-on nil))  
   string)
 
 (defvar inferior-haskell-seen-prompt nil)
@@ -419,6 +419,7 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
   (inferior-haskell-load-file 'reload))
 
 (defun inferior-haskell-wrap-decl (code)
+  "Wrap declaration code into :{ ... :}."
   (concat ":{\n"
           (if (string-match (concat "^\\s-*"
                                     haskell-ds-start-keywords-re)
@@ -444,29 +445,39 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
                     "\n}"))
           "\n:}\n"))
 
+(defun inferior-haskell-flash-decl (start end &optional timeout)
+  "Temporarily highlight declaration."
+  (let ((overlay (make-overlay start end)))
+    (overlay-put overlay 'face 'secondary-selection)
+    (run-with-timer (or timeout 0.2) nil 'delete-overlay overlay)))
+
 ;;;###autoload
 (defun inferior-haskell-send-decl ()
-  "Eval current declaration in inferior-haskell process."
+  "Send current declaration to inferior-haskell process."
   (interactive)
-  (require 'haskell-decl-scan)  
+  (require 'haskell-decl-scan)
   (save-excursion
     (goto-char (1+ (point)))
-    (let ((proc (inferior-haskell-process))
-          (raw-decl (buffer-substring (haskell-ds-backward-decl)
-                                      (haskell-ds-forward-decl))))
+    (let* ((proc (inferior-haskell-process))
+           (start (or (haskell-ds-backward-decl) (point-min)))
+           (end (or (haskell-ds-forward-decl) (point-max)))
+           (raw-decl (buffer-substring start end)))
       ;; enter multiline-prompt-cutting-mode
       (with-current-buffer (process-buffer proc)
-        (setq inferior-haskell-cut-multiline-prompt t))
+        (setq inferior-haskell-send-decl-post-filter-on t))
+      ;; flash decl
+      (inferior-haskell-flash-decl start end)
       ;; send decl
       (comint-send-string proc (inferior-haskell-wrap-decl raw-decl))
       ;; send preview
       (inferior-haskell-send-command
        proc
-       (let ((preview-string (remove ?\n raw-decl)))
-         (concat "-- evaluating: "
-                 (substring preview-string
-                            0 (min 25 (length preview-string)))
-                 ".. :}"))))))
+       (let* ((str (remove ?\n raw-decl))
+              (len (min 15 (length str))))
+         (concat "-- evaluating {: "
+                 (substring str 0 len)
+                 (if (= 15 len) ".." "")
+                 " :}"))))))
 
 ;;;###autoload
 (defun inferior-haskell-type (expr &optional insert-value)
