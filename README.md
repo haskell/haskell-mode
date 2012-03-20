@@ -116,3 +116,11 @@ Support
 
 - [Github homepage](https://github.com/haskell/haskell-mode)
 - [Mailing list](http://projects.haskell.org/cgi-bin/mailman/listinfo/haskellmode-emacs)
+
+Contributing
+------------
+
+For submitting pull requests, please see the wiki
+[page on contributing](https://github.com/haskell/haskell-mode/wiki/Contributing). You
+don't have to follow this guide, but please make sure your pull
+requests are at least properly rebased and up to date.
