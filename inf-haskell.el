@@ -642,7 +642,12 @@ By default this is set to `ghc --print-libdir`/package.conf."
     (unless (string-match inferior-haskell-module-re info)
       (error
        "No documentation information available.  Did you forget to C-c C-l?"))
-    (match-string-no-properties 1 info)))
+    (let ((module-name (match-string-no-properties 1 info)))
+      ;; Handles GHC 7.4.1+ which quotes module names like
+      ;; `System.Random', whereas previous GHC did not quote at all.
+      (if (string= "`" (substring module-name 0 1))
+          (substring module-name 1 (- (length module-name) 1))
+        module-name))))
 
 (defun inferior-haskell-query-ghc-pkg (&rest args)
   "Send ARGS to `haskell-package-manager-name'.
