@@ -226,7 +226,8 @@ be set to the preferred literate style."
 ;; Mode maps.
 (defvar haskell-mode-map
   (let ((map (make-sparse-keymap)))
-    ;; Bindings for the inferior haskell process:
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;; For inferior haskell mode, use the below bindings
     ;; (define-key map [?\M-C-x]     'inferior-haskell-send-defun)
     ;; (define-key map [?\C-x ?\C-e] 'inferior-haskell-send-last-sexp)
     ;; (define-key map [?\C-c ?\C-r] 'inferior-haskell-send-region)
@@ -241,19 +242,24 @@ be set to the preferred literate style."
     ;; (define-key map [?\C-c ?\C-s] 'inferior-haskell-start-process)
     ;; That's what M-; is for.
     ;; (define-key map "\C-c\C-c" 'comment-region)
-
     (define-key map (kbd "C-c C-t") 'inferior-haskell-type)
     (define-key map (kbd "C-c C-i") 'inferior-haskell-info)
     (define-key map (kbd "C-c M-.") 'inferior-haskell-find-definition)
     (define-key map (kbd "C-c C-d") 'inferior-haskell-find-haddock)
-    
-    (define-key map (kbd "C-c C-.") 'haskell-mode-format-imports)
-    (define-key map (kbd "C-c i") 'haskell-navigate-imports)
-
     (define-key map [?\C-c ?\C-v] 'haskell-check)
 
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;; For interactive mode, use the below bindings
+    ;; It is currently brand new and experimental.
+    ;; (define-key map [?\C-c ?\C-l] 'haskell-process-load-file)
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;; Editing-specific commands
+    (define-key map (kbd "C-c C-.") 'haskell-mode-format-imports)
+    (define-key map (kbd "C-c i") 'haskell-navigate-imports)
     (define-key map [remap delete-indentation] 'haskell-delete-indentation)
     (define-key map [backtab] 'unindent-for-tab-command)
+
     map)
   "Keymap used in Haskell mode.")
 
