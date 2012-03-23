@@ -167,8 +167,8 @@
 (defun haskell-process-log (out)
   "Log to the process log."
   (with-current-buffer (get-buffer-create "*haskell-process-log*")
-    (insert out)
-    (goto-char (point-max))))
+    (goto-char (point-max))
+    (insert out)))
 
 (defun haskell-process-project-by-proc (proc)
   "Find project by process."
@@ -228,11 +228,14 @@
 
 (defun haskell-process-trigger-queue (process)
   "Trigger the next command in the queue to be ran if there is no current command."
-  (when (equal (haskell-process-cmd process) 'none)
-    (let ((cmd (haskell-process-cmd-queue-pop process)))
-      (when cmd
-        (haskell-process-set-cmd process cmd)
-        (haskell-command-go cmd)))))
+  (if (haskell-process-process process)
+      (when (equal (haskell-process-cmd process) 'none)
+        (let ((cmd (haskell-process-cmd-queue-pop process)))
+          (when cmd
+            (haskell-process-set-cmd process cmd)
+            (haskell-command-go cmd))))
+    (progn (haskell-process-log "Process died or never started. Starting...\n")
+           (haskell-process-start (haskell-process-session process)))))
 
 (defun haskell-command-make (state go live complete)
   "Make a process command of the given `type' with the given `go' procedure."
