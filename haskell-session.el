@@ -78,6 +78,12 @@
   (haskell-session-clear)
   (setq haskell-sessions nil))
 
+(defun haskell-session-change ()
+  "Change the session for the current buffer."
+  (interactive)
+  (haskell-session-clear)
+  (haskell-session))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Building the session
 
@@ -120,6 +126,21 @@
   "Get the session process."
   (haskell-session-get s 'process))
 
+(defun haskell-session-set-cabal-dir (s v)
+  "Set the session cabal-dir."
+  (haskell-session-set s 'cabal-dir v))
+
+(defun haskell-session-cabal-dir (s)
+  "Get the session cabal-dir."
+  (let ((dir (haskell-session-get s 'cabal-dir)))
+    (if dir
+        dir
+      (let ((set-dir (haskell-cabal-get-dir)))
+        (if set-dir
+            (progn (haskell-session-set-cabal-dir s set-dir)
+                   set-dir)
+          (haskell-session-cabal-dir s))))))
+
 (defun haskell-session-get (s key)
   "Get the session `key`."
   (let ((x (assoc key s)))
@@ -128,8 +149,8 @@
 
 (defun haskell-session-set (s key value) 
   "Set the session's `key`."
-   (delete-if (lambda (prop) (equal (car prop) key)) s)
-   (setf (cdr s) (cons (cons key value)
-                       (cdr s))))
+  (delete-if (lambda (prop) (equal (car prop) key)) s)
+  (setf (cdr s) (cons (cons key value)
+                      (cdr s))))
 
 (provide 'haskell-session)

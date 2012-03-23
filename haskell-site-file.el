@@ -41,8 +41,8 @@ Major mode for Haskell FFI files.
 
 ;;;***
 
-;;;### (autoloads (haskell-cabal-mode) "haskell-cabal" "haskell-cabal.el"
-;;;;;;  (20327 38141))
+;;;### (autoloads (haskell-cabal-get-dir haskell-cabal-mode) "haskell-cabal"
+;;;;;;  "haskell-cabal.el" (20332 59806))
 ;;; Generated autoloads from haskell-cabal.el
 
 (add-to-list 'auto-mode-alist '("\\.cabal\\'" . haskell-cabal-mode))
@@ -51,6 +51,12 @@ Major mode for Haskell FFI files.
 Major mode for Cabal package description files.
 
 \(fn)" t nil)
+
+(autoload 'haskell-cabal-get-dir "haskell-cabal" "\
+Get the Cabal dir for a new project. Various ways of figuring this out,
+   and indeed just prompting the user. Do them all.
+
+\(fn)" nil nil)
 
 ;;;***
 
@@ -175,7 +181,7 @@ autofill-mode.
 
 ;;;### (autoloads (haskell-interactive-mode-echo haskell-interactive-mode)
 ;;;;;;  "haskell-interactive-mode" "haskell-interactive-mode.el"
-;;;;;;  (20331 40591))
+;;;;;;  (20331 40738))
 ;;; Generated autoloads from haskell-interactive-mode.el
 
 (autoload 'haskell-interactive-mode "haskell-interactive-mode" "\
@@ -191,7 +197,7 @@ Echo a read only piece of text before the prompt.
 ;;;***
 
 ;;;### (autoloads (haskell-hayoo haskell-hoogle literate-haskell-mode
-;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (20331 40497))
+;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (20332 48206))
 ;;; Generated autoloads from haskell-mode.el
 
 (add-to-list 'load-path (or (file-name-directory load-file-name) (car load-path)))
@@ -294,7 +300,7 @@ Return to the non-import point we were at before going to the module list.
 ;;;***
 
 ;;;### (autoloads (haskell-process-load-file) "haskell-process" "haskell-process.el"
-;;;;;;  (20331 40474))
+;;;;;;  (20332 58612))
 ;;; Generated autoloads from haskell-process.el
 
 (autoload 'haskell-process-load-file "haskell-process" "\
@@ -305,7 +311,7 @@ Load the current buffer file.
 ;;;***
 
 ;;;### (autoloads (haskell-session) "haskell-session" "haskell-session.el"
-;;;;;;  (20331 40531))
+;;;;;;  (20332 59682))
 ;;; Generated autoloads from haskell-session.el
 
 (autoload 'haskell-session "haskell-session" "\
@@ -395,7 +401,7 @@ we load it.
 
 ;;;### (autoloads nil nil ("haskell-checkers.el" "haskell-font-lock.el"
 ;;;;;;  "haskell-ghci.el" "haskell-hugs.el" "haskell-package.el"
-;;;;;;  "haskell-simple-indent.el" "init.el") (20331 40602 396047))
+;;;;;;  "haskell-simple-indent.el" "init.el") (20332 59809 150385))
 
 ;;;***
 

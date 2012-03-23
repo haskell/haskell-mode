@@ -28,20 +28,28 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configuration
 
-(defcustom haskell-process-bin
-  ;; Arbitrarily give preference to hugs over ghci.
+(defcustom haskell-process-path-ghci
   (or (cond
        ((not (fboundp 'executable-find)) nil)
        ((executable-find "hugs") "hugs \"+.\"")
        ((executable-find "ghci") "ghci"))
-      "hugs \"+.\"")
-  "The name of the command to start the inferior Haskell process.
-The command can include arguments."
-  ;; Custom only supports the :options keyword for a few types, e.g. not
-  ;; for string.
-  ;; :options '("hugs \"+.\"" "ghci")
+      "ghci")
+  "The path for starting ghci."
   :group 'haskell
   :type '(choice string (repeat string)))
+
+(defcustom haskell-process-path-cabal-dev
+  "cabal-dev"
+  "The path for starting cabal-dev."
+  :group 'haskell
+  :type '(choice string (repeat string)))
+
+(defcustom haskell-process-type
+  'ghci
+  "The inferior Haskell process type to use."
+  :options '(ghci cabal-dev)
+  :type 'symbol
+  :group 'haskell)
 
 (defvar haskell-process-prompt-regex "\\(^[> ]*> $\\|\n[> ]*> $\\)")
 
@@ -76,9 +84,17 @@ The command can include arguments."
     (haskell-process-set-session process session)
     (haskell-process-set-process
      process
-     (start-process (haskell-session-name session)
-                    nil
-                    haskell-process-bin))
+     (ecase haskell-process-type
+       ('ghci (start-process (haskell-session-name session)
+                             nil
+                             haskell-process-path-ghci))
+       ('cabal-dev (start-process (haskell-session-name session)
+                                  nil
+                                  haskell-process-path-cabal-dev
+                                  "ghci"
+                                  "-s"
+                                  (concat (haskell-session-cabal-dir session)
+                                          "/cabal-dev")))))
     (progn (set-process-sentinel (haskell-process-process process) 'haskell-process-sentinel)
            (set-process-filter (haskell-process-process process) 'haskell-process-filter))
     (haskell-process-send-startup process)
@@ -98,6 +114,11 @@ The command can include arguments."
 (defun haskell-process ()
   "Get the current process from the current session."
   (haskell-session-process (haskell-session)))
+
+(defun haskell-process-interrupt ()
+  "Interrupt the process (SIGINT)."
+  (interactive)
+  (interrupt-process (haskell-process-process (haskell-process))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Process communication
