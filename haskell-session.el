@@ -26,6 +26,7 @@
 ;;; Code:
 
 (require 'haskell-cabal)
+(require 'haskell-string)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Globals
@@ -46,8 +47,28 @@
 (defun haskell-session ()
   "Get the Haskell session, prompt if there isn't one or fail."
   (or (haskell-session-maybe)
-      (haskell-session-assign (haskell-session-choose))
-      (haskell-session-assign (haskell-session-new))))
+      (haskell-session-assign
+       (or (haskell-session-from-buffer)
+           (haskell-session-new-assume-from-cabal)
+           (haskell-session-choose)
+           (haskell-session-new)))))
+
+(defun haskell-session-new-assume-from-cabal ()
+  "Prompt to create a new project based on a guess from the nearest Cabal file."
+  (when (y-or-n-p (format "Start a new project named “%s”? "
+                          (haskell-session-default-name)))
+    (haskell-session-make (haskell-session-default-name))))
+
+(defun haskell-session-from-buffer ()
+  "Get the session based on the buffer."
+  (let ((sessions (remove-if-not (lambda (session) 
+                                   (haskell-is-prefix-of (file-name-directory (buffer-file-name))
+                                                         (haskell-session-cabal-dir session)))
+                                 haskell-sessions)))
+    (sort sessions (lambda (a b) (< (length (haskell-session-cabal-dir a))
+                                    (length (haskell-session-cabal-dir b)))))
+    (when (consp sessions)
+      (car sessions))))
 
 (defun haskell-session-new ()
   "Make a new session."
