@@ -94,7 +94,7 @@
                                      (caddr state)))
       (lambda (state))
       (lambda (state response)
-        (haskell-interactive-mode-eval-result response)
+        (haskell-interactive-mode-eval-result (car state) response)
         (haskell-interactive-mode-prompt (car state))))))))
 
 (defun haskell-interactive-mode-beginning ()
@@ -136,10 +136,10 @@
                         'rear-nonsticky t
                         'prompt t))))
 
-(defun haskell-interactive-mode-eval-result (text)
+(defun haskell-interactive-mode-eval-result (session text)
   "Insert the result of an eval as a pretty printed Showable, if
   parseable, or otherwise just as-is."
-  (with-current-buffer (haskell-session-interactive-buffer (haskell-session))
+  (with-current-buffer (haskell-session-interactive-buffer session)
     (goto-char (point-max))
     (insert "\n")
     (insert (propertize text
