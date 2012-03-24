@@ -132,10 +132,10 @@ column, `tab-to-tab-stop' is done instead."
     (goto-char (line-beginning-position))
     (save-excursion
       (while (< (point) current-point)
-        (hs-indent-hsgm)
+        (haskell-simple-indent)
         (setq i (+ i 1))))
     (while (< x (- i 1))
-      (hs-indent-hsgm)
+      (haskell-simple-indent)
       (setq x (+ x 1)))))
 
 (defvar haskell-simple-indent-old)
