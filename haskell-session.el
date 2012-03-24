@@ -114,6 +114,19 @@
   (haskell-session-clear)
   (haskell-session))
 
+(defun haskell-session-strip-dir (session file)
+  "Strip the load dir from the file path."
+  (let ((cur-dir (haskell-session-current-dir session)))
+    (if (> (length file) (length cur-dir))
+        (if (string= (substring file 0 (length cur-dir))
+                     cur-dir)
+            (replace-regexp-in-string 
+             "^[/\\]" ""
+             (substring file 
+                        (length cur-dir)))
+          file)
+      file)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Building the session
 
@@ -159,6 +172,16 @@
 (defun haskell-session-set-cabal-dir (s v)
   "Set the session cabal-dir."
   (haskell-session-set s 'cabal-dir v))
+
+(defun haskell-session-set-current-dir (s v)
+  "Set the session current directory."
+  (haskell-session-set s 'current-dir v))
+
+(defun haskell-session-current-dir (s)
+  "Get the session current directory."
+  (let ((dir (haskell-session-get s 'current-dir)))
+    (or dir
+        (haskell-process-cd t))))
 
 (defun haskell-session-cabal-dir (s)
   "Get the session cabal-dir."

@@ -115,7 +115,7 @@
         (lambda (state)
           (haskell-process-send-string (cadr state)
                                        (caddr state)))
-        (lambda (state))
+        nil
         (lambda (state response)
           (haskell-interactive-mode-eval-result (car state) response)
           (haskell-interactive-mode-prompt (car state))))))))
@@ -223,3 +223,16 @@
 (defun haskell-interactive-buffer ()
   "Get the interactive buffer of the session."
   (haskell-session-interactive-buffer (haskell-session)))
+
+(defun haskell-interactive-show-load-message (session type module-name file-name echo)
+  "Show the '(Compiling|Loading) X' message."
+  (let* ((file-name-module
+          (replace-regexp-in-string
+           "\\.hs$" ""
+           (replace-regexp-in-string "[\\/]" "." file-name)))
+         (msg (ecase type
+                ('compiling (format "Compiling: %s" module-name))
+                ('loading (format "Loading: %s" module-name)))))
+    (haskell-mode-message-line msg)
+    (when echo
+      (haskell-interactive-mode-echo session msg))))

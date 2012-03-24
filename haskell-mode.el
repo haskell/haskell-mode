@@ -551,7 +551,7 @@ Invokes `haskell-mode-hook'."
 ;;         (let ();(prefix-start (point)))
 ;;           (skip-syntax-forward "^w")
 ;;           (make-string (- (point) line-start) ?\s))))))
-          
+
 
 
 ;;;###autoload
@@ -689,6 +689,16 @@ This function will be called with no arguments.")
     (hs-align-imports)
     (goto-char (+ (line-beginning-position)
                   col))))
+
+(defun haskell-mode-message-line (str)
+  "Message only one line, multiple lines just disturbs the programmer."
+  (let ((lines (split-string str "\n" t)))
+    (when (and (car lines) (stringp (car lines)))
+      (message "%s"
+               (concat (car lines)
+                       (if (and (cdr lines) (stringp (cadr lines)))
+                           (format " [ %s .. ]" (haskell-string-take (haskell-trim (cadr lines)) 10))
+                         ""))))))
 
 (eval-after-load "flymake"
   '(add-to-list 'flymake-allowed-file-name-masks
