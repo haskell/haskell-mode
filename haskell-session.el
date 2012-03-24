@@ -25,6 +25,8 @@
 
 ;;; Code:
 
+(require 'haskell-cabal)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Globals
 
@@ -49,9 +51,16 @@
 
 (defun haskell-session-new ()
   "Make a new session."
-  (let ((name (read-from-minibuffer "Project name: ")))
+  (let ((name (read-from-minibuffer "Project name: " (haskell-session-default-name))))
     (when (not (string= name ""))
       (haskell-session-make name))))
+
+(defun haskell-session-default-name ()
+  "Generate a default project name for the new project prompt."
+  (let ((file (haskell-cabal-find-file)))
+    (when file
+      (downcase (file-name-sans-extension
+                 (file-name-nondirectory file))))))
 
 (defun haskell-session-assign (session)
   "Set the current session."
