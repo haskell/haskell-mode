@@ -420,6 +420,7 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
 
 (defun inferior-haskell-wrap-decl (code)
   "Wrap declaration code into :{ ... :}."
+  (setq code (concat code "\n"))
   (concat ":{\n"
           (if (string-match (concat "^\\s-*"
                                     haskell-ds-start-keywords-re)
