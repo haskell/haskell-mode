@@ -252,6 +252,8 @@ be set to the preferred literate style."
     ;; For interactive mode, use the below bindings
     ;; It is currently brand new and experimental.
     ;; (define-key map [?\C-c ?\C-l] 'haskell-process-load-file)
+    ;; (define-key map [?\C-c ?\C-z] 'haskell-interactive-switch)
+    ;; (define-key map (kbd "C-`") 'haskell-interactive-bring)
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;; Editing-specific commands

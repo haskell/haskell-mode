@@ -85,16 +85,24 @@
     (haskell-process-set-process
      process
      (ecase haskell-process-type
-       ('ghci (start-process (haskell-session-name session)
-                             nil
-                             haskell-process-path-ghci))
-       ('cabal-dev (start-process (haskell-session-name session)
-                                  nil
-                                  haskell-process-path-cabal-dev
-                                  "ghci"
-                                  "-s"
-                                  (concat (haskell-session-cabal-dir session)
-                                          "/cabal-dev")))))
+       ('ghci 
+        (haskell-process-log (format "Starting inferior GHCi process %s ..."
+                                     haskell-process-path-ghci))
+        (start-process (haskell-session-name session)
+                       nil
+                       haskell-process-path-ghci))
+       ('cabal-dev
+        (let ((dir (concat (haskell-session-cabal-dir session)
+                           "/cabal-dev")))
+          (haskell-process-log (format "Starting inferior cabal-dev process %s -s %s ..."
+                                       haskell-process-path-cabal-dev
+                                       dir))
+          (start-process (haskell-session-name session)
+                         nil
+                         haskell-process-path-cabal-dev
+                         "ghci"
+                         "-s"
+                         dir)))))
     (progn (set-process-sentinel (haskell-process-process process) 'haskell-process-sentinel)
            (set-process-filter (haskell-process-process process) 'haskell-process-filter))
     (haskell-process-send-startup process)

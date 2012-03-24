@@ -179,15 +179,25 @@ autofill-mode.
 
 ;;;***
 
-;;;### (autoloads (haskell-interactive-mode-echo haskell-interactive-mode)
-;;;;;;  "haskell-interactive-mode" "haskell-interactive-mode.el"
-;;;;;;  (20331 40738))
+;;;### (autoloads (haskell-interactive-mode-echo haskell-interactive-switch
+;;;;;;  haskell-interactive-bring haskell-interactive-mode) "haskell-interactive-mode"
+;;;;;;  "haskell-interactive-mode.el" (20333 63736))
 ;;; Generated autoloads from haskell-interactive-mode.el
 
 (autoload 'haskell-interactive-mode "haskell-interactive-mode" "\
 Interactive mode for Haskell.
 
 \(fn SESSION)" t nil)
+
+(autoload 'haskell-interactive-bring "haskell-interactive-mode" "\
+Bring up the interactive mode for this session.
+
+\(fn)" t nil)
+
+(autoload 'haskell-interactive-switch "haskell-interactive-mode" "\
+Switch to the interactive mode for this session.
+
+\(fn)" t nil)
 
 (autoload 'haskell-interactive-mode-echo "haskell-interactive-mode" "\
 Echo a read only piece of text before the prompt.
@@ -197,7 +207,7 @@ Echo a read only piece of text before the prompt.
 ;;;***
 
 ;;;### (autoloads (haskell-hayoo haskell-hoogle literate-haskell-mode
-;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (20332 48206))
+;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (20333 63462))
 ;;; Generated autoloads from haskell-mode.el
 
 (add-to-list 'load-path (or (file-name-directory load-file-name) (car load-path)))
@@ -300,7 +310,7 @@ Return to the non-import point we were at before going to the module list.
 ;;;***
 
 ;;;### (autoloads (haskell-process-load-file) "haskell-process" "haskell-process.el"
-;;;;;;  (20332 58612))
+;;;;;;  (20333 63684))
 ;;; Generated autoloads from haskell-process.el
 
 (autoload 'haskell-process-load-file "haskell-process" "\
@@ -311,7 +321,7 @@ Load the current buffer file.
 ;;;***
 
 ;;;### (autoloads (haskell-session) "haskell-session" "haskell-session.el"
-;;;;;;  (20332 59682))
+;;;;;;  (20333 63688))
 ;;; Generated autoloads from haskell-session.el
 
 (autoload 'haskell-session "haskell-session" "\
@@ -335,8 +345,8 @@ Sort the import list at the point.
 ;;;### (autoloads (inferior-haskell-find-haddock inferior-haskell-find-definition
 ;;;;;;  inferior-haskell-info inferior-haskell-type inferior-haskell-send-decl
 ;;;;;;  inferior-haskell-load-and-run inferior-haskell-load-file
-;;;;;;  switch-to-haskell) "inf-haskell" "inf-haskell.el" (20330
-;;;;;;  14389))
+;;;;;;  switch-to-haskell) "inf-haskell" "inf-haskell.el" (20333
+;;;;;;  43796))
 ;;; Generated autoloads from inf-haskell.el
 
 (defalias 'run-haskell 'switch-to-haskell)
@@ -401,7 +411,8 @@ we load it.
 
 ;;;### (autoloads nil nil ("haskell-checkers.el" "haskell-font-lock.el"
 ;;;;;;  "haskell-ghci.el" "haskell-hugs.el" "haskell-package.el"
-;;;;;;  "haskell-simple-indent.el" "init.el") (20332 59809 150385))
+;;;;;;  "haskell-simple-indent.el" "haskell-string.el" "init.el")
+;;;;;;  (20333 63738 475682))
 
 ;;;***
 

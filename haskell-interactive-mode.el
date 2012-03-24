@@ -77,6 +77,29 @@
     map)
   "Interactive Haskell mode map.")
 
+;;;###autoload
+(defun haskell-interactive-bring ()
+  "Bring up the interactive mode for this session."
+  (interactive)
+  (let ((session (haskell-session)))
+    (let ((buffer (haskell-session-interactive-buffer session)))
+      (unless (find-if (lambda (window) (equal (window-buffer window) buffer))
+                       (window-list))
+        (delete-other-windows)
+        (split-window-horizontally)
+        (switch-to-buffer-other-window buffer)
+        (other-window 1)))))
+
+;;;###autoload
+(defun haskell-interactive-switch ()
+  "Switch to the interactive mode for this session."
+  (interactive)
+  (let ((session (haskell-session)))
+    (let ((buffer (haskell-session-interactive-buffer session)))
+      (unless (find-if (lambda (window) (equal (window-buffer window) buffer))
+                       (window-list))
+        (switch-to-buffer-other-window (haskell-session-interactive-buffer session))))))
+
 (defun haskell-interactive-mode-return ()
   "Handle the return key."
   (interactive)
@@ -85,17 +108,17 @@
         (process (haskell-process)))
     (when (not (string= "" (replace-regexp-in-string " " "" expr)))
       (haskell-interactive-mode-history-add expr)
-    (haskell-process-queue-command
-     process
-     (haskell-command-make
-      (list session process expr)
-      (lambda (state)
-        (haskell-process-send-string (cadr state)
-                                     (caddr state)))
-      (lambda (state))
-      (lambda (state response)
-        (haskell-interactive-mode-eval-result (car state) response)
-        (haskell-interactive-mode-prompt (car state))))))))
+      (haskell-process-queue-command
+       process
+       (haskell-command-make
+        (list session process expr)
+        (lambda (state)
+          (haskell-process-send-string (cadr state)
+                                       (caddr state)))
+        (lambda (state))
+        (lambda (state response)
+          (haskell-interactive-mode-eval-result (car state) response)
+          (haskell-interactive-mode-prompt (car state))))))))
 
 (defun haskell-interactive-mode-beginning ()
   "Go to the start of the line."
