@@ -180,16 +180,23 @@
       (haskell-interactive-mode-goto-end-point)
       (insert (propertize (concat (if (= (point-min) (point)) "" "\n")
                                   message
-                                  (if (= (point-min) (point)) "\n" ""))
+                                  "\n")
+                          'read-only t
+                          'rear-nonsticky t)))))
+
+(defun haskell-interactive-mode-insert (session message)
+  "Echo a read only piece of text before the prompt."
+  (with-current-buffer (haskell-session-interactive-buffer session)
+    (save-excursion
+      (haskell-interactive-mode-goto-end-point)
+      (insert (propertize message
                           'read-only t
                           'rear-nonsticky t)))))
 
 (defun haskell-interactive-mode-goto-end-point ()
   "Go to the 'end' of the buffer (before the prompt.)"
   (goto-char (point-max))
-  (search-backward-regexp haskell-interactive-prompt (point-min) t 1)
-  (if (> (point) (point-min))
-      (backward-char)))
+  (when (search-backward-regexp haskell-interactive-prompt (point-min) t 1)))
 
 (defun haskell-interactive-mode-history-add (input)
   "Add item to the history."

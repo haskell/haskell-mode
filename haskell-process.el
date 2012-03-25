@@ -78,6 +78,50 @@
       (lambda (state response)
         (haskell-process-load-complete (car state) response))))))
 
+;;;###autoload
+(defun haskell-process-cabal-build ()
+  "Build the Cabal project."
+  (interactive)
+  (haskell-process-do-cabal "build"))
+
+;;;###autoload
+(defun haskell-process-cabal ()
+  "Prompts for a Cabal command to run."
+  (interactive)
+  (haskell-process-do-cabal
+   (ido-completing-read "Cabal command: "
+                        haskell-cabal-commands)))
+
+(defun haskell-process-do-cabal (command)
+  "Run a Cabal command."
+  (let ((process (haskell-process)))
+    (haskell-process-queue-command
+     process
+     (haskell-command-make
+      (list (haskell-session) process command 0)
+      (lambda (state)
+        (haskell-process-send-string
+         (cadr state)
+         (format ":!%s && %s"
+                 (format "cd %s" (haskell-session-cabal-dir (car state)))
+                 (format "%s %s"
+                         (ecase haskell-process-type
+                           ('ghci "cabal")
+                           ('cabal-dev "cabal-dev"))
+                         (caddr state)))))
+      (lambda (state buffer)
+        (haskell-interactive-mode-insert
+         (haskell-process-session (cadr state))
+         (replace-regexp-in-string
+          haskell-process-prompt-regex
+          ""
+          (substring buffer (cadddr state))))
+        (setf (cdddr state) (list (length buffer)))
+        nil)
+      (lambda (state _)
+        (haskell-interactive-mode-echo (haskell-process-session (cadr state))
+                                       "Command complete."))))))
+
 (defun haskell-process-load-complete (session response)
   "Handle the complete loading response."
   (cond ((haskell-process-consume process "Ok, modules loaded: \\(.+\\)$")
@@ -240,13 +284,13 @@
   (haskell-process-queue-command
    process
    (haskell-command-make process
-                         (lambda (process) (haskell-process-send-string process ":set prompt \"> \"\n"))
+                         (lambda (process) (haskell-process-send-string process ":set prompt \"> \""))
                          nil
                          nil))
   (haskell-process-queue-command
    process
    (haskell-command-make process
-                         (lambda (process) (haskell-process-send-string process ":set -v1\n"))
+                         (lambda (process) (haskell-process-send-string process ":set -v1"))
                          nil
                          (lambda (process _)
                            (haskell-interactive-mode-echo

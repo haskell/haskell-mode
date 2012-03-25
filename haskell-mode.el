@@ -254,6 +254,8 @@ be set to the preferred literate style."
     ;; (define-key map [?\C-c ?\C-l] 'haskell-process-load-file)
     ;; (define-key map [?\C-c ?\C-z] 'haskell-interactive-switch)
     ;; (define-key map (kbd "C-`") 'haskell-interactive-bring)
+    ;; (define-key map (kbd "C-c C-c") 'haskell-process-cabal-build)
+    ;; (define-key map (kbd "C-c c") 'haskell-process-cabal)
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;; Editing-specific commands

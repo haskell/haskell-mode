@@ -214,6 +214,29 @@
     (when file
       (file-name-directory file))))
 
+(defvar haskell-cabal-commands
+  '("install"
+    "update"
+    "list"
+    "info"
+    "upgrade"
+    "fetch"
+    "unpack"
+    "check"
+    "sdist"
+    "upload"
+    "report"
+    "init"
+    "configure"
+    "build"
+    "copy"
+    "haddock"
+    "clean"
+    "hscolour"
+    "register"
+    "test"
+    "help"))
+
 (provide 'haskell-cabal)
 
 ;; arch-tag: d455f920-5e4d-42b6-a2c7-4a7e84a05c29
