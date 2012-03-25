@@ -119,8 +119,7 @@
                                               (line-end-position))))
     (if (string-match "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\):" line)
         (haskell-interactive-jump-to-error-line line)
-      ;; (haskell-interactive-handle-line)
-      )))
+      (haskell-interactive-handle-line))))
 
 (defun haskell-interactive-handle-line ()
   (let ((expr (haskell-interactive-mode-input))

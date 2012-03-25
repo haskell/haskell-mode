@@ -247,8 +247,20 @@
                  'haskell-interactive-mode-compile-error)
                session final-msg)
       (unless warning
-        (haskell-mode-message-line final-msg)))
+        (haskell-mode-message-line final-msg))
+      (haskell-process-trigger-extension-suggestions session error-msg file))
     t)))
+
+(defun haskell-process-trigger-extension-suggestions (session msg file)
+  "Trigger prompting to add any extension suggestions."
+  (when (string-match "\\-X\\([A-Z][A-Za-z]+\\)" msg)
+    (let* ((extension (match-string 1 msg))
+           (string (format "{-# LANGUAGE %s #-}" extension)))
+      (when (y-or-n-p (format "Add %s to the top of the file? " string))
+        (find-file file)
+        (save-excursion
+          (goto-char (point-min))
+          (insert (concat string "\n")))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Building the process
