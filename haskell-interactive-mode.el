@@ -108,6 +108,8 @@
         (process (haskell-process)))
     (when (not (string= "" (replace-regexp-in-string " " "" expr)))
       (haskell-interactive-mode-history-add expr)
+      (goto-char (point-max))
+      (insert "\n")
       (haskell-process-queue-command
        process
        (haskell-command-make
@@ -117,7 +119,8 @@
                                        (caddr state)))
         nil
         (lambda (state response)
-          (haskell-interactive-mode-eval-result (car state) response)
+          (when (not (string= "" response))
+           (haskell-interactive-mode-eval-result (car state) response))
           (haskell-interactive-mode-prompt (car state))))))))
 
 (defun haskell-interactive-mode-beginning ()
@@ -151,8 +154,6 @@
   "Show a prompt at the end of the buffer."
   (with-current-buffer (haskell-session-interactive-buffer session)
     (goto-char (point-max))
-    (when (> (point-max) (point-min))
-      (insert "\n"))
     (insert (propertize haskell-interactive-prompt
                         'face 'haskell-interactive-face-prompt
                         'read-only t
@@ -164,8 +165,7 @@
   parseable, or otherwise just as-is."
   (with-current-buffer (haskell-session-interactive-buffer session)
     (goto-char (point-max))
-    (insert "\n")
-    (insert (propertize text
+    (insert (propertize (concat text "\n")
                         'face 'haskell-interactive-face-result
                         'read-only t
                         'rear-nonsticky t
@@ -178,9 +178,7 @@
   (with-current-buffer (haskell-session-interactive-buffer session)
     (save-excursion
       (haskell-interactive-mode-goto-end-point)
-      (insert (propertize (concat (if (= (point-min) (point)) "" "\n")
-                                  message
-                                  "\n")
+      (insert (propertize (concat message "\n")
                           'read-only t
                           'rear-nonsticky t)))))
 

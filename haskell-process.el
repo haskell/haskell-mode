@@ -56,6 +56,33 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Specialised commands
 
+(defun haskell-process-do-type ()
+  "Print the type of the given expression."
+  (interactive)
+  (haskell-process-do-simple-echo
+   (format ":type %s" (haskell-ident-at-point))))
+
+(defun haskell-process-do-info ()
+  "Print the info of the given expression."
+  (interactive)
+  (haskell-process-do-simple-echo
+   (format ":info %s" (haskell-ident-at-point))))
+
+(defun haskell-process-do-simple-echo (line)
+  "Send some line to GHCi and echo the result in the REPL and minibuffer."
+  (let ((process (haskell-process)))
+    (haskell-process-queue-command
+     process
+     (haskell-command-make
+      process
+      (lambda (process)
+        (haskell-process-send-string process line))
+      nil
+      (lambda (process response)
+        (haskell-interactive-mode-echo (haskell-process-session process)
+                                       response)
+        (haskell-mode-message-line response))))))
+
 ;;;###autoload
 (defun haskell-process-load-file ()
   "Load the current buffer file."
