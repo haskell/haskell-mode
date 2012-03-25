@@ -100,8 +100,7 @@
         (haskell-process-send-string (cadr state)
                                      (format ":load %s" (caddr state))))
       (lambda (state buffer)
-        (or (haskell-process-live-load-file (cadr state) buffer)
-            (haskell-process-live-load-packages (cadr state) buffer)))
+        (haskell-process-live-build (cadr state) buffer nil))
       (lambda (state response)
         (haskell-process-load-complete (car state) response))))))
 
@@ -137,17 +136,36 @@
                            ('cabal-dev "cabal-dev"))
                          (caddr state)))))
       (lambda (state buffer)
-        (haskell-interactive-mode-insert
-         (haskell-process-session (cadr state))
-         (replace-regexp-in-string
-          haskell-process-prompt-regex
-          ""
-          (substring buffer (cadddr state))))
-        (setf (cdddr state) (list (length buffer)))
-        nil)
+        (cond ((or (string= (caddr state) "build")
+                   (string= (caddr state) "install"))
+               (haskell-process-live-build (cadr state) buffer t))
+              (t
+               (haskell-process-cabal-live state buffer))))
       (lambda (state _)
-        (haskell-interactive-mode-echo (haskell-process-session (cadr state))
-                                       (format "Complete: cabal %s" (caddr state))))))))
+        (let* ((process (cadr state))
+               (session (haskell-process-session process))
+               (message-count 0)
+               (cursor (haskell-process-response-cursor process)))
+          (haskell-process-set-response-cursor process 0)
+          (while (haskell-process-errors-warnings session process)
+            (setq message-count (1+ message-count)))
+          (haskell-process-set-response-cursor process cursor)
+          (let ((msg (format "Complete: cabal %s (%s compiler messages)"
+                             (caddr state)
+                             message-count)))
+            (haskell-interactive-mode-echo session msg)
+            (haskell-mode-message-line msg))))))))
+
+(defun haskell-process-cabal-live (state buffer)
+  "Do live updates for Cabal processes."
+  (haskell-interactive-mode-insert
+   (haskell-process-session (cadr state))
+   (replace-regexp-in-string
+    haskell-process-prompt-regex
+    ""
+    (substring buffer (cadddr state))))
+  (setf (cdddr state) (list (length buffer)))
+  nil)
 
 (defun haskell-process-load-complete (session response)
   "Handle the complete loading response."
@@ -164,14 +182,13 @@
            (haskell-process-set-response-cursor process 0)
            (while (haskell-process-errors-warnings session process))
            (haskell-process-set-response-cursor process cursor)
-           (haskell-mode-message-line "Compilation failed.")
-           (haskell-interactive-mode-echo session "Compilation failed.")))))
+           (haskell-interactive-mode-compile-error session "Compilation failed.")))))
 
-(defun haskell-process-live-load-file (process buffer)
+(defun haskell-process-live-build (process buffer echo-in-repl)
   "Show live updates for loading files."
   (cond ((haskell-process-consume
           process
-          (concat "\\[\\([0-9]+\\) of \\([0-9]+\\)\\]"
+          (concat "\\[[ ]*\\([0-9]+\\) of \\([0-9]+\\)\\]"
                   " Compiling \\([^ ]+\\)[ ]+"
                   "( \\([^ ]+\\), \\([^ ]+\\) )[\r\n]+"))
          (haskell-interactive-show-load-message
@@ -179,15 +196,27 @@
           'compiling
           (match-string 3 buffer)
           (match-string 4 buffer)
-          nil)
-         t)))
-
-(defun haskell-process-live-load-packages (process buffer)
-  "Show live package loading updates."
-  (cond ((haskell-process-consume process "Loading package \\([^ ]+\\) ... linking ... done.\n")
+          echo-in-repl)
+         t)
+        ((haskell-process-consume process "Loading package \\([^ ]+\\) ... linking ... done.\n")
          (haskell-mode-message-line
           (format "Loading: %s"
-                  (match-string 1 buffer))))))
+                  (match-string 1 buffer)))
+         t)
+        ((haskell-process-consume
+          process
+          "^Preprocessing executables for \\(.+?\\)\\.\\.\\.")
+         (let ((msg (format "Preprocessing: %s" (match-string 1 buffer))))
+           (haskell-interactive-mode-echo
+            (haskell-process-session process)
+            msg)
+           (haskell-mode-message-line msg)))
+        ((haskell-process-consume process "\nBuilding \\(.+?\\)\\.\\.\\.")
+         (let ((msg (format "Building: %s" (match-string 1 buffer))))
+           (haskell-interactive-mode-echo
+            (haskell-process-session process)
+            msg)
+           (haskell-mode-message-line msg)))))
 
 (defun haskell-process-errors-warnings (session buffer)
   "Trigger handling type errors or warnings."
@@ -209,7 +238,10 @@
                               line
                               col
                               error-msg)))
-      (haskell-interactive-mode-echo session final-msg)
+      (funcall (if warning
+                   'haskell-interactive-mode-compile-warning
+                 'haskell-interactive-mode-compile-error)
+               session final-msg)
       (unless warning
         (haskell-mode-message-line final-msg)))
     t)))

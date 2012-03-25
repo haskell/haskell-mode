@@ -58,6 +58,16 @@
   "Face for the prompt."
   :group 'haskell)
 
+(defface haskell-interactive-face-compile-error
+  '((t :inherit 'compilation-error))
+  "Face for compile errors."
+  :group 'haskell)
+
+(defface haskell-interactive-face-compile-warning
+  '((t :inherit 'compilation-warning))
+  "Face for compiler warnings."
+  :group 'haskell)
+
 (defface haskell-interactive-face-result
   '((t :inherit 'font-lock-string-face))
   "Face for the result."
@@ -74,6 +84,7 @@
       '(lambda () (interactive) (haskell-interactive-mode-history-toggle 1)))
     (define-key map (kbd "M-n")
       '(lambda () (interactive) (haskell-interactive-mode-history-toggle -1)))
+    (define-key map [tab] 'haskell-interactive-mode-tab)
     map)
   "Interactive Haskell mode map.")
 
@@ -121,7 +132,7 @@
         nil
         (lambda (state response)
           (when (not (string= "" response))
-           (haskell-interactive-mode-eval-result (car state) response))
+            (haskell-interactive-mode-eval-result (car state) response))
           (haskell-interactive-mode-prompt (car state))))))))
 
 (defun haskell-interactive-mode-beginning ()
@@ -183,6 +194,41 @@
                           'read-only t
                           'rear-nonsticky t)))))
 
+(defun haskell-interactive-mode-compile-error (session message)
+  "Echo an error."
+  (haskell-interactive-mode-compile-message
+   session message 'haskell-interactive-face-compile-error))
+
+(defun haskell-interactive-mode-compile-warning (session message)
+  "Warning message."
+  (haskell-interactive-mode-compile-message
+   session message 'haskell-interactive-face-compile-warning))
+
+(defun haskell-interactive-mode-compile-message (session message type)
+  "Echo a compiler warning."
+  (with-current-buffer (haskell-session-interactive-buffer session)
+    (save-excursion
+      (haskell-interactive-mode-goto-end-point)
+      (let ((lines (string-match "^\\(.*\\)\n\\([[:unibyte:][:nonascii:]]+\\)" message)))
+        (when lines
+          (insert (propertize (concat (match-string 1 message) " …\n")
+                              'face type
+                              'read-only t
+                              'rear-nonsticky t
+                              'expandable t))
+          (insert (propertize (concat (match-string 2 message) "\n")
+                              'face type
+                              'read-only t
+                              'rear-nonsticky t
+                              'collapsible t
+                              'invisible t
+                              'message-length (length (match-string 2 message)))))
+        (unless lines
+          (insert (propertize (concat message "\n")
+                              'face type
+                              'read-only t
+                              'rear-nonsticky t)))))))
+
 (defun haskell-interactive-mode-insert (session message)
   "Echo a read only piece of text before the prompt."
   (with-current-buffer (haskell-session-interactive-buffer session)
@@ -242,3 +288,26 @@
     (haskell-mode-message-line msg)
     (when echo
       (haskell-interactive-mode-echo session msg))))
+
+(defun haskell-interactive-mode-tab ()
+  "The tab command."
+  (interactive)
+  (cond 
+   ((get-text-property (point) 'collapsible)
+    (let ((column (current-column)))
+      (search-backward-regexp "^[^ ]")
+      (haskell-interactive-mode-tab-expand)
+      (goto-char (+ column (line-beginning-position)))))
+   (t (haskell-interactive-mode-tab-expand))))
+
+(defun haskell-interactive-mode-tab-expand ()
+  "Expand the rest of the message."
+  (cond ((get-text-property (point) 'expandable)
+         (let* ((pos (1+ (line-end-position)))
+                (visibility (get-text-property pos 'invisible))
+                (length (1+ (get-text-property pos 'message-length))))
+           (let ((inhibit-read-only t))
+             (put-text-property pos
+                                (+ pos length)
+                                'invisible
+                                (not visibility)))))))

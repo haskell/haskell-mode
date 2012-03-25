@@ -181,7 +181,7 @@ autofill-mode.
 
 ;;;### (autoloads (haskell-interactive-mode-echo haskell-interactive-switch
 ;;;;;;  haskell-interactive-bring haskell-interactive-mode) "haskell-interactive-mode"
-;;;;;;  "haskell-interactive-mode.el" (20334 64030))
+;;;;;;  "haskell-interactive-mode.el" (20335 8730))
 ;;; Generated autoloads from haskell-interactive-mode.el
 
 (autoload 'haskell-interactive-mode "haskell-interactive-mode" "\
@@ -311,7 +311,7 @@ Return to the non-import point we were at before going to the module list.
 
 ;;;### (autoloads (haskell-process haskell-process-start haskell-process-cabal
 ;;;;;;  haskell-process-cabal-build haskell-process-load-file) "haskell-process"
-;;;;;;  "haskell-process.el" (20334 65375))
+;;;;;;  "haskell-process.el" (20335 8867))
 ;;; Generated autoloads from haskell-process.el
 
 (autoload 'haskell-process-load-file "haskell-process" "\
@@ -433,7 +433,7 @@ we load it.
 ;;;### (autoloads nil nil ("haskell-checkers.el" "haskell-font-lock.el"
 ;;;;;;  "haskell-ghci.el" "haskell-hugs.el" "haskell-package.el"
 ;;;;;;  "haskell-simple-indent.el" "haskell-string.el" "init.el")
-;;;;;;  (20334 65379 994401))
+;;;;;;  (20335 8929 659887))
 
 ;;;***
 
