@@ -147,7 +147,7 @@
         nil)
       (lambda (state _)
         (haskell-interactive-mode-echo (haskell-process-session (cadr state))
-                                       "Command complete."))))))
+                                       (format "Complete: cabal %s" (caddr state))))))))
 
 (defun haskell-process-load-complete (session response)
   "Handle the complete loading response."
