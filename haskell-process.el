@@ -217,6 +217,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Building the process
 
+;;;###autoload
 (defun haskell-process-start (session)
   "Start the inferior Haskell process."
   (let ((process (haskell-process-make (haskell-session-name session))))
@@ -264,6 +265,7 @@
         (cons 'current-command
               (haskell-command-make nil nil nil nil))))
 
+;;;###autoload
 (defun haskell-process ()
   "Get the current process from the current session."
   (haskell-session-process (haskell-session)))

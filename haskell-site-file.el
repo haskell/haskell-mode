@@ -42,7 +42,7 @@ Major mode for Haskell FFI files.
 ;;;***
 
 ;;;### (autoloads (haskell-cabal-get-dir haskell-cabal-mode) "haskell-cabal"
-;;;;;;  "haskell-cabal.el" (20332 59806))
+;;;;;;  "haskell-cabal.el" (20334 23077))
 ;;; Generated autoloads from haskell-cabal.el
 
 (add-to-list 'auto-mode-alist '("\\.cabal\\'" . haskell-cabal-mode))
@@ -181,7 +181,7 @@ autofill-mode.
 
 ;;;### (autoloads (haskell-interactive-mode-echo haskell-interactive-switch
 ;;;;;;  haskell-interactive-bring haskell-interactive-mode) "haskell-interactive-mode"
-;;;;;;  "haskell-interactive-mode.el" (20333 63736))
+;;;;;;  "haskell-interactive-mode.el" (20334 64030))
 ;;; Generated autoloads from haskell-interactive-mode.el
 
 (autoload 'haskell-interactive-mode "haskell-interactive-mode" "\
@@ -207,7 +207,7 @@ Echo a read only piece of text before the prompt.
 ;;;***
 
 ;;;### (autoloads (haskell-hayoo haskell-hoogle literate-haskell-mode
-;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (20333 63462))
+;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (20334 28453))
 ;;; Generated autoloads from haskell-mode.el
 
 (add-to-list 'load-path (or (file-name-directory load-file-name) (car load-path)))
@@ -309,8 +309,9 @@ Return to the non-import point we were at before going to the module list.
 
 ;;;***
 
-;;;### (autoloads (haskell-process-load-file) "haskell-process" "haskell-process.el"
-;;;;;;  (20333 63684))
+;;;### (autoloads (haskell-process haskell-process-start haskell-process-cabal
+;;;;;;  haskell-process-cabal-build haskell-process-load-file) "haskell-process"
+;;;;;;  "haskell-process.el" (20334 65375))
 ;;; Generated autoloads from haskell-process.el
 
 (autoload 'haskell-process-load-file "haskell-process" "\
@@ -318,10 +319,30 @@ Load the current buffer file.
 
 \(fn)" t nil)
 
+(autoload 'haskell-process-cabal-build "haskell-process" "\
+Build the Cabal project.
+
+\(fn)" t nil)
+
+(autoload 'haskell-process-cabal "haskell-process" "\
+Prompts for a Cabal command to run.
+
+\(fn)" t nil)
+
+(autoload 'haskell-process-start "haskell-process" "\
+Start the inferior Haskell process.
+
+\(fn SESSION)" nil nil)
+
+(autoload 'haskell-process "haskell-process" "\
+Get the current process from the current session.
+
+\(fn)" nil nil)
+
 ;;;***
 
 ;;;### (autoloads (haskell-session) "haskell-session" "haskell-session.el"
-;;;;;;  (20333 63688))
+;;;;;;  (20334 8942))
 ;;; Generated autoloads from haskell-session.el
 
 (autoload 'haskell-session "haskell-session" "\
@@ -412,7 +433,7 @@ we load it.
 ;;;### (autoloads nil nil ("haskell-checkers.el" "haskell-font-lock.el"
 ;;;;;;  "haskell-ghci.el" "haskell-hugs.el" "haskell-package.el"
 ;;;;;;  "haskell-simple-indent.el" "haskell-string.el" "init.el")
-;;;;;;  (20333 63738 475682))
+;;;;;;  (20334 65379 994401))
 
 ;;;***
 
