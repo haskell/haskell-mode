@@ -195,7 +195,7 @@
    ((haskell-process-consume
      process
      (concat "[\r\n]\\([^ \r\n:][^:\n\r]+\\):\\([0-9]+\\):\\([0-9]+\\):"
-             "[ \n\r]+\\([[:unibyte:]]+?\\)\n[^ ]"))
+             "[ \n\r]+\\([[:unibyte:][:nonascii:]]+?\\)\n[^ ]"))
     (haskell-process-set-response-cursor process
                                          (- (haskell-process-response-cursor process) 1))
     (let* ((buffer (haskell-process-response process))
