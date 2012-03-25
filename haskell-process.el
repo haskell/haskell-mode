@@ -102,7 +102,7 @@
       (lambda (state buffer)
         (haskell-process-live-build (cadr state) buffer nil))
       (lambda (state response)
-        (haskell-process-load-complete (car state) response))))))
+        (haskell-process-load-complete (car state) (cadr state) response))))))
 
 ;;;###autoload
 (defun haskell-process-cabal-build ()
@@ -141,13 +141,13 @@
                (haskell-process-live-build (cadr state) buffer t))
               (t
                (haskell-process-cabal-live state buffer))))
-      (lambda (state _)
+      (lambda (state response)
         (let* ((process (cadr state))
                (session (haskell-process-session process))
                (message-count 0)
                (cursor (haskell-process-response-cursor process)))
           (haskell-process-set-response-cursor process 0)
-          (while (haskell-process-errors-warnings session process)
+          (while (haskell-process-errors-warnings session process response)
             (setq message-count (1+ message-count)))
           (haskell-process-set-response-cursor process cursor)
           (let ((msg (format "Complete: cabal %s (%s compiler messages)"
@@ -167,20 +167,20 @@
   (setf (cdddr state) (list (length buffer)))
   nil)
 
-(defun haskell-process-load-complete (session response)
+(defun haskell-process-load-complete (session process buffer)
   "Handle the complete loading response."
   (cond ((haskell-process-consume process "Ok, modules loaded: \\(.+\\)$")
          (let ((cursor (haskell-process-response-cursor process)))
            (haskell-process-set-response-cursor process 0)
            (let ((warning-count 0))
-             (while (haskell-process-errors-warnings session process)
+             (while (haskell-process-errors-warnings session process buffer)
                (setq warning-count (1+ warning-count)))
              (haskell-process-set-response-cursor process cursor)
              (haskell-mode-message-line "OK."))))
         ((haskell-process-consume process "Failed, modules loaded: \\(.+\\)$")
          (let ((cursor (haskell-process-response-cursor process)))
            (haskell-process-set-response-cursor process 0)
-           (while (haskell-process-errors-warnings session process))
+           (while (haskell-process-errors-warnings session process buffer))
            (haskell-process-set-response-cursor process cursor)
            (haskell-interactive-mode-compile-error session "Compilation failed.")))))
 
@@ -211,6 +211,10 @@
             (haskell-process-session process)
             msg)
            (haskell-mode-message-line msg)))
+        ((haskell-process-consume process "Linking \\(.+?\\) \\.\\.\\.")
+         (let ((msg (format "Linking: %s" (match-string 1 buffer))))
+           (haskell-interactive-mode-echo (haskell-process-session process) msg)
+           (haskell-mode-message-line msg)))
         ((haskell-process-consume process "\nBuilding \\(.+?\\)\\.\\.\\.")
          (let ((msg (format "Building: %s" (match-string 1 buffer))))
            (haskell-interactive-mode-echo
@@ -218,7 +222,7 @@
             msg)
            (haskell-mode-message-line msg)))))
 
-(defun haskell-process-errors-warnings (session buffer)
+(defun haskell-process-errors-warnings (session process buffer)
   "Trigger handling type errors or warnings."
   (cond
    ((haskell-process-consume

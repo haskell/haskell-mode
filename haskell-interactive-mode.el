@@ -115,6 +115,14 @@
 (defun haskell-interactive-mode-return ()
   "Handle the return key."
   (interactive)
+  (let ((line (buffer-substring-no-properties (line-beginning-position)
+                                              (line-end-position))))
+    (if (string-match "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\):" line)
+        (haskell-interactive-jump-to-error-line line)
+      ;; (haskell-interactive-handle-line)
+      )))
+
+(defun haskell-interactive-handle-line ()
   (let ((expr (haskell-interactive-mode-input))
         (session (haskell-session))
         (process (haskell-process)))
@@ -134,6 +142,37 @@
           (when (not (string= "" response))
             (haskell-interactive-mode-eval-result (car state) response))
           (haskell-interactive-mode-prompt (car state))))))))
+
+(defun haskell-interactive-jump-to-error-line (line)
+  "Jump to the error line."
+  (let ((file (match-string 1 line))
+        (line (match-string 2 line))
+        (col (match-string 3 line)))
+    (let* ((session (haskell-session))
+           (cabal-path (haskell-session-cabal-dir session))
+           (src-path (haskell-session-current-dir session))
+           (cabal-relative-file (concat cabal-path "/" file))
+           (src-relative-file (concat src-path "/" file))
+           (cabal-relative-file-rel (concat cabal-path "/" 
+                                            (file-relative-name file
+                                                                cabal-path)))
+           (src-relative-file-rel (concat src-path "/" 
+                                          (file-relative-name file
+                                                              src-path))))
+      (let ((file (cond ((file-exists-p cabal-relative-file)
+                         cabal-relative-file)
+                        ((file-exists-p src-relative-file) 
+                         src-relative-file)
+                        ((file-exists-p src-relative-file-rel) 
+                         src-relative-file)
+                        ((file-exists-p cabal-relative-file-rel) 
+                         cabal-relative-file))))
+        (when file
+          (goto-char (point-max))
+          (other-window 1)
+          (find-file file)
+          (goto-line (string-to-number line))
+          (goto-char (+ (point) (string-to-number col))))))))
 
 (defun haskell-interactive-mode-beginning ()
   "Go to the start of the line."
