@@ -689,8 +689,8 @@ This function will be called with no arguments.")
   "Format the imports by aligning and sorting them."
   (interactive)
   (let ((col (current-column)))
-    (hs-sort-imports)
-    (hs-align-imports)
+    (haskell-sort-imports)
+    (haskell-align-imports)
     (goto-char (+ (line-beginning-position)
                   col))))
 
