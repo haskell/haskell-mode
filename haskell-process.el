@@ -257,7 +257,11 @@
     (let* ((extension (match-string 1 msg))
            (string (format "{-# LANGUAGE %s #-}" extension)))
       (when (y-or-n-p (format "Add %s to the top of the file? " string))
-        (find-file file)
+        (find-file (cond ((file-exists-p (concat (haskell-session-current-dir session) "/" file))
+                          (concat (haskell-session-current-dir session) "/" file))
+                         ((file-exists-p (concat (haskell-session-cabal-dir session) "/" file))
+                          (concat (haskell-session-cabal-dir session) "/" file))
+                         (t file)))
         (save-excursion
           (goto-char (point-min))
           (insert (concat string "\n")))))))
