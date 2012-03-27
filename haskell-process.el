@@ -315,8 +315,7 @@
 (defun haskell-process-make (name)
   "Make an inferior Haskell process."
   (list (cons 'name name)
-        (cons 'current-command
-              (haskell-command-make nil nil nil nil))))
+        (cons 'current-command 'none)))
 
 ;;;###autoload
 (defun haskell-process ()
@@ -366,7 +365,9 @@
   (haskell-process-queue-command
    process
    (haskell-command-make process
-                         (lambda (process) (haskell-process-send-string process ":set prompt \"> \""))
+                         (lambda (process)
+                           (haskell-process-send-string process ":set prompt \"> \"")
+                           (haskell-process-send-string process "Prelude.putStrLn \"\""))
                          nil
                          nil))
   (haskell-process-queue-command
