@@ -69,18 +69,36 @@
    (format ":info %s" (or ident
                           (haskell-ident-at-point)))))
 
+(defun haskell-process-do-try-info (sym)
+  "Get info of `sym' and echo in the minibuffer."
+  (let ((process (haskell-process)))
+    (haskell-process-queue-command
+     process
+     (haskell-command-make
+      (cons process sym)
+      (lambda (state)
+        (haskell-process-send-string (car state)
+                                     (if (string-match "^[A-Za-z_]" (cdr state))
+                                         (format ":info %s" (cdr state))
+                                       (format ":info (%s)" (cdr state)))))
+      nil
+      (lambda (process response)
+        (unless (or (string-match "^Top level" response)
+                    (string-match "^<interactive>" response))
+          (haskell-mode-message-line response)))))))
+
 (defun haskell-process-do-simple-echo (line)
   "Send some line to GHCi and echo the result in the REPL and minibuffer."
   (let ((process (haskell-process)))
     (haskell-process-queue-command
      process
      (haskell-command-make
-      process
-      (lambda (process)
-        (haskell-process-send-string process line))
+      (cons process line)
+      (lambda (state)
+        (haskell-process-send-string (car state) (cdr state)))
       nil
-      (lambda (process response)
-        (haskell-interactive-mode-echo (haskell-process-session process)
+      (lambda (state response)
+        (haskell-interactive-mode-echo (haskell-process-session (car state))
                                        response)
         (haskell-mode-message-line response))))))
 

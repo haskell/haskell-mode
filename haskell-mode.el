@@ -711,10 +711,10 @@ This function will be called with no arguments.")
                          (looking-at "import"))
          (let ((module (ido-completing-read "Module: " (haskell-session-all-modules))))
            (insert (concat " " module))))
-        ((not (string= "" (haskell-ident-at-point)))
-         (let ((ident (haskell-ident-at-point)))
+        ((not (string= "" (save-excursion (forward-char -1) (haskell-ident-at-point))))
+         (let ((ident (save-excursion (forward-char -1) (haskell-ident-at-point))))
            (insert " ")
-           (haskell-process-do-info ident)))
+           (haskell-process-do-try-info ident)))
         (t (insert " "))))
 
 (eval-after-load "flymake"
