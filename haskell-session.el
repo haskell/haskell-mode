@@ -34,6 +34,59 @@
 (defvar haskell-sessions (list)
   "All Haskell sessions in the Emacs session.")
 
+
+(defun haskell-session-all-modules ()
+  "Get all modules -- installed or in the current project."
+  (remove-if (lambda (x) (string= x ""))
+             (append (haskell-session-installed-modules)
+                     (haskell-session-project-modules))))
+
+(defun haskell-session-installed-modules ()
+  "Get the modules installed in the current package set."
+  ;; TODO: Again, this makes HEAVY use of unix utilities. It'll work
+  ;; fine in Linux, probably okay on OS X, and probably not at all on
+  ;; Windows. Again, if someone wants to test on Windows and come up
+  ;; with alternatives that's OK.
+  ;;
+  ;; Ideally all these package queries can be provided by a Haskell
+  ;; program based on the Cabal API. Possibly as a nice service. Such
+  ;; a service could cache and do nice things like that. For now, this
+  ;; simple shell script takes us far.
+  ;;
+  ;; Probably also we can take the code from inferior-haskell-mode.
+  ;;
+  ;; Ugliness aside, if it saves us time to type it's a winner.
+  (let ((modules (shell-command-to-string
+                  (format "%s | %s | %s | %s"
+                          (format "ghc-pkg dump %s"
+                                  (if (equal 'cabal-dev haskell-process-type)
+                                      (let ((dir (haskell-session-cabal-dir (haskell-session))))
+                                        (format "-f %s/cabal-dev/%s"
+                                                dir
+                                                (car (split-string (shell-command-to-string
+                                                                    (format "ls %s/cabal-dev | grep packages-"
+                                                                            dir))"\n"))))
+                                    ""))
+                          "egrep '^(exposed-modules:|                 )'"
+                          "tr ' ' '\n'"
+                          "grep '^[A-Z]'"))))
+    (split-string modules "\n")))
+
+(defun haskell-session-project-modules ()
+  "Get the modules of the current project."
+  (let* ((session (haskell-session))
+         (modules
+          (shell-command-to-string
+           (format "%s && %s"
+                   (format "cd %s" (haskell-session-cabal-dir session))
+                   ;; TODO: Use a different, better source. Possibly hasktags or some such.
+                   ;; TODO: At least make it cross-platform. Linux
+                   ;; (and possibly OS X) have egrep, Windows
+                   ;; doesn't -- or does it via Cygwin or MinGW?
+                   ;; This also doesn't handle module\nName. But those gits can just cut it out!
+                   "egrep '^module [^ (\r]+' * -r -I --include='*hs' -o -h | sed 's/^module //'"))))
+    (split-string modules "\n")))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Finding/clearing the session
 

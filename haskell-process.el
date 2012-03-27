@@ -62,11 +62,12 @@
   (haskell-process-do-simple-echo
    (format ":type %s" (haskell-ident-at-point))))
 
-(defun haskell-process-do-info ()
+(defun haskell-process-do-info (&optional ident)
   "Print the info of the given expression."
   (interactive)
   (haskell-process-do-simple-echo
-   (format ":info %s" (haskell-ident-at-point))))
+   (format ":info %s" (or ident
+                          (haskell-ident-at-point)))))
 
 (defun haskell-process-do-simple-echo (line)
   "Send some line to GHCi and echo the result in the REPL and minibuffer."

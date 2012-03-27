@@ -704,6 +704,19 @@ This function will be called with no arguments.")
                            (format " [ %s .. ]" (haskell-string-take (haskell-trim (cadr lines)) 10))
                          ""))))))
 
+(defun haskell-mode-contextual-space ()
+  "Contextually do clever stuff when hitting space."
+  (interactive)
+  (cond ((save-excursion (forward-word -1)
+                         (looking-at "import"))
+         (let ((module (ido-completing-read "Module: " (haskell-session-all-modules))))
+           (insert (concat " " module))))
+        ((not (string= "" (haskell-ident-at-point)))
+         (let ((ident (haskell-ident-at-point)))
+           (insert " ")
+           (haskell-process-do-info ident)))
+        (t (insert " "))))
+
 (eval-after-load "flymake"
   '(add-to-list 'flymake-allowed-file-name-masks
 		'("\\.l?hs\\'" haskell-flymake-init)))
