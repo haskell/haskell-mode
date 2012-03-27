@@ -301,7 +301,7 @@
     (progn (set-process-sentinel (haskell-process-process process) 'haskell-process-sentinel)
            (set-process-filter (haskell-process-process process) 'haskell-process-filter))
     (haskell-process-send-startup process)
-    (when (haskell-session-current-dir session)
+    (when (haskell-session-get session 'current-dir)
       (haskell-process-change-dir session
                                   process
                                   (haskell-session-current-dir session)))
