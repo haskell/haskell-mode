@@ -51,6 +51,12 @@
   :type 'symbol
   :group 'haskell)
 
+(defcustom haskell-notify-p
+  nil
+  "Notify using notify.el (if loaded)?"
+  :type 'boolean
+  :group 'haskell)
+
 (defvar haskell-process-prompt-regex "\\(^[> ]*> $\\|\n[> ]*> $\\)")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -173,7 +179,11 @@
                              (caddr state)
                              message-count)))
             (haskell-interactive-mode-echo session msg)
-            (haskell-mode-message-line msg))))))))
+            (haskell-mode-message-line msg)
+            (when (and haskell-notify-p
+                       (fboundp 'notify))
+              (notify (format "*%s*" (haskell-session-name (car state)))
+                      msg)))))))))
 
 (defun haskell-process-cabal-live (state buffer)
   "Do live updates for Cabal processes."
