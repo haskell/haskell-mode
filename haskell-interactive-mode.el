@@ -128,18 +128,24 @@
     (when (not (string= "" (replace-regexp-in-string " " "" expr)))
       (haskell-interactive-mode-history-add expr)
       (goto-char (point-max))
-      (insert "\n")
       (haskell-process-queue-command
        process
        (haskell-command-make
-        (list session process expr)
+        (list session process expr 0)
         (lambda (state)
           (haskell-process-send-string (cadr state)
                                        (caddr state)))
-        nil
+        (lambda (state buffer)
+          (let* ((cursor (cadddr state))
+                 (next (replace-regexp-in-string
+                        haskell-process-prompt-regex
+                        "\n"
+                        (substring buffer cursor))))
+            (when (= 0 cursor) (insert "\n"))
+            (haskell-interactive-mode-eval-result (car state) next)
+            (setf (cdddr state) (list (length buffer)))
+            nil))
         (lambda (state response)
-          (when (not (string= "" response))
-            (haskell-interactive-mode-eval-result (car state) response))
           (haskell-interactive-mode-prompt (car state))))))))
 
 (defun haskell-interactive-jump-to-error-line (line)
@@ -215,7 +221,7 @@
   parseable, or otherwise just as-is."
   (with-current-buffer (haskell-session-interactive-buffer session)
     (goto-char (point-max))
-    (insert (propertize (concat text "\n")
+    (insert (propertize text
                         'face 'haskell-interactive-face-result
                         'read-only t
                         'rear-nonsticky t
