@@ -718,6 +718,23 @@ This function will be called with no arguments.")
            (haskell-process-do-try-info ident)))
         (t (insert " "))))
 
+(defun haskell-mode-save-buffer-and-tags ()
+  "Save the current buffer and generate tags.
+Can be pretty slow on a real world project. Use at discretion."
+  (interactive)
+  (let ((modified (buffer-modified-p)))
+    (save-buffer)
+    (when modified
+        (haskell-process-generate-tags))))
+
+(defun haskell-mode-tag-find (&optional next-p)
+  "The tag find function, specific for the particular session."
+  (interactive "P")
+  (let ((tags-file-name (haskell-session-tags-filename (haskell-session))))
+    (cond ((file-exists-p tags-file-name)
+           (find-tag (haskell-ident-at-point) next-p))
+          (t (haskell-process-generate-tags (haskell-ident-at-point))))))
+
 (eval-after-load "flymake"
   '(add-to-list 'flymake-allowed-file-name-masks
 		'("\\.l?hs\\'" haskell-flymake-init)))

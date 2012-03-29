@@ -62,6 +62,30 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Specialised commands
 
+(defun haskell-process-generate-tags (&optional and-then-find-this-tag)
+  "Regenerate the TAGS table."
+  (interactive)
+  (let ((process (haskell-process)))
+    (haskell-process-queue-command
+     process
+     (haskell-command-make
+      (cons process and-then-find-this-tag)
+      (lambda (state)
+        (haskell-process-send-string
+         (car state)
+         (format ":!cd %s && %s | %s | %s"
+                 (haskell-session-cabal-dir (haskell-process-session (car state)))
+                 "find . -name '*.hs*'"
+                 "grep -v '#'" ; To avoid Emacs back-up files. Yeah.
+                 "xargs hasktags -e -x")))
+      nil
+      (lambda (state response)
+        (when (cdr state)
+          (let ((tags-file-name
+                 (haskell-session-tags-filename (haskell-process-session (car state)))))
+            (find-tag (cdr state))))
+        (haskell-mode-message-line "Tags generated."))))))
+
 (defun haskell-process-do-type ()
   "Print the type of the given expression."
   (interactive)

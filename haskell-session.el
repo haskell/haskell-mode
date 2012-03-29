@@ -34,6 +34,9 @@
 (defvar haskell-sessions (list)
   "All Haskell sessions in the Emacs session.")
 
+(defun haskell-session-tags-filename (session)
+  "Get the filename for the TAGS file."
+  (concat (haskell-session-cabal-dir session) "/TAGS"))
 
 (defun haskell-session-all-modules ()
   "Get all modules -- installed or in the current project."
