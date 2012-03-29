@@ -730,7 +730,8 @@ Can be pretty slow on a real world project. Use at discretion."
 (defun haskell-mode-tag-find (&optional next-p)
   "The tag find function, specific for the particular session."
   (interactive "P")
-  (let ((tags-file-name (haskell-session-tags-filename (haskell-session))))
+  (let ((tags-file-name (haskell-session-tags-filename (haskell-session)))
+        (tags-revert-without-query t))
     (cond ((file-exists-p tags-file-name)
            (find-tag (haskell-ident-at-point) next-p))
           (t (haskell-process-generate-tags (haskell-ident-at-point))))))
