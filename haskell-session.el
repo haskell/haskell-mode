@@ -221,6 +221,7 @@
   "Set the session process."
   (haskell-session-set s 'process v))
 
+;;;###autoload
 (defun haskell-session-process (s)
   "Get the session process."
   (haskell-session-get s 'process))

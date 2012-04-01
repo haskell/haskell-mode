@@ -18,7 +18,7 @@ Major mode for GHC Core files.
 ;;;***
 
 ;;;### (autoloads (haskell-align-imports) "haskell-align-imports"
-;;;;;;  "haskell-align-imports.el" (20328 13471))
+;;;;;;  "haskell-align-imports.el" (20341 28472))
 ;;; Generated autoloads from haskell-align-imports.el
 
 (autoload 'haskell-align-imports "haskell-align-imports" "\
@@ -181,7 +181,7 @@ autofill-mode.
 
 ;;;### (autoloads (haskell-interactive-mode-echo haskell-interactive-switch
 ;;;;;;  haskell-interactive-bring haskell-interactive-mode) "haskell-interactive-mode"
-;;;;;;  "haskell-interactive-mode.el" (20335 8730))
+;;;;;;  "haskell-interactive-mode.el" (20338 50718))
 ;;; Generated autoloads from haskell-interactive-mode.el
 
 (autoload 'haskell-interactive-mode "haskell-interactive-mode" "\
@@ -207,7 +207,7 @@ Echo a read only piece of text before the prompt.
 ;;;***
 
 ;;;### (autoloads (haskell-hayoo haskell-hoogle literate-haskell-mode
-;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (20334 28453))
+;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (20341 54213))
 ;;; Generated autoloads from haskell-mode.el
 
 (add-to-list 'load-path (or (file-name-directory load-file-name) (car load-path)))
@@ -311,7 +311,7 @@ Return to the non-import point we were at before going to the module list.
 
 ;;;### (autoloads (haskell-process haskell-process-start haskell-process-cabal
 ;;;;;;  haskell-process-cabal-build haskell-process-load-file) "haskell-process"
-;;;;;;  "haskell-process.el" (20335 8867))
+;;;;;;  "haskell-process.el" (20340 57610))
 ;;; Generated autoloads from haskell-process.el
 
 (autoload 'haskell-process-load-file "haskell-process" "\
@@ -341,14 +341,19 @@ Get the current process from the current session.
 
 ;;;***
 
-;;;### (autoloads (haskell-session) "haskell-session" "haskell-session.el"
-;;;;;;  (20334 8942))
+;;;### (autoloads (haskell-session-process haskell-session) "haskell-session"
+;;;;;;  "haskell-session.el" (20344 42487))
 ;;; Generated autoloads from haskell-session.el
 
 (autoload 'haskell-session "haskell-session" "\
 Get the Haskell session, prompt if there isn't one or fail.
 
 \(fn)" nil nil)
+
+(autoload 'haskell-session-process "haskell-session" "\
+Get the session process.
+
+\(fn S)" nil nil)
 
 ;;;***
 
@@ -433,7 +438,7 @@ we load it.
 ;;;### (autoloads nil nil ("haskell-checkers.el" "haskell-font-lock.el"
 ;;;;;;  "haskell-ghci.el" "haskell-hugs.el" "haskell-package.el"
 ;;;;;;  "haskell-simple-indent.el" "haskell-string.el" "init.el")
-;;;;;;  (20335 8929 659887))
+;;;;;;  (20344 42495 885853))
 
 ;;;***
 
