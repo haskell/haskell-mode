@@ -248,17 +248,6 @@ be set to the preferred literate style."
     (define-key map (kbd "C-c C-d") 'inferior-haskell-find-haddock)
     (define-key map [?\C-c ?\C-v] 'haskell-check)
 
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;; For interactive mode, use the below bindings
-    ;; It is currently brand new and experimental.
-    ;; (define-key map [?\C-c ?\C-l] 'haskell-process-load-file)
-    ;; (define-key map [?\C-c ?\C-z] 'haskell-interactive-switch)
-    ;; (define-key map (kbd "C-`") 'haskell-interactive-bring)
-    ;; (define-key map (kbd "C-c C-c") 'haskell-process-cabal-build)
-    ;; (define-key map (kbd "C-c c") 'haskell-process-cabal)
-    ;; (define-key map (kbd "C-c C-t") 'haskell-process-do-type)
-    ;; (define-key map (kbd "C-c C-i") 'haskell-process-do-info)
-
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;; Editing-specific commands
     (define-key map (kbd "C-c C-.") 'haskell-mode-format-imports)
