@@ -84,7 +84,7 @@
       '(lambda () (interactive) (haskell-interactive-mode-history-toggle 1)))
     (define-key map (kbd "M-n")
       '(lambda () (interactive) (haskell-interactive-mode-history-toggle -1)))
-    (define-key map [tab] 'haskell-interactive-mode-tab)
+    (define-key map (kbd "TAB") 'haskell-interactive-mode-tab)
     map)
   "Interactive Haskell mode map.")
 
