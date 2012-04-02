@@ -86,16 +86,18 @@
             (find-tag (cdr state))))
         (haskell-mode-message-line "Tags generated."))))))
 
-(defun haskell-process-do-type ()
+(defun haskell-process-do-type (&optional insert-value)
   "Print the type of the given expression."
-  (interactive)
+  (interactive "P")
   (haskell-process-do-simple-echo
+   insert-value
    (format ":type %s" (haskell-ident-at-point))))
 
 (defun haskell-process-do-info (&optional ident)
   "Print the info of the given expression."
   (interactive)
   (haskell-process-do-simple-echo
+   nil
    (format ":info %s" (or ident
                           (haskell-ident-at-point)))))
 
@@ -117,20 +119,22 @@
                     (string-match "^<interactive>" response))
           (haskell-mode-message-line response)))))))
 
-(defun haskell-process-do-simple-echo (line)
+(defun haskell-process-do-simple-echo (insert-value line)
   "Send some line to GHCi and echo the result in the REPL and minibuffer."
   (let ((process (haskell-process)))
     (haskell-process-queue-command
      process
      (haskell-command-make
-      (cons process line)
+      (list process line insert-value)
       (lambda (state)
-        (haskell-process-send-string (car state) (cdr state)))
+        (haskell-process-send-string (car state) (cadr state)))
       nil
       (lambda (state response)
         (haskell-interactive-mode-echo (haskell-process-session (car state))
                                        response)
-        (haskell-mode-message-line response))))))
+        (haskell-mode-message-line response)
+        (when (caddr state)
+          (insert (format "%s\n" response))))))))
 
 ;;;###autoload
 (defun haskell-process-load-file ()
