@@ -146,6 +146,7 @@
                                        response)
         (haskell-mode-message-line response)
         (when (caddr state)
+          (goto-char (line-beginning-position))
           (insert (format "%s\n" response))))))))
 
 ;;;###autoload
