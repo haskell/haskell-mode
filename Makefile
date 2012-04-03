@@ -17,9 +17,9 @@ ELFILES = \
 	haskell-align-imports.el \
 	haskell-move-nested.el \
 	haskell-navigate-imports.el \
-        haskell-interactive-mode.el \
-        haskell-process.el \
-        haskell-session.el \
+	haskell-interactive-mode.el \
+	haskell-process.el \
+	haskell-session.el \
 	ghc-core.el \
 	inf-haskell.el
 
