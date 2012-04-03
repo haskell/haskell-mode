@@ -697,7 +697,7 @@ This function will be called with no arguments.")
   "Contextually do clever stuff when hitting space."
   (interactive)
   (cond ((save-excursion (forward-word -1)
-                         (looking-at "^import"))
+                         (looking-at "^import$"))
          (insert " ")
          (let ((module (ido-completing-read "Module: " (haskell-session-all-modules))))
            (insert module)
