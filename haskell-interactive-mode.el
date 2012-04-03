@@ -115,11 +115,8 @@
 (defun haskell-interactive-mode-return ()
   "Handle the return key."
   (interactive)
-  (let ((line (buffer-substring-no-properties (line-beginning-position)
-                                              (line-end-position))))
-    (if (string-match "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\):" line)
-        (haskell-interactive-jump-to-error-line line)
-      (haskell-interactive-handle-line))))
+  (or (haskell-interactive-jump-to-error-line)
+      (haskell-interactive-handle-line)))
 
 (defun haskell-interactive-handle-line ()
   (let ((expr (haskell-interactive-mode-input))
@@ -148,36 +145,40 @@
         (lambda (state response)
           (haskell-interactive-mode-prompt (car state))))))))
 
-(defun haskell-interactive-jump-to-error-line (line)
+(defun haskell-interactive-jump-to-error-line ()
   "Jump to the error line."
-  (let ((file (match-string 1 line))
-        (line (match-string 2 line))
-        (col (match-string 3 line)))
-    (let* ((session (haskell-session))
-           (cabal-path (haskell-session-cabal-dir session))
-           (src-path (haskell-session-current-dir session))
-           (cabal-relative-file (concat cabal-path "/" file))
-           (src-relative-file (concat src-path "/" file))
-           (cabal-relative-file-rel (concat cabal-path "/" 
-                                            (file-relative-name file
-                                                                cabal-path)))
-           (src-relative-file-rel (concat src-path "/" 
-                                          (file-relative-name file
-                                                              src-path))))
-      (let ((file (cond ((file-exists-p cabal-relative-file)
-                         cabal-relative-file)
-                        ((file-exists-p src-relative-file) 
-                         src-relative-file)
-                        ((file-exists-p src-relative-file-rel) 
-                         src-relative-file)
-                        ((file-exists-p cabal-relative-file-rel) 
-                         cabal-relative-file))))
-        (when file
-          (goto-char (point-max))
-          (other-window 1)
-          (find-file file)
-          (goto-line (string-to-number line))
-          (goto-char (+ (point) (string-to-number col))))))))
+  (let ((orig-line (buffer-substring-no-properties (line-beginning-position)
+                                              (line-end-position))))
+    (and (string-match "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\):" orig-line)
+         (let ((file (match-string 1 orig-line))
+               (line (match-string 2 orig-line))
+               (col (match-string 3 orig-line)))
+           (let* ((session (haskell-session))
+                  (cabal-path (haskell-session-cabal-dir session))
+                  (src-path (haskell-session-current-dir session))
+                  (cabal-relative-file (concat cabal-path "/" file))
+                  (src-relative-file (concat src-path "/" file))
+                  (cabal-relative-file-rel (concat cabal-path "/" 
+                                                   (file-relative-name file
+                                                                       cabal-path)))
+                  (src-relative-file-rel (concat src-path "/" 
+                                                 (file-relative-name file
+                                                                     src-path))))
+             (let ((file (cond ((file-exists-p cabal-relative-file)
+                                cabal-relative-file)
+                               ((file-exists-p src-relative-file) 
+                                src-relative-file)
+                               ((file-exists-p src-relative-file-rel) 
+                                src-relative-file)
+                               ((file-exists-p cabal-relative-file-rel) 
+                                cabal-relative-file))))
+               (when file
+                 (find-file file)
+                 (haskell-interactive-bring)
+                 (goto-line (string-to-number line))
+                 (goto-char (+ (point) (string-to-number col)))
+                 (haskell-mode-message-line orig-line)
+                 t)))))))
 
 (defun haskell-interactive-mode-beginning ()
   "Go to the start of the line."
@@ -355,3 +356,29 @@
                                 (+ pos length)
                                 'invisible
                                 (not visibility)))))))
+
+(defun haskell-interactive-mode-error-backward ()
+  "Go backward to the previous error."
+  (interactive)
+  (search-backward-regexp "^[^:]+:[0-9]+:[0-9]+: " nil t))
+
+(defun haskell-interactive-mode-error-forward ()
+  "Go forward to the next error, or return to the REPL."
+  (interactive)
+  (goto-char (line-end-position))
+  (if (search-forward-regexp "^[^:]+:[0-9]+:[0-9]+: " nil t)
+      (progn (goto-char (line-beginning-position))
+             t)
+    (progn (goto-char (point-max))
+           nil)))
+
+(defun haskell-interactive-mode-visit-error ()
+  "Visit the buffer of the current (or last) error message."
+  (interactive)
+  (with-current-buffer (haskell-session-interactive-buffer (haskell-session))
+    (if (progn (goto-char (line-beginning-position))
+               (looking-at "^[^:]+:[0-9]+:[0-9]+: "))
+        (haskell-interactive-jump-to-error-line)
+      (progn (goto-char (point-max))
+             (haskell-interactive-mode-error-backward)
+             (haskell-interactive-jump-to-error-line)))))
