@@ -310,18 +310,23 @@
 
 (defun haskell-process-trigger-extension-suggestions (session msg file)
   "Trigger prompting to add any extension suggestions."
-  (when (string-match "\\-X\\([A-Z][A-Za-z]+\\)" msg)
-    (let* ((extension (match-string 1 msg))
-           (string (format "{-# LANGUAGE %s #-}" extension)))
-      (when (y-or-n-p (format "Add %s to the top of the file? " string))
-        (find-file (cond ((file-exists-p (concat (haskell-session-current-dir session) "/" file))
-                          (concat (haskell-session-current-dir session) "/" file))
-                         ((file-exists-p (concat (haskell-session-cabal-dir session) "/" file))
-                          (concat (haskell-session-cabal-dir session) "/" file))
-                         (t file)))
-        (save-excursion
-          (goto-char (point-min))
-          (insert (concat string "\n")))))))
+  (cond ((string-match "\\-X\\([A-Z][A-Za-z]+\\)" msg)
+         (haskell-process-suggest-pragma "LANGUAGE" (match-string 1 msg)))
+        ((string-match "Warning: orphan instance: " msg)
+         (haskell-process-suggest-pragma "OPTIONS" "-fno-warn-orphans"))))
+
+(defun haskell-process-suggest-pragma (pragma extension)
+  "Suggest to add something to the top of the file."
+  (let ((string  (format "{-# %s %s #-}" pragma extension)))
+    (when (y-or-n-p (format "Add %s to the top of the file? " string))
+      (find-file (cond ((file-exists-p (concat (haskell-session-current-dir session) "/" file))
+                        (concat (haskell-session-current-dir session) "/" file))
+                       ((file-exists-p (concat (haskell-session-cabal-dir session) "/" file))
+                        (concat (haskell-session-cabal-dir session) "/" file))
+                       (t file)))
+      (save-excursion
+        (goto-char (point-min))
+        (insert (concat string "\n"))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Building the process
