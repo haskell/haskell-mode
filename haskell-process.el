@@ -57,6 +57,18 @@
   :type 'boolean
   :group 'haskell)
 
+(defcustom haskell-process-suggest-no-warn-orphans
+  t
+  "Suggest adding -fno-warn-orphans pragma to file when getting orphan warnings."
+  :type 'boolean
+  :group 'haskell)
+
+(defcustom haskell-process-suggest-overloaded-strings
+  t
+  "Suggest adding OverloadedStrings pragma to file when getting type mismatches with [Char]."
+  :type 'boolean
+  :group 'haskell)
+
 (defvar haskell-process-prompt-regex "\\(^[> ]*> $\\|\n[> ]*> $\\)")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -313,7 +325,11 @@
   (cond ((string-match "\\-X\\([A-Z][A-Za-z]+\\)" msg)
          (haskell-process-suggest-pragma "LANGUAGE" (match-string 1 msg)))
         ((string-match "Warning: orphan instance: " msg)
-         (haskell-process-suggest-pragma "OPTIONS" "-fno-warn-orphans"))))
+         (when haskell-process-suggest-no-warn-orphans
+           (haskell-process-suggest-pragma "OPTIONS" "-fno-warn-orphans")))
+        ((string-match "against inferred type `\\[Char\\]'" msg)
+         (when haskell-process-suggest-overloaded-strings
+           (haskell-process-suggest-pragma "LANGUAGE" "OverloadedStrings")))))
 
 (defun haskell-process-suggest-pragma (pragma extension)
   "Suggest to add something to the top of the file."
