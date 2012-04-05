@@ -135,9 +135,10 @@
 (defun haskell-session-default-name ()
   "Generate a default project name for the new project prompt."
   (let ((file (haskell-cabal-find-file)))
-    (when file
-      (downcase (file-name-sans-extension
-                 (file-name-nondirectory file))))))
+    (or (when file
+          (downcase (file-name-sans-extension
+                     (file-name-nondirectory file))))
+        "haskell")))
 
 (defun haskell-session-assign (session)
   "Set the current session."
