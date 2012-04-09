@@ -133,15 +133,16 @@
           (haskell-process-send-string (cadr state)
                                        (caddr state)))
         (lambda (state buffer)
-          (let* ((cursor (cadddr state))
-                 (next (replace-regexp-in-string
-                        haskell-process-prompt-regex
-                        "\n"
-                        (substring buffer cursor))))
-            (when (= 0 cursor) (insert "\n"))
-            (haskell-interactive-mode-eval-result (car state) next)
-            (setf (cdddr state) (list (length buffer)))
-            nil))
+          (unless (string= ":q" (caddr state))
+           (let* ((cursor (cadddr state))
+                  (next (replace-regexp-in-string
+                         haskell-process-prompt-regex
+                         "\n"
+                         (substring buffer cursor))))
+             (when (= 0 cursor) (insert "\n"))
+             (haskell-interactive-mode-eval-result (car state) next)
+             (setf (cdddr state) (list (length buffer)))
+             nil)))
         (lambda (state response)
           (haskell-interactive-mode-prompt (car state))))))))
 
