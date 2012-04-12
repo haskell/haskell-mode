@@ -355,6 +355,8 @@
     (haskell-session-set-process session process)
     (haskell-process-set-session process session)
     (let ((default-directory (haskell-session-cabal-dir session)))
+      (unless (haskell-session-get session 'current-dir)
+        (haskell-session-set-current-dir session (haskell-process-prompt-dir session)))
       (haskell-process-set-process
        process
        (ecase haskell-process-type
@@ -379,10 +381,9 @@
     (progn (set-process-sentinel (haskell-process-process process) 'haskell-process-sentinel)
            (set-process-filter (haskell-process-process process) 'haskell-process-filter))
     (haskell-process-send-startup process)
-    (when (haskell-session-get session 'current-dir)
-      (haskell-process-change-dir session
-                                  process
-                                  (haskell-session-current-dir session)))
+    (haskell-process-change-dir session
+                                process
+                                (haskell-session-current-dir session))
     process))
 
 (defun haskell-process-restart ()
@@ -409,16 +410,20 @@
   "Change directory."
   (interactive)
   (let* ((session (haskell-session))
-         (dir (read-from-minibuffer
-               "Set current directory: "
-               (or (haskell-session-get session 'current-dir)
-                   (if (buffer-file-name)
-                       (file-name-directory (buffer-file-name))
-                     "~/")))))
+         (dir (haskell-process-prompt-dir session)))
     (haskell-process-log (format "Changing directory to %s ...\n" dir))
     (haskell-process-change-dir session
                                 (haskell-process)
                                 dir)))
+
+(defun haskell-process-prompt-dir (session)
+  "Prompt for the current directory."
+  (read-from-minibuffer
+   "Set current directory: "
+   (or (haskell-session-get session 'current-dir)
+       (if (buffer-file-name)
+           (file-name-directory (buffer-file-name))
+         "~/"))))
 
 (defun haskell-process-change-dir (session process dir)
   "Change the directory of the current process."
