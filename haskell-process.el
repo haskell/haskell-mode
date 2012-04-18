@@ -25,6 +25,10 @@
 
 ;;; Code:
 
+(require 'haskell-mode)
+(require 'haskell-interactive-mode)
+(require 'haskell-session)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configuration
 
