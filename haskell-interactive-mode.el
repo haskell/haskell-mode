@@ -383,3 +383,5 @@
       (progn (goto-char (point-max))
              (haskell-interactive-mode-error-backward)
              (haskell-interactive-jump-to-error-line)))))
+
+(provide 'haskell-interactive-mode)
