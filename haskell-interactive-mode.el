@@ -78,6 +78,7 @@
     (define-key map (kbd "RET") 'haskell-interactive-mode-return)
     (define-key map (kbd "C-j") 'haskell-interactive-mode-newline-indent)
     (define-key map (kbd "C-a") 'haskell-interactive-mode-beginning)
+    (define-key map (kbd "<home>") 'haskell-interactive-mode-beginning)
     (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
     (define-key map (kbd "C-c C-c") 'haskell-process-interrupt)
     (define-key map (kbd "M-p")
