@@ -119,33 +119,41 @@
   (or (haskell-interactive-jump-to-error-line)
       (haskell-interactive-handle-line)))
 
+(defun haskell-interactive-at-prompt ()
+  "Am I at the prompt?"
+  (let ((current-point (point)))
+    (save-excursion (goto-char (point-max))
+                    (search-backward-regexp haskell-interactive-prompt)
+                    (> current-point (point)))))
+
 (defun haskell-interactive-handle-line ()
-  (let ((expr (haskell-interactive-mode-input))
-        (session (haskell-session))
-        (process (haskell-process)))
-    (when (not (string= "" (replace-regexp-in-string " " "" expr)))
-      (haskell-interactive-mode-history-add expr)
-      (goto-char (point-max))
-      (haskell-process-queue-command
-       process
-       (haskell-command-make
-        (list session process expr 0)
-        (lambda (state)
-          (haskell-process-send-string (cadr state)
-                                       (caddr state)))
-        (lambda (state buffer)
-          (unless (string= ":q" (caddr state))
-           (let* ((cursor (cadddr state))
-                  (next (replace-regexp-in-string
-                         haskell-process-prompt-regex
-                         "\n"
-                         (substring buffer cursor))))
-             (when (= 0 cursor) (insert "\n"))
-             (haskell-interactive-mode-eval-result (car state) next)
-             (setf (cdddr state) (list (length buffer)))
-             nil)))
-        (lambda (state response)
-          (haskell-interactive-mode-prompt (car state))))))))
+  (when (haskell-interactive-at-prompt)
+   (let ((expr (haskell-interactive-mode-input))
+         (session (haskell-session))
+         (process (haskell-process)))
+     (when (not (string= "" (replace-regexp-in-string " " "" expr)))
+       (haskell-interactive-mode-history-add expr)
+       (goto-char (point-max))
+       (haskell-process-queue-command
+        process
+        (haskell-command-make
+         (list session process expr 0)
+         (lambda (state)
+           (haskell-process-send-string (cadr state)
+                                        (caddr state)))
+         (lambda (state buffer)
+           (unless (string= ":q" (caddr state))
+             (let* ((cursor (cadddr state))
+                    (next (replace-regexp-in-string
+                           haskell-process-prompt-regex
+                           "\n"
+                           (substring buffer cursor))))
+               (when (= 0 cursor) (insert "\n"))
+               (haskell-interactive-mode-eval-result (car state) next)
+               (setf (cdddr state) (list (length buffer)))
+               nil)))
+         (lambda (state response)
+           (haskell-interactive-mode-prompt (car state)))))))))
 
 (defun haskell-interactive-jump-to-error-line ()
   "Jump to the error line."
