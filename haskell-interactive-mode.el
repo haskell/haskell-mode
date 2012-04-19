@@ -89,6 +89,11 @@
     map)
   "Interactive Haskell mode map.")
 
+(defun haskell-interactive-mode-newline-indent ()
+  "Make newline and indent."
+  (interactive)
+  (insert "\n" (make-string (length haskell-interactive-prompt) ? )))
+
 ;;;###autoload
 (defun haskell-interactive-bring ()
   "Bring up the interactive mode for this session."
