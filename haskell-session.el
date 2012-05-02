@@ -61,15 +61,9 @@
   ;; Ugliness aside, if it saves us time to type it's a winner.
   (let ((modules (shell-command-to-string
                   (format "%s | %s | %s | %s"
-                          (format "ghc-pkg dump %s"
-                                  (if (equal 'cabal-dev haskell-process-type)
-                                      (let ((dir (haskell-session-cabal-dir (haskell-session))))
-                                        (format "-f %s/cabal-dev/%s"
-                                                dir
-                                                (car (split-string (shell-command-to-string
-                                                                    (format "ls %s/cabal-dev | grep packages-"
-                                                                            dir))"\n"))))
-                                    ""))
+                          (if (equal 'cabal-dev haskell-process-type)
+                              "cabal-dev ghc-pkg dump"
+                              "ghc-pkg dump")
                           "egrep '^(exposed-modules:|                 )'"
                           "tr ' ' '\n'"
                           "grep '^[A-Z]'"))))
@@ -117,7 +111,7 @@
 
 (defun haskell-session-from-buffer ()
   "Get the session based on the buffer."
-  (let ((sessions (remove-if-not (lambda (session) 
+  (let ((sessions (remove-if-not (lambda (session)
                                    (haskell-is-prefix-of (file-name-directory (buffer-file-name))
                                                          (haskell-session-cabal-dir session)))
                                  haskell-sessions)))
@@ -177,9 +171,9 @@
     (if (> (length file) (length cur-dir))
         (if (string= (substring file 0 (length cur-dir))
                      cur-dir)
-            (replace-regexp-in-string 
+            (replace-regexp-in-string
              "^[/\\]" ""
-             (substring file 
+             (substring file
                         (length cur-dir)))
           file)
       file)))
@@ -258,7 +252,7 @@
     (when x
       (cdr x))))
 
-(defun haskell-session-set (s key value) 
+(defun haskell-session-set (s key value)
   "Set the session's `key`."
   (delete-if (lambda (prop) (equal (car prop) key)) s)
   (setf (cdr s) (cons (cons key value)
