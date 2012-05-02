@@ -1,6 +1,9 @@
 ;; Sample file for the new session/process stuff
 ;; Based on my own configuration. Well, it IS my configuration.
 ;;
+;; NOTE: If you don't have cabal-dev, or you don't want to use it, you
+;; should change haskell-process-type (see below) to 'ghci.
+;;
 ;; To merely TRY this mode (and for debugging), do the below:
 ;;
 ;;     cd into haskell-mode's directory, and run
