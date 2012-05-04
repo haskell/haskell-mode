@@ -61,15 +61,10 @@
   ;; Ugliness aside, if it saves us time to type it's a winner.
   (let ((modules (shell-command-to-string
                   (format "%s | %s | %s | %s"
-                          (format "ghc-pkg dump %s"
-                                  (if (equal 'cabal-dev haskell-process-type)
-                                      (let ((dir (haskell-session-cabal-dir (haskell-session))))
-                                        (format "-f %s/cabal-dev/%s"
-                                                dir
-                                                (car (split-string (shell-command-to-string
-                                                                    (format "ls %s/cabal-dev | grep packages-"
-                                                                            dir))"\n"))))
-                                    ""))
+                          (if (equal 'cabal-dev haskell-process-type)
+                              (format "cabal-dev -s %s/cabal-dev ghc-pkg dump"
+                                      (haskell-session-cabal-dir (haskell-session)))
+                            "ghc-pkg dump")
                           "egrep '^(exposed-modules:|                 )'"
                           "tr ' ' '\n'"
                           "grep '^[A-Z]'"))))
