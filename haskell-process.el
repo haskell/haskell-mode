@@ -158,17 +158,26 @@
   "Load the current buffer file."
   (interactive)
   (save-buffer)
-  (let ((file-path (buffer-file-name))
-        (session (haskell-session))
+  (haskell-process-file-loadish (concat "load " (buffer-file-name))))
+
+;;;###autoload
+(defun haskell-process-reload-file ()
+  "Load the current buffer file."
+  (interactive)
+  (save-buffer)
+  (haskell-process-file-loadish "reload"))
+
+(defun haskell-process-file-loadish (command)
+  (let ((session (haskell-session))
         (process (haskell-process)))
     (haskell-session-current-dir session)
     (haskell-process-queue-command
      process
      (haskell-command-make 
-      (list session process file-path)
+      (list session process command)
       (lambda (state)
         (haskell-process-send-string (cadr state)
-                                     (format ":load %s" (caddr state))))
+                                     (format ":%s" (caddr state))))
       (lambda (state buffer)
         (haskell-process-live-build (cadr state) buffer nil))
       (lambda (state response)
