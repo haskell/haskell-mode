@@ -721,10 +721,12 @@ Can be pretty slow on a real world project. Use at discretion."
   "The tag find function, specific for the particular session."
   (interactive "P")
   (let ((tags-file-name (haskell-session-tags-filename (haskell-session)))
-        (tags-revert-without-query t))
-    (cond ((file-exists-p tags-file-name)
-           (find-tag (haskell-ident-at-point) next-p))
-          (t (haskell-process-generate-tags (haskell-ident-at-point))))))
+        (tags-revert-without-query t)
+        (ident (haskell-ident-at-point)))
+    (when (not (string= "" (haskell-trim ident)))
+      (cond ((file-exists-p tags-file-name)
+             (find-tag ident next-p))
+            (t (haskell-process-generate-tags ident))))))
 
 (eval-after-load "flymake"
   '(add-to-list 'flymake-allowed-file-name-masks
