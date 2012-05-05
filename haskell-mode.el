@@ -251,7 +251,6 @@ be set to the preferred literate style."
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;; Editing-specific commands
     (define-key map (kbd "C-c C-.") 'haskell-mode-format-imports)
-    (define-key map (kbd "C-c i") 'haskell-navigate-imports)
     (define-key map [remap delete-indentation] 'haskell-delete-indentation)
     (define-key map [backtab] 'unindent-for-tab-command)
 
