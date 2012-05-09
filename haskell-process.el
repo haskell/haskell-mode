@@ -78,6 +78,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Specialised commands
 
+(defun haskell-process-clear ()
+  "Clear the current process."
+  (interactive)
+  (haskell-process-reset (haskell-process)))
+
 (defun haskell-process-generate-tags (&optional and-then-find-this-tag)
   "Regenerate the TAGS table."
   (interactive)
