@@ -302,7 +302,7 @@ Returns keywords suitable for `font-lock-keywords'."
 		  ;;    "else" "if" "import" "in" "infix" "infixl"
                   ;;    "infixr" "instance" "let" "module" "newtype" "of"
                   ;;    "then" "type" "where" "_") t)
-		  "\\(_\\|c\\(ase\\|lass\\)\\|d\\(ata\\|e\\(fault\\|riving\\)\\|o\\)\\|else\\|i\\(mport\\|n\\(fix[lr]?\\|stance\\)\\|[fn]\\)\\|let\\|module\\|newtype\\|of\\|t\\(hen\\|ype\\)\\|where\\)"
+		  "\\(_\\|c\\(ase\\|lass\\)\\|d\\(ata\\|e\\(fault\\|riving\\)\\|o\\)\\|else\\|i\\(mport\\|n\\(fix[lr]?\\|stance\\)\\|[fn]\\)\\|let\\|module\\|mdo\\|newtype\\|of\\|rec\\|proc\\|t\\(hen\\|ype\\)\\|where\\)"
 		  "\\>"))
 
          ;; This unreadable regexp matches strings and character
@@ -347,9 +347,27 @@ Returns keywords suitable for `font-lock-keywords'."
 
 	    (,reservedid 1 (symbol-value 'haskell-keyword-face))
 	    (,reservedsym 1 (symbol-value 'haskell-operator-face))
-            ;; Special case for `as', `hiding', and `qualified', which are
+            ;; Special case for `as', `hiding', `safe' and `qualified', which are
             ;; keywords in import statements but are not otherwise reserved.
-            ("\\<import[ \t]+\\(?:\\(qualified\\>\\)[ \t]*\\)?[^ \t\n()]+[ \t]*\\(?:\\(\\<as\\>\\)[ \t]*[^ \t\n()]+[ \t]*\\)?\\(\\<hiding\\>\\)?"
+            ("\\<import[ \t]+\\(?:\\(safe\\>\\)[ \t]*\\)?\\(?:\\(qualified\\>\\)[ \t]*\\)?[^ \t\n()]+[ \t]*\\(?:\\(\\<as\\>\\)[ \t]*[^ \t\n()]+[ \t]*\\)?\\(\\<hiding\\>\\)?"
+             (1 (symbol-value 'haskell-keyword-face) nil lax)
+             (2 (symbol-value 'haskell-keyword-face) nil lax)
+             (3 (symbol-value 'haskell-keyword-face) nil lax)
+             (4 (symbol-value 'haskell-keyword-face) nil lax))
+
+	    (,reservedsym 1 (symbol-value 'haskell-operator-face))
+            ;; Special case for `foreign import'
+            ;; keywords in foreign import statements but are not otherwise reserved.
+            ("\\<\\(foreign\\)[ \t]+\\(import\\)[ \t]+\\(?:\\(ccall\\|stdcall\\|cplusplus\\|jvm\\|dotnet\\)[ \t]+\\)?\\(?:\\(safe\\|unsafe\\|interruptible\\)[ \t]+\\)?"
+             (1 (symbol-value 'haskell-keyword-face) nil lax)
+             (2 (symbol-value 'haskell-keyword-face) nil lax)
+             (3 (symbol-value 'haskell-keyword-face) nil lax)
+             (4 (symbol-value 'haskell-keyword-face) nil lax))
+
+	    (,reservedsym 1 (symbol-value 'haskell-operator-face))
+            ;; Special case for `foreign export'
+            ;; keywords in foreign export statements but are not otherwise reserved.
+            ("\\<\\(foreign\\)[ \t]+\\(export\\)[ \t]+\\(?:\\(ccall\\|stdcall\\|cplusplus\\|jvm\\|dotnet\\)[ \t]+\\)?"
              (1 (symbol-value 'haskell-keyword-face) nil lax)
              (2 (symbol-value 'haskell-keyword-face) nil lax)
              (3 (symbol-value 'haskell-keyword-face) nil lax))
@@ -506,7 +524,7 @@ that should be commented under LaTeX-style literate scripts."
    ((and haskell-font-lock-haddock
          (save-excursion
            (goto-char (nth 8 state))
-           (or (looking-at "\\(-- \\|{-\\)[|^]")
+           (or (looking-at "\\(-- \\|{-\\)[ \\t]*[|^]")
                (and haskell-font-lock-seen-haddock
                     (looking-at "-- ")
                     (let ((doc nil)
