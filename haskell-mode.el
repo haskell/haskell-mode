@@ -520,6 +520,12 @@ Invokes `haskell-mode-hook'."
   ;; TABs stops are 8 chars apart, as mandated by the Haskell Report.  --Stef
   (set (make-local-variable 'indent-tabs-mode) nil)
   (set (make-local-variable 'tab-width) 8)
+  ;; dynamic abbrev support: recognize Haskell identifiers
+  ;; Haskell is case-sensitive language
+  (set (make-local-variable 'dabbrev-case-fold-search) nil)
+  (set (make-local-variable 'dabbrev-case-distinction) nil)
+  (set (make-local-variable 'dabbrev-case-replace) nil)
+  (set (make-local-variable 'dabbrev-abbrev-char-regexp) "\\sw\\|[.]")
   (setq haskell-literate nil))
 
 (defun in-comment () (nth 4 (syntax-ppss)))
