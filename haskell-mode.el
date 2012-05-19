@@ -528,14 +528,38 @@ Invokes `haskell-mode-hook'."
   (set (make-local-variable 'dabbrev-abbrev-char-regexp) "\\sw\\|[.]")
   (setq haskell-literate nil))
 
-(defun in-comment () (nth 4 (syntax-ppss)))
-
 (defun haskell-fill-paragraph (justify)
   (save-excursion
-    ;; We don't want to reflow code.
-    (unless (in-comment)
-      (end-of-line)) ; Try to get inside a comment
-    (if (in-comment) nil t)))
+    ;; Fill paragraph should only work in comments.
+    ;; The -- comments are handled properly by default
+    ;; The {- -} comments need some extra love.
+    (let* ((syntax-values (syntax-ppss))
+           (comment-num (nth 4 syntax-values)))
+      (cond
+       ((eq t comment-num)
+        ;; standard fill works wonders inside a non-nested comment
+        (fill-comment-paragraph justify))
+
+       ((integerp comment-num)
+        ;; we are in a nested comment. lets narrow to comment content
+        ;; and use plain paragraph fill for that
+        (let* ((comment-start-point (nth 8 syntax-values))
+               (comment-end-point
+                (save-excursion
+                  (re-search-forward "-}" (point-max) t comment-num)
+                  (point)))
+               (fill-paragraph-handle-comment nil))
+          (save-restriction
+            (narrow-to-region (+ 2 comment-start-point) (- comment-end-point 2))
+            (fill-paragraph justify))))
+       ((eolp)
+        ;; do nothing outside of a comment
+        t)
+       (t
+        ;; go to end of line and try again
+        (end-of-line)
+        (haskell-fill-paragraph justify))))))
+
 
 ;; (defun haskell-adaptive-fill ()
 ;;   ;; We want to use "--  " as the prefix of "-- |", etc.
