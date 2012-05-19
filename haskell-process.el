@@ -25,6 +25,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'haskell-mode)
 (require 'haskell-interactive-mode)
 (require 'haskell-session)

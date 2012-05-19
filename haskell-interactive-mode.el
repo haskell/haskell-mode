@@ -25,6 +25,9 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
+
+
 (defvar haskell-interactive-prompt "λ> "
   "The prompt to use.")
 
