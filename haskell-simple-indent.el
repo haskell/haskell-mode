@@ -174,6 +174,7 @@ whitespace.
 Runs `haskell-simple-indent-hook'.
 
 Use `haskell-simple-indent-version' to find out what version this is."
+  (interactive)
   (set (make-local-variable 'haskell-simple-indent-old) indent-line-function)
   (set (make-local-variable 'indent-line-function) 'haskell-simple-indent)
   (set (make-local-variable 'haskell-simple-unindent-old) unindent-line-function)
@@ -183,6 +184,7 @@ Use `haskell-simple-indent-version' to find out what version this is."
 (defun turn-off-haskell-simple-indent ()
   "Return `indent-line-function' to original value.
 I.e. the value before `turn-on-haskell-simple-indent' was called."
+  (interactive)
   (when (local-variable-p 'haskell-simple-indent-old)
     (setq indent-line-function haskell-simple-indent-old)
     (setq unindent-line-function haskell-simple-unindent-old)
