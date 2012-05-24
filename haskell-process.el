@@ -113,7 +113,7 @@
   (interactive "P")
   (haskell-process-do-simple-echo
    insert-value
-   (format ":type %s" (haskell-ident-at-point))))
+   (format ":type (%s)" (haskell-ident-at-point))))
 
 (defun haskell-process-do-info (&optional ident)
   "Print the info of the given expression."
