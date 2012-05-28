@@ -654,6 +654,12 @@ If nil, use the Hoogle web-site."
 		 (const "ghc -fno-code")
 		 (string :tag "Other command")))
 
+(defcustom haskell-stylish-on-save nil
+  "Whether to run stylish-haskell on the buffer before
+saving. Needs 'haskell-mode-save-buffer to be bound for C-x C-s."
+  :group 'haskell
+  :type 'boolean)
+
 (defvar haskell-saved-check-command nil
   "Internal use.")
 
@@ -737,12 +743,27 @@ This function will be called with no arguments.")
            (haskell-process-do-try-info ident)))
         (t (insert " "))))
 
+(defun haskell-mode-save-buffer ()
+  "Save the current buffer."
+  (when haskell-stylish-on-save
+    (haskell-mode-stylish-buffer))
+  (save-buffer))
+
+(defun haskell-mode-stylish-buffer ()
+  "Apply stylish-haskell to the current buffer."
+  (interactive)
+  (let ((column (current-column)) 
+        (line (line-number-at-pos)))
+    (shell-command-on-region (point-min) (point-max) "stylish-haskell" (current-buffer))
+    (goto-line line)
+    (goto-char (+ column (point)))))
+
 (defun haskell-mode-save-buffer-and-tags ()
   "Save the current buffer and generate tags.
 Can be pretty slow on a real world project. Use at discretion."
   (interactive)
   (let ((modified (buffer-modified-p)))
-    (save-buffer)
+    (haskell-mode-save-buffer)
     (when modified
         (haskell-process-generate-tags))))
 
