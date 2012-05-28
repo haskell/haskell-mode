@@ -28,7 +28,13 @@
  
  ;; Use notify.el (if you have it installed) at the end of running
  ;; Cabal commands or generally things worth notifying.
- '(haskell-notify-p t))
+ '(haskell-notify-p t)
+
+ ;; To enable tags generation on save.
+ '(haskell-tags-on-save t)
+
+ ;; To enable stylish on save.
+ '(haskell-stylish-on-save t))
 
 (add-hook 'haskell-mode-hook 'haskell-hook)
 (add-hook 'haskell-cabal-mode-hook 'haskell-cabal-hook)
@@ -74,7 +80,7 @@
 
   ;; Save the current buffer and generate etags (a TAGS file) for the
   ;; whole project.
-  (define-key haskell-mode-map (kbd "C-x C-s") 'haskell-mode-save-buffer-and-tags)
+  (define-key haskell-mode-map (kbd "C-x C-s") 'haskell-mode-save-buffer)
 
   ;; Indent the below lines on columns after the current column.
   (define-key haskell-mode-map (kbd "C-<right>")

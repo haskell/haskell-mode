@@ -660,6 +660,12 @@ saving. Needs 'haskell-mode-save-buffer to be bound for C-x C-s."
   :group 'haskell
   :type 'boolean)
 
+(defcustom haskell-tags-on-save nil
+  "Generate tags via hasktags on save. Needs
+'haskell-mode-save-buffer to be bound for C-x C-s."
+  :group 'haskell
+  :type 'boolean)
+
 (defvar haskell-saved-check-command nil
   "Internal use.")
 
@@ -745,9 +751,14 @@ This function will be called with no arguments.")
 
 (defun haskell-mode-save-buffer ()
   "Save the current buffer."
-  (when haskell-stylish-on-save
-    (haskell-mode-stylish-buffer))
-  (save-buffer))
+  (interactive)
+  (let ((modified (buffer-modified-p)))
+    (when haskell-stylish-on-save
+      (haskell-mode-stylish-buffer))
+    (save-buffer)
+    (when modified
+      (when haskell-tags-on-save
+        (haskell-process-generate-tags)))))
 
 (defun haskell-mode-stylish-buffer ()
   "Apply stylish-haskell to the current buffer."
@@ -757,15 +768,6 @@ This function will be called with no arguments.")
     (shell-command-on-region (point-min) (point-max) "stylish-haskell" (current-buffer))
     (goto-line line)
     (goto-char (+ column (point)))))
-
-(defun haskell-mode-save-buffer-and-tags ()
-  "Save the current buffer and generate tags.
-Can be pretty slow on a real world project. Use at discretion."
-  (interactive)
-  (let ((modified (buffer-modified-p)))
-    (haskell-mode-save-buffer)
-    (when modified
-        (haskell-process-generate-tags))))
 
 (defun haskell-mode-tag-find (&optional next-p)
   "The tag find function, specific for the particular session."
