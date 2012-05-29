@@ -376,7 +376,7 @@
     (save-excursion
       (goto-line line)
       (goto-char (line-beginning-position))
-      (kill-line)
+      (haskell-kill-nested)
       (delete-char 1))))
 
 (defun haskell-process-suggest-pragma (session pragma extension file)

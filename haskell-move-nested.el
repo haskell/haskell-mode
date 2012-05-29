@@ -79,4 +79,14 @@
                (haskell-move-nested-region))))
     (kill-region start (cdr reg))))
 
+(defun haskell-delete-nested ()
+  "Kill the nested region after this."
+  (interactive)
+  (let ((start (point))
+        (reg (save-excursion
+               (search-backward-regexp "^[ ]+" (line-beginning-position) t 1)
+               (search-forward-regexp "[^ ]" (line-end-position) t 1)
+               (haskell-move-nested-region))))
+    (delete-region start (cdr reg))))
+
 (provide 'haskell-move-nested)
