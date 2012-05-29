@@ -74,6 +74,12 @@
   :type 'boolean
   :group 'haskell)
 
+(defcustom haskell-process-suggest-remove-import-lines
+  nil
+  "Suggest removing import lines as warned by GHC."
+  :type 'boolean
+  :group 'haskell)
+
 (defcustom haskell-process-suggest-overloaded-strings
   t
   "Suggest adding OverloadedStrings pragma to file when getting type mismatches with [Char]."
@@ -329,7 +335,7 @@
     (let* ((buffer (haskell-process-response process))
            (error-msg (match-string 4 buffer))
            (file (match-string 1 buffer))
-           (line (match-string 2 buffer))
+           (line (string-to-number (match-string 2 buffer)))
            (col (match-string 3 buffer))
            (warning (string-match "^Warning: " error-msg))
            (final-msg (format "%s:%s:%s: %s" 
@@ -343,33 +349,52 @@
                session final-msg)
       (unless warning
         (haskell-mode-message-line final-msg))
-      (haskell-process-trigger-extension-suggestions session error-msg file))
+      (haskell-process-trigger-suggestions session error-msg file line))
     t)))
 
-(defun haskell-process-trigger-extension-suggestions (session msg file)
+(defun haskell-process-trigger-suggestions (session msg file line)
   "Trigger prompting to add any extension suggestions."
   (cond ((string-match "\\-X\\([A-Z][A-Za-z]+\\)" msg)
          (when haskell-process-suggest-language-pragmas
-           (haskell-process-suggest-pragma "LANGUAGE" (match-string 1 msg))))
+           (haskell-process-suggest-pragma session "LANGUAGE" (match-string 1 msg) file)))
+        ((string-match "Warning: The import of[ ]`\\([^ ]+\\)' is redundant" msg)
+         (when haskell-process-suggest-remove-import-lines
+           (haskell-process-suggest-remove-import session
+                                                  file
+                                                  (match-string 1 msg)
+                                                  line)))
         ((string-match "Warning: orphan instance: " msg)
          (when haskell-process-suggest-no-warn-orphans
-           (haskell-process-suggest-pragma "OPTIONS" "-fno-warn-orphans")))
+           (haskell-process-suggest-pragma session "OPTIONS" "-fno-warn-orphans" file)))
         ((string-match "against inferred type `\\[Char\\]'" msg)
          (when haskell-process-suggest-overloaded-strings
-           (haskell-process-suggest-pragma "LANGUAGE" "OverloadedStrings")))))
+           (haskell-process-suggest-pragma session "LANGUAGE" "OverloadedStrings" file)))))
 
-(defun haskell-process-suggest-pragma (pragma extension)
+(defun haskell-process-suggest-remove-import (session file import line)
+  (when (y-or-n-p (format "The import line `%s' is redundant. Remove? " import))
+    (haskell-process-find-file session file)
+    (save-excursion
+      (goto-line line)
+      (goto-char (line-beginning-position))
+      (kill-line)
+      (delete-char 1))))
+
+(defun haskell-process-suggest-pragma (session pragma extension file)
   "Suggest to add something to the top of the file."
   (let ((string  (format "{-# %s %s #-}" pragma extension)))
     (when (y-or-n-p (format "Add %s to the top of the file? " string))
-      (find-file (cond ((file-exists-p (concat (haskell-session-current-dir session) "/" file))
-                        (concat (haskell-session-current-dir session) "/" file))
-                       ((file-exists-p (concat (haskell-session-cabal-dir session) "/" file))
-                        (concat (haskell-session-cabal-dir session) "/" file))
-                       (t file)))
+      (haskell-process-find-file session file)
       (save-excursion
         (goto-char (point-min))
         (insert (concat string "\n"))))))
+
+(defun haskell-process-find-file (session file)
+  "Find the given file in the project."
+  (find-file (cond ((file-exists-p (concat (haskell-session-current-dir session) "/" file))
+                    (concat (haskell-session-current-dir session) "/" file))
+                   ((file-exists-p (concat (haskell-session-cabal-dir session) "/" file))
+                    (concat (haskell-session-cabal-dir session) "/" file))
+                   (t file))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Building the process
