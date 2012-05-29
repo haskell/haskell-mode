@@ -68,6 +68,12 @@
   :type 'boolean
   :group 'haskell)
 
+(defcustom haskell-process-suggest-language-pragmas
+  t
+  "Suggest adding LANGUAGE pragmas recommended by GHC."
+  :type 'boolean
+  :group 'haskell)
+
 (defcustom haskell-process-suggest-overloaded-strings
   t
   "Suggest adding OverloadedStrings pragma to file when getting type mismatches with [Char]."
@@ -343,7 +349,8 @@
 (defun haskell-process-trigger-extension-suggestions (session msg file)
   "Trigger prompting to add any extension suggestions."
   (cond ((string-match "\\-X\\([A-Z][A-Za-z]+\\)" msg)
-         (haskell-process-suggest-pragma "LANGUAGE" (match-string 1 msg)))
+         (when haskell-process-suggest-language-pragmas
+           (haskell-process-suggest-pragma "LANGUAGE" (match-string 1 msg))))
         ((string-match "Warning: orphan instance: " msg)
          (when haskell-process-suggest-no-warn-orphans
            (haskell-process-suggest-pragma "OPTIONS" "-fno-warn-orphans")))
