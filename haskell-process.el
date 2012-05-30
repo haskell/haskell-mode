@@ -377,8 +377,7 @@
       (goto-line line)
       (goto-char (line-beginning-position))
       (delete-region (line-beginning-position)
-                     (line-end-position))
-      (delete-char 1))))
+                     (line-end-position)))))
 
 (defun haskell-process-suggest-pragma (session pragma extension file)
   "Suggest to add something to the top of the file."
