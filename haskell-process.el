@@ -159,6 +159,17 @@
           (goto-char (line-beginning-position))
           (insert (format "%s\n" response))))))))
 
+
+(defun haskell-process-look-config-changes(session)  
+  "Checks whether a cabal configuration file has changed. Restarts the process if that is the case"  
+    (let ((current-checksum (haskell-session-get session 'cabal-checksum))
+          (new-checksum (haskell-cabal-compute-checksum (haskell-session-get session 'cabal-dir))))
+      (when (not (equal current-checksum new-checksum))
+        (progn
+          (haskell-session-set-cabal-checksum session (haskell-session-get session 'cabal-dir))
+          (kill-process (haskell-process-name (haskell-session-process haskell-session)))
+          ))))
+
 ;;;###autoload
 (defun haskell-process-load-file ()
   "Load the current buffer file."
@@ -177,6 +188,7 @@
   (let ((session (haskell-session))
         (process (haskell-process)))
     (haskell-session-current-dir session)
+    (haskell-process-look-config-changes session)
     (haskell-process-queue-command
      process
      (haskell-command-make 
