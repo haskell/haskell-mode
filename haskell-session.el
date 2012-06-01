@@ -225,11 +225,16 @@
 
 (defun haskell-session-set-cabal-dir (s v)
   "Set the session cabal-dir."
+  (haskell-session-set-cabal-checksum s v) ;re-compute checksum for new dir
   (haskell-session-set s 'cabal-dir v))
 
 (defun haskell-session-set-current-dir (s v)
   "Set the session current directory."
   (haskell-session-set s 'current-dir v))
+
+(defun haskell-session-set-cabal-checksum (s cabal-dir)
+  "Set the session checksum of .cabal files"
+  (haskell-session-set s 'cabal-checksum (haskell-cabal-compute-checksum cabal-dir)))
 
 (defun haskell-session-current-dir (s)
   "Get the session current directory."
