@@ -86,6 +86,20 @@
   :type 'boolean
   :group 'haskell)
 
+(defcustom haskell-process-check-cabal-config-on-load
+  t
+  "Check changes cabal config on loading Haskell files and
+restart the GHCi process if changed.."
+  :type 'boolean
+  :group 'haskell)
+
+(defcustom haskell-process-prompt-restart-on-cabal-change
+  t
+  "Ask whether to restart the GHCi process when the Cabal file
+has changed?"
+  :type 'boolean
+  :group 'haskell)
+
 (defvar haskell-process-prompt-regex "\\(^[> ]*> $\\|\n[> ]*> $\\)")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -181,7 +195,9 @@ changed. Restarts the process if that is the case."
       (haskell-interactive-mode-echo session (format "Cabal file changed: %s" new-checksum))
       (haskell-session-set-cabal-checksum session
                                           (haskell-session-get session 'cabal-dir))
-      (haskell-process-start (haskell-session)))))
+      (unless (and haskell-process-prompt-restart-on-cabal-change
+                   (not (y-or-n-p "Cabal file changed; restart GHCi process? ")))
+        (haskell-process-start (haskell-session))))))
 
 ;;;###autoload
 (defun haskell-process-load-file ()
@@ -200,7 +216,8 @@ changed. Restarts the process if that is the case."
 (defun haskell-process-file-loadish (command)
   (let ((session (haskell-session)))
     (haskell-session-current-dir session)
-    (haskell-process-look-config-changes session)
+    (when haskell-process-check-cabal-config-on-load
+      (haskell-process-look-config-changes session))
     (let ((process (haskell-process)))
       (haskell-process-queue-command
        process
