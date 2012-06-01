@@ -402,6 +402,10 @@
 ;;;###autoload
 (defun haskell-process-start (session)
   "Start the inferior Haskell process."
+  (let ((existing-process (get-process (haskell-session-name (haskell-session)))))
+    (when (processp existing-process)
+      (haskell-process-set (haskell-session-process session) 'is-restarting t)
+      (delete-process existing-process)))
   (let ((process (haskell-process-make (haskell-session-name session))))
     (haskell-session-set-process session process)
     (haskell-process-set-session process session)
@@ -501,13 +505,8 @@
    (haskell-command-make process
                          (lambda (process)
                            (haskell-process-send-string process ":set prompt \"> \"")
-                           (haskell-process-send-string process "Prelude.putStrLn \"\""))
-                         nil
-                         nil))
-  (haskell-process-queue-command
-   process
-   (haskell-command-make process
-                         (lambda (process) (haskell-process-send-string process ":set -v1"))
+                           (haskell-process-send-string process "Prelude.putStrLn \"\"")
+                           (haskell-process-send-string process ":set -v1"))
                          nil
                          (lambda (process _)
                            (haskell-interactive-mode-echo
@@ -519,11 +518,11 @@
   "The sentinel for the process pipe."
   (let ((session (haskell-process-project-by-proc proc)))
     (when session
-      (let ((process (haskell-session-process session)))
-        (haskell-process-reset process)
-        (haskell-process-log (format "Event: %S\n" event))
-        (haskell-process-log "Process reset.\n")
-        (haskell-process-prompt-restart process)))))
+      (let* ((process (haskell-session-process session)))
+        (unless (haskell-process-restarting process)
+          (haskell-process-log (format "Event: %S\n" event))
+          (haskell-process-log "Process reset.\n")
+          (haskell-process-prompt-restart process))))))
 
 (defun haskell-process-filter (proc response)
   "The filter for the process pipe."
@@ -684,6 +683,10 @@
 (defun haskell-process-cmd-queue (process)
   "Get the process's command queue."
   (haskell-process-get process 'command-queue))
+
+(defun haskell-process-restarting (process)
+  "Is the process restarting?"
+  (haskell-process-get process 'is-restarting))
 
 (defun haskell-process-cmd-queue-pop (process)
   "Get the process's command queue."
