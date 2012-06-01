@@ -171,6 +171,18 @@
           (goto-char (line-beginning-position))
           (insert (format "%s\n" response))))))))
 
+(defun haskell-process-look-config-changes (session)
+  "Checks whether a cabal configuration file has
+changed. Restarts the process if that is the case."
+  (let ((current-checksum (haskell-session-get session 'cabal-checksum))
+        (new-checksum (haskell-cabal-compute-checksum
+                       (haskell-session-get session 'cabal-dir))))
+    (when (not (string= current-checksum new-checksum))
+      (haskell-interactive-mode-echo session (format "Cabal file changed: %s" new-checksum))
+      (haskell-session-set-cabal-checksum session
+                                          (haskell-session-get session 'cabal-dir))
+      (haskell-process-start (haskell-session)))))
+
 ;;;###autoload
 (defun haskell-process-load-file ()
   "Load the current buffer file."
@@ -186,20 +198,21 @@
   (haskell-process-file-loadish "reload"))
 
 (defun haskell-process-file-loadish (command)
-  (let ((session (haskell-session))
-        (process (haskell-process)))
+  (let ((session (haskell-session)))
     (haskell-session-current-dir session)
-    (haskell-process-queue-command
-     process
-     (haskell-command-make 
-      (list session process command)
-      (lambda (state)
-        (haskell-process-send-string (cadr state)
-                                     (format ":%s" (caddr state))))
-      (lambda (state buffer)
-        (haskell-process-live-build (cadr state) buffer nil))
-      (lambda (state response)
-        (haskell-process-load-complete (car state) (cadr state) response))))))
+    (haskell-process-look-config-changes session)
+    (let ((process (haskell-process)))
+      (haskell-process-queue-command
+       process
+       (haskell-command-make 
+        (list session process command)
+        (lambda (state)
+          (haskell-process-send-string (cadr state)
+                                       (format ":%s" (caddr state))))
+        (lambda (state buffer)
+          (haskell-process-live-build (cadr state) buffer nil))
+        (lambda (state response)
+          (haskell-process-load-complete (car state) (cadr state) response)))))))
 
 ;;;###autoload
 (defun haskell-process-cabal-build ()
@@ -404,9 +417,13 @@
   "Start the inferior Haskell process."
   (let ((existing-process (get-process (haskell-session-name (haskell-session)))))
     (when (processp existing-process)
+      (haskell-interactive-mode-echo session "Restarting process ...")
       (haskell-process-set (haskell-session-process session) 'is-restarting t)
       (delete-process existing-process)))
-  (let ((process (haskell-process-make (haskell-session-name session))))
+  (let ((process (haskell-process-make (haskell-session-name session)))
+        (old-queue (haskell-process-get (haskell-session-process session)
+                                        'command-queue)))
+    ;; Continue the command queue in case we're restarting the process:
     (haskell-session-set-process session process)
     (haskell-process-set-session process session)
     (let ((default-directory (haskell-session-cabal-dir session)))
@@ -439,6 +456,10 @@
     (haskell-process-change-dir session
                                 process
                                 (haskell-session-current-dir session))
+    (haskell-process-set process 'command-queue
+                         (append (haskell-process-get (haskell-session-process session)
+                                                      'command-queue)
+                                 old-queue))
     process))
 
 (defun haskell-process-restart ()
@@ -569,8 +590,7 @@
   "Reset the process's state, ready for the next send/reply."
   (progn (haskell-process-set-response-cursor process 0)
          (haskell-process-set-response process "")
-         (haskell-process-set-cmd process 'none)
-         (haskell-process-set process 'command-queue nil)))
+         (haskell-process-set-cmd process 'none)))
 
 (defun haskell-process-consume (process regex)
   "Consume a regex from the response and move the cursor along if succeed."
@@ -587,7 +607,8 @@
         (let ((out (concat string "\n")))
           (haskell-process-log (format "-> %S\n" out))
           (process-send-string child out))
-      (haskell-process-prompt-restart process))))
+      (unless (haskell-process-restarting process)
+        (haskell-process-prompt-restart process)))))
 
 (defun haskell-process-prompt-restart (process)
   "Prompt to restart the died process."

@@ -164,6 +164,16 @@
      (format "Cabal dir%s: " (if file (format " (%s)" (file-relative-name file)) ""))
      (or dir default-directory))))
 
+(defun haskell-cabal-compute-checksum (cabal-dir) 
+  "Computes a checksum of the .cabal configuration files."
+  (let* ((cabal-file-paths (directory-files cabal-dir t "\\.cabal$"))
+         (get-file-contents (lambda (path)
+                              (with-temp-buffer (insert-file-contents path)
+                                                (buffer-string))))
+         (cabal-file-contents (map 'list get-file-contents cabal-file-paths))
+         (cabal-config (reduce 'concat cabal-file-contents)))
+    (md5 cabal-config)))
+
 (defun haskell-cabal-find-file ()
   "Return a buffer visiting the cabal file of the current directory, or nil."
   (catch 'found
