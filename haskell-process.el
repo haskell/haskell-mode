@@ -570,7 +570,8 @@
   "Reset the process's state, ready for the next send/reply."
   (progn (haskell-process-set-response-cursor process 0)
          (haskell-process-set-response process "")
-         (haskell-process-set-cmd process 'none)))
+         (haskell-process-set-cmd process 'none)
+         (haskell-process-set process 'command-queue nil)))
 
 (defun haskell-process-consume (process regex)
   "Consume a regex from the response and move the cursor along if succeed."
