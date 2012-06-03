@@ -760,12 +760,20 @@ This function will be called with no arguments.")
       (when haskell-tags-on-save
         (haskell-process-generate-tags)))))
 
+(defun haskell-mode-buffer-apply-command (cmd)
+  "Execute shell command CMD with current buffer as input and
+  replace the whole buffer with the output. If CMD fails the
+  buffer remains unchanged"
+  (when (= 0 (shell-command-on-region (point-min) (point-max) cmd))
+      (erase-buffer) 
+      (insert-buffer "*Shell Command Output*")))
+
 (defun haskell-mode-stylish-buffer ()
   "Apply stylish-haskell to the current buffer."
   (interactive)
   (let ((column (current-column)) 
         (line (line-number-at-pos)))
-    (shell-command-on-region (point-min) (point-max) "stylish-haskell" (current-buffer))
+    (haskell-mode-buffer-apply-command "stylish-haskell")
     (goto-line line)
     (goto-char (+ column (point)))))
 
