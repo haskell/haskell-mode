@@ -283,7 +283,11 @@ The process PROC should be associated to a comint buffer."
 
 (defun inferior-haskell-find-project-root (buf)
   (with-current-buffer buf
-    (let ((cabal (inferior-haskell-cabal-of-buf buf)))
+    (let* (
+           (cabal-file (inferior-haskell-cabal-of-buf buf))
+           (cabal (when cabal-file
+                    (find-file-noselect cabal-file)))
+           )
       (or (when cabal
             (with-current-buffer cabal
               (let ((hsd (haskell-cabal-get-setting "hs-source-dirs")))
