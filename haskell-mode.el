@@ -753,6 +753,7 @@ This function will be called with no arguments.")
   "Save the current buffer."
   (interactive)
   (let ((modified (buffer-modified-p)))
+    (save-buffer)
     (when haskell-stylish-on-save
       (haskell-mode-stylish-buffer))
     (save-buffer)
@@ -766,10 +767,13 @@ This function will be called with no arguments.")
   buffer remains unchanged."
   (let* ((file (buffer-file-name (current-buffer)))
          (output (with-temp-buffer
-                   (call-process cmd
-                                 file
-                                 (list t nil)
-                                 nil)
+                   (let ((default-directory (if haskell-session
+                                                (haskell-session-cabal-dir haskell-session)
+                                              default-directory)))
+                     (call-process cmd
+                                   file
+                                   (list t nil)
+                                   nil))
                    (buffer-substring-no-properties (point-min) (point-max)))))
     (unless (string= "" output)
       (erase-buffer)
