@@ -437,12 +437,14 @@ changed. Restarts the process if that is the case."
       (haskell-interactive-mode-echo session "Restarting process ...")
       (haskell-process-set (haskell-session-process session) 'is-restarting t)
       (delete-process existing-process)))
-  (let ((process (haskell-process-make (haskell-session-name session)))
+  (let ((process (or (haskell-session-process session)
+                     (haskell-process-make (haskell-session-name session))))
         (old-queue (haskell-process-get (haskell-session-process session)
                                         'command-queue)))
-    ;; Continue the command queue in case we're restarting the process:
     (haskell-session-set-process session process)
     (haskell-process-set-session process session)
+    (haskell-process-set-cmd process 'none)
+    (haskell-process-set (haskell-session-process session) 'is-restarting nil)
     (let ((default-directory (haskell-session-cabal-dir session)))
       (unless (haskell-session-get session 'current-dir)
         (haskell-session-set-current-dir session (haskell-process-prompt-dir session)))
@@ -549,8 +551,9 @@ changed. Restarts the process if that is the case."
                          (lambda (process _)
                            (haskell-interactive-mode-echo
                             (haskell-process-session process)
-                            (nth (random (length haskell-interactive-greetings))
-                                 haskell-interactive-greetings))))))
+                            (concat (nth (random (length haskell-interactive-greetings))
+                                         haskell-interactive-greetings)
+                                    " (if I break, run M-x haskell-process-clear)"))))))
 
 (defun haskell-process-sentinel (proc event)
   "The sentinel for the process pipe."
