@@ -764,14 +764,16 @@ This function will be called with no arguments.")
   "Execute shell command CMD with current buffer as input and
   replace the whole buffer with the output. If CMD fails the
   buffer remains unchanged."
-  (let ((target-buffer (current-buffer)))
-    (with-temp-buffer
-      (let ((tmp-buffer (current-buffer)))
-        (when (= 0 (with-current-buffer target-buffer
-                     (shell-command-on-region (point-min) (point-max) cmd tmp-buffer)))
-          (with-current-buffer target-buffer
-            (erase-buffer)
-            (insert-buffer tmp-buffer)))))))
+  (let* ((file (buffer-file-name (current-buffer)))
+         (output (with-temp-buffer
+                   (call-process cmd
+                                 file
+                                 (list t nil)
+                                 nil)
+                   (buffer-substring-no-properties (point-min) (point-max)))))
+    (unless (string= "" output)
+      (erase-buffer)
+      (insert output))))
 
 (defun haskell-mode-stylish-buffer ()
   "Apply stylish-haskell to the current buffer."
