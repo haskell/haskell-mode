@@ -191,6 +191,7 @@
                                ((file-exists-p cabal-relative-file-rel) 
                                 cabal-relative-file))))
                (when file
+                 (other-window 1)
                  (find-file file)
                  (haskell-interactive-bring)
                  (goto-line (string-to-number line))
