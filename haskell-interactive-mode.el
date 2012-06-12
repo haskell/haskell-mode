@@ -396,9 +396,16 @@
   (with-current-buffer (haskell-session-interactive-buffer (haskell-session))
     (if (progn (goto-char (line-beginning-position))
                (looking-at "^[^:]+:[0-9]+:[0-9]+: "))
-        (haskell-interactive-jump-to-error-line)
+        (progn (previous-line)
+               (haskell-interactive-jump-to-error-line))
       (progn (goto-char (point-max))
              (haskell-interactive-mode-error-backward)
              (haskell-interactive-jump-to-error-line)))))
+
+(defun haskell-interactive-mode-reset-error (session)
+  "Reset the error cursor position."
+  (interactive)
+  (with-current-buffer (haskell-session-interactive-buffer session)
+    (goto-char (point-max))))
 
 (provide 'haskell-interactive-mode)

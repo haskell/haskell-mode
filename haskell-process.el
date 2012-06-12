@@ -204,6 +204,7 @@ changed. Restarts the process if that is the case."
   "Load the current buffer file."
   (interactive)
   (save-buffer)
+  (haskell-interactive-mode-reset-error (haskell-session))
   (haskell-process-file-loadish (concat "load " (buffer-file-name))))
 
 ;;;###autoload
