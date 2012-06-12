@@ -165,7 +165,9 @@
   "Change the session for the current buffer."
   (interactive)
   (haskell-session-clear)
-  (haskell-session))
+  (haskell-session-assign (or (haskell-session-new-assume-from-cabal)
+                              (haskell-session-choose)
+                              (haskell-session-new))))
 
 (defun haskell-session-strip-dir (session file)
   "Strip the load dir from the file path."
