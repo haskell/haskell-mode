@@ -101,15 +101,14 @@
 (defun haskell-interactive-bring ()
   "Bring up the interactive mode for this session."
   (interactive)
-  (let ((session (haskell-session)))
-    (let ((buffer (haskell-session-interactive-buffer session)))
-      (unless (and (find-if (lambda (window) (equal (window-buffer window) buffer))
-                            (window-list))
-                   (= 2 (length (window-list))))
-        (delete-other-windows)
-        (split-window-horizontally)
-        (switch-to-buffer-other-window buffer)
-        (other-window 1)))))
+  (let* ((session (haskell-session))
+         (buffer (haskell-session-interactive-buffer session)))
+    (unless (and (find-if (lambda (window) (equal (window-buffer window) buffer))
+                          (window-list))
+                 (= 2 (length (window-list))))
+      (delete-other-windows)
+      (display-buffer buffer)
+      (other-window 1))))
 
 ;;;###autoload
 (defun haskell-interactive-switch ()
