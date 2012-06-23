@@ -333,6 +333,9 @@ Returns keywords suitable for `font-lock-keywords'."
     (setq keywords
 	  `(;; NOTICE the ordering below is significant
 	    ;;
+            ("^<<<<<<< .*$" 0 'font-lock-preprocessor-face t)
+            ("^=======" 0 'font-lock-preprocessor-face t)
+            ("^>>>>>>> .*$" 0 'font-lock-preprocessor-face t)
 	    ("^#.*$" 0 'font-lock-warning-face t)
 	    ,@(unless haskell-emacs21-features ;Supports nested comments?
 		;; Expensive.
