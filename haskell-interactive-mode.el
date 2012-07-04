@@ -26,7 +26,13 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(require 'haskell-show)
 
+(defcustom haskell-interactive-mode-eval-pretty
+  nil
+  "Print eval results that can be parsed as Show instances prettily. Requires sexp-show (on Hackage)."
+  :type 'boolean
+  :group 'haskell)
 
 (defvar haskell-interactive-prompt "λ> "
   "The prompt to use.")
@@ -135,32 +141,34 @@
 
 (defun haskell-interactive-handle-line ()
   (when (haskell-interactive-at-prompt)
-   (let ((expr (haskell-interactive-mode-input))
-         (session (haskell-session))
-         (process (haskell-process)))
-     (when (not (string= "" (replace-regexp-in-string " " "" expr)))
-       (haskell-interactive-mode-history-add expr)
-       (goto-char (point-max))
-       (haskell-process-queue-command
-        process
-        (haskell-command-make
-         (list session process expr 0)
-         (lambda (state)
-           (haskell-process-send-string (cadr state)
-                                        (caddr state)))
-         (lambda (state buffer)
-           (unless (string= ":q" (caddr state))
-             (let* ((cursor (cadddr state))
-                    (next (replace-regexp-in-string
-                           haskell-process-prompt-regex
-                           "\n"
-                           (substring buffer cursor))))
-               (when (= 0 cursor) (insert "\n"))
-               (haskell-interactive-mode-eval-result (car state) next)
-               (setf (cdddr state) (list (length buffer)))
-               nil)))
-         (lambda (state response)
-           (haskell-interactive-mode-prompt (car state)))))))))
+    (let ((expr (haskell-interactive-mode-input))
+          (session (haskell-session))
+          (process (haskell-process)))
+      (when (not (string= "" (replace-regexp-in-string " " "" expr)))
+        (haskell-interactive-mode-history-add expr)
+        (goto-char (point-max))
+        (haskell-process-queue-command
+         process
+         (haskell-command-make
+          (list session process expr 0)
+          (lambda (state)
+            (haskell-process-send-string (cadr state)
+                                         (caddr state)))
+          (lambda (state buffer)
+            (unless (string= ":q" (caddr state))
+              (let* ((cursor (cadddr state))
+                     (next (replace-regexp-in-string
+                            haskell-process-prompt-regex
+                            "\n"
+                            (substring buffer cursor))))
+                (when (= 0 cursor) (insert "\n"))
+                (haskell-interactive-mode-eval-result (car state) next)
+                (setf (cdddr state) (list (length buffer)))
+                nil)))
+          (lambda (state response)
+            (when haskell-interactive-mode-eval-pretty
+              (haskell-interactive-mode-eval-pretty-result (car state) response))
+            (haskell-interactive-mode-prompt (car state)))))))))
 
 (defun haskell-interactive-jump-to-error-line ()
   "Jump to the error line."
@@ -236,16 +244,28 @@
                         'prompt t))))
 
 (defun haskell-interactive-mode-eval-result (session text)
-  "Insert the result of an eval as a pretty printed Showable, if
-  parseable, or otherwise just as-is."
+  "Insert the result of an eval as plain text"
   (with-current-buffer (haskell-session-interactive-buffer session)
     (goto-char (point-max))
     (insert (propertize text
                         'face 'haskell-interactive-face-result
-                        'read-only t
                         'rear-nonsticky t
+                        'read-only t
                         'prompt t
                         'result t))))
+
+(defun haskell-interactive-mode-eval-pretty-result (session text)
+  "Insert the result of an eval as a pretty printed Showable, if
+  parseable, or otherwise just as-is."
+  (with-current-buffer (haskell-session-interactive-buffer session)
+    (let ((start-point (save-excursion (search-backward-regexp haskell-interactive-prompt)
+                                       (forward-line 1)
+                                       (point)))
+          (inhibit-read-only t))
+      (delete-region start-point (point))
+      (goto-char (point-max))
+      (haskell-show-parse-and-insert text)
+      (insert "\n"))))
 
 ;;;###autoload
 (defun haskell-interactive-mode-echo (session message)
