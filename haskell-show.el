@@ -28,6 +28,11 @@
 (defvar sexp-show "sexp-show")
 (require 'haskell-string)
 
+(defun haskell-show-replace-region ()
+  "Replace the given region with a pretty printed version."
+  (interactive)
+  (haskell-show-replace (region-beginning) (region-end)))
+
 ;;;###autoload
 (defun haskell-show-replace (start end)
   "Replace the given region containing a Show value with a pretty
