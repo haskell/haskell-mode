@@ -140,15 +140,22 @@ has changed?"
   (interactive "P")
   (haskell-process-do-simple-echo
    insert-value
-   (format ":type (%s)" (haskell-ident-at-point))))
+   (let ((ident (haskell-ident-at-point)))
+     (format (if (string-match "^[a-z][A-Z]" ident)
+                 ":type %s"
+               ":type (%s)")
+             ident))))
 
 (defun haskell-process-do-info (&optional ident)
   "Print the info of the given expression."
   (interactive)
   (haskell-process-do-simple-echo
    nil
-   (format ":info %s" (or ident
-                          (haskell-ident-at-point)))))
+   (format (if (string-match "^[a-z][A-Z]" ident)
+                 ":info %s"
+               ":info (%s)")
+               (or ident
+                   (haskell-ident-at-point)))))
 
 (defun haskell-process-do-try-info (sym)
   "Get info of `sym' and echo in the minibuffer."
