@@ -767,7 +767,8 @@ This function will be called with no arguments.")
   buffer remains unchanged."
   (let* ((file (buffer-file-name (current-buffer)))
          (output (with-temp-buffer
-                   (let ((default-directory (if haskell-session
+                   (let ((default-directory (if (and (boundp 'haskell-session)
+                                                     haskell-session)
                                                 (haskell-session-cabal-dir haskell-session)
                                               default-directory)))
                      (call-process cmd
