@@ -151,11 +151,12 @@ has changed?"
   (interactive)
   (haskell-process-do-simple-echo
    nil
-   (format (if (string-match "^[a-z][A-Z]" ident)
+   (let ((ident (haskell-ident-at-point)))
+     (format (if (string-match "^[a-z][A-Z]" ident)
                  ":info %s"
                ":info (%s)")
-               (or ident
-                   (haskell-ident-at-point)))))
+             (or ident
+                 (haskell-ident-at-point))))))
 
 (defun haskell-process-do-try-info (sym)
   "Get info of `sym' and echo in the minibuffer."
