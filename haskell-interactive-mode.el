@@ -37,6 +37,12 @@
 (defvar haskell-interactive-prompt "λ> "
   "The prompt to use.")
 
+(defcustom haskell-interactive-mode-eval-mode
+  nil
+  "Use the given mode's font-locking to render some text."
+  :type 'boolean
+  :group 'haskell)
+
 (defvar haskell-interactive-greetings
   (list "Hello, Haskell!"
         "The lambdas must flow."
@@ -166,14 +172,16 @@
                 (setf (cdddr state) (list (length buffer)))
                 nil)))
           (lambda (state response)
-            (when haskell-interactive-mode-eval-pretty
-              (haskell-interactive-mode-eval-pretty-result (car state) response))
+            (if haskell-interactive-mode-eval-mode
+                (haskell-interactive-mode-eval-as-mode (car state) response)
+              (when haskell-interactive-mode-eval-pretty
+                (haskell-interactive-mode-eval-pretty-result (car state) response)))
             (haskell-interactive-mode-prompt (car state)))))))))
 
 (defun haskell-interactive-jump-to-error-line ()
   "Jump to the error line."
   (let ((orig-line (buffer-substring-no-properties (line-beginning-position)
-                                              (line-end-position))))
+                                                   (line-end-position))))
     (and (string-match "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\):" orig-line)
          (let ((file (match-string 1 orig-line))
                (line (match-string 2 orig-line))
@@ -253,6 +261,27 @@
                         'read-only t
                         'prompt t
                         'result t))))
+
+(defun haskell-interactive-mode-eval-as-mode (session text)
+  "Insert the result of an eval as a pretty printed Showable, if
+  parseable, or otherwise just as-is."
+  (with-current-buffer (haskell-session-interactive-buffer session)
+    (let ((start-point (save-excursion (search-backward-regexp haskell-interactive-prompt)
+                                       (forward-line 1)
+                                       (point)))
+          (inhibit-read-only t))
+      (delete-region start-point (point))
+      (goto-char (point-max))
+      (insert (let ((mode haskell-interactive-mode-eval-mode))
+                (with-current-buffer (get-buffer-create (concat "*print-" (symbol-name mode) "*"))
+                  (unless (eq major-mode mode)
+                    (funcall mode))
+                  (erase-buffer)
+                  (insert text)
+                  (font-lock-fontify-region (point-min) (point-max))
+                  (buffer-substring (point-min)
+                                    (point-max)))))
+      (insert "\n"))))
 
 (defun haskell-interactive-mode-eval-pretty-result (session text)
   "Insert the result of an eval as a pretty printed Showable, if
