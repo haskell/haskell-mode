@@ -58,7 +58,7 @@
 
 (defcustom haskell-notify-p
   nil
-  "Notify using notify.el (if loaded)?"
+  "Notify using notifications.el (if loaded)?"
   :type 'boolean
   :group 'haskell)
 
@@ -101,6 +101,10 @@ has changed?"
   :group 'haskell)
 
 (defvar haskell-process-prompt-regex "\\(^[> ]*> $\\|\n[> ]*> $\\)")
+
+(defconst haskell-process-logo
+  (file-truename "logo.svg")
+  "Haskell logo for notifications.")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Specialised commands
@@ -231,7 +235,7 @@ changed. Restarts the process if that is the case."
     (let ((process (haskell-process)))
       (haskell-process-queue-command
        process
-       (haskell-command-make 
+       (haskell-command-make
         (list session process command)
         (lambda (state)
           (haskell-process-send-string (cadr state)
@@ -293,9 +297,15 @@ changed. Restarts the process if that is the case."
             (haskell-interactive-mode-echo session msg)
             (haskell-mode-message-line msg)
             (when (and haskell-notify-p
-                       (fboundp 'notify))
-              (notify (format "*%s*" (haskell-session-name (car state)))
-                      msg)))))))))
+                       (fboundp 'notifications-notify))
+              (notifications-notify
+               :title (format "*%s*" (haskell-session-name (car state)))
+               :body msg
+               :app-name (ecase haskell-process-type
+                           ('ghci "cabal")
+                           ('cabal-dev "cabal-dev"))
+               :app-icon haskell-process-logo
+               )))))))))
 
 (defun haskell-process-cabal-live (state buffer)
   "Do live updates for Cabal processes."
@@ -378,7 +388,7 @@ changed. Restarts the process if that is the case."
            (line (string-to-number (match-string 2 buffer)))
            (col (match-string 3 buffer))
            (warning (string-match "^Warning: " error-msg))
-           (final-msg (format "%s:%s:%s: %s" 
+           (final-msg (format "%s:%s:%s: %s"
                               (haskell-session-strip-dir session file)
                               line
                               col
@@ -461,7 +471,7 @@ changed. Restarts the process if that is the case."
       (haskell-process-set-process
        process
        (ecase haskell-process-type
-         ('ghci 
+         ('ghci
           (haskell-process-log (format "Starting inferior GHCi process %s ..."
                                        haskell-process-path-ghci))
           (start-process (haskell-session-name session)
@@ -754,7 +764,7 @@ changed. Restarts the process if that is the case."
     (when x
       (cdr x))))
 
-(defun haskell-process-set (s key value) 
+(defun haskell-process-set (s key value)
   "Set the process's `key'."
   (delete-if (lambda (prop) (equal (car prop) key)) s)
   (setf (cdr s) (cons (cons key value)
@@ -776,7 +786,7 @@ changed. Restarts the process if that is the case."
   "Call the command's go function."
   (let ((func (haskell-command-get s 'go)))
     (when func
-      (funcall func 
+      (funcall func
                (haskell-command-state s)))))
 
 (defun haskell-command-complete (s response)
@@ -791,7 +801,7 @@ changed. Restarts the process if that is the case."
   "Trigger the command's live updates callback."
   (let ((func (haskell-command-get s 'live)))
     (when func
-      (funcall func 
+      (funcall func
                (haskell-command-state s)
                response))))
 
@@ -801,7 +811,7 @@ changed. Restarts the process if that is the case."
     (when x
       (cdr x))))
 
-(defun haskell-command-set (s key value) 
+(defun haskell-command-set (s key value)
   "Set the command's `key'."
   (delete-if (lambda (prop) (equal (car prop) key)) s)
   (setf (cdr s) (cons (cons key value)
