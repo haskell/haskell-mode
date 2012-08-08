@@ -78,6 +78,12 @@
   :type 'integer
   :group 'haskell-indentation)
 
+(defcustom haskell-indentation-birdtrack-extra-space t
+  "Append a space after every birdtrack in literate mode."
+  :type 'boolean
+  :group 'haskell-indentation)
+
+
 ;; Avoid a global bogus definition (which the original run-time
 ;; `defun' made), and support Emacs 21 without the syntax.el add-on.
 (eval-when-compile
@@ -236,13 +242,12 @@ Preserves indentation and removes extra whitespace"
        (skip-syntax-forward "-")
        (if (prog1 (and (eolp)
                        (not (= (haskell-current-column) ci)))
+	     (delete-horizontal-space)
 	     (if (not (eq haskell-literate 'bird))
-		 (delete-horizontal-space)
-	       (skip-syntax-backward "-")
-	       (indent-to 2)
-	       (kill-region (point) (progn (end-of-line) (point))))
-	     (newline)
-	     (when (eq haskell-literate 'bird)
+		 (newline)
+	       (when haskell-indentation-birdtrack-extra-space
+		 (indent-to 2))
+	       (newline)
 	       (insert "> ")))
            (haskell-indentation-reindent
             (max (haskell-indentation-butlast indentations)
@@ -339,32 +344,33 @@ Preserves indentation and removes extra whitespace"
 
 (defun haskell-indentation-delete-backward-char (n)
   (interactive "p")
-  (if (haskell-indentation-outside-bird-line)
-      (delete-backward-char n)
-    (on-parse-error (delete-backward-char n)
-     (cond
-      ((and delete-selection-mode
-            mark-active
-            (not (= (point) (mark))))
-       (delete-region (mark) (point)))
-      ((or (= (haskell-current-column) 0)
-           (> (haskell-current-column) (haskell-indentation-current-indentation))
-           (nth 8 (syntax-ppss)))
-       (delete-backward-char n))
-      (t (let* ((ci (haskell-indentation-current-indentation))
-                (pi (haskell-indentation-previous-indentation
-                     ci (haskell-indentation-find-indentations))))
-           (save-excursion
-             (cond (pi
-                    (move-to-column pi)
-                    (delete-region (point)
-                                   (progn (move-to-column ci)
-                                          (point))))
-                   (t
-                    (beginning-of-line)
-                    (delete-region (max (point-min) (- (point) 1))
-                                   (progn (move-to-column ci)
-                                          (point))))))))))))
+  (on-parse-error
+   (delete-backward-char n)
+   (cond
+    ((haskell-indentation-outside-bird-line)
+     (delete-backward-char n))
+    ((and delete-selection-mode
+	  mark-active
+	  (not (= (point) (mark))))
+     (delete-region (mark) (point)))
+    ((or (= (haskell-current-column) 0)
+	 (> (haskell-current-column) (haskell-indentation-current-indentation))
+	(nth 8 (syntax-ppss)))
+     (delete-backward-char n))
+    (t (let* ((ci (haskell-indentation-current-indentation))
+	      (pi (haskell-indentation-previous-indentation
+		   ci (haskell-indentation-find-indentations))))
+	 (save-excursion
+	   (cond (pi
+		  (move-to-column pi)
+		  (delete-region (point)
+				 (progn (move-to-column ci)
+					(point))))
+		 (t
+		  (beginning-of-line)
+		  (delete-region (max (point-min) (- (point) 1))
+				 (progn (move-to-column ci)
+					(point)))))))))))
 
 (defun haskell-indentation-delete-char (n)
   (interactive "p")
@@ -399,6 +405,7 @@ Preserves indentation and removes extra whitespace"
   (if (eq haskell-literate 'bird)
       (catch 'return
 	(while (not (bobp))
+	  (forward-line -1)
 	  (when (not (eq (char-after) ?>))
 	    (forward-line)
 	    (forward-char 2)
@@ -410,8 +417,7 @@ Preserves indentation and removes extra whitespace"
 	  (when (and (>= 2 (haskell-indentation-current-indentation))
 		     (not (looking-at ">\\s-*$")))
 	    (forward-char 2)
-	    (throw 'return nil))
-	  (forward-line -1)))
+	    (throw 'return nil))))
     ;; not bird style
     (catch 'return
       (while (not (bobp))
