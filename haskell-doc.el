@@ -449,6 +449,11 @@ This variable is buffer-local."
   :group 'haskell-doc
   :type 'boolean)
 
+(defcustom haskell-doc-use-inf-haskell nil
+  "If non-nil use inf-haskell.el to get type and kind information."
+  :group 'haskell-doc
+  :type 'boolean)
+
 (defvar haskell-doc-search-distance 40  ; distance in characters
  "*How far to search when looking for the type declaration of fct under cursor.")
 
@@ -1594,59 +1599,75 @@ current buffer."
 For the function under point, show the type in the echo area.
 This information is extracted from the `haskell-doc-prelude-types' alist
 of prelude functions and their types, or from the local functions in the
-current buffer."
-  (let ((i-am-prelude nil)
-        (i-am-fct nil)
-        (type nil)
-	(is-reserved (haskell-doc-is-of sym haskell-doc-reserved-ids))
-	(is-prelude  (haskell-doc-is-of sym haskell-doc-prelude-types))
-	(is-strategy (haskell-doc-is-of sym haskell-doc-strategy-ids))
-	(is-user-defined (haskell-doc-is-of sym haskell-doc-user-defined-ids))
-	(is-prelude  (haskell-doc-is-of sym haskell-doc-prelude-types)))
-   (cond
-	  ;; if reserved id (i.e. Haskell keyword
-	  ((and haskell-doc-show-reserved
-	       is-reserved)
-	   (setq type (cdr is-reserved))
-           (setcdr haskell-doc-last-data type))
-	  ;; if built-in function get type from docstring
-          ((and (not (null haskell-doc-show-prelude))
-		is-prelude)
-           (setq type (cdr is-prelude)) ; (cdr (assoc sym haskell-doc-prelude-types)))
-	   (if (= 2 (length type)) ; horrible hack to remove bad formatting
-	       (setq type (car (cdr type))))
-	   (setq i-am-prelude t)
-	   (setq i-am-fct t)
-           (setcdr haskell-doc-last-data type))
-	  ((and haskell-doc-show-strategy
-	       is-strategy)
-	   (setq i-am-fct t)
-	   (setq type (cdr is-strategy))
-           (setcdr haskell-doc-last-data type))
-	  ((and haskell-doc-show-user-defined
-	       is-user-defined)
-	   ;; (setq i-am-fct t)
-	   (setq type (cdr is-user-defined))
-           (setcdr haskell-doc-last-data type))
-          (t
-	   (let ( (x (haskell-doc-get-and-format-fct-type sym)) )
-	     (if (null x)
-		 (setcdr haskell-doc-last-data nil) ; if not found reset last data
-	       (setq type (car x))
-	       (setq i-am-fct (string= "Variables" (cdr x)))
-	       (if (and haskell-doc-show-global-types (null type))
-		   (setq type (haskell-doc-get-global-fct-type sym)))
-	       (setcdr haskell-doc-last-data type)))) )
-    ;; ToDo: encode i-am-fct info into alist of types
-    (and type
-	 ;; drop `::' if it's not a fct
-	 (let ( (str (cond ((and i-am-fct (not haskell-doc-chop-off-fctname))
-			    (format "%s :: %s" sym type))
-			   (t
-			    (format "%s" type)))) )
-	   (if i-am-prelude
-	       (add-text-properties 0 (length str) '(face bold) str))
-	   str))))
+current buffer.
+If `haskell-doc-use-inf-haskell' is non-nil, this function will consult
+the inferior Haskell process for type/kind information, rather than using
+the haskell-doc database."
+  (if haskell-doc-use-inf-haskell
+      (unless (string= "" sym)
+        (let* ((message-log-max nil)
+               (result (ignore-errors
+                         (unwind-protect
+                             (inferior-haskell-type sym)
+                           (message "")))))
+          (if (and result (string-match " :: " result))
+              result
+            (setq result (unwind-protect
+                             (inferior-haskell-kind sym)
+                           (message "")))
+            (and result (string-match " :: " result) result))))
+    (let ((i-am-prelude nil)
+          (i-am-fct nil)
+          (type nil)
+          (is-reserved (haskell-doc-is-of sym haskell-doc-reserved-ids))
+          (is-prelude  (haskell-doc-is-of sym haskell-doc-prelude-types))
+          (is-strategy (haskell-doc-is-of sym haskell-doc-strategy-ids))
+          (is-user-defined (haskell-doc-is-of sym haskell-doc-user-defined-ids))
+          (is-prelude  (haskell-doc-is-of sym haskell-doc-prelude-types)))
+      (cond
+       ;; if reserved id (i.e. Haskell keyword
+       ((and haskell-doc-show-reserved
+             is-reserved)
+        (setq type (cdr is-reserved))
+        (setcdr haskell-doc-last-data type))
+       ;; if built-in function get type from docstring
+       ((and (not (null haskell-doc-show-prelude))
+             is-prelude)
+        (setq type (cdr is-prelude)) ; (cdr (assoc sym haskell-doc-prelude-types)))
+        (if (= 2 (length type))      ; horrible hack to remove bad formatting
+            (setq type (car (cdr type))))
+        (setq i-am-prelude t)
+        (setq i-am-fct t)
+        (setcdr haskell-doc-last-data type))
+       ((and haskell-doc-show-strategy
+             is-strategy)
+        (setq i-am-fct t)
+        (setq type (cdr is-strategy))
+        (setcdr haskell-doc-last-data type))
+       ((and haskell-doc-show-user-defined
+             is-user-defined)
+        ;; (setq i-am-fct t)
+        (setq type (cdr is-user-defined))
+        (setcdr haskell-doc-last-data type))
+       (t
+        (let ( (x (haskell-doc-get-and-format-fct-type sym)) )
+          (if (null x)
+              (setcdr haskell-doc-last-data nil) ; if not found reset last data
+            (setq type (car x))
+            (setq i-am-fct (string= "Variables" (cdr x)))
+            (if (and haskell-doc-show-global-types (null type))
+                (setq type (haskell-doc-get-global-fct-type sym)))
+            (setcdr haskell-doc-last-data type)))) )
+      ;; ToDo: encode i-am-fct info into alist of types
+      (and type
+           ;; drop `::' if it's not a fct
+           (let ( (str (cond ((and i-am-fct (not haskell-doc-chop-off-fctname))
+                              (format "%s :: %s" sym type))
+                             (t
+                              (format "%s" type)))) )
+             (if i-am-prelude
+                 (add-text-properties 0 (length str) '(face bold) str))
+             str)))))
 
 
 ;; ToDo: define your own notion of `near' to find surrounding fct
