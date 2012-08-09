@@ -351,6 +351,9 @@ be set to the preferred literate style."
   "Return the identifier under point, or nil if none found.
 May return a qualified name."
   (save-excursion
+    ;; Skip whitespace if we're on it.  That way, if we're at "map ", we'll
+    ;; see the word "map".
+    (skip-chars-backward " \t")
     (let ((case-fold-search nil))
       (multiple-value-bind (start end)
           (if (looking-at "\\s_")

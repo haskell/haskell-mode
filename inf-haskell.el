@@ -484,6 +484,24 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
                  (if (= 15 len) ".." "")
                  " :}"))))))
 
+(defun inferior-haskell-get-result (inf-expr)
+  "Submit the expression `inf-expr' to ghci and read the result."
+  (let ((proc (inferior-haskell-process)))
+    (with-current-buffer (process-buffer proc)
+      (let ((parsing-end                ; Remember previous spot.
+             (marker-position (process-mark proc))))
+        (inferior-haskell-send-command proc inf-expr)
+        ;; Find new point.
+        (inferior-haskell-wait-for-prompt proc)
+        (goto-char (point-max))
+        ;; Back up to the previous end-of-line.
+        (end-of-line 0)
+        ;; Extract the output
+        (buffer-substring-no-properties
+         (save-excursion (goto-char parsing-end)
+                         (line-beginning-position 2))
+         (point))))))
+
 ;;;###autoload
 (defun inferior-haskell-type (expr &optional insert-value)
   "Query the haskell process for the type of the given expression.
@@ -498,44 +516,43 @@ The returned info is cached for reuse by `haskell-doc-mode'."
                         nil nil sym)
            current-prefix-arg)))
   (if (string-match "\\`\\s_+\\'" expr) (setq expr (concat "(" expr ")")))
-  (let* ((proc (inferior-haskell-process))
-         (type
-          (with-current-buffer (process-buffer proc)
-            (let ((parsing-end          ; Remember previous spot.
-                   (marker-position (process-mark proc))))
-              (inferior-haskell-send-command proc (concat ":type " expr))
-              ;; Find new point.
-              (inferior-haskell-wait-for-prompt proc)
-              (goto-char (point-max))
-              ;; Back up to the previous end-of-line.
-              (end-of-line 0)
-              ;; Extract the type output
-              (buffer-substring-no-properties
-               (save-excursion (goto-char parsing-end)
-                               (line-beginning-position 2))
-               (point))))))
-    (if (not (string-match (concat "^\\(" (regexp-quote expr) "[ \t\n]+::[ \t\n]*\\(.\\|\n\\)*\\)")
+  (let ((type (inferior-haskell-get-result (concat ":type " expr))))
+    (if (not (string-match (concat "^\\(" (regexp-quote expr)
+                                   "[ \t\n]+::[ \t\n]*\\(.\\|\n\\)*\\)")
                            type))
         (error "No type info: %s" type)
       (progn
         (setf type (match-string 1 type))
-      ;; Cache for reuse by haskell-doc.
-      (when (and (boundp 'haskell-doc-mode) haskell-doc-mode
-                 (boundp 'haskell-doc-user-defined-ids)
-                 ;; Haskell-doc only works for idents, not arbitrary expr.
-                 (string-match "\\`(?\\(\\s_+\\|\\(\\sw\\|\\s'\\)+\\)?[ \t]*::[ \t]*"
-                               type))
-        (let ((sym (match-string 1 type)))
-          (setq haskell-doc-user-defined-ids
-                (cons (cons sym (substring type (match-end 0)))
-                      (delq (assoc sym haskell-doc-user-defined-ids)
-                            haskell-doc-user-defined-ids)))))
+        ;; Cache for reuse by haskell-doc.
+        (when (and (boundp 'haskell-doc-mode) haskell-doc-mode
+                   (boundp 'haskell-doc-user-defined-ids)
+                   ;; Haskell-doc only works for idents, not arbitrary expr.
+                   (string-match "\\`(?\\(\\s_+\\|\\(\\sw\\|\\s'\\)+\\)?[ \t]*::[ \t]*"
+                                 type))
+          (let ((sym (match-string 1 type)))
+            (setq haskell-doc-user-defined-ids
+                  (cons (cons sym (substring type (match-end 0)))
+                        (delq (assoc sym haskell-doc-user-defined-ids)
+                              haskell-doc-user-defined-ids)))))
 
-      (if (interactive-p) (message "%s" type))
-      (when insert-value
-        (beginning-of-line)
-        (insert type "\n"))
+        (if (interactive-p) (message "%s" type))
+        (when insert-value
+          (beginning-of-line)
+          (insert type "\n"))
         type))))
+
+;;;###autoload
+(defun inferior-haskell-kind (type)
+  "Query the haskell process for the kind of the given expression."
+  (interactive
+   (let ((type (haskell-ident-at-point)))
+     (list (read-string (if (> (length type) 0)
+                            (format "Show kind of (default %s): " type)
+                          "Show kind of: ")
+                        nil nil type))))
+  (let ((result (inferior-haskell-get-result (concat ":kind " type))))
+    (if (interactive-p) (message "%s" result))
+    result))
 
 ;;;###autoload
 (defun inferior-haskell-info (sym)
@@ -546,25 +563,9 @@ The returned info is cached for reuse by `haskell-doc-mode'."
                             (format "Show info of (default %s): " sym)
                           "Show info of: ")
                         nil nil sym))))
-  (let ((proc (inferior-haskell-process)))
-    (with-current-buffer (process-buffer proc)
-      (let ((parsing-end                ; Remember previous spot.
-             (marker-position (process-mark proc))))
-        (inferior-haskell-send-command proc (concat ":info " sym))
-        ;; Find new point.
-        (inferior-haskell-wait-for-prompt proc)
-        (goto-char (point-max))
-        ;; Move to previous end-of-line
-        (end-of-line 0)
-        (let ((result
-               (buffer-substring-no-properties
-                (save-excursion (goto-char parsing-end)
-                                (line-beginning-position 2))
-                (point))))
-          ;; Move back to end of process buffer
-          (goto-char (point-max))
-          (if (interactive-p) (message "%s" result))
-          result)))))
+  (let ((result (inferior-haskell-get-result (concat ":info " sym))))
+    (if (interactive-p) (message "%s" result))
+    result))
 
 ;;;###autoload
 (defun inferior-haskell-find-definition (sym)
