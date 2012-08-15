@@ -404,8 +404,7 @@ Preserves indentation and removes extra whitespace"
   (beginning-of-line)
   (if (eq haskell-literate 'bird)
       (catch 'return
-	(while (not (bobp))
-	  (forward-line -1)
+	(while t
 	  (when (not (eq (char-after) ?>))
 	    (forward-line)
 	    (forward-char 2)
@@ -417,7 +416,11 @@ Preserves indentation and removes extra whitespace"
 	  (when (and (>= 2 (haskell-indentation-current-indentation))
 		     (not (looking-at ">\\s-*$")))
 	    (forward-char 2)
-	    (throw 'return nil))))
+	    (throw 'return nil))
+	  (when (bobp)
+	    (forward-char 2)
+	    (throw 'return nil))
+	  (forward-line -1)))
     ;; not bird style
     (catch 'return
       (while (not (bobp))
