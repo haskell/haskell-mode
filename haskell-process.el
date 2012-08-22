@@ -103,7 +103,7 @@ has changed?"
 (defvar haskell-process-prompt-regex "\\(^[> ]*> $\\|\n[> ]*> $\\)")
 
 (defconst haskell-process-logo
-  (file-truename "logo.svg")
+  (expand-file-name "logo.svg" (file-name-directory load-file-name))
   "Haskell logo for notifications.")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
