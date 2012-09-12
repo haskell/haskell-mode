@@ -33,17 +33,21 @@ Otherwise:
     you want to use in the directory ~/lib/emacs/haskell-mode/, add the
     following command to your init file (~/.emacs):
   
-        (load "~/lib/emacs/haskell-mode/haskell-site-file")
-  
+    ```lisp
+    (load "~/lib/emacs/haskell-mode/haskell-site-file")
+    ```
+
     This only loads the bare-bones haskell-mode. To make it useful, you
     need additional modules; you can use the haskell `customize-group`
     to edit the Haskell mode hook or, if you prefer manual setup, try
     adding the following lines according to which modules you want to use:
 
-        (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-        (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
-        ;;(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-        ;;(add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
+    ```lisp
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+    ;;(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+    ;;(add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
+    ```
 
     Note that the three indentation modules are mutually exclusive - add at
     most one.  Note that the line of code for simple indentation is commented
@@ -69,15 +73,19 @@ Normally, inf-haskell automatically finds ghci or hugs in your PATH, but if
 that's not the case (common under Windows), or if you need to specify your
 preference, just tell Emacs which executable to use with:
 
-    (setq haskell-program-name "/some/where/ghci.exe")
+```lisp
+(setq haskell-program-name "/some/where/ghci.exe")
+```
 
 If you want to use different settings when you use Cygwin Emacs and NTEmacs,
 you can test the value of `system-type`:
 
-    (setq haskell-program-name
-          (if (eq system-type 'cygwin)
-              "/cygdrive/c/ghc/ghc-6.8.1/bin/ghcii.sh"
-            "c:/ghc/ghc-6.8.1/bin/ghci.exe"))
+```lisp
+(setq haskell-program-name
+      (if (eq system-type 'cygwin)
+          "/cygdrive/c/ghc/ghc-6.8.1/bin/ghcii.sh"
+        "c:/ghc/ghc-6.8.1/bin/ghci.exe"))
+```
 
 Note that Cygwin binaries tend to interact poorly with NTEmacs, especially
 w.r.t signal-handling.
