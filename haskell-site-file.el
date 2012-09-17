@@ -1,16 +1,16 @@
 
 ;;;### (autoloads (ghc-core-mode ghc-core-create-core) "ghc-core"
-;;;;;;  "ghc-core.el" (20346 40197))
+;;;;;;  "ghc-core.el" (20448 8432))
 ;;; Generated autoloads from ghc-core.el
 
-(autoload (quote ghc-core-create-core) "ghc-core" "\
+(autoload 'ghc-core-create-core "ghc-core" "\
 Compiled and load the current buffer as tidy core
 
 \(fn)" t nil)
 
-(add-to-list (quote auto-mode-alist) (quote ("\\.hcr\\'" . ghc-core-mode)))
+(add-to-list 'auto-mode-alist '("\\.hcr\\'" . ghc-core-mode))
 
-(autoload (quote ghc-core-mode) "ghc-core" "\
+(autoload 'ghc-core-mode "ghc-core" "\
 Major mode for GHC Core files.
 
 \(fn)" t nil)
@@ -18,23 +18,23 @@ Major mode for GHC Core files.
 ;;;***
 
 ;;;### (autoloads (haskell-align-imports) "haskell-align-imports"
-;;;;;;  "haskell-align-imports.el" (20346 40197))
+;;;;;;  "haskell-align-imports.el" (20448 8432))
 ;;; Generated autoloads from haskell-align-imports.el
 
-(autoload (quote haskell-align-imports) "haskell-align-imports" "\
+(autoload 'haskell-align-imports "haskell-align-imports" "\
 Align all the imports in the buffer.
 
 \(fn)" t nil)
 
 ;;;***
 
-;;;### (autoloads (haskell-c-mode) "haskell-c" "haskell-c.el" (20346
-;;;;;;  40197))
+;;;### (autoloads (haskell-c-mode) "haskell-c" "haskell-c.el" (20448
+;;;;;;  8432))
 ;;; Generated autoloads from haskell-c.el
 
-(add-to-list (quote auto-mode-alist) (quote ("\\.hsc\\'" . haskell-c-mode)))
+(add-to-list 'auto-mode-alist '("\\.hsc\\'" . haskell-c-mode))
 
-(autoload (quote haskell-c-mode) "haskell-c" "\
+(autoload 'haskell-c-mode "haskell-c" "\
 Major mode for Haskell FFI files.
 
 \(fn)" t nil)
@@ -61,10 +61,10 @@ Get the Cabal dir for a new project. Various ways of figuring this out,
 ;;;***
 
 ;;;### (autoloads (haskell-decl-scan-mode) "haskell-decl-scan" "haskell-decl-scan.el"
-;;;;;;  (20346 40197))
+;;;;;;  (20448 8432))
 ;;; Generated autoloads from haskell-decl-scan.el
 
-(autoload (quote haskell-decl-scan-mode) "haskell-decl-scan" "\
+(autoload 'haskell-decl-scan-mode "haskell-decl-scan" "\
 Minor mode for declaration scanning for Haskell mode.
 Top-level declarations are scanned and listed in the menu item \"Declarations\".
 Selecting an item from this menu will take point to the start of the
@@ -111,18 +111,18 @@ Invokes `haskell-decl-scan-mode-hook'.
 ;;;***
 
 ;;;### (autoloads (haskell-doc-show-type haskell-doc-mode) "haskell-doc"
-;;;;;;  "haskell-doc.el" (20566 43962))
+;;;;;;  "haskell-doc.el" (20567 13022))
 ;;; Generated autoloads from haskell-doc.el
 
-(autoload (quote haskell-doc-mode) "haskell-doc" "\
+(autoload 'haskell-doc-mode "haskell-doc" "\
 Enter `haskell-doc-mode' for showing fct types in the echo area.
 See variable docstring.
 
 \(fn &optional ARG)" t nil)
 
-(defalias (quote turn-on-haskell-doc-mode) (quote haskell-doc-mode))
+(defalias 'turn-on-haskell-doc-mode 'haskell-doc-mode)
 
-(autoload (quote haskell-doc-show-type) "haskell-doc" "\
+(autoload 'haskell-doc-show-type "haskell-doc" "\
 Show the type of the function near point.
 For the function under point, show the type in the echo area.
 This information is extracted from the `haskell-doc-prelude-types' alist
@@ -134,10 +134,10 @@ current buffer.
 ;;;***
 
 ;;;### (autoloads (haskell-indent-mode) "haskell-indent" "haskell-indent.el"
-;;;;;;  (20430 57070))
+;;;;;;  (20448 8432))
 ;;; Generated autoloads from haskell-indent.el
 
-(autoload (quote haskell-indent-mode) "haskell-indent" "\
+(autoload 'haskell-indent-mode "haskell-indent" "\
 ``Intelligent'' Haskell indentation mode.
 This deals with the layout rule of Haskell.
 \\[haskell-indent-cycle] starts the cycle which proposes new
@@ -166,10 +166,10 @@ Invokes `haskell-indent-hook' if not nil.
 ;;;***
 
 ;;;### (autoloads (haskell-indentation-mode) "haskell-indentation"
-;;;;;;  "haskell-indentation.el" (20566 43962))
+;;;;;;  "haskell-indentation.el" (20567 13022))
 ;;; Generated autoloads from haskell-indentation.el
 
-(autoload (quote haskell-indentation-mode) "haskell-indentation" "\
+(autoload 'haskell-indentation-mode "haskell-indentation" "\
 Haskell indentation mode that deals with the layout rule.
 It rebinds RET, DEL and BACKSPACE, so that indentations can be
 set and deleted as if they were real tabs.  It supports
@@ -207,12 +207,12 @@ Echo a read only piece of text before the prompt.
 ;;;***
 
 ;;;### (autoloads (haskell-hayoo haskell-hoogle literate-haskell-mode
-;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (20566 43962))
+;;;;;;  haskell-mode) "haskell-mode" "haskell-mode.el" (20567 13022))
 ;;; Generated autoloads from haskell-mode.el
 
-(add-to-list (quote load-path) (or (file-name-directory load-file-name) (car load-path)))
+(add-to-list 'load-path (or (file-name-directory load-file-name) (car load-path)))
 
-(autoload (quote haskell-mode) "haskell-mode" "\
+(autoload 'haskell-mode "haskell-mode" "\
 Major mode for editing Haskell programs.
 Blank lines separate paragraphs, comments start with `-- '.
 \\<haskell-mode-map>
@@ -250,7 +250,7 @@ Invokes `haskell-mode-hook'.
 
 \(fn)" t nil)
 
-(autoload (quote literate-haskell-mode) "haskell-mode" "\
+(autoload 'literate-haskell-mode "haskell-mode" "\
 As `haskell-mode' but for literate scripts.
 
 \(fn)" t nil)
@@ -259,19 +259,19 @@ As `haskell-mode' but for literate scripts.
 (add-to-list 'interpreter-mode-alist '("runghc" . haskell-mode))
 (add-to-list 'interpreter-mode-alist '("runhaskell" . haskell-mode))
 
-(autoload (quote haskell-hoogle) "haskell-mode" "\
+(autoload 'haskell-hoogle "haskell-mode" "\
 Do a Hoogle search for QUERY.
 
 \(fn QUERY)" t nil)
 
-(defalias (quote hoogle) (quote haskell-hoogle))
+(defalias 'hoogle 'haskell-hoogle)
 
-(autoload (quote haskell-hayoo) "haskell-mode" "\
+(autoload 'haskell-hayoo "haskell-mode" "\
 Do a Hayoo search for QUERY.
 
 \(fn QUERY)" t nil)
 
-(defalias (quote hayoo) (quote haskell-hayoo))
+(defalias 'hayoo 'haskell-hayoo)
 
 ;;;***
 
@@ -288,20 +288,20 @@ Not documented
 
 ;;;### (autoloads (haskell-navigate-imports-return haskell-navigate-imports-go
 ;;;;;;  haskell-navigate-imports) "haskell-navigate-imports" "haskell-navigate-imports.el"
-;;;;;;  (20346 40197))
+;;;;;;  (20448 8432))
 ;;; Generated autoloads from haskell-navigate-imports.el
 
-(autoload (quote haskell-navigate-imports) "haskell-navigate-imports" "\
+(autoload 'haskell-navigate-imports "haskell-navigate-imports" "\
 Cycle the Haskell import lines or return to point (with prefix arg).
 
 \(fn &optional RETURN)" t nil)
 
-(autoload (quote haskell-navigate-imports-go) "haskell-navigate-imports" "\
+(autoload 'haskell-navigate-imports-go "haskell-navigate-imports" "\
 Go to the first line of a list of consequtive import lines. Cycles.
 
 \(fn)" t nil)
 
-(autoload (quote haskell-navigate-imports-return) "haskell-navigate-imports" "\
+(autoload 'haskell-navigate-imports-return "haskell-navigate-imports" "\
 Return to the non-import point we were at before going to the module list.
    If we were originally at an import list, we can just cycle through easily.
 
@@ -311,35 +311,35 @@ Return to the non-import point we were at before going to the module list.
 
 ;;;### (autoloads (haskell-process haskell-process-start haskell-process-cabal
 ;;;;;;  haskell-process-cabal-build haskell-process-reload-file haskell-process-load-file)
-;;;;;;  "haskell-process" "haskell-process.el" (20566 46797))
+;;;;;;  "haskell-process" "haskell-process.el" (20567 13022))
 ;;; Generated autoloads from haskell-process.el
 
-(autoload (quote haskell-process-load-file) "haskell-process" "\
+(autoload 'haskell-process-load-file "haskell-process" "\
 Load the current buffer file.
 
 \(fn)" t nil)
 
-(autoload (quote haskell-process-reload-file) "haskell-process" "\
+(autoload 'haskell-process-reload-file "haskell-process" "\
 Load the current buffer file.
 
 \(fn)" t nil)
 
-(autoload (quote haskell-process-cabal-build) "haskell-process" "\
+(autoload 'haskell-process-cabal-build "haskell-process" "\
 Build the Cabal project.
 
 \(fn)" t nil)
 
-(autoload (quote haskell-process-cabal) "haskell-process" "\
+(autoload 'haskell-process-cabal "haskell-process" "\
 Prompts for a Cabal command to run.
 
 \(fn)" t nil)
 
-(autoload (quote haskell-process-start) "haskell-process" "\
+(autoload 'haskell-process-start "haskell-process" "\
 Start the inferior Haskell process.
 
 \(fn SESSION)" nil nil)
 
-(autoload (quote haskell-process) "haskell-process" "\
+(autoload 'haskell-process "haskell-process" "\
 Get the current process from the current session.
 
 \(fn)" nil nil)
@@ -362,36 +362,41 @@ Get the session process.
 
 ;;;***
 
-;;;### (autoloads (haskell-session-virthualenv haskell-session-set-virthualenv
-;;;;;;  virthualenv-deactivate virthualenv-activate virthualenv-read-file)
-;;;;;;  "haskell-session-virthualenv" "haskell-session-virthualenv.el"
-;;;;;;  (20566 46889))
+;;;### (autoloads (haskell-session-virthualenv-activate haskell-session-virthualenv
+;;;;;;  haskell-session-set-virthualenv virthualenv-deactivate virthualenv-activate
+;;;;;;  virthualenv-read-file) "haskell-session-virthualenv" "haskell-session-virthualenv.el"
+;;;;;;  (20567 14838))
 ;;; Generated autoloads from haskell-session-virthualenv.el
 
-(autoload (quote virthualenv-read-file) "haskell-session-virthualenv" "\
+(autoload 'virthualenv-read-file "haskell-session-virthualenv" "\
 Not documented
 
 \(fn FPATH)" nil nil)
 
-(autoload (quote virthualenv-activate) "haskell-session-virthualenv" "\
+(autoload 'virthualenv-activate "haskell-session-virthualenv" "\
 Activate the Virtual Haskell Environment in DIR
 
 \(fn DIR)" t nil)
 
-(autoload (quote virthualenv-deactivate) "haskell-session-virthualenv" "\
+(autoload 'virthualenv-deactivate "haskell-session-virthualenv" "\
 Deactivate the Virtual Haskell Environment
 
 \(fn)" t nil)
 
-(autoload (quote haskell-session-set-virthualenv) "haskell-session-virthualenv" "\
+(autoload 'haskell-session-set-virthualenv "haskell-session-virthualenv" "\
 Set the sessions virthualenv directory
 
 \(fn S V)" nil nil)
 
-(autoload (quote haskell-session-virthualenv) "haskell-session-virthualenv" "\
+(autoload 'haskell-session-virthualenv "haskell-session-virthualenv" "\
 Get the sessions virthualenv directory
 
 \(fn S)" nil nil)
+
+(autoload 'haskell-session-virthualenv-activate "haskell-session-virthualenv" "\
+Activate the virthualenv for this session
+
+\(fn)" t nil)
 
 ;;;***
 
@@ -420,10 +425,10 @@ Parse the given input into a tree.
 ;;;***
 
 ;;;### (autoloads (haskell-sort-imports) "haskell-sort-imports" "haskell-sort-imports.el"
-;;;;;;  (20346 40197))
+;;;;;;  (20448 8432))
 ;;; Generated autoloads from haskell-sort-imports.el
 
-(autoload (quote haskell-sort-imports) "haskell-sort-imports" "\
+(autoload 'haskell-sort-imports "haskell-sort-imports" "\
 Sort the import list at the point.
 
 \(fn)" t nil)
@@ -455,33 +460,33 @@ Is x string a prefix of y string?
 ;;;;;;  inferior-haskell-info inferior-haskell-kind inferior-haskell-type
 ;;;;;;  inferior-haskell-send-decl inferior-haskell-load-and-run
 ;;;;;;  inferior-haskell-load-file switch-to-haskell) "inf-haskell"
-;;;;;;  "inf-haskell.el" (20566 43962))
+;;;;;;  "inf-haskell.el" (20567 13022))
 ;;; Generated autoloads from inf-haskell.el
 
-(defalias (quote run-haskell) (quote switch-to-haskell))
+(defalias 'run-haskell 'switch-to-haskell)
 
-(autoload (quote switch-to-haskell) "inf-haskell" "\
+(autoload 'switch-to-haskell "inf-haskell" "\
 Show the inferior-haskell buffer.  Start the process if needed.
 
 \(fn &optional ARG)" t nil)
 
-(autoload (quote inferior-haskell-load-file) "inf-haskell" "\
+(autoload 'inferior-haskell-load-file "inf-haskell" "\
 Pass the current buffer's file to the inferior haskell process.
 If prefix arg \\[universal-argument] is given, just reload the previous file.
 
 \(fn &optional RELOAD)" t nil)
 
-(autoload (quote inferior-haskell-load-and-run) "inf-haskell" "\
+(autoload 'inferior-haskell-load-and-run "inf-haskell" "\
 Pass the current buffer's file to haskell and then run a COMMAND.
 
 \(fn COMMAND)" t nil)
 
-(autoload (quote inferior-haskell-send-decl) "inf-haskell" "\
+(autoload 'inferior-haskell-send-decl "inf-haskell" "\
 Send current declaration to inferior-haskell process.
 
 \(fn)" t nil)
 
-(autoload (quote inferior-haskell-type) "inf-haskell" "\
+(autoload 'inferior-haskell-type "inf-haskell" "\
 Query the haskell process for the type of the given expression.
 If optional argument `insert-value' is non-nil, insert the type above point
 in the buffer.  This can be done interactively with the \\[universal-argument] prefix.
@@ -489,22 +494,22 @@ The returned info is cached for reuse by `haskell-doc-mode'.
 
 \(fn EXPR &optional INSERT-VALUE)" t nil)
 
-(autoload (quote inferior-haskell-kind) "inf-haskell" "\
+(autoload 'inferior-haskell-kind "inf-haskell" "\
 Query the haskell process for the kind of the given expression.
 
 \(fn TYPE)" t nil)
 
-(autoload (quote inferior-haskell-info) "inf-haskell" "\
+(autoload 'inferior-haskell-info "inf-haskell" "\
 Query the haskell process for the info of the given expression.
 
 \(fn SYM)" t nil)
 
-(autoload (quote inferior-haskell-find-definition) "inf-haskell" "\
+(autoload 'inferior-haskell-find-definition "inf-haskell" "\
 Attempt to locate and jump to the definition of the given expression.
 
 \(fn SYM)" t nil)
 
-(autoload (quote inferior-haskell-find-haddock) "inf-haskell" "\
+(autoload 'inferior-haskell-find-haddock "inf-haskell" "\
 Find and open the Haddock documentation of SYM.
 Make sure to load the file into GHCi or Hugs first by using C-c C-l.
 Only works for functions in a package installed with ghc-pkg, or
@@ -525,7 +530,7 @@ we load it.
 
 ;;;### (autoloads nil nil ("haskell-checkers.el" "haskell-font-lock.el"
 ;;;;;;  "haskell-ghci.el" "haskell-hugs.el" "haskell-package.el"
-;;;;;;  "haskell-simple-indent.el") (20566 46905 558390))
+;;;;;;  "haskell-simple-indent.el") (20567 15240 132531))
 
 ;;;***
 

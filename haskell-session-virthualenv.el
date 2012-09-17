@@ -63,12 +63,14 @@
 (defun virthualenv-deactivate ()
   "Deactivate the Virtual Haskell Environment"
   (interactive)
-  (setenv "PATH" virthualenv-path-backup)
-  (setq exec-path virthualenv-exec-path-backup)
-  (setenv "GHC_PACKAGE_PATH" nil)
-  (setq virthualenv nil)
-  (setq virthualenv-path-backup nil)
-  (setq virthualenv-exec-path-backup nil))
+  (if virthualenv
+      (progn
+        (setenv "PATH" virthualenv-path-backup)
+        (setq exec-path virthualenv-exec-path-backup)
+        (setenv "GHC_PACKAGE_PATH" nil)
+        (setq virthualenv nil)
+        (setq virthualenv-path-backup nil)
+        (setq virthualenv-exec-path-backup nil))))
 
 ;;;###autoload
 (defun haskell-session-set-virthualenv (s v)
@@ -80,6 +82,14 @@
   "Get the sessions virthualenv directory"
   (haskell-session-get s 'virthualenv))
 
+;;;###autoload
+(defun haskell-session-virthualenv-activate ()
+  "Activate the virthualenv for this session"
+  (interactive)
+  (let* ((s (haskell-session))
+         (ve (haskell-session-virthualenv s)))
+    (if ve
+        (virthualenv-activate ve))))
 
 (provide 'haskell-session-virthualenv)
 
