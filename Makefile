@@ -22,6 +22,7 @@ ELFILES = \
 	haskell-package.el \
 	haskell-process.el \
 	haskell-session.el \
+	haskell-session-virthualenv.el \
 	haskell-string.el \
 	ghc-core.el \
 	inf-haskell.el
