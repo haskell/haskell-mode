@@ -29,9 +29,9 @@
 (require 'haskell-cabal)
 (require 'haskell-string)
 
-(setq virthualenv nil)
-(setq virthualenv-path-backup nil)
-(setq virthualenv-exec-path-backup nil)
+(setq haskell-sve-virthualenv nil)
+(setq haskell-sve-path-backup nil)
+(setq haskell-sve-exec-path-backup nil)
 
 
 (defun haskell-sve-find-dir ()
@@ -60,41 +60,41 @@
   (haskell-sve-deactivate)
   (setq dir (file-name-as-directory dir))
 
-  (let* ((virthualenv-dir (concat dir ".virthualenv/"))
-         (path-var-prependix-location (concat virthualenv-dir "path_var_prependix"))
-         (ghc-package-path-var-location (concat virthualenv-dir "ghc_package_path_var"))
-         (path-var-prependix (virthualenv-read-file path-var-prependix-location))
-         (ghc-package-path-var (virthualenv-read-file ghc-package-path-var-location))
+  (let* ((haskell-sve-dir (concat dir ".virthualenv/"))
+         (path-var-prependix-location (concat haskell-sve-dir "path_var_prependix"))
+         (ghc-package-path-var-location (concat haskell-sve-dir "ghc_package_path_var"))
+         (path-var-prependix (haskell-sve-read-file path-var-prependix-location))
+         (ghc-package-path-var (haskell-sve-read-file ghc-package-path-var-location))
          (new-path-var (concat path-var-prependix ":" (getenv "PATH")))
          (exec-path-prependix (split-string path-var-prependix ":")))
-    (setq virthualenv-path-backup (getenv "PATH"))
+    (setq haskell-sve-path-backup (getenv "PATH"))
     (setenv "PATH" new-path-var)
-    (setq virthualenv-exec-path-backup exec-path)
+    (setq haskell-sve-exec-path-backup exec-path)
     (setq exec-path (append exec-path-prependix exec-path))
     (setenv "GHC_PACKAGE_PATH" ghc-package-path-var)
-    (setq virthualenv dir)))
+    (setq haskell-sve-virthualenv dir)))
 
 
 (defun haskell-sve-deactivate ()
   "Deactivate the Virtual Haskell Environment"
-  (if virthualenv
+  (if haskell-sve-virthualenv
       (progn
-        (setenv "PATH" virthualenv-path-backup)
-        (setq exec-path virthualenv-exec-path-backup)
+        (setenv "PATH" haskell-sve-path-backup)
+        (setq exec-path haskell-sve-exec-path-backup)
         (setenv "GHC_PACKAGE_PATH" nil)
-        (setq virthualenv nil)
-        (setq virthualenv-path-backup nil)
-        (setq virthualenv-exec-path-backup nil))))
+        (setq haskell-sve-virthualenv nil)
+        (setq haskell-sve-path-backup nil)
+        (setq haskell-sve-exec-path-backup nil))))
 
 ;;;###autoload
 (defun haskell-session-set-virthualenv (s v)
   "Set the sessions virthualenv directory"
-  (haskell-session-set s 'virthualenv v))
+  (haskell-session-set s 'haskell-sve-virthualenv v))
 
 ;;;###autoload
 (defun haskell-session-virthualenv (s)
   "Get the sessions virthualenv directory"
-  (haskell-session-get s 'virthualenv))
+  (haskell-session-get s 'haskell-sve-virthualenv))
 
 ;;;###autoload
 (defun haskell-virthualenv-get-dir ()
@@ -112,15 +112,15 @@
   (let* ((s (haskell-session))
          (ve (haskell-session-virthualenv s)))
     (if ve
-        (virthualenv-activate ve))))
+        (haskell-sve-activate ve))))
 
 ;;;###autoload
-(defun haskell-virthualenv-name (s)
+(defun haskell-virthualenv-prompt-prefix ()
   "Get the name of the currently active virthualenv
 
    If there isn't one active retruns empty string"
-  (if virthualenv
-      (file-name-nondirectory (directory-file-name virthualenv))
+  (if haskell-sve-virthualenv
+      (format "(%s) " (file-name-nondirectory (directory-file-name haskell-sve-virthualenv)))
     ""))
 
 (provide 'haskell-session-virthualenv)
