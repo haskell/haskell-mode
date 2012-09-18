@@ -181,25 +181,25 @@ autofill-mode.
 
 ;;;### (autoloads (haskell-interactive-mode-echo haskell-interactive-switch
 ;;;;;;  haskell-interactive-bring haskell-interactive-mode) "haskell-interactive-mode"
-;;;;;;  "haskell-interactive-mode.el" (20508 11604))
+;;;;;;  "haskell-interactive-mode.el" (20568 37399))
 ;;; Generated autoloads from haskell-interactive-mode.el
 
-(autoload (quote haskell-interactive-mode) "haskell-interactive-mode" "\
+(autoload 'haskell-interactive-mode "haskell-interactive-mode" "\
 Interactive mode for Haskell.
 
 \(fn SESSION)" t nil)
 
-(autoload (quote haskell-interactive-bring) "haskell-interactive-mode" "\
+(autoload 'haskell-interactive-bring "haskell-interactive-mode" "\
 Bring up the interactive mode for this session.
 
 \(fn)" t nil)
 
-(autoload (quote haskell-interactive-switch) "haskell-interactive-mode" "\
+(autoload 'haskell-interactive-switch "haskell-interactive-mode" "\
 Switch to the interactive mode for this session.
 
 \(fn)" t nil)
 
-(autoload (quote haskell-interactive-mode-echo) "haskell-interactive-mode" "\
+(autoload 'haskell-interactive-mode-echo "haskell-interactive-mode" "\
 Echo a read only piece of text before the prompt.
 
 \(fn SESSION MESSAGE)" nil nil)
@@ -311,7 +311,7 @@ Return to the non-import point we were at before going to the module list.
 
 ;;;### (autoloads (haskell-process haskell-process-start haskell-process-cabal
 ;;;;;;  haskell-process-cabal-build haskell-process-reload-file haskell-process-load-file)
-;;;;;;  "haskell-process" "haskell-process.el" (20567 13022))
+;;;;;;  "haskell-process" "haskell-process.el" (20568 11072))
 ;;; Generated autoloads from haskell-process.el
 
 (autoload 'haskell-process-load-file "haskell-process" "\
@@ -362,26 +362,11 @@ Get the session process.
 
 ;;;***
 
-;;;### (autoloads (haskell-session-virthualenv-activate haskell-session-virthualenv
-;;;;;;  haskell-session-set-virthualenv virthualenv-deactivate virthualenv-activate
-;;;;;;  virthualenv-read-file) "haskell-session-virthualenv" "haskell-session-virthualenv.el"
-;;;;;;  (20567 14838))
+;;;### (autoloads (haskell-virthualenv-prompt-prefix haskell-virthualenv-activate
+;;;;;;  haskell-virthualenv-get-dir haskell-session-virthualenv haskell-session-set-virthualenv)
+;;;;;;  "haskell-session-virthualenv" "haskell-session-virthualenv.el"
+;;;;;;  (20568 36956))
 ;;; Generated autoloads from haskell-session-virthualenv.el
-
-(autoload 'virthualenv-read-file "haskell-session-virthualenv" "\
-Not documented
-
-\(fn FPATH)" nil nil)
-
-(autoload 'virthualenv-activate "haskell-session-virthualenv" "\
-Activate the Virtual Haskell Environment in DIR
-
-\(fn DIR)" t nil)
-
-(autoload 'virthualenv-deactivate "haskell-session-virthualenv" "\
-Deactivate the Virtual Haskell Environment
-
-\(fn)" t nil)
 
 (autoload 'haskell-session-set-virthualenv "haskell-session-virthualenv" "\
 Set the sessions virthualenv directory
@@ -393,10 +378,23 @@ Get the sessions virthualenv directory
 
 \(fn S)" nil nil)
 
-(autoload 'haskell-session-virthualenv-activate "haskell-session-virthualenv" "\
+(autoload 'haskell-virthualenv-get-dir "haskell-session-virthualenv" "\
+Get the .virthualenv dir for a new project. Various ways of figuring this out,
+   and indeed just prompting the user. Do them all.
+
+\(fn)" nil nil)
+
+(autoload 'haskell-virthualenv-activate "haskell-session-virthualenv" "\
 Activate the virthualenv for this session
 
 \(fn)" t nil)
+
+(autoload 'haskell-virthualenv-prompt-prefix "haskell-session-virthualenv" "\
+Get the name of the currently active virthualenv
+
+   If there isn't one active retruns empty string
+
+\(fn)" nil nil)
 
 ;;;***
 
@@ -530,7 +528,7 @@ we load it.
 
 ;;;### (autoloads nil nil ("haskell-checkers.el" "haskell-font-lock.el"
 ;;;;;;  "haskell-ghci.el" "haskell-hugs.el" "haskell-package.el"
-;;;;;;  "haskell-simple-indent.el") (20567 15240 132531))
+;;;;;;  "haskell-simple-indent.el") (20568 38833 279214))
 
 ;;;***
 
