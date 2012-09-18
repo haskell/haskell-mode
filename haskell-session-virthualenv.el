@@ -33,19 +33,34 @@
 (setq virthualenv-path-backup nil)
 (setq virthualenv-exec-path-backup nil)
 
-;;;###autoload
-(defun virthualenv-read-file (fpath)
+
+(defun haskell-sve-find-dir ()
+  "Return a buffer visiting the cabal file of the current directory, or nil."
+  (catch 'found
+    (let ((root (abbreviate-file-name default-directory))
+          ve)
+      (while root
+        (if (setq ve (car (directory-files root 'full "\\.virthualenv\\'")))
+            (throw 'found root)
+          (if (equal root
+                     (setq root (file-name-directory
+                                 (directory-file-name root))))
+              (setq root nil))))
+      nil)))
+
+
+(defun haskell-sve-read-file (fpath)
   (with-temp-buffer
     (insert-file-contents fpath)
     (buffer-string)))
 
-;;;###autoload
-(defun virthualenv-activate (dir)
+
+(defun haskell-sve-activate (dir)
   "Activate the Virtual Haskell Environment in DIR"
-  (interactive "Dvirthualenv directory: ")
-  (when (string-match "^.*/$" dir)
-    (setq dir (substring dir 0 -1)))
-  (let* ((virthualenv-dir (concat dir "/.virthualenv/"))
+  (haskell-sve-deactivate)
+  (setq dir (file-name-as-directory dir))
+
+  (let* ((virthualenv-dir (concat dir ".virthualenv/"))
          (path-var-prependix-location (concat virthualenv-dir "path_var_prependix"))
          (ghc-package-path-var-location (concat virthualenv-dir "ghc_package_path_var"))
          (path-var-prependix (virthualenv-read-file path-var-prependix-location))
@@ -59,10 +74,9 @@
     (setenv "GHC_PACKAGE_PATH" ghc-package-path-var)
     (setq virthualenv dir)))
 
-;;;###autoload
-(defun virthualenv-deactivate ()
+
+(defun haskell-sve-deactivate ()
   "Deactivate the Virtual Haskell Environment"
-  (interactive)
   (if virthualenv
       (progn
         (setenv "PATH" virthualenv-path-backup)
@@ -83,7 +97,16 @@
   (haskell-session-get s 'virthualenv))
 
 ;;;###autoload
-(defun haskell-session-virthualenv-activate ()
+(defun haskell-virthualenv-get-dir ()
+  "Get the .virthualenv dir for a new project. Various ways of figuring this out,
+   and indeed just prompting the user. Do them all."
+  (let* ((dir (haskell-sve-find-dir)))
+    (read-from-minibuffer
+     (format "directory containing virthualenv%s: " (if dir (format " (%s)" (file-relative-name dir)) ""))
+     (or dir default-directory))))
+
+;;;###autoload
+(defun haskell-virthualenv-activate ()
   "Activate the virthualenv for this session"
   (interactive)
   (let* ((s (haskell-session))
@@ -91,6 +114,13 @@
     (if ve
         (virthualenv-activate ve))))
 
-(provide 'haskell-session-virthualenv)
+;;;###autoload
+(defun haskell-virthualenv-name (s)
+  "Get the name of the currently active virthualenv
 
-;;(haskell-session-set-virthualenv (haskell-sesson) "test")
+   If there isn't one active retruns empty string"
+  (if virthualenv
+      (file-name-nondirectory (directory-file-name virthualenv))
+    ""))
+
+(provide 'haskell-session-virthualenv)
