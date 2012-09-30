@@ -83,7 +83,7 @@
 ;;
 ;; Version 1.43:
 ;;   Various tweaks to doc strings and customization support from
-;;   Ville Skyttä <scop@xemacs.org>.
+;;   Ville Skyttï¿½ <scop@xemacs.org>.
 ;;
 ;; Version 1.42:
 ;;   Added autoload for GHCi inferior mode (thanks to Scott
@@ -336,14 +336,14 @@ be set to the preferred literate style."
       ;; Non-ASCII syntax should be OK, at least in Emacs.
       (mapc (lambda (x)
               (modify-syntax-entry x "_" table))
-            (concat "¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿"
-                    "×÷"))
+            (concat "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
+                    "ï¿½ï¿½"))
       (mapc (lambda (x)
               (modify-syntax-entry x "w" table))
-            (concat "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ"
-                    "ØÙÚÛÜİŞß"
-                    "àáâãäåæçèéêëìíîïğñòóôõö"
-                    "øùúûüışÿ")))
+            (concat "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
+                    "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
+                    "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
+                    "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")))
     table)
   "Syntax table used in Haskell mode.")
 
@@ -456,7 +456,7 @@ CONFIGURING INDENTATION
 
 ;; The main mode functions
 ;;;###autoload
-(define-derived-mode haskell-mode fundamental-mode "Haskell"
+(define-derived-mode haskell-mode prog-mode "Haskell"
   "Major mode for editing Haskell programs.
 Blank lines separate paragraphs, comments start with `-- '.
 \\<haskell-mode-map>
