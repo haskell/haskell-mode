@@ -456,7 +456,7 @@ CONFIGURING INDENTATION
 
 ;; The main mode functions
 ;;;###autoload
-(define-derived-mode haskell-mode fundamental-mode "Haskell"
+(define-derived-mode haskell-mode prog-mode "Haskell"
   "Major mode for editing Haskell programs.
 Blank lines separate paragraphs, comments start with `-- '.
 \\<haskell-mode-map>
