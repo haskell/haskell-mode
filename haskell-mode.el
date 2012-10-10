@@ -454,9 +454,12 @@ CONFIGURING INDENTATION
 
 (defvar eldoc-print-current-symbol-info-function)
 
+;; For compatibility, derive conditionally
+(defalias 'haskell-parent-mode (if (>= emacs-major-version 24) 'prog-mode 'fundamental-mode))
+
 ;; The main mode functions
 ;;;###autoload
-(define-derived-mode haskell-mode prog-mode "Haskell"
+(define-derived-mode haskell-mode haskell-parent-mode "Haskell"
   "Major mode for editing Haskell programs.
 Blank lines separate paragraphs, comments start with `-- '.
 \\<haskell-mode-map>
