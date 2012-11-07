@@ -115,6 +115,7 @@ has changed?"
   (haskell-process-reset (haskell-process))
   (haskell-process-set (haskell-process) 'command-queue nil))
 
+;;;###autoload
 (defun haskell-process-generate-tags (&optional and-then-find-this-tag)
   "Regenerate the TAGS table."
   (interactive)
@@ -817,3 +818,6 @@ changed. Restarts the process if that is the case."
   (setf (cdr s) (cons (cons key value)
                       (cdr s)))
   s)
+
+(provide 'haskell-process)
+
