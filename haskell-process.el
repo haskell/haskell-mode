@@ -115,6 +115,7 @@ has changed?"
   (haskell-process-reset (haskell-process))
   (haskell-process-set (haskell-process) 'command-queue nil))
 
+;;;###autoload
 (defun haskell-process-generate-tags (&optional and-then-find-this-tag)
   "Regenerate the TAGS table."
   (interactive)
@@ -833,3 +834,18 @@ to be loaded by ghci."
       (funcall live-func
                (haskell-command-state command)
                response))))
+
+(defun haskell-command-get (s key)
+  "Get the command `key'."
+  (let ((x (assoc key s)))
+    (when x
+      (cdr x))))
+
+(defun haskell-command-set (s key value)
+  "Set the command's `key'."
+  (delete-if (lambda (prop) (equal (car prop) key)) s)
+  (setf (cdr s) (cons (cons key value)
+                      (cdr s)))
+  s)
+
+(provide 'haskell-process)
