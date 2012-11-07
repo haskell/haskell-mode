@@ -176,8 +176,7 @@
 
 ;; Set load-path
 ;;;###autoload
-(add-to-list 'load-path
-             (or (file-name-directory load-file-name) (car load-path)))
+(when load-file-name (add-to-list 'load-path (file-name-directory load-file-name)))
 
 ;; Set up autoloads for the modules we supply
 (autoload 'turn-on-haskell-decl-scan "haskell-decl-scan"
@@ -530,7 +529,12 @@ Invokes `haskell-mode-hook'."
   (set (make-local-variable 'dabbrev-case-distinction) nil)
   (set (make-local-variable 'dabbrev-case-replace) nil)
   (set (make-local-variable 'dabbrev-abbrev-char-regexp) "\\sw\\|[.]")
-  (setq haskell-literate nil))
+  (setq haskell-literate nil)
+  (make-local-variable 'before-save-hook)
+  (add-hook 'before-save-hook 'haskell-mode-before-save-handler)
+  (make-local-variable 'after-save-hook)
+  (add-hook 'after-save-hook 'haskell-mode-after-save-handler)
+  )
 
 (defun haskell-fill-paragraph (justify)
   (save-excursion
@@ -659,14 +663,12 @@ If nil, use the Hoogle web-site."
 		 (string :tag "Other command")))
 
 (defcustom haskell-stylish-on-save nil
-  "Whether to run stylish-haskell on the buffer before
-saving. Needs 'haskell-mode-save-buffer to be bound for C-x C-s."
+  "Whether to run stylish-haskell on the buffer before saving."
   :group 'haskell
   :type 'boolean)
 
 (defcustom haskell-tags-on-save nil
-  "Generate tags via hasktags on save. Needs
-'haskell-mode-save-buffer to be bound for C-x C-s."
+  "Generate tags via hasktags after saving."
   :group 'haskell
   :type 'boolean)
 
@@ -753,17 +755,15 @@ This function will be called with no arguments.")
            (haskell-process-do-try-info ident)))
         (t (insert " "))))
 
-(defun haskell-mode-save-buffer ()
-  "Save the current buffer."
-  (interactive)
-  (let ((modified (buffer-modified-p)))
-    (save-buffer)
-    (when haskell-stylish-on-save
-      (haskell-mode-stylish-buffer))
-    (save-buffer)
-    (when modified
-      (when haskell-tags-on-save
-        (haskell-process-generate-tags)))))
+(defun haskell-mode-before-save-handler ()
+  "Function that will be called before buffer's saving."
+  (when haskell-stylish-on-save
+    (haskell-mode-stylish-buffer)))
+
+(defun haskell-mode-after-save-handler ()
+  "Function that will be called after buffer's saving."
+  (when haskell-tags-on-save
+    (haskell-process-generate-tags)))
 
 (defun haskell-mode-buffer-apply-command (cmd)
   "Execute shell command CMD with current buffer as input and
