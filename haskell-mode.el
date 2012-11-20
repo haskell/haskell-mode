@@ -69,7 +69,7 @@
 ;;
 ;; This mode is based on an editing mode by Simon Marlow 11/1/92
 ;; and heavily modified by Graeme E Moss and Tommy Thorn 7/11/98.
-;; 
+;;
 ;; If you have any problems or suggestions specific to a supported
 ;; module, consult that module for a list of known bugs, and an
 ;; author to contact via email.  For general problems or suggestions,
@@ -143,7 +143,7 @@
 ;;   Altered indent-line-function to indent-relative.
 ;;
 ;; Version 0.100:
-;; 
+;;
 ;;   First official release.
 
 ;; Present Limitations/Future Work (contributions are most welcome!):
@@ -194,6 +194,7 @@
 (autoload 'haskell-ds-create-imenu-index "haskell-decl-scan")
 (autoload 'haskell-font-lock-choose-keywords "haskell-font-lock")
 (autoload 'haskell-doc-current-info "haskell-doc")
+(autoload 'haskell-process-generate-tags "haskell-process")
 
 ;; Obsolete functions.
 (defun turn-on-haskell-font-lock ()
@@ -324,7 +325,7 @@ be set to the preferred literate style."
 	       (modify-syntax-entry i "_" table))
 	     (setq i (1+ i)))))
        (standard-syntax-table)))
-    
+
     (modify-syntax-entry ?\` "$`" table)
     (modify-syntax-entry ?\\ "\\" table)
     (mapc (lambda (x)
@@ -430,7 +431,7 @@ CONFIGURING INDENTATION
       link below), or
 
    3) some people prefer to add custom hooks like the below:
- 
+
       (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 
   In order to test each one after enabling you can re-run M-x
@@ -791,7 +792,7 @@ This function will be called with no arguments.")
 (defun haskell-mode-stylish-buffer ()
   "Apply stylish-haskell to the current buffer."
   (interactive)
-  (let ((column (current-column)) 
+  (let ((column (current-column))
         (line (line-number-at-pos)))
     (haskell-mode-buffer-apply-command "stylish-haskell")
     (goto-line line)
