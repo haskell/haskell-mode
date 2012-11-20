@@ -121,23 +121,24 @@ has changed?"
   (let ((process (haskell-process)))
     (haskell-process-queue-command
      process
-     (haskell-command-make
-      (cons process and-then-find-this-tag)
-      (lambda (state)
-        (haskell-process-send-string
-         (car state)
-         (format ":!cd %s && %s | %s | %s"
-                 (haskell-session-cabal-dir (haskell-process-session (car state)))
-                 "find . -name '*.hs*'"
-                 "grep -v '#'" ; To avoid Emacs back-up files. Yeah.
-                 "xargs hasktags -e -x")))
-      nil
-      (lambda (state response)
-        (when (cdr state)
-          (let ((tags-file-name
-                 (haskell-session-tags-filename (haskell-process-session (car state)))))
-            (find-tag (cdr state))))
-        (haskell-mode-message-line "Tags generated."))))))
+     (make-haskell-command
+      :state (cons process and-then-find-this-tag)
+      :go (lambda (state)
+            (haskell-process-send-string
+             (car state)
+             (format ":!cd %s && %s | %s | %s"
+                     (haskell-session-cabal-dir
+                      (haskell-process-session (car state)))
+                     "find . -name '*.hs*'"
+                     "grep -v '#'" ; To avoid Emacs back-up files. Yeah.
+                     "xargs hasktags -e -x")))
+      :complete (lambda (state response)
+                  (when (cdr state)
+                    (let ((tags-file-name
+                           (haskell-session-tags-filename
+                            (haskell-process-session (car state)))))
+                      (find-tag (cdr state))))
+                  (haskell-mode-message-line "Tags generated."))))))
 
 (defun haskell-process-do-type (&optional insert-value)
   "Print the type of the given expression."
@@ -167,36 +168,35 @@ has changed?"
   (let ((process (haskell-process)))
     (haskell-process-queue-command
      process
-     (haskell-command-make
-      (cons process sym)
-      (lambda (state)
-        (haskell-process-send-string (car state)
-                                     (if (string-match "^[A-Za-z_]" (cdr state))
-                                         (format ":info %s" (cdr state))
-                                       (format ":info (%s)" (cdr state)))))
-      nil
-      (lambda (process response)
-        (unless (or (string-match "^Top level" response)
-                    (string-match "^<interactive>" response))
-          (haskell-mode-message-line response)))))))
+     (make-haskell-command
+      :state (cons process sym)
+      :go (lambda (state)
+            (haskell-process-send-string
+             (car state)
+             (if (string-match "^[A-Za-z_]" (cdr state))
+                 (format ":info %s" (cdr state))
+               (format ":info (%s)" (cdr state)))))
+      :complete (lambda (process response)
+                  (unless (or (string-match "^Top level" response)
+                              (string-match "^<interactive>" response))
+                    (haskell-mode-message-line response)))))))
 
 (defun haskell-process-do-simple-echo (insert-value line)
   "Send some line to GHCi and echo the result in the REPL and minibuffer."
   (let ((process (haskell-process)))
     (haskell-process-queue-command
      process
-     (haskell-command-make
-      (list process line insert-value)
-      (lambda (state)
-        (haskell-process-send-string (car state) (cadr state)))
-      nil
-      (lambda (state response)
-        (haskell-interactive-mode-echo (haskell-process-session (car state))
-                                       response)
-        (haskell-mode-message-line response)
-        (when (caddr state)
-          (goto-char (line-beginning-position))
-          (insert (format "%s\n" response))))))))
+     (make-haskell-command
+      :state (list process line insert-value)
+      :go (lambda (state)
+            (haskell-process-send-string (car state) (cadr state)))
+      :complete (lambda (state response)
+                  (haskell-interactive-mode-echo
+                   (haskell-process-session (car state)) response)
+                  (haskell-mode-message-line response)
+                  (when (caddr state)
+                    (goto-char (line-beginning-position))
+                    (insert (format "%s\n" response))))))))
 
 (defun haskell-process-look-config-changes (session)
   "Checks whether a cabal configuration file has
@@ -235,21 +235,24 @@ changed. Restarts the process if that is the case."
     (let ((process (haskell-process)))
       (haskell-process-queue-command
        process
-       (haskell-command-make
-        (list session process command)
-        (lambda (state)
-          (haskell-process-send-string (cadr state)
-                                       (format ":%s" (caddr state))))
-        (lambda (state buffer)
-          (haskell-process-live-build (cadr state) buffer nil))
-        (lambda (state response)
-          (haskell-process-load-complete (car state) (cadr state) response)))))))
+       (make-haskell-command
+        :state (list session process command)
+        :go (lambda (state)
+              (haskell-process-send-string
+               (cadr state) (format ":%s" (caddr state))))
+        :live (lambda (state buffer)
+                (haskell-process-live-build
+                 (cadr state) buffer nil))
+        :complete (lambda (state response)
+                    (haskell-process-load-complete
+                     (car state) (cadr state) response)))))))
 
 ;;;###autoload
 (defun haskell-process-cabal-build ()
   "Build the Cabal project."
   (interactive)
-  (haskell-process-do-cabal "build"))
+  (haskell-process-do-cabal "build")
+  (haskell-process-add-cabal-autogen))
 
 ;;;###autoload
 (defun haskell-process-cabal ()
@@ -259,13 +262,27 @@ changed. Restarts the process if that is the case."
    (ido-completing-read "Cabal command: "
                         haskell-cabal-commands)))
 
+(defun haskell-process-add-cabal-autogen()
+  "Add <cabal-project-dir>/dist/build/autogen/ to the ghci search
+path. This allows modules such as 'Path_...', generated by cabal,
+to be loaded by ghci."
+  (interactive)
+  (let*
+      ((session       (haskell-session))
+       (cabal-dir     (haskell-session-cabal-dir session))
+       (ghci-gen-dir  (format "%sdist/build/autogen/" cabal-dir)))
+    (haskell-process-do-simple-echo
+     'nil (format ":set -i%s" ghci-gen-dir))))
+
 (defun haskell-process-do-cabal (command)
   "Run a Cabal command."
   (let ((process (haskell-process)))
     (haskell-process-queue-command
      process
-     (haskell-command-make
-      (list (haskell-session) process command 0)
+     (make-haskell-command
+      :state (list (haskell-session) process command 0)
+
+      :go
       (lambda (state)
         (haskell-process-send-string
          (cadr state)
@@ -276,12 +293,16 @@ changed. Restarts the process if that is the case."
                            ('ghci "cabal")
                            ('cabal-dev "cabal-dev"))
                          (caddr state)))))
+
+      :live
       (lambda (state buffer)
         (cond ((or (string= (caddr state) "build")
                    (string= (caddr state) "install"))
                (haskell-process-live-build (cadr state) buffer t))
               (t
                (haskell-process-cabal-live state buffer))))
+
+      :complete
       (lambda (state response)
         (let* ((process (cadr state))
                (session (haskell-process-session process))
@@ -545,11 +566,15 @@ changed. Restarts the process if that is the case."
   "Change the directory of the current process."
   (haskell-process-queue-command
    process
-   (haskell-command-make
-    (list session process dir)
+   (make-haskell-command
+    :state (list session process dir)
+
+    :go
     (lambda (state)
-      (haskell-process-send-string (cadr state) (format ":cd %s" (caddr state))))
-    nil
+      (haskell-process-send-string
+       (cadr state) (format ":cd %s" (caddr state))))
+
+    :complete
     (lambda (state _)
       (haskell-session-set-current-dir (car state) (caddr state))
       (haskell-interactive-mode-echo (car state)
@@ -563,18 +588,20 @@ changed. Restarts the process if that is the case."
   "Send the necessary start messages."
   (haskell-process-queue-command
    process
-   (haskell-command-make process
-                         (lambda (process)
-                           (haskell-process-send-string process ":set prompt \"> \"")
-                           (haskell-process-send-string process "Prelude.putStrLn \"\"")
-                           (haskell-process-send-string process ":set -v1"))
-                         nil
-                         (lambda (process _)
-                           (haskell-interactive-mode-echo
-                            (haskell-process-session process)
-                            (concat (nth (random (length haskell-interactive-greetings))
-                                         haskell-interactive-greetings)
-                                    " (if I break, run M-x haskell-process-clear)"))))))
+   (make-haskell-command
+    :state process
+
+    :go (lambda (process)
+          (haskell-process-send-string process ":set prompt \"> \"")
+          (haskell-process-send-string process "Prelude.putStrLn \"\"")
+          (haskell-process-send-string process ":set -v1"))
+
+    :complete (lambda (process _)
+                (haskell-interactive-mode-echo
+                 (haskell-process-session process)
+                 (concat (nth (random (length haskell-interactive-greetings))
+                              haskell-interactive-greetings)
+                         " (if I break, run M-x haskell-process-clear)"))))))
 
 (defun haskell-process-sentinel (proc event)
   "The sentinel for the process pipe."
@@ -615,10 +642,10 @@ changed. Restarts the process if that is the case."
   "Collect input for the response until receives a prompt."
   (haskell-process-set-response process
                                 (concat (haskell-process-response process) response))
-  (while (haskell-process-live-updates session process))
+  (while (haskell-process-live-updates process))
   (when (string-match haskell-process-prompt-regex
                       (haskell-process-response process))
-    (haskell-command-complete
+    (haskell-command-exec-complete
      (haskell-process-cmd process)
      (replace-regexp-in-string
       haskell-process-prompt-regex
@@ -657,10 +684,10 @@ changed. Restarts the process if that is the case."
                           (haskell-process-name process)))
     (haskell-process-start (haskell-process-session process))))
 
-(defun haskell-process-live-updates (session process)
+(defun haskell-process-live-updates (process)
   "Process live updates."
-  (haskell-command-live (haskell-process-cmd process)
-                        (haskell-process-response process)))
+  (haskell-command-exec-live (haskell-process-cmd process)
+                             (haskell-process-response process)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Making commands
@@ -677,16 +704,9 @@ changed. Restarts the process if that is the case."
         (let ((cmd (haskell-process-cmd-queue-pop process)))
           (when cmd
             (haskell-process-set-cmd process cmd)
-            (haskell-command-go cmd))))
+            (haskell-command-exec-go cmd))))
     (progn (haskell-process-log "Process died or never started. Starting...\n")
            (haskell-process-start (haskell-process-session process)))))
-
-(defun haskell-command-make (state go live complete)
-  "Make a process command of the given `type' with the given `go' procedure."
-  (list (cons 'state state)
-        (cons 'go go)
-        (cons 'live live)
-        (cons 'complete complete)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessing the process
@@ -772,48 +792,45 @@ changed. Restarts the process if that is the case."
   s)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Accessing commands -- using cl 'defstruct'
+(defstruct haskell-command
+  "Data structure representing a command to be executed when with
+  a custom state and three callback."
+  ;; hold the custom command state
+  ;; state :: a
+  state
+  ;; called when to execute a command
+  ;; go :: a -> ()
+  go
+  ;; called whenever output was collected from the haskell process
+  ;; live :: a -> Response -> Bool
+  live
+  ;; called when the output from the haskell process indicates that the command
+  ;; is complete
+  ;; complete :: a -> Response -> ()
+  complete)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessing commands
 
-(defun haskell-command-type (s)
-  "Get the command's type."
-  (haskell-command-get s 'type))
-
-(defun haskell-command-state (s)
-  "Get the command's state."
-  (haskell-command-get s 'state))
-
-(defun haskell-command-go (s)
+(defun haskell-command-exec-go (command)
   "Call the command's go function."
-  (let ((func (haskell-command-get s 'go)))
-    (when func
-      (funcall func
-               (haskell-command-state s)))))
+  (let ((go-func (haskell-command-go command)))
+    (when go-func
+      (funcall go-func (haskell-command-state command)))))
 
-(defun haskell-command-complete (s response)
+(defun haskell-command-exec-complete (command response)
   "Call the command's complete function."
-  (let ((func (haskell-command-get s 'complete)))
-    (when func
-      (funcall func
-               (haskell-command-state s)
+  (let ((comp-func (haskell-command-complete command)))
+    (when comp-func
+      (funcall comp-func
+               (haskell-command-state command)
                response))))
 
-(defun haskell-command-live (s response)
+(defun haskell-command-exec-live (command response)
   "Trigger the command's live updates callback."
-  (let ((func (haskell-command-get s 'live)))
-    (when func
-      (funcall func
-               (haskell-command-state s)
+  (let ((live-func (haskell-command-live command)))
+    (when live-func
+      (funcall live-func
+               (haskell-command-state command)
                response))))
-
-(defun haskell-command-get (s key)
-  "Get the command `key'."
-  (let ((x (assoc key s)))
-    (when x
-      (cdr x))))
-
-(defun haskell-command-set (s key value)
-  "Set the command's `key'."
-  (delete-if (lambda (prop) (equal (car prop) key)) s)
-  (setf (cdr s) (cons (cons key value)
-                      (cdr s)))
-  s)
