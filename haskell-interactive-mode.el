@@ -155,28 +155,28 @@
         (goto-char (point-max))
         (haskell-process-queue-command
          process
-         (haskell-command-make
-          (list session process expr 0)
-          (lambda (state)
-            (haskell-process-send-string (cadr state)
-                                         (caddr state)))
-          (lambda (state buffer)
-            (unless (string= ":q" (caddr state))
-              (let* ((cursor (cadddr state))
-                     (next (replace-regexp-in-string
-                            haskell-process-prompt-regex
-                            "\n"
-                            (substring buffer cursor))))
-                (when (= 0 cursor) (insert "\n"))
-                (haskell-interactive-mode-eval-result (car state) next)
-                (setf (cdddr state) (list (length buffer)))
-                nil)))
-          (lambda (state response)
-            (if haskell-interactive-mode-eval-mode
-                (haskell-interactive-mode-eval-as-mode (car state) response)
-              (when haskell-interactive-mode-eval-pretty
-                (haskell-interactive-mode-eval-pretty-result (car state) response)))
-            (haskell-interactive-mode-prompt (car state)))))))))
+         (make-haskell-command
+          :state (list session process expr 0)
+          :go (lambda (state)
+                (haskell-process-send-string (cadr state)
+                                             (caddr state)))
+          :live (lambda (state buffer)
+                  (unless (string= ":q" (caddr state))
+                    (let* ((cursor (cadddr state))
+                           (next (replace-regexp-in-string
+                                  haskell-process-prompt-regex
+                                  "\n"
+                                  (substring buffer cursor))))
+                      (when (= 0 cursor) (insert "\n"))
+                      (haskell-interactive-mode-eval-result (car state) next)
+                      (setf (cdddr state) (list (length buffer)))
+                      nil)))
+          :complete (lambda (state response)
+                      (if haskell-interactive-mode-eval-mode
+                          (haskell-interactive-mode-eval-as-mode (car state) response)
+                        (when haskell-interactive-mode-eval-pretty
+                          (haskell-interactive-mode-eval-pretty-result (car state) response)))
+                      (haskell-interactive-mode-prompt (car state)))))))))
 
 (defun haskell-interactive-jump-to-error-line ()
   "Jump to the error line."
@@ -191,19 +191,19 @@
                   (src-path (haskell-session-current-dir session))
                   (cabal-relative-file (concat cabal-path "/" file))
                   (src-relative-file (concat src-path "/" file))
-                  (cabal-relative-file-rel (concat cabal-path "/" 
+                  (cabal-relative-file-rel (concat cabal-path "/"
                                                    (file-relative-name file
                                                                        cabal-path)))
-                  (src-relative-file-rel (concat src-path "/" 
+                  (src-relative-file-rel (concat src-path "/"
                                                  (file-relative-name file
                                                                      src-path))))
              (let ((file (cond ((file-exists-p cabal-relative-file)
                                 cabal-relative-file)
-                               ((file-exists-p src-relative-file) 
+                               ((file-exists-p src-relative-file)
                                 src-relative-file)
-                               ((file-exists-p src-relative-file-rel) 
+                               ((file-exists-p src-relative-file-rel)
                                 src-relative-file)
-                               ((file-exists-p cabal-relative-file-rel) 
+                               ((file-exists-p cabal-relative-file-rel)
                                 cabal-relative-file))))
                (when file
                  (other-window 1)
@@ -404,7 +404,7 @@
 (defun haskell-interactive-mode-tab ()
   "The tab command."
   (interactive)
-  (cond 
+  (cond
    ((get-text-property (point) 'collapsible)
     (let ((column (current-column)))
       (search-backward-regexp "^[^ ]")
