@@ -763,7 +763,8 @@ This function will be called with no arguments.")
 (defun haskell-mode-before-save-handler ()
   "Function that will be called before buffer's saving."
   (when haskell-stylish-on-save
-    (haskell-mode-stylish-buffer)))
+    (ignore-errors ; save anyway!
+      (haskell-mode-stylish-buffer))))
 
 (defun haskell-mode-after-save-handler ()
   "Function that will be called after buffer's saving."
