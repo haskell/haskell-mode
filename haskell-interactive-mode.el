@@ -37,6 +37,12 @@
 (defvar haskell-interactive-prompt "λ> "
   "The prompt to use.")
 
+(defun haskell-interactive-prompt-regex ()
+  "Generate a regex for searching for any occurence of the prompt
+at the beginning of the line. This should prevent any
+interference with prompts that look like haskell expressions."
+  (concat "^" (regexp-quote haskell-interactive-prompt)))
+
 (defcustom haskell-interactive-mode-eval-mode
   nil
   "Use the given mode's font-locking to render some text."
@@ -142,7 +148,7 @@
   "Am I at the prompt?"
   (let ((current-point (point)))
     (save-excursion (goto-char (point-max))
-                    (search-backward-regexp haskell-interactive-prompt)
+                    (search-backward-regexp (haskell-interactive-prompt-regex))
                     (> current-point (point)))))
 
 (defun haskell-interactive-handle-line ()
@@ -217,8 +223,8 @@
 (defun haskell-interactive-mode-beginning ()
   "Go to the start of the line."
   (interactive)
-  (if (search-backward-regexp haskell-interactive-prompt (line-beginning-position) t 1)
-      (search-forward-regexp haskell-interactive-prompt (line-end-position) t 1)
+  (if (search-backward-regexp (haskell-interactive-prompt-regex) (line-beginning-position) t 1)
+      (search-forward-regexp (haskell-interactive-prompt-regex) (line-end-position) t 1)
     (move-beginning-of-line nil)))
 
 (defun haskell-interactive-mode-clear ()
@@ -237,7 +243,7 @@
    (buffer-substring-no-properties
     (save-excursion
       (goto-char (max (point-max)))
-      (search-backward-regexp haskell-interactive-prompt))
+      (search-backward-regexp (haskell-interactive-prompt-regex)))
     (line-end-position))
    (length haskell-interactive-prompt)))
 
@@ -266,7 +272,7 @@
   "Insert the result of an eval as a pretty printed Showable, if
   parseable, or otherwise just as-is."
   (with-current-buffer (haskell-session-interactive-buffer session)
-    (let ((start-point (save-excursion (search-backward-regexp haskell-interactive-prompt)
+    (let ((start-point (save-excursion (search-backward-regexp (haskell-interactive-prompt-regex))
                                        (forward-line 1)
                                        (point)))
           (inhibit-read-only t))
@@ -287,7 +293,7 @@
   "Insert the result of an eval as a pretty printed Showable, if
   parseable, or otherwise just as-is."
   (with-current-buffer (haskell-session-interactive-buffer session)
-    (let ((start-point (save-excursion (search-backward-regexp haskell-interactive-prompt)
+    (let ((start-point (save-excursion (search-backward-regexp (haskell-interactive-prompt-regex))
                                        (forward-line 1)
                                        (point)))
           (inhibit-read-only t))
@@ -353,7 +359,7 @@
 (defun haskell-interactive-mode-goto-end-point ()
   "Go to the 'end' of the buffer (before the prompt.)"
   (goto-char (point-max))
-  (when (search-backward-regexp haskell-interactive-prompt (point-min) t 1)))
+  (when (search-backward-regexp (haskell-interactive-prompt-regex) (point-min) t 1)))
 
 (defun haskell-interactive-mode-history-add (input)
   "Add item to the history."
@@ -380,7 +386,7 @@
   (with-current-buffer (haskell-session-interactive-buffer (haskell-session))
     (goto-char (point-max))
     (goto-char (line-beginning-position))
-    (search-forward-regexp haskell-interactive-prompt)
+    (search-forward-regexp (haskell-interactive-prompt-regex))
     (delete-region (point) (line-end-position))
     (insert p)))
 
