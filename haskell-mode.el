@@ -762,14 +762,16 @@ This function will be called with no arguments.")
 
 (defun haskell-mode-before-save-handler ()
   "Function that will be called before buffer's saving."
-  (when haskell-stylish-on-save
-    (ignore-errors ; save anyway!
-      (haskell-mode-stylish-buffer))))
+  )
 
 (defun haskell-mode-after-save-handler ()
   "Function that will be called after buffer's saving."
   (when haskell-tags-on-save
-    (haskell-process-generate-tags)))
+    (ignore-errors (haskell-process-generate-tags)))
+  (when haskell-stylish-on-save
+    (ignore-errors (haskell-mode-stylish-buffer)))
+  (set-buffer-modified-p nil)
+  )
 
 (defun haskell-mode-buffer-apply-command (cmd)
   "Execute shell command CMD with current buffer as input and
