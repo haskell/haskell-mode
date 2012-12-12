@@ -232,7 +232,7 @@ Key bindings:
     (let ((inhibit-read-only t))
       (set-text-properties (point-min) (point-max) nil))
     (delete-region (point-min) (point-max))
-    (mapcar 'delete-overlay (overlays-in (point-min) (point-max)))
+    (mapc 'delete-overlay (overlays-in (point-min) (point-max)))
     (haskell-interactive-mode-prompt (haskell-session))))
 
 (defun haskell-interactive-mode-input ()
