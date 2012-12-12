@@ -53,7 +53,10 @@
 
 ;;;###autoload
 (defun haskell-interactive-mode (session)
-  "Interactive mode for Haskell."
+  "Interactive mode for Haskell.
+
+Key bindings:
+\\{haskell-interactive-mode-map}"
   (interactive)
   (kill-all-local-variables)
   (haskell-session-assign session)
