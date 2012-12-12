@@ -33,6 +33,8 @@ AUTOLOADS = haskell-site-file.el
 	$(EMACS) --batch --eval '(setq load-path (cons "." load-path))' \
 		-f batch-byte-compile $<
 
+.PHONY: all compile info dist
+
 all: $(AUTOLOADS)
 
 compile: $(ELCFILES)
