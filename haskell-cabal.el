@@ -160,8 +160,9 @@
    and indeed just prompting the user. Do them all."
   (let* ((file (haskell-cabal-find-file))
          (dir (when file (file-name-directory file))))
-    (read-from-minibuffer
+    (read-directory-name
      (format "Cabal dir%s: " (if file (format " (%s)" (file-relative-name file)) ""))
+     nil
      (or dir default-directory))))
 
 (defun haskell-cabal-compute-checksum (cabal-dir) 

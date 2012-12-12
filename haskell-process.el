@@ -555,8 +555,9 @@ to be loaded by ghci."
 
 (defun haskell-process-prompt-dir (session)
   "Prompt for the current directory."
-  (read-from-minibuffer
+  (read-directory-name
    "Set current directory: "
+   nil
    (or (haskell-session-get session 'current-dir)
        (if (buffer-file-name)
            (file-name-directory (buffer-file-name))
