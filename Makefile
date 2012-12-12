@@ -1,4 +1,5 @@
 EMACS = emacs
+BATCH = $(EMACS) --batch -Q
 
 ELFILES = \
 	haskell-c.el \
@@ -30,7 +31,7 @@ ELCFILES = $(ELFILES:.el=.elc)
 AUTOLOADS = haskell-site-file.el
 
 %.elc: %.el
-	$(EMACS) --batch --eval '(setq load-path (cons "." load-path))' \
+	$(BATCH) --eval '(setq load-path (cons "." load-path))' \
 		-f batch-byte-compile $<
 
 .PHONY: all compile info dist clean
@@ -53,7 +54,7 @@ PACKAGE=haskell-mode
 
 $(AUTOLOADS): $(ELFILES)
 	[ -f $@ ] || echo '' >$@
-	$(EMACS) --batch --eval '(setq generated-autoload-file "'`pwd`'/$@")' -f batch-update-autoloads "."
+	$(BATCH) --eval '(setq generated-autoload-file "'`pwd`'/$@")' -f batch-update-autoloads "."
 
 ##
 
