@@ -33,11 +33,14 @@ AUTOLOADS = haskell-site-file.el
 	$(EMACS) --batch --eval '(setq load-path (cons "." load-path))' \
 		-f batch-byte-compile $<
 
-.PHONY: all compile info dist
+.PHONY: all compile info dist clean
 
 all: $(AUTOLOADS)
 
 compile: $(ELCFILES)
+
+clean:
+	$(RM) $(ELCFILES)
 
 info:
 	# No Texinfo file, sorry.
