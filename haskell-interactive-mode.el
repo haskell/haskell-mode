@@ -255,7 +255,7 @@ Key bindings:
                         'prompt t))))
 
 (defun haskell-interactive-mode-eval-result (session text)
-  "Insert the result of an eval as plain text"
+  "Insert the result of an eval as plain text."
   (with-current-buffer (haskell-session-interactive-buffer session)
     (goto-char (point-max))
     (insert (propertize text
@@ -461,3 +461,5 @@ Key bindings:
     (goto-char (point-max))))
 
 (provide 'haskell-interactive-mode)
+
+;;; haskell-interactive-mode.el ends here
