@@ -449,7 +449,7 @@ Key bindings:
   (with-current-buffer (haskell-session-interactive-buffer (haskell-session))
     (if (progn (goto-char (line-beginning-position))
                (looking-at "^[^:]+:[0-9]+:[0-9]+: "))
-        (progn (previous-line)
+        (progn (forward-line -1)
                (haskell-interactive-jump-to-error-line))
       (progn (goto-char (point-max))
              (haskell-interactive-mode-error-backward)
