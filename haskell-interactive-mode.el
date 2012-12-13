@@ -40,7 +40,7 @@
 (defcustom haskell-interactive-mode-eval-mode
   nil
   "Use the given mode's font-locking to render some text."
-  :type 'boolean
+  :type '(choice function (const :tag "None" nil))
   :group 'haskell)
 
 (defvar haskell-interactive-greetings
