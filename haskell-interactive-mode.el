@@ -40,7 +40,7 @@
 (defcustom haskell-interactive-mode-eval-mode
   nil
   "Use the given mode's font-locking to render some text."
-  :type 'boolean
+  :type '(choice function (const :tag "None" nil))
   :group 'haskell)
 
 (defvar haskell-interactive-greetings
@@ -53,7 +53,10 @@
 
 ;;;###autoload
 (defun haskell-interactive-mode (session)
-  "Interactive mode for Haskell."
+  "Interactive mode for Haskell.
+
+Key bindings:
+\\{haskell-interactive-mode-map}"
   (interactive)
   (kill-all-local-variables)
   (haskell-session-assign session)
@@ -209,7 +212,8 @@
                  (other-window 1)
                  (find-file file)
                  (haskell-interactive-bring)
-                 (goto-line (string-to-number line))
+                 (goto-char (point-min))
+                 (forward-line (1- (string-to-number line)))
                  (goto-char (+ (point) (string-to-number col)))
                  (haskell-mode-message-line orig-line)
                  t)))))))
@@ -228,7 +232,7 @@
     (let ((inhibit-read-only t))
       (set-text-properties (point-min) (point-max) nil))
     (delete-region (point-min) (point-max))
-    (mapcar 'delete-overlay (overlays-in (point-min) (point-max)))
+    (mapc 'delete-overlay (overlays-in (point-min) (point-max)))
     (haskell-interactive-mode-prompt (haskell-session))))
 
 (defun haskell-interactive-mode-input ()
@@ -252,7 +256,7 @@
                         'prompt t))))
 
 (defun haskell-interactive-mode-eval-result (session text)
-  "Insert the result of an eval as plain text"
+  "Insert the result of an eval as plain text."
   (with-current-buffer (haskell-session-interactive-buffer session)
     (goto-char (point-max))
     (insert (propertize text
@@ -445,7 +449,7 @@
   (with-current-buffer (haskell-session-interactive-buffer (haskell-session))
     (if (progn (goto-char (line-beginning-position))
                (looking-at "^[^:]+:[0-9]+:[0-9]+: "))
-        (progn (previous-line)
+        (progn (forward-line -1)
                (haskell-interactive-jump-to-error-line))
       (progn (goto-char (point-max))
              (haskell-interactive-mode-error-backward)
@@ -458,3 +462,5 @@
     (goto-char (point-max))))
 
 (provide 'haskell-interactive-mode)
+
+;;; haskell-interactive-mode.el ends here
