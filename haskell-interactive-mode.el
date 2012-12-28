@@ -43,6 +43,13 @@
   :type '(choice function (const :tag "None" nil))
   :group 'haskell)
 
+(defcustom haskell-interactive-mode-hide-multi-line-errors
+  t
+  "Hide collapsible multi-line compile messages by default."
+  :type 'boolean
+  :group 'haskell)
+
+
 (defvar haskell-interactive-greetings
   (list "Hello, Haskell!"
         "The lambdas must flow."
@@ -337,7 +344,7 @@ Key bindings:
                               'read-only t
                               'rear-nonsticky t
                               'collapsible t
-                              'invisible t
+                              'invisible haskell-interactive-mode-hide-multi-line-errors
                               'message-length (length (match-string 2 message)))))
         (unless lines
           (insert (propertize (concat message "\n")
