@@ -43,6 +43,12 @@
   :group 'haskell
   :type '(choice string (repeat string)))
 
+(defcustom haskell-process-path-cabal-ghci
+  "cabal-ghci"
+  "The path for starting cabal-ghci."
+  :group 'haskell
+  :type '(choice string (repeat string)))
+
 (defcustom haskell-process-path-cabal-dev
   "cabal-dev"
   "The path for starting cabal-dev."
@@ -52,7 +58,7 @@
 (defcustom haskell-process-type
   'ghci
   "The inferior Haskell process type to use."
-  :options '(ghci cabal-dev)
+  :options '(ghci cabal-dev cabal-ghci)
   :type 'symbol
   :group 'haskell)
 
@@ -291,6 +297,7 @@ to be loaded by ghci."
                  (format "%s %s"
                          (ecase haskell-process-type
                            ('ghci "cabal")
+                           ('cabal-ghci "cabal")
                            ('cabal-dev "cabal-dev"))
                          (caddr state)))))
 
@@ -324,6 +331,7 @@ to be loaded by ghci."
                :body msg
                :app-name (ecase haskell-process-type
                            ('ghci "cabal")
+                           ('cabal-ghci "cabal")
                            ('cabal-dev "cabal-dev"))
                :app-icon haskell-process-logo
                )))))))))
@@ -498,6 +506,12 @@ to be loaded by ghci."
           (start-process (haskell-session-name session)
                          nil
                          haskell-process-path-ghci))
+         ('cabal-ghci
+          (haskell-process-log (format "Starting inferior cabal-ghci process using %s ..."
+                                       haskell-process-path-cabal-ghci))
+          (start-process (haskell-session-name session)
+                         nil
+                         haskell-process-path-cabal-ghci))
          ('cabal-dev
           (let ((dir (concat (haskell-session-cabal-dir session)
                              "/cabal-dev")))
