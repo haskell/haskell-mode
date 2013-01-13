@@ -520,6 +520,8 @@ Preserves indentation and removes extra whitespace"
 			   #'haskell-indentation-expression-layout nil)))
     ("mdo"   . (lambda () (haskell-indentation-with-starter
 			   #'haskell-indentation-expression-layout nil)))
+    ("rec"   . (lambda () (haskell-indentation-with-starter
+			   #'haskell-indentation-expression-layout nil)))
     ("case"  . (lambda () (haskell-indentation-phrase
 			   '(haskell-indentation-expression
 			     "of" haskell-indentation-case-layout))))
@@ -948,7 +950,7 @@ Preserves indentation and removes extra whitespace"
 		 (t (setq current-token (haskell-indentation-peek-token))))))))
 
 (defun haskell-indentation-peek-token ()
-  (cond ((looking-at "\\(if\\|then\\|else\\|let\\|in\\|mdo\\|do\\|proc\\|case\\|of\\|where\\|module\\|deriving\\|data\\|type\\|newtype\\|class\\|instance\\)\\([^[:alnum:]'_]\\|$\\)")
+  (cond ((looking-at "\\(if\\|then\\|else\\|let\\|in\\|mdo\\|rec\\|do\\|proc\\|case\\|of\\|where\\|module\\|deriving\\|data\\|type\\|newtype\\|class\\|instance\\)\\([^[:alnum:]'_]\\|$\\)")
 	 (match-string 1))
 	((looking-at "[][(){}[,;]")
 	 (match-string 0))
