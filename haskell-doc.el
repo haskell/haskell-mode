@@ -1507,6 +1507,7 @@ is not."
 This function is run by an idle timer to print the type
  automatically if `haskell-doc-mode' is turned on."
   (and haskell-doc-mode
+       (not (eobp))
        (not executing-kbd-macro)
        ;; Having this mode operate in the minibuffer makes it impossible to
        ;; see what you're doing.
