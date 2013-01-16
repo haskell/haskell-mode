@@ -256,7 +256,7 @@ Key bindings:
   "Show a prompt at the end of the buffer."
   (with-current-buffer (haskell-session-interactive-buffer session)
     (goto-char (point-max))
-    (insert (propertize haskell-interactive-prompt
+    (insert (propertize (format "%s%s" (haskell-virthualenv-prompt-prefix) haskell-interactive-prompt)
                         'face 'haskell-interactive-face-prompt
                         'read-only t
                         'rear-nonsticky t

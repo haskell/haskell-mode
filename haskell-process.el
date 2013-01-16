@@ -29,6 +29,7 @@
 (require 'haskell-mode)
 (require 'haskell-interactive-mode)
 (require 'haskell-session)
+(require 'haskell-session-virthualenv)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configuration
@@ -595,6 +596,14 @@ to be loaded by ghci."
       (haskell-interactive-mode-echo (car state)
                                      (format "Changed directory: %s"
                                              (caddr state)))))))
+
+(defun haskell-process-ve (&optional not-interactive)
+  "Set virthualenv"
+  (interactive)
+  (let ((session (haskell-session))
+         (ve (haskell-virthualenv-get-dir)))
+    (haskell-process-log (format "Setting virthualenv location to %s ...\n" ve))
+    (haskell-session-set-virthualenv session ve)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Process communication
