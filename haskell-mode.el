@@ -770,27 +770,31 @@ This function will be called with no arguments.")
     (ignore-errors (haskell-process-generate-tags)))
   (when haskell-stylish-on-save
     (ignore-errors (haskell-mode-stylish-buffer)))
-  (set-buffer-modified-p nil)
+  (let ((before-save-hook '())
+        (after-save-hook '()))
+    (basic-save-buffer))
   )
 
 (defun haskell-mode-buffer-apply-command (cmd)
   "Execute shell command CMD with current buffer as input and
   replace the whole buffer with the output. If CMD fails the
   buffer remains unchanged."
-  (let* ((file (buffer-file-name (current-buffer)))
-         (output (with-temp-buffer
-                   (let ((default-directory (if (and (boundp 'haskell-session)
-                                                     haskell-session)
-                                                (haskell-session-cabal-dir haskell-session)
-                                              default-directory)))
-                     (call-process cmd
-                                   file
-                                   (list t nil)
-                                   nil))
-                   (buffer-substring-no-properties (point-min) (point-max)))))
-    (unless (string= "" output)
-      (erase-buffer)
-      (insert output))))
+  (set-buffer-modified-p t)
+  (let* ((filename (buffer-file-name (current-buffer)))
+         (tmp-file (make-temp-file (replace-regexp-in-string " .*" "" cmd)))
+         (default-directory (if (and (boundp 'haskell-session)
+                                     haskell-session)
+                                (haskell-session-cabal-dir haskell-session)
+                              default-directory))
+         (nbytes (with-temp-file tmp-file
+                   (call-process cmd filename t nil)
+                   (point-max))))
+    (unless (= 0 nbytes)
+      (save-restriction
+        (widen)
+        ; insert file with replacement to preserve markers.
+        (insert-file-contents tmp-file nil nil nil t)))
+    (delete-file tmp-file)))
 
 (defun haskell-mode-stylish-buffer ()
   "Apply stylish-haskell to the current buffer."
