@@ -199,22 +199,12 @@ Key bindings:
            (let* ((session (haskell-session))
                   (cabal-path (haskell-session-cabal-dir session))
                   (src-path (haskell-session-current-dir session))
-                  (cabal-relative-file (concat cabal-path "/" file))
-                  (src-relative-file (concat src-path "/" file))
-                  (cabal-relative-file-rel (concat cabal-path "/"
-                                                   (file-relative-name file
-                                                                       cabal-path)))
-                  (src-relative-file-rel (concat src-path "/"
-                                                 (file-relative-name file
-                                                                     src-path))))
+                  (cabal-relative-file (expand-file-name file cabal-path))
+                  (src-relative-file (expand-file-name file src-path))))
              (let ((file (cond ((file-exists-p cabal-relative-file)
                                 cabal-relative-file)
                                ((file-exists-p src-relative-file)
-                                src-relative-file)
-                               ((file-exists-p src-relative-file-rel)
-                                src-relative-file)
-                               ((file-exists-p cabal-relative-file-rel)
-                                cabal-relative-file))))
+                                src-relative-file))))
                (when file
                  (other-window 1)
                  (find-file file)
