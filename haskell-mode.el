@@ -780,21 +780,50 @@ This function will be called with no arguments.")
   replace the whole buffer with the output. If CMD fails the
   buffer remains unchanged."
   (set-buffer-modified-p t)
-  (let* ((filename (buffer-file-name (current-buffer)))
-         (tmp-file (make-temp-file (replace-regexp-in-string " .*" "" cmd)))
+  (flet
+      ((chomp (str)
+              (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'"
+                                   str)
+                (setq str (replace-match "" t t str)))
+              str)
+       (errout
+        (fmt &rest args)
+        (let* ((warning-fill-prefix "    "))
+          (display-warning cmd (apply 'format fmt args) :warning))))
+    (let*
+        ((filename (buffer-file-name (current-buffer)))
+         (cmd-prefix (replace-regexp-in-string " .*" "" cmd))
+         (tmp-file (make-temp-file cmd-prefix))
+         (err-file (make-temp-file cmd-prefix))
          (default-directory (if (and (boundp 'haskell-session)
                                      haskell-session)
                                 (haskell-session-cabal-dir haskell-session)
                               default-directory))
-         (nbytes (with-temp-file tmp-file
-                   (call-process cmd filename t nil)
-                   (point-max))))
-    (unless (= 0 nbytes)
-      (save-restriction
-        (widen)
-        ; insert file with replacement to preserve markers.
-        (insert-file-contents tmp-file nil nil nil t)))
-    (delete-file tmp-file)))
+         (errcode (call-process cmd filename
+                                (list (list :file tmp-file) err-file) nil))
+         (stderr-output
+          (with-temp-buffer
+            (insert-file-contents err-file)
+            (chomp (buffer-substring-no-properties (point-min) (point-max)))))
+         (stdout-output
+          (with-temp-buffer
+            (insert-file-contents tmp-file)
+            (buffer-substring-no-properties (point-min) (point-max)))))
+      (if (string= "" stderr-output)
+          (if (string= "" stdout-output)
+              (errout
+               "Error: %s produced no output, leaving buffer alone" cmd)
+            (save-restriction
+              (widen)
+              ;; command successful, insert file with replacement to preserve
+              ;; markers.
+              (insert-file-contents tmp-file nil nil nil t)))
+        ;; non-null stderr, command must have failed
+        (errout "%s failed: %s" cmd stderr-output)
+        )
+      (delete-file tmp-file)
+      (delete-file err-file)
+      )))
 
 (defun haskell-mode-stylish-buffer ()
   "Apply stylish-haskell to the current buffer."
