@@ -449,7 +449,7 @@ CONFIGURING INDENTATION
                                        'turn-on-haskell-doc-mode) ; Emacs 21
                                     ,@(if (fboundp 'capitalized-words-mode)
                                           '(capitalized-words-mode))
-                                    turn-on-simple-indent turn-on-haskell-doc-mode
+                                    turn-on-haskell-simple-indent turn-on-haskell-doc-mode
                                     turn-on-haskell-decl-scan imenu-add-menubar-index))
 
 (defvar eldoc-print-current-symbol-info-function)
