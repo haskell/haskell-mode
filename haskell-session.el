@@ -25,7 +25,7 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'cl)
 (require 'haskell-cabal)
 (require 'haskell-string)
 
@@ -272,3 +272,8 @@
                       (cdr s))))
 
 (provide 'haskell-session)
+
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; End:
+;;; haskell-session.el ends here
