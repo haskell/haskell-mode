@@ -799,8 +799,9 @@ This function will be called with no arguments.")
                                      haskell-session)
                                 (haskell-session-cabal-dir haskell-session)
                               default-directory))
-         (errcode (call-process cmd filename
-                                (list (list :file tmp-file) err-file) nil))
+         (errcode (with-temp-file tmp-file
+                    (call-process cmd filename
+                                  (list (current-buffer) err-file) nil)))
          (stderr-output
           (with-temp-buffer
             (insert-file-contents err-file)
