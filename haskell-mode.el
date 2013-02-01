@@ -535,10 +535,8 @@ Invokes `haskell-mode-hook'."
   (set (make-local-variable 'dabbrev-case-replace) nil)
   (set (make-local-variable 'dabbrev-abbrev-char-regexp) "\\sw\\|[.]")
   (setq haskell-literate nil)
-  (make-local-variable 'before-save-hook)
-  (add-hook 'before-save-hook 'haskell-mode-before-save-handler)
-  (make-local-variable 'after-save-hook)
-  (add-hook 'after-save-hook 'haskell-mode-after-save-handler)
+  (add-hook 'before-save-hook 'haskell-mode-before-save-handler nil t)
+  (add-hook 'after-save-hook 'haskell-mode-after-save-handler nil t)
   )
 
 (defun haskell-fill-paragraph (justify)
