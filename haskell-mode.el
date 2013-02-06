@@ -353,8 +353,10 @@ May return a qualified name."
   (save-excursion
     ;; Skip whitespace if we're on it.  That way, if we're at "map ", we'll
     ;; see the word "map".
-    (if (eq ?  (char-syntax (char-after)))
+    (if (and (not (eobp))
+             (eq ?  (char-syntax (char-after))))
         (skip-chars-backward " \t"))
+
     (let ((case-fold-search nil))
       (multiple-value-bind (start end)
           (if (looking-at "\\s_")
