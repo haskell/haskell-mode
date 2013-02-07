@@ -107,6 +107,7 @@ has changed?"
   :group 'haskell)
 
 (defvar haskell-process-prompt-regex "\\(^[> ]*> $\\|\n[> ]*> $\\)")
+(defvar haskell-reload-p nil)
 
 (defconst haskell-process-logo
   (expand-file-name "logo.svg" (file-name-directory load-file-name))
@@ -229,10 +230,19 @@ changed. Restarts the process if that is the case."
 
 ;;;###autoload
 (defun haskell-process-reload-file ()
-  "Load the current buffer file."
+  "Re-load the current buffer file."
   (interactive)
   (save-buffer)
+  (haskell-interactive-mode-reset-error (haskell-session))
   (haskell-process-file-loadish "reload"))
+
+;;;###autoload
+(defun haskell-process-load-or-reload (&optional toggle)
+  "Load or reload. Universal argument toggles which."
+  (interactive "P")
+  (when toggle
+    (setq haskell-reload-p (not haskell-reload-p)))
+  (if haskell-reload-p (haskell-process-reload-file) (haskell-process-load-file)))
 
 (defun haskell-process-file-loadish (command)
   (let ((session (haskell-session)))
