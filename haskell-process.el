@@ -226,7 +226,7 @@ changed. Restarts the process if that is the case."
   (interactive)
   (save-buffer)
   (haskell-interactive-mode-reset-error (haskell-session))
-  (haskell-process-file-loadish (concat "load " (buffer-file-name))))
+  (haskell-process-file-loadish (concat "load " (buffer-file-name)) nil))
 
 ;;;###autoload
 (defun haskell-process-reload-file ()
@@ -234,7 +234,7 @@ changed. Restarts the process if that is the case."
   (interactive)
   (save-buffer)
   (haskell-interactive-mode-reset-error (haskell-session))
-  (haskell-process-file-loadish "reload"))
+  (haskell-process-file-loadish "reload" t))
 
 ;;;###autoload
 (defun haskell-process-load-or-reload (&optional toggle)
@@ -244,7 +244,7 @@ changed. Restarts the process if that is the case."
     (setq haskell-reload-p (not haskell-reload-p)))
   (if haskell-reload-p (haskell-process-reload-file) (haskell-process-load-file)))
 
-(defun haskell-process-file-loadish (command)
+(defun haskell-process-file-loadish (command reload-p)
   (let ((session (haskell-session)))
     (haskell-session-current-dir session)
     (when haskell-process-check-cabal-config-on-load
@@ -253,7 +253,7 @@ changed. Restarts the process if that is the case."
       (haskell-process-queue-command
        process
        (make-haskell-command
-        :state (list session process command)
+        :state (list session process command reload-p)
         :go (lambda (state)
               (haskell-process-send-string
                (cadr state) (format ":%s" (caddr state))))
@@ -262,7 +262,8 @@ changed. Restarts the process if that is the case."
                  (cadr state) buffer nil))
         :complete (lambda (state response)
                     (haskell-process-load-complete
-                     (car state) (cadr state) response)))))))
+                     (car state) (cadr state) response
+                     (cadddr state))))))))
 
 ;;;###autoload
 (defun haskell-process-cabal-build ()
@@ -357,7 +358,7 @@ to be loaded by ghci."
   (setf (cdddr state) (list (length buffer)))
   nil)
 
-(defun haskell-process-load-complete (session process buffer)
+(defun haskell-process-load-complete (session process buffer reload)
   "Handle the complete loading response."
   (cond ((haskell-process-consume process "Ok, modules loaded: \\(.+\\)$")
          (let ((cursor (haskell-process-response-cursor process)))
@@ -366,7 +367,7 @@ to be loaded by ghci."
              (while (haskell-process-errors-warnings session process buffer)
                (setq warning-count (1+ warning-count)))
              (haskell-process-set-response-cursor process cursor)
-             (haskell-mode-message-line "OK."))))
+             (haskell-mode-message-line (if reload "Reloaded OK." "OK.")))))
         ((haskell-process-consume process "Failed, modules loaded: \\(.+\\)$")
          (let ((cursor (haskell-process-response-cursor process)))
            (haskell-process-set-response-cursor process 0)
