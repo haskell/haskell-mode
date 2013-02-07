@@ -240,9 +240,13 @@ changed. Restarts the process if that is the case."
 (defun haskell-process-load-or-reload (&optional toggle)
   "Load or reload. Universal argument toggles which."
   (interactive "P")
-  (when toggle
-    (setq haskell-reload-p (not haskell-reload-p)))
-  (if haskell-reload-p (haskell-process-reload-file) (haskell-process-load-file)))
+  (if toggle
+      (progn (setq haskell-reload-p (not haskell-reload-p))
+             (message "%s (No action taken this time)"
+                      (if haskell-reload-p
+                          "Now running :reload."
+                        "Now running :load <buffer-filename>.")))
+    (if haskell-reload-p (haskell-process-reload-file) (haskell-process-load-file))))
 
 (defun haskell-process-file-loadish (command reload-p)
   (let ((session (haskell-session)))
