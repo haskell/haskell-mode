@@ -55,6 +55,12 @@
   :group 'haskell
   :type '(choice string (repeat string)))
 
+(defcustom haskell-process-args-ghci
+  '()
+  "Any arguments for starting cabal-ghci."
+  :group 'haskell
+  :type '(choice list))
+
 (defcustom haskell-process-type
   'ghci
   "The inferior Haskell process type to use."
@@ -518,9 +524,11 @@ to be loaded by ghci."
          ('ghci
           (haskell-process-log (format "Starting inferior GHCi process %s ..."
                                        haskell-process-path-ghci))
-          (start-process (haskell-session-name session)
-                         nil
-                         haskell-process-path-ghci))
+          (apply #'start-process
+                 (append (list (haskell-session-name session)
+                               nil
+                               haskell-process-path-ghci)
+                         haskell-process-args-ghci)))
          ('cabal-ghci
           (haskell-process-log (format "Starting inferior cabal-ghci process using %s ..."
                                        haskell-process-path-cabal-ghci))
