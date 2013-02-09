@@ -516,11 +516,15 @@ to be loaded by ghci."
        process
        (ecase haskell-process-type
          ('ghci
-          (haskell-process-log (format "Starting inferior GHCi process %s ..."
-                                       haskell-process-path-ghci))
-          (start-process (haskell-session-name session)
-                         nil
-                         haskell-process-path-ghci))
+          (let ((cmd (car (split-string haskell-process-path-ghci " ")))
+                (args (cdr (split-string haskell-process-path-ghci " "))))
+            (haskell-process-log (format "Starting inferior GHCi process %s ..."
+                                         haskell-process-path-ghci))
+            (apply #'start-process 
+                   (haskell-session-name session)
+                   nil
+                   cmd
+                   args)))
          ('cabal-ghci
           (haskell-process-log (format "Starting inferior cabal-ghci process using %s ..."
                                        haskell-process-path-cabal-ghci))
