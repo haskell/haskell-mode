@@ -21,6 +21,7 @@ ELFILES = \
 	haskell-interactive-mode.el \
 	haskell-package.el \
 	haskell-process.el \
+	haskell-menu.el \
 	haskell-session.el \
 	haskell-string.el \
 	ghc-core.el \
