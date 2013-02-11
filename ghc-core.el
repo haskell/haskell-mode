@@ -35,7 +35,7 @@
   "Remove commonly ignored annotations and namespace
 prefixes in the given region."
   (interactive "r")
-  (save-restriction 
+  (save-restriction
     (narrow-to-region start end)
     (goto-char (point-min))
     (while (search-forward-regexp "GHC\.[^\.]*\." nil t)
@@ -57,6 +57,9 @@ prefixes in the current buffer."
   (interactive)
   (ghc-core-clean-region (point-min) (point-max)))
 
+(defvar ghc-core-create-options '("-O2")
+  "Options that will be passed to ghc when generating core output.")
+
 ;;;###autoload
 (defun ghc-core-create-core ()
   "Compiled and load the current buffer as tidy core"
@@ -65,7 +68,8 @@ prefixes in the current buffer."
   (let ((core-buffer (generate-new-buffer "ghc-core"))
         (neh (lambda () (kill-buffer core-buffer))))
     (add-hook 'next-error-hook neh)
-    (call-process "ghc" nil core-buffer nil "-c" "-ddump-simpl" "-O2" (buffer-file-name))
+    (apply 'call-process "ghc" nil core-buffer nil "-c" "-ddump-simpl"
+           (buffer-file-name) ghc-core-create-options)
     (display-buffer core-buffer)
     (with-current-buffer core-buffer
       (ghc-core-mode))
