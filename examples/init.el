@@ -78,6 +78,9 @@
   ;; Jump to the definition of the current symbol.
   (define-key haskell-mode-map (kbd "M-.") 'haskell-mode-tag-find)
 
+  ;; Sort import statements on save
+  (add-hook 'before-save-hook 'haskell-sort-imports nil 'make-it-local)
+
   ;; Indent the below lines on columns after the current column.
   (define-key haskell-mode-map (kbd "C-<right>")
     (lambda ()
