@@ -272,7 +272,8 @@ Returns keywords suitable for `font-lock-keywords'."
 
          ;; We allow _ as the first char to fit GHC
          (varid "\\b[[:lower:]_][[:alnum:]'_]*\\b")
-         (conid "\\b[[:upper:]][[:alnum:]'_]*\\b")
+         ;; We allow ' preceding conids because of DataKinds/PolyKinds
+         (conid "\\b'?[[:upper:]][[:alnum:]'_]*\\b")
 	 (modid (concat "\\b" conid "\\(\\." conid "\\)*\\b"))
          (qvarid (concat modid "\\." varid))
          (qconid (concat modid "\\." conid))
