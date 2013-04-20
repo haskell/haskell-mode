@@ -495,7 +495,8 @@ Preserves indentation and removes extra whitespace"
     ("instance" . haskell-indentation-class-declaration )))
 
 (defconst haskell-indentation-type-list
-  '(("::"    . (lambda () (haskell-indentation-statement-right #'haskell-indentation-type)))
+  '(("::"    . (lambda () (haskell-indentation-with-starter
+			   (lambda () (haskell-indentation-separated #'haskell-indentation-type "->" nil)) nil)))
     ("("     . (lambda () (haskell-indentation-list #'haskell-indentation-type
 						    ")" "," nil)))
     ("["     . (lambda () (haskell-indentation-list #'haskell-indentation-type
@@ -531,7 +532,8 @@ Preserves indentation and removes extra whitespace"
 			     "->" haskell-indentation-expression))))
     ("where" . (lambda () (haskell-indentation-with-starter
 			   #'haskell-indentation-declaration-layout nil t)))
-    ("::"    . (lambda () (haskell-indentation-statement-right #'haskell-indentation-type)))
+    ("::"    . (lambda () (haskell-indentation-with-starter
+			   (lambda () (haskell-indentation-separated #'haskell-indentation-type "->" nil)) nil)))
     ("="     . (lambda () (haskell-indentation-statement-right #'haskell-indentation-expression)))
     ("<-"    . (lambda () (haskell-indentation-statement-right #'haskell-indentation-expression)))
     ("("     . (lambda () (haskell-indentation-list #'haskell-indentation-expression
