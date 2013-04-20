@@ -488,9 +488,9 @@ Preserves indentation and removes extra whitespace"
 
 (defconst haskell-indentation-toplevel-list
   '(("module" . haskell-indentation-module)
-    ("data" . haskell-indentation-data)
-    ("type" . haskell-indentation-data)
-    ("newtype" . haskell-indentation-data)
+    ("data" . (lambda () (haskell-indentation-statement-right #'haskell-indentation-data)))
+    ("type" . (lambda () (haskell-indentation-statement-right #'haskell-indentation-data)))
+    ("newtype" . (lambda () (haskell-indentation-statement-right #'haskell-indentation-data)))
     ("class" . haskell-indentation-class-declaration)
     ("instance" . haskell-indentation-class-declaration )))
 
