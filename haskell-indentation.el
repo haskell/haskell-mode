@@ -46,6 +46,16 @@
   :type 'boolean
   :group 'haskell-indentation)
 
+(defcustom haskell-indentation-delete-backward-indentation t
+  "Delete backward removes indentation."
+  :type 'boolean
+  :group 'haskell-indentation)
+
+(defcustom haskell-indentation-delete-indentation t
+  "Delete removes indentation."
+  :type 'boolean
+  :group 'haskell-indentation)
+
 (defcustom haskell-indentation-layout-offset 2
   "Extra indentation to add before expressions in a haskell layout list."
   :type 'integer
@@ -355,7 +365,8 @@ Preserves indentation and removes extra whitespace"
 	 (> (haskell-current-column) (haskell-indentation-current-indentation))
 	(nth 8 (syntax-ppss)))
      (delete-backward-char n))
-    (t (let* ((ci (haskell-indentation-current-indentation))
+    (haskell-indentation-delete-backward-indentation
+       (let* ((ci (haskell-indentation-current-indentation))
 	      (pi (haskell-indentation-previous-indentation
 		   ci (haskell-indentation-find-indentations))))
 	 (save-excursion
@@ -368,7 +379,8 @@ Preserves indentation and removes extra whitespace"
 		  (beginning-of-line)
 		  (delete-region (max (point-min) (- (point) 1))
 				 (progn (move-to-column ci)
-					(point)))))))))))
+					(point))))))))
+    (t (delete-backward-char n)))))
 
 (defun haskell-indentation-delete-char (n)
   (interactive "p")
@@ -387,7 +399,7 @@ Preserves indentation and removes extra whitespace"
 	   (>= (haskell-current-column) (haskell-indentation-current-indentation))
 	   (nth 8 (syntax-ppss)))
        (delete-char n))
-      (t
+      (haskell-indentation-delete-indentation
        (let* ((ci (haskell-indentation-current-indentation))
 	      (pi (haskell-indentation-previous-indentation
 		   ci (haskell-indentation-find-indentations))))
@@ -396,7 +408,8 @@ Preserves indentation and removes extra whitespace"
 	       (move-to-column pi))
 	   (delete-region (point)
 			  (progn (move-to-column ci)
-				 (point))))))))))
+				 (point))))))
+    (t (delete-backward-char n))))))
 
 (defun haskell-indentation-goto-least-indentation ()
   (beginning-of-line)
