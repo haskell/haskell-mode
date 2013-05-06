@@ -69,6 +69,22 @@ interference with prompts that look like haskell expressions."
 (defvar haskell-interactive-mode-history)
 (defvar haskell-interactive-mode-history-index)
 
+(defvar haskell-interactive-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "RET") 'haskell-interactive-mode-return)
+    (define-key map (kbd "C-j") 'haskell-interactive-mode-newline-indent)
+    (define-key map (kbd "C-a") 'haskell-interactive-mode-beginning)
+    (define-key map (kbd "<home>") 'haskell-interactive-mode-beginning)
+    (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
+    (define-key map (kbd "C-c C-c") 'haskell-process-interrupt)
+    (define-key map (kbd "M-p")
+      '(lambda () (interactive) (haskell-interactive-mode-history-toggle 1)))
+    (define-key map (kbd "M-n")
+      '(lambda () (interactive) (haskell-interactive-mode-history-toggle -1)))
+    (define-key map (kbd "TAB") 'haskell-interactive-mode-tab)
+    map)
+  "Interactive Haskell mode map.")
+
 ;;;###autoload
 (defun haskell-interactive-mode (session)
   "Interactive mode for Haskell.
@@ -108,22 +124,6 @@ Key bindings:
   '((t :inherit 'font-lock-string-face))
   "Face for the result."
   :group 'haskell)
-
-(defvar haskell-interactive-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "RET") 'haskell-interactive-mode-return)
-    (define-key map (kbd "C-j") 'haskell-interactive-mode-newline-indent)
-    (define-key map (kbd "C-a") 'haskell-interactive-mode-beginning)
-    (define-key map (kbd "<home>") 'haskell-interactive-mode-beginning)
-    (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
-    (define-key map (kbd "C-c C-c") 'haskell-process-interrupt)
-    (define-key map (kbd "M-p")
-      '(lambda () (interactive) (haskell-interactive-mode-history-toggle 1)))
-    (define-key map (kbd "M-n")
-      '(lambda () (interactive) (haskell-interactive-mode-history-toggle -1)))
-    (define-key map (kbd "TAB") 'haskell-interactive-mode-tab)
-    map)
-  "Interactive Haskell mode map.")
 
 (defun haskell-interactive-mode-newline-indent ()
   "Make newline and indent."
