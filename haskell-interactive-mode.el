@@ -64,6 +64,11 @@ interference with prompts that look like haskell expressions."
         "Your wish is my IO ().")
   "Greetings for when the Haskell process starts up.")
 
+;; Used internally
+(defvar haskell-interactive-mode)
+(defvar haskell-interactive-mode-history)
+(defvar haskell-interactive-mode-history-index)
+
 ;;;###autoload
 (defun haskell-interactive-mode (session)
   "Interactive mode for Haskell.
