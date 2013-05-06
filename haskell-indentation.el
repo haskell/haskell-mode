@@ -110,8 +110,8 @@
     (define-key keymap [?\C-d] 'haskell-indentation-delete-char)
     keymap))
 
-(defvar haskell-indent-last-position nil
-  "Used by `haskell-indentation-mode' internally.")
+;; Used internally
+(defvar haskell-indent-last-position)
 
 ;;;###autoload
 (define-minor-mode haskell-indentation-mode
