@@ -27,6 +27,10 @@
 
 ;;; Test data:
 
+;; Dynamically scoped variables.
+;; TODO What actually sets this?
+(defvar haskell-config-use-cabal-dev)
+
 (defun haskell-package-conf-path-get (&optional project)
   "Gets the user conf or the cabal-dev conf. Get the global conf elsewhere."
   (if haskell-config-use-cabal-dev
