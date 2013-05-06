@@ -65,8 +65,8 @@ prefixes in the current buffer."
   "Compiled and load the current buffer as tidy core"
   (interactive)
   (save-buffer)
-  (let ((core-buffer (generate-new-buffer "ghc-core"))
-        (neh (lambda () (kill-buffer core-buffer))))
+  (let* ((core-buffer (generate-new-buffer "ghc-core"))
+         (neh (lambda () (kill-buffer core-buffer))))
     (add-hook 'next-error-hook neh)
     (apply 'call-process "ghc" nil core-buffer nil "-c" "-ddump-simpl"
            (buffer-file-name) ghc-core-create-options)
