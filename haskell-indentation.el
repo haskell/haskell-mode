@@ -98,6 +98,9 @@
     (define-key keymap [?\C-d] 'haskell-indentation-delete-char)
     keymap))
 
+(defvar haskell-indent-last-position nil
+  "Used by `haskell-indentation-mode' internally.")
+
 ;;;###autoload
 (define-minor-mode haskell-indentation-mode
   "Haskell indentation mode that deals with the layout rule.
