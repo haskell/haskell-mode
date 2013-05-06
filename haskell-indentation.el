@@ -38,6 +38,18 @@
 (eval-when-compile (require 'cl)) ;needed for def of incf
 (require 'syntax nil t)			; Emacs 21 add-on
 
+;; Dynamically scoped variables.
+(defvar following-token)
+(defvar current-token)
+(defvar left-indent)
+(defvar starter-indent)
+(defvar current-indent)
+(defvar layout-indent)
+(defvar parse-line-number)
+(defvar possible-indentations)
+(defvar indentation-point)
+(defvar haskell-literate)
+
 (defgroup haskell-indentation nil
   "Haskell indentation."
   :group 'haskell
@@ -437,17 +449,6 @@ Preserves indentation and removes extra whitespace"
     (beginning-of-line)
     (when (bobp)
       (forward-comment (buffer-size)))))
-
-;; Dynamically scoped variables.
-(defvar following-token)
-(defvar current-token)
-(defvar left-indent)
-(defvar starter-indent)
-(defvar current-indent)
-(defvar layout-indent)
-(defvar parse-line-number)
-(defvar possible-indentations)
-(defvar indentation-point)
 
 (defun haskell-indentation-parse-to-indentations ()
   (save-excursion
