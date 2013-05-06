@@ -158,6 +158,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'dabbrev))
 
 ;; All functions/variables start with `(literate-)haskell-'.
 
