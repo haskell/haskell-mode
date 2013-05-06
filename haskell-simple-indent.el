@@ -68,6 +68,9 @@
 ;; All functions/variables start with
 ;; `(turn-(on/off)-)haskell-simple-indent'.
 
+;; Dynamically scoped variables.
+(defvar unindent-line-function)
+
 ;; Version.
 (defconst haskell-simple-indent-version "1.2"
   "`haskell-simple-indent' version number.")
