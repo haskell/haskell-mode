@@ -29,6 +29,9 @@
 (require 'haskell-cabal)
 (require 'haskell-string)
 
+;; Dynamically scoped variables.
+(defvar haskell-process-type)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Globals
 
