@@ -29,6 +29,9 @@
 (require 'haskell-cabal)
 (require 'haskell-string)
 
+;; Dynamically scoped variables.
+(defvar haskell-process-type)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Globals
 
@@ -88,6 +91,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Finding/clearing the session
+
+;; Used internally
+(defvar haskell-session)
 
 (defun haskell-session-maybe ()
   "Maybe get the Haskell session, return nil if there isn't one."

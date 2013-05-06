@@ -39,7 +39,9 @@
       (if (use-region-p)
           (haskell-sort-imports-sort-imports-at (region-beginning)
                                                 (region-end)
-                                                t)
+                                                t
+                                                current-line
+                                                col)
         (haskell-sort-imports-sort-imports-at
          (save-excursion (haskell-sort-imports-goto-modules-start/end
                           'previous-line)
@@ -47,9 +49,11 @@
          (save-excursion (haskell-sort-imports-goto-modules-start/end
                           'next-line)
                          (point))
-         nil)))))
+         nil
+         current-line
+         col)))))
 
-(defun haskell-sort-imports-sort-imports-at (begin end region)
+(defun haskell-sort-imports-sort-imports-at (begin end region current-line col)
   (save-excursion
     (sort-regexp-fields nil
                         haskell-sort-imports-regexp
