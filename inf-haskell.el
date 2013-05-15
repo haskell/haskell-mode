@@ -34,7 +34,11 @@
 (require 'shell)			;For directory tracking.
 (require 'compile)
 (require 'haskell-mode)
+(require 'haskell-decl-scan)
 (eval-when-compile (require 'cl))
+
+;; Dynamically scoped variables.
+(defvar find-tag-marker-ring)
 
 ;; XEmacs compatibility.
 
