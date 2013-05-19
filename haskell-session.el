@@ -119,15 +119,21 @@
 
 (defun haskell-session-from-buffer ()
   "Get the session based on the buffer."
-  (when (buffer-file-name)
-    (let ((sessions (remove-if-not (lambda (session)
-                                     (haskell-is-prefix-of (file-name-directory (buffer-file-name))
-                                                           (haskell-session-cabal-dir session)))
-                                   haskell-sessions)))
-      (sort sessions (lambda (a b) (< (length (haskell-session-cabal-dir a))
-                                      (length (haskell-session-cabal-dir b)))))
-      (when (consp sessions)
-        (car sessions)))))
+  (when (and (buffer-file-name)
+             (consp haskell-sessions))
+    (reduce (lambda (acc a)
+              (if (haskell-is-prefix-of (haskell-session-cabal-dir a)
+                                        (file-name-directory (buffer-file-name)))
+                  (if acc
+                      (if (and
+                           (> (length (haskell-session-cabal-dir a))
+                              (length (haskell-session-cabal-dir acc))))
+                          a
+                        acc)
+                    a)
+                acc))
+            haskell-sessions
+            :initial-value nil)))
 
 (defun haskell-session-new ()
   "Make a new session."
