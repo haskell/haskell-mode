@@ -225,7 +225,7 @@ Key bindings:
                (haskell-interactive-bring)
                (goto-char (point-min))
                (forward-line (1- (string-to-number line)))
-               (goto-char (+ (point) (string-to-number col)))
+               (goto-char (+ (point) (string-to-number col) -1))
                (haskell-mode-message-line orig-line)
                t))))))
 
