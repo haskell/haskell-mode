@@ -456,11 +456,11 @@ to be loaded by ghci."
   (cond ((string-match "\\-X\\([A-Z][A-Za-z]+\\)" msg)
          (when haskell-process-suggest-language-pragmas
            (haskell-process-suggest-pragma session "LANGUAGE" (match-string 1 msg) file)))
-        ((string-match "Warning: The import of[ ]`\\([^ ]+\\)' is redundant" msg)
+        ((string-match " The \\(qualified \\)?import of[ ]`\\([^ ]+\\)' is redundant" msg)
          (when haskell-process-suggest-remove-import-lines
            (haskell-process-suggest-remove-import session
                                                   file
-                                                  (match-string 1 msg)
+                                                  (match-string 2 msg)
                                                   line)))
         ((string-match "Warning: orphan instance: " msg)
          (when haskell-process-suggest-no-warn-orphans
