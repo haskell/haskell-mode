@@ -1,5 +1,7 @@
+VERSION = $(shell git describe --tags --dirty | sed 's/_/\./g')
 EMACS = emacs
-BATCH = $(EMACS) --batch -Q
+EFLAGS =
+BATCH = $(EMACS) $(EFLAGS) --batch -Q -L .
 
 ELFILES = \
 	haskell-c.el \
@@ -24,55 +26,54 @@ ELFILES = \
 	haskell-menu.el \
 	haskell-session.el \
 	haskell-string.el \
+	haskell-show.el \
 	ghc-core.el \
 	inf-haskell.el
 
 ELCFILES = $(ELFILES:.el=.elc)
 # AUTOLOADS = $(PACKAGE)-startup.el
 AUTOLOADS = haskell-site-file.el
+DIST_FILES = $(ELFILES) $(ELCFILES) $(AUTOLOADS) logo.svg Makefile README.md
+DIST_FILES_EX = examples/init.el examples/fontlock.hs examples/indent.hs
+TGZ = haskell-mode-$(VERSION).tar.gz
 
 %.elc: %.el
-	$(BATCH) --eval '(setq load-path (cons "." load-path))' \
-		-f batch-byte-compile $<
+	@$(BATCH) -f batch-byte-compile $<
 
 .PHONY: all compile info dist clean
 
-all: $(AUTOLOADS)
+all: compile $(AUTOLOADS)
 
 compile: $(ELCFILES)
 
 clean:
-	$(RM) $(ELCFILES)
+	$(RM) $(ELCFILES) $(AUTOLOADS) $(TGZ)
 
-info:
-	# No Texinfo file, sorry.
+info: # No Texinfo file, sorry.
 
-######################################################################
-###                    don't look below                            ###
-######################################################################
+dist: $(TGZ)
 
-PACKAGE=haskell-mode
-
-$(AUTOLOADS): $(ELFILES)
+$(AUTOLOADS): $(ELFILES) haskell-mode.elc
 	[ -f $@ ] || echo '' >$@
 	$(BATCH) --eval '(setq generated-autoload-file "'`pwd`'/$@")' -f batch-update-autoloads "."
 
-##
+# embed version number into .elc file
+haskell-mode.elc: haskell-mode.el
+	sed -e 's/\$$Name:  \$$/$(VERSION)/g' < haskell-mode.el > haskell-mode.tmp.el #NO_DIST
+	@$(BATCH) -f batch-byte-compile haskell-mode.tmp.el #NO_DIST
+	mv haskell-mode.tmp.elc haskell-mode.elc #NO_DIST
+	$(RM) haskell-mode.tmp.el #NO_DIST
 
-VERSION = $(shell darcs show tags | head -n 1)
-TAG = $(shell echo v$(VERSION) | sed 's/\./\\\./g')
-TMP = $(shell echo $(PACKAGE)-$(VERSION))
+$(TGZ): $(DIST_FILES)
+	rm -rf haskell-mode-$(VERSION)
+	mkdir haskell-mode-$(VERSION)
+	cp -p $(DIST_FILES) haskell-mode-$(VERSION)
+	mkdir haskell-mode-$(VERSION)/examples
+	cp -p $(DIST_FILES_EX) haskell-mode-$(VERSION)/examples
 
-dist:
-	darcs get --lazy . $(TMP) &&\
-	cd $(TMP) &&\
-	rm -r _darcs &&\
-	sed -i 's/\$$Name:  \$$/$(TAG)/g' * &&\
-	make $(AUTOLOADS) &&\
-	rm *~ &&\
-	darcs changes > ChangeLog &&\
-	rm Makefile &&\
-	cd .. &&\
-	tar czf $(PACKAGE)-$(VERSION).tar.gz $(PACKAGE)-$(VERSION) &&\
-	rm -rf $(PACKAGE)-$(VERSION) &&\
-	mv $(PACKAGE)-$(VERSION).tar.gz ../haskellmode-emacs-web/
+	printf "1s/=.*/= $(VERSION)/\nw\n" | ed -s haskell-mode-$(VERSION)/Makefile #NO_DIST
+	printf "g/NO_DIST/d\nw\n" | ed -s haskell-mode-$(VERSION)/Makefile #NO_DIST
+	printf ',s/\$$Name:  \$$/$(VERSION)/\nw\n' | ed -s haskell-mode-$(VERSION)/haskell-mode.el #NO_DIST
+
+	tar cvzf $(TGZ) haskell-mode-$(VERSION)
+	rm -rf haskell-mode-$(VERSION)
