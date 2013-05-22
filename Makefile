@@ -53,9 +53,16 @@ info: # No Texinfo file, sorry.
 
 dist: $(TGZ)
 
-$(AUTOLOADS): $(ELFILES)
+$(AUTOLOADS): $(ELFILES) haskell-mode.elc
 	[ -f $@ ] || echo '' >$@
 	$(BATCH) --eval '(setq generated-autoload-file "'`pwd`'/$@")' -f batch-update-autoloads "."
+
+# embed version number into .elc file
+haskell-mode.elc: haskell-mode.el
+	sed -e 's/\$$Name:  \$$/$(VERSION)/g' < haskell-mode.el > haskell-mode.tmp.el #NO_DIST
+	@$(BATCH) -f batch-byte-compile haskell-mode.tmp.el #NO_DIST
+	mv haskell-mode.tmp.elc haskell-mode.elc #NO_DIST
+	$(RM) haskell-mode.tmp.el #NO_DIST
 
 $(TGZ): $(DIST_FILES)
 	rm -rf haskell-mode-$(VERSION)
@@ -63,5 +70,10 @@ $(TGZ): $(DIST_FILES)
 	cp -p $(DIST_FILES) haskell-mode-$(VERSION)
 	mkdir haskell-mode-$(VERSION)/examples
 	cp -p $(DIST_FILES_EX) haskell-mode-$(VERSION)/examples
+
+	printf "1s/=.*/= $(VERSION)/\nw\n" | ed -s haskell-mode-$(VERSION)/Makefile #NO_DIST
+	printf "g/NO_DIST/d\nw\n" | ed -s haskell-mode-$(VERSION)/Makefile #NO_DIST
+	printf ',s/\$$Name:  \$$/$(VERSION)/\nw\n' | ed -s haskell-mode-$(VERSION)/haskell-mode.el #NO_DIST
+
 	tar cvzf $(TGZ) haskell-mode-$(VERSION)
 	rm -rf haskell-mode-$(VERSION)
