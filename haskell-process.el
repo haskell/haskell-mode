@@ -437,7 +437,7 @@ to be loaded by ghci."
            (file (match-string 1 buffer))
            (line (string-to-number (match-string 2 buffer)))
            (col (match-string 3 buffer))
-           (warning (string-match "^Warning: " error-msg))
+           (warning (string-match "^Warning:" error-msg))
            (final-msg (format "%s:%s:%s: %s"
                               (haskell-session-strip-dir session file)
                               line
