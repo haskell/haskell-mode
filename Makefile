@@ -24,6 +24,7 @@ ELFILES = \
 	haskell-menu.el \
 	haskell-session.el \
 	haskell-string.el \
+	haskell-show.el \
 	ghc-core.el \
 	inf-haskell.el
 
