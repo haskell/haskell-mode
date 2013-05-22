@@ -185,7 +185,8 @@ Key bindings:
                 (haskell-process-send-string (cadr state)
                                              (caddr state)))
           :live (lambda (state buffer)
-                  (unless (string= ":q" (caddr state))
+                  (unless (and (string-prefix-p ":q" (caddr state))
+                               (string-prefix-p (caddr state) ":quit"))
                     (let* ((cursor (cadddr state))
                            (next (replace-regexp-in-string
                                   haskell-process-prompt-regex
