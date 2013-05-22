@@ -64,8 +64,7 @@
 (defcustom haskell-process-type
   'ghci
   "The inferior Haskell process type to use."
-  :options '(ghci cabal-dev cabal-ghci)
-  :type 'symbol
+  :type '(choice (const ghci) (const cabal-dev) (const cabal-ghci))
   :group 'haskell)
 
 (defcustom haskell-notify-p
