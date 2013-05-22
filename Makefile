@@ -38,12 +38,12 @@ AUTOLOADS = haskell-site-file.el
 
 .PHONY: all compile info dist clean
 
-all: $(AUTOLOADS)
+all: compile $(AUTOLOADS)
 
 compile: $(ELCFILES)
 
 clean:
-	$(RM) $(ELCFILES)
+	$(RM) $(ELCFILES) $(AUTOLOADS)
 
 info:
 	# No Texinfo file, sorry.

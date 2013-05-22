@@ -1,1 +1,3 @@
 *.elc
+*~
+haskell-site-file.el
