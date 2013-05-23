@@ -87,23 +87,33 @@ $ apt-get install haskell-mode
 
 ### Manual
 
--   Download and unpack the basic mode and modules into a suitable directory,
-    e.g. ~/lib/emacs/haskell-mode/ where ~ stands for your home directory.
+ 
+-   Download and unpack (for instance by by `git clone`) the basic mode and modules
+    into a suitable directory, e.g. `~/lib/emacs/haskell-mode/` where `~` stands for
+    your home directory.
 
 -   If you are using Emacs 21, you need an additional library, "syntax", from
     a later version of Emacs.  The one you can get as
     http://cvs.savannah.gnu.org/viewcvs/*checkout*/emacs/emacs/lisp/emacs-lisp/syntax.el?rev=1.16
     definitely works.
 
--   Assuming you have placed the basic mode haskell-mode.el and the modules
-    you want to use in the directory ~/lib/emacs/haskell-mode/, add the
-    following command to your init file (~/.emacs):
+-   Assuming you have placed the basic mode (`haskell-mode.el`) and the other modules
+    you want to use in the directory ~/lib/emacs/haskell-mode/, you need generate the
+    autoloads file (`haskell-site-file.el`) by either
+
+    - Invoking `make all` or `make haskell-site-file.el`, or
+    
+    - From inside Emacs, `M-x update-directory-autoloads` and answering the question for
+      the folder with `~/lib/emacs/haskell-mode/` and the question for the output-file with
+      `~/lib/emacs/haskell-mode/haskell-site-file.el`
+    
+    and then adding the following command to your init file (`~/.emacs` or `~/.emacs.d/init.el`):
   
     ```lisp
     (load "~/lib/emacs/haskell-mode/haskell-site-file")
     ```
 
-    This only loads the bare-bones haskell-mode. To make it useful, you
+    However, this only loads the bare-bones haskell-mode. To make it useful, you
     need additional modules; you can use the haskell `customize-group`
     to edit the Haskell mode hook or, if you prefer manual setup, try
     adding the following lines according to which modules you want to use:
