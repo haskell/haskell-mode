@@ -124,8 +124,8 @@ has changed?"
 (defun haskell-process-clear ()
   "Clear the current process."
   (interactive)
-  (haskell-process-reset (haskell-process))
-  (haskell-process-set (haskell-process) 'command-queue nil))
+  (haskell-interactive-mode-clear)
+  (haskell-process-restart))
 
 ;;;###autoload
 (defun haskell-process-generate-tags (&optional and-then-find-this-tag)
@@ -515,8 +515,7 @@ to be loaded by ghci."
     (haskell-process-set-cmd process 'none)
     (haskell-process-set (haskell-session-process session) 'is-restarting nil)
     (let ((default-directory (haskell-session-cabal-dir session)))
-      (unless (haskell-session-get session 'current-dir)
-        (haskell-session-set-current-dir session (haskell-process-prompt-dir session)))
+      (haskell-session-pwd session)
       (haskell-process-set-process
        process
        (ecase haskell-process-type
@@ -561,7 +560,8 @@ to be loaded by ghci."
 (defun haskell-process-restart ()
   "Restart the inferior Haskell process."
   (interactive)
-  (haskell-process-clear)
+  (haskell-process-reset (haskell-process))
+  (haskell-process-set (haskell-process) 'command-queue nil)
   (haskell-process-start (haskell-session)))
 
 (defun haskell-process-make (name)
@@ -583,21 +583,35 @@ to be loaded by ghci."
   "Change directory."
   (interactive)
   (let* ((session (haskell-session))
-         (dir (haskell-process-prompt-dir session)))
+         (dir (haskell-session-pwd session t)))
     (haskell-process-log (format "Changing directory to %s ...\n" dir))
     (haskell-process-change-dir session
                                 (haskell-process)
                                 dir)))
 
-(defun haskell-process-prompt-dir (session)
+(defun haskell-session-pwd (session &optional change)
   "Prompt for the current directory."
-  (read-directory-name
-   "Set current directory: "
-   nil
-   (or (haskell-session-get session 'current-dir)
-       (if (buffer-file-name)
-           (file-name-directory (buffer-file-name))
-         "~/"))))
+  (or (unless change
+        (haskell-session-get session 'current-dir))
+      (progn (haskell-session-set-current-dir
+              session
+              (haskell-read-directory-name
+               (if change "Change directory: " "Set current directory: ")
+               (or (haskell-session-get session 'current-dir)
+                   (haskell-session-get session 'cabal-dir)
+                   (if (buffer-file-name)
+                       (file-name-directory (buffer-file-name))
+                     "~/"))))
+             (haskell-session-get session 'current-dir))))
+
+(defun haskell-read-directory-name (prompt default)
+  "Read in a directory name, properly normalized."
+  (let ((filename (file-truename
+                   (ido-read-directory-name
+                    prompt
+                    default
+                    default))))
+    filename))
 
 (defun haskell-process-change-dir (session process dir)
   "Change the directory of the current process."

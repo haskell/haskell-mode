@@ -129,7 +129,7 @@
   (set (make-local-variable 'comment-start-skip) "\\(^[ \t]*\\)--[ \t]*")
   (set (make-local-variable 'comment-end) "")
   (set (make-local-variable 'comment-end-skip) "[ 	]*\\(\\s>\\|\n\\)")
-)
+  )
 
 (defun haskell-cabal-get-setting (name)
   (save-excursion
@@ -160,13 +160,11 @@
    and indeed just prompting the user. Do them all."
   (let* ((file (haskell-cabal-find-file))
          (dir (when file (file-name-directory file))))
-    (file-truename
-     (read-directory-name
-      (format "Cabal dir%s: " (if file (format " (%s)" (file-relative-name file)) ""))
-      nil
-      (or dir default-directory)))))
+    (haskell-read-directory-name
+     (format "Cabal dir%s: " (if file (format " (guessed from %s)" (file-relative-name file)) ""))
+     dir)))
 
-(defun haskell-cabal-compute-checksum (cabal-dir) 
+(defun haskell-cabal-compute-checksum (cabal-dir)
   "Computes a checksum of the .cabal configuration files."
   (let* ((cabal-file-paths (directory-files cabal-dir t "\\.cabal$"))
          (get-file-contents (lambda (path)
