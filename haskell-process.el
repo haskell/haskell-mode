@@ -121,12 +121,6 @@ has changed?"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Specialised commands
 
-(defun haskell-process-clear ()
-  "Clear the current process."
-  (interactive)
-  (haskell-interactive-mode-clear)
-  (haskell-process-restart))
-
 ;;;###autoload
 (defun haskell-process-generate-tags (&optional and-then-find-this-tag)
   "Regenerate the TAGS table."
@@ -556,6 +550,12 @@ to be loaded by ghci."
                                                       'command-queue)
                                  old-queue))
     process))
+
+(defun haskell-process-clear ()
+  "Clear the current process."
+  (interactive)
+  (haskell-process-reset (haskell-process))
+  (haskell-process-set (haskell-process) 'command-queue nil))
 
 (defun haskell-process-restart ()
   "Restart the inferior Haskell process."
