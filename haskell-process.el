@@ -57,7 +57,7 @@
 
 (defcustom haskell-process-args-ghci
   '()
-  "Any arguments for starting cabal-ghci."
+  "Any arguments for starting ghci."
   :group 'haskell
   :type '(choice list))
 
