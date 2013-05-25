@@ -564,6 +564,16 @@ to be loaded by ghci."
   (haskell-process-set (haskell-process) 'command-queue nil)
   (haskell-process-start (haskell-session)))
 
+(defun haskell-kill-session-process (&optional session)
+  "Kill the process."
+  (interactive)
+  (let* ((session (or session (haskell-session)))
+         (existing-process (get-process (haskell-session-name session))))
+    (when (processp existing-process)
+      (haskell-interactive-mode-echo session "Killing process ...")
+      (haskell-process-set (haskell-session-process session) 'is-restarting t)
+      (delete-process existing-process))))
+
 (defun haskell-process-make (name)
   "Make an inferior Haskell process."
   (list (cons 'name name)
@@ -750,14 +760,16 @@ to be loaded by ghci."
 
 (defun haskell-process-trigger-queue (process)
   "Trigger the next command in the queue to be ran if there is no current command."
-  (if (haskell-process-process process)
+  (if (and (haskell-process-process process)
+           (process-live-p (haskell-process-process process)))
       (when (equal (haskell-process-cmd process) 'none)
         (let ((cmd (haskell-process-cmd-queue-pop process)))
           (when cmd
             (haskell-process-set-cmd process cmd)
             (haskell-command-exec-go cmd))))
-    (progn (haskell-process-log "Process died or never started. Starting...\n")
-           (haskell-process-start (haskell-process-session process)))))
+    (progn (haskell-process-reset process)
+           (haskell-process-set (haskell-process) 'command-queue nil)
+           (haskell-process-prompt-restart process))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessing the process
