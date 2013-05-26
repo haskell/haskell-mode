@@ -617,11 +617,12 @@ to be loaded by ghci."
 (defun haskell-read-directory-name (prompt default)
   "Read in a directory name, properly normalized."
   (let ((filename (file-truename
-                   (ido-read-directory-name
+                   (read-directory-name
                     prompt
                     default
                     default))))
-    filename))
+    (concat (replace-regexp-in-string "/$" "" filename)
+            "/")))
 
 (defun haskell-process-change-dir (session process dir)
   "Change the directory of the current process."
