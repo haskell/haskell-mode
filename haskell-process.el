@@ -662,7 +662,7 @@ to be loaded by ghci."
                  (haskell-process-session process)
                  (concat (nth (random (length haskell-interactive-greetings))
                               haskell-interactive-greetings)
-                         " (if I break, run M-x haskell-process-clear)"))))))
+                         " (if I break, run M-x haskell-process-restart)"))))))
 
 (defun haskell-process-sentinel (proc event)
   "The sentinel for the process pipe."

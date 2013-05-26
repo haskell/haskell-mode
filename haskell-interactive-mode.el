@@ -473,6 +473,17 @@ Key bindings:
   (with-current-buffer (haskell-session-interactive-buffer session)
     (goto-char (point-max))))
 
+(defun haskell-interactive-kill ()
+  "Kill the buffer and (maybe) the session."
+  (interactive)
+  (when (eq major-mode 'haskell-interactive-mode)
+    (when (and (boundp 'haskell-session)
+               haskell-session
+               (y-or-n-p "Kill the whole session?"))
+      (haskell-session-kill t))))
+
+(add-hook 'kill-buffer-hook 'haskell-interactive-kill)
+
 (provide 'haskell-interactive-mode)
 
 ;;; haskell-interactive-mode.el ends here

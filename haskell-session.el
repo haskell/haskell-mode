@@ -89,6 +89,33 @@
                    "egrep '^module [^ (\r]+' * -r -I --include='*hs' -o -h | sed 's/^module //'"))))
     (split-string modules "\n")))
 
+(defun haskell-session-kill (&optional leave-interactive-buffer)
+  "Kill the session process and buffer, delete the session.
+0. Prompt to kill all associated buffers.
+1. Kill the process.
+2. Kill the interactive buffer.
+3. Walk through all the related buffers and set their haskell-session to nil.
+4. Remove the session from the sessions list."
+  (interactive)
+  (let* ((session (haskell-session))
+         (name (haskell-session-name session))
+         (also-kill-buffers (y-or-n-p (format "Killing `%s'. Also kill all associated buffers?" name))))
+    (haskell-kill-session-process session)
+    (unless leave-interactive-buffer
+      (kill-buffer (haskell-session-interactive-buffer session)))
+    (loop for buffer in (buffer-list)
+          do (with-current-buffer buffer
+               (when (and (boundp 'haskell-session)
+                          (string= (haskell-session-name haskell-session) name))
+                 (setq haskell-session nil)
+                 (when also-kill-buffers
+                   (kill-buffer)))))
+    (setq haskell-sessions
+          (remove-if (lambda (session)
+                       (string= (haskell-session-name session)
+                                name))
+                     haskell-sessions))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Finding/clearing the session
 
