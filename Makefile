@@ -33,7 +33,7 @@ ELFILES = \
 ELCFILES = $(ELFILES:.el=.elc)
 # AUTOLOADS = $(PACKAGE)-startup.el
 AUTOLOADS = haskell-site-file.el
-DIST_FILES = $(ELFILES) $(ELCFILES) $(AUTOLOADS) logo.svg Makefile README.md
+DIST_FILES = $(ELFILES) $(ELCFILES) $(AUTOLOADS) logo.svg Makefile README.md NEWS
 DIST_FILES_EX = examples/init.el examples/fontlock.hs examples/indent.hs
 TGZ = haskell-mode-$(VERSION).tar.gz
 
