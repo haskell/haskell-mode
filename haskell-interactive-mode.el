@@ -80,10 +80,10 @@ interference with prompts that look like haskell expressions."
     (define-key map (kbd "<home>") 'haskell-interactive-mode-beginning)
     (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
     (define-key map (kbd "C-c C-c") 'haskell-process-interrupt)
-    (define-key map (kbd "M-p")
-      '(lambda () (interactive) (haskell-interactive-mode-history-toggle 1)))
-    (define-key map (kbd "M-n")
-      '(lambda () (interactive) (haskell-interactive-mode-history-toggle -1)))
+    (define-key map (kbd "M-p") 'haskell-interactive-mode-history-previous)
+    (define-key map (kbd "M-n") 'haskell-interactive-mode-history-next)
+    (define-key map (kbd "C-<up>") 'haskell-interactive-mode-history-previous)
+    (define-key map (kbd "C-<down>") 'haskell-interactive-mode-history-next)
     (define-key map (kbd "TAB") 'haskell-interactive-mode-tab)
     map)
   "Interactive Haskell mode map.")
@@ -387,9 +387,29 @@ Key bindings:
     (setq haskell-interactive-mode-history-index
           (mod (+ haskell-interactive-mode-history-index n)
                (length haskell-interactive-mode-history)))
+    (unless (zerop haskell-interactive-mode-history-index)
+      (message "History item: %d" haskell-interactive-mode-history-index))
     (haskell-interactive-mode-set-prompt
      (nth haskell-interactive-mode-history-index
           haskell-interactive-mode-history))))
+
+(defun haskell-interactive-mode-history-previous (arg)
+    "Cycle backwards through input history."
+    (interactive "*p")
+    (when (haskell-interactive-at-prompt)
+      (if (not (zerop arg))
+          (haskell-interactive-mode-history-toggle arg)
+        (setq haskell-interactive-mode-history-index 0)
+        (haskell-interactive-mode-history-toggle 1))))
+
+(defun haskell-interactive-mode-history-next (arg)
+    "Cycle forward through input history."
+    (interactive "*p")
+    (when (haskell-interactive-at-prompt)
+      (if (not (zerop arg))
+          (haskell-interactive-mode-history-toggle (- arg))
+        (setq haskell-interactive-mode-history-index 0)
+        (haskell-interactive-mode-history-toggle -1))))
 
 (defun haskell-interactive-mode-set-prompt (p)
   "Set (and overwrite) the current prompt."
