@@ -10,7 +10,7 @@
 ;;          2003      Dave Love <fx@gnu.org>
 ;; Keywords: faces files Haskell
 ;; Version: $Name:  $
-;; URL: http://www.haskell.org/haskell-mode/
+;; URL: https://github.com/haskell/haskell-mode
 
 ;; This file is not part of GNU Emacs.
 
@@ -62,8 +62,6 @@
 ;; This mode supports full Haskell 1.4 including literate scripts.
 ;; In some versions of (X)Emacs it may only support Latin-1, not Unicode.
 ;;
-;; History:
-;;
 ;; This mode is based on an editing mode by Simon Marlow 11/1/92
 ;; and heavily modified by Graeme E Moss and Tommy Thorn 7/11/98.
 ;;
@@ -74,8 +72,10 @@
 ;; thorn@irisa.fr quoting the version of the mode you are using, the
 ;; version of Emacs you are using, and a small example of the problem
 ;; or suggestion.
-;;
-;; Version 1.5
+
+;;; Change Log:
+
+;; Version 1.5:
 ;;   Added autoload for haskell-indentation
 ;;
 ;; Version 1.43:
@@ -142,15 +142,6 @@
 ;; Version 0.100:
 ;;
 ;;   First official release.
-
-;; Present Limitations/Future Work (contributions are most welcome!):
-;;
-;; . Would like RET in Bird-style literate mode to add a ">" at the
-;;   start of a line when previous line starts with ">".  Or would
-;;   "> " be better?
-;;
-;; . Support for GreenCard?
-;;
 
 ;;; Code:
 
@@ -890,5 +881,4 @@ This function will be called with no arguments.")
 
 (provide 'haskell-mode)
 
-;; arch-tag: b2237ec0-ddb0-4c86-9339-52d410264980
 ;;; haskell-mode.el ends here
