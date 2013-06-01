@@ -1,4 +1,6 @@
-VERSION = $(shell git describe --tags --dirty | sed 's/_/\./g')
+VERSION = $(shell git describe --tags --abbrev=0 | sed 's/_/\./g')
+GIT_VERSION = $(shell git describe --tags --dirty | sed 's/_/\./g')
+
 EMACS = emacs
 EFLAGS =
 BATCH = $(EMACS) $(EFLAGS) --batch -Q -L .
@@ -35,7 +37,7 @@ ELCFILES = $(ELFILES:.el=.elc)
 AUTOLOADS = haskell-site-file.el
 DIST_FILES = $(ELFILES) $(ELCFILES) $(AUTOLOADS) logo.svg Makefile README.md NEWS
 DIST_FILES_EX = examples/init.el examples/fontlock.hs examples/indent.hs
-TGZ = haskell-mode-$(VERSION).tar.gz
+TGZ = haskell-mode-$(GIT_VERSION).tar.gz
 
 %.elc: %.el
 	@$(BATCH) -f batch-byte-compile $<
@@ -59,21 +61,22 @@ $(AUTOLOADS): $(ELFILES) haskell-mode.elc
 
 # embed version number into .elc file
 haskell-mode.elc: haskell-mode.el
-	sed -e 's/\$$Name:  \$$/$(VERSION)/g' < haskell-mode.el > haskell-mode.tmp.el #NO_DIST
+	sed -e 's/@GIT_VERSION@/$(GIT_VERSION)/g;s/@VERSION@/$(VERSION)/g' < haskell-mode.el > haskell-mode.tmp.el #NO_DIST
 	@$(BATCH) -f batch-byte-compile haskell-mode.tmp.el #NO_DIST
 	mv haskell-mode.tmp.elc haskell-mode.elc #NO_DIST
 	$(RM) haskell-mode.tmp.el #NO_DIST
 
 $(TGZ): $(DIST_FILES)
-	rm -rf haskell-mode-$(VERSION)
-	mkdir haskell-mode-$(VERSION)
-	cp -p $(DIST_FILES) haskell-mode-$(VERSION)
-	mkdir haskell-mode-$(VERSION)/examples
-	cp -p $(DIST_FILES_EX) haskell-mode-$(VERSION)/examples
+	rm -rf haskell-mode-$(GIT_VERSION)
+	mkdir haskell-mode-$(GIT_VERSION)
+	cp -p $(DIST_FILES) haskell-mode-$(GIT_VERSION)
+	mkdir haskell-mode-$(GIT_VERSION)/examples
+	cp -p $(DIST_FILES_EX) haskell-mode-$(GIT_VERSION)/examples
 
-	printf "1s/=.*/= $(VERSION)/\nw\n" | ed -s haskell-mode-$(VERSION)/Makefile #NO_DIST
-	printf "g/NO_DIST/d\nw\n" | ed -s haskell-mode-$(VERSION)/Makefile #NO_DIST
-	printf ',s/\$$Name:  \$$/$(VERSION)/\nw\n' | ed -s haskell-mode-$(VERSION)/haskell-mode.el #NO_DIST
+	printf "1s/=.*/= $(VERSION)/\nw\n" | ed -s haskell-mode-$(GIT_VERSION)/Makefile #NO_DIST
+	printf "2s/=.*/= $(GIT_VERSION)/\nw\n" | ed -s haskell-mode-$(GIT_VERSION)/Makefile #NO_DIST
+	printf "g/NO_DIST/d\nw\n" | ed -s haskell-mode-$(GIT_VERSION)/Makefile #NO_DIST
+	printf ',s/@VERSION@/$(VERSION)/\nw\n' | ed -s haskell-mode-$(GIT_VERSION)/haskell-mode.el #NO_DIST
 
-	tar cvzf $(TGZ) haskell-mode-$(VERSION)
-	rm -rf haskell-mode-$(VERSION)
+	tar cvzf $(TGZ) haskell-mode-$(GIT_VERSION)
+	rm -rf haskell-mode-$(GIT_VERSION)

@@ -9,7 +9,6 @@
 ;;          2001-2002 Reuben Thomas (>=v1.4)
 ;;          2003      Dave Love <fx@gnu.org>
 ;; Keywords: faces files Haskell
-;; Version: $Name:  $
 ;; URL: https://github.com/haskell/haskell-mode
 
 ;; This file is not part of GNU Emacs.
@@ -151,12 +150,28 @@
 ;; All functions/variables start with `(literate-)haskell-'.
 
 ;; Version of mode.
-(defconst haskell-version "$Name:  $"
-  "`haskell-mode' version number.")
-(defun haskell-version ()
-  "Echo the current version of `haskell-mode' in the minibuffer."
-  (interactive)
-  (message "Using haskell-mode version %s" haskell-version))
+(defconst haskell-version "@VERSION@"
+  "The release version of `haskell-mode'.")
+
+(defconst haskell-git-version "@GIT_VERSION@"
+  "The Git version of org-mode `haskell-mode'.")
+
+;;;###autoload
+(defun haskell-version (&optional here)
+  "Show the `haskell-mode` version in the echo area.
+With prefix argument HERE, insert it at point.
+When FULL is non-nil, use a verbose version string.
+When MESSAGE is non-nil, display a message with the version."
+  (interactive "P")
+  (let* ((haskell-mode-dir (ignore-errors
+                             (file-name-directory (or (locate-library "haskell-mode") ""))))
+         (_version (format "haskell-mode version %s (%s @ %s)"
+                            haskell-version
+                            haskell-git-version
+                            haskell-mode-dir)))
+    (if here
+        (insert _version)
+      (message "%s" _version))))
 
 (defgroup haskell nil
   "Major mode for editing Haskell programs."
