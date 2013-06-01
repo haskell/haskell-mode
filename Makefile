@@ -1,5 +1,5 @@
-VERSION = $(shell git describe --tags --abbrev=0 | sed 's/_/\./g')
-GIT_VERSION = $(shell git describe --tags --dirty | sed 's/_/\./g')
+VERSION = $(shell git describe --tags --match 'v[0-9]*' --abbrev=0 | sed 's/_/\./g;s/^v//')
+GIT_VERSION = $(shell git describe --tags --match 'v[0-9]*' --dirty | sed 's/_/\./g;s/^v//')
 
 EMACS = emacs
 EFLAGS =
@@ -60,10 +60,9 @@ dist: $(DIST_TGZ)
 
 # Generate ELPA-compatible package
 package: $(PKG_TAR)
+elpa: $(PKG_TAR)
 
 $(PKG_TAR): $(PKG_DIST_FILES) haskell-mode-pkg.el.in
-	@echo "VERSION     = $(VERSION)"
-	@echo "GIT_VERSION = $(GIT_VERSION)"
 	rm -rf haskell-mode-$(VERSION)
 	mkdir haskell-mode-$(VERSION)
 	cp $(PKG_DIST_FILES) haskell-mode-$(VERSION)/
@@ -71,6 +70,8 @@ $(PKG_TAR): $(PKG_DIST_FILES) haskell-mode-pkg.el.in
 	sed -e 's/@GIT_VERSION@/$(GIT_VERSION)/g;s/@VERSION@/$(VERSION)/g' < haskell-mode.el > haskell-mode-$(VERSION)/haskell-mode.el #NO_DIST
 	tar cvf $@ haskell-mode-$(VERSION)
 	rm -rf haskell-mode-$(VERSION)
+	@echo
+	@echo "Created ELPA compatible distribution package '$@' from $(GIT_VERSION)"
 
 $(AUTOLOADS): $(ELFILES) haskell-mode.elc
 	[ -f $@ ] || echo '' >$@
