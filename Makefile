@@ -33,11 +33,13 @@ ELFILES = \
 	inf-haskell.el
 
 ELCFILES = $(ELFILES:.el=.elc)
-# AUTOLOADS = $(PACKAGE)-startup.el
 AUTOLOADS = haskell-site-file.el
-DIST_FILES = $(ELFILES) $(ELCFILES) $(AUTOLOADS) logo.svg Makefile README.md NEWS
+DIST_FILES = $(ELFILES) $(ELCFILES) $(AUTOLOADS) haskell-mode-pkg.el.in logo.svg Makefile README.md NEWS
 DIST_FILES_EX = examples/init.el examples/fontlock.hs examples/indent.hs
-TGZ = haskell-mode-$(GIT_VERSION).tar.gz
+DIST_TGZ = haskell-mode-$(GIT_VERSION).tar.gz
+
+PKG_DIST_FILES = $(ELFILES) logo.svg
+PKG_TAR = haskell-mode-$(VERSION).tar
 
 %.elc: %.el
 	@$(BATCH) -f batch-byte-compile $<
@@ -53,7 +55,22 @@ clean:
 
 info: # No Texinfo file, sorry.
 
-dist: $(TGZ)
+# Generate snapshot distribution
+dist: $(DIST_TGZ)
+
+# Generate ELPA-compatible package
+package: $(PKG_TAR)
+
+$(PKG_TAR): $(PKG_DIST_FILES) haskell-mode-pkg.el.in
+	@echo "VERSION     = $(VERSION)"
+	@echo "GIT_VERSION = $(GIT_VERSION)"
+	rm -rf haskell-mode-$(VERSION)
+	mkdir haskell-mode-$(VERSION)
+	cp $(PKG_DIST_FILES) haskell-mode-$(VERSION)/
+	sed -e 's/@VERSION@/$(VERSION)/g' < haskell-mode-pkg.el.in > haskell-mode-$(VERSION)/haskell-mode-pkg.el
+	sed -e 's/@GIT_VERSION@/$(GIT_VERSION)/g;s/@VERSION@/$(VERSION)/g' < haskell-mode.el > haskell-mode-$(VERSION)/haskell-mode.el #NO_DIST
+	tar cvf $@ haskell-mode-$(VERSION)
+	rm -rf haskell-mode-$(VERSION)
 
 $(AUTOLOADS): $(ELFILES) haskell-mode.elc
 	[ -f $@ ] || echo '' >$@
@@ -66,7 +83,7 @@ haskell-mode.elc: haskell-mode.el
 	mv haskell-mode.tmp.elc haskell-mode.elc #NO_DIST
 	$(RM) haskell-mode.tmp.el #NO_DIST
 
-$(TGZ): $(DIST_FILES)
+$(DIST_TGZ): $(DIST_FILES)
 	rm -rf haskell-mode-$(GIT_VERSION)
 	mkdir haskell-mode-$(GIT_VERSION)
 	cp -p $(DIST_FILES) haskell-mode-$(GIT_VERSION)
@@ -78,5 +95,5 @@ $(TGZ): $(DIST_FILES)
 	printf "g/NO_DIST/d\nw\n" | ed -s haskell-mode-$(GIT_VERSION)/Makefile #NO_DIST
 	printf ',s/@VERSION@/$(VERSION)/\nw\n' | ed -s haskell-mode-$(GIT_VERSION)/haskell-mode.el #NO_DIST
 
-	tar cvzf $(TGZ) haskell-mode-$(GIT_VERSION)
+	tar cvzf $@ haskell-mode-$(GIT_VERSION)
 	rm -rf haskell-mode-$(GIT_VERSION)
