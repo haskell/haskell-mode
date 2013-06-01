@@ -51,7 +51,7 @@ all: compile $(AUTOLOADS)
 compile: $(ELCFILES)
 
 clean:
-	$(RM) $(ELCFILES) $(AUTOLOADS) $(TGZ)
+	$(RM) $(ELCFILES) $(AUTOLOADS) $(DIST_TGZ) $(PKG_TAR)
 
 info: # No Texinfo file, sorry.
 
