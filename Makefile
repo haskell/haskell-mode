@@ -29,6 +29,7 @@ ELFILES = \
 	haskell-session.el \
 	haskell-string.el \
 	haskell-show.el \
+	haskell-unicode-input-method.el \
 	ghc-core.el \
 	inf-haskell.el
 
