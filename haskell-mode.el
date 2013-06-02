@@ -1,4 +1,4 @@
-;;; haskell-mode.el --- A Haskell editing mode    -*-coding: iso-8859-1;-*-
+;;; haskell-mode.el --- A Haskell editing mode    -*- coding: utf-8 -*-
 
 ;; Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008  Free Software Foundation, Inc
 ;; Copyright (C) 1992, 1997-1998 Simon Marlow, Graeme E Moss, and Tommy Thorn
@@ -79,7 +79,7 @@
 ;;
 ;; Version 1.43:
 ;;   Various tweaks to doc strings and customization support from
-;;   Ville Skyttä <scop@xemacs.org>.
+;;   Ville SkyttÃ¤ <scop@xemacs.org>.
 ;;
 ;; Version 1.42:
 ;;   Added autoload for GHCi inferior mode (thanks to Scott
@@ -340,14 +340,14 @@ be set to the preferred literate style."
       ;; Non-ASCII syntax should be OK, at least in Emacs.
       (mapc (lambda (x)
               (modify-syntax-entry x "_" table))
-            (concat "¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿"
-                    "×÷"))
+            (concat "Â¡Â¢Â£Â¤Â¥Â¦Â§Â¨Â©ÂªÂ«Â¬Â­Â®Â¯Â°Â±Â²Â³Â´ÂµÂ¶Â·Â¸Â¹ÂºÂ»Â¼Â½Â¾Â¿"
+                    "Ã—Ã·"))
       (mapc (lambda (x)
               (modify-syntax-entry x "w" table))
-            (concat "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ"
-                    "ØÙÚÛÜİŞß"
-                    "àáâãäåæçèéêëìíîïğñòóôõö"
-                    "øùúûüışÿ")))
+            (concat "Ã€ÃÃ‚ÃƒÃ„Ã…Ã†Ã‡ÃˆÃ‰ÃŠÃ‹ÃŒÃÃÃÃÃ‘Ã’Ã“Ã”Ã•Ã–"
+                    "Ã˜Ã™ÃšÃ›ÃœÃÃÃŸ"
+                    "Ã Ã¡Ã¢Ã£Ã¤Ã¥Ã¦Ã§Ã¨Ã©ÃªÃ«Ã¬Ã­Ã®Ã¯Ã°Ã±Ã²Ã³Ã´ÃµÃ¶"
+                    "Ã¸Ã¹ÃºÃ»Ã¼Ã½Ã¾Ã¿")))
     table)
   "Syntax table used in Haskell mode.")
 

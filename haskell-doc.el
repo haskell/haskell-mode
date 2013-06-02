@@ -1,4 +1,4 @@
-;;; haskell-doc.el --- show function types in echo area  -*- coding: iso-8859-1 -*-
+;;; haskell-doc.el --- show function types in echo area  -*- coding: utf-8 -*-
 
 ;; Copyright (C) 2004, 2005, 2006, 2007, 2009  Free Software Foundation, Inc.
 ;; Copyright (C) 1997 Hans-Wolfgang Loidl
@@ -267,7 +267,7 @@
 ;;  (haskell-doc-install-keymap): Simplify.
 ;;
 ;;  Revision 1.5  2003/01/09 11:56:26  simonmar
-;;  Patches from Ville Skytt‰ <scop@xemacs.org>, the XEmacs maintainer of
+;;  Patches from Ville Skytt√§ <scop@xemacs.org>, the XEmacs maintainer of
 ;;  the haskell-mode:
 ;;
 ;;   - Make the auto-mode-alist modifications autoload-only.
@@ -285,7 +285,7 @@
 ;;
 ;;  Revision 1.2  2002/04/23 14:45:10  simonmar
 ;;  Tweaks to the doc strings and support for customization, from
-;;  Ville Skytt‰ <scop@xemacs.org>.
+;;  Ville Skytt√§ <scop@xemacs.org>.
 ;;
 ;;  Revision 1.1  2001/07/19 16:17:36  rrt
 ;;  Add the current version of the Moss/Thorn/Marlow Emacs mode, along with its
