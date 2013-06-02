@@ -1,5 +1,5 @@
-VERSION = $(shell git describe --tags --match 'v[0-9]*' --abbrev=0 | sed 's/^v//;s/\.0*/./g')
-GIT_VERSION = $(shell git describe --tags --match 'v[0-9]*' --long --dirty | sed 's/^v//')
+VERSION = $(shell git describe --tags --match 'v[0-9]*' --abbrev=0 | LC_ALL=C sed 's/^v//;s/\.0*/./g')
+GIT_VERSION = $(shell git describe --tags --match 'v[0-9]*' --long --dirty | LC_ALL=C sed 's/^v//')
 
 EMACS = emacs
 EFLAGS =
@@ -66,8 +66,8 @@ $(PKG_TAR): $(PKG_DIST_FILES) haskell-mode-pkg.el.in
 	rm -rf haskell-mode-$(VERSION)
 	mkdir haskell-mode-$(VERSION)
 	cp $(PKG_DIST_FILES) haskell-mode-$(VERSION)/
-	sed -e 's/@VERSION@/$(VERSION)/g' < haskell-mode-pkg.el.in > haskell-mode-$(VERSION)/haskell-mode-pkg.el
-	sed -e 's/@GIT_VERSION@/$(GIT_VERSION)/g;s/@VERSION@/$(VERSION)/g' < haskell-mode.el > haskell-mode-$(VERSION)/haskell-mode.el #NO_DIST
+	LC_ALL=C sed -e 's/@VERSION@/$(VERSION)/g' < haskell-mode-pkg.el.in > haskell-mode-$(VERSION)/haskell-mode-pkg.el
+	LC_ALL=C sed -e 's/@GIT_VERSION@/$(GIT_VERSION)/g;s/@VERSION@/$(VERSION)/g' < haskell-mode.el > haskell-mode-$(VERSION)/haskell-mode.el #NO_DIST
 	tar cvf $@ haskell-mode-$(VERSION)
 	rm -rf haskell-mode-$(VERSION)
 	@echo
@@ -79,7 +79,7 @@ $(AUTOLOADS): $(ELFILES) haskell-mode.elc
 
 # embed version number into .elc file
 haskell-mode.elc: haskell-mode.el
-	sed -e 's/@GIT_VERSION@/$(GIT_VERSION)/g;s/@VERSION@/$(VERSION)/g' < haskell-mode.el > haskell-mode.tmp.el #NO_DIST
+	LC_ALL=C sed -e 's/@GIT_VERSION@/$(GIT_VERSION)/g;s/@VERSION@/$(VERSION)/g' < haskell-mode.el > haskell-mode.tmp.el #NO_DIST
 	@$(BATCH) -f batch-byte-compile haskell-mode.tmp.el #NO_DIST
 	mv haskell-mode.tmp.elc haskell-mode.elc #NO_DIST
 	$(RM) haskell-mode.tmp.el #NO_DIST
