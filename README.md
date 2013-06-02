@@ -156,6 +156,23 @@ way:
     `(global-set-key [(control meta down-mouse-3)] 'imenu)` or you can also add
     it to the menubar with `(add-hook 'haskell-mode-hook 'imenu-add-menubar-index)`
 
+### Interactive block indentation (`haskell-move-nested.el`)
+
+By inserting the key bindings for `C-,` and `C-.` (these bindings are
+convenient on keyboard layouts where `,` and `.` are adjacent keys) as
+shown below you can interactively de/indent either the following
+nested block or, if a region is active while in transient-mark-mode,
+de/indent the active region.
+
+By using a numeric
+[prefix argument](http://www.gnu.org/software/emacs/manual/html_node/elisp/Prefix-Command-Arguments.html),
+you can modify the shift-amount e.g. `C-u C-,` increases indentation
+by 4 characters at once.
+
+```el
+(define-key haskell-mode-map (kbd "C-,") 'haskell-move-nested-left)
+(define-key haskell-mode-map (kbd "C-.") 'haskell-move-nested-right)
+```
 
 ### Setup for inferior haskell mode
 
