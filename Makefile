@@ -51,7 +51,7 @@ all: compile $(AUTOLOADS)
 compile: $(ELCFILES)
 
 clean:
-	$(RM) $(ELCFILES) $(AUTOLOADS) $(DIST_TGZ) $(PKG_TAR)
+	$(RM) $(ELCFILES) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) $(DIST_TGZ) $(PKG_TAR)
 
 info: # No Texinfo file, sorry.
 
@@ -76,6 +76,7 @@ $(PKG_TAR): $(PKG_DIST_FILES) haskell-mode-pkg.el.in
 $(AUTOLOADS): $(ELFILES) haskell-mode.elc
 	[ -f $@ ] || echo '' >$@
 	$(BATCH) --eval '(setq generated-autoload-file "'`pwd`'/$@")' -f batch-update-autoloads "."
+	$(RM) $(AUTOLOADS)~
 
 # embed version number into .elc file
 haskell-mode.elc: haskell-mode.el
