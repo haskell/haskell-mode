@@ -1,5 +1,5 @@
-VERSION = $(shell git describe --tags --match 'v[0-9]*' --abbrev=0 | sed 's/_/\./g;s/^v//')
-GIT_VERSION = $(shell git describe --tags --match 'v[0-9]*' --dirty | sed 's/_/\./g;s/^v//')
+VERSION = $(shell git describe --tags --match 'v[0-9]*' --abbrev=0 | sed 's/^v//;s/\.0*/./g')
+GIT_VERSION = $(shell git describe --tags --match 'v[0-9]*' --long --dirty | sed 's/^v//')
 
 EMACS = emacs
 EFLAGS =
