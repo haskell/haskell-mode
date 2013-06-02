@@ -108,8 +108,8 @@ $(DIST_TGZ): $(DIST_FILES)
 	mkdir haskell-mode-$(GIT_VERSION)/examples
 	cp -p $(DIST_FILES_EX) haskell-mode-$(GIT_VERSION)/examples
 
-	printf "1s/=.*/= $(VERSION)/\nw\n" | ed -s haskell-mode-$(GIT_VERSION)/Makefile #NO_DIST
-	printf "2s/=.*/= $(GIT_VERSION)/\nw\n" | ed -s haskell-mode-$(GIT_VERSION)/Makefile #NO_DIST
+	printf "18s/=.*/= $(VERSION)/\nw\n" | ed -s haskell-mode-$(GIT_VERSION)/Makefile #NO_DIST
+	printf "19s/=.*/= $(GIT_VERSION)/\nw\n" | ed -s haskell-mode-$(GIT_VERSION)/Makefile #NO_DIST
 	printf "g/NO_DIST/d\nw\n" | ed -s haskell-mode-$(GIT_VERSION)/Makefile #NO_DIST
 	printf ',s/@VERSION@/$(VERSION)/\nw\n' | ed -s haskell-mode-$(GIT_VERSION)/haskell-mode.el #NO_DIST
 
