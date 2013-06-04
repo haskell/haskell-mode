@@ -288,7 +288,9 @@ error line otherwise show the Hugs buffer."
                  (file-name-nondirectory efile) emesg)
         (if (file-exists-p efile)
             (progn (find-file-other-window efile)
-                   (if eline (goto-line eline))
+                   (when eline
+                         (goto-char (point-min))
+                         (forward-line (1- eline)))
                    (recenter)))
         )
     (pop-to-buffer  haskell-hugs-process-buffer) ; show *hugs* buffer

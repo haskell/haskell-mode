@@ -375,7 +375,7 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
                     (set-marker compilation-parsing-end parsing-end)
                   (setq compilation-parsing-end parsing-end))))
           (with-selected-window (display-buffer (current-buffer) nil 'visible)
-            (end-of-buffer))
+            (goto-char (point-max)))
           ;; Use compilation-auto-jump-to-first-error if available.
           ;; (if (and (boundp 'compilation-auto-jump-to-first-error)
           ;;          compilation-auto-jump-to-first-error
@@ -595,7 +595,8 @@ The returned info is cached for reuse by `haskell-doc-mode'."
           (ring-insert find-tag-marker-ring (point-marker))
           (pop-to-buffer (find-file-noselect file))
           (when line
-            (goto-line line)
+            (goto-char (point-min))
+            (forward-line (1- line))
             (when col (move-to-column col))))))))
 
 ;;; Functions to find the documentation of a given function.

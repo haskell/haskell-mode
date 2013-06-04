@@ -83,7 +83,8 @@
            (new-old-code ""))
       (save-excursion
         (switch-to-buffer (get-file-buffer fname))
-        (goto-line fline)
+        (goto-char (point-min))
+        (forward-line (1- fline))
         (beginning-of-line)
         (setf bline (point))
         (when (or hs-checkers-replace-without-ask
