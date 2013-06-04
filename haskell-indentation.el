@@ -368,10 +368,10 @@ Preserves indentation and removes extra whitespace"
 (defun haskell-indentation-delete-backward-char (n)
   (interactive "p")
   (on-parse-error
-   (delete-backward-char n)
+   (delete-char (- n))
    (cond
     ((haskell-indentation-outside-bird-line)
-     (delete-backward-char n))
+     (delete-char (- n)))
     ((and delete-selection-mode
 	  mark-active
 	  (not (= (point) (mark))))
@@ -379,7 +379,7 @@ Preserves indentation and removes extra whitespace"
     ((or (= (haskell-current-column) 0)
 	 (> (haskell-current-column) (haskell-indentation-current-indentation))
 	(nth 8 (syntax-ppss)))
-     (delete-backward-char n))
+     (delete-char (- n)))
     (haskell-indentation-delete-backward-indentation
        (let* ((ci (haskell-indentation-current-indentation))
 	      (pi (haskell-indentation-previous-indentation
@@ -395,7 +395,7 @@ Preserves indentation and removes extra whitespace"
 		  (delete-region (max (point-min) (- (point) 1))
 				 (progn (move-to-column ci)
 					(point))))))))
-    (t (delete-backward-char n)))))
+    (t (delete-char (- n))))))
 
 (defun haskell-indentation-delete-char (n)
   (interactive "p")
@@ -424,7 +424,7 @@ Preserves indentation and removes extra whitespace"
 	   (delete-region (point)
 			  (progn (move-to-column ci)
 				 (point))))))
-    (t (delete-backward-char n))))))
+    (t (delete-char (- n)))))))
 
 (defun haskell-indentation-goto-least-indentation ()
   (beginning-of-line)
