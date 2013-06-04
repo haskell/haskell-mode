@@ -35,9 +35,7 @@ of the region instead.
         (progn
           (indent-rigidly (region-beginning) (region-end) cols)
           (setq deactivate-mark nil))
-      (message "auto mode %s" (haskell-move-nested-region))
       (let ((region (haskell-move-nested-region)))
-        ;;(message "%s" region)
         (when region
           (indent-rigidly (car region) (cdr region) cols))))))
 
