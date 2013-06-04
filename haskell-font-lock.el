@@ -314,7 +314,8 @@ Returns keywords suitable for `font-lock-keywords'."
 
 	 ;; Top-level declarations
 	 (topdecl-var
-	  (concat line-prefix "\\(" varid "\\)\\s-*\\("
+	  (concat line-prefix "\\(" varid "\\)\\s-*\\([
+]*\\s-+\\)\\("
                   ;; A toplevel declaration can be followed by a definition
                   ;; (=), a type (::) or (∷), a guard, or a pattern which can
                   ;; either be a variable, a constructor, a parenthesized
