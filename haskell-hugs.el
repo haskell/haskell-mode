@@ -277,7 +277,7 @@ error line otherwise show the Hugs buffer."
       (let ((efile (buffer-substring (match-beginning 1)
 				     (match-end 1)))
 	    (eline (if (match-beginning 3)
-                       (string-to-int (buffer-substring (match-beginning 3)
+                       (string-to-number (buffer-substring (match-beginning 3)
                                                         (match-end 3)))))
 	    (emesg (buffer-substring (1+ (point))
 				     (save-excursion (end-of-line) (point)))))
