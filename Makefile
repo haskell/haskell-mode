@@ -52,7 +52,8 @@ all: compile $(AUTOLOADS)
 compile: $(ELCFILES)
 
 test: # TODO: activate 'byte-compile-error-on-warn' when we have fixed most warnings
-	$(BATCH) -f batch-byte-compile $(ELFILES)
+	$(BATCH) --eval "(byte-compile-disable-warning 'cl-functions)" \
+         -f batch-byte-compile $(ELFILES)
 	@$(RM) $(ELCFILES)
 
 clean:
