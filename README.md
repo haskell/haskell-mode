@@ -1,6 +1,8 @@
 Haskell Mode for Emacs
 ----------------------
 
+[![Build Status](https://travis-ci.org/haskell/haskell-mode.png?branch=master)](https://travis-ci.org/haskell/haskell-mode)
+
 This is the Haskell mode package for Emacs.  Its use should be mostly
 self-explanatory if you're accustomed to Emacs.
 
