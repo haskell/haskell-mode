@@ -45,11 +45,15 @@ PKG_TAR = haskell-mode-$(VERSION).tar
 %.elc: %.el
 	@$(BATCH) -f batch-byte-compile $<
 
-.PHONY: all compile info dist clean
+.PHONY: all compile info dist clean test elpa package
 
 all: compile $(AUTOLOADS)
 
 compile: $(ELCFILES)
+
+test: # TODO: activate 'byte-compile-error-on-warn' when we have fixed most warnings
+	$(BATCH) -f batch-byte-compile $(ELFILES)
+	@$(RM) $(ELCFILES)
 
 clean:
 	$(RM) $(ELCFILES) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) $(DIST_TGZ) $(PKG_TAR)
