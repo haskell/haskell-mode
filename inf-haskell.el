@@ -375,7 +375,7 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
                     (set-marker compilation-parsing-end parsing-end)
                   (setq compilation-parsing-end parsing-end))))
           (with-selected-window (display-buffer (current-buffer) nil 'visible)
-            (end-of-buffer))
+            (goto-char (point-max)))
           ;; Use compilation-auto-jump-to-first-error if available.
           ;; (if (and (boundp 'compilation-auto-jump-to-first-error)
           ;;          compilation-auto-jump-to-first-error
@@ -537,7 +537,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
                         (delq (assoc sym haskell-doc-user-defined-ids)
                               haskell-doc-user-defined-ids)))))
 
-        (if (interactive-p) (message "%s" type))
+        (if (called-interactively-p 'any) (message "%s" type))
         (when insert-value
           (beginning-of-line)
           (insert type "\n"))
@@ -553,7 +553,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
                           "Show kind of: ")
                         nil nil type))))
   (let ((result (inferior-haskell-get-result (concat ":kind " type))))
-    (if (interactive-p) (message "%s" result))
+    (if (called-interactively-p 'any) (message "%s" result))
     result))
 
 ;;;###autoload
@@ -566,7 +566,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
                           "Show info of: ")
                         nil nil sym))))
   (let ((result (inferior-haskell-get-result (concat ":info " sym))))
-    (if (interactive-p) (message "%s" result))
+    (if (called-interactively-p 'any) (message "%s" result))
     result))
 
 ;;;###autoload
@@ -595,7 +595,8 @@ The returned info is cached for reuse by `haskell-doc-mode'."
           (ring-insert find-tag-marker-ring (point-marker))
           (pop-to-buffer (find-file-noselect file))
           (when line
-            (goto-line line)
+            (goto-char (point-min))
+            (forward-line (1- line))
             (when col (move-to-column col))))))))
 
 ;;; Functions to find the documentation of a given function.

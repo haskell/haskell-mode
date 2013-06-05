@@ -467,7 +467,8 @@ to be loaded by ghci."
   (when (y-or-n-p (format "The import line `%s' is redundant. Remove? " import))
     (haskell-process-find-file session file)
     (save-excursion
-      (goto-line line)
+      (goto-char (point-min))
+      (forward-line (1- line))
       (goto-char (line-beginning-position))
       (delete-region (line-beginning-position)
                      (line-end-position)))))

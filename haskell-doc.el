@@ -1418,7 +1418,7 @@ See variable docstring."
 
     (run-hooks 'haskell-doc-mode-hook))
 
-  (and (interactive-p)
+  (and (called-interactively-p 'any)
        (message "haskell-doc-mode is %s"
 		(if haskell-doc-mode "enabled" "disabled")))
   haskell-doc-mode)
