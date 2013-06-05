@@ -89,6 +89,8 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))	;need defs of push and pop
+(require 'haskell-string)
+
 (defvar haskell-literate)
 
 (defgroup haskell-indent nil

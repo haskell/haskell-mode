@@ -67,6 +67,8 @@
 
 ;;; Code:
 
+(require 'comint)
+
 (defgroup haskell-ghci nil
   "Major mode for interacting with an inferior GHCi session."
   :group 'haskell

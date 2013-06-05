@@ -47,6 +47,7 @@
 ;;     fields))
 
 (eval-when-compile (require 'cl))
+(declare-function haskell-read-directory-name "haskell-process.el" (prompt default))
 
 (defconst haskell-cabal-general-fields
   ;; Extracted with (haskell-cabal-extract-fields-from-doc "general-fields")
