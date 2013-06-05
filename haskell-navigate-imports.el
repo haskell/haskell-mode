@@ -47,7 +47,7 @@
   (interactive)
   (unless (or (haskell-navigate-imports-line)
               (equal (line-beginning-position) (point-min))
-              (save-excursion (previous-line)
+              (save-excursion (forward-line -1)
                               (haskell-navigate-imports-line)))
     (setq haskell-navigate-imports-start-point (point)))
   (haskell-navigate-imports-go-internal))

@@ -309,7 +309,8 @@ error line otherwise show the *ghci* buffer."
                    eline (file-name-nondirectory efile))
 		   (if (file-exists-p efile)
 		       (progn (find-file-other-window efile)
-			      (goto-line eline)
+			      (goto-char (point-min))
+			      (forward-line (1- eline))
 			      (recenter))))
 
       ;; We got an error without a file and line number, so put the
