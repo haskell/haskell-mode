@@ -775,18 +775,14 @@ This function will be called with no arguments.")
   replace the whole buffer with the output. If CMD fails the
   buffer remains unchanged."
   (set-buffer-modified-p t)
-  (flet
-      ((chomp (str)
-              (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'"
-                                   str)
-                (setq str (replace-match "" t t str)))
-              str)
-       (errout
-        (fmt &rest args)
-        (let* ((warning-fill-prefix "    "))
-          (display-warning cmd (apply 'format fmt args) :warning))))
-    (let*
-        ((filename (buffer-file-name (current-buffer)))
+  (let* ((chomp (lambda (str)
+                  (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'" str)
+                    (setq str (replace-match "" t t str)))
+                  str))
+         (errout (lambda (fmt &rest args)
+                   (let* ((warning-fill-prefix "    "))
+                     (display-warning cmd (apply 'format fmt args) :warning))))
+         (filename (buffer-file-name (current-buffer)))
          (cmd-prefix (replace-regexp-in-string " .*" "" cmd))
          (tmp-file (make-temp-file cmd-prefix))
          (err-file (make-temp-file cmd-prefix))
@@ -800,14 +796,14 @@ This function will be called with no arguments.")
          (stderr-output
           (with-temp-buffer
             (insert-file-contents err-file)
-            (chomp (buffer-substring-no-properties (point-min) (point-max)))))
+            (funcall chomp (buffer-substring-no-properties (point-min) (point-max)))))
          (stdout-output
           (with-temp-buffer
             (insert-file-contents tmp-file)
             (buffer-substring-no-properties (point-min) (point-max)))))
       (if (string= "" stderr-output)
           (if (string= "" stdout-output)
-              (errout
+              (funcall errout
                "Error: %s produced no output, leaving buffer alone" cmd)
             (save-restriction
               (widen)
@@ -815,11 +811,11 @@ This function will be called with no arguments.")
               ;; markers.
               (insert-file-contents tmp-file nil nil nil t)))
         ;; non-null stderr, command must have failed
-        (errout "%s failed: %s" cmd stderr-output)
+        (funcall errout "%s failed: %s" cmd stderr-output)
         )
       (delete-file tmp-file)
       (delete-file err-file)
-      )))
+      ))
 
 (defun haskell-mode-stylish-buffer ()
   "Apply stylish-haskell to the current buffer."
