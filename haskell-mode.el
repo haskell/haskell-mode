@@ -149,7 +149,7 @@
 (require 'haskell-align-imports)
 (require 'haskell-sort-imports)
 (require 'haskell-string)
-(require 'cl)
+(with-no-warnings (require 'cl))
 
 ;; FIXME: code-smell: too many forward decls for haskell-session are required here
 (defvar haskell-session)
@@ -880,5 +880,9 @@ This function will be called with no arguments.")
 ;; Provide ourselves:
 
 (provide 'haskell-mode)
+
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; End:
 
 ;;; haskell-mode.el ends here

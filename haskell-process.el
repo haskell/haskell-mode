@@ -28,7 +28,7 @@
 (require 'haskell-mode)
 (require 'haskell-session)
 (require 'haskell-compat)
-(require 'cl)
+(with-no-warnings (require 'cl))
 
 ;; FIXME: haskell-process shouldn't depend on haskell-interactive-mode to avoid module-dep cycles
 (defvar haskell-interactive-greetings)
@@ -909,3 +909,9 @@ to be loaded by ghci."
                response))))
 
 (provide 'haskell-process)
+
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; End:
+
+;;; haskell-process.el ends here

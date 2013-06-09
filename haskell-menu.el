@@ -28,7 +28,7 @@
 (require 'haskell-compat)
 (require 'haskell-session)
 (require 'haskell-process)
-(require 'cl)
+(with-no-warnings (require 'cl))
 
 (defcustom haskell-menu-buffer-name
   "*haskell-menu*"
@@ -131,4 +131,5 @@ Letters do not insert themselves; instead, they are commands."
 ;; Local Variables:
 ;; byte-compile-warnings: (not cl-functions)
 ;; End:
+
 ;;; haskell-menu.el ends here

@@ -27,7 +27,7 @@
 
 (require 'haskell-cabal)
 (require 'haskell-string)
-(require 'cl)
+(with-no-warnings (require 'cl))
 
 (declare-function haskell-interactive-mode "haskell-interactive-mode" (session))
 (declare-function haskell-kill-session-process "haskell-process" (&optional session))
@@ -320,4 +320,5 @@
 ;; Local Variables:
 ;; byte-compile-warnings: (not cl-functions)
 ;; End:
+
 ;;; haskell-session.el ends here

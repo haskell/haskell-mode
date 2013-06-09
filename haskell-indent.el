@@ -89,7 +89,7 @@
 ;;; Code:
 
 (require 'haskell-string)
-(require 'cl)
+(with-no-warnings (require 'cl))
 
 (defvar haskell-literate)
 
@@ -1579,5 +1579,9 @@ Invokes `haskell-indent-hook' if not nil."
     (turn-off-haskell-indent)))
 
 (provide 'haskell-indent)
+
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; End:
 
 ;;; haskell-indent.el ends here
