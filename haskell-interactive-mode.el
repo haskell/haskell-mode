@@ -25,10 +25,10 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
 (require 'haskell-process)
 (require 'haskell-session)
 (require 'haskell-show)
+(require 'cl)
 
 ;; Dynamically scoped variables.
 (defvar haskell-process-prompt-regex)

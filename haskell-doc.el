@@ -353,7 +353,8 @@
 
 (require 'haskell-mode)
 (require 'inf-haskell)
-(eval-when-compile (require 'cl))
+(require 'imenu)
+(require 'cl)
 
 (defgroup haskell-doc nil
   "Show Haskell function types in echo area."
@@ -1314,9 +1315,6 @@ URL is the URL of the online doc."
 
 ;;@node Menubar Support, Haskell Doc Mode, Install as minor mode, top
 ;;@section Menubar Support
-
-;; get imenu
-(require 'imenu)
 
 ;; a dummy definition needed for XEmacs (I know, it's horrible :-(
 

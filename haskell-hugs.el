@@ -68,6 +68,9 @@
 ;;; All functions/variables start with
 ;;; `(turn-(on/off)-)haskell-hugs' or `haskell-hugs-'.
 
+(require 'comint)
+(require 'shell)
+
 (defgroup haskell-hugs nil
   "Major mode for interacting with an inferior Hugs session."
   :group 'haskell
@@ -124,10 +127,6 @@ subjob if any.
   )
 
 ;; Hugs-interface
-
-(require 'comint)
-(require 'shell)
-
 (defvar haskell-hugs-process nil
   "The active Hugs subprocess corresponding to current buffer.")
 

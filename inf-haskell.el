@@ -35,7 +35,8 @@
 (require 'compile)
 (require 'haskell-mode)
 (require 'haskell-decl-scan)
-(eval-when-compile (require 'cl))
+(require 'haskell-cabal)
+(require 'cl)
 
 ;; Dynamically scoped variables.
 (defvar find-tag-marker-ring)
@@ -242,7 +243,6 @@ The process PROC should be associated to a comint buffer."
 (defvar inferior-haskell-cabal-buffer nil)
 
 (defun inferior-haskell-cabal-of-buf (buf)
-  (require 'haskell-cabal)
   (with-current-buffer buf
     (or (and (buffer-live-p inferior-haskell-cabal-buffer)
              inferior-haskell-cabal-buffer)

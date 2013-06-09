@@ -144,11 +144,12 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
-(eval-when-compile (require 'dabbrev))
+(require 'dabbrev)
 (require 'compile)
 (require 'haskell-align-imports)
 (require 'haskell-sort-imports)
+(require 'haskell-string)
+(require 'cl)
 
 ;; FIXME: code-smell: too many forward decls for haskell-session are required here
 (defvar haskell-session)

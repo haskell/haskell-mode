@@ -88,8 +88,8 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))	;need defs of push and pop
 (require 'haskell-string)
+(require 'cl)
 
 (defvar haskell-literate)
 

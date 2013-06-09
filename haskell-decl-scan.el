@@ -125,13 +125,13 @@
 ;;; Code:
 
 (require 'haskell-mode)
-(require 'syntax nil t)			; Emacs 21 add-on
+(require 'syntax)
+(require 'cl)
 
 ;;;###autoload
 ;; As `cl' defines macros that `imenu' uses, we must require them at
 ;; compile time.
 (eval-when-compile
-  (require 'cl)
   (condition-case nil
       (require 'imenu)
     (error nil))

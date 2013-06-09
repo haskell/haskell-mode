@@ -27,6 +27,7 @@
 
 (defvar sexp-show "sexp-show")
 (require 'haskell-string)
+(require 'cl)
 
 (defun haskell-show-replace-region ()
   "Replace the given region with a pretty printed version."

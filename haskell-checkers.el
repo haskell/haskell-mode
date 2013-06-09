@@ -8,6 +8,7 @@
 ;; Status:  distributed under terms of GPL2 or above
 
 (require 'compile)
+(require 'cl)
 
 (defgroup haskell-checkers nil
   "Run HLint as inferior of Emacs, parse error messages."

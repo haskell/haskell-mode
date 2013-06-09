@@ -46,7 +46,8 @@
 ;;          (fields (mapcar (lambda (sym) (substring-no-properties sym 0 -1)) syms)))
 ;;     fields))
 
-(eval-when-compile (require 'cl))
+(require 'cl)
+
 (declare-function haskell-read-directory-name "haskell-process.el" (prompt default))
 
 (defconst haskell-cabal-general-fields

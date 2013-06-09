@@ -25,10 +25,10 @@
 
 ;;; Code:
 
-(require 'cl)
 (require 'haskell-compat)
 (require 'haskell-session)
 (require 'haskell-process)
+(require 'cl)
 
 (defcustom haskell-menu-buffer-name
   "*haskell-menu*"

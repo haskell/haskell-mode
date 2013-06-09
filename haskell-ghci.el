@@ -68,6 +68,7 @@
 ;;; Code:
 
 (require 'comint)
+(require 'shell)
 
 (defgroup haskell-ghci nil
   "Major mode for interacting with an inferior GHCi session."
@@ -113,9 +114,6 @@ The commands available from within a Haskell script are:
 
 
 ;; GHCi interface:
-
-(require 'comint)
-(require 'shell)
 
 (defvar haskell-ghci-process nil
   "The active GHCi subprocess corresponding to current buffer.")

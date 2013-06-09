@@ -96,10 +96,9 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'haskell-mode)
-  (require 'cl))
+(require 'haskell-mode)
 (require 'font-lock)
+(require 'cl)
 
 (defcustom haskell-font-lock-symbols nil
   "Display \\ and -> and such using symbols in fonts.
@@ -226,9 +225,6 @@ Regexp match data 0 points to the chars."
       (compose-region start end sym-data)))
   ;; Return nil because we're not adding any face property.
   nil)
-
-(unless (fboundp 'char-displayable-p)
-  (require 'latin1-disp nil t))
 
 (defun haskell-font-lock-symbols-keywords ()
   (when (fboundp 'compose-region)
