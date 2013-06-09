@@ -120,8 +120,9 @@ $ apt-get install haskell-mode
     
     and then adding the following command to your init file (`~/.emacs` or `~/.emacs.d/init.el`):
   
-    ```lisp
-    (load "~/lib/emacs/haskell-mode/haskell-site-file")
+    ```el
+    (add-to-list 'load-path "~/lib/emacs/haskell-mode/")
+    (require 'haskell-mode-autoloads)
     ```
 
 Basic Configuration

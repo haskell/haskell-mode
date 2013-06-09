@@ -35,7 +35,7 @@ ELFILES = \
 	inf-haskell.el
 
 ELCFILES = $(ELFILES:.el=.elc)
-AUTOLOADS = haskell-site-file.el
+AUTOLOADS = haskell-mode-autoloads.el
 DIST_FILES = $(ELFILES) $(ELCFILES) $(AUTOLOADS) haskell-mode-pkg.el.in logo.svg Makefile README.md NEWS
 DIST_FILES_EX = examples/init.el examples/fontlock.hs examples/indent.hs
 DIST_TGZ = haskell-mode-$(GIT_VERSION).tar.gz
@@ -91,9 +91,10 @@ $(PKG_TAR): $(PKG_DIST_FILES) haskell-mode-pkg.el.in
 	@echo "Created ELPA compatible distribution package '$@' from $(GIT_VERSION)"
 
 $(AUTOLOADS): $(ELFILES) haskell-mode.elc
-	[ -f $@ ] || echo '' >$@
-	$(BATCH) --eval '(setq generated-autoload-file "'`pwd`'/$@")' -f batch-update-autoloads "."
-	$(RM) $(AUTOLOADS)~
+	$(BATCH) \
+		--eval '(setq make-backup-files nil)' \
+		--eval '(setq generated-autoload-file "$(CURDIR)/$@")' \
+		-f batch-update-autoloads "."
 
 # embed version number into .elc file
 haskell-mode.elc: haskell-mode.el
