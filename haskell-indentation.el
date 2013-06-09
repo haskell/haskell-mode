@@ -140,6 +140,7 @@ autofill-mode."
     (set (make-local-variable 'haskell-indent-last-position)
          nil)))
 
+;;;###autoload
 (defun turn-on-haskell-indentation ()
   "Turn on the haskell-indentation minor mode."
   (interactive)

@@ -1503,6 +1503,7 @@ One indentation cycle is used."
     (define-key map [?\C-c ?\C->] 'haskell-indent-put-region-in-literate)
     map))
 
+;;;###autoload
 (defun turn-on-haskell-indent ()
   "Turn on ``intelligent'' Haskell indentation mode."
   (set (make-local-variable 'indent-line-function) 'haskell-indent-cycle)

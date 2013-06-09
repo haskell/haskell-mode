@@ -191,34 +191,12 @@ When MESSAGE is non-nil, display a message with the version."
   :group 'languages
   :prefix "haskell-")
 
-;; Set load-path
-;;;###autoload
-(when load-file-name (add-to-list 'load-path (file-name-directory load-file-name)))
-
-;; Set up autoloads for the modules we supply
-(autoload 'turn-on-haskell-decl-scan "haskell-decl-scan"
-  "Turn on Haskell declaration scanning." t)
-(autoload 'turn-on-haskell-doc-mode "haskell-doc"
-  "Turn on Haskell Doc minor mode." t)
-(autoload 'turn-on-haskell-indentation "haskell-indentation"
-  "Turn on advanced Haskell indentation." t)
-(autoload 'turn-on-haskell-indent "haskell-indent"
-  "Turn on Haskell indentation." t)
-(autoload 'turn-on-haskell-simple-indent "haskell-simple-indent"
-  "Turn on simple Haskell indentation." t)
-
-;; Functionality provided in other files.
-(autoload 'haskell-ds-create-imenu-index "haskell-decl-scan")
-(autoload 'haskell-font-lock-choose-keywords "haskell-font-lock")
-(autoload 'haskell-doc-current-info "haskell-doc")
-
 ;; Obsolete functions.
 (defun turn-on-haskell-font-lock ()
   (turn-on-font-lock)
   (message "turn-on-haskell-font-lock is obsolete.  Use turn-on-font-lock instead."))
 (defun turn-on-haskell-hugs () (message "haskell-hugs is obsolete."))
 (defun turn-on-haskell-ghci () (message "haskell-ghci is obsolete."))
-
 
 ;; Are we looking at a literate script?
 (defvar haskell-literate nil

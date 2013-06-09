@@ -1523,6 +1523,7 @@ This function is run by an idle timer to print the type
        ;;        (or nil ; (haskell-doc-print-var-docstring current-symbol)
        ;;            (haskell-doc-show-type current-fnsym)))))))
 
+;;;###autoload
 (defun haskell-doc-current-info ()
   "Return the info about symbol at point.
 Meant for `eldoc-documentation-function'."

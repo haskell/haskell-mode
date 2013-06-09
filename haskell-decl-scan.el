@@ -127,7 +127,7 @@
 (require 'haskell-mode)
 (require 'syntax nil t)			; Emacs 21 add-on
 
-;;###autoload
+;;;###autoload
 ;; As `cl' defines macros that `imenu' uses, we must require them at
 ;; compile time.
 (eval-when-compile
@@ -499,6 +499,7 @@ positions and the type is one of the symbols \"variable\", \"datatype\",
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Declaration scanning via `imenu'.
 
+;;;###autoload
 (defun haskell-ds-create-imenu-index ()
   "Function for finding `imenu' declarations in Haskell mode.
 Finds all declarations (classes, variables, imports, instances and
@@ -637,6 +638,7 @@ datatypes) in a Haskell file for the `imenu' package."
   (local-set-key [(meta button1)] 'fume-mouse-function-goto))
 
 ;; The main functions to turn on declaration scanning.
+;;;###autoload
 (defun turn-on-haskell-decl-scan ()
   (interactive)
   "Unconditionally activate `haskell-decl-scan-mode'."

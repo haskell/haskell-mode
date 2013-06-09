@@ -553,6 +553,7 @@ that should be commented under LaTeX-style literate scripts."
   (haskell-font-lock-keywords-create 'latex)
   "Font lock definitions for LaTeX-style literate Haskell.")
 
+;;;###autoload
 (defun haskell-font-lock-choose-keywords ()
   (let ((literate (if (boundp 'haskell-literate) haskell-literate)))
     (case literate

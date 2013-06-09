@@ -165,6 +165,7 @@ column, `tab-to-tab-stop' is done instead."
 (defvar haskell-simple-unindent-old)
 
 ;; The main functions.
+;;;###autoload
 (defun turn-on-haskell-simple-indent ()
   "Set `indent-line-function' to a simple indentation function.
 TAB will now move the cursor to the next indent point in the previous
