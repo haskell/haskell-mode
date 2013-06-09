@@ -62,7 +62,7 @@
 ;; License along with this program.  If not, see
 ;; <http://www.gnu.org/licenses/>.
 
-(require 'cl)
+(with-no-warnings (require 'cl))
 
 (defvar haskell-align-imports-regexp
   (concat "^\\(import[ ]+\\)"
@@ -171,3 +171,9 @@
                                      (line-end-position) t 1)))))
 
 (provide 'haskell-align-imports)
+
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; End:
+
+;;; haskell-align-imports.el ends here

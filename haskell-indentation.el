@@ -34,7 +34,7 @@
 ;;; Code:
 
 (require 'syntax)
-(require 'cl)
+(with-no-warnings (require 'cl))
 
 ;; Dynamically scoped variables.
 (defvar following-token)
@@ -1002,4 +1002,9 @@ Preserves indentation and removes extra whitespace"
       (forward-comment (buffer-size)))))
 
 (provide 'haskell-indentation)
+
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; End:
+
 ;;; haskell-indentation.el ends here

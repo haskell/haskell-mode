@@ -25,7 +25,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(with-no-warnings (require 'cl))
 
 ;; Dynamically scoped variables.
 ;; TODO What actually sets this?
@@ -151,3 +151,9 @@
       lines))))
 
 (provide 'haskell-package)
+
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; End:
+
+;;; haskell-package.el ends here

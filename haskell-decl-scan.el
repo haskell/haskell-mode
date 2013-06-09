@@ -126,7 +126,7 @@
 
 (require 'haskell-mode)
 (require 'syntax)
-(require 'cl)
+(with-no-warnings (require 'cl))
 
 ;;;###autoload
 ;; As `cl' defines macros that `imenu' uses, we must require them at
@@ -714,5 +714,9 @@ Invokes `haskell-decl-scan-mode-hook'."
 ;; Provide ourselves:
 
 (provide 'haskell-decl-scan)
+
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; End:
 
 ;;; haskell-decl-scan.el ends here
