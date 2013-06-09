@@ -218,7 +218,7 @@ be set to the preferred literate style."
   :group 'haskell
   :type '(choice (const bird) (const tex) (const nil)))
 
-;; Mode maps.
+;;;###autoload
 (defvar haskell-mode-map
   (let ((map (make-sparse-keymap)))
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
