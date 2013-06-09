@@ -44,7 +44,9 @@ PKG_DIST_FILES = $(ELFILES) logo.svg
 PKG_TAR = haskell-mode-$(VERSION).tar
 
 %.elc: %.el
-	@$(BATCH) -f batch-byte-compile $<
+	@$(BATCH) \
+	   --eval "(byte-compile-disable-warning 'cl-functions)" \
+       -f batch-byte-compile $<
 
 .PHONY: all compile info dist clean test elpa package
 
@@ -89,7 +91,7 @@ $(AUTOLOADS): $(ELFILES) haskell-mode.elc
 # embed version number into .elc file
 haskell-mode.elc: haskell-mode.el
 	sed -e 's/@GIT_VERSION@/$(GIT_VERSION)/g;s/@VERSION@/$(VERSION)/g' < haskell-mode.el > haskell-mode.tmp.el #NO_DIST
-	@$(BATCH) -f batch-byte-compile haskell-mode.tmp.el #NO_DIST
+	@$(BATCH) --eval "(byte-compile-disable-warning 'cl-functions)" -f batch-byte-compile haskell-mode.tmp.el #NO_DIST
 	mv haskell-mode.tmp.elc haskell-mode.elc #NO_DIST
 	$(RM) haskell-mode.tmp.el #NO_DIST
 
