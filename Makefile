@@ -6,8 +6,11 @@ EFLAGS =
 BATCH = $(EMACS) $(EFLAGS) --batch -Q -L .
 
 ELFILES = \
+	ghc-core.el \
+	haskell-align-imports.el \
 	haskell-c.el \
 	haskell-cabal.el \
+	haskell-checkers.el \
 	haskell-decl-scan.el \
 	haskell-doc.el \
 	haskell-font-lock.el \
@@ -15,22 +18,19 @@ ELFILES = \
 	haskell-hugs.el \
 	haskell-indent.el \
 	haskell-indentation.el \
-	haskell-checkers.el \
+	haskell-interactive-mode.el \
+	haskell-menu.el \
 	haskell-mode.el \
-	haskell-simple-indent.el \
-	haskell-sort-imports.el \
-	haskell-align-imports.el \
 	haskell-move-nested.el \
 	haskell-navigate-imports.el \
-	haskell-interactive-mode.el \
 	haskell-package.el \
 	haskell-process.el \
-	haskell-menu.el \
 	haskell-session.el \
-	haskell-string.el \
 	haskell-show.el \
+	haskell-simple-indent.el \
+	haskell-sort-imports.el \
+	haskell-string.el \
 	haskell-unicode-input-method.el \
-	ghc-core.el \
 	inf-haskell.el
 
 ELCFILES = $(ELFILES:.el=.elc)
