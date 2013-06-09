@@ -55,6 +55,7 @@ check: # TODO: activate 'byte-compile-error-on-warn' when we have fixed most war
 	$(BATCH) --eval "(byte-compile-disable-warning 'cl-functions)" \
          -f batch-byte-compile $(ELFILES)
 	@$(RM) $(ELCFILES)
+	$(BATCH) --eval '(when (check-declare-directory ".") (error "check-declare failed"))'
 
 clean:
 	$(RM) $(ELCFILES) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) $(DIST_TGZ) $(PKG_TAR)
