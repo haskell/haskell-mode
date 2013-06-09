@@ -195,5 +195,4 @@ I.e. the value before `turn-on-haskell-simple-indent' was called."
 
 (provide 'haskell-simple-indent)
 
-;; arch-tag: 18a08122-723b-485e-b958-e1cf8218b816
 ;;; haskell-simple-indent.el ends here

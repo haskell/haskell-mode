@@ -43,5 +43,5 @@
              (cdr font-lock-keywords))))
 
 (provide 'haskell-c)
-;; arch-tag: 51294c41-29f0-4599-9ce8-47fe2e7d3fd5
+
 ;;; haskell-c.el ends here

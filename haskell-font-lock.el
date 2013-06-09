@@ -648,5 +648,4 @@ Invokes `haskell-font-lock-hook' if not nil."
 
 (provide 'haskell-font-lock)
 
-;; arch-tag: 89fd122e-8378-4c7f-83a3-1f49a64e458d
 ;;; haskell-font-lock.el ends here

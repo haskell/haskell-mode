@@ -225,5 +225,4 @@
 
 (provide 'haskell-cabal)
 
-;; arch-tag: d455f920-5e4d-42b6-a2c7-4a7e84a05c29
 ;;; haskell-cabal.el ends here

@@ -1579,5 +1579,4 @@ Invokes `haskell-indent-hook' if not nil."
 
 (provide 'haskell-indent)
 
-;; arch-tag: e4e5e90a-12e2-4002-b5cb-7b2375710013
 ;;; haskell-indent.el ends here

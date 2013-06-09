@@ -815,5 +815,4 @@ we load it."
 
 (provide 'inf-haskell)
 
-;; arch-tag: 61804287-63dd-4052-bc0e-90f691b34b40
 ;;; inf-haskell.el ends here

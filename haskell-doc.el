@@ -1988,5 +1988,4 @@ This function switches to and potentially loads many buffers."
 
 (provide 'haskell-doc)
 
-;; arch-tag: 6492eb7e-7048-47ac-a331-da09e1eb6254
 ;;; haskell-doc.el ends here

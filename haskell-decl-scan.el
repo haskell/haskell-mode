@@ -712,5 +712,4 @@ Invokes `haskell-decl-scan-mode-hook'."
 
 (provide 'haskell-decl-scan)
 
-;; arch-tag: f4335fd8-4b6c-472e-9899-004d47d94818
 ;;; haskell-decl-scan.el ends here
