@@ -29,7 +29,7 @@ install:
     fi
 
 script:
-  lsb_release -a && $EMACS --version && make test EMACS=$EMACS
+  lsb_release -a && $EMACS --version && make EMACS=$EMACS check
 
 notifications:
   email: false
