@@ -146,6 +146,19 @@
 
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'dabbrev))
+(require 'compile)
+(require 'haskell-align-imports)
+(require 'haskell-sort-imports)
+
+;; FIXME: code-smell: too many forward decls for haskell-session are required here
+(defvar haskell-session)
+(declare-function haskell-process-do-try-info "haskell-process" (sym))
+(declare-function haskell-process-generate-tags "haskell-process" (&optional and-then-find-this-tag))
+(declare-function haskell-session "haskell-session" ())
+(declare-function haskell-session-all-modules "haskell-session" ())
+(declare-function haskell-session-cabal-dir "haskell-session" (session))
+(declare-function haskell-session-maybe "haskell-session" ())
+(declare-function haskell-session-tags-filename "haskell-session" (session))
 
 ;; All functions/variables start with `(literate-)haskell-'.
 
@@ -198,7 +211,6 @@ When MESSAGE is non-nil, display a message with the version."
 (autoload 'haskell-ds-create-imenu-index "haskell-decl-scan")
 (autoload 'haskell-font-lock-choose-keywords "haskell-font-lock")
 (autoload 'haskell-doc-current-info "haskell-doc")
-(autoload 'haskell-process-generate-tags "haskell-process")
 
 ;; Obsolete functions.
 (defun turn-on-haskell-font-lock ()
@@ -697,11 +709,8 @@ See `haskell-check-command' for the default."
 				    (if name
 					(file-name-nondirectory name))))))))
   (setq haskell-saved-check-command command)
-  (require 'compile)
   (save-some-buffers (not compilation-ask-about-save) nil)
-  (if (fboundp 'compilation-start)
-      (compilation-start command)
-    (compile-internal command "No more errors")))
+  (compilation-start command))
 
 (autoload 'flymake-init-create-temp-buffer-copy "flymake")
 

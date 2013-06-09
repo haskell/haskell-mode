@@ -616,6 +616,7 @@ datatypes) in a Haskell file for the `imenu' package."
   (concat "^" literate-haskell-ds-start-decl-re)
   "As `haskell-ds-func-menu-regexp' but for Bird-style literate scripts.")
 
+(declare-function fume-add-menubar-entry "ext:func-menu")
 (defvar fume-menubar-menu-name)
 (defvar fume-function-name-regexp-alist)
 (defvar fume-find-function-name-method-alist)

@@ -462,7 +462,6 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
 (defun inferior-haskell-send-decl ()
   "Send current declaration to inferior-haskell process."
   (interactive)
-  (require 'haskell-decl-scan)
   (save-excursion
     (goto-char (1+ (point)))
     (let* ((proc (inferior-haskell-process))

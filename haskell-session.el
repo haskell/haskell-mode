@@ -28,7 +28,11 @@
 (require 'cl)
 (require 'haskell-cabal)
 (require 'haskell-string)
+(declare-function haskell-interactive-mode "haskell-interactive-mode" (session))
 
+(declare-function haskell-kill-session-process "haskell-process" (&optional session))
+(declare-function haskell-process-start "haskell-process" (session))
+(declare-function haskell-process-cd "haskell-process" (&optional not-interactive))
 ;; Dynamically scoped variables.
 (defvar haskell-process-type)
 

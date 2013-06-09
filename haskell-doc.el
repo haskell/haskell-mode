@@ -352,6 +352,7 @@
 ;;@subsection Emacs portability
 
 (require 'haskell-mode)
+(require 'inf-haskell)
 (eval-when-compile (require 'cl))
 
 (defgroup haskell-doc nil

@@ -27,6 +27,7 @@
 
 (require 'cl)
 (require 'haskell-session)
+(require 'haskell-process)
 
 (defcustom haskell-menu-buffer-name
   "*haskell-menu*"

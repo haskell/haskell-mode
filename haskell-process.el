@@ -27,8 +27,15 @@
 
 (eval-when-compile (require 'cl))
 (require 'haskell-mode)
-(require 'haskell-interactive-mode)
 (require 'haskell-session)
+
+;; FIXME: haskell-process shouldn't depend on haskell-interactive-mode to avoid module-dep cycles
+(defvar haskell-interactive-greetings)
+(declare-function haskell-interactive-mode-echo "haskell-interactive-mode" (session message))
+(declare-function haskell-interactive-mode-compile-error "haskell-interactive-mode" (session message))
+(declare-function haskell-interactive-mode-insert "haskell-interactive-mode" (session message))
+(declare-function haskell-interactive-mode-reset-error "haskell-interactive-mode" (session))
+(declare-function haskell-interactive-show-load-message "haskell-interactive-mode" (session type module-name file-name echo))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configuration
