@@ -1560,15 +1560,12 @@ function.  Only the user interface is different."
 
 ;;@cindex haskell-doc-show-type
 
-(require 'syntax-ppss nil t)		; possible add-on in Emacs 21
-
 (defun haskell-doc-in-code-p ()
   (not (or (and (eq haskell-literate 'bird)
                 ;; Copied from haskell-indent-bolp.
                 (<= (current-column) 2)
                 (eq (char-after (line-beginning-position)) ?\>))
-           (if (fboundp 'syntax-ppss)
-               (nth 8 (syntax-ppss))))))
+           (nth 8 (syntax-ppss)))))
 
 ;;;###autoload
 (defun haskell-doc-show-type (&optional sym)

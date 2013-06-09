@@ -40,35 +40,11 @@
 ;; Dynamically scoped variables.
 (defvar find-tag-marker-ring)
 
-;; XEmacs compatibility.
-
-(unless (fboundp 'subst-char-in-string)
-  (defun subst-char-in-string (fromchar tochar string &optional inplace)
-    ;; This is Haskell-mode, we don't want no stinkin' `aset'.
-    (apply 'string (mapcar (lambda (c) (if (eq c fromchar) tochar c)) string))))
-
-(unless (fboundp 'make-temp-file)
-  (defun make-temp-file (prefix &optional dir-flag)
-    (catch 'done
-      (while t
-        (let ((f (make-temp-name (expand-file-name prefix (temp-directory)))))
-          (condition-case ()
-              (progn
-                (if dir-flag (make-directory f)
-                  (write-region "" nil f nil 'silent nil))
-                (throw 'done f))
-            (file-already-exists t)))))))
-
-(unless (fboundp 'replace-regexp-in-string)
-  (defun replace-regexp-in-string (regexp rep string)
-    (replace-in-string string regexp rep)))
-
 ;; Here I depart from the inferior-haskell- prefix.
 ;; Not sure if it's a good idea.
 (defcustom haskell-program-name
   ;; Arbitrarily give preference to hugs over ghci.
   (or (cond
-       ((not (fboundp 'executable-find)) nil)
        ((executable-find "hugs") "hugs \"+.\"")
        ((executable-find "ghci") "ghci"))
       "hugs \"+.\"")
@@ -217,13 +193,6 @@ setting up the inferior-haskell buffer."
   (interactive "P")
   (let ((proc (inferior-haskell-process arg)))
     (pop-to-buffer (process-buffer proc))))
-
-(eval-when-compile
-  (unless (fboundp 'with-selected-window)
-    (defmacro with-selected-window (win &rest body)
-      `(save-selected-window
-         (select-window ,win)
-         ,@body))))
 
 (defcustom inferior-haskell-wait-and-jump nil
   "If non-nil, wait for file loading to terminate and jump to the error."
@@ -703,9 +672,7 @@ Insert the output into the current buffer."
   ;; (expand-file-name "~/.inf-haskell-module-alist")
   (expand-file-name (concat "inf-haskell-module-alist-"
                             (number-to-string (user-uid)))
-                    (if (fboundp 'temp-directory)
-                        (temp-directory)
-                      temporary-file-directory))
+                    temporary-file-directory)
   "Where to save the module -> package lookup table.
 Set this to nil to never cache to a file."
   :group 'haskell
