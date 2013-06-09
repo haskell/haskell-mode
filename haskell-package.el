@@ -25,24 +25,24 @@
 
 ;;; Code:
 
-;;; Test data:
+(require 'cl)
 
 ;; Dynamically scoped variables.
 ;; TODO What actually sets this?
 (defvar haskell-config-use-cabal-dev)
 
-(defun haskell-package-conf-path-get (&optional project)
-  "Gets the user conf or the cabal-dev conf. Get the global conf elsewhere."
-  (if haskell-config-use-cabal-dev
-      (if project
-          (let* ((cabal-path (haskell-project-cabal-dir project)))
-            (format "%scabal-dev/packages-%s.conf/"
-                    (if (string-match "/$" cabal-path)
-                        cabal-path
-                      (concat cabal-path "/"))
-                    (haskell-ghc-version)))
-        (haskell-package-conf-user-path-get))
-    (haskell-package-conf-user-path-get)))
+;; (defun haskell-package-conf-path-get (&optional project)
+;;   "Gets the user conf or the cabal-dev conf. Get the global conf elsewhere."
+;;   (if haskell-config-use-cabal-dev
+;;       (if project
+;;           (let* ((cabal-path (haskell-project-cabal-dir project)))
+;;             (format "%scabal-dev/packages-%s.conf/"
+;;                     (if (string-match "/$" cabal-path)
+;;                         cabal-path
+;;                       (concat cabal-path "/"))
+;;                     (haskell-ghc-version)))
+;;         (haskell-package-conf-user-path-get))
+;;     (haskell-package-conf-user-path-get)))
 
 (defun haskell-package-conf-user-path-get ()
   "Get the user conf path."
@@ -70,10 +70,12 @@
             name
             version))))
 
+(defstruct haskell-package "Haskell package object.")
+
 (defun haskell-package-parse (text)
   "Parse a package into a package object."
   (let ((pkg (haskell-package-read-description text)))
-    (haskell-package-make
+    (make-haskell-package
      :name (cdr (assoc "name" pkg))
      :version (cdr (assoc "version" pkg))
      :id (cdr (assoc "id" pkg))
