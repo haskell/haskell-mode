@@ -28,6 +28,7 @@
 (eval-when-compile (require 'cl))
 (require 'haskell-mode)
 (require 'haskell-session)
+(require 'haskell-compat)
 
 ;; FIXME: haskell-process shouldn't depend on haskell-interactive-mode to avoid module-dep cycles
 (defvar haskell-interactive-greetings)

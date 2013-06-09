@@ -11,6 +11,7 @@ ELFILES = \
 	haskell-c.el \
 	haskell-cabal.el \
 	haskell-checkers.el \
+	haskell-compat.el \
 	haskell-decl-scan.el \
 	haskell-doc.el \
 	haskell-font-lock.el \

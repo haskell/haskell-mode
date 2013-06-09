@@ -26,6 +26,7 @@
 ;;; Code:
 
 (require 'cl)
+(require 'haskell-compat)
 (require 'haskell-session)
 (require 'haskell-process)
 
