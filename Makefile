@@ -42,25 +42,30 @@ DIST_TGZ = haskell-mode-$(GIT_VERSION).tar.gz
 
 PKG_DIST_FILES = $(ELFILES) logo.svg
 PKG_TAR = haskell-mode-$(VERSION).tar
+ELCHECKS=$(addprefix check-, $(ELFILES:.el=))
 
 %.elc: %.el
 	@$(BATCH) \
 	   --eval "(byte-compile-disable-warning 'cl-functions)" \
        -f batch-byte-compile $<
 
-.PHONY: all compile info dist clean test elpa package
+.PHONY: all compile info dist clean check $(ELCHECKS) elpa package
 
 all: compile $(AUTOLOADS)
 
 compile: $(ELCFILES)
 
-check:
-	$(BATCH) \
-         --eval "(setq byte-compile-error-on-warn t)" \
-         --eval "(byte-compile-disable-warning 'cl-functions)" \
-         -f batch-byte-compile $(ELFILES)
-	@$(RM) $(ELCFILES)
-	$(BATCH) --eval '(when (check-declare-directory ".") (error "check-declare failed"))'
+$(ELCHECKS): check-%: %.el
+	@$(BATCH) --eval '(when (check-declare-file "$*.el") (error "check-declare failed"))'
+	@$(BATCH) \
+	     --eval "(setq byte-compile-error-on-warn t)" \
+	 	 --eval "(byte-compile-disable-warning 'cl-functions)" \
+		 -f batch-byte-compile $*.el
+	@$(RM) $*.elc
+	@echo "--"
+
+check: $(ELCHECKS)
+	@echo "checks passed!"
 
 clean:
 	$(RM) $(ELCFILES) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) $(DIST_TGZ) $(PKG_TAR)
