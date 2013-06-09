@@ -110,13 +110,13 @@ $ apt-get install haskell-mode
 
 -   Assuming you have placed the basic mode (`haskell-mode.el`) and the other modules
     you want to use in the directory ~/lib/emacs/haskell-mode/, you need generate the
-    autoloads file (`haskell-site-file.el`) by either
+    autoloads file (`haskell-mode-autoloads.el`) by either
 
-    - Invoking `make all` or `make haskell-site-file.el`, or
+    - Invoking `make all` or `make haskell-mode-autoloads.el`, or
     
     - From inside Emacs, `M-x update-directory-autoloads` and answering the question for
       the folder with `~/lib/emacs/haskell-mode/` and the question for the output-file with
-      `~/lib/emacs/haskell-mode/haskell-site-file.el`
+      `~/lib/emacs/haskell-mode/haskell-mode-autoloads.el`
     
     and then adding the following command to your init file (`~/.emacs` or `~/.emacs.d/init.el`):
   
