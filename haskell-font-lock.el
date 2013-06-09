@@ -98,7 +98,7 @@
 
 (require 'haskell-mode)
 (require 'font-lock)
-(require 'cl)
+(with-no-warnings (require 'cl))
 
 (defcustom haskell-font-lock-symbols nil
   "Display \\ and -> and such using symbols in fonts.
@@ -644,5 +644,9 @@ Invokes `haskell-font-lock-hook' if not nil."
 ;; Provide ourselves:
 
 (provide 'haskell-font-lock)
+
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; End:
 
 ;;; haskell-font-lock.el ends here

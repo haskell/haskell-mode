@@ -36,7 +36,7 @@
 (require 'haskell-mode)
 (require 'haskell-decl-scan)
 (require 'haskell-cabal)
-(require 'cl)
+(with-no-warnings (require 'cl))
 
 ;; Dynamically scoped variables.
 (defvar find-tag-marker-ring)
@@ -780,5 +780,9 @@ we load it."
     (if url (browse-url url) (error "Local file doesn't exist"))))
 
 (provide 'inf-haskell)
+
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; End:
 
 ;;; inf-haskell.el ends here

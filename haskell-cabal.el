@@ -31,7 +31,7 @@
 
 ;; (defun haskell-cabal-extract-fields-from-doc ()
 ;;   (require 'xml)
-;;   (require 'cl)
+;;   (with-no-warnings (require 'cl))
 ;;   (let ((section (completing-read
 ;;                   "Section: "
 ;;                   '("general-fields" "library" "executable" "buildinfo"))))
@@ -46,7 +46,7 @@
 ;;          (fields (mapcar (lambda (sym) (substring-no-properties sym 0 -1)) syms)))
 ;;     fields))
 
-(require 'cl)
+(with-no-warnings (require 'cl))
 
 (declare-function haskell-read-directory-name "haskell-process.el" (prompt default))
 
@@ -225,5 +225,9 @@
     "help"))
 
 (provide 'haskell-cabal)
+
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; End:
 
 ;;; haskell-cabal.el ends here

@@ -28,7 +28,7 @@
 (require 'haskell-process)
 (require 'haskell-session)
 (require 'haskell-show)
-(require 'cl)
+(with-no-warnings (require 'cl))
 
 ;; Dynamically scoped variables.
 (defvar haskell-process-prompt-regex)
@@ -507,5 +507,9 @@ Key bindings:
 (add-hook 'kill-buffer-hook 'haskell-interactive-kill)
 
 (provide 'haskell-interactive-mode)
+
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; End:
 
 ;;; haskell-interactive-mode.el ends here

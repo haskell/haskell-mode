@@ -8,7 +8,7 @@
 ;; Status:  distributed under terms of GPL2 or above
 
 (require 'compile)
-(require 'cl)
+(with-no-warnings (require 'cl))
 
 (defgroup haskell-checkers nil
   "Run HLint as inferior of Emacs, parse error messages."
@@ -156,5 +156,9 @@ name - user visible name for this mode"
 (hs-checkers-setup scan "HScan")
 
 (provide 'haskell-checkers)
+
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; End:
 
 ;;; haskell-checkers.el ends here
