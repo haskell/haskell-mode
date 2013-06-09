@@ -54,8 +54,10 @@ all: compile $(AUTOLOADS)
 
 compile: $(ELCFILES)
 
-check: # TODO: activate 'byte-compile-error-on-warn' when we have fixed most warnings
-	$(BATCH) --eval "(byte-compile-disable-warning 'cl-functions)" \
+check:
+	$(BATCH) \
+         --eval "(setq byte-compile-error-on-warn t)" \
+         --eval "(byte-compile-disable-warning 'cl-functions)" \
          -f batch-byte-compile $(ELFILES)
 	@$(RM) $(ELCFILES)
 	$(BATCH) --eval '(when (check-declare-directory ".") (error "check-declare failed"))'
