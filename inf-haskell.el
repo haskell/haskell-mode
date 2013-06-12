@@ -246,11 +246,12 @@ The process PROC should be associated to a comint buffer."
   (with-current-buffer buf
     (or (and (buffer-live-p inferior-haskell-cabal-buffer)
              inferior-haskell-cabal-buffer)
-        (and (not (local-variable-p 'inferior-haskell-cabal-buffer
-                                    ;; XEmacs needs this argument.
-                                    (current-buffer)))
-             (set (make-local-variable 'inferior-haskell-cabal-buffer)
-                  (haskell-cabal-find-file))))))
+        (if (local-variable-p 'inferior-haskell-cabal-buffer
+                              ;; XEmacs needs this argument.
+                              (current-buffer))
+            inferior-haskell-cabal-buffer
+          (set (make-local-variable 'inferior-haskell-cabal-buffer)
+               (haskell-cabal-find-file))))))
 
 (defun inferior-haskell-find-project-root (buf)
   (with-current-buffer buf
