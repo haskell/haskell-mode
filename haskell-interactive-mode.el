@@ -480,6 +480,7 @@ Key bindings:
              (haskell-interactive-mode-error-backward)
              (haskell-interactive-jump-to-error-line)))))
 
+;;;###autoload
 (defun haskell-interactive-mode-reset-error (session)
   "Reset the error cursor position."
   (interactive)
