@@ -31,7 +31,6 @@
 (with-no-warnings (require 'cl))
 
 ;; FIXME: haskell-process shouldn't depend on haskell-interactive-mode to avoid module-dep cycles
-(defvar haskell-interactive-greetings)
 (declare-function haskell-interactive-mode-echo "haskell-interactive-mode" (session message))
 (declare-function haskell-interactive-mode-compile-error "haskell-interactive-mode" (session message))
 (declare-function haskell-interactive-mode-insert "haskell-interactive-mode" (session message))
@@ -121,6 +120,14 @@ has changed?"
 
 (defvar haskell-process-prompt-regex "\\(^[> ]*> $\\|\n[> ]*> $\\)")
 (defvar haskell-reload-p nil)
+
+(defvar haskell-process-greetings
+  (list "Hello, Haskell!"
+        "The lambdas must flow."
+        "Hours of hacking await!"
+        "The next big Haskell project is about to start!"
+        "Your wish is my IO ().")
+  "Greetings for when the Haskell process starts up.")
 
 (defconst haskell-process-logo
   (expand-file-name "logo.svg" (file-name-directory load-file-name))
@@ -670,8 +677,8 @@ to be loaded by ghci."
     :complete (lambda (process _)
                 (haskell-interactive-mode-echo
                  (haskell-process-session process)
-                 (concat (nth (random (length haskell-interactive-greetings))
-                              haskell-interactive-greetings)
+                 (concat (nth (random (length haskell-process-greetings))
+                              haskell-process-greetings)
                          " (if I break, run M-x haskell-process-restart)"))))))
 
 (defun haskell-process-sentinel (proc event)

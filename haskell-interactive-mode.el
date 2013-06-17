@@ -60,15 +60,6 @@ interference with prompts that look like haskell expressions."
   :type 'boolean
   :group 'haskell)
 
-
-(defvar haskell-interactive-greetings
-  (list "Hello, Haskell!"
-        "The lambdas must flow."
-        "Hours of hacking await!"
-        "The next big Haskell project is about to start!"
-        "Your wish is my IO ().")
-  "Greetings for when the Haskell process starts up.")
-
 ;; Used internally
 (defvar haskell-interactive-mode)
 (defvar haskell-interactive-mode-history)
