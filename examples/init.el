@@ -19,7 +19,7 @@
 (add-to-list 'load-path ".")
 ;; Always load via this. If you contribute you should run `make all`
 ;; to regenerate this.
-(load "haskell-site-file")
+(load "haskell-mode-autoloads")
 
 ;; Customization
 (custom-set-variables
