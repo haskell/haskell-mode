@@ -778,7 +778,7 @@ to be loaded by ghci."
 (defun haskell-process-trigger-queue (process)
   "Trigger the next command in the queue to be ran if there is no current command."
   (if (and (haskell-process-process process)
-           (haskell-process-live-p (haskell-process-process process)))
+           (process-live-p (haskell-process-process process)))
       (when (equal (haskell-process-cmd process) 'none)
         (let ((cmd (haskell-process-cmd-queue-pop process)))
           (when cmd
@@ -914,13 +914,6 @@ to be loaded by ghci."
       (funcall live-func
                (haskell-command-state command)
                response))))
-
-(defun haskell-process-live-p (process)
-  "Returns non-nil if PROCESS is alive.
-    A process is considered alive if its status is `run', `open',
-    `listen', `connect' or `stop'."
-  (memq (process-status process)
-        '(run open listen connect stop)))
 
 (provide 'haskell-process)
 
