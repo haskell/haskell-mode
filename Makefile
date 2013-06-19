@@ -32,6 +32,7 @@ ELFILES = \
 	haskell-sort-imports.el \
 	haskell-string.el \
 	haskell-unicode-input-method.el \
+	haskell-yas.el \
 	inf-haskell.el
 
 ELCFILES = $(ELFILES:.el=.elc)
