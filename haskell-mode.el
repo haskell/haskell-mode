@@ -193,6 +193,17 @@ When MESSAGE is non-nil, display a message with the version."
   :group 'languages
   :prefix "haskell-")
 
+;;;###autoload
+(defun haskell-customize ()
+  "Browse the haskell customize sub-tree.
+This calls 'customize-browse' with haskell as argument and makes
+sure all haskell customize definitions have been loaded."
+  (interactive)
+  ;; make sure all modules with (defcustom ...)s are loaded
+  (mapc 'require
+        '(haskell-checkers haskell-doc haskell-font-lock haskell-indentation haskell-indent haskell-interactive-mode haskell-menu haskell-process haskell-yas inf-haskell))
+  (customize-browse 'haskell))
+
 ;; Obsolete functions.
 (defun turn-on-haskell-font-lock ()
   (turn-on-font-lock)

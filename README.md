@@ -128,11 +128,15 @@ $ apt-get install haskell-mode
 Basic Configuration
 -------------------
 
+Most of Haskell Mode's settings are exposed via Emacs'
+[Customize system](http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html).
+You can use `M-x haskell-customize` to browse the `haskell` customization sub-tree.
+
 In its default state, only the bare-bones haskell-mode is active.  To
-make it useful, you need additional modules; you can use the haskell
-`customize-group` to edit the Haskell mode hook or, if you prefer
-manual setup, try adding the following lines according to which
-modules you want to use:
+make it useful, you need additional modules; you can use
+`M-x customize-variable RET haskell-mode-hook` to edit the Haskell mode
+hook or, if you prefer manual setup, try adding the following lines
+according to which modules you want to use:
 
 ```el
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
