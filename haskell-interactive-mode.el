@@ -140,11 +140,7 @@ Key bindings:
 (defun haskell-interactive-switch ()
   "Switch to the interactive mode for this session."
   (interactive)
-  (let ((session (haskell-session)))
-    (let ((buffer (haskell-session-interactive-buffer session)))
-      (unless (find-if (lambda (window) (equal (window-buffer window) buffer))
-                       (window-list))
-        (switch-to-buffer-other-window (haskell-session-interactive-buffer session))))))
+  (switch-to-buffer-other-window (haskell-session-interactive-buffer (haskell-session))))
 
 (defun haskell-interactive-mode-return ()
   "Handle the return key."
