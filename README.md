@@ -16,6 +16,9 @@ commands to the init file.
 Installation
 ------------
 
+GNU Emacs version 23 or later is officially supported.  It may work
+with other Emacsen, but we don't have the resources to other versions.
+
 There are many ways to install `haskell-mode`. Pick the one that
 you're most comfortable with.
 
@@ -74,11 +77,6 @@ Refresh the package index by `M-x package-refresh-contents` and install
 
 [el-get](https://github.com/dimitri/el-get) is another popular package manager for Emacs.
 If you're an el-get user just do `M-x el-get-install` to get `haskell-mode` installed.
-
-### XEmacs
-
-If you are using XEmacs, the haskell-mode package may be available for
-installation through the XEmacs package UI.
 
 ### Emacs Prelude
 
