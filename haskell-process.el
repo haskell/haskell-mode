@@ -436,20 +436,21 @@ to be loaded by ghci."
   (cond
    ((haskell-process-consume
      process
-     (concat "[\r\n]\\([^ \r\n:][^:\n\r]+\\):\\([0-9]+\\):\\([0-9]+\\):"
+     (concat "[\r\n]\\([^ \r\n:][^:\n\r]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:"
              "[ \n\r]+\\([[:unibyte:][:nonascii:]]+?\\)\n[^ ]"))
     (haskell-process-set-response-cursor process
                                          (- (haskell-process-response-cursor process) 1))
     (let* ((buffer (haskell-process-response process))
-           (error-msg (match-string 4 buffer))
            (file (match-string 1 buffer))
            (line (string-to-number (match-string 2 buffer)))
            (col (match-string 3 buffer))
+           (col2 (match-string 4 buffer))
+           (error-msg (match-string 5 buffer))
            (warning (string-match "^Warning:" error-msg))
-           (final-msg (format "%s:%s:%s: %s"
+           (final-msg (format "%s:%s:%s%s: %s"
                               (haskell-session-strip-dir session file)
                               line
-                              col
+                              col (or col2 "")
                               error-msg)))
       (funcall (if warning
                    'haskell-interactive-mode-compile-warning

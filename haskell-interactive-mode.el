@@ -193,7 +193,7 @@ Key bindings:
   "Jump to the error line."
   (let ((orig-line (buffer-substring-no-properties (line-beginning-position)
                                                    (line-end-position))))
-    (and (string-match "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\):" orig-line)
+    (and (string-match "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:" orig-line)
          (let* ((file (match-string 1 orig-line))
                 (line (match-string 2 orig-line))
                 (col (match-string 3 orig-line))
@@ -449,13 +449,13 @@ Key bindings:
 (defun haskell-interactive-mode-error-backward ()
   "Go backward to the previous error."
   (interactive)
-  (search-backward-regexp "^[^:]+:[0-9]+:[0-9]+: " nil t))
+  (search-backward-regexp "^[^:]+:[0-9]+:[0-9]+\\(-[0-9]+\\)?: " nil t))
 
 (defun haskell-interactive-mode-error-forward ()
   "Go forward to the next error, or return to the REPL."
   (interactive)
   (goto-char (line-end-position))
-  (if (search-forward-regexp "^[^:]+:[0-9]+:[0-9]+: " nil t)
+  (if (search-forward-regexp "^[^:]+:[0-9]+:[0-9]+\\(-[0-9]+\\)?: " nil t)
       (progn (goto-char (line-beginning-position))
              t)
     (progn (goto-char (point-max))
@@ -466,7 +466,7 @@ Key bindings:
   (interactive)
   (with-current-buffer (haskell-session-interactive-buffer (haskell-session))
     (if (progn (goto-char (line-beginning-position))
-               (looking-at "^[^:]+:[0-9]+:[0-9]+: "))
+               (looking-at "^[^:]+:[0-9]+:[0-9]+\\(-[0-9]+\\)?: "))
         (progn (forward-line -1)
                (haskell-interactive-jump-to-error-line))
       (progn (goto-char (point-max))
