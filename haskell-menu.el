@@ -128,6 +128,9 @@ Letters do not insert themselves; instead, they are commands."
     (suppress-keymap map t)
     menu-map))
 
+
+(provide 'haskell-menu)
+
 ;; Local Variables:
 ;; byte-compile-warnings: (not cl-functions)
 ;; End:
