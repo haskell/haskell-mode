@@ -146,6 +146,7 @@
 
 (require 'dabbrev)
 (require 'compile)
+(require 'flymake)
 (require 'haskell-align-imports)
 (require 'haskell-sort-imports)
 (require 'haskell-string)
@@ -691,8 +692,6 @@ See `haskell-check-command' for the default."
   (save-some-buffers (not compilation-ask-about-save) nil)
   (compilation-start command))
 
-(autoload 'flymake-init-create-temp-buffer-copy "flymake")
-
 (defun haskell-flymake-init ()
   "Flymake init function for Haskell.
 To be added to `flymake-init-create-temp-buffer-copy'."
@@ -702,6 +701,8 @@ To be added to `flymake-init-create-temp-buffer-copy'."
 	  (append (cdr checker-elts)
 		  (list (flymake-init-create-temp-buffer-copy
 			 'flymake-create-temp-inplace))))))
+
+(add-to-list 'flymake-allowed-file-name-masks '("\\.l?hs\\'" haskell-flymake-init))
 
 (defun haskell-mode-suggest-indent-choice ()
   "Ran when the user tries to indent in the buffer but no indentation mode has been selected.
@@ -873,9 +874,6 @@ This function will be called with no arguments.")
 	  (kill-region (match-beginning 0) (match-end 0))
 	(error "No SCC at point")))))
 
-(eval-after-load "flymake"
-  '(add-to-list 'flymake-allowed-file-name-masks
-		'("\\.l?hs\\'" haskell-flymake-init)))
 
 ;; Provide ourselves:
 
