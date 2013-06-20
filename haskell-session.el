@@ -303,17 +303,19 @@
                    set-dir)
           (haskell-session-cabal-dir s))))))
 
-(defun haskell-session-get (s key)
-  "Get the session `key`."
-  (let ((x (assoc key s)))
-    (when x
-      (cdr x))))
+(defun haskell-session-get (session key)
+  "Get the SESSION's KEY value.
+Returns nil if KEY not set."
+  (cdr (assq key session)))
 
-(defun haskell-session-set (s key value) 
-  "Set the session's `key`."
-  (delete-if (lambda (prop) (equal (car prop) key)) s)
-  (setf (cdr s) (cons (cons key value)
-                      (cdr s))))
+(defun haskell-session-set (session key value)
+  "Set the SESSION's KEY to VALUE.
+Returns newly set VALUE."
+  (let ((cell (assq key session)))
+    (if cell
+        (setcdr cell value) ; modify cell in-place
+      (setcdr session (cons (cons key value) (cdr session))) ; new cell
+      value)))
 
 (provide 'haskell-session)
 

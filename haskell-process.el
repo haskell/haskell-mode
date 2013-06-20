@@ -858,18 +858,19 @@ to be loaded by ghci."
         (haskell-process-set process 'command-queue (cdr queue))
         next))))
 
-(defun haskell-process-get (s key)
-  "Get the process `key'."
-  (let ((x (assoc key s)))
-    (when x
-      (cdr x))))
+(defun haskell-process-get (process key)
+  "Get the PROCESS's KEY value.
+Returns nil if KEY not set."
+  (cdr (assq key process)))
 
-(defun haskell-process-set (s key value)
-  "Set the process's `key'."
-  (delete-if (lambda (prop) (equal (car prop) key)) s)
-  (setf (cdr s) (cons (cons key value)
-                      (cdr s)))
-  s)
+(defun haskell-process-set (process key value)
+  "Set the PROCESS's KEY to VALUE.
+Returns newly set VALUE."
+  (let ((cell (assq key process)))
+    (if cell
+        (setcdr cell value) ; modify cell in-place
+      (setcdr process (cons (cons key value) (cdr process))) ; new cell
+      value)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessing commands -- using cl 'defstruct'
