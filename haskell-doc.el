@@ -92,7 +92,7 @@
 ;;   M-x turn-on-haskell-doc-mode
 
 ;; These are the names of the functions that can be called directly by the
-;; user (with keybindings in `haskell-hugs-mode' and `haskell-mode'):
+;; user (with keybindings in `haskell-mode'):
 ;;  `haskell-doc-mode' ... toggle haskell-doc-mode; with prefix turn it on
 ;;                        unconditionally if the prefix is greater 0 otherwise
 ;;                        turn it off
@@ -110,8 +110,7 @@
 ;;  =====
 
 ;;   - Fix byte-compile problems in `haskell-doc-prelude-types' for getArgs etc
-;;   - Write a parser for .hi files and make haskell-doc independent from
-;;     hugs-mode. Read library interfaces via this parser.
+;;   - Write a parser for .hi files. Read library interfaces via this parser.
 ;;   - Indicate kind of object with colours
 ;;   - Handle multi-line types
 ;;   - Encode i-am-fct info in the alist of ids and types.
@@ -1813,21 +1812,15 @@ ToDo: Also eliminate leading and trailing whitespace."
 ;;@cindex haskell-doc-get-imenu-info
 (defun haskell-doc-get-imenu-info (obj kind)
   "Return a string describing OBJ of KIND \(Variables, Types, Data\)."
-  (cond ((or (eq major-mode 'haskell-hugs-mode)
-             ;; GEM: Haskell Mode does not work with Haskell Doc
-             ;;      under XEmacs 20.x
-             (and (eq major-mode 'haskell-mode)
-                  (not (and (featurep 'xemacs)
-                            (string-match "^20" emacs-version)))))
-	 (let* ((imenu-info-alist (cdr (assoc kind imenu--index-alist)))
-                ;; (names (mapcar 'car imenu-info-alist))
-                (x (assoc obj imenu-info-alist)))
-	     (if x
-		 (haskell-doc-grab-line x)
-	       nil)))
-	  (t
-           ;; (error "Cannot get local functions in %s mode, sorry" major-mode))) )
-	   nil)))
+  (cond
+   ((eq major-mode 'haskell-mode)
+    (let* ((imenu-info-alist (cdr (assoc kind imenu--index-alist)))
+           ;; (names (mapcar 'car imenu-info-alist))
+           (x (assoc obj imenu-info-alist)))
+      (when x (haskell-doc-grab-line x))))
+
+   (t ;; (error "Cannot get local functions in %s mode, sorry" major-mode)))
+    nil)))
 
 ;;@node Global fct type, Local fct type, Aux, Print fctsym
 ;;@subsection Global fct type

@@ -53,9 +53,6 @@
 ;;
 ;; `inf-haskell'
 ;;   Interaction with an inferior Haskell process.
-;;   It replaces the previous two modules:
-;;     `haskell-hugs', Guy Lapalme
-;;     `haskell-ghci', Chris Web
 ;;
 ;;
 ;; This mode supports full Haskell 1.4 including literate scripts.
@@ -208,8 +205,6 @@ sure all haskell customize definitions have been loaded."
 (defun turn-on-haskell-font-lock ()
   (turn-on-font-lock)
   (message "turn-on-haskell-font-lock is obsolete.  Use turn-on-font-lock instead."))
-(defun turn-on-haskell-hugs () (message "haskell-hugs is obsolete."))
-(defun turn-on-haskell-ghci () (message "haskell-ghci is obsolete."))
 
 ;; Are we looking at a literate script?
 (defvar haskell-literate nil

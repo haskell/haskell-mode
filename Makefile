@@ -15,8 +15,6 @@ ELFILES = \
 	haskell-decl-scan.el \
 	haskell-doc.el \
 	haskell-font-lock.el \
-	haskell-ghci.el \
-	haskell-hugs.el \
 	haskell-indent.el \
 	haskell-indentation.el \
 	haskell-interactive-mode.el \
