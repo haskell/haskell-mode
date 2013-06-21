@@ -41,11 +41,7 @@
 ;; Configuration
 
 (defcustom haskell-process-path-ghci
-  (or (cond
-       ((not (fboundp 'executable-find)) nil)
-       ((executable-find "hugs") "hugs \"+.\"")
-       ((executable-find "ghci") "ghci"))
-      "ghci")
+  "ghci"
   "The path for starting ghci."
   :group 'haskell
   :type '(choice string (repeat string)))
