@@ -47,12 +47,14 @@
   "Get the filename for the TAGS file."
   (concat (haskell-session-cabal-dir session) "/TAGS"))
 
+;;;###autoload
 (defun haskell-session-all-modules ()
   "Get all modules -- installed or in the current project."
   (remove-if (lambda (x) (string= x ""))
              (append (haskell-session-installed-modules)
                      (haskell-session-project-modules))))
 
+;;;###autoload
 (defun haskell-session-installed-modules ()
   "Get the modules installed in the current package set."
   ;; TODO: Again, this makes HEAVY use of unix utilities. It'll work

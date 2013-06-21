@@ -44,6 +44,7 @@
   :group 'haskell-yas
   :type 'function)
 
+;;;###autoload
 (defun haskell-yas-complete (&rest args)
   (apply haskell-yas-completing-function args))
 
