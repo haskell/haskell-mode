@@ -91,7 +91,7 @@
                    ;; (and possibly OS X) have egrep, Windows
                    ;; doesn't -- or does it via Cygwin or MinGW?
                    ;; This also doesn't handle module\nName. But those gits can just cut it out!
-                   "egrep '^module [^ (\r]+' * -r -I --include='*hs' -o -h | sed 's/^module //'"))))
+                   "egrep '^module[\t\r ]+[^(\t\r ]+' . -r -I --include='*.*hs' --include='*.hsc' -s -o -h | sed 's/^module[\t\r ]*//' | sort | uniq"))))
     (split-string modules "\n")))
 
 (defun haskell-session-kill (&optional leave-interactive-buffer)
