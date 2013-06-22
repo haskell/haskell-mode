@@ -397,22 +397,22 @@ Key bindings:
           haskell-interactive-mode-history))))
 
 (defun haskell-interactive-mode-history-previous (arg)
-    "Cycle backwards through input history."
-    (interactive "*p")
-    (when (haskell-interactive-at-prompt)
-      (if (not (zerop arg))
-          (haskell-interactive-mode-history-toggle arg)
-        (setq haskell-interactive-mode-history-index 0)
-        (haskell-interactive-mode-history-toggle 1))))
+  "Cycle backwards through input history."
+  (interactive "*p")
+  (when (haskell-interactive-at-prompt)
+    (if (not (zerop arg))
+        (haskell-interactive-mode-history-toggle arg)
+      (setq haskell-interactive-mode-history-index 0)
+      (haskell-interactive-mode-history-toggle 1))))
 
 (defun haskell-interactive-mode-history-next (arg)
-    "Cycle forward through input history."
-    (interactive "*p")
-    (when (haskell-interactive-at-prompt)
-      (if (not (zerop arg))
-          (haskell-interactive-mode-history-toggle (- arg))
-        (setq haskell-interactive-mode-history-index 0)
-        (haskell-interactive-mode-history-toggle -1))))
+  "Cycle forward through input history."
+  (interactive "*p")
+  (when (haskell-interactive-at-prompt)
+    (if (not (zerop arg))
+        (haskell-interactive-mode-history-toggle (- arg))
+      (setq haskell-interactive-mode-history-index 0)
+      (haskell-interactive-mode-history-toggle -1))))
 
 (defun haskell-interactive-mode-set-prompt (p)
   "Set (and overwrite) the current prompt."
@@ -464,7 +464,7 @@ Key bindings:
                                 (not visibility)))))))
 
 (defconst haskell-interactive-mode-error-regexp
-  "^[^:]+:[0-9]+:[0-9]+\\(-[0-9]+\\)?:\\( \\|$\\)")
+  "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:")
 
 (defun haskell-interactive-at-compile-message ()
   "Am I on a compile message?"
@@ -515,7 +515,7 @@ Key bindings:
 
     (let ((orig-line (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
 
-      (when (string-match "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:"  orig-line)
+      (when (string-match haskell-interactive-mode-error-regexp orig-line)
         (let* ((msgmrk (set-marker (make-marker) (line-beginning-position)))
                (file (match-string 1 orig-line))
                (line (match-string 2 orig-line))
@@ -530,22 +530,20 @@ Key bindings:
 
           (haskell-session-set session 'next-error-locus msgmrk)
 
-          (unless real-file
-            (message "don't know where to find %S" file))
+          (if real-file
+              (let ((m1 (make-marker))
+                    (m2 (make-marker)))
+                (with-current-buffer (find-file-noselect real-file)
+                  (save-excursion
+                    (goto-char (point-min))
+                    (forward-line (1- (string-to-number line)))
+                    (set-marker m1 (+ (string-to-number col1) (point) -1))
 
-          (when real-file
-            (let ((m1 (make-marker))
-                  (m2 (make-marker)))
-              (with-current-buffer (find-file-noselect real-file)
-                (save-excursion
-                  (goto-char (point-min))
-                  (forward-line (1- (string-to-number line)))
-                  (set-marker m1 (+ (string-to-number col1) (point) -1))
-
-                  (when col2
-                    (set-marker m2 (+ (string-to-number col2) (point) -1)))))
-              ;; ...finally select&hilight error locus
-              (compilation-goto-locus msgmrk m1 (and (marker-position m2) m2)))))))))
+                    (when col2
+                      (set-marker m2 (+ (string-to-number col2) (point) -1)))))
+                ;; ...finally select&hilight error locus
+                (compilation-goto-locus msgmrk m1 (and (marker-position m2) m2)))
+            (error "don't know where to find %S" file)))))))
 
 (defun haskell-interactive-mode-visit-error ()
   "Visit the buffer of the current (or last) error message."
