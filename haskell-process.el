@@ -59,7 +59,7 @@
   :type '(choice string (repeat string)))
 
 (defcustom haskell-process-args-ghci
-  '()
+  '("-ferror-spans")
   "Any arguments for starting ghci."
   :group 'haskell
   :type '(choice list))
