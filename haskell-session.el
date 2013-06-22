@@ -208,11 +208,6 @@ If DONTCREATE is non-nil don't create a new session."
   "Clear the buffer of any Haskell session choice."
   (set (make-local-variable 'haskell-session) nil))
 
-(defun haskell-session-clear-all ()
-  "Clear the buffer of any Haskell session choice."
-  (haskell-session-clear)
-  (setq haskell-sessions nil))
-
 (defun haskell-session-change ()
   "Change the session for the current buffer."
   (interactive)
