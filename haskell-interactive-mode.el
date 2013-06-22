@@ -488,7 +488,7 @@ Key bindings:
            nil)))
 
 (defun haskell-interactive-next-error-function (&optional n reset)
-  "See `next-error-function` for more information."
+  "See `next-error-function' for more information."
 
   (let* ((session (haskell-session))
          (next-error-region (haskell-session-get session 'next-error-region))
