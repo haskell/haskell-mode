@@ -134,6 +134,7 @@ If DONTCREATE is non-nil don't create a new session."
 ;; Used internally
 (defvar haskell-session)
 
+;;;###autoload
 (defun haskell-session-maybe ()
   "Maybe get the Haskell session, return nil if there isn't one."
   (if (default-boundp 'haskell-session)
