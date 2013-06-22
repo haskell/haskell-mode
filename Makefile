@@ -36,7 +36,7 @@ ELFILES = \
 ELCFILES = $(ELFILES:.el=.elc)
 AUTOLOADS = haskell-mode-autoloads.el
 
-PKG_DIST_FILES = $(ELFILES) logo.svg
+PKG_DIST_FILES = $(ELFILES) logo.svg README
 PKG_TAR = haskell-mode-$(VERSION).tar
 ELCHECKS=$(addprefix check-, $(ELFILES:.el=))
 
