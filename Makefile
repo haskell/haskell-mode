@@ -37,7 +37,7 @@ ELFILES = \
 ELCFILES = $(ELFILES:.el=.elc)
 AUTOLOADS = haskell-mode-autoloads.el
 
-PKG_DIST_FILES = $(ELFILES) logo.svg README haskell-mode.info dir
+PKG_DIST_FILES = $(ELFILES) logo.svg haskell-mode.info dir
 PKG_TAR = haskell-mode-$(VERSION).tar
 ELCHECKS=$(addprefix check-, $(ELFILES:.el=))
 
@@ -85,6 +85,7 @@ $(PKG_TAR): $(PKG_DIST_FILES) haskell-mode-pkg.el.in
 	cp $(PKG_DIST_FILES) haskell-mode-$(VERSION)/
 	sed -e 's/@VERSION@/$(VERSION)/g' < haskell-mode-pkg.el.in > haskell-mode-$(VERSION)/haskell-mode-pkg.el
 	sed -e 's/@GIT_VERSION@/$(GIT_VERSION)/g;s/@VERSION@/$(VERSION)/g' < haskell-mode.el > haskell-mode-$(VERSION)/haskell-mode.el
+	(sed -n -e '/^;;; Commentary/,/^;;;/p' | egrep '^;;( |$$)' | cut -c4-) < haskell-mode.el > haskell-mode-$(VERSION)/README
 	tar cvf $@ haskell-mode-$(VERSION)
 	rm -rf haskell-mode-$(VERSION)
 	@echo

@@ -28,49 +28,29 @@
 
 ;;; Commentary:
 
-;; Purpose:
+;; A major mode for editing Haskell (the functional programming
+;; language, see URL `http://www.haskell.org') in Emacs.
 ;;
-;; To provide a pleasant mode to browse and edit Haskell files, linking
-;; into the following supported modules:
+;; Some of its major features include:
 ;;
-;; `haskell-font-lock', Graeme E Moss and Tommy Thorn
-;;   Fontifies standard Haskell keywords, symbols, functions, etc.
+;;  - syntax highlighting (font lock),
 ;;
-;; `haskell-decl-scan', Graeme E Moss
-;;   Scans top-level declarations, and places them in a menu.
+;;  - automatic indentation,
 ;;
-;; `haskell-doc', Hans-Wolfgang Loidl
-;;   Echoes types of functions or syntax of keywords when the cursor is idle.
+;;  - on-the-fly documentation,
 ;;
-;; `haskell-indentation', Kristof Bastiaensen
-;;   Intelligent semi-automatic indentation, mark two.
+;;  - interaction with inferior GHCi/Hugs instance,
 ;;
-;; `haskell-indent', Guy Lapalme
-;;   Intelligent semi-automatic indentation.
+;;  - scans declarations and places them in a menu.
 ;;
-;; `haskell-simple-indent', Graeme E Moss and Heribert Schuetz
-;;   Simple indentation.
-;;
-;; `inf-haskell'
-;;   Interaction with an inferior Haskell process.
-;;
-;;
-;; This mode supports full Haskell 1.4 including literate scripts.
-;; In some versions of (X)Emacs it may only support Latin-1, not Unicode.
-;;
-;; This mode is based on an editing mode by Simon Marlow 11/1/92
-;; and heavily modified by Graeme E Moss and Tommy Thorn 7/11/98.
-;;
-;; If you have any problems or suggestions specific to a supported
-;; module, consult that module for a list of known bugs, and an
-;; author to contact via email.  For general problems or suggestions,
-;; consult the list below, then email gem@cs.york.ac.uk and
-;; thorn@irisa.fr quoting the version of the mode you are using, the
-;; version of Emacs you are using, and a small example of the problem
-;; or suggestion.
+;; See URL `https://github.com/haskell/haskell-mode' and/or
+;; Info node `(haskell-mode)Introduction' for more information.
 
 ;;; Change Log:
 
+;; This mode is based on an editing mode by Simon Marlow 11/1/92
+;; and heavily modified by Graeme E Moss and Tommy Thorn 7/11/98.
+;;
 ;; Version 1.5:
 ;;   Added autoload for haskell-indentation
 ;;
