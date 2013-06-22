@@ -540,7 +540,7 @@ Key bindings:
                     (set-marker m1 (+ (string-to-number col1) (point) -1))
 
                     (when col2
-                      (set-marker m2 (+ (string-to-number col2) (point) -1)))))
+                      (set-marker m2 (- (point) (string-to-number col2))))))
                 ;; ...finally select&hilight error locus
                 (compilation-goto-locus msgmrk m1 (and (marker-position m2) m2)))
             (error "don't know where to find %S" file)))))))
