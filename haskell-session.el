@@ -48,15 +48,16 @@
   (concat (haskell-session-cabal-dir session) "/TAGS"))
 
 ;;;###autoload
-(defun haskell-session-all-modules ()
-  "Get all modules -- installed or in the current project."
-  (remove-if (lambda (x) (string= x ""))
-             (append (haskell-session-installed-modules)
-                     (haskell-session-project-modules))))
+(defun haskell-session-all-modules (&optional dontcreate)
+  "Get all modules -- installed or in the current project.
+If DONTCREATE is non-nil don't create a new session."
+  (append (haskell-session-installed-modules dontcreate)
+          (haskell-session-project-modules dontcreate)))
 
 ;;;###autoload
-(defun haskell-session-installed-modules ()
-  "Get the modules installed in the current package set."
+(defun haskell-session-installed-modules (&optional dontcreate)
+  "Get the modules installed in the current package set.
+If DONTCREATE is non-nil don't create a new session."
   ;; TODO: Again, this makes HEAVY use of unix utilities. It'll work
   ;; fine in Linux, probably okay on OS X, and probably not at all on
   ;; Windows. Again, if someone wants to test on Windows and come up
@@ -70,20 +71,24 @@
   ;; Probably also we can take the code from inferior-haskell-mode.
   ;;
   ;; Ugliness aside, if it saves us time to type it's a winner.
+  (require 'haskell-process) ; hack for accessing haskell-process-type
   (let ((modules (shell-command-to-string
-                  (format "%s | %s | %s | %s"
-                          (if (equal 'cabal-dev haskell-process-type)
-                              (format "cabal-dev -s %s/cabal-dev ghc-pkg dump"
-                                      (haskell-session-cabal-dir (haskell-session)))
+                  (format "%s | %s | %s"
+                          (if (eq 'cabal-dev haskell-process-type)
+                              (if (or (not dontcreate) (haskell-session-maybe))
+                                  (format "cabal-dev -s %s/cabal-dev ghc-pkg dump"
+                                          (haskell-session-cabal-dir (haskell-session)))
+                                "echo ''")
                             "ghc-pkg dump")
-                          "egrep '^(exposed-modules:|                 )'"
-                          "tr ' ' '\n'"
-                          "grep '^[A-Z]'"))))
-    (split-string modules "\n")))
+                          "egrep '^(exposed-modules: |                 )[A-Z]'"
+                          "cut -c18-"))))
+    (split-string modules)))
 
-(defun haskell-session-project-modules ()
-  "Get the modules of the current project."
-  (let* ((session (haskell-session))
+(defun haskell-session-project-modules (&optional dontcreate)
+  "Get the modules of the current project.
+If DONTCREATE is non-nil don't create a new session."
+  (if (or (not dontcreate) (haskell-session-maybe))
+      (let* ((session (haskell-session))
          (modules
           (shell-command-to-string
            (format "%s && %s"
@@ -94,7 +99,7 @@
                    ;; doesn't -- or does it via Cygwin or MinGW?
                    ;; This also doesn't handle module\nName. But those gits can just cut it out!
                    "egrep '^module[\t\r ]+[^(\t\r ]+' . -r -I --include='*.*hs' --include='*.hsc' -s -o -h | sed 's/^module[\t\r ]*//' | sort | uniq"))))
-    (split-string modules "\n")))
+    (split-string modules))))
 
 (defun haskell-session-kill (&optional leave-interactive-buffer)
   "Kill the session process and buffer, delete the session.
