@@ -448,16 +448,19 @@ Key bindings:
                                 'invisible
                                 (not visibility)))))))
 
+(defconst haskell-interactive-mode-error-regexp
+  "^[^:]+:[0-9]+:[0-9]+\\(-[0-9]+\\)?: ")
+
 (defun haskell-interactive-mode-error-backward ()
   "Go backward to the previous error."
   (interactive)
-  (search-backward-regexp "^[^:]+:[0-9]+:[0-9]+\\(-[0-9]+\\)?: " nil t))
+  (search-backward-regexp haskell-interactive-mode-error-regexp nil t))
 
 (defun haskell-interactive-mode-error-forward ()
   "Go forward to the next error, or return to the REPL."
   (interactive)
   (goto-char (line-end-position))
-  (if (search-forward-regexp "^[^:]+:[0-9]+:[0-9]+\\(-[0-9]+\\)?: " nil t)
+  (if (search-forward-regexp haskell-interactive-mode-error-regexp nil t)
       (progn (goto-char (line-beginning-position))
              t)
     (progn (goto-char (point-max))
@@ -468,7 +471,7 @@ Key bindings:
   (interactive)
   (with-current-buffer (haskell-session-interactive-buffer (haskell-session))
     (if (progn (goto-char (line-beginning-position))
-               (looking-at "^[^:]+:[0-9]+:[0-9]+\\(-[0-9]+\\)?: "))
+               (looking-at haskell-interactive-mode-error-regexp))
         (progn (forward-line -1)
                (haskell-interactive-jump-to-error-line))
       (progn (goto-char (point-max))
