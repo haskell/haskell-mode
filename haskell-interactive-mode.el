@@ -451,16 +451,16 @@ Key bindings:
 (defconst haskell-interactive-mode-error-regexp
   "^[^:]+:[0-9]+:[0-9]+\\(-[0-9]+\\)?: ")
 
-(defun haskell-interactive-mode-error-backward ()
+(defun haskell-interactive-mode-error-backward (&optional count)
   "Go backward to the previous error."
   (interactive)
-  (search-backward-regexp haskell-interactive-mode-error-regexp nil t))
+  (search-backward-regexp haskell-interactive-mode-error-regexp nil t count))
 
-(defun haskell-interactive-mode-error-forward ()
+(defun haskell-interactive-mode-error-forward (&optional count)
   "Go forward to the next error, or return to the REPL."
   (interactive)
   (goto-char (line-end-position))
-  (if (search-forward-regexp haskell-interactive-mode-error-regexp nil t)
+  (if (search-forward-regexp haskell-interactive-mode-error-regexp nil t count)
       (progn (goto-char (line-beginning-position))
              t)
     (progn (goto-char (point-max))
