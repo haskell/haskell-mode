@@ -65,11 +65,13 @@ interference with prompts that look like haskell expressions."
 (defvar haskell-interactive-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "RET") 'haskell-interactive-mode-return)
+    (define-key map (kbd "SPC") 'haskell-interactive-mode-space)
     (define-key map (kbd "C-j") 'haskell-interactive-mode-newline-indent)
     (define-key map (kbd "C-a") 'haskell-interactive-mode-beginning)
     (define-key map (kbd "<home>") 'haskell-interactive-mode-beginning)
     (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
     (define-key map (kbd "C-c C-c") 'haskell-process-interrupt)
+    (define-key map (kbd "C-c C-f") 'next-error-follow-minor-mode)
     (define-key map (kbd "M-p") 'haskell-interactive-mode-history-previous)
     (define-key map (kbd "M-n") 'haskell-interactive-mode-history-next)
     (define-key map (kbd "C-<up>") 'haskell-interactive-mode-history-previous)
@@ -91,6 +93,7 @@ Key bindings:
   (set (make-local-variable 'haskell-interactive-mode) t)
   (setq major-mode 'haskell-interactive-mode)
   (setq mode-name "Interactive-Haskell")
+  (setq next-error-function 'haskell-interactive-next-error-function)
   (run-mode-hooks 'haskell-interactive-mode-hook)
   (set (make-local-variable 'haskell-interactive-mode-history)
        (list))
@@ -147,8 +150,16 @@ Key bindings:
 (defun haskell-interactive-mode-return ()
   "Handle the return key."
   (interactive)
-  (or (haskell-interactive-jump-to-error-line)
-      (haskell-interactive-handle-line)))
+  (if (haskell-interactive-at-compile-message)
+      (next-error 0)
+    (haskell-interactive-handle-line)))
+
+(defun haskell-interactive-mode-space (n)
+  "Handle the space key."
+  (interactive "p")
+  (if (haskell-interactive-at-compile-message)
+      (next-error-no-select 0)
+    (self-insert-command n)))
 
 (defun haskell-interactive-at-prompt ()
   "Am I at the prompt?"
@@ -228,12 +239,15 @@ Key bindings:
 (defun haskell-interactive-mode-clear ()
   "Newline and indent at the prompt."
   (interactive)
-  (with-current-buffer (haskell-session-interactive-buffer (haskell-session))
-    (let ((inhibit-read-only t))
-      (set-text-properties (point-min) (point-max) nil))
-    (delete-region (point-min) (point-max))
-    (mapc 'delete-overlay (overlays-in (point-min) (point-max)))
-    (haskell-interactive-mode-prompt (haskell-session))))
+  (let ((session (haskell-session)))
+    (with-current-buffer (haskell-session-interactive-buffer session)
+      (let ((inhibit-read-only t))
+        (set-text-properties (point-min) (point-max) nil))
+      (delete-region (point-min) (point-max))
+      (mapc 'delete-overlay (overlays-in (point-min) (point-max)))
+      (haskell-interactive-mode-prompt session)
+      (haskell-session-set session 'next-error-region nil)
+      (haskell-session-set session 'next-error-locus nil))))
 
 (defun haskell-interactive-mode-input ()
   "Get the interactive mode input."
@@ -323,6 +337,7 @@ Key bindings:
 (defun haskell-interactive-mode-compile-message (session message type)
   "Echo a compiler warning."
   (with-current-buffer (haskell-session-interactive-buffer session)
+    (setq next-error-last-buffer (current-buffer))
     (save-excursion
       (haskell-interactive-mode-goto-end-point)
       (let ((lines (string-match "^\\(.*\\)\n\\([[:unibyte:][:nonascii:]]+\\)" message)))
@@ -449,7 +464,13 @@ Key bindings:
                                 (not visibility)))))))
 
 (defconst haskell-interactive-mode-error-regexp
-  "^[^:]+:[0-9]+:[0-9]+\\(-[0-9]+\\)?: ")
+  "^[^:]+:[0-9]+:[0-9]+\\(-[0-9]+\\)?:\\( \\|$\\)")
+
+(defun haskell-interactive-at-compile-message ()
+  "Am I on a compile message?"
+  (save-excursion
+    (goto-char (line-beginning-position))
+    (looking-at haskell-interactive-mode-error-regexp)))
 
 (defun haskell-interactive-mode-error-backward (&optional count)
   "Go backward to the previous error."
@@ -465,6 +486,66 @@ Key bindings:
              t)
     (progn (goto-char (point-max))
            nil)))
+
+(defun haskell-interactive-next-error-function (&optional n reset)
+  "See `next-error-function` for more information."
+
+  (let* ((session (haskell-session))
+         (next-error-region (haskell-session-get session 'next-error-region))
+         (next-error-locus (haskell-session-get session 'next-error-locus))
+         (reset-locus nil))
+
+    (when (and next-error-region (or reset (and (/= n 0) (not next-error-locus))))
+      (goto-char (car next-error-region))
+      (unless (looking-at haskell-interactive-mode-error-regexp)
+        (haskell-interactive-mode-error-forward))
+
+      (setq reset-locus t)
+      (unless (looking-at haskell-interactive-mode-error-regexp)
+        (error "no errors found")))
+
+    ;; move point if needed
+    (cond
+     (reset-locus nil)
+     ((> n 0) (unless (haskell-interactive-mode-error-forward n)
+                (error "no more errors")))
+
+     ((< n 0) (unless (haskell-interactive-mode-error-backward (- n))
+                (error "no more errors"))))
+
+    (let ((orig-line (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
+
+      (when (string-match "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:"  orig-line)
+        (let* ((msgmrk (set-marker (make-marker) (line-beginning-position)))
+               (file (match-string 1 orig-line))
+               (line (match-string 2 orig-line))
+               (col1 (match-string 3 orig-line))
+               (col2 (match-string 4 orig-line))
+
+               (cabal-relative-file (expand-file-name file (haskell-session-cabal-dir session)))
+               (src-relative-file (expand-file-name file (haskell-session-current-dir session)))
+
+               (real-file (cond ((file-exists-p cabal-relative-file) cabal-relative-file)
+                                ((file-exists-p src-relative-file) src-relative-file))))
+
+          (haskell-session-set session 'next-error-locus msgmrk)
+
+          (unless real-file
+            (message "don't know where to find %S" file))
+
+          (when real-file
+            (let ((m1 (make-marker))
+                  (m2 (make-marker)))
+              (with-current-buffer (find-file-noselect real-file)
+                (save-excursion
+                  (goto-char (point-min))
+                  (forward-line (1- (string-to-number line)))
+                  (set-marker m1 (+ (string-to-number col1) (point) -1))
+
+                  (when col2
+                    (set-marker m2 (+ (string-to-number col2) (point) -1)))))
+              ;; ...finally select&hilight error locus
+              (compilation-goto-locus msgmrk m1 (and (marker-position m2) m2)))))))))
 
 (defun haskell-interactive-mode-visit-error ()
   "Visit the buffer of the current (or last) error message."
@@ -483,6 +564,10 @@ Key bindings:
   "Reset the error cursor position."
   (interactive)
   (with-current-buffer (haskell-session-interactive-buffer session)
+    (haskell-interactive-mode-goto-end-point)
+    (let ((mrk (point-marker)))
+      (haskell-session-set session 'next-error-locus nil)
+      (haskell-session-set session 'next-error-region (cons mrk (copy-marker mrk t))))
     (goto-char (point-max))))
 
 (defun haskell-interactive-kill ()
