@@ -466,6 +466,10 @@ CONFIGURING INDENTATION
 ;;;###autoload
 (define-derived-mode haskell-mode haskell-parent-mode "Haskell"
   "Major mode for editing Haskell programs.
+
+See also Info node `(haskell-mode)Getting Started' for more
+information about this mode.
+
 Blank lines separate paragraphs, comments start with `-- '.
 \\<haskell-mode-map>
 Literate scripts are supported via `literate-haskell-mode'.

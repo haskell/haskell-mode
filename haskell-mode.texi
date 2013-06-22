@@ -1,0 +1,196 @@
+\input texinfo          @c -*-texinfo-*-
+@c %**start of header
+@setfilename haskell-mode.info
+@settitle haskell-mode manual 13.x
+@c %**end of header
+
+@dircategory Emacs
+@direntry
+* Haskell Mode: (haskell-mode).             Haskell Development Environment for Emacs(en)
+@end direntry
+
+@copying
+This manual is for haskell-mode, version 13.x.
+
+Copyright @copyright{} 2013 Haskell Mode contributors.
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.2 or any later version published by the Free Software Foundation; with no Invariant Sections, with no Front-Cover Texts, and with no Back-Cover Texts.
+@end quotation
+@end copying
+
+@titlepage
+@title Haskell Mode
+@subtitle Haskell Development Environment for Emacs
+
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top, Introduction, (dir), (dir)
+@top Haskell Mode
+
+Haskell Mode is an Haskell development Environment for GNU Emacs.  It provides syntax-based indentation, font locking, and supports running an inferior Haskell interpreter (e.g. GHCi).
+ 
+@insertcopying
+@end ifnottex
+
+@menu
+* Introduction::
+* Getting Started::
+* Editing Code::
+* Unicode::
+* Indentation::
+* inferior-haskell-mode::
+* haskell-interactive-mode::
+* haskell-cabal-mode::
+* Concept index::
+* Function index::
+* Variable index::
+
+@end menu
+
+@node Introduction, Getting Started, Top, Top
+@chapter Introduction
+
+Haskell Mode is a major mode for editing Haskell (http://www.haskell.org) programs.
+
+Some of its major features include:
+
+@itemize
+@item
+syntax highlighting (font lock),
+@item
+automatic indentation,
+@item
+on-the-fly documentation,
+@item
+interaction with inferior GHCi/Hugs instance,
+@item
+scans declarations and places them in a menu.
+@end itemize
+
+This Info manual is work in progress and incomplete. However, you can find more information at these locations:
+
+@itemize
+@item
+Haskell Mode's GitHub Home: @uref{https://github.com/haskell/haskell-mode}
+@item
+The Haskell Wiki: @uref{http://www.haskell.org/haskellwiki/Haskell_mode_for_Emacs}
+@end itemize
+
+@node Getting Started, Editing Code, Introduction, Top
+@chapter Getting Started
+
+One of the recommended ways is to install Haskell Mode via the Marmalade package archive (@uref{http://marmalade-repo.org/packages/haskell-mode}).
+
+Most of Haskell Mode's settings are exposed via Emacs' @pxref{Easy Customization,,, emacs} interface. You can use @kbd{M-x haskell-customize} to browse the @code{haskell} customization sub-tree.
+
+TODO:
+@itemize
+@item
+provide basic instructions to get up and running with haskell-mode
+@item
+tell about the most important commands
+@item
+tell where to find advanced help
+@end itemize
+
+@node Editing Code, Unicode, Getting Started, Top
+@chapter Editing Code
+
+TODO
+
+@node Unicode, Indentation, Editing Code, Top
+@chapter Unicode support
+
+@cindex Unicode
+
+TODO:
+@itemize
+@item
+tell about the issues and benefits of using Unicode in source code.
+@item
+tell about @code{UnicodeSyntax} language extension and the unicode
+symbol providing packages on hackage
+@item
+tell about the haskell-unicode entry methods
+@end itemize
+
+@node Indentation, inferior-haskell-mode, Unicode, Top
+@chapter Indentation
+
+@findex turn-on-haskell-indent
+@findex turn-on-haskell-indentation
+@findex turn-on-haskell-simple-indent
+@cindex indentation
+
+TODO:
+@itemize
+@item
+tell about the three available basic indentation modules
+@item
+tell about the import sorting/alignment modules
+@item
+tell about customizations
+@end itemize
+
+@node inferior-haskell-mode, haskell-interactive-mode, Indentation, Top
+@chapter @code{inferior-haskell-mode}
+
+@findex inferior-haskell-find-definition
+@findex inferior-haskell-find-haddock
+@findex inferior-haskell-info
+@findex inferior-haskell-load-and-run
+@findex inferior-haskell-load-file
+@findex inferior-haskell-mode
+@findex inferior-haskell-reload-file
+@findex inferior-haskell-start-process
+@findex inferior-haskell-type
+@vindex haskell-program-name
+@vindex inferior-haskell-mode-hook
+
+The major mode @code{inferior-haskell-mode} provides support for interacting with an inferior Haskell process.
+
+The Haskell interpreter used by the inferior Haskell mode is autodetected by default, but is customizable via the @code{haskell-program-name} variable.
+
+Currently, GHCi and Hugs are support as Haskell interpreter.
+
+TODO: write about supported features
+
+@node haskell-interactive-mode, haskell-cabal-mode, inferior-haskell-mode, Top
+@chapter @code{haskell-interactive-mode}
+
+A new mode for the REPL and GHCi sessions is called @code{haskell-interactive-mode}, it intends to replace @code{inferior-haskell-mode}, but comes with different features.
+
+TODO/WRITEME
+
+@node haskell-cabal-mode, Concept index, haskell-interactive-mode, Top
+@chapter @code{haskell-cabal-mode}
+
+@findex inferior-cabal-mode
+@vindex inferior-cabal-mode-hook
+
+WRITEME
+
+@node Concept index, Function index, haskell-cabal-mode, Top
+@unnumbered Concept index
+
+@printindex cp
+
+@node Function index, Variable index, Concept index, Top
+@unnumbered Function index
+
+@printindex fn
+
+@node Variable index,  , Function index, Top
+@unnumbered Variable index
+
+@printindex vr
+
+
+@bye

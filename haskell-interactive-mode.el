@@ -84,6 +84,9 @@ interference with prompts that look like haskell expressions."
 (defun haskell-interactive-mode (session)
   "Interactive mode for Haskell.
 
+See Info node `(haskell-mode)haskell-interactive-mode' for more
+information.
+
 Key bindings:
 \\{haskell-interactive-mode-map}"
   (interactive)

@@ -1,6 +1,7 @@
 VERSION = $(shell git describe --tags --match 'v[0-9]*' --abbrev=0 | sed 's/^v//;s/\.0*/./g')
 GIT_VERSION = $(shell git describe --tags --match 'v[0-9]*' --long --dirty | sed 's/^v//')
 
+INSTALL_INFO = install-info
 EMACS = emacs
 EFLAGS =
 BATCH = $(EMACS) $(EFLAGS) --batch -Q -L .
@@ -36,7 +37,7 @@ ELFILES = \
 ELCFILES = $(ELFILES:.el=.elc)
 AUTOLOADS = haskell-mode-autoloads.el
 
-PKG_DIST_FILES = $(ELFILES) logo.svg README
+PKG_DIST_FILES = $(ELFILES) logo.svg README haskell-mode.info dir
 PKG_TAR = haskell-mode-$(VERSION).tar
 ELCHECKS=$(addprefix check-, $(ELFILES:.el=))
 
@@ -47,7 +48,7 @@ ELCHECKS=$(addprefix check-, $(ELFILES:.el=))
 
 .PHONY: all compile info clean check $(ELCHECKS) elpa package
 
-all: compile $(AUTOLOADS)
+all: compile $(AUTOLOADS) info
 
 compile: $(ELCFILES)
 
@@ -64,9 +65,15 @@ check: $(ELCHECKS)
 	@echo "checks passed!"
 
 clean:
-	$(RM) $(ELCFILES) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) $(PKG_TAR)
+	$(RM) $(ELCFILES) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) $(PKG_TAR) haskell-mode.info dir
 
-info: # No Texinfo file, sorry.
+info: haskell-mode.info dir
+
+dir: haskell-mode.info
+	$(INSTALL_INFO) --dir=$@ $<
+
+# haskell-mode.info: haskell-mode.texi
+# 	$(MAKEINFO) -o $@ $<
 
 # Generate ELPA-compatible package
 package: $(PKG_TAR)
