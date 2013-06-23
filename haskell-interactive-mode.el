@@ -57,6 +57,12 @@ interference with prompts that look like haskell expressions."
   :type 'boolean
   :group 'haskell-interactive)
 
+(defcustom haskell-interactive-mode-delete-superseded-errors
+  t
+  "Whether to delete compile messages superseded by recompile/reloads."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 ;; Used internally
 (defvar haskell-interactive-mode)
 (defvar haskell-interactive-mode-history)
@@ -430,14 +436,12 @@ SESSION, otherwise operate on the current buffer.
 
 (defun haskell-interactive-show-load-message (session type module-name file-name echo)
   "Show the '(Compiling|Loading) X' message."
-  (let* ((file-name-module
-          (replace-regexp-in-string
-           "\\.hs$" ""
-           (replace-regexp-in-string "[\\/]" "." file-name)))
-         (msg (ecase type
-                ('compiling (format "Compiling: %s" module-name))
-                ('loading (format "Loading: %s" module-name)))))
+  (let ((msg (ecase type
+               ('compiling (format "Compiling: %s (%s)" module-name file-name))
+               ('loading (format "Loading: %s" module-name)))))
     (haskell-mode-message-line msg)
+    (when haskell-interactive-mode-delete-superseded-errors
+      (haskell-interactive-mode-delete-compile-messages session file-name))
     (when echo
       (haskell-interactive-mode-echo session msg))))
 
@@ -545,6 +549,28 @@ SESSION, otherwise operate on the current buffer.
                 ;; ...finally select&hilight error locus
                 (compilation-goto-locus msgmrk m1 (and (marker-position m2) m2)))
             (error "don't know where to find %S" file)))))))
+
+(defun haskell-interactive-mode-delete-compile-messages (session &optional file-name)
+  "Delete compile messages in REPL buffer.
+If FILE-NAME is non-nil, restrict to removing messages concerning
+FILE-NAME only."
+  (message "called haskell-interactive-mode-delete-compile-messages for %S" file-name)
+  (with-current-buffer (haskell-session-interactive-buffer session)
+    (save-excursion
+      (goto-char (point-min))
+      (while (when (re-search-forward haskell-interactive-mode-error-regexp nil t)
+               (let ((msg-file-name (match-string-no-properties 1))
+                     (msg-startpos (line-beginning-position)))
+                 ;; skip over hanging continuation message lines
+                 (while (progn (forward-line) (looking-at "^    ")))
+
+                 (when (or (not file-name) (string= file-name msg-file-name))
+                   (message "trying to delete %S" (list msg-file-name msg-startpos (point)))
+                   (let ((inhibit-read-only t))
+                     (set-text-properties msg-startpos (point) nil))
+                   (delete-region msg-startpos (point))
+                   ))
+               t)))))
 
 (defun haskell-interactive-mode-visit-error ()
   "Visit the buffer of the current (or last) error message."
