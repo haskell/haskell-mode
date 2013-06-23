@@ -50,6 +50,7 @@
 
 (defgroup haskell-indentation nil
   "Haskell indentation."
+  :link '(custom-manual "(haskell-mode)Indentation")
   :group 'haskell
   :prefix "haskell-indentation-")
 

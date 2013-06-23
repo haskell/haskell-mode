@@ -96,6 +96,7 @@
 (defgroup haskell-indent nil
   "Haskell indentation."
   :group 'haskell
+  :link '(custom-manual "(haskell-mode)Indentation")
   :prefix "haskell-indent-")
 
 (defcustom haskell-indent-offset 4

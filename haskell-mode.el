@@ -167,6 +167,7 @@ When MESSAGE is non-nil, display a message with the version."
 
 (defgroup haskell nil
   "Major mode for editing Haskell programs."
+  :link '(custom-manual "(haskell-mode)")
   :group 'languages
   :prefix "haskell-")
 
