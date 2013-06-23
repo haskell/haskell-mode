@@ -29,7 +29,7 @@
 (require 'haskell-string)
 (with-no-warnings (require 'cl))
 
-(declare-function haskell-interactive-mode "haskell-interactive-mode" (session))
+(declare-function haskell-interactive-mode "haskell-interactive-mode" ())
 (declare-function haskell-kill-session-process "haskell-process" (&optional session))
 (declare-function haskell-process-start "haskell-process" (session))
 (declare-function haskell-process-cd "haskell-process" (&optional not-interactive))
@@ -256,7 +256,8 @@ If DONTCREATE is non-nil don't create a new session."
       (let ((buffer (get-buffer-create (format "*%s*" (haskell-session-name s)))))
         (haskell-session-set-interactive-buffer s buffer)
         (with-current-buffer buffer
-          (haskell-interactive-mode s))
+          (haskell-interactive-mode)
+          (haskell-session-assign s))
         (switch-to-buffer-other-window buffer)
         buffer))))
 

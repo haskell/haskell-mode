@@ -81,7 +81,7 @@ interference with prompts that look like haskell expressions."
   "Interactive Haskell mode map.")
 
 ;;;###autoload
-(defun haskell-interactive-mode (session)
+(define-derived-mode haskell-interactive-mode fundamental-mode "Interactive-Haskell"
   "Interactive mode for Haskell.
 
 See Info node `(haskell-mode)haskell-interactive-mode' for more
@@ -89,20 +89,12 @@ information.
 
 Key bindings:
 \\{haskell-interactive-mode-map}"
-  (interactive)
-  (kill-all-local-variables)
-  (haskell-session-assign session)
-  (use-local-map haskell-interactive-mode-map)
   (set (make-local-variable 'haskell-interactive-mode) t)
-  (setq major-mode 'haskell-interactive-mode)
-  (setq mode-name "Interactive-Haskell")
+  (set (make-local-variable 'haskell-interactive-mode-history) (list))
+  (set (make-local-variable 'haskell-interactive-mode-history-index) 0)
   (setq next-error-function 'haskell-interactive-next-error-function)
-  (run-mode-hooks 'haskell-interactive-mode-hook)
-  (set (make-local-variable 'haskell-interactive-mode-history)
-       (list))
-  (set (make-local-variable 'haskell-interactive-mode-history-index)
-       0)
-  (haskell-interactive-mode-prompt session))
+  (haskell-interactive-mode-prompt))
+
 
 (defface haskell-interactive-face-prompt
   '((t :inherit 'font-lock-function-name-face))
@@ -262,9 +254,14 @@ Key bindings:
     (line-end-position))
    (length haskell-interactive-prompt)))
 
-(defun haskell-interactive-mode-prompt (session)
-  "Show a prompt at the end of the buffer."
-  (with-current-buffer (haskell-session-interactive-buffer session)
+(defun haskell-interactive-mode-prompt (&optional session)
+  "Show a prompt at the end of the REPL buffer.
+If SESSION is non-nil, use the REPL buffer associated with
+SESSION, otherwise operate on the current buffer.
+"
+  (with-current-buffer (if session
+                           (haskell-session-interactive-buffer session)
+                         (current-buffer))
     (goto-char (point-max))
     (insert (propertize haskell-interactive-prompt
                         'face 'haskell-interactive-face-prompt
