@@ -30,9 +30,8 @@
 (require 'haskell-process)
 (with-no-warnings (require 'cl))
 
-(defcustom haskell-menu-buffer-name
-  "*haskell-menu*"
-  "The path for starting cabal-dev."
+(defcustom haskell-menu-buffer-name "*haskell-menu*"
+  "The name of the Haskell session menu buffer"
   :group 'haskell
   :type 'string)
 
