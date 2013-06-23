@@ -89,6 +89,7 @@ information.
 
 Key bindings:
 \\{haskell-interactive-mode-map}"
+  :group 'haskell-interactive
   (set (make-local-variable 'haskell-interactive-mode) t)
   (set (make-local-variable 'haskell-interactive-mode-history) (list))
   (set (make-local-variable 'haskell-interactive-mode-history-index) 0)

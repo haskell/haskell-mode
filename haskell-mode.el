@@ -484,6 +484,7 @@ that `haskell-doc' is irregular in using `turn-(on/off)-haskell-doc-mode'.)
 Use `haskell-version' to find out what version this is.
 
 Invokes `haskell-mode-hook'."
+  :group 'haskell
   (set (make-local-variable 'paragraph-start) (concat "^$\\|" page-delimiter))
   (set (make-local-variable 'paragraph-separate) paragraph-start)
   (set (make-local-variable 'fill-paragraph-function) 'haskell-fill-paragraph)
