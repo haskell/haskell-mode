@@ -34,7 +34,7 @@
   nil
   "Print eval results that can be parsed as Show instances prettily. Requires sexp-show (on Hackage)."
   :type 'boolean
-  :group 'haskell)
+  :group 'haskell-interactive)
 
 (defvar haskell-interactive-prompt "λ> "
   "The prompt to use.")
@@ -49,13 +49,13 @@ interference with prompts that look like haskell expressions."
   nil
   "Use the given mode's font-locking to render some text."
   :type '(choice function (const :tag "None" nil))
-  :group 'haskell)
+  :group 'haskell-interactive)
 
 (defcustom haskell-interactive-mode-hide-multi-line-errors
   t
   "Hide collapsible multi-line compile messages by default."
   :type 'boolean
-  :group 'haskell)
+  :group 'haskell-interactive)
 
 ;; Used internally
 (defvar haskell-interactive-mode)
@@ -99,22 +99,22 @@ Key bindings:
 (defface haskell-interactive-face-prompt
   '((t :inherit 'font-lock-function-name-face))
   "Face for the prompt."
-  :group 'haskell)
+  :group 'haskell-interactive)
 
 (defface haskell-interactive-face-compile-error
   '((t :inherit 'compilation-error))
   "Face for compile errors."
-  :group 'haskell)
+  :group 'haskell-interactive)
 
 (defface haskell-interactive-face-compile-warning
   '((t :inherit 'compilation-warning))
   "Face for compiler warnings."
-  :group 'haskell)
+  :group 'haskell-interactive)
 
 (defface haskell-interactive-face-result
   '((t :inherit 'font-lock-string-face))
   "Face for the result."
-  :group 'haskell)
+  :group 'haskell-interactive)
 
 (defun haskell-interactive-mode-newline-indent ()
   "Make newline and indent."

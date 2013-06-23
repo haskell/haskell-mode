@@ -32,7 +32,7 @@
 
 (defcustom haskell-menu-buffer-name "*haskell-menu*"
   "The name of the Haskell session menu buffer"
-  :group 'haskell
+  :group 'haskell-interactive
   :type 'string)
 
 ;;;###autoload

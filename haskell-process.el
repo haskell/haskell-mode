@@ -39,80 +39,84 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configuration
+(defgroup haskell-interactive nil
+  "Settings for REPL interaction via `haskell-interactive-mode'"
+  :link '(custom-manual "(haskell-mode)haskell-interactive-mode")
+  :group 'haskell)
 
 (defcustom haskell-process-path-ghci
   "ghci"
   "The path for starting ghci."
-  :group 'haskell
+  :group 'haskell-interactive
   :type '(choice string (repeat string)))
 
 (defcustom haskell-process-path-cabal-ghci
   "cabal-ghci"
   "The path for starting cabal-ghci."
-  :group 'haskell
+  :group 'haskell-interactive
   :type '(choice string (repeat string)))
 
 (defcustom haskell-process-path-cabal-dev
   "cabal-dev"
   "The path for starting cabal-dev."
-  :group 'haskell
+  :group 'haskell-interactive
   :type '(choice string (repeat string)))
 
 (defcustom haskell-process-args-ghci
   '("-ferror-spans")
   "Any arguments for starting ghci."
-  :group 'haskell
+  :group 'haskell-interactive
   :type '(choice list))
 
 (defcustom haskell-process-type
   'ghci
   "The inferior Haskell process type to use."
   :type '(choice (const ghci) (const cabal-dev) (const cabal-ghci))
-  :group 'haskell)
+  :group 'haskell-interactive)
 
 (defcustom haskell-notify-p
   nil
   "Notify using notifications.el (if loaded)?"
   :type 'boolean
-  :group 'haskell)
+  :group 'haskell-interactive)
 
 (defcustom haskell-process-suggest-no-warn-orphans
   t
   "Suggest adding -fno-warn-orphans pragma to file when getting orphan warnings."
   :type 'boolean
-  :group 'haskell)
+  :group 'haskell-interactive)
 
 (defcustom haskell-process-suggest-language-pragmas
   t
   "Suggest adding LANGUAGE pragmas recommended by GHC."
   :type 'boolean
-  :group 'haskell)
+  :group 'haskell-interactive)
 
 (defcustom haskell-process-suggest-remove-import-lines
   nil
   "Suggest removing import lines as warned by GHC."
   :type 'boolean
-  :group 'haskell)
+  :group 'haskell-interactive)
 
 (defcustom haskell-process-suggest-overloaded-strings
   t
   "Suggest adding OverloadedStrings pragma to file when getting type mismatches with [Char]."
   :type 'boolean
-  :group 'haskell)
+  :group 'haskell-interactive)
 
 (defcustom haskell-process-check-cabal-config-on-load
   t
   "Check changes cabal config on loading Haskell files and
 restart the GHCi process if changed.."
   :type 'boolean
-  :group 'haskell)
+  :group 'haskell-interactive)
 
 (defcustom haskell-process-prompt-restart-on-cabal-change
   t
   "Ask whether to restart the GHCi process when the Cabal file
 has changed?"
   :type 'boolean
-  :group 'haskell)
+  :group 'haskell-interactive)
 
 (defvar haskell-process-prompt-regex "\\(^[> ]*> $\\|\n[> ]*> $\\)")
 (defvar haskell-reload-p nil)
