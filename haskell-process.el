@@ -399,13 +399,16 @@ to be loaded by ghci."
           process
           (concat "\\[[ ]*\\([0-9]+\\) of \\([0-9]+\\)\\]"
                   " Compiling \\([^ ]+\\)[ ]+"
-                  "( \\([^ ]+\\), \\([^ ]+\\) )[\r\n]+"))
-         (haskell-interactive-show-load-message
-          (haskell-process-session process)
-          'compiling
-          (match-string 3 buffer)
-          (match-string 4 buffer)
-          echo-in-repl)
+                  "( \\([^ ]+\\), \\([^ ]+\\) )[^\r\n]*[\r\n]+"))
+         (let ((session (haskell-process-session process))
+               (module-name (match-string 3 buffer))
+               (file-name (match-string 4 buffer)))
+           (haskell-interactive-show-load-message
+            session
+            'compiling
+            module-name
+            (haskell-session-strip-dir session file-name)
+            echo-in-repl))
          t)
         ((haskell-process-consume process "Loading package \\([^ ]+\\) ... linking ... done.\n")
          (haskell-mode-message-line
