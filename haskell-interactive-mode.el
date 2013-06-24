@@ -554,7 +554,6 @@ SESSION, otherwise operate on the current buffer.
   "Delete compile messages in REPL buffer.
 If FILE-NAME is non-nil, restrict to removing messages concerning
 FILE-NAME only."
-  (message "called haskell-interactive-mode-delete-compile-messages for %S" file-name)
   (with-current-buffer (haskell-session-interactive-buffer session)
     (save-excursion
       (goto-char (point-min))
@@ -565,7 +564,6 @@ FILE-NAME only."
                  (while (progn (forward-line) (looking-at "^    ")))
 
                  (when (or (not file-name) (string= file-name msg-file-name))
-                   (message "trying to delete %S" (list msg-file-name msg-startpos (point)))
                    (let ((inhibit-read-only t))
                      (set-text-properties msg-startpos (point) nil))
                    (delete-region msg-startpos (point))
