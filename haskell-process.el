@@ -162,6 +162,7 @@ has changed?"
                       (find-tag (cdr state))))
                   (haskell-mode-message-line "Tags generated."))))))
 
+;;;###autoload
 (defun haskell-process-do-type (&optional insert-value)
   "Print the type of the given expression."
   (interactive "P")
@@ -173,6 +174,7 @@ has changed?"
                ":type (%s)")
              ident))))
 
+;;;###autoload
 (defun haskell-process-do-info (&optional ident)
   "Print the info of the given expression."
   (interactive)
