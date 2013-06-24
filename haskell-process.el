@@ -169,7 +169,7 @@ has changed?"
   (haskell-process-do-simple-echo
    insert-value
    (let ((ident (haskell-ident-at-point)))
-     (format (if (string-match "^[a-z][A-Z]" ident)
+     (format (if (string-match "^[_[:lower:][:upper:]]" ident)
                  ":type %s"
                ":type (%s)")
              ident))))
