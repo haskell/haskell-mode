@@ -153,7 +153,7 @@ Key bindings:
   "Handle the return key."
   (interactive)
   (if (haskell-interactive-at-compile-message)
-      (next-error 0)
+      (next-error-internal)
     (haskell-interactive-handle-line)))
 
 (defun haskell-interactive-mode-space (n)
