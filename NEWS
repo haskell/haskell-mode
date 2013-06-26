@@ -16,7 +16,48 @@ WRITEME
 
 See also [[https://github.com/haskell/haskell-mode/compare/2_9_1...v13.06][detailed Git history]].
 
-WRITEME
+- Switch to new versioning scheme
+
+- Switch to MELPA/Marmalade based packaging
+
+- Cleanup/refactor build-system
+
+- Enhance `M-x haskell-version` to report more detailed versioning
+  information
+
+- Make haskell-interactive-mode emulate comint/eshell history navigation
+  (see commit 0e96843 for more details)
+
+- Improvements to haskell-interactive-mode
+  - Improve killing/restarting haskell-interactive sessions
+  - Improve directory prompting and resolution
+  - Fix redundant-import suggest trigger to support qualified imports
+  - Detect all abbreviations of an user-inputted ":quit"
+  - Fix regexps for recent GHC 7.x compiler messages
+  - Customizable commandline args for GHCi
+    (M-x customize-variable RET haskell-process-args-ghci)
+  - New command to load or reload via prefix argument
+    (M-x haskell-process-load-or-reload)
+  - Fix haskell-interactive-mode prompt detection
+  - Add cabal-ghci as supported process mode
+  - Add a customization option for the visibility of multi-line errors
+    (M-x customize-variable RET haskell-interactive-mode-hide-multi-line-errors)
+
+- Add forward declarations to reduce Elisp bytecompile warnings
+
+- Improvements to `haskell-indentation`
+  - Indent "=" following data/type/newtype declarations.
+  - Align arrows in types under "::"
+  - Make customizable whether "<backspace>" deletes indentation too
+    (via `haskell-indentation-delete-backward-indentation` and
+     `haskell-indentation-delete-indentation`)
+  - Properly indent 'rec' keyword, same as 'mdo'
+
+- Add support for "'"-prefixed constructors to font-locking
+
+- New experimental haskell session menu mode (M-x haskell-menu)
+
+- Various minor cleanups/fixes/improvements...
 
 * Changes in 2.9.1
 
