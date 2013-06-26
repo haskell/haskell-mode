@@ -12,7 +12,7 @@ See also [[https://github.com/haskell/haskell-mode/compare/v13.06...v13.07][deta
 
 - Convert NEWS (this file) to Org mode style and include NEWS file in
   package and add command for visiting NEWS file
-  (M-x haskell-mode-view-emacs)
+  (M-x haskell-mode-view-news)
 
 - Officially drop support for versions prior to Emacs 23
 
