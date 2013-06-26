@@ -45,6 +45,9 @@
 ;;
 ;; See URL `https://github.com/haskell/haskell-mode' and/or
 ;; Info node `(haskell-mode)Introduction' for more information.
+;;
+;; Use `M-x haskell-mode-view-news` (after Haskell Mode is installed)
+;; to show information on recent changes in Haskell Mode.
 
 ;;; Change Log:
 
