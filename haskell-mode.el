@@ -148,6 +148,10 @@
 (defconst haskell-git-version "@GIT_VERSION@"
   "The Git version of org-mode `haskell-mode'.")
 
+(defvar haskell-mode-pkg-base-dir (file-name-directory load-file-name)
+  "Package base directory of installed haskell-mode.
+Used for locating additional data files")
+
 ;;;###autoload
 (defun haskell-version (&optional here)
   "Show the `haskell-mode` version in the echo area.

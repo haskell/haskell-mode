@@ -130,7 +130,7 @@ has changed?"
   "Greetings for when the Haskell process starts up.")
 
 (defconst haskell-process-logo
-  (expand-file-name "logo.svg" (file-name-directory load-file-name))
+  (expand-file-name "logo.svg" haskell-mode-pkg-base-dir)
   "Haskell logo for notifications.")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
