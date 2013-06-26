@@ -1,4 +1,4 @@
-Haskell Mode NEWS -*- mode: org; -*-
+Haskell Mode NEWS                                -*- org -*-
 
 This file uses Org mode. Some useful (default) key-bindings:
  - Use "C-c C-n"/"C-c C-p" to jump to next/prev heading
@@ -10,7 +10,57 @@ This file uses Org mode. Some useful (default) key-bindings:
 
 See also [[https://github.com/haskell/haskell-mode/compare/v13.06...v13.07][detailed Git history]].
 
-WRITEME
+- Convert NEWS (this file) to Org mode style and include NEWS file in
+  package and add command for visiting NEWS file
+  (M-x haskell-mode-view-emacs)
+
+- Officially drop support for versions prior to Emacs 23
+
+- New work-in-progress Info manual for haskell-mode
+
+- Remove deprecated `haskell-{hugs,ghci}' modules
+
+- Improvements to `haskell-move-nested' module:
+  - Add support for operating on active regions
+  - New interactive commands `haskell-move-nested-{left,right}` which
+    support numeric prefix arguments for controlling the amount of
+    shifting to apply.
+
+- Add `haskell-unicode-input-method.el` to distribution
+
+- Fix all byte-compilation warnings
+
+- Build-system:
+  - For in-place installation, `haskell-site-file.el' is renamed
+    to `haskell-mode-autoloads.el`
+  - Auto-generate ELPA compatible README file by extracting header of
+    haskell-mode.el
+  - New "make check" target
+  - Add Travis-CI build jobs for testing byte-compilation with
+    multiple Emacs versions
+
+- Reorganize customize settings
+  - Add new convenience function for browsing all Haskell Mode settings
+    (M-x haskell-customize)
+  - Add `:link' keywords pointing to the new Info manual
+  - Add `:group' keywords to modes to make (M-x customize-mode) work
+  - Create new customization groups `haskell-interactive' and `inferior-haskell'
+    to clean up namespace
+
+- Improvements to haskell-interactive-mode
+  - Add support for deleting compile messages superseded by recompile/reloads
+    (M-x customize-variable RET haskell-interactive-mode-delete-superseded-errors)
+  - Fix `C-u M-x haskell-process-do-type` inserting bad signatures
+  - Integrate with Emacs' `next-error` subsystem
+  - Add "C-c C-f" binding to REPL keymap for enabling `next-error-follow-minor-mode'
+  - Add support for `-ferror-spans`-style compile messages
+  - Add `-ferror-spans` as default for `haskell-process-args-ghci`
+  - Add optional argument to
+    `haskell-session-{all,installed,project}-modules' to suppress
+    session-creation. This is useful for yasnippet usage, see commit
+    517fd7e for an example.
+  - Change default for `haskell-process-path-ghci` to a static "ghci"
+  - Fix `haskell-interactive-switch` not selecting the REPL window
 
 * Changes in 13.6
 
