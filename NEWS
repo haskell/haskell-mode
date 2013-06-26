@@ -22,7 +22,77 @@ WRITEME
 
 See also [[https://github.com/haskell/haskell-mode/compare/2_9_0...2_9_1][detailed Git history]].
 
-WRITEME
+- Bugfix release adding missing autoload declaration
+
+* Changes in 2.9.0
+
+See also [[https://github.com/haskell/haskell-mode/compare/2_8_0...2_9_0][detailed Git history]].
+
+- This is the first release after haskell-mode was migrated to GitHub
+
+- New experimental `haskell-interactive-mode' module implementing a
+  new REPL interaction mode for GHCi sessions to eventually replace
+  the existing "inf-haskell" mode.
+
+- New `haskell-process-cabal' command for interaction with cabal-install
+
+- New `haskell-checkers' module
+
+- Update haskell-cabal-mode font-lock keywords
+
+- Improve scrolling of hoogle output (haskell-mode.el)
+
+- Derive `haskell-mode` from `prog-mode` for Emacs 24+
+
+- Add new binding for "<backtab>" to haskell-mode's keymap which
+  unindents current line
+
+- New modules `haskell-navigate-imports`, `haskell-sort-imports' and
+  `haskell-align-imports' for operating on module import lines in
+  Haskell source code
+
+- Add new binding for "C-c C-." to haskell-mode's keymap to sort and
+  realign Haskell module imports
+
+- Add new binding for "C-c i" to haskell-mode's keymap to jump back and
+  forth from/to the current Haskell module's module import section.
+
+- New `inferior-haskell-kind' function for querying kind via GHCi's ":kind"
+
+- New `inferior-haskell-send-decl' for sending declarations to GHCi
+  (bound to "C-x C-d" by default)
+
+- Add new `haskell-doc-use-inf-haskell` customization variable
+
+- Add support for bird-style literate haskell editing and a new
+  related customization variable
+  `haskell-indentation-birdtrack-extra-space'
+
+- Font locking improvements
+  - Add support for Git's merge annotation
+    (with `font-lock-preprocessor-face')
+  - Improve `import', `foreign import' and `foreign export' font
+    locking
+  - Add support for `rec', `proc' and `mdo` as keywords
+  - Make whitespace within `-- |' and `{- |' optional when possible
+
+- New `haskell-move-nested` module providing utilities for
+  interactively {in,de}denting nested "hanging" blocks.
+
+- Add stylish-haskell support
+  (enable via `haskell-stylish-on-save` customization variable)
+
+- Add support for generating tags on save
+  (enable via `haskell-tags-on-save' customization variable)
+
+- Set sensible dabbrev defaults in haskell-mode
+
+- Added `SCC` pragma insert/delete commands
+  (`haskell-mode-insert-scc-at-point` and `haskell-mode-kill-scc-at-point')
+
+- New experimental `haskell-mode-contextual-space' command
+
+- And a couple more cleanups/fixes/improvements...
 
 * Changes in 2.8.0 (since 2.7.0)
 
@@ -43,7 +113,7 @@ See also [[https://github.com/haskell/haskell-mode/compare/2_7_0...2_8_0][detail
 
 - Allow configuration of where-clause indentation; M-x customize-group
   haskell-indentation.
-  
+
 * Changes since 2.6.4
 
 - fill-paragraph (M-q) now only affects comments, and correctly
@@ -63,7 +133,7 @@ See also [[https://github.com/haskell/haskell-mode/compare/2_7_0...2_8_0][detail
   current file. Also bound to C-c C-v.
 
   You can also use the flymake minor mode with this.
-  
+
 * Changes since 2.5.1
 
 - Parser corrections for haskell-indentation and haskell-decl-scan
@@ -84,11 +154,11 @@ See also [[https://github.com/haskell/haskell-mode/compare/2_7_0...2_8_0][detail
 - If haskell-indentation errors out, it now fail-safes to inserting
   a literal newline or deleting one character, for return and
   backspace respectively.
-  
+
 * Changes since 2.4:
 
 - haskell-indentation, a new minor mode for indentation.
-  
+
 * Changes since 2.3:
 
 - Update license to GPLv3.
