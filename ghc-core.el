@@ -31,9 +31,33 @@
 (require 'haskell-mode)
 (require 'haskell-font-lock)
 
+(defgroup ghc-core nil
+  "Major mode for viewing pretty printed GHC Core output."
+  :link '(custom-manual "(haskell-mode)")
+  :group 'haskell
+  :prefix "ghc-core-")
+
+(defcustom ghc-core-program
+  "ghc"
+  "Name of the GHC executable (excluding any arguments)."
+  :type 'string
+  :group 'ghc-core)
+
+(defcustom ghc-core-options
+  '("-O2")
+  "Additional options to be passed to GHC when generating core output.
+GHC (see variable `ghc-core-program') is invoked with the basic
+command line options \"-ddump-simpl -c <source-file>\"
+followed by the additional options defined here."
+  :type '(repeat string)
+  :group 'ghc-core)
+
+(define-obsolete-variable-alias 'ghc-core-create-options 'ghc-core-options
+  "haskell-mode 13.7")
+
 (defun ghc-core-clean-region (start end)
-  "Remove commonly ignored annotations and namespace
-prefixes in the given region."
+  "Remove commonly ignored annotations and namespace prefixes
+in the region between START and END."
   (interactive "r")
   (save-restriction
     (narrow-to-region start end)
@@ -52,24 +76,21 @@ prefixes in the given region."
     (while (search-forward "Main." nil t) (replace-match "" nil t))))
 
 (defun ghc-core-clean-buffer ()
-  "Remove commonly ignored annotations and namespace
-prefixes in the current buffer."
+  "Remove commonly ignored annotations and namespace prefixes
+in the current buffer."
   (interactive)
   (ghc-core-clean-region (point-min) (point-max)))
 
-(defvar ghc-core-create-options '("-O2")
-  "Options that will be passed to ghc when generating core output.")
-
 ;;;###autoload
 (defun ghc-core-create-core ()
-  "Compiled and load the current buffer as tidy core"
+  "Compile and load the current buffer as tidy core."
   (interactive)
   (save-buffer)
   (let* ((core-buffer (generate-new-buffer "ghc-core"))
          (neh (lambda () (kill-buffer core-buffer))))
     (add-hook 'next-error-hook neh)
-    (apply 'call-process "ghc" nil core-buffer nil "-c" "-ddump-simpl"
-           (buffer-file-name) ghc-core-create-options)
+    (apply #'call-process ghc-core-program nil core-buffer nil
+           "-ddump-simpl" "-c" (buffer-file-name) ghc-core-options)
     (display-buffer core-buffer)
     (with-current-buffer core-buffer
       (ghc-core-mode))
