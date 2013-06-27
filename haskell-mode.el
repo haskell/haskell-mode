@@ -200,11 +200,6 @@ sure all haskell customize definitions have been loaded."
         '(haskell-checkers haskell-doc haskell-font-lock haskell-indentation haskell-indent haskell-interactive-mode haskell-menu haskell-process haskell-yas inf-haskell))
   (customize-browse 'haskell))
 
-;; Obsolete functions.
-(defun turn-on-haskell-font-lock ()
-  (turn-on-font-lock)
-  (message "turn-on-haskell-font-lock is obsolete.  Use turn-on-font-lock instead."))
-
 ;; Are we looking at a literate script?
 (defvar haskell-literate nil
   "*If not nil, the current buffer contains a literate Haskell script.
