@@ -150,11 +150,11 @@
   "The release version of `haskell-mode'.")
 
 (defconst haskell-git-version "@GIT_VERSION@"
-  "The Git version of org-mode `haskell-mode'.")
+  "The Git version of `haskell-mode'.")
 
 (defvar haskell-mode-pkg-base-dir (file-name-directory load-file-name)
-  "Package base directory of installed haskell-mode.
-Used for locating additional data files")
+  "Package base directory of installed `haskell-mode'.
+Used for locating additional package data files.")
 
 ;;;###autoload
 (defun haskell-version (&optional here)
@@ -399,8 +399,7 @@ May return a qualified name."
 ;; Various mode variables.
 
 (defcustom haskell-mode-hook nil
-  "
-Hook run after entering Haskell mode.
+  "Hook run after entering Haskell mode.
 
 --------------------------------------------------------------------------------
 
@@ -783,8 +782,8 @@ This function will be called with no arguments.")
 
 (defun haskell-mode-buffer-apply-command (cmd)
   "Execute shell command CMD with current buffer as input and
-  replace the whole buffer with the output. If CMD fails the
-  buffer remains unchanged."
+replace the whole buffer with the output. If CMD fails the buffer
+remains unchanged."
   (set-buffer-modified-p t)
   (let* ((chomp (lambda (str)
                   (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'" str)
