@@ -43,16 +43,28 @@
   :type 'string
   :group 'ghc-core)
 
-(defcustom ghc-core-options
+(defcustom ghc-core-program-args
   '("-O2")
   "Additional options to be passed to GHC when generating core output.
 GHC (see variable `ghc-core-program') is invoked with the basic
 command line options \"-ddump-simpl -c <source-file>\"
-followed by the additional options defined here."
-  :type '(repeat string)
+followed by the additional options defined here.
+
+The following `-ddump-simpl` options might be of interest:
+
+ - `-dsuppress-all'
+ - `-dsuppress-uniques'
+ - `-dsuppress-idinfo'
+ - `-dsuppress-module-prefixes'
+ - `-dsuppress-type-signatures'
+ - `-dsuppress-type-applications'
+ - `-dsuppress-coercions'
+
+See `M-x manual-entry RET ghc' for more details."
+  :type '(repeat (string :tag "Argument"))
   :group 'ghc-core)
 
-(define-obsolete-variable-alias 'ghc-core-create-options 'ghc-core-options
+(define-obsolete-variable-alias 'ghc-core-create-options 'ghc-core-program-args
   "haskell-mode 13.7")
 
 (defun ghc-core-clean-region (start end)
@@ -90,7 +102,7 @@ in the current buffer."
          (neh (lambda () (kill-buffer core-buffer))))
     (add-hook 'next-error-hook neh)
     (apply #'call-process ghc-core-program nil core-buffer nil
-           "-ddump-simpl" "-c" (buffer-file-name) ghc-core-options)
+           "-ddump-simpl" "-c" (buffer-file-name) ghc-core-program-args)
     (display-buffer core-buffer)
     (with-current-buffer core-buffer
       (ghc-core-mode))
