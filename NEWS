@@ -22,6 +22,8 @@ See also [[https://github.com/haskell/haskell-mode/compare/v13.06...v13.07][deta
 
 - Remove deprecated `turn-on-haskell-font-lock` function
 
+- Improve font-locking of type-signatures in presence of newlines
+
 - Improvements to `haskell-move-nested' module:
   - Add support for operating on active regions
   - New interactive commands `haskell-move-nested-{left,right}` which
@@ -48,6 +50,8 @@ See also [[https://github.com/haskell/haskell-mode/compare/v13.06...v13.07][deta
   - Add `:group' keywords to modes to make (M-x customize-mode) work
   - Create new customization groups `haskell-interactive' and `inferior-haskell'
     to clean up namespace
+  - Create new customization group `ghc-core` containing the two new
+    customization variables `ghc-core-program` and `ghc-core-options`.
 
 - Improvements to haskell-interactive-mode
   - Add support for deleting compile messages superseded by recompile/reloads
