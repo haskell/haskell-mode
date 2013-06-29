@@ -74,6 +74,12 @@
   :type '(choice (const ghci) (const cabal-dev) (const cabal-ghci))
   :group 'haskell-interactive)
 
+(defcustom haskell-process-log
+  nil
+  "Enable debug logging to \"*haskell-process-log*\" buffer."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defcustom haskell-notify-p
   nil
   "Notify using notifications.el (if loaded)?"
@@ -709,11 +715,12 @@ to be loaded by ghci."
                                  (haskell-session-process session)
                                  'main)))))
 
-(defun haskell-process-log (out)
-  "Log to the process log."
-  (with-current-buffer (get-buffer-create "*haskell-process-log*")
-    (goto-char (point-max))
-    (insert out)))
+(defun haskell-process-log (msg)
+  "Write MSG to the process log (if enabled)."
+  (when haskell-process-log
+    (with-current-buffer (get-buffer-create "*haskell-process-log*")
+      (goto-char (point-max))
+      (insert msg))))
 
 (defun haskell-process-project-by-proc (proc)
   "Find project by process."

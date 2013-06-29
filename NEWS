@@ -67,6 +67,8 @@ See also [[https://github.com/haskell/haskell-mode/compare/v13.06...v13.07][deta
     517fd7e for an example.
   - Change default for `haskell-process-path-ghci` to a static "ghci"
   - Fix `haskell-interactive-switch` not selecting the REPL window
+  - Make `*haskell-process-log*` buffer configurable
+    (controlled via new `haskell-process-log` customize option)
 
 * Changes in 13.6
 
