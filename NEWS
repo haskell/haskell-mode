@@ -104,14 +104,16 @@ See also [[https://github.com/haskell/haskell-mode/compare/2_9_1...v13.06][detai
 - Add forward declarations to reduce Elisp bytecompile warnings
 
 - Improvements to `haskell-indentation`
+  - Add support for the UnicodeSyntax tokens `→`, `←`, and `∷`.
   - Indent "=" following data/type/newtype declarations.
-  - Align arrows in types under "::"
+  - Align "->"/"→" arrows in types under "::"/"∷"
   - Make customizable whether "<backspace>" deletes indentation too
     (via `haskell-indentation-delete-backward-indentation` and
      `haskell-indentation-delete-indentation`)
   - Properly indent 'rec' keyword, same as 'mdo'
+  - Minor optimizations.
 
-- Add support for "'"-prefixed constructors to font-locking
+- Add support for "'"-prefixed constructors (-> DataKinds) to font-locking
 
 - New experimental haskell session menu mode (M-x haskell-menu)
 

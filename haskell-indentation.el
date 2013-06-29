@@ -505,6 +505,19 @@ Preserves indentation and removes extra whitespace"
      (t
       (haskell-indentation-parse-to-indentations)))))
 
+(defconst haskell-indentation-unicode-tokens
+  '(("→" . "->")     ;; #x2192 RIGHTWARDS ARROW
+    ("∷" . "::")     ;; #x2237 PROPORTION
+    ("←" . "<-")     ;; #x2190 LEFTWARDS ARROW
+    ("⇒" . "=>")     ;; #x21D2 RIGHTWARDS DOUBLE ARROW
+    ("∀" . "forall") ;; #x2200 FOR ALL
+    ("↢" . "-<")     ;; #x2919 LEFTWARDS ARROW-TAIL
+    ("↣" . ">-")     ;; #x291A RIGHTWARDS ARROW-TAIL
+    ("⤛" . "-<<")    ;; #x291B LEFTWARDS DOUBLE ARROW-TAIL
+    ("⤜" . ">>-")    ;; #x291C RIGHTWARDS DOUBLE ARROW-TAIL
+    ("★" . "*"))     ;; #x2605 BLACK STAR
+  "Translation dictionary from UnicodeSyntax tokens to their ASCII representation.")
+
 (defconst haskell-indentation-toplevel-list
   '(("module" . haskell-indentation-module)
     ("data" . (lambda () (haskell-indentation-statement-right #'haskell-indentation-data)))
@@ -976,6 +989,9 @@ Preserves indentation and removes extra whitespace"
 	 (match-string-no-properties 0))
 	((looking-at "\\(\\\\\\|->\\|<-\\|::\\|=\\||\\)\\([^-:!#$%&*+./<=>?@\\\\^|~]\\|$\\)")
 	 (match-string-no-properties 1))
+	((looking-at "\\(→\\|←\\|∷\\)\\([^-:!#$%&*+./<=>?@\\\\^|~]\\|$\\)")
+         (let ((tok (match-string-no-properties 1)))
+           (or (cdr (assoc tok haskell-indentation-unicode-tokens)) tok)))
 	((looking-at"[-:!#$%&*+./<=>?@\\\\^|~`]" )
 	 'operator)
 	(t 'value)))
