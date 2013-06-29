@@ -20,9 +20,13 @@ See also [[https://github.com/haskell/haskell-mode/compare/v13.06...v13.07][deta
 
 - Remove deprecated `haskell-{hugs,ghci}' modules
 
-- Remove deprecated `turn-on-haskell-font-lock` function
-
-- Improve font-locking of type-signatures in presence of newlines
+- Font-locking changes:
+  - Remove deprecated `turn-on-haskell-font-lock` function
+  - Improve font-locking of type-signatures in presence of newlines
+  - Use `font-lock-preprocessor-face' instead of the previously used
+    `font-lock-warning-face` for CPP directives
+  - Use `font-lock-warning-face` instead  of the previously used
+    `font-lock-preprocessor-face` for Git merge conflict annotations.
 
 - Improvements to `haskell-move-nested' module:
   - Add support for operating on active regions

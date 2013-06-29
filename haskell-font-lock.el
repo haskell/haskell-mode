@@ -328,10 +328,10 @@ Returns keywords suitable for `font-lock-keywords'."
     (setq keywords
 	  `(;; NOTICE the ordering below is significant
 	    ;;
-            ("^<<<<<<< .*$" 0 'font-lock-preprocessor-face t)
-            ("^=======" 0 'font-lock-preprocessor-face t)
-            ("^>>>>>>> .*$" 0 'font-lock-preprocessor-face t)
-	    ("^#.*$" 0 'font-lock-warning-face t)
+            ("^<<<<<<< .*$" 0 'font-lock-warning-face t)
+            ("^=======" 0 'font-lock-warning-face t)
+            ("^>>>>>>> .*$" 0 'font-lock-warning-face t)
+	    ("^#.*$" 0 'font-lock-preprocessor-face t)
 	    ,@(unless haskell-emacs21-features ;Supports nested comments?
 		;; Expensive.
 		`((,string-and-char 1 font-lock-string-face)))
@@ -648,6 +648,7 @@ Invokes `haskell-font-lock-hook' if not nil."
 
 ;; Local Variables:
 ;; byte-compile-warnings: (not cl-functions)
+;; tab-width: 8
 ;; End:
 
 ;;; haskell-font-lock.el ends here
