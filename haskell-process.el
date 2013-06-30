@@ -782,7 +782,7 @@ to be loaded by ghci."
 
 (defun haskell-process-queue-command (process command)
   "Add a command to the process command queue."
-  (haskell-process-add-to-cmd-queue process command)
+  (haskell-process-cmd-queue-add process command)
   (haskell-process-trigger-queue process))
 
 (defun haskell-process-trigger-queue (process)
@@ -800,6 +800,22 @@ to be loaded by ghci."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessing the process
+
+(defun haskell-process-get (process key)
+  "Get the PROCESS's KEY value.
+Returns nil if KEY not set."
+  (cdr (assq key process)))
+
+(defun haskell-process-set (process key value)
+  "Set the PROCESS's KEY to VALUE.
+Returns newly set VALUE."
+  (let ((cell (assq key process)))
+    (if cell
+        (setcdr cell value) ; modify cell in-place
+      (setcdr process (cons (cons key value) (cdr process))) ; new cell
+      value)))
+
+;; Wrappers using haskell-process-{get,set}
 
 (defun haskell-process-set-process (p v)
   "Set the process's inferior process."
@@ -846,42 +862,34 @@ Return nil if no current command."
   "Set the process's response cursor."
   (haskell-process-set p 'current-response-cursor v))
 
-(defun haskell-process-add-to-cmd-queue (process cmd)
-  "Set the process's response cursor."
+;; low-level command queue operations
+
+(defun haskell-process-restarting (process)
+  "Is the PROCESS restarting?"
+  (haskell-process-get process 'is-restarting))
+
+(defun haskell-process-cmd-queue (process)
+  "Get the PROCESS' command queue.
+New entries get added to the end of the list. Use
+`haskell-process-cmd-queue-add' and
+`haskell-process-cmd-queue-pop' to modify the command queue."
+  (haskell-process-get process 'command-queue))
+
+(defun haskell-process-cmd-queue-add (process cmd)
+  "Add CMD to end of PROCESS's command queue."
+  (check-type cmd haskell-command)
   (haskell-process-set process
                        'command-queue
                        (append (haskell-process-cmd-queue process)
                                (list cmd))))
 
-(defun haskell-process-cmd-queue (process)
-  "Get the process's command queue."
-  (haskell-process-get process 'command-queue))
-
-(defun haskell-process-restarting (process)
-  "Is the process restarting?"
-  (haskell-process-get process 'is-restarting))
-
 (defun haskell-process-cmd-queue-pop (process)
-  "Get the process's command queue."
-  (let ((queue (haskell-process-get process 'command-queue)))
-    (unless (null queue)
-      (let ((next (car queue)))
-        (haskell-process-set process 'command-queue (cdr queue))
-        next))))
-
-(defun haskell-process-get (process key)
-  "Get the PROCESS's KEY value.
-Returns nil if KEY not set."
-  (cdr (assq key process)))
-
-(defun haskell-process-set (process key value)
-  "Set the PROCESS's KEY to VALUE.
-Returns newly set VALUE."
-  (let ((cell (assq key process)))
-    (if cell
-        (setcdr cell value) ; modify cell in-place
-      (setcdr process (cons (cons key value) (cdr process))) ; new cell
-      value)))
+  "Pop the PROCESS' next entry from command queue.
+Returns nil if queue is empty."
+  (let ((queue (haskell-process-cmd-queue process)))
+    (when queue
+      (haskell-process-set process 'command-queue (cdr queue))
+      (car queue))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessing commands -- using cl 'defstruct'
