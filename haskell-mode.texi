@@ -57,53 +57,50 @@ Haskell Mode is an Haskell development Environment for GNU Emacs.  It provides s
 @node Introduction, Getting Started, Top, Top
 @chapter Introduction
 
-Haskell Mode is a major mode for editing Haskell (http://www.haskell.org) programs.
+@dfn{Haskell Mode} is a major mode providing a convenient environment for editing @uref{http://www.haskell.org,Haskell} programs.
 
-Some of its major features include:
+Some of its major features are:
 
 @itemize
 @item
-syntax highlighting (font lock),
+Syntax highlighting (font lock),
 @item
 automatic indentation,
 @item
 on-the-fly documentation,
 @item
-interaction with inferior GHCi/Hugs instance,
+interaction with inferior GHCi/Hugs instance, and
 @item
-scans declarations and places them in a menu.
+scanning declarations and placing them in a menu.
 @end itemize
 
 This Info manual is work in progress and incomplete. However, you can find more information at these locations:
 
 @itemize
 @item
-Haskell Mode's GitHub Home: @uref{https://github.com/haskell/haskell-mode}
+@uref{https://github.com/haskell/haskell-mode,Haskell Mode's GitHub Home}
 @item
-The Haskell Wiki: @uref{http://www.haskell.org/haskellwiki/Haskell_mode_for_Emacs}
+@uref{http://www.haskell.org/haskellwiki/Haskell_mode_for_Emacs,Haskell Wiki Emacs Page}
 @end itemize
 
 @node Getting Started, Editing Code, Introduction, Top
 @chapter Getting Started
 
-One of the recommended ways is to install Haskell Mode via the Marmalade package archive (@uref{http://marmalade-repo.org/packages/haskell-mode}).
+If you are reading this, you have most likely already managed to install Haskell mode in one way or another. However, just for the record, the officially recommended way to install Haskell Mode via the @uref{http://marmalade-repo.org/packages/haskell-mode,Marmalade package archive} which contains the latest stable release of Haskell Mode.
 
-Most of Haskell Mode's settings are exposed via Emacs' @pxref{Easy Customization,,, emacs} interface. You can use @kbd{M-x haskell-customize} to browse the @code{haskell} customization sub-tree.
+@findex haskell-customize
+Most of Haskell Mode's settings are configurable via customizable variables (@xref{Easy Customization,,, emacs}, for details). You can use @kbd{M-x haskell-customize} to browse the @code{haskell} customization sub-tree.
 
-TODO:
-@itemize
-@item
-provide basic instructions to get up and running with haskell-mode
-@item
-tell about the most important commands
-@item
-tell where to find advanced help
-@end itemize
+One of the important setting you should customize is the @code{haskell-mode-hook} variable (@pxref{Hooks,,, emacs}) which gets run right after the @code{haskell-mode} major mode is initialized for a buffer. You can customize @code{haskell-mode-hook} by @kbd{M-x customize-variable @key{RET} haskell-mode-hook}. It's highly recommended you set up indentation to match to match your preferences, @xref{Indentation}.
+
+@c TODO:
+@c provide basic instructions to get up and running with haskell-mode
+@c tell about the most important commands
 
 @node Editing Code, Unicode, Getting Started, Top
 @chapter Editing Code
 
-TODO
+TODO/WRITEME
 
 @node Unicode, Indentation, Editing Code, Top
 @chapter Unicode support
@@ -130,20 +127,38 @@ If you don't like the highlighting of partially matching tokens you can turn it 
 @node Indentation, inferior-haskell-mode, Unicode, Top
 @chapter Indentation
 
-@findex turn-on-haskell-indent
-@findex turn-on-haskell-indentation
-@findex turn-on-haskell-simple-indent
 @cindex indentation
 
-TODO:
-@itemize
-@item
-tell about the three available basic indentation modules
-@item
-tell about the import sorting/alignment modules
-@item
-tell about customizations
-@end itemize
+Three Haskell indentation schemes are included in Haskell mode:
+
+@ftable @code
+
+@item turn-on-haskell-simple-indent
+
+A very simple indentation scheme; In this scheme, @key{TAB} will now move the cursor to the next indent point in the previous nonblank line.  An indent point is a non-whitespace character following whitespace.
+
+@item turn-on-haskell-indent
+
+Intelligent semi-automatic indentation for Haskell's layout rule.  The basic idea is to have @key{TAB} cycle through possibilities indentation points based on some clever heuristics.
+
+The rationale and the implementation principles are described in more detail the article @cite{Dynamic tabbing for automatic indentation with the layout rule} published in the Journal of Functional Programming 8.5 (1998).
+
+@item turn-on-haskell-indentation
+
+Improved variation of @code{turn-on-haskell-indent} indentation mode. Rebinds @key{RET} and @key{DEL}, so that indentations can be set and deleted as if they were real tabs.
+
+@end ftable
+
+To enable one of these three mutually exclusive indentation schemes, you just need call one (and only one!) of the `turn-on-*' commands while in the buffer you want the indentation scheme to be activated for.
+
+The recommended way is to add one of @code{turn-on-*} commands to @code{haskell-mode-hook}. This can be done either by using @kbd{M-x customize-variable @key{RET} haskell-mode-hook} which provides a convenient user interface or by adding @emph{one} the following three lines to your @file{.emacs} file:
+
+@example
+(add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
+(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+@end example
+
 
 @node inferior-haskell-mode, haskell-interactive-mode, Indentation, Top
 @chapter @code{inferior-haskell-mode}
@@ -166,7 +181,8 @@ The Haskell interpreter used by the inferior Haskell mode is autodetected by def
 
 Currently, GHCi and Hugs are support as Haskell interpreter.
 
-TODO: write about supported features
+TODO/WRITEME
+@c write about supported features
 
 @node haskell-interactive-mode, haskell-cabal-mode, inferior-haskell-mode, Top
 @chapter @code{haskell-interactive-mode}
@@ -181,7 +197,7 @@ TODO/WRITEME
 @findex inferior-cabal-mode
 @vindex inferior-cabal-mode-hook
 
-WRITEME
+TODO/WRITEME
 
 @node Concept index, Function index, haskell-cabal-mode, Top
 @unnumbered Concept index
@@ -198,5 +214,10 @@ WRITEME
 
 @printindex vr
 
-
 @bye
+
+@c Local Variables:
+@c eval: (visual-line-mode t)
+@c eval: (linum-mode t)
+@c eval: (hl-line-mode t)
+@c End:
