@@ -65,9 +65,6 @@
 ;; All functions/variables start with
 ;; `(turn-(on/off)-)haskell-simple-indent'.
 
-;; Dynamically scoped variables.
-(defvar unindent-line-function)
-
 (defgroup haskell-simple-indent nil
   "Simple Haskell indentation."
   :link '(custom-manual "(haskell-mode)Indentation")
@@ -130,7 +127,7 @@ column, `tab-to-tab-stop' is done instead."
       (tab-to-tab-stop))))
 
 (defun haskell-simple-indent-backtab ()
-  "Indent backwards."
+  "Indent backwards.  Dual to `haskell-simple-indent'."
   (interactive)
   (let ((current-point (point))
         (i 0)
@@ -167,36 +164,36 @@ column, `tab-to-tab-stop' is done instead."
   (haskell-simple-indent-newline-same-col)
   (insert "  "))
 
-(defvar haskell-simple-indent-old)
-(defvar haskell-simple-unindent-old)
+;;;###autoload
+(define-minor-mode haskell-simple-indent-mode
+  "Simple Haskell indentation mode that uses simple heuristic.
+In this minor mode, `indent-for-tab-command' (bound to <tab> by
+default) will move the cursor to the next indent point in the
+previous nonblank line, whereas `haskell-simple-indent-backtab'
+\ (bound to <backtab> by default) will move the cursor the
+previous indent point.  An indent point is a non-whitespace
+character following whitespace.
+
+Runs `haskell-simple-indent-hook' on activation."
+  :lighter " Ind"
+  :group 'haskell-simple-indent
+  :keymap '(([backtab] . haskell-simple-indent-backtab))
+  (kill-local-variable 'indent-line-function)
+  (when haskell-simple-indent-mode
+    (set (make-local-variable 'indent-line-function) 'haskell-simple-indent)
+    (run-hooks 'haskell-simple-indent-hook)))
 
 ;; The main functions.
 ;;;###autoload
 (defun turn-on-haskell-simple-indent ()
-  "Set `indent-line-function' to a simple indentation function.
-TAB will now move the cursor to the next indent point in the previous
-nonblank line.  An indent point is a non-whitespace character following
-whitespace.
-
-Runs `haskell-simple-indent-hook'.
-
-Use `haskell-simple-indent-version' to find out what version this is."
+  "Turn on function `haskell-simple-indent-mode'."
   (interactive)
-  (set (make-local-variable 'haskell-simple-indent-old) indent-line-function)
-  (set (make-local-variable 'indent-line-function) 'haskell-simple-indent)
-  (set (make-local-variable 'haskell-simple-unindent-old) unindent-line-function)
-  (set (make-local-variable 'unindent-line-function) 'haskell-simple-indent-backtab)
-  (run-hooks 'haskell-simple-indent-hook))
+  (haskell-simple-indent-mode t))
 
 (defun turn-off-haskell-simple-indent ()
-  "Return `indent-line-function' to original value.
-I.e. the value before `turn-on-haskell-simple-indent' was called."
+  "Turn off function `haskell-simple-indent-mode'."
   (interactive)
-  (when (local-variable-p 'haskell-simple-indent-old)
-    (setq indent-line-function haskell-simple-indent-old)
-    (setq unindent-line-function haskell-simple-unindent-old)
-    (kill-local-variable 'haskell-simple-indent-old)
-    (kill-local-variable 'haskell-simple-unindent-old)))
+  (haskell-simple-indent-mode nil))
 
 ;; Provide ourselves:
 

@@ -6,6 +6,12 @@ This file uses Org mode. Some useful (default) key-bindings:
  - Use "<backtab>" to cycle visibility of all nodes
  - Use "C-c C-o" to open links
 
+* Changes in 13.8
+
+See also [[https://github.com/haskell/haskell-mode/compare/v13.07...v13.08][detailed Git history]].
+
+- Make haskell-simple-indent a proper minor mode
+
 * Changes in 13.7
 
 See also [[https://github.com/haskell/haskell-mode/compare/v13.06...v13.07][detailed Git history]].
