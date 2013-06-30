@@ -798,6 +798,28 @@ to be loaded by ghci."
            (haskell-process-set (haskell-process) 'command-queue nil)
            (haskell-process-prompt-restart process))))
 
+(defun haskell-process-queue-flushed-p (process)
+  "Return t if command queue has been completely processed."
+  (not (or (haskell-process-cmd-queue process)
+           (haskell-process-cmd process))))
+
+(defun haskell-process-queue-flush (process)
+  "Block till PROCESS' command queue has been completely processed.
+This uses `accept-process-output' internally."
+  (while (not (haskell-process-queue-flushed-p process))
+    (haskell-process-trigger-queue process)
+    (accept-process-output (haskell-process-process process) 1)))
+
+(defun haskell-process-queue-sync-request (process reqstr)
+  "Queue submitting REQSTR to PROCESS and return response blockingly."
+  (let ((cmd (make-haskell-command
+              :state (cons nil process)
+              :go `(lambda (s) (haskell-process-send-string (cdr s) ,reqstr))
+              :complete 'setcar)))
+      (haskell-process-queue-command process cmd)
+      (haskell-process-queue-flush process)
+      (car-safe (haskell-command-state cmd))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessing the process
 
