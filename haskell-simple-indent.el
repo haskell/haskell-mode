@@ -68,6 +68,12 @@
 ;; Dynamically scoped variables.
 (defvar unindent-line-function)
 
+(defgroup haskell-simple-indent nil
+  "Simple Haskell indentation."
+  :link '(custom-manual "(haskell-mode)Indentation")
+  :group 'haskell
+  :prefix "haskell-simple-indent-")
+
 ;; Version.
 (defconst haskell-simple-indent-version "1.2"
   "`haskell-simple-indent' version number.")
