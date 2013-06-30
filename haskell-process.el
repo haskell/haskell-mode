@@ -534,7 +534,7 @@ to be loaded by ghci."
                                         'command-queue)))
     (haskell-session-set-process session process)
     (haskell-process-set-session process session)
-    (haskell-process-set-cmd process 'none)
+    (haskell-process-set-cmd process nil)
     (haskell-process-set (haskell-session-process session) 'is-restarting nil)
     (let ((default-directory (haskell-session-cabal-dir session)))
       (haskell-session-pwd session)
@@ -604,8 +604,7 @@ to be loaded by ghci."
 
 (defun haskell-process-make (name)
   "Make an inferior Haskell process."
-  (list (cons 'name name)
-        (cons 'current-command 'none)))
+  (list (cons 'name name)))
 
 ;;;###autoload
 (defun haskell-process ()
@@ -708,8 +707,7 @@ to be loaded by ghci."
   (haskell-process-log (format "<- %S\n" response))
   (let ((session (haskell-process-project-by-proc proc)))
     (when session
-      (when (not (eq (haskell-process-cmd (haskell-session-process session))
-                     'none))
+      (when (haskell-process-cmd (haskell-session-process session))
         (haskell-process-collect session
                                  response
                                  (haskell-session-process session)
@@ -749,7 +747,7 @@ to be loaded by ghci."
   "Reset the process's state, ready for the next send/reply."
   (progn (haskell-process-set-response-cursor process 0)
          (haskell-process-set-response process "")
-         (haskell-process-set-cmd process 'none)))
+         (haskell-process-set-cmd process nil)))
 
 (defun haskell-process-consume (process regex)
   "Consume a regex from the response and move the cursor along if succeed."
@@ -792,7 +790,7 @@ to be loaded by ghci."
   "Trigger the next command in the queue to be ran if there is no current command."
   (if (and (haskell-process-process process)
            (process-live-p (haskell-process-process process)))
-      (when (equal (haskell-process-cmd process) 'none)
+      (unless (haskell-process-cmd process)
         (let ((cmd (haskell-process-cmd-queue-pop process)))
           (when cmd
             (haskell-process-set-cmd process cmd)
@@ -817,7 +815,8 @@ to be loaded by ghci."
   (haskell-process-get p 'name))
 
 (defun haskell-process-cmd (p)
-  "Get the process's current command."
+  "Get the process's current command.
+Return nil if no current command."
   (haskell-process-get p 'current-command))
 
 (defun haskell-process-set-cmd (p v)
