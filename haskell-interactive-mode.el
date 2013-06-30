@@ -256,7 +256,7 @@ Key bindings:
   (substring
    (buffer-substring-no-properties
     (save-excursion
-      (goto-char (max (point-max)))
+      (goto-char (point-max))
       (search-backward-regexp (haskell-interactive-prompt-regex)))
     (line-end-position))
    (length haskell-interactive-prompt)))
