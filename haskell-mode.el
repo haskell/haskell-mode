@@ -248,7 +248,6 @@ be set to the preferred literate style."
     ;; Editing-specific commands
     (define-key map (kbd "C-c C-.") 'haskell-mode-format-imports)
     (define-key map [remap delete-indentation] 'haskell-delete-indentation)
-    (define-key map [backtab] 'unindent-for-tab-command)
 
     map)
   "Keymap used in Haskell mode.")
@@ -713,16 +712,6 @@ To be added to `flymake-init-create-temp-buffer-copy'."
   "Ran when the user tries to indent in the buffer but no indentation mode has been selected.
 Brings up the documentation for haskell-mode-hook."
   (describe-variable 'haskell-mode-hook))
-
-(defvar unindent-line-function nil
-  "Function to unindent the current line.
-This function will be called with no arguments.")
-
-(defun unindent-for-tab-command ()
-  "Un-indent the current line according to the mode's unindenting function (if any)."
-  (interactive)
-  (when unindent-line-function
-    (funcall unindent-line-function)))
 
 (defun haskell-mode-format-imports ()
   "Format the imports by aligning and sorting them."
