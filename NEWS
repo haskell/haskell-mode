@@ -35,6 +35,7 @@ See also [[https://github.com/haskell/haskell-mode/compare/v13.06...v13.07][deta
     shifting to apply.
 
 - Add `haskell-unicode-input-method.el` to distribution
+  (enable with `turn-on-haskell-unicode-input-method`)
 
 - Fix all byte-compilation warnings
 

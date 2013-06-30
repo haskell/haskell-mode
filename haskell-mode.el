@@ -447,7 +447,8 @@ CONFIGURING INDENTATION
                                     ,@(if (fboundp 'capitalized-words-mode)
                                           '(capitalized-words-mode))
                                     turn-on-haskell-simple-indent turn-on-haskell-doc-mode
-                                    turn-on-haskell-decl-scan imenu-add-menubar-index))
+                                    turn-on-haskell-decl-scan imenu-add-menubar-index
+                                    turn-on-haskell-unicode-input-method))
 
 (defvar eldoc-print-current-symbol-info-function)
 
