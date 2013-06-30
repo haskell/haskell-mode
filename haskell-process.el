@@ -710,8 +710,7 @@ to be loaded by ghci."
       (when (haskell-process-cmd (haskell-session-process session))
         (haskell-process-collect session
                                  response
-                                 (haskell-session-process session)
-                                 'main)))))
+                                 (haskell-session-process session))))))
 
 (defun haskell-process-log (msg)
   "Write MSG to the process log (if enabled)."
@@ -727,7 +726,7 @@ to be loaded by ghci."
                       (process-name proc)))
            haskell-sessions))
 
-(defun haskell-process-collect (session response process type)
+(defun haskell-process-collect (session response process)
   "Collect input for the response until receives a prompt."
   (haskell-process-set-response process
                                 (concat (haskell-process-response process) response))
