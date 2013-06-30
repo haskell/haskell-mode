@@ -31,7 +31,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @contents
 
 @ifnottex
-@node Top, Introduction, (dir), (dir)
+@node Top
 @top Haskell Mode
 
 Haskell Mode is an Haskell development Environment for GNU Emacs.  It provides syntax-based indentation, font locking, and supports running an inferior Haskell interpreter (e.g. GHCi).
@@ -54,7 +54,7 @@ Haskell Mode is an Haskell development Environment for GNU Emacs.  It provides s
 
 @end menu
 
-@node Introduction, Getting Started, Top, Top
+@node Introduction
 @chapter Introduction
 
 @dfn{Haskell Mode} is a major mode providing a convenient environment for editing @uref{http://www.haskell.org,Haskell} programs.
@@ -83,7 +83,7 @@ This Info manual is work in progress and incomplete. However, you can find more 
 @uref{http://www.haskell.org/haskellwiki/Haskell_mode_for_Emacs,Haskell Wiki Emacs Page}
 @end itemize
 
-@node Getting Started, Editing Code, Introduction, Top
+@node Getting Started
 @chapter Getting Started
 
 If you are reading this, you have most likely already managed to install Haskell mode in one way or another. However, just for the record, the officially recommended way to install Haskell Mode via the @uref{http://marmalade-repo.org/packages/haskell-mode,Marmalade package archive} which contains the latest stable release of Haskell Mode.
@@ -97,12 +97,12 @@ One of the important setting you should customize is the @code{haskell-mode-hook
 @c provide basic instructions to get up and running with haskell-mode
 @c tell about the most important commands
 
-@node Editing Code, Unicode, Getting Started, Top
+@node Editing Code
 @chapter Editing Code
 
 TODO/WRITEME
 
-@node Unicode, Indentation, Editing Code, Top
+@node Unicode
 @chapter Unicode support
 
 @cindex Unicode
@@ -124,7 +124,7 @@ When the @code{haskell-unicode} input method is active, you can simply type @sam
 
 If you don't like the highlighting of partially matching tokens you can turn it off by setting @code{input-method-highlight-flag} to @code{nil} via @kbd{M-x customize-variable}.
 
-@node Indentation, inferior-haskell-mode, Unicode, Top
+@node Indentation
 @chapter Indentation
 
 @cindex indentation
@@ -160,7 +160,7 @@ The recommended way is to add one of @code{turn-on-*} commands to @code{haskell-
 @end example
 
 
-@node inferior-haskell-mode, haskell-interactive-mode, Indentation, Top
+@node inferior-haskell-mode
 @chapter @code{inferior-haskell-mode}
 
 @findex inferior-haskell-find-definition
@@ -184,14 +184,14 @@ Currently, GHCi and Hugs are support as Haskell interpreter.
 TODO/WRITEME
 @c write about supported features
 
-@node haskell-interactive-mode, haskell-cabal-mode, inferior-haskell-mode, Top
+@node haskell-interactive-mode
 @chapter @code{haskell-interactive-mode}
 
 A new mode for the REPL and GHCi sessions is called @code{haskell-interactive-mode}, it intends to replace @code{inferior-haskell-mode}, but comes with different features.
 
 TODO/WRITEME
 
-@node haskell-cabal-mode, Concept index, haskell-interactive-mode, Top
+@node haskell-cabal-mode
 @chapter @code{haskell-cabal-mode}
 
 @findex inferior-cabal-mode
@@ -199,17 +199,17 @@ TODO/WRITEME
 
 TODO/WRITEME
 
-@node Concept index, Function index, haskell-cabal-mode, Top
+@node Concept index
 @unnumbered Concept index
 
 @printindex cp
 
-@node Function index, Variable index, Concept index, Top
+@node Function index
 @unnumbered Function index
 
 @printindex fn
 
-@node Variable index,  , Function index, Top
+@node Variable index
 @unnumbered Variable index
 
 @printindex vr
