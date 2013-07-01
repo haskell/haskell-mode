@@ -1,0 +1,593 @@
+<html lang="en">
+<head>
+<title>haskell-mode manual 13.07</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="haskell-mode manual 13.07">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="top" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This manual is for haskell-mode, version 13.07.
+
+Copyright (C) 2013 Haskell Mode contributors.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.2 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, with no Front-Cover Texts,
+     and with no Back-Cover Texts.
+   -->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+*
+{
+margin: 0;
+padding: 0;
+/*border: 0; commented out so "About this document" page drew table right*/
+vertical-align: baseline;
+}
+
+sup {
+    vertical-align: super;
+}
+
+hr
+{
+margin: 1em 0em 1em 0em;
+border-top: 1px solid #C2C2C2;
+}
+
+body
+{
+margin: 2% 3% 3% 3%;
+font-size: 125%;
+}
+
+div.smallexample, div.example
+{
+border: 1px solid silver;
+background: rgb(244, 244, 244);
+margin: 1em 0em 1em 0em;
+color: #033DA3;
+border-radius: 4px;
+}
+
+pre.example, pre.smallexample
+{
+margin: .5em 1em .5em 1em;
+
+}
+
+pre.verbatim
+{
+border: 1px solid #900;
+padding: 1em;
+color: #900;
+background: white;
+border-radius: 4px;
+}
+
+pre.lisp
+{
+border: 1px solid black;
+padding: 1em;
+color: black;
+background: #CCE0F5;
+border-radius: 4px;
+}
+
+div.lisp
+{
+margin: 0;
+}
+
+pre.display
+{
+border: 1px solid black;
+padding: 1em;
+color: black;
+background: #E6F0FA;
+border-radius: 4px;
+font-family: serif;
+}
+
+pre.format
+{
+font-family: serif;
+border: 1px solid black;
+padding: 1em;
+color: black;
+background: #C2E0C2;
+border-radius: 4px;
+}
+
+blockquote
+{
+border: 1px solid #900;
+margin: 1em 3em .25em 3em;
+background: rgba(248, 248, 2, 0.16);
+border-radius: 4px;
+padding: .25em .5em .25em .5em;
+}
+
+
+h1, h2, h3, h4, h5
+{
+color: #990000;
+font-family: Arial,sans-serif;
+}
+
+h1
+{
+margin-top: 1em;
+margin-bottom: .5em;
+}
+
+h1.chapter, h2.section
+{
+margin-bottom: .375em;
+}
+
+h2.section, h3.section
+{
+margin-top: 1em;
+}
+
+h3.subsection
+{
+margin-top: 1em;
+}
+
+div.footnote h3
+{
+font-size: 90%;
+}
+
+.subheading
+{
+margin-top: 1em;
+}
+
+table.header, div.header p
+{
+/*border: 1px solid black;*/
+/*padding: .5em;*/
+white-space: nowrap;
+/*border-radius: 4px;*/
+}
+
+table.header a, div.header p a
+{
+    border-bottom: none;
+}
+
+table.header
+{
+    margin: .5em 0em .5em 0em;
+}
+
+table.cartouche
+{
+    border: 2px solid black;
+    padding: .5em;
+    box-shadow: 5px 5px silver;
+}
+
+p
+{
+    margin: 1em 0em 1em 0em;
+}
+
+table.header a:link, div.header p a:link
+{text-decoration:none;}
+
+table.header a:visited, div.header p a:visited
+{text-decoration:none;}
+
+table.header a:hover, div.header p a:hover
+{text-decoration:underline;}
+
+table.header a:active, div.header p a:active
+{text-decoration:underline;}
+
+
+div.contents code, div.contents var, div.contents samp, div.contents kbd,
+table.menu code, table.menu var, table.menu samp, table.menu kbd,
+h1 code, h1 var, h1 samp, h1 kbd,
+h2 code, h2 var, h2 samp, h2 kbd,
+h3 code, h3 var, h3 samp, h3 kbd,
+h4 code, h4 var, h4 samp, h4 kbd,
+a code, a var, a samp, a kbd
+{
+    padding: inherit;
+    font-family: inherit;
+    border: inherit;
+    background-color: inherit;
+    box-shadow: inherit;
+    color: inherit;
+}
+
+div.contents li
+{
+    margin-bottom: .25ex;
+    white-space: nowrap;
+}
+
+div.contents li ul
+{
+    margin-top: .25ex;
+}
+
+ul, ol
+{
+    margin-left: 2.5em;
+    margin-top: .5em;
+    margin-bottom: 1em;
+}
+
+li
+{
+    margin-bottom: .5em;
+}
+
+table.menu
+{
+    border-top: solid 1px #C2C2C2;
+    padding-top: .5em;
+    white-space: nowrap;
+    margin-top: 2em;
+    line-height: 1.4em;
+}
+
+dl
+{
+    display: block;
+    margin-top: 1em;
+}
+
+dt
+{
+    color: #900;
+}
+
+dd
+{
+    margin-left: 2.5em;
+}
+
+pre.menu-comment
+{
+    margin-top: 1.5em;
+    font-family: Arial,sans-serif;
+}
+
+code
+{
+    color: #900;
+}
+
+kbd
+{
+    padding-left: .25em;
+    padding-right: .25em;
+    border: solid 1px #C2C2C2;
+    border-radius: 4px;
+    background-color: #F0F0F0;
+    box-shadow: 1px 1px silver;
+    color: black;
+}
+
+
+samp
+{
+    color: #046370;
+}
+
+var
+{
+
+    color: #927811;
+}
+
+span.nocodebreak {white-space:pre}
+span.nolinebreak {white-space:pre}
+span.roman {font-family:serif; font-weight:normal}
+span.sansserif {font-family:sans-serif; font-weight:normal}
+ul.no-bullet {list-style: none}
+
+/*
+--------------------------------------------------------------------------
+END OF janix-texinfo.css
+--------------------------------------------------------------------------
+*/--></style>
+</head>
+<body>
+<h1 class="settitle">haskell-mode manual 13.07</h1>
+<div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Top" href="#Top">Haskell Mode</a>
+<li><a name="toc_Introduction" href="#Introduction">1 Introduction</a>
+<li><a name="toc_Getting-Started" href="#Getting-Started">2 Getting Started</a>
+<li><a name="toc_Editing-Code" href="#Editing-Code">3 Editing Code</a>
+<li><a name="toc_Unicode" href="#Unicode">4 Unicode support</a>
+<li><a name="toc_Indentation" href="#Indentation">5 Indentation</a>
+<li><a name="toc_inferior_002dhaskell_002dmode" href="#inferior_002dhaskell_002dmode">6 <code>inferior-haskell-mode</code></a>
+<li><a name="toc_haskell_002dinteractive_002dmode" href="#haskell_002dinteractive_002dmode">7 <code>haskell-interactive-mode</code></a>
+<li><a name="toc_haskell_002dcabal_002dmode" href="#haskell_002dcabal_002dmode">8 <code>haskell-cabal-mode</code></a>
+<li><a name="toc_Concept-index" href="#Concept-index">Concept index</a>
+<li><a name="toc_Function-index" href="#Function-index">Function index</a>
+<li><a name="toc_Variable-index" href="#Variable-index">Variable index</a>
+</li></ul>
+</div>
+
+
+
+<div class="node">
+<a name="Top"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Introduction">Introduction</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#dir">(dir)</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
+
+</div>
+
+<h2 class="unnumbered">Haskell Mode</h2>
+
+<p>Haskell Mode is an Haskell development Environment for GNU Emacs.  It provides syntax-based indentation, font locking, and supports running an inferior Haskell interpreter (e.g. GHCi).
+
+   <p>This manual is for haskell-mode, version 13.07.
+
+   <p>Copyright &copy; 2013 Haskell Mode contributors.
+
+   <blockquote>
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.2 or any later version published by the Free Software Foundation; with no Invariant Sections, with no Front-Cover Texts, and with no Back-Cover Texts. 
+</blockquote>
+
+<div class="node">
+<a name="Introduction"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Getting-Started">Getting Started</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">1 Introduction</h2>
+
+<p><dfn>Haskell Mode</dfn> is a major mode providing a convenient environment for editing <a href="http://www.haskell.org">Haskell</a> programs.
+
+   <p>Some of its major features are:
+
+     <ul>
+<li>Syntax highlighting (font lock),
+<li>automatic indentation,
+<li>on-the-fly documentation,
+<li>interaction with inferior GHCi/Hugs instance, and
+<li>scanning declarations and placing them in a menu. 
+</ul>
+
+   <p>This Info manual is work in progress and incomplete. However, you can find more information at these locations:
+
+     <ul>
+<li><a href="https://github.com/haskell/haskell-mode">Haskell Mode's GitHub Home</a>
+<li><a href="http://www.haskell.org/haskellwiki/Haskell_mode_for_Emacs">Haskell Wiki Emacs Page</a>
+</ul>
+
+<div class="node">
+<a name="Getting-Started"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Editing-Code">Editing Code</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Introduction">Introduction</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">2 Getting Started</h2>
+
+<p>If you are reading this, you have most likely already managed to install Haskell mode in one way or another. However, just for the record, the officially recommended way to install Haskell Mode via the <a href="http://marmalade-repo.org/packages/haskell-mode">Marmalade package archive</a> which contains the latest stable release of Haskell Mode.
+
+   <p><a name="index-haskell_002dcustomize-1"></a>Most of Haskell Mode's settings are configurable via customizable variables (See <a href="emacs.html#Easy-Customization">Easy Customization</a>, for details). You can use <kbd>M-x haskell-customize</kbd> to browse the <code>haskell</code> customization sub-tree.
+
+   <p>One of the important setting you should customize is the <code>haskell-mode-hook</code> variable (see <a href="emacs.html#Hooks">Hooks</a>) which gets run right after the <code>haskell-mode</code> major mode is initialized for a buffer. You can customize <code>haskell-mode-hook</code> by <kbd>M-x customize-variable &lt;RET&gt; haskell-mode-hook</kbd>. It's highly recommended you set up indentation to match to match your preferences, See <a href="#Indentation">Indentation</a>.
+
+<!-- TODO: -->
+<!-- provide basic instructions to get up and running with haskell-mode -->
+<!-- tell about the most important commands -->
+<div class="node">
+<a name="Editing-Code"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Unicode">Unicode</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Getting-Started">Getting Started</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">3 Editing Code</h2>
+
+<p>TODO/WRITEME
+
+<div class="node">
+<a name="Unicode"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Indentation">Indentation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Editing-Code">Editing Code</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">4 Unicode support</h2>
+
+<p><a name="index-Unicode-2"></a>
+See the Haskell Wiki's entry on <a href="http://www.haskell.org/haskellwiki/Unicode-symbols">Unicode Symbols</a> for general information about Unicode support in Haskell.
+
+   <p>As Emacs supports editing files containing Unicode out of the box, so does Haskell Mode. As an add-on, Haskell Mode includes the <code>haskell-unicode</code> input method which allows you to easily type a number of Unicode symbols that are useful when writing Haskell code; for more details See <a href="Emacs.html#Input-Methods">Input Methods</a>.
+
+   <p>To automatically enable the <code>haskell-unicode</code> input method in haskell-mode buffers use <kbd>M-x customize-variable &lt;RET&gt; haskell-mode-hook</kbd> or put the following code in your `.emacs` file:
+
+<pre class="example">     (add-hook 'haskell-mode-hook 'turn-on-haskell-unicode-input-method)
+</pre>
+   <p class="noindent">To temporarily enable this input method for a single buffer you can use <kbd>M-x turn-on-haskell-unicode-input-method</kbd>.
+
+   <p>When the <code>haskell-unicode</code> input method is active, you can simply type &lsquo;<samp><span class="samp">-&gt;</span></samp>&rsquo; and it is immediately replaced with &lsquo;<samp><span class="samp">→</span></samp>&rsquo;. Use <kbd>C-\</kbd> to toggle the input method. To see a table of all key sequences use <kbd>M-x describe-input-method &lt;RET&gt; haskell-unicode</kbd>. A sequence like &lsquo;<samp><span class="samp">&lt;=</span></samp>&rsquo; is ambiguous and can mean either &lsquo;<samp><span class="samp">⇐</span></samp>&rsquo; or &lsquo;<samp><span class="samp">≤</span></samp>&rsquo;. Typing it presents you with a choice. Type <kbd>1</kbd> or <kbd>2</kbd> to select an option or keep typing to use the default option.
+
+   <p>If you don't like the highlighting of partially matching tokens you can turn it off by setting <code>input-method-highlight-flag</code> to <code>nil</code> via <kbd>M-x customize-variable</kbd>.
+
+<div class="node">
+<a name="Indentation"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#inferior_002dhaskell_002dmode">inferior-haskell-mode</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Unicode">Unicode</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">5 Indentation</h2>
+
+<p><a name="index-indentation-3"></a>
+Three Haskell indentation schemes are included in Haskell mode:
+
+     <dl>
+<dt><code>turn-on-haskell-simple-indent</code><a name="index-turn_002don_002dhaskell_002dsimple_002dindent-4"></a><dd>
+A very simple indentation scheme; In this scheme, &lt;TAB&gt; will now move the cursor to the next indent point in the previous nonblank line.  An indent point is a non-whitespace character following whitespace.
+
+     <br><dt><code>turn-on-haskell-indent</code><a name="index-turn_002don_002dhaskell_002dindent-5"></a><dd>
+Intelligent semi-automatic indentation for Haskell's layout rule.  The basic idea is to have &lt;TAB&gt; cycle through possibilities indentation points based on some clever heuristics.
+
+     <p>The rationale and the implementation principles are described in more detail the article <cite>Dynamic tabbing for automatic indentation with the layout rule</cite> published in the Journal of Functional Programming 8.5 (1998).
+
+     <br><dt><code>turn-on-haskell-indentation</code><a name="index-turn_002don_002dhaskell_002dindentation-6"></a><dd>
+Improved variation of <code>turn-on-haskell-indent</code> indentation mode. Rebinds &lt;RET&gt; and &lt;DEL&gt;, so that indentations can be set and deleted as if they were real tabs.
+
+   </dl>
+
+   <p>To enable one of these three mutually exclusive indentation schemes, you just need call one (and only one!) of the `turn-on-*' commands while in the buffer you want the indentation scheme to be activated for.
+
+   <p>The recommended way is to add one of <code>turn-on-*</code> commands to <code>haskell-mode-hook</code>. This can be done either by using <kbd>M-x customize-variable &lt;RET&gt; haskell-mode-hook</kbd> which provides a convenient user interface or by adding <em>one</em> the following three lines to your <samp><span class="file">.emacs</span></samp> file:
+
+<pre class="example">     (add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
+     (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+     (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+</pre>
+   <div class="node">
+<a name="inferior-haskell-mode"></a>
+<a name="inferior_002dhaskell_002dmode"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#haskell_002dinteractive_002dmode">haskell-interactive-mode</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Indentation">Indentation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">6 <code>inferior-haskell-mode</code></h2>
+
+<p><a name="index-inferior_002dhaskell_002dfind_002ddefinition-7"></a><a name="index-inferior_002dhaskell_002dfind_002dhaddock-8"></a><a name="index-inferior_002dhaskell_002dinfo-9"></a><a name="index-inferior_002dhaskell_002dload_002dand_002drun-10"></a><a name="index-inferior_002dhaskell_002dload_002dfile-11"></a><a name="index-inferior_002dhaskell_002dmode-12"></a><a name="index-inferior_002dhaskell_002dreload_002dfile-13"></a><a name="index-inferior_002dhaskell_002dstart_002dprocess-14"></a><a name="index-inferior_002dhaskell_002dtype-15"></a><a name="index-haskell_002dprogram_002dname-16"></a><a name="index-inferior_002dhaskell_002dmode_002dhook-17"></a>
+The major mode <code>inferior-haskell-mode</code> provides support for interacting with an inferior Haskell process.
+
+   <p>The Haskell interpreter used by the inferior Haskell mode is autodetected by default, but is customizable via the <code>haskell-program-name</code> variable.
+
+   <p>Currently, GHCi and Hugs are support as Haskell interpreter.
+
+   <p>TODO/WRITEME
+<!-- write about supported features -->
+
+<div class="node">
+<a name="haskell-interactive-mode"></a>
+<a name="haskell_002dinteractive_002dmode"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#haskell_002dcabal_002dmode">haskell-cabal-mode</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#inferior_002dhaskell_002dmode">inferior-haskell-mode</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">7 <code>haskell-interactive-mode</code></h2>
+
+<p>A new mode for the REPL and GHCi sessions is called <code>haskell-interactive-mode</code>, it intends to replace <code>inferior-haskell-mode</code>, but comes with different features.
+
+   <p>TODO/WRITEME
+
+<div class="node">
+<a name="haskell-cabal-mode"></a>
+<a name="haskell_002dcabal_002dmode"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Concept-index">Concept index</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#haskell_002dinteractive_002dmode">haskell-interactive-mode</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">8 <code>haskell-cabal-mode</code></h2>
+
+<p><a name="index-inferior_002dcabal_002dmode-18"></a><a name="index-inferior_002dcabal_002dmode_002dhook-19"></a>
+TODO/WRITEME
+
+<div class="node">
+<a name="Concept-index"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Function-index">Function index</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#haskell_002dcabal_002dmode">haskell-cabal-mode</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="unnumbered">Concept index</h2>
+
+<ul class="index-cp" compact>
+<li><a href="#index-indentation-3">indentation</a>: <a href="#Indentation">Indentation</a></li>
+<li><a href="#index-Unicode-2">Unicode</a>: <a href="#Unicode">Unicode</a></li>
+   </ul><div class="node">
+<a name="Function-index"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Variable-index">Variable index</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Concept-index">Concept index</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="unnumbered">Function index</h2>
+
+
+
+<ul class="index-fn" compact>
+<li><a href="#index-haskell_002dcustomize-1"><code>haskell-customize</code></a>: <a href="#Getting-Started">Getting Started</a></li>
+<li><a href="#index-inferior_002dcabal_002dmode-18"><code>inferior-cabal-mode</code></a>: <a href="#haskell_002dcabal_002dmode">haskell-cabal-mode</a></li>
+<li><a href="#index-inferior_002dhaskell_002dfind_002ddefinition-7"><code>inferior-haskell-find-definition</code></a>: <a href="#inferior_002dhaskell_002dmode">inferior-haskell-mode</a></li>
+<li><a href="#index-inferior_002dhaskell_002dfind_002dhaddock-8"><code>inferior-haskell-find-haddock</code></a>: <a href="#inferior_002dhaskell_002dmode">inferior-haskell-mode</a></li>
+<li><a href="#index-inferior_002dhaskell_002dinfo-9"><code>inferior-haskell-info</code></a>: <a href="#inferior_002dhaskell_002dmode">inferior-haskell-mode</a></li>
+<li><a href="#index-inferior_002dhaskell_002dload_002dand_002drun-10"><code>inferior-haskell-load-and-run</code></a>: <a href="#inferior_002dhaskell_002dmode">inferior-haskell-mode</a></li>
+<li><a href="#index-inferior_002dhaskell_002dload_002dfile-11"><code>inferior-haskell-load-file</code></a>: <a href="#inferior_002dhaskell_002dmode">inferior-haskell-mode</a></li>
+<li><a href="#index-inferior_002dhaskell_002dmode-12"><code>inferior-haskell-mode</code></a>: <a href="#inferior_002dhaskell_002dmode">inferior-haskell-mode</a></li>
+<li><a href="#index-inferior_002dhaskell_002dreload_002dfile-13"><code>inferior-haskell-reload-file</code></a>: <a href="#inferior_002dhaskell_002dmode">inferior-haskell-mode</a></li>
+<li><a href="#index-inferior_002dhaskell_002dstart_002dprocess-14"><code>inferior-haskell-start-process</code></a>: <a href="#inferior_002dhaskell_002dmode">inferior-haskell-mode</a></li>
+<li><a href="#index-inferior_002dhaskell_002dtype-15"><code>inferior-haskell-type</code></a>: <a href="#inferior_002dhaskell_002dmode">inferior-haskell-mode</a></li>
+<li><a href="#index-turn_002don_002dhaskell_002dindent-5"><code>turn-on-haskell-indent</code></a>: <a href="#Indentation">Indentation</a></li>
+<li><a href="#index-turn_002don_002dhaskell_002dindentation-6"><code>turn-on-haskell-indentation</code></a>: <a href="#Indentation">Indentation</a></li>
+<li><a href="#index-turn_002don_002dhaskell_002dsimple_002dindent-4"><code>turn-on-haskell-simple-indent</code></a>: <a href="#Indentation">Indentation</a></li>
+   </ul><div class="node">
+<a name="Variable-index"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Function-index">Function index</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="unnumbered">Variable index</h2>
+
+
+
+<ul class="index-vr" compact>
+<li><a href="#index-haskell_002dprogram_002dname-16"><code>haskell-program-name</code></a>: <a href="#inferior_002dhaskell_002dmode">inferior-haskell-mode</a></li>
+<li><a href="#index-inferior_002dcabal_002dmode_002dhook-19"><code>inferior-cabal-mode-hook</code></a>: <a href="#haskell_002dcabal_002dmode">haskell-cabal-mode</a></li>
+<li><a href="#index-inferior_002dhaskell_002dmode_002dhook-17"><code>inferior-haskell-mode-hook</code></a>: <a href="#inferior_002dhaskell_002dmode">inferior-haskell-mode</a></li>
+   </ul></body></html>
+
