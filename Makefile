@@ -66,15 +66,21 @@ check: $(ELCHECKS)
 	@echo "checks passed!"
 
 clean:
-	$(RM) $(ELCFILES) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) $(PKG_TAR) haskell-mode.info dir
+	$(RM) $(ELCFILES) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) $(PKG_TAR) haskell-mode.tmp.texi haskell-mode.info dir
 
 info: haskell-mode.info dir
 
 dir: haskell-mode.info
 	$(INSTALL_INFO) --dir=$@ $<
 
-# haskell-mode.info: haskell-mode.texi
-# 	$(MAKEINFO) -o $@ $<
+haskell-mode.tmp.texi: haskell-mode.texi
+	$(SUBST_ATAT) < haskell-mode.texi > haskell-mode.tmp.texi
+
+haskell-mode.info: haskell-mode.tmp.texi
+	$(MAKEINFO) $(MAKEINFO_FLAGS) -o $@ $<
+
+haskell-mode.html: haskell-mode.tmp.texi
+	$(MAKEINFO) $(MAKEINFO_FLAGS) --html --no-split -o $@ $<
 
 # Generate ELPA-compatible package
 package: $(PKG_TAR)

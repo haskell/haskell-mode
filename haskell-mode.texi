@@ -1,7 +1,7 @@
 \input texinfo          @c -*-texinfo-*-
 @c %**start of header
 @setfilename haskell-mode.info
-@settitle haskell-mode manual 13.x
+@settitle Haskell Mode @@VERSION@@
 @c %**end of header
 
 @dircategory Emacs
@@ -10,7 +10,7 @@
 @end direntry
 
 @copying
-This manual is for haskell-mode, version 13.x.
+This manual is for Haskell mode, version @@GIT_VERSION@@
 
 Copyright @copyright{} 2013 Haskell Mode contributors.
 
