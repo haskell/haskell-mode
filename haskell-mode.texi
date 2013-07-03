@@ -1,6 +1,7 @@
 \input texinfo          @c -*-texinfo-*-
 @c %**start of header
 @setfilename haskell-mode.info
+@documentencoding UTF-8
 @settitle Haskell Mode @@VERSION@@
 @c %**end of header
 
@@ -15,10 +16,11 @@ This manual is for Haskell mode, version @@GIT_VERSION@@
 Copyright @copyright{} 2013 Haskell Mode contributors.
 
 @quotation
-Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.2 or any later version published by the Free Software Foundation; with no Invariant Sections, with no Front-Cover Texts, and with no Back-Cover Texts.
+Permission is granted to copy, distribute and/or modify this document under the terms of the @uref{http://www.gnu.org/licenses/fdl.html,GNU Free Documentation License}, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, no Front-Cover Texts and no Back-Cover Texts.
 @end quotation
 @end copying
 
+@iftex
 @titlepage
 @title Haskell Mode
 @subtitle Haskell Development Environment for Emacs
@@ -29,20 +31,29 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @end titlepage
 
 @contents
+@end iftex
+
+@ifhtml
+@titlepage
+@title Haskell Mode
+@subtitle Haskell Development Environment for Emacs
+
+@end titlepage
+@insertcopying
+@end ifhtml
 
 @ifnottex
 @node Top
 @top Haskell Mode
 
-Haskell Mode is an Haskell development Environment for GNU Emacs.  It provides syntax-based indentation, font locking, and supports running an inferior Haskell interpreter (e.g. GHCi).
+Haskell Mode is an Haskell development Environment for GNU Emacs version 23 or later.  It provides syntax-based indentation, font locking, editing cabal files, and supports running an inferior Haskell interpreter (e.g. GHCi).
  
-@insertcopying
 @end ifnottex
 
 @menu
 * Introduction::
 * Getting Started::
-* Editing Code::
+* Editing Haskell Code::
 * Unicode::
 * Indentation::
 * inferior-haskell-mode::
@@ -97,8 +108,32 @@ One of the important setting you should customize is the @code{haskell-mode-hook
 @c provide basic instructions to get up and running with haskell-mode
 @c tell about the most important commands
 
-@node Editing Code
-@chapter Editing Code
+@node Editing Haskell Code
+@chapter Editing Haskell Code
+
+@findex haskell-mode
+@cindex @code{haskell-mode}
+
+@dfn{Haskell mode} is actually a collection of so-called major modes@footnote{for more information about the concept of @dfn{major modes} @pxref{Major Modes,,,emacs}} one of which is called @code{haskell-mode}.  To avoid confusion, when referring to this package the name ``Haskell mode'' is written in a normal font, whereas when referring the major mode of the same name @code{haskell-mode} written with a dash in-between in a typewriter font is used.
+
+As one might guess, @code{haskell-mode} is the (programming language@footnote{@code{haskell-mode} is derived from @code{prog-mode}}) major mode for editing (non-literate) Haskell source code. @code{haskell-mode} is associated with the file extensions listed below by default@footnote{for more information about file associations, @pxref{Choosing Modes,,,emacs}}.
+
+@table @file
+@item .hs
+official file extension for (non-literate) Haskell 98/2010 files
+@item .hsc
+``almost-Haskell'' input file for the @uref{http://www.haskell.org/ghc/docs/latest/html/users_guide/hsc2hs.html,hsc2hs} pre-processor
+@item .cpphs
+input file for the @uref{http://projects.haskell.org/cpphs/,cpphs} pre-processor
+@end table
+
+@cindex literate programming
+@findex literate-haskell-mode
+
+@noindent
+The major mode @code{literate-haskell-mode} (which is derived from @code{haskell-mode} and thus transitively from @code{prog-mode}) provides support for @uref{http://www.haskell.org/haskellwiki/Literate_programming,literate Haskell programs} and is associated with the @file{.lhs} file extension by default.
+
+@code{literate-haskell-mode} supports Bird-style as well as @TeX{}-style literate Haskell files. The currently detected literate Haskell variant is shown in the mode line (@pxref{Mode Line,,,emacs}) as either @samp{LitHaskell/bird} or @samp{LitHaskell/tex}.
 
 TODO/WRITEME
 
@@ -109,13 +144,13 @@ TODO/WRITEME
 
 See the Haskell Wiki's entry on @uref{http://www.haskell.org/haskellwiki/Unicode-symbols, Unicode Symbols} for general information about Unicode support in Haskell.
 
-As Emacs supports editing files containing Unicode out of the box, so does Haskell Mode. As an add-on, Haskell Mode includes the @code{haskell-unicode} input method which allows you to easily type a number of Unicode symbols that are useful when writing Haskell code; for more details @xref{Input Methods,,,Emacs}.
+As Emacs supports editing files containing Unicode out of the box, so does Haskell Mode. As an add-on, Haskell Mode includes the @code{haskell-unicode} input method which allows you to easily type a number of Unicode symbols that are useful when writing Haskell code; for more details @xref{Input Methods,,,emacs}.
 
-To automatically enable the @code{haskell-unicode} input method in haskell-mode buffers use @kbd{M-x customize-variable @key{RET} haskell-mode-hook} or put the following code in your `.emacs` file:
+To automatically enable the @code{haskell-unicode} input method in haskell-mode buffers use @kbd{M-x customize-variable @key{RET} haskell-mode-hook} or put the following code in your @file{.emacs} file:
 
-@example
+@lisp
 (add-hook 'haskell-mode-hook 'turn-on-haskell-unicode-input-method)
-@end example
+@end lisp
 
 @noindent
 To temporarily enable this input method for a single buffer you can use @kbd{M-x turn-on-haskell-unicode-input-method}.
@@ -128,14 +163,20 @@ If you don't like the highlighting of partially matching tokens you can turn it 
 @chapter Indentation
 
 @cindex indentation
+@cindex layout rule
+@cindex off-side rule
 
-Three Haskell indentation schemes are included in Haskell mode:
+For general information about GNU Emacs' support for indentation @xref{Indentation,,,emacs}.
+
+In Haskell, code indentation has semantic meaning as it defines the block structure@footnote{Haskell also supports braces and semicolons notation for conveying the block structure. However, most Haskell written by humans uses indentation for block structuring.}.
+
+As GNU Emacs' default indentation function (i.e. @code{indent-relative}) is not designed for use with Haskell's layout rule, Haskell mode includes three different indentation minor modes with different trade-offs:
 
 @ftable @code
 
 @item turn-on-haskell-simple-indent
 
-A very simple indentation scheme; In this scheme, @key{TAB} will now move the cursor to the next indent point in the previous nonblank line.  An indent point is a non-whitespace character following whitespace.
+A very simple indentation scheme; In this scheme, @key{TAB} will now move the cursor to the next indent point in the previous non-blank line.  An indent point is a non-whitespace character following whitespace.
 
 @item turn-on-haskell-indent
 
@@ -149,15 +190,15 @@ Improved variation of @code{turn-on-haskell-indent} indentation mode. Rebinds @k
 
 @end ftable
 
-To enable one of these three mutually exclusive indentation schemes, you just need call one (and only one!) of the `turn-on-*' commands while in the buffer you want the indentation scheme to be activated for.
+To enable one of these three mutually exclusive indentation schemes, you just need call one (and only one!) of the @code{turn-on-*} commands while in the buffer you want the indentation scheme to be activated for.
 
 The recommended way is to add one of @code{turn-on-*} commands to @code{haskell-mode-hook}. This can be done either by using @kbd{M-x customize-variable @key{RET} haskell-mode-hook} which provides a convenient user interface or by adding @emph{one} the following three lines to your @file{.emacs} file:
 
-@example
+@lisp
 (add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
-@end example
+@end lisp
 
 
 @node inferior-haskell-mode
@@ -177,7 +218,7 @@ The recommended way is to add one of @code{turn-on-*} commands to @code{haskell-
 
 The major mode @code{inferior-haskell-mode} provides support for interacting with an inferior Haskell process.
 
-The Haskell interpreter used by the inferior Haskell mode is autodetected by default, but is customizable via the @code{haskell-program-name} variable.
+The Haskell interpreter used by the inferior Haskell mode is auto-detected by default, but is customizable via the @code{haskell-program-name} variable.
 
 Currently, GHCi and Hugs are support as Haskell interpreter.
 
@@ -187,7 +228,7 @@ TODO/WRITEME
 @node haskell-interactive-mode
 @chapter @code{haskell-interactive-mode}
 
-A new mode for the REPL and GHCi sessions is called @code{haskell-interactive-mode}, it intends to replace @code{inferior-haskell-mode}, but comes with different features.
+A new mode for the @acronym{REPL,read–eval–print loop} and GHCi sessions is called @code{haskell-interactive-mode}, it intends to replace @code{inferior-haskell-mode}, but comes with a different set of features.
 
 TODO/WRITEME
 
