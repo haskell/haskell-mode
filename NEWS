@@ -12,6 +12,8 @@ See also [[https://github.com/haskell/haskell-mode/compare/v13.07...v13.08][deta
 
 - Make haskell-simple-indent a proper minor mode
 
+- Support popular "λ> " prompt in inf-haskell by default
+
 * Changes in 13.7
 
 See also [[https://github.com/haskell/haskell-mode/compare/v13.06...v13.07][detailed Git history]].

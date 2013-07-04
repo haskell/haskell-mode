@@ -119,7 +119,7 @@ This will either look for a Cabal file or a \"module\" statement in the file."
   :group 'inferior-haskell
   (set (make-local-variable 'comint-prompt-regexp)
        ;; Whay the backslash in [\\._[:alnum:]]?
-       "^\\*?[[:upper:]][\\._[:alnum:]]*\\(?: \\*?[[:upper:]][\\._[:alnum:]]*\\)*> \\|^> $")
+       "^\\*?[[:upper:]][\\._[:alnum:]]*\\(?: \\*?[[:upper:]][\\._[:alnum:]]*\\)*> \\|^λ?> $")
   (set (make-local-variable 'comint-input-autoexpand) nil)
   (add-hook 'comint-preoutput-filter-functions
             'inferior-haskell-send-decl-post-filter)
