@@ -179,7 +179,8 @@ has changed?"
      (format (if (string-match "^[_[:lower:][:upper:]]" ident)
                  ":type %s"
                ":type (%s)")
-             ident))))
+             ident))
+   'haskell-mode))
 
 ;;;###autoload
 (defun haskell-process-do-info (&optional ident)
@@ -192,7 +193,8 @@ has changed?"
                  ":info %s"
                ":info (%s)")
              (or ident
-                 (haskell-ident-at-point))))))
+                 (haskell-ident-at-point))))
+   'haskell-mode))
 
 (defun haskell-process-do-try-info (sym)
   "Get info of `sym' and echo in the minibuffer."
@@ -212,18 +214,20 @@ has changed?"
                               (string-match "^<interactive>" response))
                     (haskell-mode-message-line response)))))))
 
-(defun haskell-process-do-simple-echo (insert-value line)
+(defun haskell-process-do-simple-echo (insert-value line &optional mode)
   "Send some line to GHCi and echo the result in the REPL and minibuffer."
   (let ((process (haskell-process)))
     (haskell-process-queue-command
      process
      (make-haskell-command
-      :state (list process line insert-value)
+      :state (list process line insert-value mode)
       :go (lambda (state)
             (haskell-process-send-string (car state) (cadr state)))
       :complete (lambda (state response)
                   (haskell-interactive-mode-echo
-                   (haskell-process-session (car state)) response)
+                   (haskell-process-session (car state))
+                   response
+                   (cadddr state))
                   (haskell-mode-message-line response)
                   (when (caddr state)
                     (goto-char (line-beginning-position))
