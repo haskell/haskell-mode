@@ -125,6 +125,12 @@ has changed?"
   :type 'boolean
   :group 'haskell-interactive)
 
+(defcustom haskell-process-auto-import-loaded-modules
+  nil
+  "Auto import the modules reported by GHC to have been loaded?"
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defvar haskell-process-prompt-regex "\\(^[> ]*> $\\|\n[> ]*> $\\)")
 (defvar haskell-reload-p nil)
 
@@ -391,20 +397,51 @@ to be loaded by ghci."
 
 (defun haskell-process-load-complete (session process buffer reload)
   "Handle the complete loading response."
-  (cond ((haskell-process-consume process "Ok, modules loaded: \\(.+\\)$")
-         (let ((cursor (haskell-process-response-cursor process)))
+  (cond ((haskell-process-consume process "Ok, modules loaded: \\(.+\\)\\.$")
+         (let* ((modules (haskell-process-extract-modules buffer))
+                (cursor (haskell-process-response-cursor process)))
            (haskell-process-set-response-cursor process 0)
            (let ((warning-count 0))
              (while (haskell-process-errors-warnings session process buffer)
                (setq warning-count (1+ warning-count)))
              (haskell-process-set-response-cursor process cursor)
-             (haskell-mode-message-line (if reload "Reloaded OK." "OK.")))))
-        ((haskell-process-consume process "Failed, modules loaded: \\(.+\\)$")
-         (let ((cursor (haskell-process-response-cursor process)))
+             (haskell-process-import-modules process (car modules))
+             (haskell-mode-message-line
+              (format (if reload "Reloaded OK %s." "OK %s.")
+                      (format "(imported %d modules: %s)"
+                              (length (car modules))
+                              (haskell-string-ellipsis (cdr modules) 80)))))))
+        ((haskell-process-consume process "Failed, modules loaded: \\(.+\\)\\.$")
+         (let* ((modules (haskell-process-extract-modules buffer))
+                (cursor (haskell-process-response-cursor process)))
            (haskell-process-set-response-cursor process 0)
            (while (haskell-process-errors-warnings session process buffer))
            (haskell-process-set-response-cursor process cursor)
-           (haskell-interactive-mode-compile-error session "Compilation failed.")))))
+           (haskell-process-import-modules process (car modules))
+           (haskell-interactive-mode-compile-error
+            session
+            (format "Compilation failed (but imported %d modules: %s)."
+                    (length (car modules))
+                    (haskell-string-ellipsis (cdr modules) 80)))))))
+
+(defun haskell-process-extract-modules (buffer)
+  "Extract the modules from the process buffer."
+  (let* ((modules-string (match-string 1 buffer))
+         (modules (split-string modules-string ", ")))
+    (cons modules modules-string)))
+
+(defun haskell-process-import-modules (process modules)
+  "Import `modules' with :m +, and send any import statements
+from `module-buffer'."
+  (when haskell-process-auto-import-loaded-modules
+    (haskell-process-queue-command
+     process
+     (make-haskell-command
+      :state (cons process modules)
+      :go (lambda (state)
+            (haskell-process-send-string
+             (car state)
+             (format ":m + %s" (mapconcat 'identity (cdr state) " "))))))))
 
 (defun haskell-process-live-build (process buffer echo-in-repl)
   "Show live updates for loading files."
