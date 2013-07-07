@@ -63,11 +63,6 @@ interference with prompts that look like haskell expressions."
   :type 'boolean
   :group 'haskell-interactive)
 
-;; Used internally
-(defvar haskell-interactive-mode)
-(defvar haskell-interactive-mode-history)
-(defvar haskell-interactive-mode-history-index)
-
 (defvar haskell-interactive-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "RET") 'haskell-interactive-mode-return)
@@ -86,6 +81,10 @@ interference with prompts that look like haskell expressions."
     map)
   "Interactive Haskell mode map.")
 
+;; buffer-local variables used internally by `haskell-interactive-mode'
+(defvar haskell-interactive-mode-history)
+(defvar haskell-interactive-mode-history-index)
+
 ;;;###autoload
 (define-derived-mode haskell-interactive-mode fundamental-mode "Interactive-Haskell"
   "Interactive mode for Haskell.
@@ -96,7 +95,6 @@ information.
 Key bindings:
 \\{haskell-interactive-mode-map}"
   :group 'haskell-interactive
-  (set (make-local-variable 'haskell-interactive-mode) t)
   (set (make-local-variable 'haskell-interactive-mode-history) (list))
   (set (make-local-variable 'haskell-interactive-mode-history-index) 0)
   (setq next-error-function 'haskell-interactive-next-error-function)
