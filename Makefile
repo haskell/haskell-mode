@@ -61,9 +61,17 @@ $(ELCHECKS): check-%: %.el
 	 	 --eval "(byte-compile-disable-warning 'cl-functions)" \
 		 -f batch-byte-compile $*.el
 	@$(RM) $*.elc
+	@if [ -f "$(<:%.el=tests/%-tests.el)" ]; then \
+	if $(BATCH) --eval "(require 'ert)" 2> /dev/null; then \
+		echo; \
+		$(BATCH) -l "$(<:%.el=tests/%-tests.el)" -f ert-run-tests-batch-and-exit; \
+	else \
+		echo "ERT not available, skipping unit tests"; \
+	fi; \
+	fi
 	@echo "--"
 
-check: $(ELCHECKS)
+check: clean $(ELCHECKS)
 	@echo "checks passed!"
 
 clean:
