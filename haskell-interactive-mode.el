@@ -84,6 +84,7 @@ interference with prompts that look like haskell expressions."
 ;; buffer-local variables used internally by `haskell-interactive-mode'
 (defvar haskell-interactive-mode-history)
 (defvar haskell-interactive-mode-history-index)
+(defvar haskell-interactive-mode-completion-cache)
 
 ;;;###autoload
 (define-derived-mode haskell-interactive-mode fundamental-mode "Interactive-Haskell"
@@ -97,7 +98,11 @@ Key bindings:
   :group 'haskell-interactive
   (set (make-local-variable 'haskell-interactive-mode-history) (list))
   (set (make-local-variable 'haskell-interactive-mode-history-index) 0)
+  (set (make-local-variable 'haskell-interactive-mode-completion-cache) nil)
+
   (setq next-error-function 'haskell-interactive-next-error-function)
+  (setq completion-at-point-functions '(haskell-interactive-mode-completion-at-point-function))
+
   (haskell-interactive-mode-prompt))
 
 
@@ -451,10 +456,29 @@ SESSION, otherwise operate on the current buffer.
     (when echo
       (haskell-interactive-mode-echo session msg))))
 
+(defun haskell-interactive-mode-completion-at-point-function ()
+  "Offer completions for partial expression between prompt and point"
+  (when (haskell-interactive-at-prompt)
+    (let* ((process (haskell-process))
+           (session (haskell-session))
+           (inp (haskell-interactive-mode-input-partial)))
+      (if (string= inp (car-safe haskell-interactive-mode-completion-cache))
+          (cdr haskell-interactive-mode-completion-cache)
+        (let* ((resp2 (haskell-process-get-repl-completions process inp))
+               (rlen (-  (length inp) (length (car resp2))))
+               (coll (append (if (string-prefix-p inp "import") '("import"))
+                             (if (string-prefix-p inp "let") '("let"))
+                             (cdr resp2)))
+               (result (list (- (point) rlen) (point) coll)))
+          (setq haskell-interactive-mode-completion-cache (cons inp result))
+          result)))))
+
 (defun haskell-interactive-mode-tab ()
   "The tab command."
   (interactive)
   (cond
+   ((haskell-interactive-at-prompt)
+    (completion-at-point))
    ((get-text-property (point) 'collapsible)
     (let ((column (current-column)))
       (search-backward-regexp "^[^ ]")

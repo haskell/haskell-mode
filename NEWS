@@ -17,6 +17,9 @@ See also [[https://github.com/haskell/haskell-mode/compare/v13.07...v13.08][deta
 - Hide internal `*print-haskell-mode*' buffers
   (used when `haskell-interactive-mode-eval-mode' is active)
 
+- Add tab-completion support for haskell-interactive-mode
+  (requires `:complete' command support in GHCi)
+
 * Changes in 13.7
 
 See also [[https://github.com/haskell/haskell-mode/compare/v13.06...v13.07][detailed Git history]].
