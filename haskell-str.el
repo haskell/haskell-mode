@@ -35,7 +35,7 @@ A Whitespace character is defined in the Haskell Report as follows
   whitechar -> newline | vertab | space | tab | uniWhite
   newline   -> return linefeed | return | linefeed | formfeed
   uniWhite  -> any Unicode character defined as whitespace
-  
+
 Note: The implementation currently only supports ASCII
       white-space characters, i.e. the implemention doesn't
       consider uniWhite."
@@ -162,6 +162,13 @@ This is the dual operation to `haskell-str-literal-encode'."
                (error "String literal must be delimited by quotes"))))
         (case-fold-search nil))
     (replace-regexp-in-string haskell-str-literal-escapes-regexp #'haskell-str-literal-decode1 s t t)))
+
+(defun haskell-str-ellipsis (string n)
+  "Ellipsize a string."
+  (let ((e (haskell-str-take string n)))
+    (if (> (length string) (length e))
+        (concat e "…")
+      string)))
 
 (provide 'haskell-str)
 
