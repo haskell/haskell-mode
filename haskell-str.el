@@ -155,13 +155,16 @@ This is an internal function used by `haskell-str-literal-decode'."
 If NO-QUOTES is nil, ESTR must be surrounded by quotes.
 
 This is the dual operation to `haskell-str-literal-encode'."
-  (let ((s (if no-quotes
-               estr
-             (if (string-match "\\`\".*\"\\'" estr)
-                 (substring estr 1 -1)
-               (error "String literal must be delimited by quotes"))))
-        (case-fold-search nil))
-    (replace-regexp-in-string haskell-str-literal-escapes-regexp #'haskell-str-literal-decode1 s t t)))
+  (if (and (not no-quotes)
+           (string-match-p "\\`\"[^\\\"[:cntrl:]]*\"\\'" estr))
+      (substring estr 1 -1) ;; optimized fast-path for trivial strings
+    (let ((s (if no-quotes ;; else: do general decoding
+                 estr
+               (if (string-match-p "\\`\".*\"\\'" estr)
+                   (substring estr 1 -1)
+                 (error "String literal must be delimited by quotes"))))
+          (case-fold-search nil))
+      (replace-regexp-in-string haskell-str-literal-escapes-regexp #'haskell-str-literal-decode1 s t t))))
 
 (defun haskell-str-ellipsize (string n)
   "Return STRING truncated to (at most) N characters.
