@@ -162,11 +162,12 @@ Key bindings:
     (self-insert-command n)))
 
 (defun haskell-interactive-at-prompt ()
-  "Am I at the prompt?"
+  "If at prompt, returns start position of user-input, otherwise returns nil."
   (let ((current-point (point)))
     (save-excursion (goto-char (point-max))
                     (search-backward-regexp (haskell-interactive-prompt-regex))
-                    (> current-point (point)))))
+                    (when (> current-point (point))
+                      (+ (length haskell-interactive-prompt) (point))))))
 
 (defun haskell-interactive-handle-line ()
   (when (haskell-interactive-at-prompt)
@@ -248,6 +249,13 @@ Key bindings:
       (haskell-interactive-mode-prompt session)
       (haskell-session-set session 'next-error-region nil)
       (haskell-session-set session 'next-error-locus nil))))
+
+(defun haskell-interactive-mode-input-partial ()
+  "Get the interactive mode input up to point."
+  (let ((input-start (haskell-interactive-at-prompt)))
+    (unless input-start
+      (error "not at prompt"))
+    (buffer-substring-no-properties input-start (point))))
 
 (defun haskell-interactive-mode-input ()
   "Get the interactive mode input."
