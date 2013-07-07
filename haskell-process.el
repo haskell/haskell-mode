@@ -410,7 +410,7 @@ to be loaded by ghci."
               (format (if reload "Reloaded OK %s." "OK %s.")
                       (format "(imported %d modules: %s)"
                               (length (car modules))
-                              (haskell-str-ellipsis (cdr modules) 80)))))))
+                              (haskell-str-ellipsize (cdr modules) 80)))))))
         ((haskell-process-consume process "Failed, modules loaded: \\(.+\\)\\.$")
          (let* ((modules (haskell-process-extract-modules buffer))
                 (cursor (haskell-process-response-cursor process)))
@@ -422,7 +422,7 @@ to be loaded by ghci."
             session
             (format "Compilation failed (but imported %d modules: %s)."
                     (length (car modules))
-                    (haskell-str-ellipsis (cdr modules) 80)))))))
+                    (haskell-str-ellipsize (cdr modules) 80)))))))
 
 (defun haskell-process-extract-modules (buffer)
   "Extract the modules from the process buffer."

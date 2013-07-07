@@ -163,12 +163,14 @@ This is the dual operation to `haskell-str-literal-encode'."
         (case-fold-search nil))
     (replace-regexp-in-string haskell-str-literal-escapes-regexp #'haskell-str-literal-decode1 s t t)))
 
-(defun haskell-str-ellipsis (string n)
-  "Ellipsize a string."
-  (let ((e (haskell-str-take string n)))
-    (if (> (length string) (length e))
-        (concat e "…")
-      string)))
+(defun haskell-str-ellipsize (string n)
+  "Return STRING truncated to (at most) N characters.
+If truncation occured, last character in string is replaced by `…'.
+See also `haskell-str-take'."
+  (cond
+   ((<= (length string) n) string) ;; no truncation needed
+   ((< n 1) "")
+   (t (concat (substring string 0 (1- n)) "…"))))
 
 (provide 'haskell-str)
 
