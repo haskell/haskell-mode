@@ -294,8 +294,7 @@ SESSION, otherwise operate on the current buffer.
                         'result t))))
 
 (defun haskell-interactive-mode-eval-as-mode (session text)
-  "Insert the result of an eval as a pretty printed Showable, if
-  parseable, or otherwise just as-is."
+  "Insert TEXT font-locked according to `haskell-interactive-mode-eval-mode'."
   (with-current-buffer (haskell-session-interactive-buffer session)
     (let ((start-point (save-excursion (search-backward-regexp (haskell-interactive-prompt-regex))
                                        (forward-line 1)
@@ -304,15 +303,16 @@ SESSION, otherwise operate on the current buffer.
       (delete-region start-point (point))
       (goto-char (point-max))
       (insert (let ((mode haskell-interactive-mode-eval-mode))
-                (with-current-buffer (get-buffer-create (concat "*print-" (symbol-name mode) "*"))
+                (with-current-buffer (get-buffer-create (concat " haskell-font-lock-as-"
+                                                                (symbol-name mode)))
                   (unless (eq major-mode mode)
                     (funcall mode))
                   (erase-buffer)
                   (insert text)
                   (font-lock-fontify-region (point-min) (point-max))
-                  (buffer-substring (point-min)
-                                    (point-max)))))
-      (insert "\n"))))
+                  (let ((result (buffer-substring (point-min) (point-max))))
+                    (erase-buffer)
+                    (concat result "\n"))))))))
 
 (defun haskell-interactive-mode-eval-pretty-result (session text)
   "Insert the result of an eval as a pretty printed Showable, if
