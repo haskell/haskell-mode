@@ -32,7 +32,7 @@
 (with-no-warnings (require 'cl))
 
 ;; FIXME: haskell-process shouldn't depend on haskell-interactive-mode to avoid module-dep cycles
-(declare-function haskell-interactive-mode-echo "haskell-interactive-mode" (session message))
+(declare-function haskell-interactive-mode-echo "haskell-interactive-mode" (session message &optional mode))
 (declare-function haskell-interactive-mode-compile-error "haskell-interactive-mode" (session message))
 (declare-function haskell-interactive-mode-insert "haskell-interactive-mode" (session message))
 (declare-function haskell-interactive-mode-reset-error "haskell-interactive-mode" (session))
