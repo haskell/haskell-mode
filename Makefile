@@ -31,6 +31,7 @@ ELFILES = \
 	haskell-simple-indent.el \
 	haskell-sort-imports.el \
 	haskell-string.el \
+	haskell-str.el \
 	haskell-unicode-input-method.el \
 	haskell-yas.el \
 	inf-haskell.el
