@@ -919,9 +919,9 @@ This uses `accept-process-output' internally."
               :state (cons nil process)
               :go `(lambda (s) (haskell-process-send-string (cdr s) ,reqstr))
               :complete 'setcar)))
-      (haskell-process-queue-command process cmd)
-      (haskell-process-queue-flush process)
-      (car-safe (haskell-command-state cmd))))
+    (haskell-process-queue-command process cmd)
+    (haskell-process-queue-flush process)
+    (car-safe (haskell-command-state cmd))))
 
 (defun haskell-process-get-repl-completions (process inputstr)
   "Perform `:complete repl ...' query for INPUTSTR using PROCESS."
@@ -933,13 +933,13 @@ This uses `accept-process-output' internally."
       (let* ((s1 (split-string rawstr "\r?\n"))
              (cs (mapcar #'haskell-str-literal-decode (cdr s1)))
              (h0 (car s1))) ;; "<cnt1> <cnt2> <quoted-str>"
-           (unless (string-match "\\`\\([0-9]+\\) \\([0-9]+\\) \\(\".*\"\\)\\'" h0)
-             (error "Invalid `:complete' response"))
-           (let ((cnt1 (match-string 1 h0))
-                 (h1 (haskell-str-literal-decode (match-string 3 h0))))
-             (unless (= (string-to-number cnt1) (length cs))
-               (error "Lengths inconsistent in `:complete' reponse"))
-             (cons h1 cs))))))
+        (unless (string-match "\\`\\([0-9]+\\) \\([0-9]+\\) \\(\".*\"\\)\\'" h0)
+          (error "Invalid `:complete' response"))
+        (let ((cnt1 (match-string 1 h0))
+              (h1 (haskell-str-literal-decode (match-string 3 h0))))
+          (unless (= (string-to-number cnt1) (length cs))
+            (error "Lengths inconsistent in `:complete' reponse"))
+          (cons h1 cs))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessing the process
