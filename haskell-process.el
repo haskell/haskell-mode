@@ -294,7 +294,7 @@ changed. Restarts the process if that is the case."
 (defun haskell-process-file-loadish (command reload-p module-buffer)
   "Run a loading-ish COMMAND that wants to pick up type errors
 and things like that. RELOAD-P indicates whether the notification
-should say 'reloaded' or 'loaded'. MODULE-BUFFER is may be used
+should say 'reloaded' or 'loaded'. MODULE-BUFFER may be used
 for various things, but is optional."
   (let ((session (haskell-session)))
     (haskell-session-current-dir session)
