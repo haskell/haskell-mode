@@ -467,7 +467,7 @@ PROCESS."
           (haskell-process-send-string
            (car state)
            (format ":!%s %s"
-                   dired-touch-program
+                   "touch"
                    (shell-quote-argument (buffer-file-name
                                           (cdr state))))))
     :complete (lambda (state _)
