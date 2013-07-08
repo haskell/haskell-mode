@@ -429,10 +429,7 @@ actual Emacs buffer of the module being loaded."
                  (haskell-process-reload-with-fbytecode process module-buffer)
                (haskell-process-import-modules process (car modules)))
              (haskell-mode-message-line
-              (format (if reload "Reloaded OK %s." "OK %s.")
-                      (format "(imported %d modules: %s)"
-                              (length (car modules))
-                              (haskell-str-ellipsize (cdr modules) 80)))))))
+              (if reload "Reloaded OK." "OK.")))))
         ((haskell-process-consume process "Failed, modules loaded: \\(.+\\)\\.$")
          (let* ((modules (haskell-process-extract-modules buffer))
                 (cursor (haskell-process-response-cursor process)))
@@ -442,11 +439,7 @@ actual Emacs buffer of the module being loaded."
            (if (and (not reload) haskell-process-reload-with-fbytecode)
                (haskell-process-reload-with-fbytecode process module-buffer)
              (haskell-process-import-modules process (car modules)))
-           (haskell-interactive-mode-compile-error
-            session
-            (format "Compilation failed (but imported %d modules: %s)."
-                    (length (car modules))
-                    (haskell-str-ellipsize (cdr modules) 80)))))))
+           (haskell-interactive-mode-compile-error session "Compilation failed.")))))
 
 (defun haskell-process-reload-with-fbytecode (process module-buffer)
   "Reload FILE-NAME with -fbyte-code set, and then restore -fobject-code."
