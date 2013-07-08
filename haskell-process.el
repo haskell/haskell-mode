@@ -131,6 +131,14 @@ has changed?"
   :type 'boolean
   :group 'haskell-interactive)
 
+(defcustom haskell-process-reload-with-fbytecode
+  nil
+  "When using -fobject-code, auto reload with -fbyte-code (and
+then restore the -fobject-code) so that all module info and
+imports become available?"
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defvar haskell-process-prompt-regex "\\(^[> ]*> $\\|\n[> ]*> $\\)")
 (defvar haskell-reload-p nil)
 
@@ -259,7 +267,9 @@ changed. Restarts the process if that is the case."
   (interactive)
   (save-buffer)
   (haskell-interactive-mode-reset-error (haskell-session))
-  (haskell-process-file-loadish (concat "load " (buffer-file-name)) nil))
+  (haskell-process-file-loadish (concat "load " (buffer-file-name))
+                                nil
+                                (current-buffer)))
 
 ;;;###autoload
 (defun haskell-process-reload-file ()
@@ -267,7 +277,7 @@ changed. Restarts the process if that is the case."
   (interactive)
   (save-buffer)
   (haskell-interactive-mode-reset-error (haskell-session))
-  (haskell-process-file-loadish "reload" t))
+  (haskell-process-file-loadish "reload" t nil))
 
 ;;;###autoload
 (defun haskell-process-load-or-reload (&optional toggle)
@@ -281,7 +291,11 @@ changed. Restarts the process if that is the case."
                         "Now running :load <buffer-filename>.")))
     (if haskell-reload-p (haskell-process-reload-file) (haskell-process-load-file))))
 
-(defun haskell-process-file-loadish (command reload-p)
+(defun haskell-process-file-loadish (command reload-p module-buffer)
+  "Run a loading-ish COMMAND that wants to pick up type errors
+and things like that. RELOAD-P indicates whether the notification
+should say 'reloaded' or 'loaded'. MODULE-BUFFER is may be used
+for various things, but is optional."
   (let ((session (haskell-session)))
     (haskell-session-current-dir session)
     (when haskell-process-check-cabal-config-on-load
@@ -290,7 +304,7 @@ changed. Restarts the process if that is the case."
       (haskell-process-queue-command
        process
        (make-haskell-command
-        :state (list session process command reload-p)
+        :state (list session process command reload-p module-buffer)
         :go (lambda (state)
               (haskell-process-send-string
                (cadr state) (format ":%s" (caddr state))))
@@ -299,8 +313,11 @@ changed. Restarts the process if that is the case."
                  (cadr state) buffer nil))
         :complete (lambda (state response)
                     (haskell-process-load-complete
-                     (car state) (cadr state) response
-                     (cadddr state))))))))
+                     (car state)
+                     (cadr state)
+                     response
+                     (cadddr state)
+                     (cadddr (cdr state)))))))))
 
 ;;;###autoload
 (defun haskell-process-cabal-build ()
@@ -395,8 +412,10 @@ to be loaded by ghci."
   (setf (cdddr state) (list (length buffer)))
   nil)
 
-(defun haskell-process-load-complete (session process buffer reload)
-  "Handle the complete loading response."
+(defun haskell-process-load-complete (session process buffer reload module-buffer)
+  "Handle the complete loading response. BUFFER is the string of
+text being sent over the process pipe. MODULE-BUFFER is the
+actual Emacs buffer of the module being loaded."
   (cond ((haskell-process-consume process "Ok, modules loaded: \\(.+\\)\\.$")
          (let* ((modules (haskell-process-extract-modules buffer))
                 (cursor (haskell-process-response-cursor process)))
@@ -405,7 +424,10 @@ to be loaded by ghci."
              (while (haskell-process-errors-warnings session process buffer)
                (setq warning-count (1+ warning-count)))
              (haskell-process-set-response-cursor process cursor)
-             (haskell-process-import-modules process (car modules))
+             (if (and (not reload)
+                      haskell-process-reload-with-fbytecode)
+                 (haskell-process-reload-with-fbytecode process module-buffer)
+               (haskell-process-import-modules process (car modules)))
              (haskell-mode-message-line
               (format (if reload "Reloaded OK %s." "OK %s.")
                       (format "(imported %d modules: %s)"
@@ -417,12 +439,40 @@ to be loaded by ghci."
            (haskell-process-set-response-cursor process 0)
            (while (haskell-process-errors-warnings session process buffer))
            (haskell-process-set-response-cursor process cursor)
-           (haskell-process-import-modules process (car modules))
+           (if (and (not reload) haskell-process-reload-with-fbytecode)
+               (haskell-process-reload-with-fbytecode process module-buffer)
+             (haskell-process-import-modules process (car modules)))
            (haskell-interactive-mode-compile-error
             session
             (format "Compilation failed (but imported %d modules: %s)."
                     (length (car modules))
                     (haskell-str-ellipsize (cdr modules) 80)))))))
+
+(defun haskell-process-reload-with-fbytecode (process module-buffer)
+  "Reload FILE-NAME with -fbyte-code set, and then restore -fobject-code."
+  (haskell-process-queue-without-filters process ":set -fbyte-code")
+  (haskell-process-touch-buffer process module-buffer)
+  (haskell-process-queue-without-filters process ":reload")
+  (haskell-process-queue-without-filters process ":set -fobject-code"))
+
+(defun haskell-process-touch-buffer (process buffer)
+  "Updates mtime on the file for BUFFER by queing a touch on
+PROCESS."
+  (interactive)
+  (haskell-process-queue-command
+   process
+   (make-haskell-command
+    :state (cons process buffer)
+    :go (lambda (state)
+          (haskell-process-send-string
+           (car state)
+           (format ":!%s %s"
+                   dired-touch-program
+                   (shell-quote-argument (buffer-file-name
+                                          (cdr state))))))
+    :complete (lambda (state _)
+                (with-current-buffer (cdr state)
+                  (clear-visited-file-modtime))))))
 
 (defun haskell-process-extract-modules (buffer)
   "Extract the modules from the process buffer."
@@ -821,6 +871,17 @@ from `module-buffer'."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Making commands
+
+(defun haskell-process-queue-without-filters (process line)
+  "Queue LINE to be sent to PROCESS without bothering to look at
+the response."
+  (haskell-process-queue-command
+   process
+   (make-haskell-command
+    :state (cons process line)
+    :go (lambda (state)
+          (haskell-process-send-string (car state)
+                                       (cdr state))))))
 
 (defun haskell-process-queue-command (process command)
   "Add a command to the process command queue."
