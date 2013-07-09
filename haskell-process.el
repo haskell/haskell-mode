@@ -197,12 +197,14 @@ imports become available?"
    'haskell-mode))
 
 ;;;###autoload
-(defun haskell-process-do-info (&optional ident)
+(defun haskell-process-do-info (&optional prompt-value)
   "Print the info of the given expression."
-  (interactive)
+  (interactive "P")
   (haskell-process-do-simple-echo
    nil
-   (let ((ident (haskell-ident-at-point)))
+   (let ((ident (if prompt-value
+                    (read-from-minibuffer "Info: " (haskell-ident-at-point))
+                    (haskell-ident-at-point))))
      (format (if (string-match "^[a-z][A-Z]" ident)
                  ":info %s"
                ":info (%s)")
