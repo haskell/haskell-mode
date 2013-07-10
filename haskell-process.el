@@ -29,6 +29,7 @@
 (require 'haskell-session)
 (require 'haskell-compat)
 (require 'haskell-str)
+(require 'haskell-presentation-mode)
 (with-no-warnings (require 'cl))
 
 ;; FIXME: haskell-process shouldn't depend on haskell-interactive-mode to avoid module-dep cycles
@@ -139,6 +140,13 @@ imports become available?"
   :type 'boolean
   :group 'haskell-interactive)
 
+(defcustom haskell-process-use-presentation-mode
+  nil
+  "Use presentation mode to show things like type info instead of
+  printing to the message area."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defvar haskell-process-prompt-regex "\\(^[> ]*> $\\|\n[> ]*> $\\)")
 (defvar haskell-reload-p nil)
 
@@ -204,7 +212,7 @@ imports become available?"
    nil
    (let ((ident (if prompt-value
                     (read-from-minibuffer "Info: " (haskell-ident-at-point))
-                    (haskell-ident-at-point))))
+                  (haskell-ident-at-point))))
      (format (if (string-match "^[a-z][A-Z]" ident)
                  ":info %s"
                ":info (%s)")
@@ -228,7 +236,9 @@ imports become available?"
       :complete (lambda (process response)
                   (unless (or (string-match "^Top level" response)
                               (string-match "^<interactive>" response))
-                    (haskell-mode-message-line response)))))))
+                    (if haskell-process-use-presentation-mode
+                        (haskell-present response)
+                      (haskell-mode-message-line response))))))))
 
 (defun haskell-process-do-simple-echo (insert-value line &optional mode)
   "Send some line to GHCi and echo the result in the REPL and minibuffer."
@@ -244,7 +254,9 @@ imports become available?"
                    (haskell-process-session (car state))
                    response
                    (cadddr state))
-                  (haskell-mode-message-line response)
+                  (if haskell-process-use-presentation-mode
+                      (haskell-present response)
+                    (haskell-mode-message-line response))
                   (when (caddr state)
                     (goto-char (line-beginning-position))
                     (insert (format "%s\n" response))))))))

@@ -34,6 +34,7 @@ ELFILES = \
 	haskell-str.el \
 	haskell-unicode-input-method.el \
 	haskell-yas.el \
+	haskell-presentation-mode.el \
 	inf-haskell.el
 
 ELCFILES = $(ELFILES:.el=.elc)
