@@ -236,11 +236,7 @@ imports become available?"
       :complete (lambda (state response)
                   (unless (or (string-match "^Top level" response)
                               (string-match "^<interactive>" response))
-                    (if haskell-process-use-presentation-mode
-                        (haskell-present (cdr state)
-                                         (haskell-process-session (car state))
-                                         response)
-                      (haskell-mode-message-line response))))))))
+                    (haskell-mode-message-line response)))))))
 
 (defun haskell-process-do-simple-echo (insert-value line &optional mode)
   "Send some line to GHCi and echo the result in the REPL and minibuffer."
