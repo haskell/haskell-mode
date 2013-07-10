@@ -253,9 +253,10 @@ imports become available?"
                    response
                    (cadddr state))
                   (if haskell-process-use-presentation-mode
-                      (haskell-present (cadr state)
-                                       (haskell-process-session (car state))
-                                       response)
+                      (progn (haskell-present (cadr state)
+                                              (haskell-process-session (car state))
+                                              response)
+                             (setq haskell-session (haskell-process-session (car state))))
                     (haskell-mode-message-line response))
                   (when (caddr state)
                     (goto-char (line-beginning-position))

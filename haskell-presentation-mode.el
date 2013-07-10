@@ -43,8 +43,7 @@ SESSION as the current haskell-session."
       (unless (eq major-mode 'haskell-mode)
         (haskell-mode)
         (haskell-presentation-mode)
-        (font-lock-mode -1)
-        (setq haskell-session session))
+        (font-lock-mode -1))
       (let ((buffer-read-only nil))
         (erase-buffer)
         (insert (propertize "Hit `q' to close this window.\n\n"
