@@ -34,15 +34,17 @@
   :keymap haskell-presentation-mode-keymap
   (setq buffer-read-only t))
 
-(defun haskell-present (code)
-  "Present CODE in a popup buffer."
-  (let* ((name "*Haskell Presentation*")
+(defun haskell-present (name session code)
+  "Present CODE in a popup buffer suffixed with NAME and set
+SESSION as the current haskell-session."
+  (let* ((name (format "*Haskell Presentation%s*" name))
          (buffer (get-buffer-create name)))
     (with-current-buffer buffer
       (unless (eq major-mode 'haskell-mode)
         (haskell-mode)
         (haskell-presentation-mode)
-        (font-lock-mode -1))
+        (font-lock-mode -1)
+        (setq haskell-session session))
       (let ((buffer-read-only nil))
         (erase-buffer)
         (insert (propertize "Hit `q' to close this window.\n\n"
@@ -51,7 +53,7 @@
         (let ((point (point)))
           (insert code "\n\n")
           (font-lock-fontify-region point (point))
-          (goto-char (point-max)))))
+          (goto-char point))))
     (pop-to-buffer buffer)))
 
 (provide 'haskell-presentation-mode)

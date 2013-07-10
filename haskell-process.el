@@ -233,11 +233,13 @@ imports become available?"
              (if (string-match "^[A-Za-z_]" (cdr state))
                  (format ":info %s" (cdr state))
                (format ":info (%s)" (cdr state)))))
-      :complete (lambda (process response)
+      :complete (lambda (state response)
                   (unless (or (string-match "^Top level" response)
                               (string-match "^<interactive>" response))
                     (if haskell-process-use-presentation-mode
-                        (haskell-present response)
+                        (haskell-present (cdr state)
+                                         (haskell-process-session (car state))
+                                         response)
                       (haskell-mode-message-line response))))))))
 
 (defun haskell-process-do-simple-echo (insert-value line &optional mode)
@@ -255,7 +257,9 @@ imports become available?"
                    response
                    (cadddr state))
                   (if haskell-process-use-presentation-mode
-                      (haskell-present response)
+                      (haskell-present (cadr state)
+                                       (haskell-process-session (car state))
+                                       response)
                     (haskell-mode-message-line response))
                   (when (caddr state)
                     (goto-char (line-beginning-position))
