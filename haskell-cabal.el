@@ -132,7 +132,7 @@
   (set (make-local-variable 'comment-start) "-- ")
   (set (make-local-variable 'comment-start-skip) "\\(^[ \t]*\\)--[ \t]*")
   (set (make-local-variable 'comment-end) "")
-  (set (make-local-variable 'comment-end-skip) "[ 	]*\\(\\s>\\|\n\\)")
+  (set (make-local-variable 'comment-end-skip) "[ \t]*\\(\\s>\\|\n\\)")
   )
 
 (defun haskell-cabal-get-setting (name)
