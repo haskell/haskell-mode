@@ -225,9 +225,9 @@ If DONTCREATE is non-nil don't create a new session."
     (if (> (length file) (length cur-dir))
         (if (string= (substring file 0 (length cur-dir))
                      cur-dir)
-            (replace-regexp-in-string 
+            (replace-regexp-in-string
              "^[/\\]" ""
-             (substring file 
+             (substring file
                         (length cur-dir)))
           file)
       file)))

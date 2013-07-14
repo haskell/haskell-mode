@@ -1,5 +1,5 @@
 ;;; haskell-compat.el --- legacy/compatibility backports for haskell-mode
-;; 
+;;
 ;; Filename: haskell-compat.el
 ;; Description: legacy/compatibility backports for haskell-mode
 

@@ -32,7 +32,7 @@
 ;;
 ;;
 ;; Installation:
-;; 
+;;
 ;; To turn declaration scanning on for all Haskell buffers under the
 ;; Haskell mode of Moss&Thorn, add this to .emacs:
 ;;

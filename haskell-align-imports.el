@@ -110,7 +110,7 @@
     (while (not (or (equal (point) (point-max)) (haskell-align-imports-after-imports-p)))
       (let ((line (haskell-align-imports-line-match-it)))
         (when line
-          (let ((match 
+          (let ((match
                  (haskell-align-imports-merge-parts
                   (loop for i from 1 to 8
                         collect (haskell-align-imports-chomp (match-string i line))))))

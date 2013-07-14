@@ -245,7 +245,7 @@ Preserves indentation and removes extra whitespace"
 	(current-column))
     (current-indentation)))
 
-(defun haskell-indentation-outside-bird-line () 
+(defun haskell-indentation-outside-bird-line ()
   (and (eq haskell-literate 'bird)
        (or (< (current-column) 2)
 	   (save-excursion
@@ -573,7 +573,7 @@ Preserves indentation and removes extra whitespace"
 						    "]" "," "|")))
     ("{"     . (lambda () (haskell-indentation-list #'haskell-indentation-expression
 						    "}" "," nil)))))
-	  
+
 (defun haskell-indentation-expression-layout ()
   (haskell-indentation-layout #'haskell-indentation-expression))
 
@@ -612,14 +612,14 @@ Preserves indentation and removes extra whitespace"
 	(cond
 	 ((member current-token '(value operator "->"))
 	  (haskell-indentation-read-next-token))
-	 
+
 	 ((eq current-token 'end-tokens)
 	  (when (member following-token
 			'(value operator no-following-token
 				"->" "(" "[" "{" "::"))
 	    (haskell-indentation-add-indentation current-indent))
 	  (throw 'return nil))
-	 
+
 	 (t (let ((parser (assoc current-token haskell-indentation-type-list)))
 	      (if (not parser)
 		  (throw 'return nil)
@@ -888,7 +888,7 @@ Preserves indentation and removes extra whitespace"
 	    (t (throw 'parse-end nil))))
 
      ((null (cdr phrase)))
-     
+
      ((equal (cadr phrase) current-token)
       (let* ((on-new-line (= (haskell-current-column) (haskell-indentation-current-indentation)))
 	     (lines-between (- parse-line-number starter-line))
@@ -998,7 +998,7 @@ Preserves indentation and removes extra whitespace"
 (defun haskell-indentation-skip-token ()
   "Skip to the next token."
   (let ((case-fold-search nil))
-    
+
     (if (or (looking-at "'\\([^\\']\\|\\\\.\\)*'")
             (looking-at "\"\\([^\\\"]\\|\\\\.\\)*\"")
             (looking-at	; Hierarchical names always start with uppercase

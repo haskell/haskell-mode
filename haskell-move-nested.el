@@ -96,8 +96,8 @@ Used by `haskell-move-nested'.
                                 start-end-point)))))))
 
 (defun haskell-move-nested-indent-level ()
-  (max 
-   0 
+  (max
+   0
    (1- (length
         (buffer-substring-no-properties
          (line-beginning-position)

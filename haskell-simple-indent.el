@@ -32,7 +32,7 @@
 ;;
 ;;
 ;; Installation:
-;; 
+;;
 ;; To bind TAB to the indentation command for all Haskell buffers, add
 ;; this to .emacs:
 ;;

@@ -136,7 +136,7 @@
 (defun haskell-package-list-get (conf)
   "Get the list of packages in the given config."
   (haskell-package-list-parse
-   (shell-command-to-string 
+   (shell-command-to-string
     (format "ghc-pkg -f %s list"
             conf))))
 
@@ -144,7 +144,7 @@
   "Parse the list of installed packges."
   (let* ((lines (split-string text "\n    ")))
     (mapcar
-     (lambda (line) 
+     (lambda (line)
        (string-match "^{?\\([a-zA-Z0-9-_]+\\)-\\([0-9.]+\\)}?$" line)
        (cons (match-string 1 line) (match-string 2 line)))
      (delete-if

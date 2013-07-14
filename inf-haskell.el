@@ -216,11 +216,11 @@ setting up the inferior-haskell buffer."
              #1=(string-match inferior-haskell-multiline-prompt-re string))
     ;; deleting sequence of `%s|' multiline promts
     (while #1#
-      (setq string (substring string (match-end 0))))    
+      (setq string (substring string (match-end 0))))
     ;; deleting regular prompts
     (setq string (replace-regexp-in-string comint-prompt-regexp "" string)
           ;; turning off this post-filter
-          inferior-haskell-send-decl-post-filter-on nil))  
+          inferior-haskell-send-decl-post-filter-on nil))
   string)
 
 (defvar inferior-haskell-seen-prompt nil)
