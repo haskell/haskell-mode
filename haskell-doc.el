@@ -69,10 +69,10 @@
 ;;
 ;;   (setq haskell-doc-show-user-defined t)
 ;;   (setq haskell-doc-user-defined-ids
-;;	(list
-;;	   '("main" . "just another pathetic main function")
-;;	   '("foo" . "a very dummy name")
-;;	   '("bar" . "another dummy name")))
+;;      (list
+;;         '("main" . "just another pathetic main function")
+;;         '("foo" . "a very dummy name")
+;;         '("bar" . "another dummy name")))
 
 ;;  The following two variables are useful to make the type fit on one line:
 ;;  If `haskell-doc-chop-off-context' is non-nil the context part of the type
@@ -541,33 +541,33 @@ the keyword is used.")
 (eval-and-compile
 (defalias 'haskell-doc-split-string
   (if (condition-case ()
-	  (split-string "" nil t)
-	(wrong-number-of-arguments nil))
+          (split-string "" nil t)
+        (wrong-number-of-arguments nil))
       'split-string
     ;; copied from Emacs 22
     (lambda (string &optional separators omit-nulls)
       (let ((keep-nulls (not (if separators omit-nulls t)))
-	    (rexp (or separators "[ \f\t\n\r\v]+"))
-	    (start 0)
-	    notfirst
-	    (list nil))
-	(while (and (string-match rexp string
-				  (if (and notfirst
-					   (= start (match-beginning 0))
-					   (< start (length string)))
-				      (1+ start) start))
-		    (< start (length string)))
-	  (setq notfirst t)
-	  (if (or keep-nulls (< start (match-beginning 0)))
-	      (setq list
-		    (cons (substring string start (match-beginning 0))
-			  list)))
-	  (setq start (match-end 0)))
-	(if (or keep-nulls (< start (length string)))
-	    (setq list
-		  (cons (substring string start)
-			list)))
-	(nreverse list))))))
+            (rexp (or separators "[ \f\t\n\r\v]+"))
+            (start 0)
+            notfirst
+            (list nil))
+        (while (and (string-match rexp string
+                                  (if (and notfirst
+                                           (= start (match-beginning 0))
+                                           (< start (length string)))
+                                      (1+ start) start))
+                    (< start (length string)))
+          (setq notfirst t)
+          (if (or keep-nulls (< start (match-beginning 0)))
+              (setq list
+                    (cons (substring string start (match-beginning 0))
+                          list)))
+          (setq start (match-end 0)))
+        (if (or keep-nulls (< start (length string)))
+            (setq list
+                  (cons (substring string start)
+                        list)))
+        (nreverse list))))))
 
 ;;@cindex haskell-doc-prelude-types
 
@@ -1340,18 +1340,18 @@ URL is the URL of the online doc."
   ;; Add the menu to the hugs menu as last entry.
   (let ((hugsmap (lookup-key (current-local-map) [menu-bar Hugs])))
     (if (not (or (featurep 'xemacs) ; XEmacs has problems here
-		 (not (keymapp hugsmap))
-		 (lookup-key hugsmap [haskell-doc])))
-	(if (functionp 'define-key-after)
-	    (define-key-after hugsmap [haskell-doc]
-	      (cons "Haskell-doc" haskell-doc-keymap)
-	      [Haskell-doc mode]))))
+                 (not (keymapp hugsmap))
+                 (lookup-key hugsmap [haskell-doc])))
+        (if (functionp 'define-key-after)
+            (define-key-after hugsmap [haskell-doc]
+              (cons "Haskell-doc" haskell-doc-keymap)
+              [Haskell-doc mode]))))
   ;; Add shortcuts for these commands.
   (local-set-key "\C-c\e/" 'haskell-doc-check-active)
   ;; Conflicts with the binding of haskell-insert-otherwise.
   ;; (local-set-key "\C-c\C-o" 'haskell-doc-mode)
   (local-set-key [(control shift meta mouse-3)]
-		 'haskell-doc-ask-mouse-for-type))
+                 'haskell-doc-ask-mouse-for-type))
 
 
 ;;@node Haskell Doc Mode, Switch it on or off, Menubar Support, top
@@ -1369,10 +1369,10 @@ See variable docstring."
   (interactive (list (or current-prefix-arg 'toggle)))
 
   (setq haskell-doc-mode
-	(cond
-	 ((eq arg 'toggle) (not haskell-doc-mode))
-	 (arg (> (prefix-numeric-value arg) 0))
-	 (t)))
+        (cond
+         ((eq arg 'toggle) (not haskell-doc-mode))
+         (arg (> (prefix-numeric-value arg) 0))
+         (t)))
 
   ;; First, unconditionally turn the mode OFF.
 
@@ -1402,7 +1402,7 @@ See variable docstring."
       (add-hook 'post-command-hook
                 'haskell-doc-mode-print-current-symbol-info nil 'local))
     (and haskell-doc-show-global-types
-	 (haskell-doc-make-global-fct-index)) ; build type index for global fcts
+         (haskell-doc-make-global-fct-index)) ; build type index for global fcts
 
     (haskell-doc-install-keymap)
 
@@ -1410,15 +1410,15 @@ See variable docstring."
 
   (and (called-interactively-p 'any)
        (message "haskell-doc-mode is %s"
-		(if haskell-doc-mode "enabled" "disabled")))
+                (if haskell-doc-mode "enabled" "disabled")))
   haskell-doc-mode)
 
 (defmacro haskell-doc-toggle-var (id prefix)
   ;; toggle variable or set it based on prefix value
   `(setq ,id
-	 (if ,prefix
-	     (>= (prefix-numeric-value ,prefix) 0)
-	   (not ,id))) )
+         (if ,prefix
+             (>= (prefix-numeric-value ,prefix) 0)
+           (not ,id))) )
 
 ;;@cindex haskell-doc-show-global-types
 (defun haskell-doc-show-global-types (&optional prefix)
@@ -1661,7 +1661,7 @@ the haskell-doc database."
 ;;(defun haskell-doc-fnsym-in-current-sexp ()
 ;;  (let* ((p (point))
 ;;         (sym (progn
-;;		(forward-word -1)
+;;              (forward-word -1)
 ;;                (while (and (forward-word -1) ; (haskell-doc-forward-sexp-safe -1)
 ;;                            (> (point) (point-min))))
 ;;                (cond ((or (= (point) (point-min))
@@ -1677,7 +1677,7 @@ the haskell-doc database."
 ;;                           (error nil)))))))
 ;;    (goto-char p)
 ;;    (if sym
-;;	(format "%s" sym)
+;;      (format "%s" sym)
 ;;      sym)))
 
 ;;    (and (symbolp sym)
@@ -1707,8 +1707,8 @@ the haskell-doc database."
        (setq str (concat str (haskell-doc-grab))))
      (haskell-doc-string-nub-ws           ; squeeze string
       (if haskell-doc-chop-off-context    ; no context
-	  (haskell-doc-chop-off-context str)
-	str)))))
+          (haskell-doc-chop-off-context str)
+        str)))))
  ;; (concat (car fct-and-pos) "::" (haskell-doc-string-nub-ws str))))
 
 ;;@cindex haskell-doc-wrapped-type-p
@@ -1722,10 +1722,10 @@ multi-line type \(same for `=>'\).
 ToDo: Check for matching parenthesis!."
  (save-excursion
    (let ( (here (point))
-	  (lim (progn (beginning-of-line) (point)))
-	  ;; (foo "")
-	  (res nil)
-	  )
+          (lim (progn (beginning-of-line) (point)))
+          ;; (foo "")
+          (res nil)
+          )
    (goto-char here)
    (search-backward "--" lim t) ; skip over `--' comment
    (skip-chars-backward " \t")
@@ -1737,24 +1737,24 @@ ToDo: Check for matching parenthesis!."
    (forward-char -1)
    ;; (setq foo (concat foo (char-to-string (preceding-char)) (char-to-string (following-char))))
    (if (or (and (or (char-equal (preceding-char) ?-) (char-equal (preceding-char) ?=))
-		(char-equal (following-char) ?>)) ; (or -!> =!>
-	   (char-equal (following-char) ?,))      ;     !,)
+                (char-equal (following-char) ?>)) ; (or -!> =!>
+           (char-equal (following-char) ?,))      ;     !,)
        (setq res t)
      (forward-line)
      (let ((here (point)))
        (goto-char here)
        (skip-chars-forward " \t")
        (if (looking-at "--")  ; it is a comment line
-	   (progn
-	     (forward-line 1)
-	     (end-of-line)
-	     (setq res (haskell-doc-wrapped-type-p)))
-	 (forward-char 1)
-	 ;; (setq foo (concat foo (char-to-string (preceding-char)) (char-to-string (following-char))))
-	 ;; (message "|%s|" foo)
-	 (if (and (or (char-equal (preceding-char) ?-) (char-equal (preceding-char) ?=))
-		  (char-equal (following-char) ?>)) ; -!> or =!>
-	     (setq res t))))))
+           (progn
+             (forward-line 1)
+             (end-of-line)
+             (setq res (haskell-doc-wrapped-type-p)))
+         (forward-char 1)
+         ;; (setq foo (concat foo (char-to-string (preceding-char)) (char-to-string (following-char))))
+         ;; (message "|%s|" foo)
+         (if (and (or (char-equal (preceding-char) ?-) (char-equal (preceding-char) ?=))
+                  (char-equal (following-char) ?>)) ; -!> or =!>
+             (setq res t))))))
    res)))
 
 ;;@cindex haskell-doc-grab
@@ -1780,15 +1780,15 @@ ToDo: Also eliminate leading and trailing whitespace."
 ;;(defun haskell-doc-string-nub-ws (str)
 ;;  "Replace all sequences of whitespaces in STR by just one whitespace."
 ;;  (let ( (res "")
-;;	 (l (length str))
-;;	 (i 0)
-;;	 (j 0)
-;;	 (in-ws nil))
+;;       (l (length str))
+;;       (i 0)
+;;       (j 0)
+;;       (in-ws nil))
 ;;   (while (< i l)
 ;;     (let* ( (c (string-to-char (substring str i (1+ i))))
-;;	    (is-ws (eq (char-syntax c) ? )) )
+;;          (is-ws (eq (char-syntax c) ? )) )
 ;;       (if (not (and in-ws is-ws))
-;;	     (setq res (concat res (char-to-string c))))
+;;           (setq res (concat res (char-to-string c))))
 ;;       (setq in-ws is-ws)
 ;;       (setq i (1+ i))))
 ;;   res))
@@ -1882,20 +1882,20 @@ This function switches to and potentially loads many buffers."
   (or sym
       (current-word))
   (let* ( (fn sym) ; (format "%s" sym))
-	  (fal haskell-doc-index)
-	  (res "") )
+          (fal haskell-doc-index)
+          (res "") )
     (while (not (null fal))
       (let* ( (l (car fal))
-	      (f (car l))
-	      (x (assoc fn (cdr l))) )
-	(if (not (null x))
-	    (let* ( (ty (cdr x)) ; the type as string
-		    (idx (string-match "::" ty))
-		    (str (if (null idx)
-			     ty
-			   (substring ty (+ idx 2)))) )
-	      (setq res (format "[%s] %s" f str))))
-	  (setq fal (cdr fal))))
+              (f (car l))
+              (x (assoc fn (cdr l))) )
+        (if (not (null x))
+            (let* ( (ty (cdr x)) ; the type as string
+                    (idx (string-match "::" ty))
+                    (str (if (null idx)
+                             ty
+                           (substring ty (+ idx 2)))) )
+              (setq res (format "[%s] %s" f str))))
+          (setq fal (cdr fal))))
     res))) ; (message res)) )
 
 ;;@node Local fct type,  , Global fct type, Print fctsym
@@ -1904,27 +1904,27 @@ This function switches to and potentially loads many buffers."
 ;;@cindex haskell-doc-get-and-format-fct-type
 
 (defun haskell-doc-get-and-format-fct-type (fn)
- "Get the type and kind of FN by checking local and global functions."
- (save-excursion
-   (save-match-data
-     (let ((docstring "")
-	   (doc nil)
-	   )
-       ;; is it a local function?
-       (setq docstring (haskell-doc-get-imenu-info fn "Variables"))
-       (if (not (null docstring))
-		;; (string-match (format "^%s\\s-+::\\s-+\\(.*\\)$" fn) docstring))
-	   (setq doc `(,docstring . "Variables"))) ; `(,(match-string 1 docstring) . "Variables") ))
-       ;; is it a type declaration?
-       (setq docstring (haskell-doc-get-imenu-info fn "Types"))
-       (if (not (null docstring))
-		;; (string-match (format "^\\s-*type\\s-+%s.*$" fn) docstring))
-	     (setq doc `(,docstring . "Types"))) ; `(,(match-string 0 docstring) . "Types")) )
-       (if (not (null docstring))
-		;; (string-match (format "^\\s-*data.*%s.*$" fn) docstring))
-	 (setq doc `(,docstring . "Data"))) ; (setq doc `(,(match-string 0 docstring) . "Data")) )
-       ;; return the result
-       doc ))))
+  "Get the type and kind of FN by checking local and global functions."
+  (save-excursion
+    (save-match-data
+      (let ((docstring "")
+            (doc nil)
+            )
+        ;; is it a local function?
+        (setq docstring (haskell-doc-get-imenu-info fn "Variables"))
+        (if (not (null docstring))
+            ;; (string-match (format "^%s\\s-+::\\s-+\\(.*\\)$" fn) docstring))
+            (setq doc `(,docstring . "Variables"))) ; `(,(match-string 1 docstring) . "Variables") ))
+        ;; is it a type declaration?
+        (setq docstring (haskell-doc-get-imenu-info fn "Types"))
+        (if (not (null docstring))
+            ;; (string-match (format "^\\s-*type\\s-+%s.*$" fn) docstring))
+            (setq doc `(,docstring . "Types"))) ; `(,(match-string 0 docstring) . "Types")) )
+        (if (not (null docstring))
+            ;; (string-match (format "^\\s-*data.*%s.*$" fn) docstring))
+            (setq doc `(,docstring . "Data"))) ; (setq doc `(,(match-string 0 docstring) . "Data")) )
+        ;; return the result
+        doc ))))
 
 
 ;;@appendix

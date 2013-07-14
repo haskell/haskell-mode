@@ -138,23 +138,23 @@
   ;; It makes a big difference if we don't copy the syntax table here,
   ;; as Emacs 21 does, but Emacs 22 doesn't.
   (unless (eq (syntax-table)
-	      (with-syntax-table (syntax-table) (syntax-table)))
+              (with-syntax-table (syntax-table) (syntax-table)))
     (defmacro with-syntax-table (table &rest body)
       "Evaluate BODY with syntax table of current buffer set to a copy of TABLE.
 The syntax table of the current buffer is saved, BODY is evaluated, and the
 saved table is restored, even in case of an abnormal exit.
 Value is what BODY returns."
       (let ((old-table (make-symbol "table"))
-	    (old-buffer (make-symbol "buffer")))
-	`(let ((,old-table (syntax-table))
-	       (,old-buffer (current-buffer)))
-	   (unwind-protect
-	       (progn
-		 (set-syntax-table ,table)
-		 ,@body)
-	     (save-current-buffer
-	       (set-buffer ,old-buffer)
-	       (set-syntax-table ,old-table))))))))
+            (old-buffer (make-symbol "buffer")))
+        `(let ((,old-table (syntax-table))
+               (,old-buffer (current-buffer)))
+           (unwind-protect
+               (progn
+                 (set-syntax-table ,table)
+                 ,@body)
+             (save-current-buffer
+               (set-buffer ,old-buffer)
+               (set-syntax-table ,old-table))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General declaration scanning functions.
@@ -168,9 +168,9 @@ Value is what BODY returns."
 
 (defvar haskell-ds-start-keywords-re
   (concat "\\(\\<"
-	  "class\\|data\\|i\\(mport\\|n\\(fix\\(\\|[lr]\\)\\|stance\\)\\)\\|"
-	  "module\\|primitive\\|type\\|newtype"
-	  "\\)\\>")
+          "class\\|data\\|i\\(mport\\|n\\(fix\\(\\|[lr]\\)\\|stance\\)\\)\\|"
+          "module\\|primitive\\|type\\|newtype"
+          "\\)\\>")
   "Keywords that may start a declaration.")
 
 (defvar haskell-ds-syntax-table
@@ -229,9 +229,9 @@ current line that starts with REGEXP and is not in `font-lock-comment-face'."
   ;; no effect on efficiency.  It is probably not called enough to do
   ;; so.
   (while (and (= (forward-line inc) 0)
-	      (or (not (looking-at regexp))
-		  (eq (get-text-property (point) 'face)
-		      'font-lock-comment-face)))))
+              (or (not (looking-at regexp))
+                  (eq (get-text-property (point) 'face)
+                      'font-lock-comment-face)))))
 
 (defun haskell-ds-move-to-start-regexp-skipping-comments (inc regexp)
   "Like haskell-ds-move-to-start-regexp, but uses syntax-ppss to
@@ -271,21 +271,21 @@ then point does not move if already at the start of a declaration."
   ;; argument, this function will treat such value bindings as
   ;; separate from the declarations surrounding it.
   (let ( ;; The variable typed or bound in the current series of
-	;; declarations.
-	name
-	;; The variable typed or bound in the new declaration.
-	newname
-	;; Hack to solve hard problem for Bird-style literate scripts
-	;; that start with a declaration.  We are in the abyss if
-	;; point is before start of this declaration.
-	abyss
-	(line-prefix (if bird-literate literate-haskell-ds-line-prefix ""))
-	;; The regexp to match for the start of a declaration.
-	(start-decl-re (if bird-literate
-			   literate-haskell-ds-start-decl-re
-			 haskell-ds-start-decl-re))
-	(increment (if direction 1 -1))
-	(bound (if direction (point-max) (point-min))))
+        ;; declarations.
+        name
+        ;; The variable typed or bound in the new declaration.
+        newname
+        ;; Hack to solve hard problem for Bird-style literate scripts
+        ;; that start with a declaration.  We are in the abyss if
+        ;; point is before start of this declaration.
+        abyss
+        (line-prefix (if bird-literate literate-haskell-ds-line-prefix ""))
+        ;; The regexp to match for the start of a declaration.
+        (start-decl-re (if bird-literate
+                           literate-haskell-ds-start-decl-re
+                         haskell-ds-start-decl-re))
+        (increment (if direction 1 -1))
+        (bound (if direction (point-max) (point-min))))
     ;; Change syntax table.
     (with-syntax-table haskell-ds-syntax-table
       ;; move to beginning of line that starts the "current
@@ -405,96 +405,96 @@ of the declaration, and the name-position is at the start of the name
 of the declaration.  The name is a string, the positions are buffer
 positions and the type is one of the symbols \"variable\", \"datatype\",
 \"class\", \"import\" and \"instance\"."
-  (let (;; The name, type and name-position of the declaration to
-	;; return.
-	name
-	type
-	name-pos
-	;; Buffer positions marking the start and end of the space
-	;; containing a declaration.
-	start
-	end)
+  (let ( ;; The name, type and name-position of the declaration to
+        ;; return.
+        name
+        type
+        name-pos
+        ;; Buffer positions marking the start and end of the space
+        ;; containing a declaration.
+        start
+        end)
     ;; Change to declaration scanning syntax.
     (with-syntax-table haskell-ds-syntax-table
-    ;; Stop when we are at the end of the buffer or when a valid
-    ;; declaration is grabbed.
-    (while (not (or (eobp) name))
-      ;; Move forward to next declaration at or after point.
-      (haskell-ds-move-to-decl t bird-literate t)
-      ;; Start and end of search space is currently just the starting
-      ;; line of the declaration.
-      (setq start (point)
-	    end   (line-end-position))
-      (cond
-       ;; If the start of the top-level declaration does not begin
-       ;; with a starting keyword, then (if legal) must be a type
-       ;; signature or value binding, and the variable concerned is
-       ;; grabbed.
-       ((not (looking-at haskell-ds-start-keywords-re))
-	(setq name (haskell-ds-get-variable ""))
-	(if name
-	    (progn
-	      (setq type 'variable)
-	      (re-search-forward (regexp-quote name) end t)
-	      (setq name-pos (match-beginning 0)))))
-       ;; User-defined datatype declaration.
-       ((re-search-forward "\\=\\(data\\|newtype\\|type\\)\\>" end t)
-	(re-search-forward "=>" end t)
-	(if (looking-at "[ \t]*\\(\\sw+\\)")
-	    (progn
-	      (setq name (haskell-ds-match-string 1))
-	      (setq name-pos (match-beginning 1))
-	      (setq type 'datatype))))
-       ;; Class declaration.
-       ((re-search-forward "\\=class\\>" end t)
-	(re-search-forward "=>" end t)
-	(if (looking-at "[ \t]*\\(\\sw+\\)")
-	    (progn
-	      (setq name (haskell-ds-match-string 1))
-	      (setq name-pos (match-beginning 1))
-	      (setq type 'class))))
-       ;; Import declaration.
-       ((looking-at "import[ \t]+\\(qualified[ \t]+\\)?\\(\\(?:\\sw\\|.\\)+\\)")
-	(setq name (haskell-ds-match-string 2))
-	(setq name-pos (match-beginning 2))
-	(setq type 'import))
-       ;; Instance declaration.
-       ((re-search-forward "\\=instance[ \t]+" end t)
-	(re-search-forward "=>[ \t]+" end t)
-	;; The instance "title" starts just after the `instance' (and
-	;; any context) and finishes just before the _first_ `where'
-	;; if one exists.  This solution is ugly, but I can't find a
-	;; nicer one---a simple regexp will pick up the last `where',
-	;; which may be rare but nevertheless...
-	(setq name-pos (point))
-	(setq name (format "%s"
-			   (buffer-substring
-			    (point)
-			    (progn
-			      ;; Look for a `where'.
-			      (if (re-search-forward "\\<where\\>" end t)
-				  ;; Move back to just before the `where'.
-				  (progn
-				    (re-search-backward "\\s-where")
-				    (point))
-				;; No `where' so move to last non-whitespace
-				;; before `end'.
-				(progn
-				  (goto-char end)
-				  (skip-chars-backward " \t")
-				  (point)))))))
-	;; If we did not manage to extract a name, cancel this
-	;; declaration (eg. when line ends in "=> ").
-	(if (string-match "^[ \t]*$" name) (setq name nil))
-	(setq type 'instance)))
-      ;; Move past start of current declaration.
-      (goto-char end))
-    ;; If we have a valid declaration then return it, otherwise return
-    ;; nil.
-    (if name
-	(cons (cons name (cons (copy-marker start t) (copy-marker name-pos t)))
-	      type)
-      nil))))
+      ;; Stop when we are at the end of the buffer or when a valid
+      ;; declaration is grabbed.
+      (while (not (or (eobp) name))
+        ;; Move forward to next declaration at or after point.
+        (haskell-ds-move-to-decl t bird-literate t)
+        ;; Start and end of search space is currently just the starting
+        ;; line of the declaration.
+        (setq start (point)
+              end   (line-end-position))
+        (cond
+         ;; If the start of the top-level declaration does not begin
+         ;; with a starting keyword, then (if legal) must be a type
+         ;; signature or value binding, and the variable concerned is
+         ;; grabbed.
+         ((not (looking-at haskell-ds-start-keywords-re))
+          (setq name (haskell-ds-get-variable ""))
+          (if name
+              (progn
+                (setq type 'variable)
+                (re-search-forward (regexp-quote name) end t)
+                (setq name-pos (match-beginning 0)))))
+         ;; User-defined datatype declaration.
+         ((re-search-forward "\\=\\(data\\|newtype\\|type\\)\\>" end t)
+          (re-search-forward "=>" end t)
+          (if (looking-at "[ \t]*\\(\\sw+\\)")
+              (progn
+                (setq name (haskell-ds-match-string 1))
+                (setq name-pos (match-beginning 1))
+                (setq type 'datatype))))
+         ;; Class declaration.
+         ((re-search-forward "\\=class\\>" end t)
+          (re-search-forward "=>" end t)
+          (if (looking-at "[ \t]*\\(\\sw+\\)")
+              (progn
+                (setq name (haskell-ds-match-string 1))
+                (setq name-pos (match-beginning 1))
+                (setq type 'class))))
+         ;; Import declaration.
+         ((looking-at "import[ \t]+\\(qualified[ \t]+\\)?\\(\\(?:\\sw\\|.\\)+\\)")
+          (setq name (haskell-ds-match-string 2))
+          (setq name-pos (match-beginning 2))
+          (setq type 'import))
+         ;; Instance declaration.
+         ((re-search-forward "\\=instance[ \t]+" end t)
+          (re-search-forward "=>[ \t]+" end t)
+          ;; The instance "title" starts just after the `instance' (and
+          ;; any context) and finishes just before the _first_ `where'
+          ;; if one exists.  This solution is ugly, but I can't find a
+          ;; nicer one---a simple regexp will pick up the last `where',
+          ;; which may be rare but nevertheless...
+          (setq name-pos (point))
+          (setq name (format "%s"
+                             (buffer-substring
+                              (point)
+                              (progn
+                                ;; Look for a `where'.
+                                (if (re-search-forward "\\<where\\>" end t)
+                                    ;; Move back to just before the `where'.
+                                    (progn
+                                      (re-search-backward "\\s-where")
+                                      (point))
+                                  ;; No `where' so move to last non-whitespace
+                                  ;; before `end'.
+                                  (progn
+                                    (goto-char end)
+                                    (skip-chars-backward " \t")
+                                    (point)))))))
+          ;; If we did not manage to extract a name, cancel this
+          ;; declaration (eg. when line ends in "=> ").
+          (if (string-match "^[ \t]*$" name) (setq name nil))
+          (setq type 'instance)))
+        ;; Move past start of current declaration.
+        (goto-char end))
+      ;; If we have a valid declaration then return it, otherwise return
+      ;; nil.
+      (if name
+          (cons (cons name (cons (copy-marker start t) (copy-marker name-pos t)))
+                type)
+        nil))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Declaration scanning via `imenu'.
@@ -507,62 +507,62 @@ datatypes) in a Haskell file for the `imenu' package."
   ;; Each list has elements of the form `(INDEX-NAME . INDEX-POSITION)'.
   ;; These lists are nested using `(INDEX-TITLE . INDEX-ALIST)'.
   (let* ((bird-literate (haskell-ds-bird-p))
-	 (index-alist '())
-	 (index-class-alist '())   ;; Classes
-	 (index-var-alist '())     ;; Variables
-	 (index-imp-alist '())     ;; Imports
-	 (index-inst-alist '())    ;; Instances
-	 (index-type-alist '())    ;; Datatypes
-	 ;; Variables for showing progress.
-	 (bufname (buffer-name))
-	 (divisor-of-progress (max 1 (/ (buffer-size) 100)))
-	 ;; The result we wish to return.
-	 result)
+         (index-alist '())
+         (index-class-alist '()) ;; Classes
+         (index-var-alist '())   ;; Variables
+         (index-imp-alist '())   ;; Imports
+         (index-inst-alist '())  ;; Instances
+         (index-type-alist '())  ;; Datatypes
+         ;; Variables for showing progress.
+         (bufname (buffer-name))
+         (divisor-of-progress (max 1 (/ (buffer-size) 100)))
+         ;; The result we wish to return.
+         result)
     (goto-char (point-min))
     ;; Loop forwards from the beginning of the buffer through the
     ;; starts of the top-level declarations.
     (while (< (point) (point-max))
       (message "Scanning declarations in %s... (%3d%%)" bufname
-	       (/ (- (point) (point-min)) divisor-of-progress))
+               (/ (- (point) (point-min)) divisor-of-progress))
       ;; Grab the next declaration.
       (setq result (haskell-ds-generic-find-next-decl bird-literate))
       (if result
-	  ;; If valid, extract the components of the result.
-	  (let* ((name-posns (car result))
-		 (name (car name-posns))
-		 (posns (cdr name-posns))
-		 (start-pos (car posns))
-		 (type (cdr result))
-		 ;; Place `(name . start-pos)' in the correct alist.
-		 (sym (cdr (assq type
+          ;; If valid, extract the components of the result.
+          (let* ((name-posns (car result))
+                 (name (car name-posns))
+                 (posns (cdr name-posns))
+                 (start-pos (car posns))
+                 (type (cdr result))
+                 ;; Place `(name . start-pos)' in the correct alist.
+                 (sym (cdr (assq type
                                  '((variable . index-var-alist)
                                    (datatype . index-type-alist)
                                    (class . index-class-alist)
                                    (import . index-imp-alist)
                                    (instance . index-inst-alist))))))
-	    (set sym (cons (cons name start-pos) (symbol-value sym))))))
+            (set sym (cons (cons name start-pos) (symbol-value sym))))))
     ;; Now sort all the lists, label them, and place them in one list.
     (message "Sorting declarations in %s..." bufname)
     (and index-type-alist
-	 (push (cons "Datatypes"
-		     (sort index-type-alist 'haskell-ds-imenu-label-cmp))
-	       index-alist))
+         (push (cons "Datatypes"
+                     (sort index-type-alist 'haskell-ds-imenu-label-cmp))
+               index-alist))
     (and index-inst-alist
-	 (push (cons "Instances"
-		     (sort index-inst-alist 'haskell-ds-imenu-label-cmp))
-	       index-alist))
+         (push (cons "Instances"
+                     (sort index-inst-alist 'haskell-ds-imenu-label-cmp))
+               index-alist))
     (and index-imp-alist
-	 (push (cons "Imports"
-		     (sort index-imp-alist 'haskell-ds-imenu-label-cmp))
-	       index-alist))
+         (push (cons "Imports"
+                     (sort index-imp-alist 'haskell-ds-imenu-label-cmp))
+               index-alist))
     (and index-var-alist
-	 (push (cons "Variables"
-		     (sort index-var-alist 'haskell-ds-imenu-label-cmp))
-	       index-alist))
+         (push (cons "Variables"
+                     (sort index-var-alist 'haskell-ds-imenu-label-cmp))
+               index-alist))
     (and index-class-alist
-	 (push (cons "Classes"
-		     (sort index-class-alist 'haskell-ds-imenu-label-cmp))
-	       index-alist))
+         (push (cons "Classes"
+                     (sort index-class-alist 'haskell-ds-imenu-label-cmp))
+               index-alist))
     (message "Sorting declarations in %s...done" bufname)
     ;; Return the alist.
     index-alist))
@@ -589,24 +589,24 @@ datatypes) in a Haskell file for the `imenu' package."
   (set-buffer buffer)
   (let ((result (haskell-ds-generic-find-next-decl bird-literate)))
     (if result
-	(let* ((name-posns (car result))
-	       (name (car name-posns))
-	       (posns (cdr name-posns))
-	       (name-pos (cdr posns))
+        (let* ((name-posns (car result))
+               (name (car name-posns))
+               (posns (cdr name-posns))
+               (name-pos (cdr posns))
                ;;(type (cdr result))
-	       )
-	  (cons ;(concat
-		 ;; func-menu has problems with spaces, and adding a
-		 ;; qualifying keyword will not allow the "goto fn"
-		 ;; functions to work properly.  Sigh.
-		 ;; (cond
-		 ;;  ((eq type 'variable) "")
-		 ;;  ((eq type 'datatype) "datatype ")
-		 ;;  ((eq type 'class) "class ")
-		 ;;  ((eq type 'import) "import ")
-		 ;;  ((eq type 'instance) "instance "))
-		 name;)
-		name-pos))
+               )
+          (cons    ;(concat
+           ;; func-menu has problems with spaces, and adding a
+           ;; qualifying keyword will not allow the "goto fn"
+           ;; functions to work properly.  Sigh.
+           ;; (cond
+           ;;  ((eq type 'variable) "")
+           ;;  ((eq type 'datatype) "datatype ")
+           ;;  ((eq type 'class) "class ")
+           ;;  ((eq type 'import) "import ")
+           ;;  ((eq type 'instance) "instance "))
+           name                         ;)
+           name-pos))
       nil)))
 
 (defvar haskell-ds-func-menu-regexp

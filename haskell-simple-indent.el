@@ -90,7 +90,7 @@ the current line.  If there is no visible indent point beyond the current
 column, `tab-to-tab-stop' is done instead."
   (interactive)
   (let* ((start-column (current-column))
-         (invisible-from nil)		; `nil' means infinity here
+         (invisible-from nil)           ; `nil' means infinity here
          (indent
           (catch 'haskell-simple-indent-break
             (save-excursion
@@ -119,11 +119,11 @@ column, `tab-to-tab-stop' is done instead."
                                            invisible-from
                                          col)))))))))))))
     (if indent
-	(let ((opoint (point-marker)))
-	  (indent-line-to indent)
-	  (if (> opoint (point))
-	      (goto-char opoint))
-	  (set-marker opoint nil))
+        (let ((opoint (point-marker)))
+          (indent-line-to indent)
+          (if (> opoint (point))
+              (goto-char opoint))
+          (set-marker opoint nil))
       (tab-to-tab-stop))))
 
 (defun haskell-simple-indent-backtab ()
@@ -146,17 +146,17 @@ column, `tab-to-tab-stop' is done instead."
   (interactive)
   (let ((point (point)))
     (let ((start-end
-	   (save-excursion
-	     (let* ((start (line-beginning-position))
-		    (end (progn (goto-char start)
-				(search-forward-regexp
-				 "[^ ]" (line-end-position) t 1))))
-	       (when end (cons start (1- end)))))))
+           (save-excursion
+             (let* ((start (line-beginning-position))
+                    (end (progn (goto-char start)
+                                (search-forward-regexp
+                                 "[^ ]" (line-end-position) t 1))))
+               (when end (cons start (1- end)))))))
       (if start-end
-	  (progn (newline)
-		 (insert (buffer-substring-no-properties
-			  (car start-end) (cdr start-end))))
-	(newline)))))
+          (progn (newline)
+                 (insert (buffer-substring-no-properties
+                          (car start-end) (cdr start-end))))
+        (newline)))))
 
 (defun haskell-simple-indent-newline-indent ()
   "Make a newline on the current column and indent on step."

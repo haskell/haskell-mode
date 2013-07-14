@@ -289,36 +289,36 @@ be set to the preferred literate style."
     (modify-syntax-entry ?\]  ")[" table)
 
     (cond ((featurep 'xemacs)
-	   ;; I don't know whether this is equivalent to the below
-	   ;; (modulo nesting).  -- fx
-	   (modify-syntax-entry ?{  "(}5" table)
-	   (modify-syntax-entry ?}  "){8" table)
-	   (modify-syntax-entry ?-  "_ 1267" table))
-	  (t
-	   ;; In Emacs 21, the `n' indicates that they nest.
-	   ;; The `b' annotation is actually ignored because it's only
-	   ;; meaningful on the second char of a comment-starter, so
-	   ;; on Emacs 20 and before we get wrong results.  --Stef
-	   (modify-syntax-entry ?\{  "(}1nb" table)
-	   (modify-syntax-entry ?\}  "){4nb" table)
-	   (modify-syntax-entry ?-  "_ 123" table)))
+           ;; I don't know whether this is equivalent to the below
+           ;; (modulo nesting).  -- fx
+           (modify-syntax-entry ?{  "(}5" table)
+           (modify-syntax-entry ?}  "){8" table)
+           (modify-syntax-entry ?-  "_ 1267" table))
+          (t
+           ;; In Emacs 21, the `n' indicates that they nest.
+           ;; The `b' annotation is actually ignored because it's only
+           ;; meaningful on the second char of a comment-starter, so
+           ;; on Emacs 20 and before we get wrong results.  --Stef
+           (modify-syntax-entry ?\{  "(}1nb" table)
+           (modify-syntax-entry ?\}  "){4nb" table)
+           (modify-syntax-entry ?-  "_ 123" table)))
     (modify-syntax-entry ?\n ">" table)
 
     (let (i lim)
       (map-char-table
        (lambda (k v)
-	 (when (equal v '(1))
-	   ;; The current Emacs 22 codebase can pass either a char
-	   ;; or a char range.
-	   (if (consp k)
-	       (setq i (car k)
-		     lim (cdr k))
-	     (setq i k
-		   lim k))
-	   (while (<= i lim)
-	     (when (> i 127)
-	       (modify-syntax-entry i "_" table))
-	     (setq i (1+ i)))))
+         (when (equal v '(1))
+           ;; The current Emacs 22 codebase can pass either a char
+           ;; or a char range.
+           (if (consp k)
+               (setq i (car k)
+                     lim (cdr k))
+             (setq i k
+                   lim k))
+           (while (<= i lim)
+             (when (> i 127)
+               (modify-syntax-entry i "_" table))
+             (setq i (1+ i)))))
        (standard-syntax-table)))
 
     (modify-syntax-entry ?\` "$`" table)
@@ -518,13 +518,13 @@ Invokes `haskell-mode-hook'."
   ;; Set things up for font-lock.
   (set (make-local-variable 'font-lock-defaults)
        '(haskell-font-lock-choose-keywords
-	 nil nil ((?\' . "w") (?_  . "w")) nil
-	 (font-lock-syntactic-keywords
-	  . haskell-font-lock-choose-syntactic-keywords)
-	 (font-lock-syntactic-face-function
-	  . haskell-syntactic-face-function)
-	 ;; Get help from font-lock-syntactic-keywords.
-	 (parse-sexp-lookup-properties . t)))
+         nil nil ((?\' . "w") (?_  . "w")) nil
+         (font-lock-syntactic-keywords
+          . haskell-font-lock-choose-syntactic-keywords)
+         (font-lock-syntactic-face-function
+          . haskell-syntactic-face-function)
+         ;; Get help from font-lock-syntactic-keywords.
+         (parse-sexp-lookup-properties . t)))
   ;; Haskell's layout rules mean that TABs have to be handled with extra care.
   ;; The safer option is to avoid TABs.  The second best is to make sure
   ;; TABs stops are 8 chars apart, as mandated by the Haskell Report.  --Stef
@@ -634,13 +634,13 @@ If nil, use the Hoogle web-site."
       (browse-url (format "http://haskell.org/hoogle/?q=%s" query))
     (lexical-let ((temp-buffer (if (fboundp 'help-buffer) (help-buffer) "*Help*")))
       (with-output-to-temp-buffer temp-buffer
-	(with-current-buffer standard-output
-	  (let ((hoogle-process
-		 (start-process "hoogle" (current-buffer) haskell-hoogle-command query))
-		(scroll-to-top
-		 (lambda (process event)
-		   (set-window-start (get-buffer-window temp-buffer t) 1))))
-	    (set-process-sentinel hoogle-process scroll-to-top)))))))
+        (with-current-buffer standard-output
+          (let ((hoogle-process
+                 (start-process "hoogle" (current-buffer) haskell-hoogle-command query))
+                (scroll-to-top
+                 (lambda (process event)
+                   (set-window-start (get-buffer-window temp-buffer t) 1))))
+            (set-process-sentinel hoogle-process scroll-to-top)))))))
 
 ;;;###autoload
 (defalias 'hoogle 'haskell-hoogle)
@@ -664,8 +664,8 @@ If nil, use the Hoogle web-site."
   "*Command used to check a Haskell file."
   :group 'haskell
   :type '(choice (const "hlint")
-		 (const "ghc -fno-code")
-		 (string :tag "Other command")))
+                 (const "ghc -fno-code")
+                 (string :tag "Other command")))
 
 (defcustom haskell-stylish-on-save nil
   "Whether to run stylish-haskell on the buffer before saving."
@@ -687,11 +687,11 @@ Runs COMMAND, a shell command, as if by `compile'.
 See `haskell-check-command' for the default."
   (interactive
    (list (read-string "Checker command: "
-		      (or haskell-saved-check-command
-			  (concat haskell-check-command " "
-				  (let ((name (buffer-file-name)))
-				    (if name
-					(file-name-nondirectory name))))))))
+                      (or haskell-saved-check-command
+                          (concat haskell-check-command " "
+                                  (let ((name (buffer-file-name)))
+                                    (if name
+                                        (file-name-nondirectory name))))))))
   (setq haskell-saved-check-command command)
   (save-some-buffers (not compilation-ask-about-save) nil)
   (compilation-start command))
@@ -700,11 +700,11 @@ See `haskell-check-command' for the default."
   "Flymake init function for Haskell.
 To be added to `flymake-init-create-temp-buffer-copy'."
   (let ((checker-elts (and haskell-saved-check-command
-			   (split-string haskell-saved-check-command))))
+                           (split-string haskell-saved-check-command))))
     (list (car checker-elts)
-	  (append (cdr checker-elts)
-		  (list (flymake-init-create-temp-buffer-copy
-			 'flymake-create-temp-inplace))))))
+          (append (cdr checker-elts)
+                  (list (flymake-init-create-temp-buffer-copy
+                         'flymake-create-temp-inplace))))))
 
 (add-to-list 'flymake-allowed-file-name-masks '("\\.l?hs\\'" haskell-flymake-init))
 
@@ -839,18 +839,18 @@ remains unchanged."
   "Insert an SCC annotation at point."
   (interactive)
   (if (or (looking-at "\\b\\|[ \t]\\|$") (and (not (bolp))
-					  (save-excursion
-					    (forward-char -1)
-					    (looking-at "\\b\\|[ \t]"))))
+                                              (save-excursion
+                                                (forward-char -1)
+                                                (looking-at "\\b\\|[ \t]"))))
       (let ((space-at-point (looking-at "[ \t]")))
-	(unless (and (not (bolp)) (save-excursion
-				    (forward-char -1)
-				    (looking-at "[ \t]")))
-	  (insert " "))
-	(insert "{-# SCC \"\" #-}")
-	(unless space-at-point
-	  (insert " "))
-	(forward-char (if space-at-point -5 -6)))
+        (unless (and (not (bolp)) (save-excursion
+                                    (forward-char -1)
+                                    (looking-at "[ \t]")))
+          (insert " "))
+        (insert "{-# SCC \"\" #-}")
+        (unless space-at-point
+          (insert " "))
+        (forward-char (if space-at-point -5 -6)))
     (error "Not over an area of whitespace")))
 
 ;; Also Bryan O'Sullivan's.
@@ -859,14 +859,14 @@ remains unchanged."
   (interactive)
   (save-excursion
     (let ((old-point (point))
-	  (scc "\\({-#[ \t]*SCC \"[^\"]*\"[ \t]*#-}\\)[ \t]*"))
+          (scc "\\({-#[ \t]*SCC \"[^\"]*\"[ \t]*#-}\\)[ \t]*"))
       (while (not (or (looking-at scc) (bolp)))
-	(forward-char -1))
+        (forward-char -1))
       (if (and (looking-at scc)
-	       (<= (match-beginning 1) old-point)
-	       (> (match-end 1) old-point))
-	  (kill-region (match-beginning 0) (match-end 0))
-	(error "No SCC at point")))))
+               (<= (match-beginning 1) old-point)
+               (> (match-end 1) old-point))
+          (kill-region (match-beginning 0) (match-end 0))
+        (error "No SCC at point")))))
 
 
 ;; Provide ourselves:

@@ -100,35 +100,35 @@ set it to a particular font of your preference among `japanese-jisx0208'
 and `unicode'."
   :group 'haskell
   :type '(choice (const nil)
-	         (const t)
-	         (const unicode)
-	         (const japanese-jisx0208)))
+                 (const t)
+                 (const unicode)
+                 (const japanese-jisx0208)))
 
 (defconst haskell-font-lock-symbols-alist
   (append
    ;; Prefer single-width Unicode font for lambda.
    (and (fboundp 'decode-char)
-	(memq haskell-font-lock-symbols '(t unicode))
-	(list (cons "\\" (decode-char 'ucs 955))))
+        (memq haskell-font-lock-symbols '(t unicode))
+        (list (cons "\\" (decode-char 'ucs 955))))
    ;; The symbols can come from a JIS0208 font.
    (and (fboundp 'make-char) (fboundp 'charsetp) (charsetp 'japanese-jisx0208)
-	(memq haskell-font-lock-symbols '(t japanese-jisx0208))
-	(list (cons "not" (make-char 'japanese-jisx0208 34 76))
-	      (cons "\\" (make-char 'japanese-jisx0208 38 75))
-	      (cons "->" (make-char 'japanese-jisx0208 34 42))
-	      (cons "<-" (make-char 'japanese-jisx0208 34 43))
-	      (cons "=>" (make-char 'japanese-jisx0208 34 77))
+        (memq haskell-font-lock-symbols '(t japanese-jisx0208))
+        (list (cons "not" (make-char 'japanese-jisx0208 34 76))
+              (cons "\\" (make-char 'japanese-jisx0208 38 75))
+              (cons "->" (make-char 'japanese-jisx0208 34 42))
+              (cons "<-" (make-char 'japanese-jisx0208 34 43))
+              (cons "=>" (make-char 'japanese-jisx0208 34 77))
               ;; FIXME: I'd like to either use ∀ or ∃ depending on how the
               ;; `forall' keyword is used, but currently the rest of the
               ;; code assumes that such ambiguity doesn't happen :-(
               (cons "forall" (make-char 'japanese-jisx0208 34 79))))
    ;; Or a unicode font.
    (and (fboundp 'decode-char)
-	(memq haskell-font-lock-symbols '(t unicode))
-	(list (cons "not" (decode-char 'ucs 172))
+        (memq haskell-font-lock-symbols '(t unicode))
+        (list (cons "not" (decode-char 'ucs 172))
               (cons "->" (decode-char 'ucs 8594))
-	      (cons "<-" (decode-char 'ucs 8592))
-	      (cons "=>" (decode-char 'ucs 8658))
+              (cons "<-" (decode-char 'ucs 8592))
+              (cons "=>" (decode-char 'ucs 8658))
               (cons "()" (decode-char 'ucs #X2205))
               (cons "==" (decode-char 'ucs #X2261))
               (cons "/=" (decode-char 'ucs #X2262))
@@ -144,8 +144,8 @@ and `unicode'."
               ;; (cons "~>" (decode-char 'ucs 8605)) ;; less desirable
               (cons "-<" (decode-char 'ucs 8610)) ;; Paterson's arrow syntax
               ;; (cons "-<" (decode-char 'ucs 10521)) ;; nicer but uncommon
-	      (cons "::" (decode-char 'ucs 8759))
-	      (list "." (decode-char 'ucs 8728) ; (decode-char 'ucs 9675)
+              (cons "::" (decode-char 'ucs 8759))
+              (list "." (decode-char 'ucs 8728) ; (decode-char 'ucs 9675)
                     ;; Need a predicate here to distinguish the . used by
                     ;; forall <foo> . <bar>.
                     'haskell-font-lock-dot-is-not-composition)
@@ -193,7 +193,7 @@ Regexp match data 0 points to the chars."
   ;; Check that the chars should really be composed into a symbol.
   (let* ((start (match-beginning 0))
          (end (match-end 0))
-	 (syntaxes (cond
+         (syntaxes (cond
                     ((eq (char-syntax (char-after start)) ?w) '(?w))
                     ;; Special case for the . used for qualified names.
                     ((and (eq (char-after start) ?\.) (= end (1+ start)))
@@ -201,17 +201,17 @@ Regexp match data 0 points to the chars."
                     (t '(?_ ?\\))))
          sym-data)
     (if (or (memq (char-syntax (or (char-before start) ?\ )) syntaxes)
-	    (memq (char-syntax (or (char-after end) ?\ )) syntaxes)
-	    (memq (get-text-property start 'face)
-		  '(font-lock-doc-face font-lock-string-face
-		    font-lock-comment-face))
+            (memq (char-syntax (or (char-after end) ?\ )) syntaxes)
+            (memq (get-text-property start 'face)
+                  '(font-lock-doc-face font-lock-string-face
+                    font-lock-comment-face))
             (and (consp (setq sym-data (cdr (assoc (match-string 0) alist))))
                  (let ((pred (cadr sym-data)))
                    (setq sym-data (car sym-data))
                    (funcall pred start))))
-	;; No composition for you.  Let's actually remove any composition
-	;; we may have added earlier and which is now incorrect.
-	(remove-text-properties start end '(composition))
+        ;; No composition for you.  Let's actually remove any composition
+        ;; we may have added earlier and which is now incorrect.
+        (remove-text-properties start end '(composition))
       ;; That's a symbol alright, so add the composition.
       (compose-region start end sym-data)))
   ;; Return nil because we're not adding any face property.
@@ -221,18 +221,18 @@ Regexp match data 0 points to the chars."
   (when (fboundp 'compose-region)
     (let ((alist nil))
       (dolist (x haskell-font-lock-symbols-alist)
-	(when (and (if (fboundp 'char-displayable-p)
-		       (char-displayable-p (if (consp (cdr x)) (cadr x) (cdr x)))
-		     (if (fboundp 'latin1-char-displayable-p)
-			 (latin1-char-displayable-p (if (consp (cdr x))
-							(cadr x)
-						      (cdr x)))
-		       t))
-		   (not (assoc (car x) alist)))	;Not yet in alist.
-	  (push x alist)))
+        (when (and (if (fboundp 'char-displayable-p)
+                       (char-displayable-p (if (consp (cdr x)) (cadr x) (cdr x)))
+                     (if (fboundp 'latin1-char-displayable-p)
+                         (latin1-char-displayable-p (if (consp (cdr x))
+                                                        (cadr x)
+                                                      (cdr x)))
+                       t))
+                   (not (assoc (car x) alist))) ; Not yet in alist.
+          (push x alist)))
       (when alist
-	`((,(regexp-opt (mapcar 'car alist) t)
-	   (0 (haskell-font-lock-compose-symbol ',alist)
+        `((,(regexp-opt (mapcar 'car alist) t)
+           (0 (haskell-font-lock-compose-symbol ',alist)
               ;; In Emacs-21, if the `override' field is nil, the face
               ;; expressions is only evaluated if the text has currently
               ;; no face.  So force evaluation by using `keep'.
@@ -243,99 +243,99 @@ Regexp match data 0 points to the chars."
   "Create fontification definitions for Haskell scripts.
 Returns keywords suitable for `font-lock-keywords'."
   (let* (;; Bird-style literate scripts start a line of code with
-	 ;; "^>", otherwise a line of code starts with "^".
-	 (line-prefix (if (eq literate 'bird) "^> ?" "^"))
+         ;; "^>", otherwise a line of code starts with "^".
+         (line-prefix (if (eq literate 'bird) "^> ?" "^"))
 
-	 ;; Most names are borrowed from the lexical syntax of the Haskell
-	 ;; report.
+         ;; Most names are borrowed from the lexical syntax of the Haskell
+         ;; report.
          ;; Some of these definitions have been superseded by using the
          ;; syntax table instead.
 
-	 ;; (ASCsymbol "-!#$%&*+./<=>?@\\\\^|~")
+         ;; (ASCsymbol "-!#$%&*+./<=>?@\\\\^|~")
          ;; Put the minus first to make it work in ranges.
 
          ;; We allow _ as the first char to fit GHC
          (varid "\\b[[:lower:]_][[:alnum:]'_]*\\b")
          ;; We allow ' preceding conids because of DataKinds/PolyKinds
          (conid "\\b'?[[:upper:]][[:alnum:]'_]*\\b")
-	 (modid (concat "\\b" conid "\\(\\." conid "\\)*\\b"))
+         (modid (concat "\\b" conid "\\(\\." conid "\\)*\\b"))
          (qvarid (concat modid "\\." varid))
          (qconid (concat modid "\\." conid))
-	 (sym
-	  ;; We used to use the below for non-Emacs21, but I think the
-	  ;; regexp based on syntax works for other emacsen as well.  -- Stef
-	  ;; (concat "[" symbol ":]+")
-	  ;; Add backslash to the symbol-syntax chars.  This seems to
-	  ;; be thrown for some reason by backslash's escape syntax.
-	  "\\(\\s_\\|\\\\\\)+")
+         (sym
+          ;; We used to use the below for non-Emacs21, but I think the
+          ;; regexp based on syntax works for other emacsen as well.  -- Stef
+          ;; (concat "[" symbol ":]+")
+          ;; Add backslash to the symbol-syntax chars.  This seems to
+          ;; be thrown for some reason by backslash's escape syntax.
+          "\\(\\s_\\|\\\\\\)+")
 
          ;; Reserved operations
          (reservedsym
-	  (concat "\\S_"
-		  ;; (regexp-opt '(".." "::" "=" "\\" "|" "<-" "->"
-		  ;; 		"@" "~" "=>") t)
-		  "\\(->\\|\\.\\.\\|::\\|∷\\|<-\\|=>\\|[=@\\|~]\\)"
-		  "\\S_"))
+          (concat "\\S_"
+                  ;; (regexp-opt '(".." "::" "=" "\\" "|" "<-" "->"
+                  ;;            "@" "~" "=>") t)
+                  "\\(->\\|\\.\\.\\|::\\|∷\\|<-\\|=>\\|[=@\\|~]\\)"
+                  "\\S_"))
          ;; Reserved identifiers
-	 (reservedid
-	  (concat "\\<"
-		  ;; `as', `hiding', and `qualified' are part of the import
+         (reservedid
+          (concat "\\<"
+                  ;; `as', `hiding', and `qualified' are part of the import
                   ;; spec syntax, but they are not reserved.
-		  ;; `_' can go in here since it has temporary word syntax.
-		  ;; (regexp-opt
-		  ;;  '("case" "class" "data" "default" "deriving" "do"
-		  ;;    "else" "if" "import" "in" "infix" "infixl"
+                  ;; `_' can go in here since it has temporary word syntax.
+                  ;; (regexp-opt
+                  ;;  '("case" "class" "data" "default" "deriving" "do"
+                  ;;    "else" "if" "import" "in" "infix" "infixl"
                   ;;    "infixr" "instance" "let" "module" "newtype" "of"
                   ;;    "then" "type" "where" "_") t)
-		  "\\(_\\|c\\(ase\\|lass\\)\\|d\\(ata\\|e\\(fault\\|riving\\)\\|o\\)\\|else\\|i\\(mport\\|n\\(fix[lr]?\\|stance\\)\\|[fn]\\)\\|let\\|module\\|mdo\\|newtype\\|of\\|rec\\|proc\\|t\\(hen\\|ype\\)\\|where\\)"
-		  "\\>"))
+                  "\\(_\\|c\\(ase\\|lass\\)\\|d\\(ata\\|e\\(fault\\|riving\\)\\|o\\)\\|else\\|i\\(mport\\|n\\(fix[lr]?\\|stance\\)\\|[fn]\\)\\|let\\|module\\|mdo\\|newtype\\|of\\|rec\\|proc\\|t\\(hen\\|ype\\)\\|where\\)"
+                  "\\>"))
 
          ;; This unreadable regexp matches strings and character
          ;; constants.  We need to do this with one regexp to handle
          ;; stuff like '"':"'".  The regexp is the composition of
          ;; "([^"\\]|\\.)*" for strings and '([^\\]|\\.[^']*)' for
          ;; characters, allowing for string continuations.
-	 ;; Could probably be improved...
+         ;; Could probably be improved...
          (string-and-char
           (concat "\\(\\(\"\\|" line-prefix "[ \t]*\\\\\\)\\([^\"\\\\\n]\\|\\\\.\\)*\\(\"\\|\\\\[ \t]*$\\)\\|'\\([^'\\\\\n]\\|\\\\.[^'\n]*\\)'\\)"))
 
-	 ;; Top-level declarations
-	 (topdecl-var
-	  (concat line-prefix "\\(" varid "\\)\\s-*\\([
+         ;; Top-level declarations
+         (topdecl-var
+          (concat line-prefix "\\(" varid "\\)\\s-*\\([
 ]*\\s-+\\)*\\("
                   ;; A toplevel declaration can be followed by a definition
                   ;; (=), a type (::) or (∷), a guard, or a pattern which can
                   ;; either be a variable, a constructor, a parenthesized
                   ;; thingy, or an integer or a string.
-		  varid "\\|" conid "\\|::\\|∷\\|=\\||\\|\\s(\\|[0-9\"']\\)"))
-	 (topdecl-var2
-	  (concat line-prefix "\\(" varid "\\|" conid "\\)\\s-*`\\(" varid "\\)`"))
-	 (topdecl-sym
-	  (concat line-prefix "\\(" varid "\\|" conid "\\)\\s-*\\(" sym "\\)"))
-	 (topdecl-sym2 (concat line-prefix "(\\(" sym "\\))"))
+                  varid "\\|" conid "\\|::\\|∷\\|=\\||\\|\\s(\\|[0-9\"']\\)"))
+         (topdecl-var2
+          (concat line-prefix "\\(" varid "\\|" conid "\\)\\s-*`\\(" varid "\\)`"))
+         (topdecl-sym
+          (concat line-prefix "\\(" varid "\\|" conid "\\)\\s-*\\(" sym "\\)"))
+         (topdecl-sym2 (concat line-prefix "(\\(" sym "\\))"))
 
-	 keywords)
+         keywords)
 
     (setq keywords
-	  `(;; NOTICE the ordering below is significant
-	    ;;
+          `(;; NOTICE the ordering below is significant
+            ;;
             ("^<<<<<<< .*$" 0 'font-lock-warning-face t)
             ("^=======" 0 'font-lock-warning-face t)
             ("^>>>>>>> .*$" 0 'font-lock-warning-face t)
-	    ("^#.*$" 0 'font-lock-preprocessor-face t)
-	    ,@(unless haskell-emacs21-features ;Supports nested comments?
-		;; Expensive.
-		`((,string-and-char 1 font-lock-string-face)))
+            ("^#.*$" 0 'font-lock-preprocessor-face t)
+            ,@(unless haskell-emacs21-features ;Supports nested comments?
+                ;; Expensive.
+                `((,string-and-char 1 font-lock-string-face)))
 
             ;; This was originally at the very end (and needs to be after
             ;; all the comment/string/doc highlighting) but it seemed to
             ;; trigger a bug in Emacs-21.3 which caused the compositions to
             ;; be "randomly" dropped.  Moving it earlier seemed to reduce
             ;; the occurrence of the bug.
-	    ,@(haskell-font-lock-symbols-keywords)
+            ,@(haskell-font-lock-symbols-keywords)
 
-	    (,reservedid 1 (symbol-value 'haskell-keyword-face))
-	    (,reservedsym 1 (symbol-value 'haskell-operator-face))
+            (,reservedid 1 (symbol-value 'haskell-keyword-face))
+            (,reservedsym 1 (symbol-value 'haskell-operator-face))
             ;; Special case for `as', `hiding', `safe' and `qualified', which are
             ;; keywords in import statements but are not otherwise reserved.
             ("\\<import[ \t]+\\(?:\\(safe\\>\\)[ \t]*\\)?\\(?:\\(qualified\\>\\)[ \t]*\\)?[^ \t\n()]+[ \t]*\\(?:\\(\\<as\\>\\)[ \t]*[^ \t\n()]+[ \t]*\\)?\\(\\<hiding\\>\\)?"
@@ -344,7 +344,7 @@ Returns keywords suitable for `font-lock-keywords'."
              (3 (symbol-value 'haskell-keyword-face) nil lax)
              (4 (symbol-value 'haskell-keyword-face) nil lax))
 
-	    (,reservedsym 1 (symbol-value 'haskell-operator-face))
+            (,reservedsym 1 (symbol-value 'haskell-operator-face))
             ;; Special case for `foreign import'
             ;; keywords in foreign import statements but are not otherwise reserved.
             ("\\<\\(foreign\\)[ \t]+\\(import\\)[ \t]+\\(?:\\(ccall\\|stdcall\\|cplusplus\\|jvm\\|dotnet\\)[ \t]+\\)?\\(?:\\(safe\\|unsafe\\|interruptible\\)[ \t]+\\)?"
@@ -353,7 +353,7 @@ Returns keywords suitable for `font-lock-keywords'."
              (3 (symbol-value 'haskell-keyword-face) nil lax)
              (4 (symbol-value 'haskell-keyword-face) nil lax))
 
-	    (,reservedsym 1 (symbol-value 'haskell-operator-face))
+            (,reservedsym 1 (symbol-value 'haskell-operator-face))
             ;; Special case for `foreign export'
             ;; keywords in foreign export statements but are not otherwise reserved.
             ("\\<\\(foreign\\)[ \t]+\\(export\\)[ \t]+\\(?:\\(ccall\\|stdcall\\|cplusplus\\|jvm\\|dotnet\\)[ \t]+\\)?"
@@ -361,38 +361,38 @@ Returns keywords suitable for `font-lock-keywords'."
              (2 (symbol-value 'haskell-keyword-face) nil lax)
              (3 (symbol-value 'haskell-keyword-face) nil lax))
 
-	    ;; Toplevel Declarations.
-	    ;; Place them *before* generic id-and-op highlighting.
-	    (,topdecl-var  (1 (symbol-value 'haskell-definition-face)))
-	    (,topdecl-var2 (2 (symbol-value 'haskell-definition-face)))
-	    (,topdecl-sym  (2 (symbol-value 'haskell-definition-face)))
-	    (,topdecl-sym2 (1 (symbol-value 'haskell-definition-face)))
+            ;; Toplevel Declarations.
+            ;; Place them *before* generic id-and-op highlighting.
+            (,topdecl-var  (1 (symbol-value 'haskell-definition-face)))
+            (,topdecl-var2 (2 (symbol-value 'haskell-definition-face)))
+            (,topdecl-sym  (2 (symbol-value 'haskell-definition-face)))
+            (,topdecl-sym2 (1 (symbol-value 'haskell-definition-face)))
 
-	    ;; These four are debatable...
-	    ("(\\(,*\\|->\\))" 0 (symbol-value 'haskell-constructor-face))
-	    ("\\[\\]" 0 (symbol-value 'haskell-constructor-face))
-	    ;; Expensive.
-	    (,qvarid 0 (symbol-value 'haskell-default-face))
-	    (,qconid 0 (symbol-value 'haskell-constructor-face))
-	    (,(concat "\`" varid "\`") 0 (symbol-value 'haskell-operator-face))
-	    ;; Expensive.
-	    (,conid 0 (symbol-value 'haskell-constructor-face))
+            ;; These four are debatable...
+            ("(\\(,*\\|->\\))" 0 (symbol-value 'haskell-constructor-face))
+            ("\\[\\]" 0 (symbol-value 'haskell-constructor-face))
+            ;; Expensive.
+            (,qvarid 0 (symbol-value 'haskell-default-face))
+            (,qconid 0 (symbol-value 'haskell-constructor-face))
+            (,(concat "\`" varid "\`") 0 (symbol-value 'haskell-operator-face))
+            ;; Expensive.
+            (,conid 0 (symbol-value 'haskell-constructor-face))
 
-	    ;; Very expensive.
-	    (,sym 0 (if (eq (char-after (match-beginning 0)) ?:)
-			haskell-constructor-face
-		      haskell-operator-face))))
+            ;; Very expensive.
+            (,sym 0 (if (eq (char-after (match-beginning 0)) ?:)
+                        haskell-constructor-face
+                      haskell-operator-face))))
     (unless (boundp 'font-lock-syntactic-keywords)
       (case literate
-	(bird
-	 (setq keywords
-	       `(("^[^>\n].*$" 0 haskell-comment-face t)
-		 ,@keywords
-		 ("^>" 0 haskell-default-face t))))
-	((latex tex)
-	 (setq keywords
-	       `((haskell-fl-latex-comments 0 'font-lock-comment-face t)
-		 ,@keywords)))))
+        (bird
+         (setq keywords
+               `(("^[^>\n].*$" 0 haskell-comment-face t)
+                 ,@keywords
+                 ("^>" 0 haskell-default-face t))))
+        ((latex tex)
+         (setq keywords
+               `((haskell-fl-latex-comments 0 'font-lock-comment-face t)
+                 ,@keywords)))))
     keywords))
 
 ;; The next three aren't used in Emacs 21.
@@ -463,18 +463,18 @@ that should be commented under LaTeX-style literate scripts."
                               ;; Sequence of hyphens.  Do nothing in
                               ;; case of things like `{---'.
                               nil)
-                             (t "_"))))	; other symbol sequence
+                             (t "_")))) ; other symbol sequence
     ))
 
 (defconst haskell-bird-syntactic-keywords
   (cons '("^[^\n>]"  (0 "<"))
-	haskell-basic-syntactic-keywords))
+        haskell-basic-syntactic-keywords))
 
 (defconst haskell-latex-syntactic-keywords
   (append
    '(("^\\\\begin{code}\\(\n\\)" 1 "!")
      ;; Note: buffer is widened during font-locking.
-     ("\\`\\(.\\|\n\\)" (1 "!"))	       ; start comment at buffer start
+     ("\\`\\(.\\|\n\\)" (1 "!"))               ; start comment at buffer start
      ("^\\(\\\\\\)end{code}$" 1 "!"))
    haskell-basic-syntactic-keywords))
 
@@ -489,11 +489,11 @@ that should be commented under LaTeX-style literate scripts."
 (defun haskell-syntactic-face-function (state)
   "`font-lock-syntactic-face-function' for Haskell."
   (cond
-   ((nth 3 state) font-lock-string-face)		; as normal
+   ((nth 3 state) font-lock-string-face) ; as normal
    ;; Else comment.  If it's from syntax table, use default face.
    ((or (eq 'syntax-table (nth 7 state))
-	(and (eq haskell-literate 'bird)
-	     (memq (char-before (nth 8 state)) '(nil ?\n))))
+        (and (eq haskell-literate 'bird)
+             (memq (char-before (nth 8 state)) '(nil ?\n))))
     haskell-literate-comment-face)
    ;; Try and recognize Haddock comments.  From what I gather from its
    ;; documentation, its comments can take the following forms:
@@ -560,13 +560,13 @@ that should be commented under LaTeX-style literate scripts."
   "Locally set `font-lock-defaults' for Haskell."
   (set (make-local-variable 'font-lock-defaults)
        '(haskell-font-lock-choose-keywords
-	 nil nil ((?\' . "w") (?_  . "w")) nil
-	 (font-lock-syntactic-keywords
-	  . haskell-font-lock-choose-syntactic-keywords)
-	 (font-lock-syntactic-face-function
-	  . haskell-syntactic-face-function)
-	 ;; Get help from font-lock-syntactic-keywords.
-	 (parse-sexp-lookup-properties . t))))
+         nil nil ((?\' . "w") (?_  . "w")) nil
+         (font-lock-syntactic-keywords
+          . haskell-font-lock-choose-syntactic-keywords)
+         (font-lock-syntactic-face-function
+          . haskell-syntactic-face-function)
+         ;; Get help from font-lock-syntactic-keywords.
+         (parse-sexp-lookup-properties . t))))
 
 ;; The main functions.
 (defun turn-on-haskell-font-lock ()
