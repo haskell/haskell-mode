@@ -1,8 +1,10 @@
-;;; haskell-menu.el -- A Haskell sessions menu.
+;;; haskell-menu.el --- A Haskell sessions menu
 
-;; Copyright (C) 2013 Chris Done
+;; Copyright (C) 2013  Chris Done
 
 ;; Author: Chris Done <chrisdone@gmail.com>
+
+;; This file is not part of GNU Emacs.
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

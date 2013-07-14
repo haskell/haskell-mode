@@ -1,9 +1,9 @@
 ;;; haskell-mode.el --- A Haskell editing mode    -*- coding: utf-8 -*-
 
 ;; Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008  Free Software Foundation, Inc
-;; Copyright (C) 1992, 1997-1998 Simon Marlow, Graeme E Moss, and Tommy Thorn
+;; Copyright (C) 1992, 1997-1998  Simon Marlow, Graeme E Moss, and Tommy Thorn
 
-;; Authors: 1992      Simon Marlow
+;; Author:  1992      Simon Marlow
 ;;          1997-1998 Graeme E Moss <gem@cs.york.ac.uk> and
 ;;                    Tommy Thorn <thorn@irisa.fr>,
 ;;          2001-2002 Reuben Thomas (>=v1.4)

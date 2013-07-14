@@ -1,8 +1,10 @@
-;;; haskell-interactive-mode.el -- The interactive Haskell mode.
+;;; haskell-interactive-mode.el --- The interactive Haskell mode
 
-;; Copyright (C) 2011-2012 Chris Done
+;; Copyright (C) 2011-2012  Chris Done
 
 ;; Author: Chris Done <chrisdone@gmail.com>
+
+;; This file is not part of GNU Emacs.
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

@@ -1,6 +1,6 @@
 ;;; haskell-str.el --- Haskell related string utilities
 
-;; Copyright (C) 2013 Herbert Valerio Riedel
+;; Copyright (C) 2013  Herbert Valerio Riedel
 
 ;; Author: Herbert Valerio Riedel <hvr@gnu.org>
 

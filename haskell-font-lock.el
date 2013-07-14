@@ -1,11 +1,11 @@
 ;;; haskell-font-lock.el --- Font locking module for Haskell Mode
 
 ;; Copyright 2003, 2004, 2005, 2006, 2007, 2008  Free Software Foundation, Inc.
-;; Copyright 1997-1998 Graeme E Moss, and Tommy Thorn
+;; Copyright 1997-1998  Graeme E Moss, and Tommy Thorn
 
-;; Authors: 1997-1998 Graeme E Moss <gem@cs.york.ac.uk> and
-;;                    Tommy Thorn <thorn@irisa.fr>
-;;          2003  Dave Love <fx@gnu.org>
+;; Author: 1997-1998 Graeme E Moss <gem@cs.york.ac.uk>
+;;         1997-1998 Tommy Thorn <thorn@irisa.fr>
+;;         2003      Dave Love <fx@gnu.org>
 ;; Keywords: faces files Haskell
 
 ;; This file is not part of GNU Emacs.
@@ -32,7 +32,7 @@
 ;; Bird-style literate scripts.
 ;;
 ;; Installation:
-;; 
+;;
 ;; To turn font locking on for all Haskell buffers under the Haskell
 ;; mode of Moss&Thorn, add this to .emacs:
 ;;
@@ -46,17 +46,24 @@
 ;; The colours and level of font locking may be customised.  See the
 ;; documentation on `turn-on-haskell-font-lock' for more details.
 ;;
+;; Present Limitations/Future Work (contributions are most welcome!):
 ;;
-;; History:
+;; . Debatable whether `()' `[]' `(->)' `(,)' `(,,)' etc.  should be
+;;   highlighted as constructors or not.  Should the `->' in
+;;   `id :: a -> a' be considered a constructor or a keyword?  If so,
+;;   how do we distinguish this from `\x -> x'?  What about the `\'?
 ;;
-;; If you have any problems or suggestions, after consulting the list
-;; below, email gem@cs.york.ac.uk and thorn@irisa.fr quoting the
-;; version of the mode you are using, the version of Emacs you are
-;; using, and a small example of the problem or suggestion.  Note that
-;; this module requires a reasonably recent version of Emacs.  It
-;; requires Emacs 21 to cope with Unicode characters and to do proper
-;; syntactic fontification.
+;; . XEmacs can support both `--' comments and `{- -}' comments
+;;   simultaneously.  If XEmacs is detected, this should be used.
 ;;
+;; . Support for GreenCard?
+;;
+;;
+;; All functions/variables start with
+;; `(turn-(on/off)-)haskell-font-lock' or `haskell-fl-'.
+
+;;; Change Log:
+
 ;; Version 1.3:
 ;;   From Dave Love:
 ;;   Support for proper behaviour (including with Unicode identifiers)
@@ -77,22 +84,6 @@
 ;;
 ;; Version 1.0:
 ;;   Brought over from Haskell mode v1.1.
-;;
-;; Present Limitations/Future Work (contributions are most welcome!):
-;;
-;; . Debatable whether `()' `[]' `(->)' `(,)' `(,,)' etc. should be
-;;   highlighted as constructors or not.  Should the `->' in
-;;   `id :: a -> a' be considered a constructor or a keyword?  If so,
-;;   how do we distinguish this from `\x -> x'?  What about the `\'?
-;;
-;; . XEmacs can support both `--' comments and `{- -}' comments
-;;   simultaneously.  If XEmacs is detected, this should be used.
-;; 
-;; . Support for GreenCard?
-;;
-
-;; All functions/variables start with
-;; `(turn-(on/off)-)haskell-font-lock' or `haskell-fl-'.
 
 ;;; Code:
 

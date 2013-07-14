@@ -1,8 +1,10 @@
-;;; haskell-presentation.el -- Presenting Haskell things.
+;;; haskell-presentation-mode.el --- Presenting Haskell things
 
-;; Copyright (C) 2013 Chris Done
+;; Copyright (C) 2013  Chris Done
 
 ;; Author: Chris Done <chrisdone@gmail.com>
+
+;; This file is not part of GNU Emacs.
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -18,6 +20,10 @@
 ;; along with GNU Emacs; see the file COPYING.  If not, write to
 ;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
+
+;;; Commentary:
+
+;;; Code:
 
 (require 'haskell-mode)
 
@@ -56,3 +62,5 @@ SESSION as the current haskell-session."
     (pop-to-buffer buffer)))
 
 (provide 'haskell-presentation-mode)
+
+;;; haskell-presentation-mode.el ends here

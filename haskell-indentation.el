@@ -1,6 +1,6 @@
 ;;; haskell-indentation.el -- indentation module for Haskell Mode
 
-;; Copyright 2009 Kristof Bastiaensen
+;; Copyright (C) 2009  Kristof Bastiaensen
 
 ;; Author: 2009 Kristof Bastiaensen <kristof.bastiaensen@vleeuwen.org>
 
@@ -29,7 +29,6 @@
 ;;    (add-hook haskell-mode-hook 'turn-on-haskell-indentation)
 ;;
 ;; Otherwise, call `haskell-indentation-mode'.
-;;
 
 ;;; Code:
 

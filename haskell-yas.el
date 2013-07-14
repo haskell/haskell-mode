@@ -1,12 +1,10 @@
 ;;; haskell-yas.el --- Customization support for Luke Hoersten's yasnippets
 
-;; Copyright (C) 2013 John Wiegley, Luke Hoersten
+;; Copyright (C) 2013  John Wiegley, Luke Hoersten
 
-;; Authors: 2013      John Wiegley
-;;          2013      Luke Hoersten
+;; Author: John Wiegley <johnw@newartisans.com>
+;;         Luke Hoersten <Luke@Hoersten.org>
 ;; Keywords: faces files Haskell
-;; Version: $Name:  $
-;; URL: http://www.haskell.org/haskell-mode/
 
 ;; This file is not part of GNU Emacs.
 
@@ -27,6 +25,8 @@
 
 ;; Provides customization variables for Luke Hoersten's yasnippet collection
 ;; to depend on.
+
+;;; Code:
 
 (defgroup haskell-yas nil
   "Customizations for Luke Hoersten's yasnippet collection for haskell-mode."
@@ -52,5 +52,4 @@
 
 (provide 'haskell-yas)
 
-;; arch-tag: 
 ;;; haskell-yas.el ends here

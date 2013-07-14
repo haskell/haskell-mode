@@ -1,7 +1,7 @@
 ;;; haskell-doc.el --- show function types in echo area  -*- coding: utf-8 -*-
 
 ;; Copyright (C) 2004, 2005, 2006, 2007, 2009  Free Software Foundation, Inc.
-;; Copyright (C) 1997 Hans-Wolfgang Loidl
+;; Copyright (C) 1997  Hans-Wolfgang Loidl
 
 ;; Author: Hans-Wolfgang Loidl <hwloidl@dcs.glasgow.ac.uk>
 ;; Temporary Maintainer and Hacker: Graeme E Moss <gem@cs.york.ac.uk>
@@ -9,8 +9,7 @@
 ;; Created: 1997-06-17
 ;; URL: http://cvs.haskell.org/cgi-bin/cvsweb.cgi/fptools/CONTRIB/haskell-modes/emacs/haskell-doc.el?rev=HEAD
 
-;;; Copyright:
-;;  ==========
+;; This file is not part of GNU Emacs.
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -26,7 +25,6 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;;  ===========
 
 ;; This program shows the type of the Haskell function under the cursor in the
 ;; minibuffer.  It acts as a kind of "Emacs background process", by regularly
@@ -43,8 +41,7 @@
 
 ;; This program was inspired by the `eldoc.el' package by Noah Friedman.
 
-;;; Installation:
-;;  =============
+;; Installation:
 
 ;; One useful way to enable this minor mode is to put the following in your
 ;; .emacs:
@@ -56,8 +53,7 @@
 ;;     or
 ;;      (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode) ; haskell-mode
 
-;;; Customisation:
-;;  ==============
+;; Customisation:
 
 ;; You can control what exactly is shown by setting the following variables to
 ;; either t or nil:
@@ -84,11 +80,10 @@
 ;;  If `haskell-doc-chop-off-fctname' is non-nil the function name is not
 ;;  shown together with the type (default: nil).
 
-;;; Internals:
-;;  ==========
+;; Internals:
 
-;; `haskell-doc-mode' is implemented as a minor-mode. So, you can combine it
-;; with any other mode. To enable it just type
+;; `haskell-doc-mode' is implemented as a minor-mode.  So, you can combine it
+;; with any other mode.  To enable it just type
 ;;   M-x turn-on-haskell-doc-mode
 
 ;; These are the names of the functions that can be called directly by the
@@ -106,24 +101,22 @@
 ;;  `haskell-doc-check-active' ... check whether haskell-doc is active;
 ;;                                 Key: CTRL-c ESC-/
 
-;;; ToDo:
-;;  =====
+;; ToDo:
 
 ;;   - Fix byte-compile problems in `haskell-doc-prelude-types' for getArgs etc
-;;   - Write a parser for .hi files. Read library interfaces via this parser.
+;;   - Write a parser for .hi files.  Read library interfaces via this parser.
 ;;   - Indicate kind of object with colours
 ;;   - Handle multi-line types
 ;;   - Encode i-am-fct info in the alist of ids and types.
 
-;;; Bugs:
-;;  =====
+;; Bugs:
 
-;;   - Some prelude fcts aren't displayed properly. This might be due to a
+;;   - Some prelude fcts aren't displayed properly.  This might be due to a
 ;;     name clash of Haskell and Elisp functions (e.g. length) which
 ;;     confuses Emacs when reading `haskell-doc-prelude-types'
 
 ;;; Changelog:
-;;  ==========
+
 ;;  $Log: haskell-doc.el,v $
 ;;  Revision 1.30  2009/02/02 21:00:33  monnier
 ;;  (haskell-doc-imported-list): Don't add current buffer
@@ -313,7 +306,6 @@
 ;;
 
 ;;; Code:
-;;  =====
 
 ;;@menu
 ;;* Constants and Variables::

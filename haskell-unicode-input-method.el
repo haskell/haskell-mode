@@ -1,7 +1,11 @@
-;; Haskell Unicode helper functions
-;;
-;; Copyright 2010—2011 Roel van Dijk
-;;
+;;; haskell-unicode-input-method.el --- Haskell Unicode helper functions  -*- coding: utf-8 -*-
+
+;; Copyright (C) 2010-2011  Roel van Dijk
+
+;; Author: Roel van Dijk <vandijk.roel@gmail.com>
+
+;; This file is not part of GNU Emacs.
+
 ;; All rights reserved.
 ;;
 ;; Redistribution and use in source and binary forms, with or without
@@ -34,7 +38,10 @@
 ;; ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 ;; OF THE POSSIBILITY OF SUCH DAMAGE.
 
-(provide 'haskell-unicode-input-method)
+;;; Commentary:
+
+;;; Code:
+
 (require 'quail)
 
 ;;;###autoload
@@ -307,3 +314,7 @@ packages (base-unicode-symbols and containers-unicode-symbols).
  ("^8 "              ["⁸"])
  ("^9 "              ["⁹"])
 )
+
+(provide 'haskell-unicode-input-method)
+
+;;; haskell-unicode-input-method.el ends here

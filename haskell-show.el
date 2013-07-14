@@ -1,6 +1,10 @@
-;;; haskell-show.el — A pretty printer for Haskell Show values.
+;;; haskell-show.el --- A pretty printer for Haskell Show values
 
-;; Copyright (C) 2011 Chris Done
+;; Copyright (C) 2011  Chris Done
+
+;; Author: Chris Done <chrisdone@gmail.com>
+
+;; This file is not part of GNU Emacs.
 
 ;; This program is free software: you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -17,9 +21,9 @@
 ;; <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;;
-;; It doesn't support some number literals (probably). I'm not
-;; precisely sure what values Show will always produce. There is
+
+;; It doesn't support some number literals (probably).  I'm not
+;; precisely sure what values Show will always produce.  There is
 ;; however a test suite available, so patches for extra Show support
 ;; is welcome and should be easy to test.
 

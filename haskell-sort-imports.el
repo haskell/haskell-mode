@@ -1,11 +1,10 @@
-;; haskell-sort-imports.el — Sort the list of Haskell imports at the point alphabetically.
-;; Copyright (C) 2010 Chris Done <chrisdone@gmail.com>
+;;; haskell-sort-imports.el --- Sort the list of Haskell imports at the point alphabetically
 
-;; If the region is active it sorts the imports within the
-;; region.
+;; Copyright (C) 2010  Chris Done
 
-;; This will align and sort the columns of the current import
-;; list. It's more or less the coolest thing on the planet.
+;; Author: Chris Done <chrisdone@gmail.com>
+
+;; This file is not part of GNU Emacs.
 
 ;; This program is free software: you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -20,6 +19,16 @@
 ;; You should have received a copy of the GNU General Public
 ;; License along with this program.  If not, see
 ;; <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; If the region is active it sorts the imports within the
+;; region.
+
+;; This will align and sort the columns of the current import
+;; list.  It's more or less the coolest thing on the planet.
+
+;;; Code:
 
 (defvar haskell-sort-imports-regexp
   (concat "^\\(import[ ]+\\)"
@@ -80,3 +89,5 @@
     (funcall direction)))
 
 (provide 'haskell-sort-imports)
+
+;;; haskell-sort-imports.el ends here

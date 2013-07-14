@@ -1,6 +1,6 @@
 ;;; haskell-simple-indent.el --- Simple indentation module for Haskell Mode
 
-;; Copyright (C) 1998 Heribert Schuetz, Graeme E Moss
+;; Copyright (C) 1998  Heribert Schuetz, Graeme E Moss
 
 ;; Authors:
 ;;   1998 Heribert Schuetz <Heribert.Schuetz@informatik.uni-muenchen.de> and

@@ -1,13 +1,10 @@
-;; haskell-move-nested.el — Change the column of text nested below a line.
-;; Copyright (C) 2010 Chris Done <chrisdone@gmail.com>
+;;; haskell-move-nested.el --- Change the column of text nested below a line
 
-;; This module is intended for Haskell mode users, but is
-;; independent of Haskell mode.
+;; Copyright (C) 2010  Chris Done
 
-;; Example usage:
+;; Author: Chris Done <chrisdone@gmail.com>
 
-;; (define-key haskell-mode-map (kbd "C-,") 'haskell-move-nested-left)
-;; (define-key haskell-mode-map (kbd "C-.") 'haskell-move-nested-right)
+;; This file is not part of GNU Emacs.
 
 ;; This program is free software: you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -22,6 +19,18 @@
 ;; You should have received a copy of the GNU General Public
 ;; License along with this program.  If not, see
 ;; <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; This module is intended for Haskell mode users, but is
+;; independent of Haskell mode.
+
+;; Example usage:
+
+;; (define-key haskell-mode-map (kbd "C-,") 'haskell-move-nested-left)
+;; (define-key haskell-mode-map (kbd "C-.") 'haskell-move-nested-right)
+
+;;; Code:
 
 ;;;###autoload
 (defun haskell-move-nested (cols)
@@ -117,3 +126,5 @@ Used by `haskell-move-nested'.
     (delete-region start (cdr reg))))
 
 (provide 'haskell-move-nested)
+
+;;; haskell-move-nested.el ends here
