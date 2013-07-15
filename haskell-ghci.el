@@ -143,6 +143,10 @@ The commands available from within a Haskell script are:
 (defvar haskell-ghci-send-end nil
   "Position of the end of the last send command.")
 
+(defvar haskell-ghci-comint-prompt-regexp
+  "^\\*?[[:upper:]][\\._[:alnum:]]*\\( \\*?[[:upper:]][\\._[:alnum:]]*\\)*> "
+  "A regexp that matches the GHCi prompt.")
+
 (defun haskell-ghci-start-process (arg)
   "Start a GHCi process and invoke `haskell-ghci-hook' if not nil.
 Prompt for a list of args if called with an argument."
@@ -175,9 +179,7 @@ Prompt for a list of args if called with an argument."
   (setq shell-dirtrackp t)
   (add-hook 'comint-input-filter-functions 'shell-directory-tracker nil 'local)
 
-  ;; GHCi prompt should be of the form `ModuleName> '.
-  (setq comint-prompt-regexp
-	"^\\*?[[:upper:]][\\._[:alnum:]]*\\( \\*?[[:upper:]][\\._[:alnum:]]*\\)*> ")
+  (setq comint-prompt-regexp haskell-ghci-comint-prompt-regexp)
 
   ;; History syntax of comint conflicts with Haskell, e.g. !!, so better
   ;; turn it off.

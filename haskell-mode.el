@@ -69,7 +69,7 @@
 ;;
 ;; This mode is based on an editing mode by Simon Marlow 11/1/92
 ;; and heavily modified by Graeme E Moss and Tommy Thorn 7/11/98.
-;; 
+;;
 ;; If you have any problems or suggestions specific to a supported
 ;; module, consult that module for a list of known bugs, and an
 ;; author to contact via email.  For general problems or suggestions,
@@ -143,7 +143,7 @@
 ;;   Altered indent-line-function to indent-relative.
 ;;
 ;; Version 0.100:
-;; 
+;;
 ;;   First official release.
 
 ;; Present Limitations/Future Work (contributions are most welcome!):
@@ -176,8 +176,7 @@
 
 ;; Set load-path
 ;;;###autoload
-(add-to-list 'load-path
-             (or (file-name-directory load-file-name) (car load-path)))
+(when load-file-name (add-to-list 'load-path (file-name-directory load-file-name)))
 
 ;; Set up autoloads for the modules we supply
 (autoload 'turn-on-haskell-decl-scan "haskell-decl-scan"
@@ -195,6 +194,7 @@
 (autoload 'haskell-ds-create-imenu-index "haskell-decl-scan")
 (autoload 'haskell-font-lock-choose-keywords "haskell-font-lock")
 (autoload 'haskell-doc-current-info "haskell-doc")
+(autoload 'haskell-process-generate-tags "haskell-process")
 
 ;; Obsolete functions.
 (defun turn-on-haskell-font-lock ()
@@ -325,7 +325,7 @@ be set to the preferred literate style."
 	       (modify-syntax-entry i "_" table))
 	     (setq i (1+ i)))))
        (standard-syntax-table)))
-    
+
     (modify-syntax-entry ?\` "$`" table)
     (modify-syntax-entry ?\\ "\\" table)
     (mapc (lambda (x)
@@ -351,6 +351,12 @@ be set to the preferred literate style."
   "Return the identifier under point, or nil if none found.
 May return a qualified name."
   (save-excursion
+    ;; Skip whitespace if we're on it.  That way, if we're at "map ", we'll
+    ;; see the word "map".
+    (if (and (not (eobp))
+             (eq ?  (char-syntax (char-after))))
+        (skip-chars-backward " \t"))
+
     (let ((case-fold-search nil))
       (multiple-value-bind (start end)
           (if (looking-at "\\s_")
@@ -427,7 +433,7 @@ CONFIGURING INDENTATION
       link below), or
 
    3) some people prefer to add custom hooks like the below:
- 
+
       (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 
   In order to test each one after enabling you can re-run M-x
@@ -445,14 +451,18 @@ CONFIGURING INDENTATION
                                        'turn-on-haskell-doc-mode) ; Emacs 21
                                     ,@(if (fboundp 'capitalized-words-mode)
                                           '(capitalized-words-mode))
-                                    turn-on-simple-indent turn-on-haskell-doc-mode
+                                    turn-on-haskell-simple-indent turn-on-haskell-doc-mode
                                     turn-on-haskell-decl-scan imenu-add-menubar-index))
 
 (defvar eldoc-print-current-symbol-info-function)
 
+;; For compatibility with Emacs < 24, derive conditionally
+(defalias 'haskell-parent-mode
+  (if (fboundp 'prog-mode) 'prog-mode 'fundamental-mode))
+
 ;; The main mode functions
 ;;;###autoload
-(define-derived-mode haskell-mode fundamental-mode "Haskell"
+(define-derived-mode haskell-mode haskell-parent-mode "Haskell"
   "Major mode for editing Haskell programs.
 Blank lines separate paragraphs, comments start with `-- '.
 \\<haskell-mode-map>
@@ -526,7 +536,10 @@ Invokes `haskell-mode-hook'."
   (set (make-local-variable 'dabbrev-case-distinction) nil)
   (set (make-local-variable 'dabbrev-case-replace) nil)
   (set (make-local-variable 'dabbrev-abbrev-char-regexp) "\\sw\\|[.]")
-  (setq haskell-literate nil))
+  (setq haskell-literate nil)
+  (add-hook 'before-save-hook 'haskell-mode-before-save-handler nil t)
+  (add-hook 'after-save-hook 'haskell-mode-after-save-handler nil t)
+  )
 
 (defun haskell-fill-paragraph (justify)
   (save-excursion
@@ -655,14 +668,12 @@ If nil, use the Hoogle web-site."
 		 (string :tag "Other command")))
 
 (defcustom haskell-stylish-on-save nil
-  "Whether to run stylish-haskell on the buffer before
-saving. Needs 'haskell-mode-save-buffer to be bound for C-x C-s."
+  "Whether to run stylish-haskell on the buffer before saving."
   :group 'haskell
   :type 'boolean)
 
 (defcustom haskell-tags-on-save nil
-  "Generate tags via hasktags on save. Needs
-'haskell-mode-save-buffer to be bound for C-x C-s."
+  "Generate tags via hasktags after saving."
   :group 'haskell
   :type 'boolean)
 
@@ -737,53 +748,90 @@ This function will be called with no arguments.")
 (defun haskell-mode-contextual-space ()
   "Contextually do clever stuff when hitting space."
   (interactive)
-  (cond ((save-excursion (forward-word -1)
-                         (looking-at "^import$"))
-         (insert " ")
-         (let ((module (ido-completing-read "Module: " (haskell-session-all-modules))))
-           (insert module)
-           (haskell-mode-format-imports)))
-        ((not (string= "" (save-excursion (forward-char -1) (haskell-ident-at-point))))
-         (let ((ident (save-excursion (forward-char -1) (haskell-ident-at-point))))
+  (if (not (haskell-session-maybe))
+      (self-insert-command 1)
+    (cond ((save-excursion (forward-word -1)
+                           (looking-at "^import$"))
            (insert " ")
-           (haskell-process-do-try-info ident)))
-        (t (insert " "))))
+           (let ((module (ido-completing-read "Module: " (haskell-session-all-modules))))
+             (insert module)
+             (haskell-mode-format-imports)))
+          ((not (string= "" (save-excursion (forward-char -1) (haskell-ident-at-point))))
+           (let ((ident (save-excursion (forward-char -1) (haskell-ident-at-point))))
+             (insert " ")
+             (haskell-process-do-try-info ident)))
+          (t (insert " ")))))
 
-(defun haskell-mode-save-buffer ()
-  "Save the current buffer."
-  (interactive)
-  (let ((modified (buffer-modified-p)))
-    (save-buffer)
-    (when haskell-stylish-on-save
-      (haskell-mode-stylish-buffer))
-    (save-buffer)
-    (when modified
-      (when haskell-tags-on-save
-        (haskell-process-generate-tags)))))
+(defun haskell-mode-before-save-handler ()
+  "Function that will be called before buffer's saving."
+  )
+
+(defun haskell-mode-after-save-handler ()
+  "Function that will be called after buffer's saving."
+  (when haskell-tags-on-save
+    (ignore-errors (haskell-process-generate-tags)))
+  (when haskell-stylish-on-save
+    (ignore-errors (haskell-mode-stylish-buffer)))
+  (let ((before-save-hook '())
+        (after-save-hook '()))
+    (basic-save-buffer))
+  )
 
 (defun haskell-mode-buffer-apply-command (cmd)
   "Execute shell command CMD with current buffer as input and
   replace the whole buffer with the output. If CMD fails the
   buffer remains unchanged."
-  (let* ((file (buffer-file-name (current-buffer)))
-         (output (with-temp-buffer
-                   (let ((default-directory (if (and (boundp 'haskell-session)
-                                                     haskell-session)
-                                                (haskell-session-cabal-dir haskell-session)
-                                              default-directory)))
-                     (call-process cmd
-                                   file
-                                   (list t nil)
-                                   nil))
-                   (buffer-substring-no-properties (point-min) (point-max)))))
-    (unless (string= "" output)
-      (erase-buffer)
-      (insert output))))
+  (set-buffer-modified-p t)
+  (flet
+      ((chomp (str)
+              (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'"
+                                   str)
+                (setq str (replace-match "" t t str)))
+              str)
+       (errout
+        (fmt &rest args)
+        (let* ((warning-fill-prefix "    "))
+          (display-warning cmd (apply 'format fmt args) :warning))))
+    (let*
+        ((filename (buffer-file-name (current-buffer)))
+         (cmd-prefix (replace-regexp-in-string " .*" "" cmd))
+         (tmp-file (make-temp-file cmd-prefix))
+         (err-file (make-temp-file cmd-prefix))
+         (default-directory (if (and (boundp 'haskell-session)
+                                     haskell-session)
+                                (haskell-session-cabal-dir haskell-session)
+                              default-directory))
+         (errcode (with-temp-file tmp-file
+                    (call-process cmd filename
+                                  (list (current-buffer) err-file) nil)))
+         (stderr-output
+          (with-temp-buffer
+            (insert-file-contents err-file)
+            (chomp (buffer-substring-no-properties (point-min) (point-max)))))
+         (stdout-output
+          (with-temp-buffer
+            (insert-file-contents tmp-file)
+            (buffer-substring-no-properties (point-min) (point-max)))))
+      (if (string= "" stderr-output)
+          (if (string= "" stdout-output)
+              (errout
+               "Error: %s produced no output, leaving buffer alone" cmd)
+            (save-restriction
+              (widen)
+              ;; command successful, insert file with replacement to preserve
+              ;; markers.
+              (insert-file-contents tmp-file nil nil nil t)))
+        ;; non-null stderr, command must have failed
+        (errout "%s failed: %s" cmd stderr-output)
+        )
+      (delete-file tmp-file)
+      (delete-file err-file)
+      )))
 
 (defun haskell-mode-stylish-buffer ()
   "Apply stylish-haskell to the current buffer."
   (interactive)
-  (let ((column (current-column)) 
+  (let ((column (current-column))
         (line (line-number-at-pos)))
     (haskell-mode-buffer-apply-command "stylish-haskell")
     (goto-line line)

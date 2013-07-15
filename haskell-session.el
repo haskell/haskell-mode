@@ -25,7 +25,7 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'cl)
 (require 'haskell-cabal)
 (require 'haskell-string)
 
@@ -113,14 +113,15 @@
 
 (defun haskell-session-from-buffer ()
   "Get the session based on the buffer."
-  (let ((sessions (remove-if-not (lambda (session) 
-                                   (haskell-is-prefix-of (file-name-directory (buffer-file-name))
-                                                         (haskell-session-cabal-dir session)))
-                                 haskell-sessions)))
-    (sort sessions (lambda (a b) (< (length (haskell-session-cabal-dir a))
-                                    (length (haskell-session-cabal-dir b)))))
-    (when (consp sessions)
-      (car sessions))))
+  (when (buffer-file-name)
+    (let ((sessions (remove-if-not (lambda (session)
+                                     (haskell-is-prefix-of (file-name-directory (buffer-file-name))
+                                                           (haskell-session-cabal-dir session)))
+                                   haskell-sessions)))
+      (sort sessions (lambda (a b) (< (length (haskell-session-cabal-dir a))
+                                      (length (haskell-session-cabal-dir b)))))
+      (when (consp sessions)
+        (car sessions)))))
 
 (defun haskell-session-new ()
   "Make a new session."
@@ -227,12 +228,14 @@
 
 (defun haskell-session-set-cabal-dir (s v)
   "Set the session cabal-dir."
-  (haskell-session-set s 'cabal-dir v)
-  (haskell-session-set-cabal-checksum s v))
+  (let ((true-path (file-truename v)))
+    (haskell-session-set s 'cabal-dir true-path)
+    (haskell-session-set-cabal-checksum s true-path)))
 
 (defun haskell-session-set-current-dir (s v)
   "Set the session current directory."
-  (haskell-session-set s 'current-dir v))
+  (let ((true-path (file-truename v)))
+    (haskell-session-set s 'current-dir true-path)))
 
 (defun haskell-session-set-cabal-checksum (s cabal-dir)
   "Set the session checksum of .cabal files"
@@ -269,3 +272,8 @@
                       (cdr s))))
 
 (provide 'haskell-session)
+
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; End:
+;;; haskell-session.el ends here

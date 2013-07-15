@@ -1,4 +1,5 @@
 EMACS = emacs
+BATCH = $(EMACS) --batch -Q
 
 ELFILES = \
 	haskell-c.el \
@@ -20,6 +21,7 @@ ELFILES = \
 	haskell-interactive-mode.el \
 	haskell-package.el \
 	haskell-process.el \
+	haskell-menu.el \
 	haskell-session.el \
 	haskell-string.el \
 	ghc-core.el \
@@ -30,12 +32,17 @@ ELCFILES = $(ELFILES:.el=.elc)
 AUTOLOADS = haskell-site-file.el
 
 %.elc: %.el
-	$(EMACS) --batch --eval '(setq load-path (cons "." load-path))' \
+	$(BATCH) --eval '(setq load-path (cons "." load-path))' \
 		-f batch-byte-compile $<
+
+.PHONY: all compile info dist clean
 
 all: $(AUTOLOADS)
 
 compile: $(ELCFILES)
+
+clean:
+	$(RM) $(ELCFILES)
 
 info:
 	# No Texinfo file, sorry.
@@ -48,7 +55,7 @@ PACKAGE=haskell-mode
 
 $(AUTOLOADS): $(ELFILES)
 	[ -f $@ ] || echo '' >$@
-	$(EMACS) --batch --eval '(setq generated-autoload-file "'`pwd`'/$@")' -f batch-update-autoloads "."
+	$(BATCH) --eval '(setq generated-autoload-file "'`pwd`'/$@")' -f batch-update-autoloads "."
 
 ##
 
