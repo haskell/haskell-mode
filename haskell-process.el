@@ -197,21 +197,50 @@ imports become available?"
 (defun haskell-process-do-type (&optional insert-value)
   "Print the type of the given expression."
   (interactive "P")
-  (haskell-process-do-simple-echo
-   insert-value
-   (let ((ident (haskell-ident-at-point)))
-     (format (if (string-match "^[_[:lower:][:upper:]]" ident)
-                 ":type %s"
-               ":type (%s)")
-             ident))
-   'haskell-mode))
+  (if insert-value
+      (haskell-process-insert-type)
+    (haskell-process-do-simple-echo
+     (let ((ident (haskell-ident-at-point)))
+       ;; TODO: Generalize all these STRING-MATCH of ident calls into
+       ;; one function.
+       (format (if (string-match "^[_[:lower:][:upper:]]" ident)
+                   ":type %s"
+                 ":type (%s)")
+               ident))
+     'haskell-mode)))
+
+(defun haskell-process-insert-type ()
+  "Get the identifer at the point and insert its type, if
+possible, using GHCi's :type."
+  (let ((process (haskell-process))
+        (query (let ((ident (haskell-ident-at-point)))
+                 (format (if (string-match "^[_[:lower:][:upper:]]" ident)
+                             ":type %s"
+                           ":type (%s)")
+                         ident))))
+    (haskell-process-queue-command
+     process
+     (make-haskell-command
+      :state (list process query (current-buffer))
+      :go (lambda (state)
+            (haskell-process-send-string (nth 0 state)
+                                         (nth 1 state)))
+      :complete (lambda (state response)
+                  (cond
+                   ;; TODO: Generalize this into a function.
+                   ((or (string-match "^Top level" response)
+                        (string-match "^<interactive>" response))
+                    (message response))
+                   (t
+                    (with-current-buffer (nth 2 state)
+                      (goto-char (line-beginning-position))
+                      (insert (format "%s\n" response))))))))))
 
 ;;;###autoload
 (defun haskell-process-do-info (&optional prompt-value)
   "Print the info of the given expression."
   (interactive "P")
   (haskell-process-do-simple-echo
-   nil
    (let ((ident (if prompt-value
                     (read-from-minibuffer "Info: " (haskell-ident-at-point))
                   (haskell-ident-at-point))))
@@ -240,30 +269,31 @@ imports become available?"
                               (string-match "^<interactive>" response))
                     (haskell-mode-message-line response)))))))
 
-(defun haskell-process-do-simple-echo (insert-value line &optional mode)
-  "Send some line to GHCi and echo the result in the REPL and minibuffer."
+(defun haskell-process-do-simple-echo (line &optional mode)
+  "Send LINE to the GHCi process and echo the result in some
+fashion, such as printing in the minibuffer, or using
+haskell-present, depending on configuration."
   (let ((process (haskell-process)))
     (haskell-process-queue-command
      process
      (make-haskell-command
-      :state (list process line insert-value mode)
+      :state (list process line mode)
       :go (lambda (state)
             (haskell-process-send-string (car state) (cadr state)))
       :complete (lambda (state response)
+                  ;; TODO: TBD: don't do this if
+                  ;; HASKELL-PROCESS-USE-PRESENTATION-MODE is T.
                   (haskell-interactive-mode-echo
                    (haskell-process-session (car state))
                    response
-                   (cadddr state))
+                   (caddr state))
                   (if haskell-process-use-presentation-mode
                       (progn (haskell-present (cadr state)
                                               (haskell-process-session (car state))
                                               response)
                              (haskell-session-assign
                               (haskell-process-session (car state))))
-                    (haskell-mode-message-line response))
-                  (when (caddr state)
-                    (goto-char (line-beginning-position))
-                    (insert (format "%s\n" response))))))))
+                    (haskell-mode-message-line response)))))))
 
 (defun haskell-process-look-config-changes (session)
   "Checks whether a cabal configuration file has
