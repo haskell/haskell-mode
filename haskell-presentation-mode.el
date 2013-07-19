@@ -59,7 +59,10 @@ SESSION as the current haskell-session."
           (insert code "\n\n")
           (font-lock-fontify-region point (point))
           (goto-char point))))
-    (pop-to-buffer buffer)))
+    (if (and (boundp 'haskell-presentation-mode)
+             haskell-presentation-mode)
+        (switch-to-buffer buffer)
+      (pop-to-buffer buffer))))
 
 (provide 'haskell-presentation-mode)
 
