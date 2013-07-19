@@ -201,7 +201,7 @@ imports become available?"
       (haskell-process-insert-type)
     (haskell-process-do-simple-echo
      (let ((ident (haskell-ident-at-point)))
-       ;; TODO: Generalize all these STRING-MATCH of ident calls into
+       ;; TODO: Generalize all these `string-match' of ident calls into
        ;; one function.
        (format (if (string-match "^[_[:lower:][:upper:]]" ident)
                    ":type %s"
@@ -282,7 +282,7 @@ haskell-present, depending on configuration."
             (haskell-process-send-string (car state) (cadr state)))
       :complete (lambda (state response)
                   ;; TODO: TBD: don't do this if
-                  ;; HASKELL-PROCESS-USE-PRESENTATION-MODE is T.
+                  ;; `haskell-process-use-presentation-mode' is t.
                   (haskell-interactive-mode-echo
                    (haskell-process-session (car state))
                    response
