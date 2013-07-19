@@ -65,6 +65,13 @@ interference with prompts that look like haskell expressions."
   :type 'boolean
   :group 'haskell-interactive)
 
+(defcustom haskell-interactive-mode-include-file-name
+  t
+  "Include the file name of the module being compiled when
+printing compilation messages."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defvar haskell-interactive-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "RET") 'haskell-interactive-mode-return)
@@ -458,7 +465,10 @@ SESSION, otherwise operate on the current buffer.
 (defun haskell-interactive-show-load-message (session type module-name file-name echo)
   "Show the '(Compiling|Loading) X' message."
   (let ((msg (ecase type
-               ('compiling (format "Compiling: %s (%s)" module-name file-name))
+               ('compiling
+                (if haskell-interactive-mode-include-file-name
+                    (format "Compiling: %s (%s)" module-name file-name)
+                  (format "Compiling: %s" module-name)))
                ('loading (format "Loading: %s" module-name)))))
     (haskell-mode-message-line msg)
     (when haskell-interactive-mode-delete-superseded-errors
