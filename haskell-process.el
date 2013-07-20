@@ -990,12 +990,14 @@ Returns nil if KEY not set."
 (defun haskell-process-set (process key value)
   "Set the PROCESS's KEY to VALUE.
 Returns newly set VALUE."
-  (when process
-    (let ((cell (assq key process)))
-      (if cell
-          (setcdr cell value)           ; modify cell in-place
-        (setcdr process (cons (cons key value) (cdr process))) ; new cell
-        value))))
+  (if process
+      (let ((cell (assq key process)))
+        (if cell
+            (setcdr cell value)         ; modify cell in-place
+          (setcdr process (cons (cons key value) (cdr process))) ; new cell
+          value))
+    (display-warning 'haskell-interactive
+                     "`haskell-process-set' called with nil process")))
 
 ;; Wrappers using haskell-process-{get,set}
 
