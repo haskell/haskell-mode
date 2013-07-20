@@ -33,6 +33,7 @@ ELFILES = \
 	haskell-string.el \
 	haskell-str.el \
 	haskell-unicode-input-method.el \
+	haskell-utils.el \
 	haskell-yas.el \
 	haskell-presentation-mode.el \
 	inf-haskell.el
