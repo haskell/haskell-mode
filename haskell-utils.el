@@ -51,6 +51,24 @@ DEFAULT."
             "/")))
 
 
+(defun haskell-utils-parse-import-statement-at-point ()
+  "Return imported module name if on import statement or nil otherwise.
+This currently assumes that the \"import\" keyword and the module
+name are on the same line.
+
+This function supports the SafeHaskell and PackageImports syntax extensions.
+
+Note: doesn't detect if in {--}-style comment."
+  (save-excursion
+    (goto-char (line-beginning-position))
+    (if (looking-at (concat "[\t ]*import[\t ]+"
+                            "\\(safe[\t ]+\\)?" ;; SafeHaskell
+                            "\\(qualified[\t ]+\\)?"
+                            "\\(\"[^\"]*\"[\t ]+\\)?" ;; PackageImports
+                            "\\([[:digit:][:upper:][:lower:].]+\\)"))
+        (match-string-no-properties 4))))
+
+
 (provide 'haskell-utils)
 
 ;;; haskell-utils.el ends here

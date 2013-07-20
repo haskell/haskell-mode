@@ -10,7 +10,8 @@ This file uses Org mode. Some useful (default) key-bindings:
 
 See also [[https://github.com/haskell/haskell-mode/compare/v13.07...v13.08][detailed Git history]].
 
-- Make haskell-simple-indent a proper minor mode
+- Make `haskell-simple-indent-mode' a proper minor mode with `SInd` as
+  mode-line lighter
 
 - Support popular "λ> " prompt in inf-haskell by default
 
@@ -19,6 +20,9 @@ See also [[https://github.com/haskell/haskell-mode/compare/v13.07...v13.08][deta
 
 - Add tab-completion support for haskell-interactive-mode
   (requires `:complete' command support in GHCi)
+
+- Add support to `haskell-process-do-info` to perform `:browse!` query
+  on module name when called on import statement line
 
 * Changes in 13.7
 

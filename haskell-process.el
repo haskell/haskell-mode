@@ -31,6 +31,7 @@
 (require 'haskell-session)
 (require 'haskell-compat)
 (require 'haskell-str)
+(require 'haskell-utils)
 (require 'haskell-presentation-mode)
 (with-no-warnings (require 'cl))
 
@@ -238,18 +239,23 @@ possible, using GHCi's :type."
 
 ;;;###autoload
 (defun haskell-process-do-info (&optional prompt-value)
-  "Print the info of the given expression."
+  "Print info on the identifier at point.
+If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
   (interactive "P")
   (haskell-process-do-simple-echo
    (let ((ident (if prompt-value
                     (read-from-minibuffer "Info: " (haskell-ident-at-point))
-                  (haskell-ident-at-point))))
-     (format (if (string-match "^[a-z][A-Z]" ident)
-                 ":info %s"
-               ":info (%s)")
-             (or ident
-                 (haskell-ident-at-point))))
-   'haskell-mode))
+                  (haskell-ident-at-point)))
+         (modname (unless prompt-value
+                    (haskell-utils-parse-import-statement-at-point))))
+     (if modname
+         (format ":browse! %s" modname)
+       (format (if (string-match "^[a-z][A-Z]" ident)
+                   ":info %s"
+                 ":info (%s)")
+               (or ident
+                   (haskell-ident-at-point)))))
+     'haskell-mode))
 
 (defun haskell-process-do-try-info (sym)
   "Get info of `sym' and echo in the minibuffer."
