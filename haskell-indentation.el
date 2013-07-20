@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2009  Kristof Bastiaensen
 
-;; Author: 2009 Kristof Bastiaensen <kristof.bastiaensen@vleeuwen.org>
+;; Author: Kristof Bastiaensen <kristof.bastiaensen@vleeuwen.org>
 
 ;; This file is not part of GNU Emacs.
 

@@ -2,12 +2,9 @@
 
 ;; Copyright (C) 1998  Heribert Schuetz, Graeme E Moss
 
-;; Authors:
-;;   1998 Heribert Schuetz <Heribert.Schuetz@informatik.uni-muenchen.de> and
-;;        Graeme E Moss <gem@cs.york.ac.uk>
+;; Author: Heribert Schuetz <Heribert.Schuetz@informatik.uni-muenchen.de>
+;;         Graeme E Moss <gem@cs.york.ac.uk>
 ;; Keywords: indentation files Haskell
-;; Version: 1.0
-;; URL: http://www.cs.york.ac.uk/~gem/haskell-mode/simple-indent.html
 
 ;; This file is not part of GNU Emacs.
 
