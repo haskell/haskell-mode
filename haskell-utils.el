@@ -38,6 +38,19 @@
 ;;       require/depend-on any other haskell-mode modules in order to
 ;;       stay at the bottom of the module dependency graph.
 
+
+(defun haskell-utils-read-directory-name (prompt default)
+  "Read directory name and normalize to true absolute path.
+Refer to `read-directory-name' for the meaning of PROMPT and
+DEFAULT."
+  (let ((filename (file-truename
+                   (read-directory-name prompt
+                                        default
+                                        default))))
+    (concat (replace-regexp-in-string "/$" "" filename)
+            "/")))
+
+
 (provide 'haskell-utils)
 
 ;;; haskell-utils.el ends here

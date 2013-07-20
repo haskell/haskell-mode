@@ -49,8 +49,7 @@
 ;;     fields))
 
 (with-no-warnings (require 'cl))
-
-(declare-function haskell-read-directory-name "haskell-process.el" (prompt default))
+(require 'haskell-utils)
 
 (defconst haskell-cabal-general-fields
   ;; Extracted with (haskell-cabal-extract-fields-from-doc "general-fields")
@@ -164,7 +163,7 @@
    and indeed just prompting the user. Do them all."
   (let* ((file (haskell-cabal-find-file))
          (dir (when file (file-name-directory file))))
-    (haskell-read-directory-name
+    (haskell-utils-read-directory-name
      (format "Cabal dir%s: " (if file (format " (guessed from %s)" (file-relative-name file)) ""))
      dir)))
 

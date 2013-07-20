@@ -766,7 +766,7 @@ from `module-buffer'."
         (haskell-session-get session 'current-dir))
       (progn (haskell-session-set-current-dir
               session
-              (haskell-read-directory-name
+              (haskell-utils-read-directory-name
                (if change "Change directory: " "Set current directory: ")
                (or (haskell-session-get session 'current-dir)
                    (haskell-session-get session 'cabal-dir)
@@ -774,16 +774,6 @@ from `module-buffer'."
                        (file-name-directory (buffer-file-name))
                      "~/"))))
              (haskell-session-get session 'current-dir))))
-
-(defun haskell-read-directory-name (prompt default)
-  "Read in a directory name, properly normalized."
-  (let ((filename (file-truename
-                   (read-directory-name
-                    prompt
-                    default
-                    default))))
-    (concat (replace-regexp-in-string "/$" "" filename)
-            "/")))
 
 (defun haskell-process-change-dir (session process dir)
   "Change the directory of the current process."
