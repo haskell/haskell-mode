@@ -425,22 +425,21 @@ positions and the type is one of the symbols \"variable\", \"datatype\",
           ;; nicer one---a simple regexp will pick up the last `where',
           ;; which may be rare but nevertheless...
           (setq name-pos (point))
-          (setq name (format "%s"
-                             (buffer-substring
-                              (point)
-                              (progn
-                                ;; Look for a `where'.
-                                (if (re-search-forward "\\<where\\>" end t)
-                                    ;; Move back to just before the `where'.
-                                    (progn
-                                      (re-search-backward "\\s-where")
-                                      (point))
-                                  ;; No `where' so move to last non-whitespace
-                                  ;; before `end'.
-                                  (progn
-                                    (goto-char end)
-                                    (skip-chars-backward " \t")
-                                    (point)))))))
+          (setq name (buffer-substring-no-properties
+                      (point)
+                      (progn
+                        ;; Look for a `where'.
+                        (if (re-search-forward "\\<where\\>" end t)
+                            ;; Move back to just before the `where'.
+                            (progn
+                              (re-search-backward "\\s-where")
+                              (point))
+                          ;; No `where' so move to last non-whitespace
+                          ;; before `end'.
+                          (progn
+                            (goto-char end)
+                            (skip-chars-backward " \t")
+                            (point))))))
           ;; If we did not manage to extract a name, cancel this
           ;; declaration (eg. when line ends in "=> ").
           (if (string-match "^[ \t]*$" name) (setq name nil))
