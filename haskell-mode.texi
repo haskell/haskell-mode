@@ -53,6 +53,7 @@ Haskell Mode is an Haskell development Environment for GNU Emacs version 23 or l
 @menu
 * Introduction::
 * Getting Started::
+* Getting Help and Reporting Bugs::
 * Editing Haskell Code::
 * Unicode::
 * Indentation::
@@ -85,7 +86,10 @@ interaction with inferior GHCi/Hugs instance, and
 scanning declarations and placing them in a menu.
 @end itemize
 
-This Info manual is work in progress and incomplete. However, you can find more information at these locations:
+@node Getting Help and Reporting Bugs
+@chapter Getting Help and Reporting Bugs
+
+This Info manual is work in progress and incomplete. However, you can find more information at these locations in the meantime:
 
 @itemize
 @item
@@ -94,15 +98,20 @@ This Info manual is work in progress and incomplete. However, you can find more 
 @uref{http://www.haskell.org/haskellwiki/Haskell_mode_for_Emacs,Haskell Wiki Emacs Page}
 @end itemize
 
+If you have any questions or like to discuss something regarding Haskell Mode, please consider sending an email to the @uref{http://projects.haskell.org/cgi-bin/mailman/listinfo/haskellmode-emacs, Haskellmode-emacs mailing list}. The mailing list is also available on @uref{http://gmane.org/, Gmane} via the @uref{http://dir.gmane.org/gmane.comp.lang.haskell.emacs, gmane.comp.lang.haskell.emacs} newsgroup.
+
+If you have discovered a bug or wish to request a new feature, you can @uref{https://github.com/haskell/haskell-mode/issues/new, file a new issue} with Haskell Mode's issue tracker. When filing a bug, please state your currently used software version (@kbd{M-x haskell-version}, @kbd{M-x version}) and what steps to perform in order to reproduce the bug you're experiencing.
+
 @node Getting Started
 @chapter Getting Started
 
-If you are reading this, you have most likely already managed to install Haskell mode in one way or another. However, just for the record, the officially recommended way to install Haskell Mode via the @uref{http://marmalade-repo.org/packages/haskell-mode,Marmalade package archive} which contains the latest stable release of Haskell Mode.
+If you are reading this, you have most likely already managed to install Haskell Mode in one way or another. However, just for the record, the officially recommended way to install Haskell Mode via the @uref{http://marmalade-repo.org/packages/haskell-mode,Marmalade package archive} which contains the latest stable release of Haskell Mode.
 
 @findex haskell-customize
-Most of Haskell Mode's settings are configurable via customizable variables (@xref{Easy Customization,,, emacs}, for details). You can use @kbd{M-x haskell-customize} to browse the @code{haskell} customization sub-tree.
+Most of Haskell Mode's settings are configurable via customizable variables (@xref{Easy Customization,,,emacs}, for details). You can use @kbd{M-x haskell-customize} to browse the @code{haskell} customization sub-tree.
 
-One of the important setting you should customize is the @code{haskell-mode-hook} variable (@pxref{Hooks,,, emacs}) which gets run right after the @code{haskell-mode} major mode is initialized for a buffer. You can customize @code{haskell-mode-hook} by @kbd{M-x customize-variable @key{RET} haskell-mode-hook}. It's highly recommended you set up indentation to match to match your preferences, @xref{Indentation}.
+@vindex haskell-mode-hook
+One of the important setting you should customize is the @code{haskell-mode-hook} variable (@pxref{Hooks,,,emacs}) which gets run right after the @code{haskell-mode} major mode is initialized for a buffer. You can customize @code{haskell-mode-hook} by @kbd{M-x customize-variable @key{RET} haskell-mode-hook}. It's highly recommended you set up indentation to match to match your preferences, @xref{Indentation}.
 
 @c TODO:
 @c provide basic instructions to get up and running with haskell-mode
@@ -114,7 +123,7 @@ One of the important setting you should customize is the @code{haskell-mode-hook
 @findex haskell-mode
 @cindex @code{haskell-mode}
 
-@dfn{Haskell mode} is actually a collection of so-called major modes@footnote{for more information about the concept of @dfn{major modes} @pxref{Major Modes,,,emacs}} one of which is called @code{haskell-mode}.  To avoid confusion, when referring to this package the name ``Haskell mode'' is written in a normal font, whereas when referring the major mode of the same name @code{haskell-mode} written with a dash in-between in a typewriter font is used.
+@dfn{Haskell Mode} is actually a collection of so-called major modes@footnote{for more information about the concept of @dfn{major modes} @pxref{Major Modes,,,emacs}} one of which is called @code{haskell-mode}.  To avoid confusion, when referring to this package the name ``Haskell mode'' is written in a normal font, whereas when referring the major mode of the same name @code{haskell-mode} written with a dash in-between in a typewriter font is used.
 
 As one might guess, @code{haskell-mode} is the (programming language@footnote{@code{haskell-mode} is derived from @code{prog-mode}}) major mode for editing (non-literate) Haskell source code. @code{haskell-mode} is associated with the file extensions listed below by default@footnote{for more information about file associations, @pxref{Choosing Modes,,,emacs}}.
 
