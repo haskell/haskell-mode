@@ -43,7 +43,7 @@
 ;;
 ;; Customisation:
 ;;
-;; None available so far.
+;; M-x customize-group haskell-decl-scan
 ;;
 ;;
 ;; History:
@@ -104,6 +104,22 @@
 (require 'syntax)
 (with-no-warnings (require 'cl))
 (require 'imenu)
+
+(defgroup haskell-decl-scan nil
+  "Haskell declaration scanning (`imenu' support)."
+  :link '(custom-manual "(haskell-mode)haskell-decl-scan-mode")
+  :group 'haskell
+  :prefix "haskell-decl-scan-")
+
+(defcustom haskell-decl-scan-bindings-as-variables nil
+  "Whether to put top-level value bindings into a \"Variables\" category."
+  :group 'haskell-decl-scan
+  :type 'boolean)
+
+(defcustom haskell-decl-scan-add-to-menubar t
+  "Whether to add a \"Declarations\" menu entry to menu bar."
+  :group 'haskell-decl-scan
+  :type 'boolean)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General declaration scanning functions.
@@ -485,26 +501,29 @@ datatypes) in a Haskell file for the `imenu' package."
             (set sym (cons (cons name start-pos) (symbol-value sym))))))
     ;; Now sort all the lists, label them, and place them in one list.
     (message "Sorting declarations in %s..." bufname)
-    (and index-type-alist
-         (push (cons "Datatypes"
-                     (sort index-type-alist 'haskell-ds-imenu-label-cmp))
-               index-alist))
-    (and index-inst-alist
-         (push (cons "Instances"
-                     (sort index-inst-alist 'haskell-ds-imenu-label-cmp))
-               index-alist))
-    (and index-imp-alist
-         (push (cons "Imports"
-                     (sort index-imp-alist 'haskell-ds-imenu-label-cmp))
-               index-alist))
-    (and index-var-alist
-         (push (cons "Variables"
-                     (sort index-var-alist 'haskell-ds-imenu-label-cmp))
-               index-alist))
-    (and index-class-alist
-         (push (cons "Classes"
-                     (sort index-class-alist 'haskell-ds-imenu-label-cmp))
-               index-alist))
+    (when index-type-alist
+      (push (cons "Datatypes"
+                  (sort index-type-alist 'haskell-ds-imenu-label-cmp))
+            index-alist))
+    (when index-inst-alist
+      (push (cons "Instances"
+                  (sort index-inst-alist 'haskell-ds-imenu-label-cmp))
+            index-alist))
+    (when index-imp-alist
+      (push (cons "Imports"
+                  (sort index-imp-alist 'haskell-ds-imenu-label-cmp))
+            index-alist))
+    (when index-class-alist
+      (push (cons "Classes"
+                  (sort index-class-alist 'haskell-ds-imenu-label-cmp))
+            index-alist))
+    (when index-var-alist
+      (if haskell-decl-scan-bindings-as-variables
+          (push (cons "Variables"
+                      (sort index-var-alist 'haskell-ds-imenu-label-cmp))
+                index-alist)
+        (setq index-alist (append index-alist
+                                  (sort index-var-alist 'haskell-ds-imenu-label-cmp)))))
     (message "Sorting declarations in %s...done" bufname)
     ;; Return the alist.
     index-alist))
@@ -516,7 +535,8 @@ datatypes) in a Haskell file for the `imenu' package."
 (defun haskell-ds-imenu ()
   "Install `imenu' for Haskell scripts."
   (setq imenu-create-index-function 'haskell-ds-create-imenu-index)
-  (imenu-add-to-menubar "Declarations"))
+  (when haskell-decl-scan-add-to-menubar
+    (imenu-add-to-menubar "Declarations")))
 
 ;; The main functions to turn on declaration scanning.
 ;;;###autoload
@@ -532,9 +552,13 @@ With a prefix argument ARG, enable minor mode if ARG is
 positive, and disable it otherwise.  If called from Lisp, enable
 the mode if ARG is omitted or nil, and toggle it if ARG is `toggle'.
 
-Top-level declarations are scanned and listed in the menu item \"Declarations\".
-Selecting an item from this menu will take point to the start of the
-declaration.
+See also info node `(haskell-mode)haskell-decl-scan-mode' for
+more details about this minor mode.
+
+Top-level declarations are scanned and listed in the menu item
+\"Declarations\" (if enabled via option
+`haskell-decl-scan-add-to-menubar').  Selecting an item from this
+menu will take point to the start of the declaration.
 
 \\[beginning-of-defun] and \\[end-of-defun] move forward and backward to the start of a declaration.
 
@@ -557,14 +581,15 @@ or `tex', a non-literate or LaTeX-style literate script is
 assumed, respectively.
 
 Invokes `haskell-decl-scan-mode-hook' on activation."
-  :group 'haskell-mode
+  :group 'haskell-decl-scan
 
   (kill-local-variable 'beginning-of-defun-function)
   (kill-local-variable 'end-of-defun-function)
   (kill-local-variable 'imenu-create-index-function)
   (unless haskell-decl-scan-mode
     ;; How can we cleanly remove the "Declarations" menu?
-    (local-set-key [menu-bar index] nil))
+    (when haskell-decl-scan-add-to-menubar
+      (local-set-key [menu-bar index] nil)))
 
   (when haskell-decl-scan-mode
     (set (make-local-variable 'beginning-of-defun-function)

@@ -57,6 +57,7 @@ Haskell Mode is an Haskell development Environment for GNU Emacs version 23 or l
 * Editing Haskell Code::
 * Unicode::
 * Indentation::
+* haskell-decl-scan-mode::
 * inferior-haskell-mode::
 * haskell-interactive-mode::
 * haskell-cabal-mode::
@@ -209,6 +210,48 @@ The recommended way is to add one of @code{turn-on-*} commands to @code{haskell-
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 @end lisp
 
+@node haskell-decl-scan-mode
+@chapter @code{haskell-decl-scan-mode}
+
+@findex turn-on-haskell-decl-scan
+@findex haskell-decl-scan-mode
+@vindex haskell-decl-scan-mode-hook
+
+@code{haskell-decl-scan-mode} is a minor mode which performs declaration scanning and provides @kbd{M-x imenu} support (@xref{Imenu,,,emacs}, for more information).
+
+For non-literate and @TeX{}-style literate scripts, the common convention that top-level declarations start at the first column is assumed.  For Bird-style literate scripts, the common convention that top-level declarations start at the third column, ie. after @samp{> }, is assumed.
+
+When @code{haskell-decl-scan-mode} is active, the standard Emacs top-level definition movement commands (@pxref{Moving by Defuns,,,emacs}) are enabled to operate on Haskell declarations:
+
+@table @kbd
+@item C-M-a
+Move to beginning of current or preceding declaration (@code{beginning-of-defun}).
+
+@item C-M-e
+Move to end of current or following declaration (@code{end-of-defun}).
+
+@item C-M-h
+Select whole current or following declaration (@code{mark-defun}).
+@end table
+
+Moreover, if enabled via the option @code{haskell-decl-scan-add-to-menubar}, a menu item ``Declarations'' is added to the menu bar listing the scanned declarations and allowing to jump to declarations in the source buffer.
+
+It's recommended to have font lock mode enabled (@pxref{Font Lock,,,emacs}) as @code{haskell-decl-scan-mode} ignores text highlighted with @code{font-lock-comment-face}.
+
+As usual, in order to activate @code{haskell-decl-scan-mode} automatically for Haskell buffers, add @code{turn-on-haskell-decl-scan} to @code{haskell-mode-hook}:
+
+@lisp
+(add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
+@end lisp
+
+@code{haskell-decl-scan-mode} enables the use of features that build upon @code{imenu} support such as Speedbar Frames (@pxref{Speedbar,,,emacs}) or the global ``Which Function'' minor mode (@pxref{Which Function,,,emacs}).
+
+In order to enable @code{which-function-mode} for Haskell buffers you need to add the following to your Emacs initialization:
+
+@lisp
+(eval-after-load "which-func"
+  '(add-to-list 'which-func-modes 'haskell-mode))
+@end lisp
 
 @node inferior-haskell-mode
 @chapter @code{inferior-haskell-mode}

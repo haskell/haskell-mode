@@ -24,6 +24,14 @@ See also [[https://github.com/haskell/haskell-mode/compare/v13.07...v13.08][deta
 - Add support to `haskell-process-do-info` to perform `:browse!` query
   on module name when called on import statement line
 
+- `haskell-decl-scan-mode':
+  - New customize group `haskell-decl-scan'
+  - New flag `haskell-decl-scan-bindings-as-variables' for controlling
+    whether to put value bindings into the "Variables" category.
+  - New flag `haskell-decl-scan-add-to-menubar' for controlling
+    whether to add "Declarations" menu entry to menu bar.
+  - New manual section node `(haskell-mode)haskell-decl-scan-mode'
+
 * Changes in 13.7
 
 See also [[https://github.com/haskell/haskell-mode/compare/v13.06...v13.07][detailed Git history]].
