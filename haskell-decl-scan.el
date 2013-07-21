@@ -127,34 +127,7 @@
 (require 'haskell-mode)
 (require 'syntax)
 (with-no-warnings (require 'cl))
-
-;;;###autoload
-;; As `cl' defines macros that `imenu' uses, we must require them at
-;; compile time.
-(eval-when-compile
-  (condition-case nil
-      (require 'imenu)
-    (error nil))
-  ;; It makes a big difference if we don't copy the syntax table here,
-  ;; as Emacs 21 does, but Emacs 22 doesn't.
-  (unless (eq (syntax-table)
-              (with-syntax-table (syntax-table) (syntax-table)))
-    (defmacro with-syntax-table (table &rest body)
-      "Evaluate BODY with syntax table of current buffer set to a copy of TABLE.
-The syntax table of the current buffer is saved, BODY is evaluated, and the
-saved table is restored, even in case of an abnormal exit.
-Value is what BODY returns."
-      (let ((old-table (make-symbol "table"))
-            (old-buffer (make-symbol "buffer")))
-        `(let ((,old-table (syntax-table))
-               (,old-buffer (current-buffer)))
-           (unwind-protect
-               (progn
-                 (set-syntax-table ,table)
-                 ,@body)
-             (save-current-buffer
-               (set-buffer ,old-buffer)
-               (set-syntax-table ,old-table))))))))
+(require 'imenu)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General declaration scanning functions.
