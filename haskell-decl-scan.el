@@ -54,7 +54,7 @@
 ;; example of the problem or suggestion.  Note that this library
 ;; requires a reasonably recent version of Emacs.
 ;;
-;; Uses `imenu' under Emacs, and `func-menu' under XEmacs.
+;; Uses `imenu' under Emacs.
 ;;
 ;; Version 1.2:
 ;;   Added support for LaTeX-style literate scripts.
@@ -89,30 +89,6 @@
 ;;   that it does.  The ability to turn off scanning would also be
 ;;   useful.  (Note that re-running (literate-)haskell-mode seems to
 ;;   cause no problems.)
-;;
-;; . Inconsistency: we define the start of a declaration in `imenu' as
-;;   the start of the line the declaration starts on, but in
-;;   `func-menu' as the start of the name that the declaration is
-;;   given (eg. "class Eq a => Ord a ..." starts at "class" in `imenu'
-;;   but at "Ord" in `func-menu').  This avoids rescanning of the
-;;   buffer by the goto functions of `func-menu' but allows `imenu' to
-;;   have the better definition of the start of the declaration (IMO).
-;;
-;; . `func-menu' cannot cope well with spaces in declaration names.
-;;   This is unavoidable in "instance Eq Int" (changing the spaces to
-;;   underscores would cause rescans of the buffer).  Note though that
-;;   `fume-prompt-function-goto' (usually bound to "C-c g") does cope
-;;   with spaces okay.
-;;
-;; . Would like to extend the goto functions given by `func-menu'
-;;   under XEmacs to Emacs.  Would have to implement these
-;;   ourselves as `imenu' does not provide them.
-;;
-;; . `func-menu' uses its own syntax table when grabbing a declaration
-;;   name to lookup (why doesn't it use the syntax table of the
-;;   buffer?) so some declaration names will not be grabbed correctly,
-;;   eg. "fib'" will be grabbed as "fib" since "'" is not a word or
-;;   symbol constituent under the syntax table `func-menu' uses.
 
 ;; All functions/variables start with
 ;; `(turn-(on/off)-)haskell-decl-scan' or `haskell-ds-'.
@@ -540,68 +516,7 @@ datatypes) in a Haskell file for the `imenu' package."
 (defun haskell-ds-imenu ()
   "Install `imenu' for Haskell scripts."
   (setq imenu-create-index-function 'haskell-ds-create-imenu-index)
-  (if (fboundp 'imenu-add-to-menubar)
-      (imenu-add-to-menubar "Declarations")))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Declaration scanning via `func-menu'.
-
-(defun haskell-ds-func-menu-next (buffer)
-  "Non-literate Haskell version of `haskell-ds-generic-func-menu-next'."
-  (haskell-ds-generic-func-menu-next (haskell-ds-bird-p) buffer))
-
-(defun haskell-ds-generic-func-menu-next (bird-literate buffer)
-  "Return `(name . pos)' of next declaration."
-  (set-buffer buffer)
-  (let ((result (haskell-ds-generic-find-next-decl bird-literate)))
-    (if result
-        (let* ((name-posns (car result))
-               (name (car name-posns))
-               (posns (cdr name-posns))
-               (name-pos (cdr posns))
-               ;;(type (cdr result))
-               )
-          (cons    ;(concat
-           ;; func-menu has problems with spaces, and adding a
-           ;; qualifying keyword will not allow the "goto fn"
-           ;; functions to work properly.  Sigh.
-           ;; (cond
-           ;;  ((eq type 'variable) "")
-           ;;  ((eq type 'datatype) "datatype ")
-           ;;  ((eq type 'class) "class ")
-           ;;  ((eq type 'import) "import ")
-           ;;  ((eq type 'instance) "instance "))
-           name                         ;)
-           name-pos))
-      nil)))
-
-(defvar haskell-ds-func-menu-regexp
-  (concat "^" haskell-ds-start-decl-re)
-  "Regexp to match the start of a possible declaration.")
-
-(defvar literate-haskell-ds-func-menu-regexp
-  (concat "^" literate-haskell-ds-start-decl-re)
-  "As `haskell-ds-func-menu-regexp' but for Bird-style literate scripts.")
-
-(declare-function fume-add-menubar-entry "ext:func-menu")
-(defvar fume-menubar-menu-name)
-(defvar fume-function-name-regexp-alist)
-(defvar fume-find-function-name-method-alist)
-
-(defun haskell-ds-func-menu ()
-  "Use `func-menu' to establish declaration scanning for Haskell scripts."
-  (require 'func-menu)
-  (set (make-local-variable 'fume-menubar-menu-name) "Declarations")
-  (set (make-local-variable 'fume-function-name-regexp-alist)
-       (if (haskell-ds-bird-p)
-           '((haskell-mode . literate-haskell-ds-func-menu-regexp))
-         '((haskell-mode . haskell-ds-func-menu-regexp))))
-  (set (make-local-variable 'fume-find-function-name-method-alist)
-       '((haskell-mode . haskell-ds-func-menu-next)))
-  (fume-add-menubar-entry)
-  (local-set-key "\C-cl" 'fume-list-functions)
-  (local-set-key "\C-cg" 'fume-prompt-function-goto)
-  (local-set-key [(meta button1)] 'fume-mouse-function-goto))
+  (imenu-add-to-menubar "Declarations"))
 
 ;; The main functions to turn on declaration scanning.
 ;;;###autoload
@@ -622,13 +537,7 @@ declaration.
 
 \\[haskell-ds-forward-decl] and \\[haskell-ds-backward-decl] move forward and backward to the start of a declaration.
 
-Under XEmacs, the following keys are also defined:
-
-\\[fume-list-functions] lists the declarations of the current buffer,
-\\[fume-prompt-function-goto] prompts for a declaration to move to, and
-\\[fume-mouse-function-goto] moves to the declaration whose name is at point.
-
-This may link with `haskell-doc' (only for Emacs currently).
+This may link with `haskell-doc'.
 
 For non-literate and LaTeX-style literate scripts, we assume the
 common convention that top-level declarations start at the first
@@ -670,9 +579,7 @@ Invokes `haskell-decl-scan-mode-hook'."
     (local-set-key "\M-\C-a"
                    (if haskell-decl-scan-mode 'haskell-ds-backward-decl)))
   (if haskell-decl-scan-mode
-      (if (fboundp 'imenu)
-          (haskell-ds-imenu)
-        (haskell-ds-func-menu))
+      (haskell-ds-imenu)
     ;; How can we cleanly remove that menus?
     (local-set-key [menu-bar index] nil))
   (run-hooks 'haskell-decl-scan-mode-hook))
