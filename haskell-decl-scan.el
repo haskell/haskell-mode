@@ -159,13 +159,6 @@ Value is what BODY returns."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General declaration scanning functions.
 
-(defalias 'haskell-ds-match-string
-  (if (fboundp 'match-string-no-properties)
-      'match-string-no-properties
-    (lambda (num)
-      "As `match-string' except that the string is stripped of properties."
-      (format "%s" (match-string num)))))
-
 (defvar haskell-ds-start-keywords-re
   (concat "\\(\\<"
           "class\\|data\\|i\\(mport\\|n\\(fix\\(\\|[lr]\\)\\|stance\\)\\)\\|"
@@ -197,7 +190,7 @@ Point is not changed."
       (if (looking-at haskell-ds-start-keywords-re)
           nil
         (or ;; Parenthesized symbolic variable.
-         (and (looking-at "(\\(\\s_+\\))") (haskell-ds-match-string 1))
+         (and (looking-at "(\\(\\s_+\\))") (match-string-no-properties 1))
          ;; General case.
          (if (looking-at
               (if (eq ?\( (char-after))
@@ -208,19 +201,19 @@ Point is not changed."
                     ;; possible speeds things up.
                     "\\(\\'\\)?\\s-*\\(\\s_+\\|`\\(\\sw+\\)`\\)")
                 "\\(\\sw+\\)?\\s-*\\(\\s_+\\|`\\(\\sw+\\)`\\)"))
-             (let ((match2 (haskell-ds-match-string 2)))
+             (let ((match2 (match-string-no-properties 2)))
                ;; Weed out `::', `∷',`=' and `|' from potential infix
                ;; symbolic variable.
                (if (member match2 '("::" "∷" "=" "|"))
                    ;; Variable identifier.
-                   (haskell-ds-match-string 1)
+                   (match-string-no-properties 1)
                  (if (eq (aref match2 0) ?\`)
                      ;; Infix variable identifier.
-                     (haskell-ds-match-string 3)
+                     (match-string-no-properties 3)
                    ;; Infix symbolic variable.
                    match2))))
          ;; Variable identifier.
-         (and (looking-at "\\sw+") (haskell-ds-match-string 0)))))))
+         (and (looking-at "\\sw+") (match-string-no-properties 0)))))))
 
 (defun haskell-ds-move-to-start-regexp (inc regexp)
   "Move to beginning of line that succeeds/precedes (INC = 1/-1)
@@ -442,7 +435,7 @@ positions and the type is one of the symbols \"variable\", \"datatype\",
           (re-search-forward "=>" end t)
           (if (looking-at "[ \t]*\\(\\sw+\\)")
               (progn
-                (setq name (haskell-ds-match-string 1))
+                (setq name (match-string-no-properties 1))
                 (setq name-pos (match-beginning 1))
                 (setq type 'datatype))))
          ;; Class declaration.
@@ -450,12 +443,12 @@ positions and the type is one of the symbols \"variable\", \"datatype\",
           (re-search-forward "=>" end t)
           (if (looking-at "[ \t]*\\(\\sw+\\)")
               (progn
-                (setq name (haskell-ds-match-string 1))
+                (setq name (match-string-no-properties 1))
                 (setq name-pos (match-beginning 1))
                 (setq type 'class))))
          ;; Import declaration.
          ((looking-at "import[ \t]+\\(qualified[ \t]+\\)?\\(\\(?:\\sw\\|.\\)+\\)")
-          (setq name (haskell-ds-match-string 2))
+          (setq name (match-string-no-properties 2))
           (setq name-pos (match-beginning 2))
           (setq type 'import))
          ;; Instance declaration.
