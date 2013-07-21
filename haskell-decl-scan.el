@@ -521,23 +521,24 @@ datatypes) in a Haskell file for the `imenu' package."
 ;; The main functions to turn on declaration scanning.
 ;;;###autoload
 (defun turn-on-haskell-decl-scan ()
-  (interactive)
   "Unconditionally activate `haskell-decl-scan-mode'."
-  (haskell-decl-scan-mode 1))
-
-(defvar haskell-decl-scan-mode nil)
-(make-variable-buffer-local 'haskell-decl-scan-mode)
+  (interactive)
+  (haskell-decl-scan-mode))
 
 ;;;###autoload
-(defun haskell-decl-scan-mode (&optional arg)
-  "Minor mode for declaration scanning for Haskell mode.
+(define-minor-mode haskell-decl-scan-mode
+  "Toggle Haskell declaration scanning minor mode on or off.
+With a prefix argument ARG, enable minor mode if ARG is
+positive, and disable it otherwise.  If called from Lisp, enable
+the mode if ARG is omitted or nil, and toggle it if ARG is `toggle'.
+
 Top-level declarations are scanned and listed in the menu item \"Declarations\".
 Selecting an item from this menu will take point to the start of the
 declaration.
 
-\\[haskell-ds-forward-decl] and \\[haskell-ds-backward-decl] move forward and backward to the start of a declaration.
+\\[beginning-of-defun] and \\[end-of-defun] move forward and backward to the start of a declaration.
 
-This may link with `haskell-doc'.
+This may link with `haskell-doc-mode'.
 
 For non-literate and LaTeX-style literate scripts, we assume the
 common convention that top-level declarations start at the first
@@ -549,40 +550,29 @@ Anything in `font-lock-comment-face' is not considered for a
 declaration.  Therefore, using Haskell font locking with comments
 coloured in `font-lock-comment-face' improves declaration scanning.
 
-To turn on declaration scanning for all Haskell buffers, add this to
-.emacs:
-
-  (add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
-
-To turn declaration scanning on for the current buffer, call
-`turn-on-haskell-decl-scan'.
-
 Literate Haskell scripts are supported: If the value of
-`haskell-literate' (automatically set by the Haskell mode of
-Moss&Thorn) is `bird', a Bird-style literate script is assumed.  If it
-is nil or `tex', a non-literate or LaTeX-style literate script is
+`haskell-literate' (set automatically by `literate-haskell-mode')
+is `bird', a Bird-style literate script is assumed.  If it is nil
+or `tex', a non-literate or LaTeX-style literate script is
 assumed, respectively.
 
-Invokes `haskell-decl-scan-mode-hook'."
-  (interactive)
-  (if (boundp 'beginning-of-defun-function)
-      (if haskell-decl-scan-mode
-          (progn
-            (set (make-local-variable 'beginning-of-defun-function)
-                 'haskell-ds-backward-decl)
-            (set (make-local-variable 'end-of-defun-function)
-                 'haskell-ds-forward-decl))
-        (kill-local-variable 'beginning-of-defun-function)
-        (kill-local-variable 'end-of-defun-function))
-    (local-set-key "\M-\C-e"
-                   (if haskell-decl-scan-mode 'haskell-ds-forward-decl))
-    (local-set-key "\M-\C-a"
-                   (if haskell-decl-scan-mode 'haskell-ds-backward-decl)))
-  (if haskell-decl-scan-mode
-      (haskell-ds-imenu)
-    ;; How can we cleanly remove that menus?
+Invokes `haskell-decl-scan-mode-hook' on activation."
+  :group 'haskell-mode
+
+  (kill-local-variable 'beginning-of-defun-function)
+  (kill-local-variable 'end-of-defun-function)
+  (kill-local-variable 'imenu-create-index-function)
+  (unless haskell-decl-scan-mode
+    ;; How can we cleanly remove the "Declarations" menu?
     (local-set-key [menu-bar index] nil))
-  (run-hooks 'haskell-decl-scan-mode-hook))
+
+  (when haskell-decl-scan-mode
+    (set (make-local-variable 'beginning-of-defun-function)
+         'haskell-ds-backward-decl)
+    (set (make-local-variable 'end-of-defun-function)
+         'haskell-ds-forward-decl)
+    (haskell-ds-imenu)))
+
 
 ;; Provide ourselves:
 
