@@ -211,11 +211,20 @@ Key bindings:
                       (setf (cdddr state) (list (length buffer)))
                       nil)))
           :complete (lambda (state response)
-                      (if haskell-interactive-mode-eval-mode
-                          (haskell-interactive-mode-eval-as-mode (car state) response)
-                        (when haskell-interactive-mode-eval-pretty
-                          (haskell-interactive-mode-eval-pretty-result (car state) response)))
+                      (cond
+                       (haskell-interactive-mode-eval-mode
+                        (haskell-interactive-mode-eval-as-mode (car state) response))
+                       ((haskell-interactive-mode-line-is-query (elt state 2))
+                        (let ((haskell-interactive-mode-eval-mode 'haskell-mode))
+                          (haskell-interactive-mode-eval-as-mode (car state) response)))
+                       (haskell-interactive-mode-eval-pretty
+                        (haskell-interactive-mode-eval-pretty-result (car state) response)))
                       (haskell-interactive-mode-prompt (car state)))))))))
+
+(defun haskell-interactive-mode-line-is-query (line)
+  "Is LINE actually a :t/:k/:i?"
+  (and (string-match "^:[itk] " line)
+       t))
 
 (defun haskell-interactive-jump-to-error-line ()
   "Jump to the error line."
