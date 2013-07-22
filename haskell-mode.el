@@ -142,6 +142,7 @@
 (declare-function haskell-session-cabal-dir "haskell-session" (session))
 (declare-function haskell-session-maybe "haskell-session" ())
 (declare-function haskell-session-tags-filename "haskell-session" (session))
+(declare-function haskell-session-current-dir "haskell-session" (session))
 
 ;; All functions/variables start with `(literate-)haskell-'.
 
@@ -867,6 +868,18 @@ remains unchanged."
                (> (match-end 1) old-point))
           (kill-region (match-beginning 0) (match-end 0))
         (error "No SCC at point")))))
+
+(defun haskell-rgrep (&optional prompt)
+  "Grep the effective project for the symbol at point. Very
+useful for codebase navigation. Prompts for an arbitrary regexp
+given a prefix arg."
+  (interactive "P")
+  (let ((sym (if prompt
+                 (read-from-minibuffer "Look for: ")
+               (haskell-ident-at-point))))
+    (rgrep sym
+           "*.hs" ;; TODO: common Haskell extensions.
+           (haskell-session-current-dir (haskell-session)))))
 
 
 ;; Provide ourselves:
