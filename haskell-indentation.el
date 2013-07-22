@@ -392,10 +392,7 @@ Preserves indentation and removes extra whitespace"
                                  (progn (move-to-column ci)
                                         (point))))
                  (t
-                  (beginning-of-line)
-                  (delete-region (max (point-min) (- (point) 1))
-                                 (progn (move-to-column ci)
-                                        (point))))))))
+                  (delete-char (- 1)))))))
     (t (delete-char (- n))))))
 
 (defun haskell-indentation-delete-char (n)
