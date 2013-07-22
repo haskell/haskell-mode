@@ -32,6 +32,8 @@ See also [[https://github.com/haskell/haskell-mode/compare/v13.07...v13.08][deta
     whether to add "Declarations" menu entry to menu bar.
   - New manual section node `(haskell-mode)haskell-decl-scan-mode'
 
+- Add support for [[http://www.haskell.org/ghc/docs/latest/html/users_guide/syntax-extns.html#lambda-case][LambdaCase]] syntax extension to `haskell-indentation`
+
 * Changes in 13.7
 
 See also [[https://github.com/haskell/haskell-mode/compare/v13.06...v13.07][detailed Git history]].
