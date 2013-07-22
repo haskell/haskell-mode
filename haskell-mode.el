@@ -166,9 +166,9 @@ When MESSAGE is non-nil, display a message with the version."
   (let* ((haskell-mode-dir (ignore-errors
                              (file-name-directory (or (locate-library "haskell-mode") ""))))
          (_version (format "haskell-mode version %s (%s @ %s)"
-                            haskell-version
-                            haskell-git-version
-                            haskell-mode-dir)))
+                           haskell-version
+                           haskell-git-version
+                           haskell-mode-dir)))
     (if here
         (insert _version)
       (message "%s" _version))))
@@ -796,21 +796,21 @@ remains unchanged."
           (with-temp-buffer
             (insert-file-contents tmp-file)
             (buffer-substring-no-properties (point-min) (point-max)))))
-      (if (string= "" stderr-output)
-          (if (string= "" stdout-output)
-              (funcall errout
-               "Error: %s produced no output, leaving buffer alone" cmd)
-            (save-restriction
-              (widen)
-              ;; command successful, insert file with replacement to preserve
-              ;; markers.
-              (insert-file-contents tmp-file nil nil nil t)))
-        ;; non-null stderr, command must have failed
-        (funcall errout "%s failed: %s" cmd stderr-output)
-        )
-      (delete-file tmp-file)
-      (delete-file err-file)
-      ))
+    (if (string= "" stderr-output)
+        (if (string= "" stdout-output)
+            (funcall errout
+                     "Error: %s produced no output, leaving buffer alone" cmd)
+          (save-restriction
+            (widen)
+            ;; command successful, insert file with replacement to preserve
+            ;; markers.
+            (insert-file-contents tmp-file nil nil nil t)))
+      ;; non-null stderr, command must have failed
+      (funcall errout "%s failed: %s" cmd stderr-output)
+      )
+    (delete-file tmp-file)
+    (delete-file err-file)
+    ))
 
 (defun haskell-mode-stylish-buffer ()
   "Apply stylish-haskell to the current buffer."
