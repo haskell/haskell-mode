@@ -555,9 +555,8 @@ Preserves indentation and removes extra whitespace"
     ("case"  . (lambda () (haskell-indentation-phrase
                            '(haskell-indentation-expression
                              "of" haskell-indentation-case-layout))))
-    ("\\"    . (lambda () (haskell-indentation-phrase
-                           '(haskell-indentation-expression
-                             "->" haskell-indentation-expression))))
+    ("\\"    . (lambda () (haskell-indentation-with-starter
+                           #'haskell-indentation-lambda-maybe-lambdacase nil)))
     ("proc"  . (lambda () (haskell-indentation-phrase
                            '(haskell-indentation-expression
                              "->" haskell-indentation-expression))))
@@ -582,6 +581,18 @@ Preserves indentation and removes extra whitespace"
 
 (defun haskell-indentation-case-layout ()
   (haskell-indentation-layout #'haskell-indentation-case))
+
+;; After a lambda (backslash) there are two possible cases:
+;;   - the new lambdacase expression, that can be recognized by the
+;;     next token being "case",
+;;   - or simply an anonymous function definition in the form of
+;;     "expression -> expression".
+(defun haskell-indentation-lambda-maybe-lambdacase ()
+  (if (string= current-token "case")
+      (haskell-indentation-with-starter
+       #'haskell-indentation-case-layout nil)
+    (haskell-indentation-phrase-rest
+     '(haskell-indentation-expression "->" haskell-indentation-expression))))
 
 (defun haskell-indentation-fundep ()
   (haskell-indentation-with-starter
