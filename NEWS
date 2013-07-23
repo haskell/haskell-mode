@@ -34,6 +34,10 @@ See also [[https://github.com/haskell/haskell-mode/compare/v13.07...v13.08][deta
 
 - Add support for [[http://www.haskell.org/ghc/docs/latest/html/users_guide/syntax-extns.html#lambda-case][LambdaCase]] syntax extension to `haskell-indentation`
 
+- Change `haskell-indentation-mode' to never jump back a whole line
+  when pressing DEL.  The old behavior can be restored by setting
+  `haskell-indentation-delete-backward-jump-line' to t.
+
 * Changes in 13.7
 
 See also [[https://github.com/haskell/haskell-mode/compare/v13.06...v13.07][detailed Git history]].
