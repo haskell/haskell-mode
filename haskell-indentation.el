@@ -63,6 +63,11 @@
   :type 'boolean
   :group 'haskell-indentation)
 
+(defcustom haskell-indentation-delete-backward-jump-line nil
+  "Delete backward jumps to the previous line when removing last indentation."
+  :type 'boolean
+  :group 'haskell-indentation)
+
 (defcustom haskell-indentation-delete-indentation t
   "Delete removes indentation."
   :type 'boolean
@@ -392,7 +397,12 @@ Preserves indentation and removes extra whitespace"
                                  (progn (move-to-column ci)
                                         (point))))
                  (t
-                  (delete-char (- 1)))))))
+                  (if (not haskell-indentation-delete-backward-jump-line)
+                      (delete-char (- 1))
+                    (beginning-of-line)
+                    (delete-region (max (point-min) (- (point) 1))
+                                   (progn (move-to-column ci)
+                                          (point)))))))))
     (t (delete-char (- n))))))
 
 (defun haskell-indentation-delete-char (n)
