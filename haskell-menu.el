@@ -58,6 +58,7 @@ Letters do not insert themselves; instead, they are commands."
 
 (defvar haskell-menu-mode-map
   (let ((map (make-keymap)))
+    (suppress-keymap map t)
     (define-key map (kbd "n") 'next-line)
     (define-key map (kbd "p") 'previous-line)
     map)
@@ -137,13 +138,6 @@ Letters do not insert themselves; instead, they are commands."
         (insert (format (concat "%-" (number-to-string (nth i widths)) "s")
                         (nth i row))))
       (insert "\n"))))
-
-(defvar haskell-menu-mode-map
-  (let ((map (make-keymap))
-        (menu-map (make-sparse-keymap)))
-    (suppress-keymap map t)
-    menu-map))
-
 
 (provide 'haskell-menu)
 
