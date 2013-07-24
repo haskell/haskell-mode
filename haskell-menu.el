@@ -61,6 +61,7 @@ Letters do not insert themselves; instead, they are commands."
     (suppress-keymap map t)
     (define-key map (kbd "n") 'next-line)
     (define-key map (kbd "p") 'previous-line)
+    (define-key map (kbd "RET") 'haskell-menu-mode-ret)
     map)
   "Key map for haskell-menu-mode.")
 
@@ -138,6 +139,21 @@ Letters do not insert themselves; instead, they are commands."
         (insert (format (concat "%-" (number-to-string (nth i widths)) "s")
                         (nth i row))))
       (insert "\n"))))
+
+(defun haskell-menu-mode-ret ()
+  "Handle RET key."
+  (interactive)
+  (let* ((name (save-excursion
+                 (goto-char (line-beginning-position))
+                 (buffer-substring-no-properties (point)
+                                                 (progn (search-forward " ")
+                                                        (forward-char -1)
+                                                        (point)))))
+         (session (car (remove-if-not (lambda (session)
+                                        (string= (haskell-session-name session)
+                                                 name))
+                                      haskell-sessions))))
+    (switch-to-buffer (haskell-session-interactive-buffer session))))
 
 (provide 'haskell-menu)
 
