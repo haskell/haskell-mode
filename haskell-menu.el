@@ -83,23 +83,31 @@ Letters do not insert themselves; instead, they are commands."
     (haskell-menu-tabulate
      (list "Name" "PID" "Time" "RSS" "Cabal directory" "Working directory" "Command")
      (mapcar (lambda (session)
-               (let* ((process (haskell-process-process (haskell-session-process session)))
-                      (id (process-id process)))
-                 (list (propertize (haskell-session-name session) 'face 'buffer-menu-buffer)
-                       (if (process-live-p process) (number-to-string id) "-")
-                       (if (process-live-p process)
-                           (format-time-string "%H:%M:%S"
-                                               (encode-time (caddr (assoc 'etime (process-attributes id)))
-                                                            0 0 0 0 0))
-                         "-")
-                       (if (process-live-p process)
-                           (concat (number-to-string (/ (cdr (assoc 'rss (process-attributes id)))
-                                                        1024))
-                                   "MB")
-                         "-")
-                       (haskell-session-cabal-dir session)
-                       (haskell-session-current-dir session)
-                       (mapconcat 'identity (process-command process) " "))))
+               (let ((process (haskell-process-process (haskell-session-process session))))
+                 (cond
+                  (process
+                   (let ((id (process-id process)))
+                     (list (propertize (haskell-session-name session) 'face 'buffer-menu-buffer)
+                           (if (process-live-p process) (number-to-string id) "-")
+                           (if (process-live-p process)
+                               (format-time-string "%H:%M:%S"
+                                                   (encode-time (caddr (assoc 'etime (process-attributes id)))
+                                                                0 0 0 0 0))
+                             "-")
+                           (if (process-live-p process)
+                               (concat (number-to-string (/ (cdr (assoc 'rss (process-attributes id)))
+                                                            1024))
+                                       "MB")
+                             "-")
+                           (haskell-session-cabal-dir session)
+                           (haskell-session-current-dir session)
+                           (mapconcat 'identity (process-command process) " "))))
+                  (t (list (propertize (haskell-session-name session) 'face 'buffer-menu-buffer)
+                           "—"
+                           "—"
+                           "—"
+                           (haskell-session-cabal-dir session)
+                           (haskell-session-current-dir session))))))
              haskell-sessions))))
 
 (defun haskell-menu-tabulate (headings rows)
