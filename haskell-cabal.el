@@ -196,6 +196,24 @@
               (setq root nil))))
       nil)))
 
+(defun haskell-cabal-find-pkg-desc (dir &optional allow-multiple)
+  "Find a package description file in the directory DIR.
+Returns nil if none or multiple \".cabal\" files were found.  If
+ALLOW-MULTIPLE is non nil, in case of multiple \".cabal\" files,
+a list is returned instead of failing with a nil result."
+  ;; This is basically a port of Cabal's
+  ;; Distribution.Simple.Utils.findPackageDesc function
+  ;;  http://hackage.haskell.org/packages/archive/Cabal/1.16.0.3/doc/html/Distribution-Simple-Utils.html
+  ;; but without the exception throwing.
+  (let* ((cabal-files
+          (remove-if 'file-directory-p
+                     (remove-if-not 'file-exists-p
+                                    (directory-files dir t ".\\.cabal\\'")))))
+    (cond
+     ((= (length cabal-files) 1) (car cabal-files)) ;; exactly one candidate found
+     (allow-multiple cabal-files) ;; pass-thru multiple candidates
+     (t nil))))
+
 (defun haskell-cabal-find-dir ()
   "Use the .cabal file-finding function to find the Cabal dir."
   (let ((file (haskell-cabal-find-file)))
