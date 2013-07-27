@@ -100,11 +100,6 @@
 (defvar haskell-cabal-buffers nil
   "List of Cabal buffers.")
 
-;; (defsubst* inferior-haskell-string-prefix-p (str1 str2)
-;;   "Return non-nil if STR1 is a prefix of STR2"
-;;   (eq t (compare-strings str2 nil (length str1) str1 nil nil)))
-4
-
 (defun haskell-cabal-buffers-clean (&optional buffer)
   (let ((bufs ()))
     (dolist (buf haskell-cabal-buffers)
