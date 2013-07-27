@@ -47,13 +47,13 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @top Haskell Mode
 
 Haskell Mode is an Haskell development Environment for GNU Emacs version 23 or later.  It provides syntax-based indentation, font locking, editing cabal files, and supports running an inferior Haskell interpreter (e.g. GHCi).
- 
+
 @end ifnottex
 
 @menu
 * Introduction::
-* Getting Started::
 * Getting Help and Reporting Bugs::
+* Getting Started::
 * Editing Haskell Code::
 * Unicode::
 * Indentation::
@@ -101,7 +101,7 @@ This Info manual is work in progress and incomplete. However, you can find more 
 
 If you have any questions or like to discuss something regarding Haskell Mode, please consider sending an email to the @uref{http://projects.haskell.org/cgi-bin/mailman/listinfo/haskellmode-emacs, Haskellmode-emacs mailing list}. The mailing list is also available on @uref{http://gmane.org/, Gmane} via the @uref{http://dir.gmane.org/gmane.comp.lang.haskell.emacs, gmane.comp.lang.haskell.emacs} newsgroup.
 
-If you have discovered a bug or wish to request a new feature, you can @uref{https://github.com/haskell/haskell-mode/issues/new, file a new issue} with Haskell Mode's issue tracker. When filing a bug, please state your currently used software version (@kbd{M-x haskell-version}, @kbd{M-x version}) and what steps to perform in order to reproduce the bug you're experiencing.
+If you have discovered a bug or wish to request a new feature, you can @uref{https://github.com/haskell/haskell-mode/issues/new, file a new issue} with Haskell Mode's issue tracker. When filing a bug, please state your currently used software version (@kbd{M-x haskell-version}, @kbd{M-x version}) and what steps to perform in order to reproduce the bug you're experiencing. Finally, if you happen to be proficient in Emacs Lisp (@pxref{Top, Emacs Lisp,, elisp, The Emacs Lisp Reference Manual}) you are welcome to submit patches via @uref{https://help.github.com/articles/using-pull-requests, GitHub Pull Requests}.
 
 @node Getting Started
 @chapter Getting Started
@@ -145,7 +145,9 @@ The major mode @code{literate-haskell-mode} (which is derived from @code{haskell
 
 @code{literate-haskell-mode} supports Bird-style as well as @TeX{}-style literate Haskell files. The currently detected literate Haskell variant is shown in the mode line (@pxref{Mode Line,,,emacs}) as either @samp{LitHaskell/bird} or @samp{LitHaskell/tex}.
 
-TODO/WRITEME
+@section Font Lock Support
+
+@code{haskell-mode} supports @dfn{syntax highlighting} via Emacs' Font Lock minor mode which should be enabled by default in current Emacsen. For more information on how to control @code{font-lock-mode} @ref{Font Lock,,,emacs}.
 
 @node Unicode
 @chapter Unicode support
@@ -178,7 +180,7 @@ If you don't like the highlighting of partially matching tokens you can turn it 
 
 For general information about GNU Emacs' support for indentation @xref{Indentation,,,emacs}.
 
-In Haskell, code indentation has semantic meaning as it defines the block structure@footnote{Haskell also supports braces and semicolons notation for conveying the block structure. However, most Haskell written by humans uses indentation for block structuring.}.
+In Haskell, code indentation has semantic meaning as it defines the block structure@footnote{Haskell also supports braces and semicolons notation for conveying the block structure. However, most Haskell programs written by humans use indentation for block structuring.}.
 
 As GNU Emacs' default indentation function (i.e. @code{indent-relative}) is not designed for use with Haskell's layout rule, Haskell mode includes three different indentation minor modes with different trade-offs:
 
@@ -208,6 +210,22 @@ The recommended way is to add one of @code{turn-on-*} commands to @code{haskell-
 (add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+@end lisp
+
+@section Interactive Block Indentation
+
+By inserting the key bindings for @kbd{C-,} and @kbd{C-.} (these bindings are convenient on keyboard layouts where @key{,} and @key{.} are adjacent keys) as shown below you can interactively de/indent either the following nested block or, if a region is active while in Transient Mark Mode (@pxref{Disabled Transient Mark,,,emacs}), de/indent the active region.
+
+By using a numeric prefix argument (@pxref{Prefix Command Arguments,,,elisp}) you can modify the shift-amount e.g. @kbd{C-u C-,} increases indentation by 4 characters at once.
+
+@findex haskell-move-nested-left
+@findex haskell-move-nested-right
+
+@lisp
+(eval-after-load "haskell-mode"
+  '(progn
+     (define-key haskell-mode-map (kbd "C-,") 'haskell-move-nested-left)
+     (define-key haskell-mode-map (kbd "C-.") 'haskell-move-nested-right)))
 @end lisp
 
 @node haskell-decl-scan-mode
@@ -268,7 +286,22 @@ In order to enable @code{which-function-mode} for Haskell buffers you need to ad
 @vindex haskell-program-name
 @vindex inferior-haskell-mode-hook
 
-The major mode @code{inferior-haskell-mode} provides support for interacting with an inferior Haskell process.
+The major mode @code{inferior-haskell-mode} provides support for interacting with an inferior Haskell process based on @code{comint-mode}.
+
+By default the @code{haskell-mode-map} keymap is setup to use this mode:
+
+@table @kbd
+@item C-c C-z
+is bound to @code{switch-to-haskell}
+@item C-c C-b
+is bound to @code{switch-to-haskell}
+@item C-c C-l
+is bound to @code{inferior-haskell-load-file}
+@item C-c C-t
+is bound to @code{inferior-haskell-type}
+@item C-c C-i
+is bound to @code{inferior-haskell-info}
+@end table
 
 The Haskell interpreter used by the inferior Haskell mode is auto-detected by default, but is customizable via the @code{haskell-program-name} variable.
 
@@ -280,15 +313,43 @@ TODO/WRITEME
 @node haskell-interactive-mode
 @chapter @code{haskell-interactive-mode}
 
-A new mode for the @acronym{REPL,read–eval–print loop} and GHCi sessions is called @code{haskell-interactive-mode}, it intends to replace @code{inferior-haskell-mode}, but comes with a different set of features.
+An alternative mode providing a @acronym{REPL,read–eval–print loop} via GHCi sessions is called @code{haskell-interactive-mode}, which effectively replaces @code{inferior-haskell-mode}, but comes with a different set of features:
+
+@itemize
+@item
+Separate sessions per Cabal project @file{haskell-session.el}.
+@item
+A new inferior Haskell process handling code @file{haskell-process.el}.
+@item
+New REPL implementation similiar to SLIME/IELM @file{haskell-interactive-mode.el}.
+@end itemize
+
+In order to use @code{haskell-interactive-mode} instead of the default @code{inferior-haskell-mode}, you need to replace some of the default keybindings in the @code{haskell-mode-map} keymap with the respective @code{haskell-interactive-mode} counterparts:
+
+@lisp
+(eval-after-load "haskell-mode"
+  '(progn
+    (define-key haskell-mode-map (kbd "C-x C-d") nil)
+    (define-key haskell-mode-map (kbd "C-c C-z") 'haskell-interactive-switch)
+    (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-file)
+    (define-key haskell-mode-map (kbd "C-c C-b") 'haskell-interactive-switch)
+    (define-key haskell-mode-map (kbd "C-c C-t") 'haskell-process-do-type)
+    (define-key haskell-mode-map (kbd "C-c C-i") 'haskell-process-do-info)
+    (define-key haskell-mode-map (kbd "C-c M-.") nil)
+    (define-key haskell-mode-map (kbd "C-c C-d") nil)))
+@end lisp
+
+With @code{haskell-interactive-mode}, each Haskell source buffer is associated with at most one GHCi session, so when you call @code{haskell-process-load-file} for a Haskell source buffer which has no session associated yet, you're asked which GHCi session to create or associate with.
 
 TODO/WRITEME
 
 @node haskell-cabal-mode
 @chapter @code{haskell-cabal-mode}
 
-@findex inferior-cabal-mode
-@vindex inferior-cabal-mode-hook
+@findex haskell-cabal-mode
+@vindex haskell-cabal-mode-hook
+
+@code{haskell-cabal-mode} is a major mode for editing @uref{Cabal package description files,http://www.haskell.org/cabal/users-guide/developing-packages.html} and is automatically associated with files having a @file{.cabal} extension.
 
 TODO/WRITEME
 
