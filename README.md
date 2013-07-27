@@ -6,21 +6,24 @@ Haskell Mode for Emacs
 This is the Haskell mode package for Emacs.  Its use should be mostly
 self-explanatory if you're accustomed to Emacs.
 
-When Emacs is started up, it normally runs a file called `~/.emacs`
-(or `~/.emacs.d/init.el`), `~` standing for your home directory.  This
-file should contain all of your personal customisations written as a
-series of Emacs Lisp commands.  In order to install the Haskell mode, you
-have to tell Emacs where to find it.  This is done by adding some
-commands to the init file.
+When Emacs is started up, it normally loads the
+[Emacs initialization file](http://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html)
+usually called `~/.emacs`, `~/.emacs.el`, or `~/.emacs.d/init.el`;
+with `~` standing for for your home directory.  This file should
+contain all of your personal customisations written as a series of
+Emacs Lisp commands.  In the following sections, this file will simply
+be referred to as the `.emacs` file.
 
 Installation
 ------------
 
 GNU Emacs version 23 or later is officially supported.  It may work
-with other Emacsen, but we don't have the resources to other versions.
+with other Emacsen, but we don't have the resources to support other
+versions.
 
-There are many ways to install `haskell-mode`. Pick the one that
-you're most comfortable with.
+There are many ways to install `haskell-mode`. The following sections
+describe the most common ones; pick the one that you're most
+comfortable with.
 
 ### `package.el`-based Installation
 
@@ -39,8 +42,7 @@ somewhere in your
 [Marmalade](http://marmalade-repo.org/packages/haskell-mode).
 
 If you're not already using Marmalade, add the following snippet to
-your `.emacs` or `~/.emacs.d/init.el` and evaluate it with
-`M-x eval-buffer`:
+your `.emacs` and evaluate it with `M-x eval-buffer`:
 
 ```el
 (require 'package)
@@ -93,30 +95,27 @@ ships with version 2.8.0) of `haskell-mode` with a command like:
 $ apt-get install haskell-mode
 ```
 
-### Manual
+### Installation from Git
 
-*This installation method is rather hacky and recommended for haskell-mode developers/contributors only as it allows to load haskell-mode directly from the git working copy. If you just want to use bleeding edge versions of haskell-mode please use the MELPA method described above.*
+*This installation method requires more work and recommended for haskell-mode developers/contributors only as it allows to load haskell-mode directly from the checked out Git working copy. If you just want to use bleeding edge versions of haskell-mode please use the MELPA installation method described above.*
 
--   Download and unpack (for instance by by `git clone`) the basic mode and modules
-    into a suitable directory, e.g. `~/lib/emacs/haskell-mode/` where `~` stands for
-    your home directory.
+-   `git clone https://github.com/haskell/haskell-mode.git` into a
+    suitable directory, e.g. `~/lib/emacs/haskell-mode/` where `~`
+    stands for your home directory.
 
--   If you are using Emacs 21, you need an additional library, "syntax", from
-    a later version of Emacs.  The one you can get as
-    http://cvs.savannah.gnu.org/viewcvs/*checkout*/emacs/emacs/lisp/emacs-lisp/syntax.el?rev=1.16
-    definitely works.
+-   Assuming you have unpacked the various haskell-mode modules
+    (`haskell-mode.el` and the rest) in the directory
+    `~/lib/emacs/haskell-mode/`, you need generate the autoloads file
+    (`haskell-mode-autoloads.el`) by either
 
--   Assuming you have placed the basic mode (`haskell-mode.el`) and the other modules
-    you want to use in the directory ~/lib/emacs/haskell-mode/, you need generate the
-    autoloads file (`haskell-mode-autoloads.el`) by either
-
-    - Invoking `make all` or `make haskell-mode-autoloads.el`, or
+    - Invoking `make haskell-mode-autoloads.el`, or `make all` (use
+      this to perform byte-compilation and Info manual generation)
     
     - From inside Emacs, `M-x update-directory-autoloads` and answering the question for
       the folder with `~/lib/emacs/haskell-mode/` and the question for the output-file with
       `~/lib/emacs/haskell-mode/haskell-mode-autoloads.el`
     
-    and then adding the following command to your init file (`~/.emacs` or `~/.emacs.d/init.el`):
+    and then adding the following command to your `.emacs`:
   
     ```el
     (add-to-list 'load-path "~/lib/emacs/haskell-mode/")
@@ -124,187 +123,24 @@ $ apt-get install haskell-mode
     (add-to-list 'Info-default-directory-list "~/lib/emacs/haskell-mode/")
     ```
 
+-   After updating your haskell-mode working directory, you need to
+    re-run `make all` or `M-x update-directory-autoloads`.
+
 Basic Configuration
 -------------------
 
-Most of Haskell Mode's settings are exposed via Emacs'
-[Customize system](http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html).
-You can use `M-x haskell-customize` to browse the `haskell` customization sub-tree.
-
-In its default state, only the bare-bones haskell-mode is active.  To
-make it useful, you need additional modules; you can use
-`M-x customize-variable RET haskell-mode-hook` to edit the Haskell mode
-hook or, if you prefer manual setup, try adding the following lines
-according to which modules you want to use:
-
-```el
-(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-```
-
-```el
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
-;;(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-;;(add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
-```
-
-Note that the three indentation modules are mutually exclusive - add at
-most one.  Note that the line of code for simple indentation is commented
-out (using a preceding `;`) in preference for the more advanced
-indentation module.  Installation is now complete!
-
-Other modules can be automatically loaded when needed in the following
-way:
-
--   Font locking: just turn it on via `global-font-lock-mode` or do
-    `(add-hook 'haskell-mode-hook 'font-lock-mode)`
-
--   Declaration scanning: just use `M-x imenu` or bind `imenu` to a key.  E.g.
-    `(global-set-key [(control meta down-mouse-3)] 'imenu)` or you can also add
-    it to the menubar with `(add-hook 'haskell-mode-hook 'imenu-add-menubar-index)`
-
-### Interactive block indentation (`haskell-move-nested.el`)
-
-By inserting the key bindings for `C-,` and `C-.` (these bindings are
-convenient on keyboard layouts where `,` and `.` are adjacent keys) as
-shown below you can interactively de/indent either the following
-nested block or, if a region is active while in transient-mark-mode,
-de/indent the active region.
-
-By using a numeric
-[prefix argument](http://www.gnu.org/software/emacs/manual/html_node/elisp/Prefix-Command-Arguments.html),
-you can modify the shift-amount e.g. `C-u C-,` increases indentation
-by 4 characters at once.
-
-```el
-(define-key haskell-mode-map (kbd "C-,") 'haskell-move-nested-left)
-(define-key haskell-mode-map (kbd "C-.") 'haskell-move-nested-right)
-```
-
-### Setup for inferior haskell mode
-
-This is the traditional mode for interacting with the Haskell interpreter.
-
-By default the `haskell-mode-map` keymap is setup to use this mode, e.g.
-
--   `C-c C-z` is bound to `switch-to-haskell`
--   `C-c C-b` is bound to `switch-to-haskell`
--   `C-c C-l` is bound to `inferior-haskell-load-file`
--   `C-c C-t` is bound to `inferior-haskell-type`
--   `C-c C-i` is bound to `inferior-haskell-info`
-
-Normally, inf-haskell automatically finds ghci or hugs in your PATH,
-but if that's not the case (common under Windows), or if you need to
-specify your preference, just tell Emacs which executable to use with:
-
-```lisp
-(setq haskell-program-name "/some/where/ghci.exe")
-```
-
-If you want to use different settings when you use Cygwin Emacs and NTEmacs,
-you can test the value of `system-type`:
-
-```lisp
-(setq haskell-program-name
-      (if (eq system-type 'cygwin)
-          "/cygdrive/c/ghc/ghc-6.8.1/bin/ghcii.sh"
-        "c:/ghc/ghc-6.8.1/bin/ghci.exe"))
-```
-
-Note that Cygwin binaries tend to interact poorly with NTEmacs,
-especially w.r.t signal-handling.
-
-### Setup for haskell interactive mode
-
-A new mode for the REPL and GHCi sessions is called
-haskell-interactive-mode, it intends to replace inferior-haskell-mode,
-but comes with different features.
-
-There are new modules for handling the following things:
-
-* Separate sessions per Cabal project (`haskell-session.el`).
-* A new inferior Haskell process handling code (`haskell-process.el`).
-* New REPL (`haskell-interactive-mode.el`).
-* Bunch of new features based upon the above three things.
-
-To make use of them, try out the instructions in
-`examples/init.el`. WARNING: The features expressed in here are new
-and many are Linux-specific.
-
-Note: These features are entirely orthogonal to the older
-inferior-haskell-mode, and therefore key-bindings which work for
-inferior-haskell-mode will not magically work for the above new
-modules.
-
-### Haskell Unicode input method
-
-This package provides `haskell-unicode-input-method`, an input
-method which allows you to easily type a number of Unicode symbols
-that are useful when writing Haskell code.
-
-To automatically load in haskell-mode put the following code in your
-`.emacs` file:
-
-```el
-(require 'haskell-unicode-input-method)
-(add-hook 'haskell-mode-hook
-  (lambda () (set-input-method "haskell-unicode")))
-```
-
-Make sure the directory containing the .el file is in your load-path,
-for example:
-
-```el
-(add-to-list 'load-path "~/.elisp/emacs-haskell-unicode-input-method")
-```
-
-To manually enable use `M-x set-input-method` or `C-x [RET] C-\` with
-`haskell-unicode`. Note that the elisp file must be evaluated for this
-to work.
-
-Now you can simply type `->` and it is immediately replaced with
-`→`. Use `C-\` to toggle the input method. To see a table of all key
-sequences use `M-x describe-input-method haskell-unicode`. A sequence
-like `<=` is ambiguous and can mean either `⇐` or `≤`. Typing it
-presents you with a choice. Type `1` or `2` to select an option or
-keep typing to use the default option.
-
-If you don't like the highlighting of partially matching tokens you
-can turn it off:
-
-    (setq input-method-highlight-flag nil)
-
-### Further Customization
-
-Most customizations are on the functionality of a particular module.
-See the documentation of that module for information on its
-customization.
-
-There is also a [wiki page listing tips and
-tricks](http://www.haskell.org/haskellwiki/Haskell_mode_for_Emacs).
-
-Known problems
---------------
-
-It seems that some versions of XEmacs come without the fsf-compat package
-(which provides functions such as `line-end-position`) and it seems that
-even if your XEmacs does have the fsf-compat package installed it does not
-autoload its part.  Thus you may have to install the fsf-compat package and
-add `(require 'goto-addr)` in your .emacs.
-
-
-Multi-mode editing
-------------------
-
-For LaTeX-based literate Haskell, you might be interested in the
-multiple major mode package haskell-latex.el (plus multi-mode.el) from
-http://www.loveshack.ukfsn.org/emacs/.
-
+For setup instructions, please consult the new integrated haskell-mode
+[Info](https://www.gnu.org/software/texinfo/manual/info/info.html)
+manual which can be accessed after installation via
+`M-x info-display-manual [RET] haskell-mode`.
+Alternatively, you can also direct your browser to the
+[latest online HTML version](http://haskell.github.io/haskell-mode/manual/latest/).
 
 Support
 -------
 
-- [Github homepage](https://github.com/haskell/haskell-mode)
 - [Mailing list](http://projects.haskell.org/cgi-bin/mailman/listinfo/haskellmode-emacs)
+- [Github homepage](https://github.com/haskell/haskell-mode)
 
 Contributing
 ------------
