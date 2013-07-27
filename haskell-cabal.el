@@ -161,33 +161,35 @@
      (format "Cabal dir%s: " (if file (format " (guessed from %s)" (file-relative-name file)) ""))
      dir)))
 
-(defun haskell-cabal-compute-checksum (cabal-dir)
-  "Computes a checksum of the .cabal configuration files."
-  (let* ((cabal-file-paths (directory-files cabal-dir t "\\.cabal$"))
-         (get-file-contents (lambda (path)
-                              (with-temp-buffer (insert-file-contents path)
-                                                (buffer-string))))
-         (cabal-file-contents (map 'list get-file-contents cabal-file-paths))
-         (cabal-config (reduce 'concat cabal-file-contents)))
-    (md5 cabal-config)))
+(defun haskell-cabal-compute-checksum (dir)
+  "Compute MD5 checksum of package description file in DIR.
+Return nil if no Cabal description file could be located via
+`haskell-cabal-find-pkg-desc'."
+  (let ((cabal-file (haskell-cabal-find-pkg-desc dir)))
+    (when cabal-file
+      (with-temp-buffer
+        (insert-file-contents cabal-file)
+        (md5 (buffer-string))))))
 
-(defun haskell-cabal-find-file ()
-  "Return a buffer visiting the cabal file of the current directory, or nil."
+(defun haskell-cabal-find-file (&optional dir)
+  "Search for package description file upwards starting from DIR.
+If DIR is nil, `default-directory' is used as starting point for
+directory traversal.  Upward traversal is aborted if file owner
+changes.  Uses`haskell-cabal-find-pkg-desc' internally."
   (catch 'found
-    (let ((user (nth 2 (file-attributes default-directory)))
+    (let ((user (nth 2 (file-attributes (or dir default-directory))))
           ;; Abbreviate, so as to stop when we cross ~/.
-          (root (abbreviate-file-name default-directory))
-          files)
+          (root (abbreviate-file-name (or dir default-directory))))
+      ;; traverse current dir up to root as long as file owner doesn't change
       (while (and root (equal user (nth 2 (file-attributes root))))
-        (if (setq files (directory-files root 'full "\\.cabal\\'"))
-            ;; Avoid the .cabal directory.
-            (dolist (file files (throw 'found nil))
-              (unless (file-directory-p file)
-                (throw 'found file)))
-          (if (equal root
-                     (setq root (file-name-directory
-                                 (directory-file-name root))))
-              (setq root nil))))
+        (let ((cabal-file (haskell-cabal-find-pkg-desc root)))
+          (when cabal-file
+            (throw 'found cabal-file)))
+
+        (let ((proot (file-name-directory (directory-file-name root))))
+          (if (equal proot root) ;; fix-point reached?
+              (throw 'found nil)
+            (setq root proot))))
       nil)))
 
 (defun haskell-cabal-find-pkg-desc (dir &optional allow-multiple)
