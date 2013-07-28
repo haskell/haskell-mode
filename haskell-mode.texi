@@ -101,18 +101,18 @@ This Info manual is work in progress and incomplete. However, you can find more 
 
 If you have any questions or like to discuss something regarding Haskell Mode, please consider sending an email to the @uref{http://projects.haskell.org/cgi-bin/mailman/listinfo/haskellmode-emacs, Haskellmode-emacs mailing list}. The mailing list is also available on @uref{http://gmane.org/, Gmane} via the @uref{http://dir.gmane.org/gmane.comp.lang.haskell.emacs, gmane.comp.lang.haskell.emacs} newsgroup.
 
-If you have discovered a bug or wish to request a new feature, you can @uref{https://github.com/haskell/haskell-mode/issues/new, file a new issue} with Haskell Mode's issue tracker. When filing a bug, please state your currently used software version (@kbd{M-x haskell-version}, @kbd{M-x version}) and what steps to perform in order to reproduce the bug you're experiencing. Finally, if you happen to be proficient in Emacs Lisp (@pxref{Top, Emacs Lisp,, elisp, The Emacs Lisp Reference Manual}) you are welcome to submit patches via @uref{https://help.github.com/articles/using-pull-requests, GitHub Pull Requests}.
+If you have discovered a bug or wish to request a new feature, you can @uref{https://github.com/haskell/haskell-mode/issues/new, file a new issue} with Haskell Mode's issue tracker. When filing a bug, please state your currently used software version (@kbd{M-x haskell-version}, @kbd{M-x version}) and what steps to perform in order to reproduce the bug you're experiencing. Finally, if you happen to be proficient in @ref{Top,Emacs Lisp,,elisp} you are welcome to submit patches via @uref{https://help.github.com/articles/using-pull-requests, GitHub Pull Requests}.
 
 @node Getting Started
 @chapter Getting Started
 
-If you are reading this, you have most likely already managed to install Haskell Mode in one way or another. However, just for the record, the officially recommended way to install Haskell Mode via the @uref{http://marmalade-repo.org/packages/haskell-mode,Marmalade package archive} which contains the latest stable release of Haskell Mode.
+If you are reading this, you have most likely already managed to install Haskell Mode in one way or another. However, just for the record, the officially recommended way is to install Haskell Mode via the @uref{http://marmalade-repo.org/packages/haskell-mode,Marmalade package archive} which contains the latest stable release of Haskell Mode.
 
 @findex haskell-customize
-Most of Haskell Mode's settings are configurable via customizable variables (@xref{Easy Customization,,,emacs}, for details). You can use @kbd{M-x haskell-customize} to browse the @code{haskell} customization sub-tree.
+Most of Haskell Mode's settings are configurable via customizable variables (@pxref{Easy Customization,,,emacs}, for details). You can use @kbd{M-x haskell-customize} to browse the @code{haskell} customization sub-tree.
 
 @vindex haskell-mode-hook
-One of the important setting you should customize is the @code{haskell-mode-hook} variable (@pxref{Hooks,,,emacs}) which gets run right after the @code{haskell-mode} major mode is initialized for a buffer. You can customize @code{haskell-mode-hook} by @kbd{M-x customize-variable @key{RET} haskell-mode-hook}. It's highly recommended you set up indentation to match to match your preferences, @xref{Indentation}.
+One of the important setting you should customize is the @code{haskell-mode-hook} variable (@pxref{Hooks,,,emacs}) which gets run right after the @code{haskell-mode} major mode is initialized for a buffer. You can customize @code{haskell-mode-hook} by @kbd{M-x customize-variable @key{RET} haskell-mode-hook}. It's highly recommended you set up indentation to match your preferences; @xref{Indentation}, for more details about the indentation modes included with Haskell Mode.
 
 @c TODO:
 @c provide basic instructions to get up and running with haskell-mode
@@ -147,7 +147,7 @@ The major mode @code{literate-haskell-mode} (which is derived from @code{haskell
 
 @section Font Lock Support
 
-@code{haskell-mode} supports @dfn{syntax highlighting} via Emacs' Font Lock minor mode which should be enabled by default in current Emacsen. For more information on how to control @code{font-lock-mode} @ref{Font Lock,,,emacs}.
+@code{haskell-mode} supports @dfn{syntax highlighting} via Emacs' Font Lock minor mode which should be enabled by default in current Emacsen. @xref{Font Lock,,,emacs}, for more information on how to control @code{font-lock-mode}.
 
 @node Unicode
 @chapter Unicode support
@@ -156,7 +156,7 @@ The major mode @code{literate-haskell-mode} (which is derived from @code{haskell
 
 See the Haskell Wiki's entry on @uref{http://www.haskell.org/haskellwiki/Unicode-symbols, Unicode Symbols} for general information about Unicode support in Haskell.
 
-As Emacs supports editing files containing Unicode out of the box, so does Haskell Mode. As an add-on, Haskell Mode includes the @code{haskell-unicode} input method which allows you to easily type a number of Unicode symbols that are useful when writing Haskell code; for more details @xref{Input Methods,,,emacs}.
+As Emacs supports editing files containing Unicode out of the box, so does Haskell Mode. As an add-on, Haskell Mode includes the @code{haskell-unicode} input method which allows you to easily type a number of Unicode symbols that are useful when writing Haskell code; @xref{Input Methods,,,emacs}, for more details.
 
 To automatically enable the @code{haskell-unicode} input method in haskell-mode buffers use @kbd{M-x customize-variable @key{RET} haskell-mode-hook} or put the following code in your @file{.emacs} file:
 
@@ -178,7 +178,7 @@ If you don't like the highlighting of partially matching tokens you can turn it 
 @cindex layout rule
 @cindex off-side rule
 
-For general information about GNU Emacs' support for indentation @xref{Indentation,,,emacs}.
+For general information about indentation support in GNU Emacs, @pxref{Indentation,,,emacs}.
 
 In Haskell, code indentation has semantic meaning as it defines the block structure@footnote{Haskell also supports braces and semicolons notation for conveying the block structure. However, most Haskell programs written by humans use indentation for block structuring.}.
 
@@ -194,7 +194,7 @@ A very simple indentation scheme; In this scheme, @key{TAB} will now move the cu
 
 Intelligent semi-automatic indentation for Haskell's layout rule.  The basic idea is to have @key{TAB} cycle through possibilities indentation points based on some clever heuristics.
 
-The rationale and the implementation principles are described in more detail the article @cite{Dynamic tabbing for automatic indentation with the layout rule} published in the Journal of Functional Programming 8.5 (1998).
+The rationale and the implementation principles are described in more detail in the article @cite{Dynamic tabbing for automatic indentation with the layout rule} published in the Journal of Functional Programming 8.5 (1998).
 
 @item turn-on-haskell-indentation
 
@@ -204,7 +204,7 @@ Improved variation of @code{turn-on-haskell-indent} indentation mode. Rebinds @k
 
 To enable one of these three mutually exclusive indentation schemes, you just need call one (and only one!) of the @code{turn-on-*} commands while in the buffer you want the indentation scheme to be activated for.
 
-The recommended way is to add one of @code{turn-on-*} commands to @code{haskell-mode-hook}. This can be done either by using @kbd{M-x customize-variable @key{RET} haskell-mode-hook} which provides a convenient user interface or by adding @emph{one} the following three lines to your @file{.emacs} file:
+The recommended way is to add one of @code{turn-on-*} commands to @code{haskell-mode-hook}. This can be done either by using @kbd{M-x customize-variable @key{RET} haskell-mode-hook} which provides a convenient user interface or by adding @emph{one} of the following three lines to your @file{.emacs} file:
 
 @lisp
 (add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
@@ -216,7 +216,7 @@ The recommended way is to add one of @code{turn-on-*} commands to @code{haskell-
 
 By inserting the key bindings for @kbd{C-,} and @kbd{C-.} (these bindings are convenient on keyboard layouts where @key{,} and @key{.} are adjacent keys) as shown below you can interactively de/indent either the following nested block or, if a region is active while in Transient Mark Mode (@pxref{Disabled Transient Mark,,,emacs}), de/indent the active region.
 
-By using a numeric prefix argument (@pxref{Prefix Command Arguments,,,elisp}) you can modify the shift-amount e.g. @kbd{C-u C-,} increases indentation by 4 characters at once.
+By using a numeric prefix argument (@pxref{Prefix Command Arguments,,,elisp}) you can modify the shift-amount; for instance, @kbd{C-u C-,} increases indentation by 4 characters at once.
 
 @findex haskell-move-nested-left
 @findex haskell-move-nested-right
@@ -244,7 +244,7 @@ Moreover, CUA mode (@pxref{CUA Bindings,,,emacs}) provides enhanced rectangle su
 @findex haskell-decl-scan-mode
 @vindex haskell-decl-scan-mode-hook
 
-@code{haskell-decl-scan-mode} is a minor mode which performs declaration scanning and provides @kbd{M-x imenu} support (@xref{Imenu,,,emacs}, for more information).
+@code{haskell-decl-scan-mode} is a minor mode which performs declaration scanning and provides @kbd{M-x imenu} support (@pxref{Imenu,,,emacs} for more information).
 
 For non-literate and @TeX{}-style literate scripts, the common convention that top-level declarations start at the first column is assumed.  For Bird-style literate scripts, the common convention that top-level declarations start at the third column, ie. after @samp{> }, is assumed.
 
