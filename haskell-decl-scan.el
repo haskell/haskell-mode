@@ -412,9 +412,9 @@ positions and the type is one of the symbols \"variable\", \"datatype\",
                 (setq name-pos (match-beginning 1))
                 (setq type 'class))))
          ;; Import declaration.
-         ((looking-at "import[ \t]+\\(qualified[ \t]+\\)?\\(\\(?:\\sw\\|.\\)+\\)")
-          (setq name (match-string-no-properties 2))
-          (setq name-pos (match-beginning 2))
+         ((looking-at "import[ \t]+\\(?:safe[\t ]+\\)?\\(?:qualified[ \t]+\\)?\\(?:\"[^\"]*\"[\t ]+\\)?\\(\\(?:\\sw\\|.\\)+\\)")
+          (setq name (match-string-no-properties 1))
+          (setq name-pos (match-beginning 1))
           (setq type 'import))
          ;; Instance declaration.
          ((re-search-forward "\\=instance[ \t]+" end t)

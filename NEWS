@@ -41,6 +41,9 @@ See also [[https://github.com/haskell/haskell-mode/compare/v13.07...v13.08][deta
 - New convenience function `haskell-cabal-visit-file' for locating and
   visiting most likely `.cabal` file associated with current buffer
 
+- Add support for [[http://www.haskell.org/ghc/docs/latest/html/users_guide/syntax-extns.html#package-import][PackageImports]] and [[http://www.haskell.org/ghc/docs/latest/html/users_guide/syntax-extns.html#safe-imports-ext][SafeHaskell]] syntax extensions to
+  `haskell-decl-scan-mode' parser
+
 * Changes in 13.7
 
 See also [[https://github.com/haskell/haskell-mode/compare/v13.06...v13.07][detailed Git history]].
