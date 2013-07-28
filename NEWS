@@ -44,6 +44,9 @@ See also [[https://github.com/haskell/haskell-mode/compare/v13.07...v13.08][deta
 - Add support for [[http://www.haskell.org/ghc/docs/latest/html/users_guide/syntax-extns.html#package-import][PackageImports]] and [[http://www.haskell.org/ghc/docs/latest/html/users_guide/syntax-extns.html#safe-imports-ext][SafeHaskell]] syntax extensions to
   `haskell-decl-scan-mode' parser
 
+- Add `turn-{on,off}-haskell-doc' commands as aliases for the existing
+  `turn-{on,off}-haskell-doc-mode' commands
+
 * Changes in 13.7
 
 See also [[https://github.com/haskell/haskell-mode/compare/v13.06...v13.07][detailed Git history]].
