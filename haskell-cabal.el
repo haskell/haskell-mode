@@ -217,6 +217,28 @@ See `haskell-cabal-find-file' for meaning of DIR argument."
     (when cabal-file
       (file-name-directory cabal-file))))
 
+;;;###autoload
+(defun haskell-cabal-visit-file (other-window)
+  "Locate and visit package description file for file visited by current buffer.
+This uses `haskell-cabal-find-file' to locate the closest
+\".cabal\" file and open it.  This command assumes a common Cabal
+project structure where the \".cabal\" file is in the top-folder
+of the project, and all files related to the project are in or
+below the top-folder.  If called with non-nil prefix argument
+OTHER-WINDOW use `find-file-other-window'."
+  (interactive "P")
+  ;; Note: We aren't allowed to rely on haskell-session here (which,
+  ;; in pathological cases, can have a different .cabal file
+  ;; associated with the current buffer)
+  (if buffer-file-name
+    (let ((cabal-file (haskell-cabal-find-file (file-name-directory buffer-file-name))))
+      (if cabal-file
+          (if other-window
+              (find-file-other-window cabal-file)
+            (find-file cabal-file))
+        (error "Could not locate \".cabal\" file for %S" buffer-file-name)))
+    (error "Cannot locate \".cabal\" file for buffers not visiting any file")))
+
 (defvar haskell-cabal-commands
   '("install"
     "update"

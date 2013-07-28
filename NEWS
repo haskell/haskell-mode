@@ -38,6 +38,9 @@ See also [[https://github.com/haskell/haskell-mode/compare/v13.07...v13.08][deta
   when pressing DEL.  The old behavior can be restored by setting
   `haskell-indentation-delete-backward-jump-line' to t.
 
+- New convenience function `haskell-cabal-visit-file' for locating and
+  visiting most likely `.cabal` file associated with current buffer.
+
 * Changes in 13.7
 
 See also [[https://github.com/haskell/haskell-mode/compare/v13.06...v13.07][detailed Git history]].

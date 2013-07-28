@@ -349,7 +349,16 @@ TODO/WRITEME
 @findex haskell-cabal-mode
 @vindex haskell-cabal-mode-hook
 
-@code{haskell-cabal-mode} is a major mode for editing @uref{Cabal package description files,http://www.haskell.org/cabal/users-guide/developing-packages.html} and is automatically associated with files having a @file{.cabal} extension.
+@code{haskell-cabal-mode} is a major mode for editing @uref{http://www.haskell.org/cabal/users-guide/developing-packages.html,Cabal package description files} and is automatically associated with files having a @file{.cabal} extension.
+
+@findex haskell-cabal-visit-file
+
+For quickly locating and jumping to the nearest @file{.cabal} file from a Haskell source buffer, you can use @kbd{M-x haskell-cabal-visit-file}; with a prefix argument (i.e. @kbd{C-u}) @code{find-file-other-window} is used to visit the @file{.cabal} file.  If you wish, you can bind @code{haskell-cabal-visit-file} to a convenient key sequence, e.g.
+
+@lisp
+(eval-after-load "haskell-mode"
+  (define-key haskell-mode-map (kbd "C-c v c") 'haskell-cabal-visit-file))
+@end lisp
 
 TODO/WRITEME
 
