@@ -210,11 +210,12 @@ a list is returned instead of failing with a nil result."
      (allow-multiple cabal-files) ;; pass-thru multiple candidates
      (t nil))))
 
-(defun haskell-cabal-find-dir ()
-  "Use the .cabal file-finding function to find the Cabal dir."
-  (let ((file (haskell-cabal-find-file)))
-    (when file
-      (file-name-directory file))))
+(defun haskell-cabal-find-dir (&optional dir)
+  "Like `haskell-cabal-find-file' but returns directory instead.
+See `haskell-cabal-find-file' for meaning of DIR argument."
+  (let ((cabal-file (haskell-cabal-find-file dir)))
+    (when cabal-file
+      (file-name-directory cabal-file))))
 
 (defvar haskell-cabal-commands
   '("install"
