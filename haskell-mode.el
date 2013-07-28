@@ -597,7 +597,7 @@ If nil, use the Hoogle web-site."
                         nil nil def))))
   (if (null haskell-hoogle-command)
       (browse-url (format "http://haskell.org/hoogle/?q=%s" query))
-    (lexical-let ((temp-buffer (if (fboundp 'help-buffer) (help-buffer) "*Help*")))
+    (lexical-let ((temp-buffer (help-buffer)))
       (with-output-to-temp-buffer temp-buffer
         (with-current-buffer standard-output
           (let ((hoogle-process
