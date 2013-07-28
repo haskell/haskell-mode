@@ -185,12 +185,12 @@ Runs `haskell-simple-indent-hook' on activation."
 (defun turn-on-haskell-simple-indent ()
   "Turn on function `haskell-simple-indent-mode'."
   (interactive)
-  (haskell-simple-indent-mode t))
+  (haskell-simple-indent-mode))
 
 (defun turn-off-haskell-simple-indent ()
   "Turn off function `haskell-simple-indent-mode'."
   (interactive)
-  (haskell-simple-indent-mode nil))
+  (haskell-simple-indent-mode 0))
 
 ;; Provide ourselves:
 
