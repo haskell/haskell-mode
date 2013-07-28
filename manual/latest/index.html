@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<!-- This manual is for Haskell mode, version 13.07-74-g25d61a7-dirty
+<!-- This manual is for Haskell mode, version 13.07-85-g738ae2f-dirty
 
 Copyright (C) 2013 Haskell Mode contributors.
 
@@ -329,6 +329,16 @@ kbd
     color: black;
 }
 
+tt.key
+{
+    padding-left: .25em;
+    padding-right: .25em;
+    border: solid 1px #C2C2C2;
+    border-radius: 4px;
+    background-color: #F0F0F0;
+    box-shadow: 1px 1px silver;
+    color: black;
+}
 
 samp
 {
@@ -352,6 +362,7 @@ ul.no-bullet {list-style: none}
 END OF janix-texinfo.css
 --------------------------------------------------------------------------
 */
+
 -->
 </style>
 
@@ -364,7 +375,7 @@ END OF janix-texinfo.css
 
 
 
-<p>This manual is for Haskell mode, version 13.07-74-g25d61a7-dirty
+<p>This manual is for Haskell mode, version 13.07-85-g738ae2f-dirty
 </p>
 <p>Copyright &copy; 2013 Haskell Mode contributors.
 </p>
@@ -453,7 +464,7 @@ Next: <a href="#Getting-Started" accesskey="n" rel="next">Getting Started</a>, P
 
 <p>If you have any questions or like to discuss something regarding Haskell Mode, please consider sending an email to the <a href="http://projects.haskell.org/cgi-bin/mailman/listinfo/haskellmode-emacs">Haskellmode-emacs mailing list</a>. The mailing list is also available on <a href="http://gmane.org/">Gmane</a> via the <a href="http://dir.gmane.org/gmane.comp.lang.haskell.emacs">gmane.comp.lang.haskell.emacs</a> newsgroup.
 </p>
-<p>If you have discovered a bug or wish to request a new feature, you can <a href="https://github.com/haskell/haskell-mode/issues/new">file a new issue</a> with Haskell Mode&rsquo;s issue tracker. When filing a bug, please state your currently used software version (<kbd>M-x haskell-version</kbd>, <kbd>M-x version</kbd>) and what steps to perform in order to reproduce the bug you&rsquo;re experiencing. Finally, if you happen to be proficient in Emacs Lisp (see <a href="http://www.gnu.org/software/emacs/manual/html_mono/elisp.html#Top">Emacs Lisp</a> in <cite>The Emacs Lisp Reference Manual</cite>) you are welcome to submit patches via <a href="https://help.github.com/articles/using-pull-requests">GitHub Pull Requests</a>.
+<p>If you have discovered a bug or wish to request a new feature, you can <a href="https://github.com/haskell/haskell-mode/issues/new">file a new issue</a> with Haskell Mode&rsquo;s issue tracker. When filing a bug, please state your currently used software version (<kbd>M-x haskell-version</kbd>, <kbd>M-x version</kbd>) and what steps to perform in order to reproduce the bug you&rsquo;re experiencing. Finally, if you happen to be proficient in <a href="http://www.gnu.org/software/emacs/manual/html_mono/elisp.html#Top">(elisp)Emacs Lisp</a> you are welcome to submit patches via <a href="https://help.github.com/articles/using-pull-requests">GitHub Pull Requests</a>.
 </p>
 <hr>
 <a name="Getting-Started"></a>
@@ -464,13 +475,13 @@ Next: <a href="#Editing-Haskell-Code" accesskey="n" rel="next">Editing Haskell C
 <a name="Getting-Started-1"></a>
 <h2 class="chapter">3 Getting Started</h2>
 
-<p>If you are reading this, you have most likely already managed to install Haskell Mode in one way or another. However, just for the record, the officially recommended way to install Haskell Mode via the <a href="http://marmalade-repo.org/packages/haskell-mode">Marmalade package archive</a> which contains the latest stable release of Haskell Mode.
+<p>If you are reading this, you have most likely already managed to install Haskell Mode in one way or another. However, just for the record, the officially recommended way is to install Haskell Mode via the <a href="http://marmalade-repo.org/packages/haskell-mode">Marmalade package archive</a> which contains the latest stable release of Haskell Mode.
 </p>
 <a name="index-haskell_002dcustomize"></a>
-<p>Most of Haskell Mode&rsquo;s settings are configurable via customizable variables (See <a href="http://www.gnu.org/software/emacs/manual/html_mono/emacs.html#Easy-Customization">(emacs)Easy Customization</a>, for details). You can use <kbd>M-x haskell-customize</kbd> to browse the <code>haskell</code> customization sub-tree.
+<p>Most of Haskell Mode&rsquo;s settings are configurable via customizable variables (see <a href="http://www.gnu.org/software/emacs/manual/html_mono/emacs.html#Easy-Customization">(emacs)Easy Customization</a>, for details). You can use <kbd>M-x haskell-customize</kbd> to browse the <code>haskell</code> customization sub-tree.
 </p>
 <a name="index-haskell_002dmode_002dhook"></a>
-<p>One of the important setting you should customize is the <code>haskell-mode-hook</code> variable (see <a href="http://www.gnu.org/software/emacs/manual/html_mono/emacs.html#Hooks">(emacs)Hooks</a>) which gets run right after the <code>haskell-mode</code> major mode is initialized for a buffer. You can customize <code>haskell-mode-hook</code> by <kbd>M-x customize-variable <span class="key">RET</span> haskell-mode-hook</kbd>. It&rsquo;s highly recommended you set up indentation to match to match your preferences, See <a href="#Indentation">Indentation</a>.
+<p>One of the important setting you should customize is the <code>haskell-mode-hook</code> variable (see <a href="http://www.gnu.org/software/emacs/manual/html_mono/emacs.html#Hooks">(emacs)Hooks</a>) which gets run right after the <code>haskell-mode</code> major mode is initialized for a buffer. You can customize <code>haskell-mode-hook</code> by <kbd>M-x customize-variable <span class="key">RET</span> haskell-mode-hook</kbd>. It&rsquo;s highly recommended you set up indentation to match your preferences; See <a href="#Indentation">Indentation</a>, for more details about the indentation modes included with Haskell Mode.
 </p>
 
 <hr>
@@ -511,7 +522,7 @@ Next: <a href="#Unicode" accesskey="n" rel="next">Unicode</a>, Previous: <a href
 <a name="Font-Lock-Support"></a>
 <h3 class="section">4.1 Font Lock Support</h3>
 
-<p><code>haskell-mode</code> supports <em>syntax highlighting</em> via Emacs&rsquo; Font Lock minor mode which should be enabled by default in current Emacsen. For more information on how to control <code>font-lock-mode</code> <a href="http://www.gnu.org/software/emacs/manual/html_mono/emacs.html#Font-Lock">(emacs)Font Lock</a>.
+<p><code>haskell-mode</code> supports <em>syntax highlighting</em> via Emacs&rsquo; Font Lock minor mode which should be enabled by default in current Emacsen. See <a href="http://www.gnu.org/software/emacs/manual/html_mono/emacs.html#Font-Lock">(emacs)Font Lock</a>, for more information on how to control <code>font-lock-mode</code>.
 </p>
 <hr>
 <a name="Unicode"></a>
@@ -526,7 +537,7 @@ Next: <a href="#Indentation" accesskey="n" rel="next">Indentation</a>, Previous:
 
 <p>See the Haskell Wiki&rsquo;s entry on <a href="http://www.haskell.org/haskellwiki/Unicode-symbols">Unicode Symbols</a> for general information about Unicode support in Haskell.
 </p>
-<p>As Emacs supports editing files containing Unicode out of the box, so does Haskell Mode. As an add-on, Haskell Mode includes the <code>haskell-unicode</code> input method which allows you to easily type a number of Unicode symbols that are useful when writing Haskell code; for more details See <a href="http://www.gnu.org/software/emacs/manual/html_mono/emacs.html#Input-Methods">(emacs)Input Methods</a>.
+<p>As Emacs supports editing files containing Unicode out of the box, so does Haskell Mode. As an add-on, Haskell Mode includes the <code>haskell-unicode</code> input method which allows you to easily type a number of Unicode symbols that are useful when writing Haskell code; See <a href="http://www.gnu.org/software/emacs/manual/html_mono/emacs.html#Input-Methods">(emacs)Input Methods</a>, for more details.
 </p>
 <p>To automatically enable the <code>haskell-unicode</code> input method in haskell-mode buffers use <kbd>M-x customize-variable <span class="key">RET</span> haskell-mode-hook</kbd> or put the following code in your <samp>.emacs</samp> file:
 </p>
@@ -553,7 +564,7 @@ Next: <a href="#haskell_002ddecl_002dscan_002dmode" accesskey="n" rel="next">has
 <a name="index-layout-rule"></a>
 <a name="index-off_002dside-rule"></a>
 
-<p>For general information about GNU Emacs&rsquo; support for indentation See <a href="http://www.gnu.org/software/emacs/manual/html_mono/emacs.html#Indentation">(emacs)Indentation</a>.
+<p>For general information about indentation support in GNU Emacs, see <a href="http://www.gnu.org/software/emacs/manual/html_mono/emacs.html#Indentation">(emacs)Indentation</a>.
 </p>
 <p>In Haskell, code indentation has semantic meaning as it defines the block structure<a name="DOCF4" href="#FOOT4"><sup>4</sup></a>.
 </p>
@@ -573,7 +584,7 @@ Next: <a href="#haskell_002ddecl_002dscan_002dmode" accesskey="n" rel="next">has
 <dd>
 <p>Intelligent semi-automatic indentation for Haskell&rsquo;s layout rule.  The basic idea is to have <tt class="key">TAB</tt> cycle through possibilities indentation points based on some clever heuristics.
 </p>
-<p>The rationale and the implementation principles are described in more detail the article <cite>Dynamic tabbing for automatic indentation with the layout rule</cite> published in the Journal of Functional Programming 8.5 (1998).
+<p>The rationale and the implementation principles are described in more detail in the article <cite>Dynamic tabbing for automatic indentation with the layout rule</cite> published in the Journal of Functional Programming 8.5 (1998).
 </p>
 </dd>
 <dt><code>turn-on-haskell-indentation</code>
@@ -587,7 +598,7 @@ Next: <a href="#haskell_002ddecl_002dscan_002dmode" accesskey="n" rel="next">has
 
 <p>To enable one of these three mutually exclusive indentation schemes, you just need call one (and only one!) of the <code>turn-on-*</code> commands while in the buffer you want the indentation scheme to be activated for.
 </p>
-<p>The recommended way is to add one of <code>turn-on-*</code> commands to <code>haskell-mode-hook</code>. This can be done either by using <kbd>M-x customize-variable <span class="key">RET</span> haskell-mode-hook</kbd> which provides a convenient user interface or by adding <em>one</em> the following three lines to your <samp>.emacs</samp> file:
+<p>The recommended way is to add one of <code>turn-on-*</code> commands to <code>haskell-mode-hook</code>. This can be done either by using <kbd>M-x customize-variable <span class="key">RET</span> haskell-mode-hook</kbd> which provides a convenient user interface or by adding <em>one</em> of the following three lines to your <samp>.emacs</samp> file:
 </p>
 <div class="lisp">
 <pre class="lisp">(add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
@@ -600,7 +611,7 @@ Next: <a href="#haskell_002ddecl_002dscan_002dmode" accesskey="n" rel="next">has
 
 <p>By inserting the key bindings for <kbd>C-,</kbd> and <kbd>C-.</kbd> (these bindings are convenient on keyboard layouts where <tt class="key">,</tt> and <tt class="key">.</tt> are adjacent keys) as shown below you can interactively de/indent either the following nested block or, if a region is active while in Transient Mark Mode (see <a href="http://www.gnu.org/software/emacs/manual/html_mono/emacs.html#Disabled-Transient-Mark">(emacs)Disabled Transient Mark</a>), de/indent the active region.
 </p>
-<p>By using a numeric prefix argument (see <a href="http://www.gnu.org/software/emacs/manual/html_mono/elisp.html#Prefix-Command-Arguments">(elisp)Prefix Command Arguments</a>) you can modify the shift-amount e.g. <kbd>C-u C-,</kbd> increases indentation by 4 characters at once.
+<p>By using a numeric prefix argument (see <a href="http://www.gnu.org/software/emacs/manual/html_mono/elisp.html#Prefix-Command-Arguments">(elisp)Prefix Command Arguments</a>) you can modify the shift-amount; for instance, <kbd>C-u C-,</kbd> increases indentation by 4 characters at once.
 </p>
 <a name="index-haskell_002dmove_002dnested_002dleft"></a>
 <a name="index-haskell_002dmove_002dnested_002dright"></a>
@@ -612,6 +623,16 @@ Next: <a href="#haskell_002ddecl_002dscan_002dmode" accesskey="n" rel="next">has
      (define-key haskell-mode-map (kbd &quot;C-.&quot;) 'haskell-move-nested-right)))
 </pre></div>
 
+<a name="Rectangle-Commands"></a>
+<h3 class="section">6.2 Rectangle Commands</h3>
+
+<a name="index-rectangle"></a>
+<a name="index-CUA-mode"></a>
+
+<p>GNU Emacs provides so-called <em>rectangle commands</em> which operate on rectangular areas of text, which are particularly useful for languages with a layout rule such as Haskell. See <a href="http://www.gnu.org/software/emacs/manual/html_mono/emacs.html#Rectangles">(emacs)Rectangles</a>, to learn more about rectangle commands.
+</p>
+<p>Moreover, CUA mode (see <a href="http://www.gnu.org/software/emacs/manual/html_mono/emacs.html#CUA-Bindings">(emacs)CUA Bindings</a>) provides enhanced rectangle support with visible rectangle highlighting. When CUA mode is active, you can initiate a rectangle selection by <kbd>C-RET</kbd> and extend it simply by movement commands. You don&rsquo;t have to enable full CUA mode to benefit from these enhanced rectangle commands; you can activate CUA selection mode (without redefining  <kbd>C-x</kbd>,<kbd>C-c</kbd>,<kbd>C-v</kbd>, and <kbd>C-z</kbd>) by calling <kbd>M-x cua-selection-mode</kbd> (or adding <code>(cua-selection-mode nil)</code> to your <code>haskell-mode-hook</code>).
+</p>
 <hr>
 <a name="haskell_002ddecl_002dscan_002dmode"></a>
 <div class="header">
@@ -625,7 +646,7 @@ Next: <a href="#inferior_002dhaskell_002dmode" accesskey="n" rel="next">inferior
 <a name="index-haskell_002ddecl_002dscan_002dmode"></a>
 <a name="index-haskell_002ddecl_002dscan_002dmode_002dhook"></a>
 
-<p><code>haskell-decl-scan-mode</code> is a minor mode which performs declaration scanning and provides <kbd>M-x imenu</kbd> support (See <a href="http://www.gnu.org/software/emacs/manual/html_mono/emacs.html#Imenu">(emacs)Imenu</a>, for more information).
+<p><code>haskell-decl-scan-mode</code> is a minor mode which performs declaration scanning and provides <kbd>M-x imenu</kbd> support (see <a href="http://www.gnu.org/software/emacs/manual/html_mono/emacs.html#Imenu">(emacs)Imenu</a> for more information).
 </p>
 <p>For non-literate and TeX-style literate scripts, the common convention that top-level declarations start at the first column is assumed.  For Bird-style literate scripts, the common convention that top-level declarations start at the third column, ie. after &lsquo;<samp>&gt; </samp>&rsquo;, is assumed.
 </p>
@@ -761,8 +782,17 @@ Next: <a href="#Concept-index" accesskey="n" rel="next">Concept index</a>, Previ
 <a name="index-haskell_002dcabal_002dmode"></a>
 <a name="index-haskell_002dcabal_002dmode_002dhook"></a>
 
-<p><code>haskell-cabal-mode</code> is a major mode for editing <a href="Cabal package description files">http://www.haskell.org/cabal/users-guide/developing-packages.html</a> and is automatically associated with files having a <samp>.cabal</samp> extension.
+<p><code>haskell-cabal-mode</code> is a major mode for editing <a href="http://www.haskell.org/cabal/users-guide/developing-packages.html">Cabal package description files</a> and is automatically associated with files having a <samp>.cabal</samp> extension.
 </p>
+<a name="index-haskell_002dcabal_002dvisit_002dfile"></a>
+
+<p>For quickly locating and jumping to the nearest <samp>.cabal</samp> file from a Haskell source buffer, you can use <kbd>M-x haskell-cabal-visit-file</kbd>; with a prefix argument (i.e. <kbd>C-u</kbd>) <code>find-file-other-window</code> is used to visit the <samp>.cabal</samp> file.  If you wish, you can bind <code>haskell-cabal-visit-file</code> to a convenient key sequence, e.g.
+</p>
+<div class="lisp">
+<pre class="lisp">(eval-after-load &quot;haskell-mode&quot;
+  (define-key haskell-mode-map (kbd &quot;C-c v c&quot;) 'haskell-cabal-visit-file))
+</pre></div>
+
 <p>TODO/WRITEME
 </p>
 <hr>
@@ -774,7 +804,9 @@ Next: <a href="#Function-index" accesskey="n" rel="next">Function index</a>, Pre
 <a name="Concept-index-1"></a>
 <h2 class="unnumbered">Concept index</h2>
 
-<table><tr><th valign="top">Jump to: &nbsp; </th><td><a class="summary-letter" href="#Concept-index_cp_letter-H"><b>H</b></a>
+<table><tr><th valign="top">Jump to: &nbsp; </th><td><a class="summary-letter" href="#Concept-index_cp_letter-C"><b>C</b></a>
+ &nbsp; 
+<a class="summary-letter" href="#Concept-index_cp_letter-H"><b>H</b></a>
  &nbsp; 
 <a class="summary-letter" href="#Concept-index_cp_letter-I"><b>I</b></a>
  &nbsp; 
@@ -782,11 +814,16 @@ Next: <a href="#Function-index" accesskey="n" rel="next">Function index</a>, Pre
  &nbsp; 
 <a class="summary-letter" href="#Concept-index_cp_letter-O"><b>O</b></a>
  &nbsp; 
+<a class="summary-letter" href="#Concept-index_cp_letter-R"><b>R</b></a>
+ &nbsp; 
 <a class="summary-letter" href="#Concept-index_cp_letter-U"><b>U</b></a>
  &nbsp; 
 </td></tr></table>
 <table class="index-cp" border="0">
 <tr><td></td><th align="left">Index Entry</th><td>&nbsp;</td><th align="left"> Section</th></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th><a name="Concept-index_cp_letter-C">C</a></th><td></td><td></td></tr>
+<tr><td></td><td valign="top"><a href="#index-CUA-mode">CUA mode</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Indentation">Indentation</a></td></tr>
 <tr><td colspan="4"> <hr></td></tr>
 <tr><th><a name="Concept-index_cp_letter-H">H</a></th><td></td><td></td></tr>
 <tr><td></td><td valign="top"><a href="#index-haskell_002dmode"><code>haskell-mode</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Editing-Haskell-Code">Editing Haskell Code</a></td></tr>
@@ -801,17 +838,24 @@ Next: <a href="#Function-index" accesskey="n" rel="next">Function index</a>, Pre
 <tr><th><a name="Concept-index_cp_letter-O">O</a></th><td></td><td></td></tr>
 <tr><td></td><td valign="top"><a href="#index-off_002dside-rule">off-side rule</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Indentation">Indentation</a></td></tr>
 <tr><td colspan="4"> <hr></td></tr>
+<tr><th><a name="Concept-index_cp_letter-R">R</a></th><td></td><td></td></tr>
+<tr><td></td><td valign="top"><a href="#index-rectangle">rectangle</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Indentation">Indentation</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
 <tr><th><a name="Concept-index_cp_letter-U">U</a></th><td></td><td></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Unicode">Unicode</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Unicode">Unicode</a></td></tr>
 <tr><td colspan="4"> <hr></td></tr>
 </table>
-<table><tr><th valign="top">Jump to: &nbsp; </th><td><a class="summary-letter" href="#Concept-index_cp_letter-H"><b>H</b></a>
+<table><tr><th valign="top">Jump to: &nbsp; </th><td><a class="summary-letter" href="#Concept-index_cp_letter-C"><b>C</b></a>
+ &nbsp; 
+<a class="summary-letter" href="#Concept-index_cp_letter-H"><b>H</b></a>
  &nbsp; 
 <a class="summary-letter" href="#Concept-index_cp_letter-I"><b>I</b></a>
  &nbsp; 
 <a class="summary-letter" href="#Concept-index_cp_letter-L"><b>L</b></a>
  &nbsp; 
 <a class="summary-letter" href="#Concept-index_cp_letter-O"><b>O</b></a>
+ &nbsp; 
+<a class="summary-letter" href="#Concept-index_cp_letter-R"><b>R</b></a>
  &nbsp; 
 <a class="summary-letter" href="#Concept-index_cp_letter-U"><b>U</b></a>
  &nbsp; 
@@ -840,6 +884,7 @@ Next: <a href="#Variable-index" accesskey="n" rel="next">Variable index</a>, Pre
 <tr><td colspan="4"> <hr></td></tr>
 <tr><th><a name="Function-index_fn_letter-H">H</a></th><td></td><td></td></tr>
 <tr><td></td><td valign="top"><a href="#index-haskell_002dcabal_002dmode"><code>haskell-cabal-mode</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#haskell_002dcabal_002dmode">haskell-cabal-mode</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-haskell_002dcabal_002dvisit_002dfile"><code>haskell-cabal-visit-file</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#haskell_002dcabal_002dmode">haskell-cabal-mode</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-haskell_002dcustomize"><code>haskell-customize</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Getting-Started">Getting Started</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-haskell_002ddecl_002dscan_002dmode"><code>haskell-decl-scan-mode</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#haskell_002ddecl_002dscan_002dmode">haskell-decl-scan-mode</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-haskell_002dmode-1"><code>haskell-mode</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Editing-Haskell-Code">Editing Haskell Code</a></td></tr>
