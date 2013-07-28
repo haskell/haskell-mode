@@ -394,49 +394,35 @@ May return a qualified name."
 ;; Various mode variables.
 
 (defcustom haskell-mode-hook nil
-  "Hook run after entering Haskell mode.
+  "Hook run after entering `haskell-mode'.
 
---------------------------------------------------------------------------------
+Some of the supported modules that can be activated via this hook:
 
-CONFIGURING INDENTATION
+   `haskell-decl-scan', Graeme E Moss
+     Scans top-level declarations, and places them in a menu.
 
-  Using this you can configure the Haskell indentation mode. There
-  are three major Haskell indentation modes:
+   `haskell-doc', Hans-Wolfgang Loidl
+     Echoes types of functions or syntax of keywords when the cursor is idle.
 
-  `haskell-indentation', Kristof Bastiaensen
-    Intelligent semi-automatic indentation, mark two. How to enable:
-    (custom-set-variables
-     '(haskell-mode-hook '(turn-on-haskell-indentation)))
+   `haskell-indentation', Kristof Bastiaensen
+     Intelligent semi-automatic indentation Mk2
 
-  `haskell-indent', Guy Lapalme
-    Intelligent semi-automatic indentation. How to enable:
-    (custom-set-variables
-     '(haskell-mode-hook '(turn-on-haskell-indentation)))
+   `haskell-indent', Guy Lapalme
+     Intelligent semi-automatic indentation.
 
-  `haskell-simple-indent', Graeme E Moss and Heribert Schuetz
-    Simple indentation. How to enable:
-    (custom-set-variables
-     '(haskell-mode-hook '(turn-on-haskell-simple-indent)))
+   `haskell-simple-indent', Graeme E Moss and Heribert Schuetz
+     Simple indentation.
 
-  You can either:
+Module X is activated using the command `turn-on-X'.  For example,
+`haskell-doc' is activated using `turn-on-haskell-doc'.
+For more information on a specific module, see the help for its `X-mode'
+function.  Some modules can be deactivated using `turn-off-X'.
 
-   1) Use the code above if you're more Elisp savvy, and put it
-      in your .emacs or similar file (type C-M-x to run each
-      one), or
+See Info node `(haskell-mode)haskell-mode-hook' for more details.
 
-   2) customize the variable by ``M-x customize-group'' (see the
-      link below), or
-
-   3) some people prefer to add custom hooks like the below:
-
-      (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
-
-  In order to test each one after enabling you can re-run M-x
-  haskell-mode in the same buffer.
-
-  Do not select more than one of the three indentation modes.
-
---------------------------------------------------------------------------------"
+Warning: do not enable more than one of the three indentation
+modes. See Info node `(haskell-mode)indentation' for more
+details."
   :type 'hook
   :group 'haskell
   :link '(info-link "(haskell-mode)haskell-mode-hook")
@@ -465,39 +451,16 @@ CONFIGURING INDENTATION
 See also Info node `(haskell-mode)Getting Started' for more
 information about this mode.
 
-Blank lines separate paragraphs, comments start with `-- '.
 \\<haskell-mode-map>
 Literate scripts are supported via `literate-haskell-mode'.
 The variable `haskell-literate' indicates the style of the script in the
 current buffer.  See the documentation on this variable for more details.
 
-Modules can hook in via `haskell-mode-hook'.  The following modules
-are supported with an `autoload' command:
+Use `haskell-version' to find out what version of Haskell mode you are
+currently using.
 
-   `haskell-decl-scan', Graeme E Moss
-     Scans top-level declarations, and places them in a menu.
-
-   `haskell-doc', Hans-Wolfgang Loidl
-     Echoes types of functions or syntax of keywords when the cursor is idle.
-
-   `haskell-indentation', Kristof Bastiaensen
-     Intelligent semi-automatic indentation Mk2
-
-   `haskell-indent', Guy Lapalme
-     Intelligent semi-automatic indentation.
-
-   `haskell-simple-indent', Graeme E Moss and Heribert Schuetz
-     Simple indentation.
-
-Module X is activated using the command `turn-on-X'.  For example,
-`haskell-indent' is activated using `turn-on-haskell-indent'.
-For more information on a module, see the help for its `X-mode'
-function.  Some modules can be deactivated using `turn-off-X'.  (Note
-that `haskell-doc' is irregular in using `turn-(on/off)-haskell-doc-mode'.)
-
-Use `haskell-version' to find out what version this is.
-
-Invokes `haskell-mode-hook'."
+Additional Haskell mode modules can be hooked in via `haskell-mode-hook';
+see documentation for that variable for more details."
   :group 'haskell
   (set (make-local-variable 'paragraph-start) (concat "^$\\|" page-delimiter))
   (set (make-local-variable 'paragraph-separate) paragraph-start)
