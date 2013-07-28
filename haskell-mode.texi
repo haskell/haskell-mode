@@ -228,6 +228,15 @@ By using a numeric prefix argument (@pxref{Prefix Command Arguments,,,elisp}) yo
      (define-key haskell-mode-map (kbd "C-.") 'haskell-move-nested-right)))
 @end lisp
 
+@section Rectangle Commands
+
+@cindex rectangle
+@cindex CUA mode
+
+GNU Emacs provides so-called @dfn{rectangle commands} which operate on rectangular areas of text, which are particularly useful for languages with a layout rule such as Haskell. @xref{Rectangles,,,emacs}, to learn more about rectangle commands.
+
+Moreover, CUA mode (@pxref{CUA Bindings,,,emacs}) provides enhanced rectangle support with visible rectangle highlighting. When CUA mode is active, you can initiate a rectangle selection by @kbd{C-RET} and extend it simply by movement commands. You don't have to enable full CUA mode to benefit from these enhanced rectangle commands; you can activate CUA selection mode (without redefining  @kbd{C-x},@kbd{C-c},@kbd{C-v}, and @kbd{C-z}) by calling @kbd{M-x cua-selection-mode} (or adding @code{(cua-selection-mode nil)} to your @code{haskell-mode-hook}).
+
 @node haskell-decl-scan-mode
 @chapter @code{haskell-decl-scan-mode}
 
