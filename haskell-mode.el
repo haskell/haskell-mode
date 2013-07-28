@@ -439,16 +439,17 @@ CONFIGURING INDENTATION
 --------------------------------------------------------------------------------"
   :type 'hook
   :group 'haskell
-  :options `(turn-on-haskell-indent turn-on-haskell-indentation
-                                    turn-on-font-lock
-                                    ,(if (boundp 'eldoc-documentation-function)
-                                         'turn-on-eldoc-mode
-                                       'turn-on-haskell-doc-mode) ; Emacs 21
-                                    ,@(if (fboundp 'capitalized-words-mode)
-                                          '(capitalized-words-mode))
-                                    turn-on-haskell-simple-indent turn-on-haskell-doc-mode
-                                    turn-on-haskell-decl-scan imenu-add-menubar-index
-                                    turn-on-haskell-unicode-input-method))
+  :link '(info-link "(haskell-mode)haskell-mode-hook")
+  :link '(function-link haskell-mode)
+  :options `(capitalized-words-mode
+             imenu-add-menubar-index
+             turn-on-eldoc-mode
+             turn-on-haskell-decl-scan
+             turn-on-haskell-doc
+             turn-on-haskell-indent
+             turn-on-haskell-indentation
+             turn-on-haskell-simple-indent
+             turn-on-haskell-unicode-input-method))
 
 (defvar eldoc-print-current-symbol-info-function)
 
