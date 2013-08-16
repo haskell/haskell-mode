@@ -16,8 +16,7 @@
 ;;;###autoload
 (defun haskell-is-prefix-of (x y)
   "Is x string a prefix of y string?"
-  (string= (substring x 0 (min (length x) (length y)))
-           (substring y 0 (min (length x) (length y)))))
+  (string= x (substring y 0 (min (length y) (length x)))))
 
 (defun haskell-string ())
 

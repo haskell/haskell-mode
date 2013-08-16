@@ -1,22 +1,10 @@
-;; haskell-move-nested.el — Change the column of text nested below a line.
-;; Copyright (C) 2010 Chris Done <chrisdone@gmail.com>
+;;; haskell-move-nested.el --- Change the column of text nested below a line
 
-;; This module is intended for Haskell mode users, but is
-;; independent of Haskell mode.
+;; Copyright (C) 2010  Chris Done
 
-;; Example usage:
+;; Author: Chris Done <chrisdone@gmail.com>
 
-;; (require 'haskell-move-nested)
-;; (define-key haskell-mode-map (kbd "C-<left>")
-;;   (lambda ()
-;;     (interactive)
-;;     (haskell-move-nested -1)))
-
-;; (define-key haskell-mode-map (kbd "C-<right>")
-;;   (lambda ()
-;;     (interactive)
-;;     (haskell-move-nested 1)))
-
+;; This file is not part of GNU Emacs.
 
 ;; This program is free software: you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -32,14 +20,62 @@
 ;; License along with this program.  If not, see
 ;; <http://www.gnu.org/licenses/>.
 
+;;; Commentary:
+
+;; This module is intended for Haskell mode users, but is
+;; independent of Haskell mode.
+
+;; Example usage:
+
+;; (define-key haskell-mode-map (kbd "C-,") 'haskell-move-nested-left)
+;; (define-key haskell-mode-map (kbd "C-.") 'haskell-move-nested-right)
+
+;;; Code:
+
 ;;;###autoload
-(defun haskell-move-nested (columns)
+(defun haskell-move-nested (cols)
+"Shift the nested off-side-rule block adjacent to point by COLS columns to the right.
+
+In Transient Mark mode, if the mark is active, operate on the contents
+of the region instead.
+"
   (save-excursion
-    (let ((region (haskell-move-nested-region)))
-      (when region
-        (indent-rigidly (car region) (cdr region) columns)))))
+    (if (and transient-mark-mode mark-active)
+        (progn
+          (indent-rigidly (region-beginning) (region-end) cols)
+          (setq deactivate-mark nil))
+      (let ((region (haskell-move-nested-region)))
+        (when region
+          (indent-rigidly (car region) (cdr region) cols))))))
+
+;;;###autoload
+(defun haskell-move-nested-right (cols)
+  "Increase indentation of the following off-side-rule block adjacent to point.
+
+Use a numeric prefix argument to indicate amount of indentation to apply.
+
+In Transient Mark mode, if the mark is active, operate on the contents
+of the region instead."
+  (interactive "p")
+  (haskell-move-nested cols)
+)
+
+;;;###autoload
+(defun haskell-move-nested-left (cols)
+  "Decrease indentation of the following off-side-rule block adjacent to point.
+
+Use a numeric prefix argument to indicate amount of indentation to apply.
+
+In Transient Mark mode, if the mark is active, operate on the contents
+of the region instead."
+  (interactive "p")
+  (haskell-move-nested (- cols))
+)
 
 (defun haskell-move-nested-region ()
+  "Infer region off-side-rule block adjacent to point.
+Used by `haskell-move-nested'.
+"
   (save-excursion
     (let ((starting-level (current-column)))
       (forward-line)
@@ -60,8 +96,8 @@
                                 start-end-point)))))))
 
 (defun haskell-move-nested-indent-level ()
-  (max 
-   0 
+  (max
+   0
    (1- (length
         (buffer-substring-no-properties
          (line-beginning-position)
@@ -70,7 +106,7 @@
              (line-beginning-position)))))))
 
 (defun haskell-kill-nested ()
-  "Kill the nested region after this."
+  "Kill the nested region after point."
   (interactive)
   (let ((start (point))
         (reg (save-excursion
@@ -80,7 +116,7 @@
     (kill-region start (cdr reg))))
 
 (defun haskell-delete-nested ()
-  "Kill the nested region after this."
+  "Kill the nested region after point."
   (interactive)
   (let ((start (point))
         (reg (save-excursion
@@ -90,3 +126,5 @@
     (delete-region start (cdr reg))))
 
 (provide 'haskell-move-nested)
+
+;;; haskell-move-nested.el ends here

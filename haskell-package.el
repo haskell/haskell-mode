@@ -1,8 +1,10 @@
-;;; haskell-package.el — Interface for working with Cabal packages.
+;;; haskell-package.el --- Interface for working with Cabal packages
 
-;; Copyright (C) 2011 Chris Done
+;; Copyright (C) 2011  Chris Done
 
 ;; Author: Chris Done <chrisdone@gmail.com>
+
+;; This file is not part of GNU Emacs.
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -25,20 +27,24 @@
 
 ;;; Code:
 
-;;; Test data:
+(with-no-warnings (require 'cl))
 
-(defun haskell-package-conf-path-get (&optional project)
-  "Gets the user conf or the cabal-dev conf. Get the global conf elsewhere."
-  (if haskell-config-use-cabal-dev
-      (if project
-          (let* ((cabal-path (haskell-project-cabal-dir project)))
-            (format "%scabal-dev/packages-%s.conf/"
-                    (if (string-match "/$" cabal-path)
-                        cabal-path
-                      (concat cabal-path "/"))
-                    (haskell-ghc-version)))
-        (haskell-package-conf-user-path-get))
-    (haskell-package-conf-user-path-get)))
+;; Dynamically scoped variables.
+;; TODO What actually sets this?
+(defvar haskell-config-use-cabal-dev)
+
+;; (defun haskell-package-conf-path-get (&optional project)
+;;   "Gets the user conf or the cabal-dev conf. Get the global conf elsewhere."
+;;   (if haskell-config-use-cabal-dev
+;;       (if project
+;;           (let* ((cabal-path (haskell-project-cabal-dir project)))
+;;             (format "%scabal-dev/packages-%s.conf/"
+;;                     (if (string-match "/$" cabal-path)
+;;                         cabal-path
+;;                       (concat cabal-path "/"))
+;;                     (haskell-ghc-version)))
+;;         (haskell-package-conf-user-path-get))
+;;     (haskell-package-conf-user-path-get)))
 
 (defun haskell-package-conf-user-path-get ()
   "Get the user conf path."
@@ -66,10 +72,12 @@
             name
             version))))
 
+(defstruct haskell-package "Haskell package object.")
+
 (defun haskell-package-parse (text)
   "Parse a package into a package object."
   (let ((pkg (haskell-package-read-description text)))
-    (haskell-package-make
+    (make-haskell-package
      :name (cdr (assoc "name" pkg))
      :version (cdr (assoc "version" pkg))
      :id (cdr (assoc "id" pkg))
@@ -128,7 +136,7 @@
 (defun haskell-package-list-get (conf)
   "Get the list of packages in the given config."
   (haskell-package-list-parse
-   (shell-command-to-string 
+   (shell-command-to-string
     (format "ghc-pkg -f %s list"
             conf))))
 
@@ -136,7 +144,7 @@
   "Parse the list of installed packges."
   (let* ((lines (split-string text "\n    ")))
     (mapcar
-     (lambda (line) 
+     (lambda (line)
        (string-match "^{?\\([a-zA-Z0-9-_]+\\)-\\([0-9.]+\\)}?$" line)
        (cons (match-string 1 line) (match-string 2 line)))
      (delete-if
@@ -145,3 +153,9 @@
       lines))))
 
 (provide 'haskell-package)
+
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; End:
+
+;;; haskell-package.el ends here

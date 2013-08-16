@@ -1,6 +1,10 @@
-;;; haskell-show.el — A pretty printer for Haskell Show values.
+;;; haskell-show.el --- A pretty printer for Haskell Show values
 
-;; Copyright (C) 2011 Chris Done
+;; Copyright (C) 2011  Chris Done
+
+;; Author: Chris Done <chrisdone@gmail.com>
+
+;; This file is not part of GNU Emacs.
 
 ;; This program is free software: you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -17,9 +21,9 @@
 ;; <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;;
-;; It doesn't support some number literals (probably). I'm not
-;; precisely sure what values Show will always produce. There is
+
+;; It doesn't support some number literals (probably).  I'm not
+;; precisely sure what values Show will always produce.  There is
 ;; however a test suite available, so patches for extra Show support
 ;; is welcome and should be easy to test.
 
@@ -27,6 +31,7 @@
 
 (defvar sexp-show "sexp-show")
 (require 'haskell-string)
+(with-no-warnings (require 'cl))
 
 (defun haskell-show-replace-region ()
   "Replace the given region with a pretty printed version."
@@ -106,7 +111,7 @@
        (let ((curly-start (1- (point)))
              (show-len (+ column (length (haskell-show-pretty tree parens)))))
          (haskell-show-mapcar/i (lambda (field i len)
-                             (insert 
+                             (insert
                               (haskell-show-indent
                                (if (and (> i 0) (< show-len 80)) 0 column)
                                (car field)))
@@ -143,9 +148,9 @@
                    (let ((overlay (make-overlay (+ 2 str-start) (point) nil t)))
                      (overlay-put overlay 'invisible t)
                      (put-text-property (+ 2 str-start) (point) 'face 'font-lock-string-face)
-                     (let ((button (make-text-button (+ 1 str-start) (+ 2 str-start) 
+                     (let ((button (make-text-button (+ 1 str-start) (+ 2 str-start)
                                                      :type 'haskell-show-toggle-button)))
-                       (put-text-property (+ 1 str-start) (+ 2 str-start) 
+                       (put-text-property (+ 1 str-start) (+ 2 str-start)
                                           'face 'font-lock-keyword-face)
                        (button-put button 'overlay (list overlay))
                        (button-put button 'hide-on-click t)))))
@@ -182,7 +187,7 @@
   "The callback to toggle the overlay visibility."
   (let ((overlay (button-get btn 'overlay)))
     (when overlay
-      (overlay-put (car overlay) 
+      (overlay-put (car overlay)
                    'invisible (not (overlay-get (car overlay)
                                                 'invisible)))))
   (let ((hide (button-get btn 'remove-on-click)))
@@ -250,3 +255,9 @@
           s))
 
 (provide 'haskell-show)
+
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; End:
+
+;;; haskell-show.el ends here

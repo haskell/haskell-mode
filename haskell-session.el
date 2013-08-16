@@ -1,8 +1,10 @@
-;;; haskell-session.el -- Haskell sessions.
+;;; haskell-session.el --- Haskell sessions
 
-;; Copyright (C) 2011-2012 Chris Done
+;; Copyright (C) 2011-2012  Chris Done
 
 ;; Author: Chris Done <chrisdone@gmail.com>
+
+;; This file is not part of GNU Emacs.
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -25,9 +27,17 @@
 
 ;;; Code:
 
-(require 'cl)
 (require 'haskell-cabal)
 (require 'haskell-string)
+(with-no-warnings (require 'cl))
+
+(declare-function haskell-interactive-mode "haskell-interactive-mode" ())
+(declare-function haskell-kill-session-process "haskell-process" (&optional session))
+(declare-function haskell-process-start "haskell-process" (session))
+(declare-function haskell-process-cd "haskell-process" (&optional not-interactive))
+
+;; Dynamically scoped variables.
+(defvar haskell-process-type)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Globals
@@ -39,14 +49,17 @@
   "Get the filename for the TAGS file."
   (concat (haskell-session-cabal-dir session) "/TAGS"))
 
-(defun haskell-session-all-modules ()
-  "Get all modules -- installed or in the current project."
-  (remove-if (lambda (x) (string= x ""))
-             (append (haskell-session-installed-modules)
-                     (haskell-session-project-modules))))
+;;;###autoload
+(defun haskell-session-all-modules (&optional dontcreate)
+  "Get all modules -- installed or in the current project.
+If DONTCREATE is non-nil don't create a new session."
+  (append (haskell-session-installed-modules dontcreate)
+          (haskell-session-project-modules dontcreate)))
 
-(defun haskell-session-installed-modules ()
-  "Get the modules installed in the current package set."
+;;;###autoload
+(defun haskell-session-installed-modules (&optional dontcreate)
+  "Get the modules installed in the current package set.
+If DONTCREATE is non-nil don't create a new session."
   ;; TODO: Again, this makes HEAVY use of unix utilities. It'll work
   ;; fine in Linux, probably okay on OS X, and probably not at all on
   ;; Windows. Again, if someone wants to test on Windows and come up
@@ -60,20 +73,24 @@
   ;; Probably also we can take the code from inferior-haskell-mode.
   ;;
   ;; Ugliness aside, if it saves us time to type it's a winner.
+  (require 'haskell-process) ; hack for accessing haskell-process-type
   (let ((modules (shell-command-to-string
-                  (format "%s | %s | %s | %s"
-                          (if (equal 'cabal-dev haskell-process-type)
-                              (format "cabal-dev -s %s/cabal-dev ghc-pkg dump"
-                                      (haskell-session-cabal-dir (haskell-session)))
+                  (format "%s | %s | %s"
+                          (if (eq 'cabal-dev haskell-process-type)
+                              (if (or (not dontcreate) (haskell-session-maybe))
+                                  (format "cabal-dev -s %s/cabal-dev ghc-pkg dump"
+                                          (haskell-session-cabal-dir (haskell-session)))
+                                "echo ''")
                             "ghc-pkg dump")
-                          "egrep '^(exposed-modules:|                 )'"
-                          "tr ' ' '\n'"
-                          "grep '^[A-Z]'"))))
-    (split-string modules "\n")))
+                          "egrep '^(exposed-modules: |                 )[A-Z]'"
+                          "cut -c18-"))))
+    (split-string modules)))
 
-(defun haskell-session-project-modules ()
-  "Get the modules of the current project."
-  (let* ((session (haskell-session))
+(defun haskell-session-project-modules (&optional dontcreate)
+  "Get the modules of the current project.
+If DONTCREATE is non-nil don't create a new session."
+  (if (or (not dontcreate) (haskell-session-maybe))
+      (let* ((session (haskell-session))
          (modules
           (shell-command-to-string
            (format "%s && %s"
@@ -83,12 +100,43 @@
                    ;; (and possibly OS X) have egrep, Windows
                    ;; doesn't -- or does it via Cygwin or MinGW?
                    ;; This also doesn't handle module\nName. But those gits can just cut it out!
-                   "egrep '^module [^ (\r]+' * -r -I --include='*hs' -o -h | sed 's/^module //'"))))
-    (split-string modules "\n")))
+                   "egrep '^module[\t\r ]+[^(\t\r ]+' . -r -I --include='*.*hs' --include='*.hsc' -s -o -h | sed 's/^module[\t\r ]*//' | sort | uniq"))))
+    (split-string modules))))
+
+(defun haskell-session-kill (&optional leave-interactive-buffer)
+  "Kill the session process and buffer, delete the session.
+0. Prompt to kill all associated buffers.
+1. Kill the process.
+2. Kill the interactive buffer.
+3. Walk through all the related buffers and set their haskell-session to nil.
+4. Remove the session from the sessions list."
+  (interactive)
+  (let* ((session (haskell-session))
+         (name (haskell-session-name session))
+         (also-kill-buffers (y-or-n-p (format "Killing `%s'. Also kill all associated buffers?" name))))
+    (haskell-kill-session-process session)
+    (unless leave-interactive-buffer
+      (kill-buffer (haskell-session-interactive-buffer session)))
+    (loop for buffer in (buffer-list)
+          do (with-current-buffer buffer
+               (when (and (boundp 'haskell-session)
+                          (string= (haskell-session-name haskell-session) name))
+                 (setq haskell-session nil)
+                 (when also-kill-buffers
+                   (kill-buffer)))))
+    (setq haskell-sessions
+          (remove-if (lambda (session)
+                       (string= (haskell-session-name session)
+                                name))
+                     haskell-sessions))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Finding/clearing the session
 
+;; Used internally
+(defvar haskell-session)
+
+;;;###autoload
 (defun haskell-session-maybe ()
   "Maybe get the Haskell session, return nil if there isn't one."
   (if (default-boundp 'haskell-session)
@@ -113,15 +161,21 @@
 
 (defun haskell-session-from-buffer ()
   "Get the session based on the buffer."
-  (when (buffer-file-name)
-    (let ((sessions (remove-if-not (lambda (session)
-                                     (haskell-is-prefix-of (file-name-directory (buffer-file-name))
-                                                           (haskell-session-cabal-dir session)))
-                                   haskell-sessions)))
-      (sort sessions (lambda (a b) (< (length (haskell-session-cabal-dir a))
-                                      (length (haskell-session-cabal-dir b)))))
-      (when (consp sessions)
-        (car sessions)))))
+  (when (and (buffer-file-name)
+             (consp haskell-sessions))
+    (reduce (lambda (acc a)
+              (if (haskell-is-prefix-of (haskell-session-cabal-dir a)
+                                        (file-name-directory (buffer-file-name)))
+                  (if acc
+                      (if (and
+                           (> (length (haskell-session-cabal-dir a))
+                              (length (haskell-session-cabal-dir acc))))
+                          a
+                        acc)
+                    a)
+                acc))
+            haskell-sessions
+            :initial-value nil)))
 
 (defun haskell-session-new ()
   "Make a new session."
@@ -157,11 +211,6 @@
   "Clear the buffer of any Haskell session choice."
   (set (make-local-variable 'haskell-session) nil))
 
-(defun haskell-session-clear-all ()
-  "Clear the buffer of any Haskell session choice."
-  (haskell-session-clear)
-  (setq haskell-sessions nil))
-
 (defun haskell-session-change ()
   "Change the session for the current buffer."
   (interactive)
@@ -176,9 +225,9 @@
     (if (> (length file) (length cur-dir))
         (if (string= (substring file 0 (length cur-dir))
                      cur-dir)
-            (replace-regexp-in-string 
+            (replace-regexp-in-string
              "^[/\\]" ""
-             (substring file 
+             (substring file
                         (length cur-dir)))
           file)
       file)))
@@ -209,7 +258,8 @@
       (let ((buffer (get-buffer-create (format "*%s*" (haskell-session-name s)))))
         (haskell-session-set-interactive-buffer s buffer)
         (with-current-buffer buffer
-          (haskell-interactive-mode s))
+          (haskell-interactive-mode)
+          (haskell-session-assign s))
         (switch-to-buffer-other-window buffer)
         buffer))))
 
@@ -259,21 +309,24 @@
                    set-dir)
           (haskell-session-cabal-dir s))))))
 
-(defun haskell-session-get (s key)
-  "Get the session `key`."
-  (let ((x (assoc key s)))
-    (when x
-      (cdr x))))
+(defun haskell-session-get (session key)
+  "Get the SESSION's KEY value.
+Returns nil if KEY not set."
+  (cdr (assq key session)))
 
-(defun haskell-session-set (s key value) 
-  "Set the session's `key`."
-  (delete-if (lambda (prop) (equal (car prop) key)) s)
-  (setf (cdr s) (cons (cons key value)
-                      (cdr s))))
+(defun haskell-session-set (session key value)
+  "Set the SESSION's KEY to VALUE.
+Returns newly set VALUE."
+  (let ((cell (assq key session)))
+    (if cell
+        (setcdr cell value) ; modify cell in-place
+      (setcdr session (cons (cons key value) (cdr session))) ; new cell
+      value)))
 
 (provide 'haskell-session)
 
 ;; Local Variables:
 ;; byte-compile-warnings: (not cl-functions)
 ;; End:
+
 ;;; haskell-session.el ends here

@@ -1,8 +1,10 @@
-;;; haskell-menu.el -- A Haskell sessions menu.
+;;; haskell-menu.el --- A Haskell sessions menu
 
-;; Copyright (C) 2013 Chris Done
+;; Copyright (C) 2013  Chris Done
 
 ;; Author: Chris Done <chrisdone@gmail.com>
+
+;; This file is not part of GNU Emacs.
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -25,12 +27,14 @@
 
 ;;; Code:
 
-(require 'cl)
+(require 'haskell-compat)
+(require 'haskell-session)
+(require 'haskell-process)
+(with-no-warnings (require 'cl))
 
-(defcustom haskell-menu-buffer-name
-  "*haskell-menu*"
-  "The path for starting cabal-dev."
-  :group 'haskell
+(defcustom haskell-menu-buffer-name "*haskell-menu*"
+  "The name of the Haskell session menu buffer"
+  :group 'haskell-interactive
   :type 'string)
 
 ;;;###autoload
@@ -52,6 +56,15 @@ Letters do not insert themselves; instead, they are commands."
   (setq truncate-lines t)
   (haskell-menu-revert-function nil t))
 
+(defvar haskell-menu-mode-map
+  (let ((map (make-keymap)))
+    (suppress-keymap map t)
+    (define-key map (kbd "n") 'next-line)
+    (define-key map (kbd "p") 'previous-line)
+    (define-key map (kbd "RET") 'haskell-menu-mode-ret)
+    map)
+  "Key map for haskell-menu-mode.")
+
 (defun haskell-menu-revert-function (arg1 arg2)
   "Function to refresh the display."
   (let ((buffer-read-only nil)
@@ -72,23 +85,31 @@ Letters do not insert themselves; instead, they are commands."
     (haskell-menu-tabulate
      (list "Name" "PID" "Time" "RSS" "Cabal directory" "Working directory" "Command")
      (mapcar (lambda (session)
-               (let* ((process (haskell-process-process (haskell-session-process session)))
-                      (id (process-id process)))
-                 (list (propertize (haskell-session-name session) 'face 'buffer-menu-buffer)
-                       (if (process-live-p process) (number-to-string id) "-")
-                       (if (process-live-p process)
-                           (format-time-string "%H:%M:%S"
-                                               (encode-time (caddr (assoc 'etime (process-attributes id)))
-                                                            0 0 0 0 0))
-                         "-")
-                       (if (process-live-p process)
-                           (concat (number-to-string (/ (cdr (assoc 'rss (process-attributes id)))
-                                                        1024))
-                                   "MB")
-                         "-")
-                       (haskell-session-cabal-dir session)
-                       (haskell-session-current-dir session)
-                       (mapconcat 'identity (process-command process) " "))))
+               (let ((process (haskell-process-process (haskell-session-process session))))
+                 (cond
+                  (process
+                   (let ((id (process-id process)))
+                     (list (propertize (haskell-session-name session) 'face 'buffer-menu-buffer)
+                           (if (process-live-p process) (number-to-string id) "-")
+                           (if (process-live-p process)
+                               (format-time-string "%H:%M:%S"
+                                                   (encode-time (caddr (assoc 'etime (process-attributes id)))
+                                                                0 0 0 0 0))
+                             "-")
+                           (if (process-live-p process)
+                               (concat (number-to-string (/ (cdr (assoc 'rss (process-attributes id)))
+                                                            1024))
+                                       "MB")
+                             "-")
+                           (haskell-session-cabal-dir session)
+                           (haskell-session-current-dir session)
+                           (mapconcat 'identity (process-command process) " "))))
+                  (t (list (propertize (haskell-session-name session) 'face 'buffer-menu-buffer)
+                           "—"
+                           "—"
+                           "—"
+                           (haskell-session-cabal-dir session)
+                           (haskell-session-current-dir session))))))
              haskell-sessions))))
 
 (defun haskell-menu-tabulate (headings rows)
@@ -119,13 +140,25 @@ Letters do not insert themselves; instead, they are commands."
                         (nth i row))))
       (insert "\n"))))
 
-(defvar haskell-menu-mode-map
-  (let ((map (make-keymap))
-        (menu-map (make-sparse-keymap)))
-    (suppress-keymap map t)
-    menu-map))
+(defun haskell-menu-mode-ret ()
+  "Handle RET key."
+  (interactive)
+  (let* ((name (save-excursion
+                 (goto-char (line-beginning-position))
+                 (buffer-substring-no-properties (point)
+                                                 (progn (search-forward " ")
+                                                        (forward-char -1)
+                                                        (point)))))
+         (session (car (remove-if-not (lambda (session)
+                                        (string= (haskell-session-name session)
+                                                 name))
+                                      haskell-sessions))))
+    (switch-to-buffer (haskell-session-interactive-buffer session))))
+
+(provide 'haskell-menu)
 
 ;; Local Variables:
 ;; byte-compile-warnings: (not cl-functions)
 ;; End:
+
 ;;; haskell-menu.el ends here

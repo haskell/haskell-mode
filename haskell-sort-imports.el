@@ -1,11 +1,10 @@
-;; haskell-sort-imports.el — Sort the list of Haskell imports at the point alphabetically.
-;; Copyright (C) 2010 Chris Done <chrisdone@gmail.com>
+;;; haskell-sort-imports.el --- Sort the list of Haskell imports at the point alphabetically
 
-;; If the region is active it sorts the imports within the
-;; region.
+;; Copyright (C) 2010  Chris Done
 
-;; This will align and sort the columns of the current import
-;; list. It's more or less the coolest thing on the planet.
+;; Author: Chris Done <chrisdone@gmail.com>
+
+;; This file is not part of GNU Emacs.
 
 ;; This program is free software: you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -20,6 +19,16 @@
 ;; You should have received a copy of the GNU General Public
 ;; License along with this program.  If not, see
 ;; <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; If the region is active it sorts the imports within the
+;; region.
+
+;; This will align and sort the columns of the current import
+;; list.  It's more or less the coolest thing on the planet.
+
+;;; Code:
 
 (defvar haskell-sort-imports-regexp
   (concat "^\\(import[ ]+\\)"
@@ -39,7 +48,9 @@
       (if (use-region-p)
           (haskell-sort-imports-sort-imports-at (region-beginning)
                                                 (region-end)
-                                                t)
+                                                t
+                                                current-line
+                                                col)
         (haskell-sort-imports-sort-imports-at
          (save-excursion (haskell-sort-imports-goto-modules-start/end
                           'previous-line)
@@ -47,9 +58,11 @@
          (save-excursion (haskell-sort-imports-goto-modules-start/end
                           'next-line)
                          (point))
-         nil)))))
+         nil
+         current-line
+         col)))))
 
-(defun haskell-sort-imports-sort-imports-at (begin end region)
+(defun haskell-sort-imports-sort-imports-at (begin end region current-line col)
   (save-excursion
     (sort-regexp-fields nil
                         haskell-sort-imports-regexp
@@ -76,3 +89,5 @@
     (funcall direction)))
 
 (provide 'haskell-sort-imports)
+
+;;; haskell-sort-imports.el ends here
