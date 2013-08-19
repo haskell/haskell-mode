@@ -77,7 +77,7 @@
   '("-ferror-spans")
   "Any arguments for starting ghci."
   :group 'haskell-interactive
-  :type '(choice list))
+  :type '(repeat (string :tag "Argument")))
 
 (defcustom haskell-process-args-cabal-repl
   '("--ghc-option=-ferror-spans")
