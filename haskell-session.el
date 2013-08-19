@@ -73,6 +73,8 @@ If DONTCREATE is non-nil don't create a new session."
   ;; Probably also we can take the code from inferior-haskell-mode.
   ;;
   ;; Ugliness aside, if it saves us time to type it's a winner.
+  ;;
+  ;; FIXME/TODO: add support for (eq 'cabal-repl haskell-process-type)
   (require 'haskell-process) ; hack for accessing haskell-process-type
   (let ((modules (shell-command-to-string
                   (format "%s | %s | %s"

@@ -47,6 +47,8 @@ See also [[https://github.com/haskell/haskell-mode/compare/v13.07...v13.08][deta
 - Add `turn-{on,off}-haskell-doc' commands as aliases for the existing
   `turn-{on,off}-haskell-doc-mode' commands
 
+- Add support for "cabal repl" process type to `haskell-interactive-mode'
+
 * Changes in 13.7
 
 See also [[https://github.com/haskell/haskell-mode/compare/v13.06...v13.07][detailed Git history]].
