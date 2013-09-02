@@ -93,8 +93,10 @@ This is a child of `compilation-mode-map'.")
 
   (when haskell-compile-ghc-filter-linker-messages
     (delete-matching-lines "^Loading package [^ \t\r\n]+ [.]+ linking [.]+ done\\.$"
-                           (save-excursion (goto-char compilation-filter-start)
-                                           (line-beginning-position))
+                           (if (boundp 'compilation-filter-start) ;; available since Emacs 24.2
+                               (save-excursion (goto-char compilation-filter-start)
+                                               (line-beginning-position))
+                             (point-min))
                            (point))))
 
 (define-compilation-mode haskell-compilation-mode "HsCompilation"
@@ -135,7 +137,8 @@ derived from `compilation-mode'. See Info
 node `(haskell-mode)compilation' for more details."
   (interactive "P")
   (save-some-buffers (not compilation-ask-about-save)
-                     compilation-save-buffers-predicate)
+                     (if (boundp 'compilation-save-buffers-predicate) ;; since Emacs 24.1(?)
+                         compilation-save-buffers-predicate))
   (let* ((cabdir (haskell-cabal-find-dir))
          (command1 (if (eq edit-command '-)
                        haskell-compile-cabal-build-alt-command
