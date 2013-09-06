@@ -156,7 +156,7 @@ This will either look for a Cabal file or a \"module\" statement in the file."
 
 (defun inferior-haskell-string-to-strings (string)
   "Split the STRING into a list of strings."
-  (let ((i (string-match "[\"]" string)))
+  (let ((i (string-match-p "[\"]" string)))
     (if (null i) (split-string string) ; no quoting:  easy
       (append (unless (eq i 0) (split-string (substring string 0 i)))
               (let ((rfs (read-from-string string i)))
@@ -406,9 +406,9 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
   "Wrap declaration code into :{ ... :}."
   (setq code (concat code "\n"))
   (concat ":{\n"
-          (if (string-match (concat "^\\s-*"
-                                    haskell-ds-start-keywords-re)
-                            code)
+          (if (string-match-p (concat "^\\s-*"
+                                      haskell-ds-start-keywords-re)
+                              code)
               ;; non-fun-decl
               code
             ;; fun-decl, wrapping into let { .. (; ..)* }
@@ -494,7 +494,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
                           "Show type of: ")
                         nil nil sym)
            current-prefix-arg)))
-  (if (string-match "\\`\\s_+\\'" expr) (setq expr (concat "(" expr ")")))
+  (if (string-match-p "\\`\\s_+\\'" expr) (setq expr (concat "(" expr ")")))
   (let ((type (inferior-haskell-get-result (concat ":type " expr))))
     (if (not (string-match (concat "^\\(" (regexp-quote expr)
                                    "[ \t\n]+::[ \t\n]*\\(.\\|\n\\)*\\)")

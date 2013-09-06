@@ -100,7 +100,7 @@
   "Try to match the current line as a regexp."
   (let ((line (buffer-substring-no-properties (line-beginning-position)
                                               (line-end-position))))
-    (if (string-match "^import " line)
+    (if (string-match-p "^import " line)
         line
       nil)))
 

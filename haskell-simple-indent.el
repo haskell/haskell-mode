@@ -94,7 +94,7 @@ column, `tab-to-tab-stop' is done instead."
               (while (progn (beginning-of-line)
                             (not (bobp)))
                 (forward-line -1)
-                (if (not (looking-at "[ \t]*\n"))
+                (if (not (looking-at-p "[ \t]*\n"))
                     (let ((this-indentation (current-indentation)))
                       (if (or (not invisible-from)
                               (< this-indentation invisible-from))
@@ -105,7 +105,7 @@ column, `tab-to-tab-stop' is done instead."
                               ;; Is start-column inside a tab on this line?
                               (if (> (current-column) start-column)
                                   (backward-char 1))
-                              (or (looking-at "[ \t]")
+                              (or (looking-at-p "[ \t]")
                                   (skip-chars-forward "^ \t" end))
                               (skip-chars-forward " \t" end)
                               (let ((col (current-column)))
