@@ -78,8 +78,8 @@ This function supports the SafeHaskell and PackageImports syntax extensions.
 Note: doesn't detect if in {--}-style comment."
   (save-excursion
     (goto-char (line-beginning-position))
-    (if (looking-at haskell-align-imports-regexp)
-        (match-string-no-properties 4))))
+    (when (looking-at haskell-align-imports-regexp)
+      (match-string-no-properties 4))))
 
 
 (provide 'haskell-utils)

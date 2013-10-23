@@ -204,8 +204,8 @@ Preserves indentation and removes extra whitespace"
                           (forward-line arg)
                           (point)))
            (skip-chars-forward " \t")
-           (if (> (haskell-current-column) col)
-               (move-to-column col)))
+           (when (> (haskell-current-column) col)
+             (move-to-column col)))
           (t                            ; killing from not empty line:
                                         ; kill all indentation
            (goto-char old-point)
@@ -427,8 +427,8 @@ Preserves indentation and removes extra whitespace"
               (pi (haskell-indentation-previous-indentation
                    ci (haskell-indentation-find-indentations))))
          (save-excursion
-           (if (and pi (> pi (haskell-current-column)))
-               (move-to-column pi))
+           (when (and pi (> pi (haskell-current-column)))
+             (move-to-column pi))
            (delete-region (point)
                           (progn (move-to-column ci)
                                  (point))))))
@@ -942,9 +942,9 @@ Preserves indentation and removes extra whitespace"
 (defun haskell-indentation-add-where-pre-indent ()
   (haskell-indentation-push-indentation
    (+ layout-indent haskell-indentation-where-pre-offset))
-  (if (= layout-indent haskell-indentation-layout-offset)
-      (haskell-indentation-push-indentation
-       haskell-indentation-where-pre-offset)))
+  (when (= layout-indent haskell-indentation-layout-offset)
+    (haskell-indentation-push-indentation
+     haskell-indentation-where-pre-offset)))
 
 (defun haskell-indentation-add-where-post-indent (indent)
   (haskell-indentation-push-indentation

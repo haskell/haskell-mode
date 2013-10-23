@@ -558,15 +558,15 @@ the keyword is used.")
                                       (1+ start) start))
                     (< start (length string)))
           (setq notfirst t)
-          (if (or keep-nulls (< start (match-beginning 0)))
-              (setq list
-                    (cons (substring string start (match-beginning 0))
-                          list)))
-          (setq start (match-end 0)))
-        (if (or keep-nulls (< start (length string)))
+          (when (or keep-nulls (< start (match-beginning 0)))
             (setq list
-                  (cons (substring string start)
+                  (cons (substring string start (match-beginning 0))
                         list)))
+          (setq start (match-end 0)))
+        (when (or keep-nulls (< start (length string)))
+          (setq list
+                (cons (substring string start)
+                      list)))
         (nreverse list))))))
 
 ;;@cindex haskell-doc-prelude-types
@@ -613,8 +613,8 @@ the keyword is used.")
       (goto-char (point-min))
       (while (search-forward "&amp;" nil t) (replace-match "&" t t))
       (goto-char (point-min))
-      (if (re-search-forward "&[a-z]+;" nil t)
-          (error "Unexpected charref %s" (match-string 0)))
+      (when (re-search-forward "&[a-z]+;" nil t)
+        (error "Unexpected charref %s" (match-string 0)))
       ;; Remove TABS.
       (goto-char (point-min))
       (while (search-forward "\t" nil t) (replace-match "        " t t))
@@ -662,20 +662,20 @@ the keyword is used.")
             (let ((type (match-string 4))
                   (vars (match-string 3))
                   (indented (match-end 2)))
-              (if (string-match "[ \t\n][ \t\n]+" type)
-                  (setq type (replace-match " " t t type)))
-              (if (string-match " *\\(--.*\\)?\\'" type)
-                  (setq type (substring type 0 (match-beginning 0))))
+              (when (string-match "[ \t\n][ \t\n]+" type)
+                (setq type (replace-match " " t t type)))
+              (when (string-match " *\\(--.*\\)?\\'" type)
+                (setq type (substring type 0 (match-beginning 0))))
               (if indented
                   (if curclass
                       (if (string-match "\\`\\(.*[^ \t\n]\\) *=> *" type)
                           (let ((classes (match-string 1 type)))
                             (setq type (substring type (match-end 0)))
-                            (if (string-match-p "\\`(.*)\\'" classes)
-                                (setq classes (substring classes 1 -1)))
+                            (when (string-match-p "\\`(.*)\\'" classes)
+                              (setq classes (substring classes 1 -1)))
                             (setq type (concat "(" curclass ", " classes
                                                ") => " type)))
-                      (setq type (concat curclass " => " type)))
+                        (setq type (concat curclass " => " type)))
                     ;; It's actually not an error: just a type annotation on
                     ;; some local variable.
                     ;; (error "Indentation outside a class in %s: %s"
@@ -683,7 +683,7 @@ the keyword is used.")
                     nil)
                 (setq curclass nil))
               (dolist (var (haskell-doc-split-string vars comma-re t))
-                (if (string-match-p "(.*)" var) (setq var (substring var 1 -1)))
+                (when (string-match-p "(.*)" var) (setq var (substring var 1 -1)))
                 (push (cons var type) elems))))
            ;; A datatype decl.
            ((match-end 5)
@@ -696,16 +696,16 @@ the keyword is used.")
                   (while (re-search-forward val-decl-re nil t)
                     (let ((vars (match-string 2))
                           (type (match-string 3)))
-                      (if (string-match "[ \t\n][ \t\n]+" type)
-                          (setq type (replace-match " " t t type)))
-                      (if (string-match " *\\(--.*\\)?\\'" type)
-                          (setq type (substring type 0 (match-beginning 0))))
-                      (if (string-match-p ",\\'" type)
-                          (setq type (substring type 0 -1)))
+                      (when (string-match "[ \t\n][ \t\n]+" type)
+                        (setq type (replace-match " " t t type)))
+                      (when (string-match " *\\(--.*\\)?\\'" type)
+                        (setq type (substring type 0 (match-beginning 0))))
+                      (when (string-match-p ",\\'" type)
+                        (setq type (substring type 0 -1)))
                       (setq type (concat name " -> " type))
                       (dolist (var (haskell-doc-split-string vars comma-re t))
-                        (if (string-match-p "(.*)" var)
-                            (setq var (substring var 1 -1)))
+                        (when (string-match-p "(.*)" var)
+                          (setq var (substring var 1 -1)))
                         (push (cons var type) elems))))))))
 
            ;; The end of a class declaration.
@@ -1339,13 +1339,13 @@ URL is the URL of the online doc."
   (interactive)
   ;; Add the menu to the hugs menu as last entry.
   (let ((hugsmap (lookup-key (current-local-map) [menu-bar Hugs])))
-    (if (not (or (featurep 'xemacs) ; XEmacs has problems here
-                 (not (keymapp hugsmap))
-                 (lookup-key hugsmap [haskell-doc])))
-        (if (functionp 'define-key-after)
-            (define-key-after hugsmap [haskell-doc]
-              (cons "Haskell-doc" haskell-doc-keymap)
-              [Haskell-doc mode]))))
+    (unless (or (featurep 'xemacs) ; XEmacs has problems here
+                (not (keymapp hugsmap))
+                (lookup-key hugsmap [haskell-doc]))
+        (when (functionp 'define-key-after)
+          (define-key-after hugsmap [haskell-doc]
+            (cons "Haskell-doc" haskell-doc-keymap)
+            [Haskell-doc mode]))))
   ;; Add shortcuts for these commands.
   (local-set-key "\C-c\e/" 'haskell-doc-check-active)
   ;; Conflicts with the binding of haskell-insert-otherwise.
@@ -1425,8 +1425,8 @@ See variable docstring."
   "Turn on global types information in `haskell-doc-mode'."
   (interactive "P")
   (haskell-doc-toggle-var haskell-doc-show-global-types prefix)
-  (if haskell-doc-show-global-types
-      (haskell-doc-make-global-fct-index)))
+  (when haskell-doc-show-global-types
+    (haskell-doc-make-global-fct-index)))
 
 ;;@cindex haskell-doc-show-reserved
 (defun haskell-doc-show-reserved (&optional prefix)
@@ -1625,8 +1625,8 @@ the haskell-doc database."
        ((and (not (null haskell-doc-show-prelude))
              is-prelude)
         (setq type (cdr is-prelude)) ; (cdr (assoc sym haskell-doc-prelude-types)))
-        (if (= 2 (length type))      ; horrible hack to remove bad formatting
-            (setq type (car (cdr type))))
+        (when (= 2 (length type))      ; horrible hack to remove bad formatting
+          (setq type (car (cdr type))))
         (setq i-am-prelude t)
         (setq i-am-fct t)
         (setcdr haskell-doc-last-data type))
@@ -1646,18 +1646,18 @@ the haskell-doc database."
               (setcdr haskell-doc-last-data nil) ; if not found reset last data
             (setq type (car x))
             (setq i-am-fct (string= "Variables" (cdr x)))
-            (if (and haskell-doc-show-global-types (null type))
-                (setq type (haskell-doc-get-global-fct-type sym)))
+            (when (and haskell-doc-show-global-types (null type))
+              (setq type (haskell-doc-get-global-fct-type sym)))
             (setcdr haskell-doc-last-data type)))) )
       ;; ToDo: encode i-am-fct info into alist of types
       (and type
            ;; drop `::' if it's not a fct
-           (let ( (str (cond ((and i-am-fct (not haskell-doc-chop-off-fctname))
-                              (format "%s :: %s" sym type))
-                             (t
-                              (format "%s" type)))) )
-             (if i-am-prelude
-                 (add-text-properties 0 (length str) '(face bold) str))
+           (let ((str (cond ((and i-am-fct (not haskell-doc-chop-off-fctname))
+                             (format "%s :: %s" sym type))
+                            (t
+                             (format "%s" type)))))
+             (when i-am-prelude
+               (add-text-properties 0 (length str) '(face bold) str))
              str)))))
 
 
@@ -1728,19 +1728,18 @@ ToDo: Check for matching parenthesis!."
    (let ( (here (point))
           (lim (progn (beginning-of-line) (point)))
           ;; (foo "")
-          (res nil)
-          )
+          (res nil))
    (goto-char here)
    (search-backward "--" lim t) ; skip over `--' comment
    (skip-chars-backward " \t")
-   (if (bolp)                   ; skip empty lines
-      (progn
-       (forward-line 1)
-       (end-of-line)
-       (setq res (haskell-doc-wrapped-type-p)))
+   (when (bolp)                   ; skip empty lines
+     (forward-line 1)
+     (end-of-line)
+     (setq res (haskell-doc-wrapped-type-p))
    (forward-char -1)
    ;; (setq foo (concat foo (char-to-string (preceding-char)) (char-to-string (following-char))))
-   (if (or (and (or (char-equal (preceding-char) ?-) (char-equal (preceding-char) ?=))
+   (if (or (and (or (char-equal (preceding-char) ?-)
+                    (char-equal (preceding-char) ?=))
                 (char-equal (following-char) ?>)) ; (or -!> =!>
            (char-equal (following-char) ?,))      ;     !,)
        (setq res t)
@@ -1748,7 +1747,7 @@ ToDo: Check for matching parenthesis!."
      (let ((here (point)))
        (goto-char here)
        (skip-chars-forward " \t")
-       (if (looking-at "--")  ; it is a comment line
+       (if (looking-at-p "--")  ; it is a comment line
            (progn
              (forward-line 1)
              (end-of-line)
@@ -1756,8 +1755,9 @@ ToDo: Check for matching parenthesis!."
          (forward-char 1)
          ;; (setq foo (concat foo (char-to-string (preceding-char)) (char-to-string (following-char))))
          ;; (message "|%s|" foo)
-         (if (and (or (char-equal (preceding-char) ?-) (char-equal (preceding-char) ?=))
-                  (char-equal (following-char) ?>)) ; -!> or =!>
+         (when (and (or (char-equal (preceding-char) ?-)
+                        (char-equal (preceding-char) ?=))
+                    (char-equal (following-char) ?>)) ; -!> or =!>
              (setq res t))))))
    res)))
 
@@ -1840,8 +1840,8 @@ ToDo: Also eliminate leading and trailing whitespace."
       (let ((basename (match-string 1)))
         (dolist (ext '(".hs" ".lhs"))
           (let ((file (concat basename ext)))
-            (if (file-exists-p file)
-                (push file imported-file-list))))))
+            (when (file-exists-p file)
+              (push file imported-file-list))))))
     (nreverse imported-file-list)
     ;;(message imported-file-list)
     ))
@@ -1893,14 +1893,14 @@ This function switches to and potentially loads many buffers."
       (let* ( (l (car fal))
               (f (car l))
               (x (assoc fn (cdr l))) )
-        (if (not (null x))
-            (let* ( (ty (cdr x)) ; the type as string
-                    (idx (string-match "::" ty))
-                    (str (if (null idx)
-                             ty
-                           (substring ty (+ idx 2)))) )
-              (setq res (format "[%s] %s" f str))))
-          (setq fal (cdr fal))))
+        (when (not (null x))
+          (let* ( (ty (cdr x)) ; the type as string
+                  (idx (string-match "::" ty))
+                  (str (if (null idx)
+                           ty
+                         (substring ty (+ idx 2)))) )
+            (setq res (format "[%s] %s" f str))))
+        (setq fal (cdr fal))))
     res))) ; (message res)) )
 
 ;;@node Local fct type,  , Global fct type, Print fctsym
@@ -1913,23 +1913,22 @@ This function switches to and potentially loads many buffers."
   (save-excursion
     (save-match-data
       (let ((docstring "")
-            (doc nil)
-            )
+            (doc nil))
         ;; is it a local function?
         (setq docstring (haskell-doc-get-imenu-info fn "Variables"))
-        (if (not (null docstring))
-            ;; (string-match (format "^%s\\s-+::\\s-+\\(.*\\)$" fn) docstring))
-            (setq doc `(,docstring . "Variables"))) ; `(,(match-string 1 docstring) . "Variables") ))
+        (when (not (null docstring))
+          ;; (string-match (format "^%s\\s-+::\\s-+\\(.*\\)$" fn) docstring))
+          (setq doc `(,docstring . "Variables"))) ; `(,(match-string 1 docstring) . "Variables") ))
         ;; is it a type declaration?
         (setq docstring (haskell-doc-get-imenu-info fn "Types"))
-        (if (not (null docstring))
-            ;; (string-match (format "^\\s-*type\\s-+%s.*$" fn) docstring))
-            (setq doc `(,docstring . "Types"))) ; `(,(match-string 0 docstring) . "Types")) )
-        (if (not (null docstring))
-            ;; (string-match (format "^\\s-*data.*%s.*$" fn) docstring))
-            (setq doc `(,docstring . "Data"))) ; (setq doc `(,(match-string 0 docstring) . "Data")) )
+        (when (not (null docstring))
+          ;; (string-match (format "^\\s-*type\\s-+%s.*$" fn) docstring))
+          (setq doc `(,docstring . "Types"))) ; `(,(match-string 0 docstring) . "Types")) )
+        (when (not (null docstring))
+          ;; (string-match (format "^\\s-*data.*%s.*$" fn) docstring))
+          (setq doc `(,docstring . "Data"))) ; (setq doc `(,(match-string 0 docstring) . "Data")) )
         ;; return the result
-        doc ))))
+        doc))))
 
 
 ;;@appendix

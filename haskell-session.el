@@ -91,19 +91,19 @@ If DONTCREATE is non-nil don't create a new session."
 (defun haskell-session-project-modules (&optional dontcreate)
   "Get the modules of the current project.
 If DONTCREATE is non-nil don't create a new session."
-  (if (or (not dontcreate) (haskell-session-maybe))
-      (let* ((session (haskell-session))
-         (modules
-          (shell-command-to-string
-           (format "%s && %s"
-                   (format "cd %s" (haskell-session-cabal-dir session))
-                   ;; TODO: Use a different, better source. Possibly hasktags or some such.
-                   ;; TODO: At least make it cross-platform. Linux
-                   ;; (and possibly OS X) have egrep, Windows
-                   ;; doesn't -- or does it via Cygwin or MinGW?
-                   ;; This also doesn't handle module\nName. But those gits can just cut it out!
-                   "egrep '^module[\t\r ]+[^(\t\r ]+' . -r -I --include='*.*hs' --include='*.hsc' -s -o -h | sed 's/^module[\t\r ]*//' | sort | uniq"))))
-    (split-string modules))))
+  (when (or (not dontcreate) (haskell-session-maybe))
+    (let* ((session (haskell-session))
+           (modules
+            (shell-command-to-string
+             (format "%s && %s"
+                     (format "cd %s" (haskell-session-cabal-dir session))
+                     ;; TODO: Use a different, better source. Possibly hasktags or some such.
+                     ;; TODO: At least make it cross-platform. Linux
+                     ;; (and possibly OS X) have egrep, Windows
+                     ;; doesn't -- or does it via Cygwin or MinGW?
+                     ;; This also doesn't handle module\nName. But those gits can just cut it out!
+                     "egrep '^module[\t\r ]+[^(\t\r ]+' . -r -I --include='*.*hs' --include='*.hsc' -s -o -h | sed 's/^module[\t\r ]*//' | sort | uniq"))))
+      (split-string modules))))
 
 (defun haskell-session-kill (&optional leave-interactive-buffer)
   "Kill the session process and buffer, delete the session.

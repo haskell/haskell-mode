@@ -349,9 +349,9 @@ May return a qualified name."
   (save-excursion
     ;; Skip whitespace if we're on it.  That way, if we're at "map ", we'll
     ;; see the word "map".
-    (if (and (not (eobp))
-             (eq ?  (char-syntax (char-after))))
-        (skip-chars-backward " \t"))
+    (when (and (not (eobp))
+               (eq ?  (char-syntax (char-after))))
+      (skip-chars-backward " \t"))
 
     (let ((case-fold-search nil))
       (multiple-value-bind (start end)
@@ -375,7 +375,7 @@ May return a qualified name."
         ;; If we're looking at an ID that's itself qualified by previous
         ;; module IDs, add those too.
         (goto-char start)
-        (if (eq (char-after) ?.) (forward-char 1)) ;Special case for "."
+        (when (eq (char-after) ?.) (forward-char 1)) ;Special case for "."
         (while (and (eq (char-before) ?.)
                     (progn (forward-char -1)
                            (not (zerop (skip-syntax-backward "w'"))))
@@ -388,7 +388,7 @@ May return a qualified name."
 (defun haskell-delete-indentation (&optional arg)
   "Like `delete-indentation' but ignoring Bird-style \">\"."
   (interactive "*P")
-  (let ((fill-prefix (or fill-prefix (if (eq haskell-literate 'bird) ">"))))
+  (let ((fill-prefix (or fill-prefix (when (eq haskell-literate 'bird) ">"))))
     (delete-indentation arg)))
 
 ;; Various mode variables.
@@ -564,11 +564,11 @@ see documentation for that variable for more details."
            ((re-search-forward "^\\\\\\(begin\\|end\\){code}$" nil t) 'tex)
            ((re-search-forward "^>" nil t) 'bird)
            (t haskell-literate-default))))
-  (if (eq haskell-literate 'bird)
-      ;; fill-comment-paragraph isn't much use there, and even gets confused
-      ;; by the syntax-table text-properties we add to mark the first char
-      ;; of each line as a comment-starter.
-      (set (make-local-variable 'fill-paragraph-handle-comment) nil))
+  (when (eq haskell-literate 'bird)
+    ;; fill-comment-paragraph isn't much use there, and even gets confused
+    ;; by the syntax-table text-properties we add to mark the first char
+    ;; of each line as a comment-starter.
+    (set (make-local-variable 'fill-paragraph-handle-comment) nil))
   (set (make-local-variable 'mode-line-process)
        '("/" (:eval (symbol-name haskell-literate)))))
 
@@ -578,7 +578,7 @@ see documentation for that variable for more details."
 ;;;###autoload(add-to-list 'interpreter-mode-alist '("runhaskell" . haskell-mode))
 
 (defcustom haskell-hoogle-command
-  (if (executable-find "hoogle") "hoogle")
+  (when (executable-find "hoogle") "hoogle")
   "Name of the command to use to query Hoogle.
 If nil, use the Hoogle web-site."
   :group 'haskell
@@ -590,7 +590,7 @@ If nil, use the Hoogle web-site."
   "Do a Hoogle search for QUERY."
   (interactive
    (let ((def (haskell-ident-at-point)))
-     (if (and def (symbolp def)) (setq def (symbol-name def)))
+     (when (and def (symbolp def)) (setq def (symbol-name def)))
      (list (read-string (if def
                             (format "Hoogle query (default %s): " def)
                           "Hoogle query: ")
@@ -615,7 +615,7 @@ If nil, use the Hoogle web-site."
   "Do a Hayoo search for QUERY."
   (interactive
    (let ((def (haskell-ident-at-point)))
-     (if (and def (symbolp def)) (setq def (symbol-name def)))
+     (when (and def (symbolp def)) (setq def (symbol-name def)))
      (list (read-string (if def
                             (format "Hayoo query (default %s): " def)
                           "Hayoo query: ")
@@ -655,8 +655,8 @@ See `haskell-check-command' for the default."
                       (or haskell-saved-check-command
                           (concat haskell-check-command " "
                                   (let ((name (buffer-file-name)))
-                                    (if name
-                                        (file-name-nondirectory name))))))))
+                                    (when name
+                                      (file-name-nondirectory name))))))))
   (setq haskell-saved-check-command command)
   (save-some-buffers (not compilation-ask-about-save) nil)
   (compilation-start command))

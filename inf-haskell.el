@@ -80,8 +80,8 @@ The command can include arguments."
   `(("^ERROR \"\\(.+?\\)\"\\(:\\| line \\)\\([0-9]+\\) - " 1 3)
     ;; Format of error messages used by GHCi.
     ("^\\(.+?\\):\\([0-9]+\\):\\(\\([0-9]+\\):\\)?\\( \\|\n *\\)\\(Warning\\)?"
-     1 2 4 ,@(if (fboundp 'compilation-fake-loc)
-                 '((6) nil (5 '(face nil font-lock-multiline t)))))
+     1 2 4 ,@(when (fboundp 'compilation-fake-loc)
+               '((6) nil (5 '(face nil font-lock-multiline t)))))
     ;; Runtime exceptions, from ghci.
     ("^\\*\\*\\* Exception: \\(.+?\\):(\\([0-9]+\\),\\([0-9]+\\))-(\\([0-9]+\\),\\([0-9]+\\)): .*"
      1 ,@(if (fboundp 'compilation-fake-loc) '((2 . 4) (3 . 5)) '(2 3)))
@@ -186,8 +186,8 @@ setting up the inferior-haskell buffer."
     (run-hooks 'inferior-haskell-hook)))
 
 (defun inferior-haskell-process (&optional arg)
-  (or (if (buffer-live-p inferior-haskell-buffer)
-          (get-buffer-process inferior-haskell-buffer))
+  (or (when (buffer-live-p inferior-haskell-buffer)
+        (get-buffer-process inferior-haskell-buffer))
       (progn
         (let ((current-prefix-arg arg))
           (call-interactively 'inferior-haskell-start-process))
@@ -231,9 +231,9 @@ setting up the inferior-haskell buffer."
     (when proc
       (save-excursion
         (goto-char (process-mark proc))
-        (if (re-search-backward comint-prompt-regexp
-                                (line-beginning-position) t)
-            (setq inferior-haskell-seen-prompt t))))))
+        (when (re-search-backward comint-prompt-regexp
+                                  (line-beginning-position) t)
+          (setq inferior-haskell-seen-prompt t))))))
 
 (defun inferior-haskell-wait-for-prompt (proc &optional timeout)
   "Wait until PROC sends us a prompt.
@@ -279,7 +279,7 @@ The process PROC should be associated to a comint buffer."
                   ;; dir (otherwise, it may be a list of dirs and we don't
                   ;; know what to do with those).  If it doesn't exist, then
                   ;; give up.
-                  (if (file-directory-p hsd) (expand-file-name hsd))))))
+                  (when (file-directory-p hsd) (expand-file-name hsd))))))
           ;; If there's no Cabal file or it's not helpful, try to look for
           ;; a "module" statement and count the number of "." in the
           ;; module name.
@@ -348,10 +348,10 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
             ;; that it doesn't point just to the insertion point.
             ;; Otherwise insertion may move the marker (if done with
             ;; insert-before-markers) and we'd then miss some errors.
-            (if (boundp 'compilation-parsing-end)
-                (if (markerp compilation-parsing-end)
-                    (set-marker compilation-parsing-end parsing-end)
-                  (setq compilation-parsing-end parsing-end))))
+            (when (boundp 'compilation-parsing-end)
+              (if (markerp compilation-parsing-end)
+                  (set-marker compilation-parsing-end parsing-end)
+                (setq compilation-parsing-end parsing-end))))
           (with-selected-window (display-buffer (current-buffer) nil 'visible)
             (goto-char (point-max)))
           ;; Use compilation-auto-jump-to-first-error if available.
@@ -496,7 +496,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
                         nil nil sym)
            current-prefix-arg)))
   (save-match-data
-    (if (string-match-p "\\`\\s_+\\'" expr) (setq expr (concat "(" expr ")")))
+    (when (string-match-p "\\`\\s_+\\'" expr) (setq expr (concat "(" expr ")")))
     (let ((type (inferior-haskell-get-result (concat ":type " expr))))
       (if (not (string-match (concat "^\\(" (regexp-quote expr)
                                      "[ \t\n]+::[ \t\n]*\\(.\\|\n\\)*\\)")
@@ -516,7 +516,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
                           (delq (assoc sym haskell-doc-user-defined-ids)
                                 haskell-doc-user-defined-ids)))))
 
-          (if (called-interactively-p 'any) (message "%s" type))
+          (when (called-interactively-p 'any) (message "%s" type))
           (when insert-value
             (beginning-of-line)
             (insert type "\n"))
@@ -532,7 +532,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
                           "Show kind of: ")
                         nil nil type))))
   (let ((result (inferior-haskell-get-result (concat ":kind " type))))
-    (if (called-interactively-p 'any) (message "%s" result))
+    (when (called-interactively-p 'any) (message "%s" result))
     result))
 
 ;;;###autoload
@@ -545,7 +545,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
                           "Show info of: ")
                         nil nil sym))))
   (let ((result (inferior-haskell-get-result (concat ":info " sym))))
-    (if (called-interactively-p 'any) (message "%s" result))
+    (when (called-interactively-p 'any) (message "%s" result))
     result))
 
 ;;;###autoload

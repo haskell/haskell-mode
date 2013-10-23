@@ -415,23 +415,22 @@ that should be commented under LaTeX-style literate scripts."
     (if (= start end)
         ;; We're at the end.  No more to fontify.
         nil
-      (if (not (eq start haskell-fl-latex-cache-pos))
-          ;; If the start position is not cached, calculate the state
-          ;; of the start.
-          (progn
-            (setq haskell-fl-latex-cache-pos start)
-            ;; If the previous \begin{code} or \end{code} is a
-            ;; \begin{code}, then start is not in a comment, otherwise
-            ;; it is in a comment.
-            (setq haskell-fl-latex-cache-in-comment
-                  (if (and
-                       (re-search-backward
-                        "^\\(\\(\\\\begin{code}\\)\\|\\(\\\\end{code}\\)\\)$"
-                        (point-min) t)
-                       (match-end 2))
-                      nil t))
-            ;; Restore position.
-            (goto-char start)))
+      (when (not (eq start haskell-fl-latex-cache-pos))
+        ;; If the start position is not cached, calculate the state
+        ;; of the start.
+        (setq haskell-fl-latex-cache-pos start)
+        ;; If the previous \begin{code} or \end{code} is a
+        ;; \begin{code}, then start is not in a comment, otherwise
+        ;; it is in a comment.
+        (setq haskell-fl-latex-cache-in-comment
+              (if (and
+                   (re-search-backward
+                    "^\\(\\(\\\\begin{code}\\)\\|\\(\\\\end{code}\\)\\)$"
+                    (point-min) t)
+                   (match-end 2))
+                  nil t))
+        ;; Restore position.
+        (goto-char start))
       (if haskell-fl-latex-cache-in-comment
           (progn
             ;; If start is inside a comment, search for next \begin{code}.
@@ -442,9 +441,9 @@ that should be commented under LaTeX-style literate scripts."
             ;; Return point, as a normal regexp would.
             (point))
         ;; If start is inside a code block, search for next \end{code}.
-        (if (re-search-forward "^\\\\end{code}$" end t)
-            ;; If one found, mark it as a comment, otherwise finish.
-            (point))))))
+        (when (re-search-forward "^\\\\end{code}$" end t)
+          ;; If one found, mark it as a comment, otherwise finish.
+          (point))))))
 
 (defconst haskell-basic-syntactic-keywords
   '(;; Character constants (since apostrophe can't have string syntax).
@@ -545,14 +544,14 @@ that should be commented under LaTeX-style literate scripts."
 
 ;;;###autoload
 (defun haskell-font-lock-choose-keywords ()
-  (let ((literate (if (boundp 'haskell-literate) haskell-literate)))
+  (let ((literate (when (boundp 'haskell-literate) haskell-literate)))
     (case literate
       (bird haskell-font-lock-bird-literate-keywords)
       ((latex tex) haskell-font-lock-latex-literate-keywords)
       (t haskell-font-lock-keywords))))
 
 (defun haskell-font-lock-choose-syntactic-keywords ()
-  (let ((literate (if (boundp 'haskell-literate) haskell-literate)))
+  (let ((literate (when (boundp 'haskell-literate) haskell-literate)))
     (case literate
       (bird haskell-bird-syntactic-keywords)
       ((latex tex) haskell-latex-syntactic-keywords)

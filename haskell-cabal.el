@@ -103,9 +103,9 @@
 (defun haskell-cabal-buffers-clean (&optional buffer)
   (let ((bufs ()))
     (dolist (buf haskell-cabal-buffers)
-      (if (and (buffer-live-p buf) (not (eq buf buffer))
-               (with-current-buffer buf (derived-mode-p 'haskell-cabal-mode)))
-          (push buf bufs)))
+      (when (and (buffer-live-p buf) (not (eq buf buffer))
+                 (with-current-buffer buf (derived-mode-p 'haskell-cabal-mode)))
+        (push buf bufs)))
     (setq haskell-cabal-buffers bufs)))
 
 (defun haskell-cabal-unregister-buffer ()
