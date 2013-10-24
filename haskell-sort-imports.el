@@ -30,11 +30,7 @@
 
 ;;; Code:
 
-(defvar haskell-sort-imports-regexp
-  (concat "^\\(import[ ]+\\)"
-          "\\(qualified \\)?"
-          "[ ]*\\(\"[^\"]*\" \\)?"
-          "[ ]*\\([A-Za-z0-9_.']*.*\\)"))
+(require 'haskell-align-imports)
 
 ;;;###autoload
 (defun haskell-sort-imports ()
@@ -65,7 +61,7 @@
 (defun haskell-sort-imports-sort-imports-at (begin end region current-line col)
   (save-excursion
     (sort-regexp-fields nil
-                        haskell-sort-imports-regexp
+                        haskell-align-imports-regexp
                         "\\4"
                         begin end))
   (when (not region)

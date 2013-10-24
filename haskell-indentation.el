@@ -204,8 +204,8 @@ Preserves indentation and removes extra whitespace"
                           (forward-line arg)
                           (point)))
            (skip-chars-forward " \t")
-           (if (> (haskell-current-column) col)
-               (move-to-column col)))
+           (when (> (haskell-current-column) col)
+             (move-to-column col)))
           (t                            ; killing from not empty line:
                                         ; kill all indentation
            (goto-char old-point)
@@ -427,8 +427,8 @@ Preserves indentation and removes extra whitespace"
               (pi (haskell-indentation-previous-indentation
                    ci (haskell-indentation-find-indentations))))
          (save-excursion
-           (if (and pi (> pi (haskell-current-column)))
-               (move-to-column pi))
+           (when (and pi (> pi (haskell-current-column)))
+             (move-to-column pi))
            (delete-region (point)
                           (progn (move-to-column ci)
                                  (point))))))
@@ -942,9 +942,9 @@ Preserves indentation and removes extra whitespace"
 (defun haskell-indentation-add-where-pre-indent ()
   (haskell-indentation-push-indentation
    (+ layout-indent haskell-indentation-where-pre-offset))
-  (if (= layout-indent haskell-indentation-layout-offset)
-      (haskell-indentation-push-indentation
-       haskell-indentation-where-pre-offset)))
+  (when (= layout-indent haskell-indentation-layout-offset)
+    (haskell-indentation-push-indentation
+     haskell-indentation-where-pre-offset)))
 
 (defun haskell-indentation-add-where-post-indent (indent)
   (haskell-indentation-push-indentation
@@ -1000,41 +1000,42 @@ Preserves indentation and removes extra whitespace"
 
 (defun haskell-indentation-peek-token ()
   "Return token starting at point."
-  (cond ((looking-at "\\(if\\|then\\|else\\|let\\|in\\|mdo\\|rec\\|do\\|proc\\|case\\|of\\|where\\|module\\|deriving\\|data\\|type\\|newtype\\|class\\|instance\\)\\([^[:alnum:]'_]\\|$\\)")
-         (match-string-no-properties 1))
-        ((looking-at "[][(){}[,;]")
-         (match-string-no-properties 0))
-        ((looking-at "\\(\\\\\\|->\\|<-\\|::\\|=\\||\\)\\([^-:!#$%&*+./<=>?@\\\\^|~]\\|$\\)")
-         (match-string-no-properties 1))
-        ((looking-at "\\(→\\|←\\|∷\\)\\([^-:!#$%&*+./<=>?@\\\\^|~]\\|$\\)")
-         (let ((tok (match-string-no-properties 1)))
-           (or (cdr (assoc tok haskell-indentation-unicode-tokens)) tok)))
-        ((looking-at"[-:!#$%&*+./<=>?@\\\\^|~`]" )
-         'operator)
-        (t 'value)))
+  (save-match-data
+    (cond ((looking-at "\\(if\\|then\\|else\\|let\\|in\\|mdo\\|rec\\|do\\|proc\\|case\\|of\\|where\\|module\\|deriving\\|data\\|type\\|newtype\\|class\\|instance\\)\\([^[:alnum:]'_]\\|$\\)")
+           (match-string-no-properties 1))
+          ((looking-at "[][(){}[,;]")
+           (match-string-no-properties 0))
+          ((looking-at "\\(\\\\\\|->\\|<-\\|::\\|=\\||\\)\\([^-:!#$%&*+./<=>?@\\\\^|~]\\|$\\)")
+           (match-string-no-properties 1))
+          ((looking-at "\\(→\\|←\\|∷\\)\\([^-:!#$%&*+./<=>?@\\\\^|~]\\|$\\)")
+           (let ((tok (match-string-no-properties 1)))
+             (or (cdr (assoc tok haskell-indentation-unicode-tokens)) tok)))
+          ((looking-at"[-:!#$%&*+./<=>?@\\\\^|~`]" )
+           'operator)
+          (t 'value))))
 
 (defun haskell-indentation-skip-token ()
   "Skip to the next token."
-  (let ((case-fold-search nil))
-
-    (if (or (looking-at "'\\([^\\']\\|\\\\.\\)*'")
-            (looking-at "\"\\([^\\\"]\\|\\\\.\\)*\"")
-            (looking-at         ; Hierarchical names always start with uppercase
-             "[[:upper:]]\\(\\sw\\|'\\)*\\(\\.\\(\\sw\\|'\\)+\\)*")
-            (looking-at "\\sw\\(\\sw\\|'\\)*") ; Only unqualified vars can start with lowercase
-            (looking-at "[0-9][0-9oOxXeE+-]*")
-            (looking-at "[-:!#$%&*+./<=>?@\\\\^|~]+")
-            (looking-at "[](){}[,;]")
-            (looking-at "`[[:alnum:]']*`"))
+  (save-match-data
+    (let ((case-fold-search nil))
+      (if (or (looking-at "'\\([^\\']\\|\\\\.\\)*'")
+              (looking-at "\"\\([^\\\"]\\|\\\\.\\)*\"")
+              (looking-at         ; Hierarchical names always start with uppercase
+               "[[:upper:]]\\(\\sw\\|'\\)*\\(\\.\\(\\sw\\|'\\)+\\)*")
+              (looking-at "\\sw\\(\\sw\\|'\\)*") ; Only unqualified vars can start with lowercase
+              (looking-at "[0-9][0-9oOxXeE+-]*")
+              (looking-at "[-:!#$%&*+./<=>?@\\\\^|~]+")
+              (looking-at "[](){}[,;]")
+              (looking-at "`[[:alnum:]']*`"))
         (goto-char (match-end 0))
-    ;; otherwise skip until space found
-      (skip-syntax-forward "^-"))
-    (forward-comment (buffer-size))
-    (while (and (eq haskell-literate 'bird)
-                (bolp)
-                (eq (char-after) ?>))
-      (forward-char)
-      (forward-comment (buffer-size)))))
+        ;; otherwise skip until space found
+        (skip-syntax-forward "^-"))
+      (forward-comment (buffer-size))
+      (while (and (eq haskell-literate 'bird)
+                  (bolp)
+                  (eq (char-after) ?>))
+        (forward-char)
+        (forward-comment (buffer-size))))))
 
 (provide 'haskell-indentation)
 

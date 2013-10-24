@@ -38,6 +38,23 @@
 ;;       require/depend-on any other haskell-mode modules in order to
 ;;       stay at the bottom of the module dependency graph.
 
+(defvar haskell-align-imports-regexp
+  (rx bol
+      (* (any ?\t ?\s))
+      (group "import"
+             (+ (any ?\t ?\s)))
+      ;; SafeHaskell
+      (? "safe"
+         (+ (any ?\t ?\s)))
+      (? (group "qualified")
+         (+ (any ?\t ?\s)))
+      ;; PackageImports
+      (? (group "\""
+                (* (not (any ?\")))
+                "\"")
+         (+ (any ?\t ?\s)))
+      (group (* (any (?A . ?Z) (?a . ?z) (?0 . ?9) ?_ ?. ?'))
+             (* not-newline))))
 
 (defun haskell-utils-read-directory-name (prompt default)
   "Read directory name and normalize to true absolute path.
@@ -61,12 +78,8 @@ This function supports the SafeHaskell and PackageImports syntax extensions.
 Note: doesn't detect if in {--}-style comment."
   (save-excursion
     (goto-char (line-beginning-position))
-    (if (looking-at (concat "[\t ]*import[\t ]+"
-                            "\\(safe[\t ]+\\)?" ;; SafeHaskell
-                            "\\(qualified[\t ]+\\)?"
-                            "\\(\"[^\"]*\"[\t ]+\\)?" ;; PackageImports
-                            "\\([[:digit:][:upper:][:lower:].]+\\)"))
-        (match-string-no-properties 4))))
+    (when (looking-at haskell-align-imports-regexp)
+      (match-string-no-properties 4))))
 
 
 (provide 'haskell-utils)

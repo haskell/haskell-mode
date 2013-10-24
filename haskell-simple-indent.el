@@ -94,32 +94,32 @@ column, `tab-to-tab-stop' is done instead."
               (while (progn (beginning-of-line)
                             (not (bobp)))
                 (forward-line -1)
-                (if (not (looking-at "[ \t]*\n"))
-                    (let ((this-indentation (current-indentation)))
-                      (if (or (not invisible-from)
+                (when (not (looking-at-p "[ \t]*\n"))
+                  (let ((this-indentation (current-indentation)))
+                    (when (or (not invisible-from)
                               (< this-indentation invisible-from))
-                          (if (> this-indentation start-column)
-                              (setq invisible-from this-indentation)
-                            (let ((end (line-beginning-position 2)))
-                              (move-to-column start-column)
-                              ;; Is start-column inside a tab on this line?
-                              (if (> (current-column) start-column)
-                                  (backward-char 1))
-                              (or (looking-at "[ \t]")
-                                  (skip-chars-forward "^ \t" end))
-                              (skip-chars-forward " \t" end)
-                              (let ((col (current-column)))
-                                (throw 'haskell-simple-indent-break
-                                       (if (or (= (point) end)
-                                               (and invisible-from
-                                                    (> col invisible-from)))
-                                           invisible-from
-                                         col)))))))))))))
+                      (if (> this-indentation start-column)
+                          (setq invisible-from this-indentation)
+                        (let ((end (line-beginning-position 2)))
+                          (move-to-column start-column)
+                          ;; Is start-column inside a tab on this line?
+                          (when (> (current-column) start-column)
+                            (backward-char 1))
+                          (or (looking-at-p "[ \t]")
+                              (skip-chars-forward "^ \t" end))
+                          (skip-chars-forward " \t" end)
+                          (let ((col (current-column)))
+                            (throw 'haskell-simple-indent-break
+                                   (if (or (= (point) end)
+                                           (and invisible-from
+                                                (> col invisible-from)))
+                                       invisible-from
+                                     col)))))))))))))
     (if indent
         (let ((opoint (point-marker)))
           (indent-line-to indent)
-          (if (> opoint (point))
-              (goto-char opoint))
+          (when (> opoint (point))
+            (goto-char opoint))
           (set-marker opoint nil))
       (tab-to-tab-stop))))
 

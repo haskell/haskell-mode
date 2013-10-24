@@ -72,12 +72,8 @@
 ;;; Code:
 
 (with-no-warnings (require 'cl))
+(require 'haskell-utils)
 
-(defvar haskell-align-imports-regexp
-  (concat "^\\(import[ ]+\\)"
-          "\\(qualified \\)?"
-          "[ ]*\\(\"[^\"]*\" \\)?"
-          "[ ]*\\([A-Za-z0-9_.']*.*\\)"))
 
 ;;;###autoload
 (defun haskell-align-imports ()
@@ -100,7 +96,7 @@
   "Try to match the current line as a regexp."
   (let ((line (buffer-substring-no-properties (line-beginning-position)
                                               (line-end-position))))
-    (if (string-match "^import " line)
+    (if (string-match-p "^import " line)
         line
       nil)))
 
@@ -176,8 +172,8 @@
   "Are we after the imports list?"
   (save-excursion
     (goto-char (line-beginning-position))
-    (not (not (search-forward-regexp "\\( = \\|\\<instance\\>\\| :: \\)"
-                                     (line-end-position) t 1)))))
+    (not (null (search-forward-regexp "\\( = \\|\\<instance\\>\\| :: \\)"
+                                      (line-end-position) t 1)))))
 
 (provide 'haskell-align-imports)
 

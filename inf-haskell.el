@@ -80,8 +80,8 @@ The command can include arguments."
   `(("^ERROR \"\\(.+?\\)\"\\(:\\| line \\)\\([0-9]+\\) - " 1 3)
     ;; Format of error messages used by GHCi.
     ("^\\(.+?\\):\\([0-9]+\\):\\(\\([0-9]+\\):\\)?\\( \\|\n *\\)\\(Warning\\)?"
-     1 2 4 ,@(if (fboundp 'compilation-fake-loc)
-                 '((6) nil (5 '(face nil font-lock-multiline t)))))
+     1 2 4 ,@(when (fboundp 'compilation-fake-loc)
+               '((6) nil (5 '(face nil font-lock-multiline t)))))
     ;; Runtime exceptions, from ghci.
     ("^\\*\\*\\* Exception: \\(.+?\\):(\\([0-9]+\\),\\([0-9]+\\))-(\\([0-9]+\\),\\([0-9]+\\)): .*"
      1 ,@(if (fboundp 'compilation-fake-loc) '((2 . 4) (3 . 5)) '(2 3)))
@@ -156,7 +156,7 @@ This will either look for a Cabal file or a \"module\" statement in the file."
 
 (defun inferior-haskell-string-to-strings (string)
   "Split the STRING into a list of strings."
-  (let ((i (string-match "[\"]" string)))
+  (let ((i (string-match-p "[\"]" string)))
     (if (null i) (split-string string) ; no quoting:  easy
       (append (unless (eq i 0) (split-string (substring string 0 i)))
               (let ((rfs (read-from-string string i)))
@@ -186,8 +186,8 @@ setting up the inferior-haskell buffer."
     (run-hooks 'inferior-haskell-hook)))
 
 (defun inferior-haskell-process (&optional arg)
-  (or (if (buffer-live-p inferior-haskell-buffer)
-          (get-buffer-process inferior-haskell-buffer))
+  (or (when (buffer-live-p inferior-haskell-buffer)
+        (get-buffer-process inferior-haskell-buffer))
       (progn
         (let ((current-prefix-arg arg))
           (call-interactively 'inferior-haskell-start-process))
@@ -231,9 +231,9 @@ setting up the inferior-haskell buffer."
     (when proc
       (save-excursion
         (goto-char (process-mark proc))
-        (if (re-search-backward comint-prompt-regexp
-                                (line-beginning-position) t)
-            (setq inferior-haskell-seen-prompt t))))))
+        (when (re-search-backward comint-prompt-regexp
+                                  (line-beginning-position) t)
+          (setq inferior-haskell-seen-prompt t))))))
 
 (defun inferior-haskell-wait-for-prompt (proc &optional timeout)
   "Wait until PROC sends us a prompt.
@@ -279,7 +279,7 @@ The process PROC should be associated to a comint buffer."
                   ;; dir (otherwise, it may be a list of dirs and we don't
                   ;; know what to do with those).  If it doesn't exist, then
                   ;; give up.
-                  (if (file-directory-p hsd) (expand-file-name hsd))))))
+                  (when (file-directory-p hsd) (expand-file-name hsd))))))
           ;; If there's no Cabal file or it's not helpful, try to look for
           ;; a "module" statement and count the number of "." in the
           ;; module name.
@@ -348,10 +348,10 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
             ;; that it doesn't point just to the insertion point.
             ;; Otherwise insertion may move the marker (if done with
             ;; insert-before-markers) and we'd then miss some errors.
-            (if (boundp 'compilation-parsing-end)
-                (if (markerp compilation-parsing-end)
-                    (set-marker compilation-parsing-end parsing-end)
-                  (setq compilation-parsing-end parsing-end))))
+            (when (boundp 'compilation-parsing-end)
+              (if (markerp compilation-parsing-end)
+                  (set-marker compilation-parsing-end parsing-end)
+                (setq compilation-parsing-end parsing-end))))
           (with-selected-window (display-buffer (current-buffer) nil 'visible)
             (goto-char (point-max)))
           ;; Use compilation-auto-jump-to-first-error if available.
@@ -405,30 +405,31 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
 (defun inferior-haskell-wrap-decl (code)
   "Wrap declaration code into :{ ... :}."
   (setq code (concat code "\n"))
-  (concat ":{\n"
-          (if (string-match (concat "^\\s-*"
-                                    haskell-ds-start-keywords-re)
-                            code)
-              ;; non-fun-decl
-              code
-            ;; fun-decl, wrapping into let { .. (; ..)* }
-            (concat "let {\n"
-                    (mapconcat
-                     ;; adding 2 whitespaces to each line
-                     (lambda (decl)
-                       (mapconcat (lambda (s)
-                                    (concat "  " s))
-                                  (split-string decl "\n")
-                                  "\n"))
-                     ;; splitting function case-decls
-                     (let (decls)
-                       (while (string-match "^\\(\\w+\\).*\n*\\(?:\\s-+.*\n+\\)*" code)
-                         (push (match-string 0 code) decls)
-                         (setq code (substring code (match-end 0))))
-                       (reverse decls))
-                     "\n;\n")
-                    "\n}"))
-          "\n:}\n"))
+  (save-match-data
+    (concat ":{\n"
+            (if (string-match-p (concat "^\\s-*"
+                                        haskell-ds-start-keywords-re)
+                                code)
+                ;; non-fun-decl
+                code
+              ;; fun-decl, wrapping into let { .. (; ..)* }
+              (concat "let {\n"
+                      (mapconcat
+                       ;; adding 2 whitespaces to each line
+                       (lambda (decl)
+                         (mapconcat (lambda (s)
+                                      (concat "  " s))
+                                    (split-string decl "\n")
+                                    "\n"))
+                       ;; splitting function case-decls
+                       (let (decls)
+                         (while (string-match "^\\(\\w+\\).*\n*\\(?:\\s-+.*\n+\\)*" code)
+                           (push (match-string 0 code) decls)
+                           (setq code (substring code (match-end 0))))
+                         (reverse decls))
+                       "\n;\n")
+                      "\n}"))
+            "\n:}\n")))
 
 (defun inferior-haskell-flash-decl (start end &optional timeout)
   "Temporarily highlight declaration."
@@ -494,31 +495,32 @@ The returned info is cached for reuse by `haskell-doc-mode'."
                           "Show type of: ")
                         nil nil sym)
            current-prefix-arg)))
-  (if (string-match "\\`\\s_+\\'" expr) (setq expr (concat "(" expr ")")))
-  (let ((type (inferior-haskell-get-result (concat ":type " expr))))
-    (if (not (string-match (concat "^\\(" (regexp-quote expr)
-                                   "[ \t\n]+::[ \t\n]*\\(.\\|\n\\)*\\)")
-                           type))
-        (error "No type info: %s" type)
-      (progn
-        (setf type (match-string 1 type))
-        ;; Cache for reuse by haskell-doc.
-        (when (and (boundp 'haskell-doc-mode) haskell-doc-mode
-                   (boundp 'haskell-doc-user-defined-ids)
-                   ;; Haskell-doc only works for idents, not arbitrary expr.
-                   (string-match "\\`(?\\(\\s_+\\|\\(\\sw\\|\\s'\\)+\\)?[ \t]*::[ \t]*"
-                                 type))
-          (let ((sym (match-string 1 type)))
-            (setq haskell-doc-user-defined-ids
-                  (cons (cons sym (substring type (match-end 0)))
-                        (delq (assoc sym haskell-doc-user-defined-ids)
-                              haskell-doc-user-defined-ids)))))
+  (save-match-data
+    (when (string-match-p "\\`\\s_+\\'" expr) (setq expr (concat "(" expr ")")))
+    (let ((type (inferior-haskell-get-result (concat ":type " expr))))
+      (if (not (string-match (concat "^\\(" (regexp-quote expr)
+                                     "[ \t\n]+::[ \t\n]*\\(.\\|\n\\)*\\)")
+                             type))
+          (error "No type info: %s" type)
+        (progn
+          (setf type (match-string 1 type))
+          ;; Cache for reuse by haskell-doc.
+          (when (and (boundp 'haskell-doc-mode) haskell-doc-mode
+                     (boundp 'haskell-doc-user-defined-ids)
+                     ;; Haskell-doc only works for idents, not arbitrary expr.
+                     (string-match "\\`(?\\(\\s_+\\|\\(\\sw\\|\\s'\\)+\\)?[ \t]*::[ \t]*"
+                                   type))
+            (let ((sym (match-string 1 type)))
+              (setq haskell-doc-user-defined-ids
+                    (cons (cons sym (substring type (match-end 0)))
+                          (delq (assoc sym haskell-doc-user-defined-ids)
+                                haskell-doc-user-defined-ids)))))
 
-        (if (called-interactively-p 'any) (message "%s" type))
-        (when insert-value
-          (beginning-of-line)
-          (insert type "\n"))
-        type))))
+          (when (called-interactively-p 'any) (message "%s" type))
+          (when insert-value
+            (beginning-of-line)
+            (insert type "\n"))
+          type)))))
 
 ;;;###autoload
 (defun inferior-haskell-kind (type)
@@ -530,7 +532,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
                           "Show kind of: ")
                         nil nil type))))
   (let ((result (inferior-haskell-get-result (concat ":kind " type))))
-    (if (called-interactively-p 'any) (message "%s" result))
+    (when (called-interactively-p 'any) (message "%s" result))
     result))
 
 ;;;###autoload
@@ -543,7 +545,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
                           "Show info of: ")
                         nil nil sym))))
   (let ((result (inferior-haskell-get-result (concat ":info " sym))))
-    (if (called-interactively-p 'any) (message "%s" result))
+    (when (called-interactively-p 'any) (message "%s" result))
     result))
 
 ;;;###autoload
@@ -738,17 +740,18 @@ so that it can be obtained more quickly next time.")
 
 (defun inferior-haskell-map-internal-ghc-ident (ident)
   "Try to translate some internal GHC identifier to its alter ego in haskell docs."
-  (let ((head ident)
-        (tail "")
-        remapped)
-    (while (and (not
-                 (setq remapped
-                       (cdr (assoc head
-                                   inferior-haskell-ghc-internal-ident-alist))))
-                (string-match "\\.[^.]+\\'" head))
-      (setq tail (concat (match-string 0 head) tail))
-      (setq head (substring head 0 (match-beginning 0))))
-    (concat (or remapped head) tail)))
+  (save-match-data
+    (let ((head ident)
+          (tail "")
+          remapped)
+      (while (and (not
+                   (setq remapped
+                         (cdr (assoc head
+                                     inferior-haskell-ghc-internal-ident-alist))))
+                  (string-match "\\.[^.]+\\'" head))
+        (setq tail (concat (match-string 0 head) tail))
+        (setq head (substring head 0 (match-beginning 0))))
+      (concat (or remapped head) tail))))
 
 ;;;###autoload
 (defun inferior-haskell-find-haddock (sym)
