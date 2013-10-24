@@ -1775,10 +1775,11 @@ Leaves point at end of line."
 (defun haskell-doc-string-nub-ws (str)
   "Replace all sequences of whitespace in STR by just one space.
 ToDo: Also eliminate leading and trailing whitespace."
-  (let ((i -1))
-    (while (setq i (string-match " [ \t\n]+\\|[\t\n]+" str (1+ i)))
-      (setq str (replace-match " " t t str)))
-    str))
+  (save-match-data
+    (let ((i -1))
+      (while (setq i (string-match " [ \t\n]+\\|[\t\n]+" str (1+ i)))
+        (setq str (replace-match " " t t str)))
+      str)))
 
 ;; ToDo: make this more efficient!!
 ;;(defun haskell-doc-string-nub-ws (str)

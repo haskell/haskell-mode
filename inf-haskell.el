@@ -405,30 +405,31 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
 (defun inferior-haskell-wrap-decl (code)
   "Wrap declaration code into :{ ... :}."
   (setq code (concat code "\n"))
-  (concat ":{\n"
-          (if (string-match-p (concat "^\\s-*"
-                                      haskell-ds-start-keywords-re)
-                              code)
-              ;; non-fun-decl
-              code
-            ;; fun-decl, wrapping into let { .. (; ..)* }
-            (concat "let {\n"
-                    (mapconcat
-                     ;; adding 2 whitespaces to each line
-                     (lambda (decl)
-                       (mapconcat (lambda (s)
-                                    (concat "  " s))
-                                  (split-string decl "\n")
-                                  "\n"))
-                     ;; splitting function case-decls
-                     (let (decls)
-                       (while (string-match "^\\(\\w+\\).*\n*\\(?:\\s-+.*\n+\\)*" code)
-                         (push (match-string 0 code) decls)
-                         (setq code (substring code (match-end 0))))
-                       (reverse decls))
-                     "\n;\n")
-                    "\n}"))
-          "\n:}\n"))
+  (save-match-data
+    (concat ":{\n"
+            (if (string-match-p (concat "^\\s-*"
+                                        haskell-ds-start-keywords-re)
+                                code)
+                ;; non-fun-decl
+                code
+              ;; fun-decl, wrapping into let { .. (; ..)* }
+              (concat "let {\n"
+                      (mapconcat
+                       ;; adding 2 whitespaces to each line
+                       (lambda (decl)
+                         (mapconcat (lambda (s)
+                                      (concat "  " s))
+                                    (split-string decl "\n")
+                                    "\n"))
+                       ;; splitting function case-decls
+                       (let (decls)
+                         (while (string-match "^\\(\\w+\\).*\n*\\(?:\\s-+.*\n+\\)*" code)
+                           (push (match-string 0 code) decls)
+                           (setq code (substring code (match-end 0))))
+                         (reverse decls))
+                       "\n;\n")
+                      "\n}"))
+            "\n:}\n")))
 
 (defun inferior-haskell-flash-decl (start end &optional timeout)
   "Temporarily highlight declaration."
@@ -494,31 +495,32 @@ The returned info is cached for reuse by `haskell-doc-mode'."
                           "Show type of: ")
                         nil nil sym)
            current-prefix-arg)))
-  (if (string-match-p "\\`\\s_+\\'" expr) (setq expr (concat "(" expr ")")))
-  (let ((type (inferior-haskell-get-result (concat ":type " expr))))
-    (if (not (string-match (concat "^\\(" (regexp-quote expr)
-                                   "[ \t\n]+::[ \t\n]*\\(.\\|\n\\)*\\)")
-                           type))
-        (error "No type info: %s" type)
-      (progn
-        (setf type (match-string 1 type))
-        ;; Cache for reuse by haskell-doc.
-        (when (and (boundp 'haskell-doc-mode) haskell-doc-mode
-                   (boundp 'haskell-doc-user-defined-ids)
-                   ;; Haskell-doc only works for idents, not arbitrary expr.
-                   (string-match "\\`(?\\(\\s_+\\|\\(\\sw\\|\\s'\\)+\\)?[ \t]*::[ \t]*"
-                                 type))
-          (let ((sym (match-string 1 type)))
-            (setq haskell-doc-user-defined-ids
-                  (cons (cons sym (substring type (match-end 0)))
-                        (delq (assoc sym haskell-doc-user-defined-ids)
-                              haskell-doc-user-defined-ids)))))
+  (save-match-data
+    (if (string-match-p "\\`\\s_+\\'" expr) (setq expr (concat "(" expr ")")))
+    (let ((type (inferior-haskell-get-result (concat ":type " expr))))
+      (if (not (string-match (concat "^\\(" (regexp-quote expr)
+                                     "[ \t\n]+::[ \t\n]*\\(.\\|\n\\)*\\)")
+                             type))
+          (error "No type info: %s" type)
+        (progn
+          (setf type (match-string 1 type))
+          ;; Cache for reuse by haskell-doc.
+          (when (and (boundp 'haskell-doc-mode) haskell-doc-mode
+                     (boundp 'haskell-doc-user-defined-ids)
+                     ;; Haskell-doc only works for idents, not arbitrary expr.
+                     (string-match "\\`(?\\(\\s_+\\|\\(\\sw\\|\\s'\\)+\\)?[ \t]*::[ \t]*"
+                                   type))
+            (let ((sym (match-string 1 type)))
+              (setq haskell-doc-user-defined-ids
+                    (cons (cons sym (substring type (match-end 0)))
+                          (delq (assoc sym haskell-doc-user-defined-ids)
+                                haskell-doc-user-defined-ids)))))
 
-        (if (called-interactively-p 'any) (message "%s" type))
-        (when insert-value
-          (beginning-of-line)
-          (insert type "\n"))
-        type))))
+          (if (called-interactively-p 'any) (message "%s" type))
+          (when insert-value
+            (beginning-of-line)
+            (insert type "\n"))
+          type)))))
 
 ;;;###autoload
 (defun inferior-haskell-kind (type)
@@ -738,17 +740,18 @@ so that it can be obtained more quickly next time.")
 
 (defun inferior-haskell-map-internal-ghc-ident (ident)
   "Try to translate some internal GHC identifier to its alter ego in haskell docs."
-  (let ((head ident)
-        (tail "")
-        remapped)
-    (while (and (not
-                 (setq remapped
-                       (cdr (assoc head
-                                   inferior-haskell-ghc-internal-ident-alist))))
-                (string-match "\\.[^.]+\\'" head))
-      (setq tail (concat (match-string 0 head) tail))
-      (setq head (substring head 0 (match-beginning 0))))
-    (concat (or remapped head) tail)))
+  (save-match-data
+    (let ((head ident)
+          (tail "")
+          remapped)
+      (while (and (not
+                   (setq remapped
+                         (cdr (assoc head
+                                     inferior-haskell-ghc-internal-ident-alist))))
+                  (string-match "\\.[^.]+\\'" head))
+        (setq tail (concat (match-string 0 head) tail))
+        (setq head (substring head 0 (match-beginning 0))))
+      (concat (or remapped head) tail))))
 
 ;;;###autoload
 (defun inferior-haskell-find-haddock (sym)
