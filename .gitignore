@@ -1,6 +1,5 @@
 *.elc
-*~
-haskell-mode-autoloads.el
-haskell-mode.info
-haskell-mode.tmp.texi
-dir
+/haskell-mode-autoloads.el
+/haskell-mode.info
+/haskell-mode.tmp.texi
+/dir
