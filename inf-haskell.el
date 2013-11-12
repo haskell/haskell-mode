@@ -734,7 +734,8 @@ so that it can be obtained more quickly next time.")
 (defvar inferior-haskell-ghc-internal-ident-alist
   ;; FIXME: Fill this table, ideally semi-automatically.
   '(("GHC.Base.return" . "Control.Monad.return")
-    ("GHC.List" . "Data.List")))
+    ("GHC.Base.String" . "Data.String.String")
+    ("GHC.List"        . "Data.List")))
 
 (defun inferior-haskell-map-internal-ghc-ident (ident)
   "Try to translate some internal GHC identifier to its alter ego in haskell docs."
