@@ -784,11 +784,11 @@ we load it."
          (url (if (or (eq inferior-haskell-use-web-docs 'always)
                       (and (not (file-exists-p local-path))
                            (eq inferior-haskell-use-web-docs 'fallback)))
-                  (concat inferior-haskell-web-docs-base package "/" file-name
-                          ;; Jump to the symbol anchor within Haddock.
-                          "#v:" sym)
+                  (concat inferior-haskell-web-docs-base package "/" file-name)
                 (and (file-exists-p local-path)
-                     (concat "file://" local-path)))))
+                     (concat "file://" local-path))))
+         ;; Jump to the symbol within Haddock.
+         (url (concat url "#v:" sym)))
     (if url (browse-url url) (error "Local file doesn't exist"))))
 
 (provide 'inf-haskell)
