@@ -772,11 +772,9 @@ we load it."
                             (format "Find documentation of (default %s): " sym)
                           "Find documentation of: ")
                         nil nil sym))))
+  (setq sym (inferior-haskell-map-internal-ghc-ident sym))
   (let* (;; Find the module and look it up in the alist
          (module (inferior-haskell-get-module sym))
-         (full-name (inferior-haskell-map-internal-ghc-ident (concat module "." sym)))
-         (module (file-name-base full-name))
-         (sym (file-name-extension full-name))
          (alist-record (assoc module (inferior-haskell-module-alist)))
          (package (nth 1 alist-record))
          (file-name (concat (subst-char-in-string ?. ?- module) ".html"))
