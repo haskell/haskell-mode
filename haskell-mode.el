@@ -346,6 +346,13 @@ be set to the preferred literate style."
 (defun haskell-ident-at-point ()
   "Return the identifier under point, or nil if none found.
 May return a qualified name."
+  (let ((reg (haskell-ident-pos-at-point)))
+    (when reg
+      (buffer-substring-no-properties (car reg) (cdr reg)))))
+
+(defun haskell-ident-pos-at-point ()
+  "Return the span of the identifier under point, or nil if none found.
+May return a qualified name."
   (save-excursion
     ;; Skip whitespace if we're on it.  That way, if we're at "map ", we'll
     ;; see the word "map".
@@ -383,7 +390,7 @@ May return a qualified name."
                     (looking-at "[[:upper:]]"))
           (setq start (point)))
         ;; This is it.
-        (buffer-substring-no-properties start end)))))
+        (cons start end)))))
 
 (defun haskell-delete-indentation (&optional arg)
   "Like `delete-indentation' but ignoring Bird-style \">\"."
