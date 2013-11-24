@@ -268,7 +268,7 @@ If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
                     (haskell-utils-parse-import-statement-at-point))))
      (if modname
          (format ":browse! %s" modname)
-       (format (if (string-match "^[a-z][A-Z]" ident)
+       (format (if (string-match "^[a-zA-Z_]" ident)
                    ":info %s"
                  ":info (%s)")
                (or ident
