@@ -27,18 +27,13 @@
 
 (require 'haskell-mode)
 
-(defvar haskell-presentation-mode-keymap
-  (let ((map (make-keymap)))
-    (suppress-keymap map)
-    (define-key map (kbd "q") 'quit-window)
-    map)
-  "Key map for the presentation mode.")
+(define-derived-mode haskell-presentation-mode
+  haskell-mode "Presentation"
+  "Major mode for viewing Haskell snippets.
+          \\{hypertext-mode-map}"
+  (setq case-fold-search nil))
 
-(define-minor-mode haskell-presentation-mode
-  "Mode for presenting Haskell values."
-  :lighter "-Presentation"
-  :keymap haskell-presentation-mode-keymap
-  (setq buffer-read-only t))
+(define-key haskell-presentation-mode-map (kbd "q") 'quit-window)
 
 (defun haskell-present (name session code)
   "Present CODE in a popup buffer suffixed with NAME and set
@@ -46,13 +41,10 @@ SESSION as the current haskell-session."
   (let* ((name (format "*Haskell Presentation%s*" name))
          (buffer (get-buffer-create name)))
     (with-current-buffer buffer
-      (unless (eq major-mode 'haskell-mode)
-        (haskell-mode)
-        (haskell-presentation-mode)
-        (font-lock-mode -1))
+      (haskell-presentation-mode)
       (let ((buffer-read-only nil))
         (erase-buffer)
-        (insert (propertize "Hit `q' to close this window.\n\n"
+        (insert (propertize "-- Hit `q' to close this window.\n\n"
                             'face
                             'font-lock-comment-face))
         (let ((point (point)))
