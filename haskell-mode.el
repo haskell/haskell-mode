@@ -852,6 +852,14 @@ given a prefix arg."
            "*.hs" ;; TODO: common Haskell extensions.
            (haskell-session-current-dir (haskell-session)))))
 
+(defun haskell-fontify-as-mode (text mode)
+  "Fontify TEXT as MODE, returning the fontified text."
+  (with-temp-buffer
+    (funcall mode)
+    (insert text)
+    (font-lock-fontify-buffer)
+    (buffer-substring (point-min) (point-max))))
+
 
 ;; Provide ourselves:
 
