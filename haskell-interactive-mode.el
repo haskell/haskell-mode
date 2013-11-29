@@ -261,7 +261,7 @@ Key bindings:
     (move-beginning-of-line nil)))
 
 (defun haskell-interactive-mode-clear ()
-  "Newline and indent at the prompt."
+  "Clear the screen and put any current input into the history."
   (interactive)
   (let ((session (haskell-session)))
     (with-current-buffer (haskell-session-interactive-buffer session)
@@ -503,7 +503,7 @@ SESSION, otherwise operate on the current buffer.
           result)))))
 
 (defun haskell-interactive-mode-tab ()
-  "The tab command."
+  "Do completion if at prompt or else try collapse/expand."
   (interactive)
   (cond
    ((haskell-interactive-at-prompt)
