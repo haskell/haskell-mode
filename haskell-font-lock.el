@@ -204,7 +204,7 @@ Regexp match data 0 points to the chars."
             (memq (char-syntax (or (char-after end) ?\ )) syntaxes)
             (memq (get-text-property start 'face)
                   '(font-lock-doc-face font-lock-string-face
-                    font-lock-comment-face))
+                                       font-lock-comment-face))
             (and (consp (setq sym-data (cdr (assoc (match-string 0) alist))))
                  (let ((pred (cadr sym-data)))
                    (setq sym-data (car sym-data))

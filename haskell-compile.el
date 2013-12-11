@@ -112,7 +112,7 @@ See Info node `(haskell-mode)compilation' for more details."
 
   (add-hook 'compilation-filter-hook
             'haskell-compilation-filter-hook nil t)
-)
+  )
 
 ;;;###autoload
 (defun haskell-compile (&optional edit-command)

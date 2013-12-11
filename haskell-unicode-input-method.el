@@ -42,18 +42,18 @@ Designed to be used with the Haskell UnicodeSyntax language
 extension in combination with the x-unicode-symbols set of
 packages (base-unicode-symbols and containers-unicode-symbols).
 "                  ;; docstring
-  nil              ;; translation-keys
-  nil              ;; forget-last-selection
-  nil              ;; deterministic
-  nil              ;; kbd-translate
-  nil              ;; show-layout
-  nil              ;; create-decode-map
-  nil              ;; maximum-shortest
-  nil              ;; overlay-plist
-  nil              ;; update-translation-function
-  nil              ;; conversion-keys
-  t                ;; simple
-  )
+ nil              ;; translation-keys
+ nil              ;; forget-last-selection
+ nil              ;; deterministic
+ nil              ;; kbd-translate
+ nil              ;; show-layout
+ nil              ;; create-decode-map
+ nil              ;; maximum-shortest
+ nil              ;; overlay-plist
+ nil              ;; update-translation-function
+ nil              ;; conversion-keys
+ t                ;; simple
+ )
 
 (quail-define-rules
  ;; Greek letters
@@ -294,7 +294,7 @@ packages (base-unicode-symbols and containers-unicode-symbols).
  ("^7 "              ["⁷"])
  ("^8 "              ["⁸"])
  ("^9 "              ["⁹"])
-)
+ )
 
 (provide 'haskell-unicode-input-method)
 

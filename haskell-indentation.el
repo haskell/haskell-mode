@@ -384,25 +384,25 @@ Preserves indentation and removes extra whitespace"
      (delete-region (mark) (point)))
     ((or (= (haskell-current-column) 0)
          (> (haskell-current-column) (haskell-indentation-current-indentation))
-        (nth 8 (syntax-ppss)))
+         (nth 8 (syntax-ppss)))
      (delete-char (- n)))
     (haskell-indentation-delete-backward-indentation
-       (let* ((ci (haskell-indentation-current-indentation))
-              (pi (haskell-indentation-previous-indentation
-                   ci (haskell-indentation-find-indentations))))
-         (save-excursion
-           (cond (pi
-                  (move-to-column pi)
-                  (delete-region (point)
+     (let* ((ci (haskell-indentation-current-indentation))
+            (pi (haskell-indentation-previous-indentation
+                 ci (haskell-indentation-find-indentations))))
+       (save-excursion
+         (cond (pi
+                (move-to-column pi)
+                (delete-region (point)
+                               (progn (move-to-column ci)
+                                      (point))))
+               (t
+                (if (not haskell-indentation-delete-backward-jump-line)
+                    (delete-char (- 1))
+                  (beginning-of-line)
+                  (delete-region (max (point-min) (- (point) 1))
                                  (progn (move-to-column ci)
-                                        (point))))
-                 (t
-                  (if (not haskell-indentation-delete-backward-jump-line)
-                      (delete-char (- 1))
-                    (beginning-of-line)
-                    (delete-region (max (point-min) (- (point) 1))
-                                   (progn (move-to-column ci)
-                                          (point)))))))))
+                                        (point)))))))))
     (t (delete-char (- n))))))
 
 (defun haskell-indentation-delete-char (n)
@@ -410,29 +410,29 @@ Preserves indentation and removes extra whitespace"
   (if (haskell-indentation-outside-bird-line)
       (delete-char n)
     (on-parse-error (delete-char n)
-     (cond
-      ((and delete-selection-mode
-            mark-active
-            (not (= (point) (mark))))
-       (delete-region (mark) (point)))
-      ((and (eq haskell-literate 'bird)
-            (looking-at "\n> "))
-       (delete-char (+ n 2)))
-      ((or (eolp)
-           (>= (haskell-current-column) (haskell-indentation-current-indentation))
-           (nth 8 (syntax-ppss)))
-       (delete-char n))
-      (haskell-indentation-delete-indentation
-       (let* ((ci (haskell-indentation-current-indentation))
-              (pi (haskell-indentation-previous-indentation
-                   ci (haskell-indentation-find-indentations))))
-         (save-excursion
-           (if (and pi (> pi (haskell-current-column)))
-               (move-to-column pi))
-           (delete-region (point)
-                          (progn (move-to-column ci)
-                                 (point))))))
-    (t (delete-char (- n)))))))
+                    (cond
+                     ((and delete-selection-mode
+                           mark-active
+                           (not (= (point) (mark))))
+                      (delete-region (mark) (point)))
+                     ((and (eq haskell-literate 'bird)
+                           (looking-at "\n> "))
+                      (delete-char (+ n 2)))
+                     ((or (eolp)
+                          (>= (haskell-current-column) (haskell-indentation-current-indentation))
+                          (nth 8 (syntax-ppss)))
+                      (delete-char n))
+                     (haskell-indentation-delete-indentation
+                      (let* ((ci (haskell-indentation-current-indentation))
+                             (pi (haskell-indentation-previous-indentation
+                                  ci (haskell-indentation-find-indentations))))
+                        (save-excursion
+                          (if (and pi (> pi (haskell-current-column)))
+                              (move-to-column pi))
+                          (delete-region (point)
+                                         (progn (move-to-column ci)
+                                                (point))))))
+                     (t (delete-char (- n)))))))
 
 (defun haskell-indentation-goto-least-indentation ()
   (beginning-of-line)
@@ -747,13 +747,13 @@ Preserves indentation and removes extra whitespace"
         ))
 
 (defun haskell-indentation-statement-right (parser)
-    (haskell-indentation-read-next-token)
-    (when (eq current-token 'end-tokens)
-      (haskell-indentation-add-indentation
-       (+ left-indent haskell-indentation-left-offset))
-      (throw 'parse-end nil))
-    (let ((current-indent (haskell-current-column)))
-          (funcall parser)))
+  (haskell-indentation-read-next-token)
+  (when (eq current-token 'end-tokens)
+    (haskell-indentation-add-indentation
+     (+ left-indent haskell-indentation-left-offset))
+    (throw 'parse-end nil))
+  (let ((current-indent (haskell-current-column)))
+    (funcall parser)))
 
 (defun haskell-indentation-simple-declaration ()
   (haskell-indentation-expression)
@@ -875,8 +875,8 @@ Preserves indentation and removes extra whitespace"
                (haskell-indentation-read-next-token))
               ((eq current-token 'end-tokens)
                (when (or (haskell-indentation-expression-token following-token)
-                                         (string= following-token ";"))
-                         (haskell-indentation-add-layout-indent))
+                         (string= following-token ";"))
+                 (haskell-indentation-add-layout-indent))
                (throw 'return nil))
               (t (throw 'return nil))))))
   ;; put haskell-indentation-read-next-token outside the current-indent definition
@@ -1027,7 +1027,7 @@ Preserves indentation and removes extra whitespace"
             (looking-at "[](){}[,;]")
             (looking-at "`[[:alnum:]']*`"))
         (goto-char (match-end 0))
-    ;; otherwise skip until space found
+      ;; otherwise skip until space found
       (skip-syntax-forward "^-"))
     (forward-comment (buffer-size))
     (while (and (eq haskell-literate 'bird)

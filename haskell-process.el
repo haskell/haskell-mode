@@ -280,7 +280,7 @@ If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
                  ":info (%s)")
                (or ident
                    (haskell-ident-at-point)))))
-     'haskell-mode))
+   'haskell-mode))
 
 (defun haskell-process-do-try-info (sym)
   "Get info of `sym' and echo in the minibuffer."
