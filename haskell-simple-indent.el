@@ -62,6 +62,8 @@
 ;; All functions/variables start with
 ;; `(turn-(on/off)-)haskell-simple-indent'.
 
+(require 'haskell-mode)
+
 (defgroup haskell-simple-indent nil
   "Simple Haskell indentation."
   :link '(custom-manual "(haskell-mode)Indentation")
