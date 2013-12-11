@@ -6,6 +6,24 @@ This file uses Org mode. Some useful (default) key-bindings:
  - Use "<backtab>" to cycle visibility of all nodes
  - Use "C-c C-o" to open links
 
+* Changes in 13.10
+
+- Small fix for haskell-simple-indent: Certain indentation situations
+  cause valname-string to be nil, which haskell-trim did not handle
+  gracefully (naturally, since nil != "").
+
+- Luke Hoersten's Shnippet merged in under snippets/.
+
+- haskell-presentation-mode is now a haskell-mode derived mode.
+
+- Small improvement to haskell-process-do-info (works on constructors
+  now and underscored names).
+
+- Add haskell-indent-spaces configuration variable.
+
+- The command string to run cabal commands is slightly more
+  configurable. See: C-h f haskell-process-do-cabal-format-string
+
 * Changes in 13.8
 
 See also [[https://github.com/haskell/haskell-mode/compare/v13.07...v13.08][detailed Git history]].
