@@ -652,7 +652,7 @@ If nil, use the Hoogle web-site."
 (defvar haskell-saved-check-command nil
   "Internal use.")
 
-(defcustom haskell-tab-width tab-width
+(defcustom haskell-indent-spaces 2
   "Number of spaces to indent inwards.")
 
 ;; Like Python.  Should be abstracted, sigh.
