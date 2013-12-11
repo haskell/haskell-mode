@@ -91,6 +91,13 @@ pass additional flags to `ghc'."
   :group 'haskell-interactive
   :type '(repeat (string :tag "Argument")))
 
+(defcustom haskell-process-do-cabal-format-string
+  ":!cd %s && %s"
+  "The way to run cabal comands. It takes two arguments -- the directory and the command.
+See `haskell-process-do-cabal' for more details."
+  :group 'haskell-interactive
+  :type 'string)
+
 (defcustom haskell-process-type
   'ghci
   "The inferior Haskell process type to use."
@@ -431,8 +438,8 @@ to be loaded by ghci."
       (lambda (state)
         (haskell-process-send-string
          (cadr state)
-         (format ":!%s && %s"
-                 (format "cd %s" (haskell-session-cabal-dir (car state)))
+         (format haskell-process-do-cabal-format-string
+                 (haskell-session-cabal-dir (car state))
                  (format "%s %s"
                          (ecase haskell-process-type
                            ('ghci "cabal")
