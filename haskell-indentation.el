@@ -378,8 +378,8 @@ Preserves indentation and removes extra whitespace"
    (cond
     ((haskell-indentation-outside-bird-line)
      (delete-char (- n)))
-    ((and delete-selection-mode
-          mark-active
+    ((and (use-region-p)
+          delete-active-region
           (not (= (point) (mark))))
      (delete-region (mark) (point)))
     ((or (= (haskell-current-column) 0)
