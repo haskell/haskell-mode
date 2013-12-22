@@ -69,6 +69,26 @@ Note: doesn't detect if in {--}-style comment."
         (match-string-no-properties 4))))
 
 
+(defvar haskell-utils-operator-name-chars
+  "-!#$%&*+./<=>?@^|~:\\"
+  "Characters that can constitute Haskell operators.")
+
+(defvar haskell-utils-operator-name-regexp
+  (concat "[" haskell-utils-operator-name-chars "]+")
+  "Regexp matching all operator names, including data and type operators.")
+
+(defvar haskell-utils-qualified-operator-name-regexp
+  (concat "\\(\\(?:[[:upper:]][[:alnum:]'_]*\\.\\)+\\)"
+          haskell-utils-operator-name-regexp)
+  "Regexp matching qualified operator names, e.g. ++, Data.Map.!.")
+
+(defun haskell-utils-unqualify-op (op)
+  "Remove module qualification, if any, from operator name OP."
+  (save-match-data
+    (if (string-match haskell-utils-qualified-operator-name-regexp op)
+      (replace-match "" nil nil op 1)
+      op)))
+
 (provide 'haskell-utils)
 
 ;;; haskell-utils.el ends here
