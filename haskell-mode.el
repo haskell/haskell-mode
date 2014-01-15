@@ -800,13 +800,28 @@ remains unchanged."
 (defun haskell-mode-tag-find (&optional next-p)
   "The tag find function, specific for the particular session."
   (interactive "P")
-  (let ((tags-file-name (haskell-session-tags-filename (haskell-session)))
-        (tags-revert-without-query t)
-        (ident (haskell-ident-at-point)))
-    (when (not (string= "" (haskell-trim ident)))
-      (cond ((file-exists-p tags-file-name)
-             (find-tag ident next-p))
-            (t (haskell-process-generate-tags ident))))))
+  (cond
+   ((eq 'font-lock-string-face
+        (get-text-property (point) 'face))
+    (let* ((string (save-excursion
+                    (buffer-substring-no-properties
+                     (1+ (search-backward-regexp "\"" (line-beginning-position) nil 1))
+                     (1- (progn (forward-char 1)
+                                (search-forward-regexp "\"" (line-end-position) nil 1))))))
+           (fp (expand-file-name string
+                                  (haskell-session-cabal-dir (haskell-session)))))
+      (find-file
+       (read-file-name
+        ""
+        fp
+        fp))))
+   (t (let ((tags-file-name (haskell-session-tags-filename (haskell-session)))
+            (tags-revert-without-query t)
+            (ident (haskell-ident-at-point)))
+        (when (not (string= "" (haskell-trim ident)))
+          (cond ((file-exists-p tags-file-name)
+                 (find-tag ident next-p))
+                (t (haskell-process-generate-tags ident))))))))
 
 ;; From Bryan O'Sullivan's blog:
 ;; http://www.serpentine.com/blog/2007/10/09/using-emacs-to-insert-scc-annotations-in-haskell-code/
