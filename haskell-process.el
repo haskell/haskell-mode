@@ -737,8 +737,8 @@ from `module-buffer'."
                                nil
                                haskell-process-path-cabal)
                          '("repl") haskell-process-args-cabal-repl
-                          (let ((target (haskell-session-target session)))
-                            (if target (list target) nil)))))
+                         (let ((target (haskell-session-target session)))
+                           (if target (list target) nil)))))
          ('cabal-ghci
           (haskell-process-log (format "Starting inferior cabal-ghci process using %s ..."
                                        haskell-process-path-cabal-ghci))
