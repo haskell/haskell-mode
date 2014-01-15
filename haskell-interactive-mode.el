@@ -603,6 +603,11 @@ FILE-NAME only."
   (with-current-buffer (haskell-session-interactive-buffer session)
     (save-excursion
       (goto-char (point-min))
+      (when (search-forward-regexp "^Compilation failed.$" nil t 1)
+        (let ((inhibit-read-only t))
+          (delete-region (line-beginning-position)
+                         (1+ (line-end-position))))
+        (goto-char (point-min)))
       (while (when (re-search-forward haskell-interactive-mode-error-regexp nil t)
                (let ((msg-file-name (match-string-no-properties 1))
                      (msg-startpos (line-beginning-position)))
