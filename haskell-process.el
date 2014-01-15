@@ -659,14 +659,25 @@ from `module-buffer'."
            (haskell-process-suggest-pragma session "LANGUAGE" "OverloadedStrings" file)))))
 
 (defun haskell-process-suggest-remove-import (session file import line)
-  (when (y-or-n-p (format "The import line `%s' is redundant. Remove? " import))
-    (haskell-process-find-file session file)
-    (save-excursion
-      (goto-char (point-min))
-      (forward-line (1- line))
-      (goto-char (line-beginning-position))
-      (delete-region (line-beginning-position)
-                     (line-end-position)))))
+  "Suggest removing or commenting out IMPORT on LINE."
+  (case (read-key (propertize (format "The import line `%s' is redundant. Remove? (y, n, c: comment out)  "
+                                      import)
+                              'face 'minibuffer-prompt))
+    (?y
+     (haskell-process-find-file session file)
+     (save-excursion
+       (goto-char (point-min))
+       (forward-line (1- line))
+       (goto-char (line-beginning-position))
+       (delete-region (line-beginning-position)
+                      (line-end-position))))
+    (?c
+     (haskell-process-find-file session file)
+     (save-excursion
+       (goto-char (point-min))
+       (forward-line (1- line))
+       (goto-char (line-beginning-position))
+       (insert "-- ")))))
 
 (defun haskell-process-suggest-pragma (session pragma extension file)
   "Suggest to add something to the top of the file."
