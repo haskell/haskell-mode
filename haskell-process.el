@@ -33,6 +33,7 @@
 (require 'haskell-str)
 (require 'haskell-utils)
 (require 'haskell-presentation-mode)
+(require 'haskell-navigate-imports)
 (with-no-warnings (require 'cl))
 
 ;; FIXME: haskell-process shouldn't depend on haskell-interactive-mode to avoid module-dep cycles
@@ -181,6 +182,7 @@ imports become available?"
   :type 'boolean
   :group 'haskell-interactive)
 
+(defvar haskell-imported-suggested nil)
 (defvar haskell-process-prompt-regex "\\(^[> ]*> $\\|\n[> ]*> $\\)")
 (defvar haskell-reload-p nil)
 
@@ -467,7 +469,8 @@ to be loaded by ghci."
         (let* ((process (cadr state))
                (session (haskell-process-session process))
                (message-count 0)
-               (cursor (haskell-process-response-cursor process)))
+               (cursor (haskell-process-response-cursor process))
+               (haskell-imported-suggested (list)))
           (haskell-process-set-response-cursor process 0)
           (while (haskell-process-errors-warnings session process response)
             (setq message-count (1+ message-count)))
@@ -522,7 +525,7 @@ actual Emacs buffer of the module being loaded."
         ((haskell-process-consume process "Failed, modules loaded: \\(.+\\)\\.$")
          (let* ((modules (haskell-process-extract-modules buffer))
                 (cursor (haskell-process-response-cursor process))
-                (imported-suggested (list)))
+                (haskell-imported-suggested (list)))
            (haskell-process-set-response-cursor process 0)
            (while (haskell-process-errors-warnings session process buffer))
            (haskell-process-set-response-cursor process cursor)
@@ -675,13 +678,13 @@ now."
   (let* ((ident (match-string 1 msg))
          (module (haskell-process-hoogle-ident ident)))
     (when module
-      (unless (member module imported-suggested)
+      (unless (member module haskell-imported-suggested)
        (when (y-or-n-p
               (format
                "Identifier `%s' not in scope, import `%s'?"
                ident
                module))
-         (push module imported-suggested)
+         (push module haskell-imported-suggested)
          (haskell-process-find-file session file)
          (save-excursion
            (haskell-navigate-imports)
