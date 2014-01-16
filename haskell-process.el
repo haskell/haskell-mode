@@ -122,6 +122,12 @@ See `haskell-process-do-cabal' for more details."
   :type 'boolean
   :group 'haskell-interactive)
 
+(defcustom haskell-process-suggest-hoogle-imports
+  t
+  "Suggest to add import statements using Hoogle as a backend."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defcustom haskell-process-suggest-language-pragmas
   t
   "Suggest adding LANGUAGE pragmas recommended by GHC."
@@ -515,7 +521,8 @@ actual Emacs buffer of the module being loaded."
               (if reload "Reloaded OK." "OK.")))))
         ((haskell-process-consume process "Failed, modules loaded: \\(.+\\)\\.$")
          (let* ((modules (haskell-process-extract-modules buffer))
-                (cursor (haskell-process-response-cursor process)))
+                (cursor (haskell-process-response-cursor process))
+                (imported-suggested (list)))
            (haskell-process-set-response-cursor process 0)
            (while (haskell-process-errors-warnings session process buffer))
            (haskell-process-set-response-cursor process cursor)
@@ -656,7 +663,40 @@ from `module-buffer'."
            (haskell-process-suggest-pragma session "OPTIONS" "-fno-warn-orphans" file)))
         ((string-match "against inferred type `\\[Char\\]'" msg)
          (when haskell-process-suggest-overloaded-strings
-           (haskell-process-suggest-pragma session "LANGUAGE" "OverloadedStrings" file)))))
+           (haskell-process-suggest-pragma session "LANGUAGE" "OverloadedStrings" file)))
+        ((string-match "^Not in scope: `\\(.+\\)'$" msg)
+         (when haskell-process-suggest-hoogle-imports
+           (haskell-process-suggest-hoogle-imports session msg file)))))
+
+(defun haskell-process-suggest-hoogle-imports (session msg file)
+  "Given an out of scope identifier, Hoogle for that identifier,
+and if a result comes back, suggest to import that identifier
+now."
+  (let* ((ident (match-string 1 msg))
+         (module (haskell-process-hoogle-ident ident)))
+    (when module
+      (unless (member module imported-suggested)
+       (when (y-or-n-p
+              (format
+               "Identifier `%s' not in scope, import `%s'?"
+               ident
+               module))
+         (push module imported-suggested)
+         (haskell-process-find-file session file)
+         (save-excursion
+           (haskell-navigate-imports)
+           (insert "import " module "\n")
+           (haskell-sort-imports)
+           (haskell-align-imports)))))))
+
+(defun haskell-process-hoogle-ident (ident)
+  "Hoogle for IDENT, returns either an import or nil."
+  (with-temp-buffer
+    (call-process "hoogle" nil t nil "search" "-n" "1" "--exact" ident)
+    (goto-char (point-min))
+    (unless (looking-at "^No results found")
+      (buffer-substring-no-properties (point-min)
+                                      (1- (search-forward " "))))))
 
 (defun haskell-process-suggest-remove-import (session file import line)
   "Suggest removing or commenting out IMPORT on LINE."
