@@ -736,30 +736,38 @@ file. Prompts the user before doing so."
 and if a result comes back, suggest to import that identifier
 now."
   (let* ((ident (match-string 1 msg))
-         (module (haskell-process-hoogle-ident ident)))
+         (modules (haskell-process-hoogle-ident ident))
+         (module (cond
+                  ((> (length modules) 1)
+                   (when (y-or-n-p (format "Identifier `%s' not in scope, choose module to import?"
+                                           ident))
+                     (ido-completing-read "Module: " modules)))
+                  ((= (length modules) 1)
+                   (when (y-or-n-p (format "Identifier `%s' not in scope, import `%s'?"
+                                           ident
+                                           (car modules)))
+                     (car modules))))))
     (when module
       (unless (member module haskell-imported-suggested)
-        (when (y-or-n-p
-               (format
-                "Identifier `%s' not in scope, import `%s'?"
-                ident
-                module))
-          (push module haskell-imported-suggested)
-          (haskell-process-find-file session file)
-          (save-excursion
-            (haskell-navigate-imports)
-            (insert "import " module "\n")
-            (haskell-sort-imports)
-            (haskell-align-imports)))))))
+        (push module haskell-imported-suggested)
+        (haskell-process-find-file session file)
+        (save-excursion
+          (goto-char (point-max))
+          (haskell-navigate-imports)
+          (insert "import " module "\n")
+          (haskell-sort-imports)
+          (haskell-align-imports))))))
 
 (defun haskell-process-hoogle-ident (ident)
-  "Hoogle for IDENT, returns either an import or nil."
+  "Hoogle for IDENT, returns a list of modules."
   (with-temp-buffer
-    (call-process "hoogle" nil t nil "search" "-n" "1" "--exact" ident)
+    (call-process "hoogle" nil t nil "search" "--exact" ident)
     (goto-char (point-min))
     (unless (looking-at "^No results found")
-      (buffer-substring-no-properties (point-min)
-                                      (1- (search-forward " "))))))
+      (replace-regexp "^\\([^ ]+\\).*$" "\\1")
+      (remove-if (lambda (a) (string= "" a))
+                 (split-string (buffer-string)
+                               "\n")))))
 
 (defun haskell-process-suggest-remove-import (session file import line)
   "Suggest removing or commenting out IMPORT on LINE."
