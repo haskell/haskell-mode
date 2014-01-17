@@ -763,7 +763,8 @@ now."
   (with-temp-buffer
     (call-process "hoogle" nil t nil "search" "--exact" ident)
     (goto-char (point-min))
-    (unless (looking-at "^No results found")
+    (unless (or (looking-at "^No results found")
+                (looking-at "^package "))
       (replace-regexp "^\\([^ ]+\\).*$" "\\1")
       (remove-if (lambda (a) (string= "" a))
                  (split-string (buffer-string)
