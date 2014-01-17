@@ -129,6 +129,13 @@ See `haskell-process-do-cabal' for more details."
   :type 'boolean
   :group 'haskell-interactive)
 
+(defcustom haskell-process-suggest-add-package
+  t
+  "Suggest to add packages to your .cabal file when Cabal says it
+is a member of the hidden package, blah blah."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defcustom haskell-process-suggest-language-pragmas
   t
   "Suggest adding LANGUAGE pragmas recommended by GHC."
@@ -669,7 +676,60 @@ from `module-buffer'."
            (haskell-process-suggest-pragma session "LANGUAGE" "OverloadedStrings" file)))
         ((string-match "^Not in scope: `\\(.+\\)'$" msg)
          (when haskell-process-suggest-hoogle-imports
-           (haskell-process-suggest-hoogle-imports session msg file)))))
+           (haskell-process-suggest-hoogle-imports session msg file)))
+        ((string-match "^[ ]+It is a member of the hidden package `\\(.+\\)'.$" msg)
+         (when haskell-process-suggest-add-package
+           (haskell-process-suggest-add-package session msg)))))
+
+(defun haskell-process-suggest-add-package (session msg)
+  "Add the (matched) module to your cabal file."
+  (let* ((suggested-package (match-string 1 msg))
+         (package-name (replace-regexp-in-string "-[^-]+$" "" suggested-package))
+         (version (progn (string-match "\\([^-]+\\)$" suggested-package)
+                         (match-string 1 suggested-package)))
+         (cabal-file (concat (haskell-session-name session)
+                             ".cabal")))
+    (when (y-or-n-p
+           (format "Add `%s' to %s?"
+                   package-name
+                   cabal-file))
+      (haskell-process-add-dependency package-name version))))
+
+(defun haskell-process-add-dependency (package &optional version no-prompt)
+  "Add PACKAGE (and optionally suffix -VERSION) to the cabal
+file. Prompts the user before doing so."
+  (interactive
+   (list (read-from-minibuffer "Package entry: ")
+         nil
+         t))
+  (let ((buffer (current-buffer)))
+    (find-file (haskell-cabal-find-file))
+    (let ((entry (if no-prompt
+                     package
+                   (read-from-minibuffer "Package entry: "
+                                         (concat package
+                                                 (if version
+                                                     (concat " >= "
+                                                             version)
+                                                   ""))))))
+      (save-excursion
+        (goto-char (point-min))
+        (when (search-forward-regexp "^library$" nil t 1)
+          (search-forward-regexp "build-depends:[ ]+")
+          (let ((column (current-column)))
+            (when (y-or-n-p "Add to library?")
+              (insert entry ",\n")
+              (indent-to column))))
+        (goto-char (point-min))
+        (while (search-forward-regexp "^executable " nil t 1)
+          (let ((name (buffer-substring-no-properties (point) (line-end-position))))
+            (search-forward-regexp "build-depends:[ ]+")
+            (let ((column (current-column)))
+              (when (y-or-n-p (format "Add to executable `%s'?" name))
+                (insert entry ",\n")
+                (indent-to column)))))
+        (save-buffer)
+        (switch-to-buffer buffer)))))
 
 (defun haskell-process-suggest-hoogle-imports (session msg file)
   "Given an out of scope identifier, Hoogle for that identifier,
@@ -679,18 +739,18 @@ now."
          (module (haskell-process-hoogle-ident ident)))
     (when module
       (unless (member module haskell-imported-suggested)
-       (when (y-or-n-p
-              (format
-               "Identifier `%s' not in scope, import `%s'?"
-               ident
-               module))
-         (push module haskell-imported-suggested)
-         (haskell-process-find-file session file)
-         (save-excursion
-           (haskell-navigate-imports)
-           (insert "import " module "\n")
-           (haskell-sort-imports)
-           (haskell-align-imports)))))))
+        (when (y-or-n-p
+               (format
+                "Identifier `%s' not in scope, import `%s'?"
+                ident
+                module))
+          (push module haskell-imported-suggested)
+          (haskell-process-find-file session file)
+          (save-excursion
+            (haskell-navigate-imports)
+            (insert "import " module "\n")
+            (haskell-sort-imports)
+            (haskell-align-imports)))))))
 
 (defun haskell-process-hoogle-ident (ident)
   "Hoogle for IDENT, returns either an import or nil."
