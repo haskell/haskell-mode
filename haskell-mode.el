@@ -617,6 +617,45 @@ If nil, use the Hoogle web-site."
 ;;;###autoload
 (defalias 'hoogle 'haskell-hoogle)
 
+(defvar hoogle-server-process-name "emacs-local-hoogle")
+(defvar hoogle-server-buffer-name (format "*%s*" hoogle-server-process-name))
+(defvar hoogle-port-number 49513 "Port number.")
+
+(defun hoogle-start-server ()
+  "Start hoogle local server."
+  (interactive)
+  (unless (hoogle-server-live-p)
+    (start-process
+     hoogle-server-process-name
+     (get-buffer-create hoogle-server-buffer-name) "/bin/sh" "-c"
+     (format "hoogle server -p %i" hoogle-port-number))))
+
+(defun hoogle-server-live-p ()
+  "Whether hoogle server is live or not."
+  (condition-case err
+      (process-live-p (get-buffer-create hoogle-server-buffer-name))
+    (error nil)))
+
+(defun hoogle-kill-server ()
+  "Kill hoogle server if it is live."
+  (interactive)
+  (when (hoogle-server-live-p)
+    (kill-process (get-buffer-create hoogle-server-buffer-name))))
+
+;;;###autoload
+(defun hoogle-lookup-from-local ()
+  "Lookup by local hoogle."
+  (interactive)
+  (if (hoogle-server-live-p)
+      (browse-url (format "http://localhost:%i/?hoogle=%s"
+                          hoogle-port-number
+                          (read-string "hoogle: " (haskell-ident-at-point))))
+    (when (y-or-n-p
+           "hoogle server not found, start hoogle server?")
+      (if (executable-find "hoogle")
+          (hoogle-start-server)
+        (error "hoogle is not installed")))))
+
 ;;;###autoload
 (defun haskell-hayoo (query)
   "Do a Hayoo search for QUERY."
