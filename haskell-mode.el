@@ -619,6 +619,16 @@ If nil, use the Hoogle web-site."
 
 (defvar hoogle-server-process-name "emacs-local-hoogle")
 (defvar hoogle-server-buffer-name (format "*%s*" hoogle-server-process-name))
+(defvar hoogle-port-number 49513 "Port number.")
+
+(defun hoogle-start-server ()
+  "Start hoogle local server."
+  (interactive)
+  (unless (hoogle-server-live-p)
+    (start-process
+     hoogle-server-process-name
+     (get-buffer-create hoogle-server-buffer-name) "/bin/sh" "-c"
+     (format "hoogle server -p %i" hoogle-port-number))))
 
 (defun hoogle-server-live-p ()
   "Whether hoogle server is live or not."
