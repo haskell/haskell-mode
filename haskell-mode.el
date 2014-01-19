@@ -617,6 +617,15 @@ If nil, use the Hoogle web-site."
 ;;;###autoload
 (defalias 'hoogle 'haskell-hoogle)
 
+(defvar hoogle-server-process-name "emacs-local-hoogle")
+(defvar hoogle-server-buffer-name (format "*%s*" hoogle-server-process-name))
+
+(defun hoogle-server-live-p ()
+  "Whether hoogle server is live or not."
+  (condition-case err
+      (process-live-p (get-buffer-create hoogle-server-buffer-name))
+    (error nil)))
+
 ;;;###autoload
 (defun haskell-hayoo (query)
   "Do a Hayoo search for QUERY."
