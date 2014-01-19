@@ -636,6 +636,12 @@ If nil, use the Hoogle web-site."
       (process-live-p (get-buffer-create hoogle-server-buffer-name))
     (error nil)))
 
+(defun hoogle-kill-server ()
+  "Kill hoogle server if it is live."
+  (interactive)
+  (when (hoogle-server-live-p)
+    (kill-process (get-buffer-create hoogle-server-buffer-name))))
+
 ;;;###autoload
 (defun haskell-hayoo (query)
   "Do a Hayoo search for QUERY."
