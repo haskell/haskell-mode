@@ -643,6 +643,20 @@ If nil, use the Hoogle web-site."
     (kill-process (get-buffer-create hoogle-server-buffer-name))))
 
 ;;;###autoload
+(defun hoogle-lookup-from-local ()
+  "Lookup by local hoogle."
+  (interactive)
+  (if (hoogle-server-live-p)
+      (browse-url (format "http://localhost:%i/?hoogle=%s"
+                          hoogle-port-number
+                          (read-string "hoogle: " (word-at-point))))
+    (when (y-or-n-p
+           "hoogle server not found, start hoogle server?")
+      (if (executable-find "hoogle")
+          (hoogle-start-server)
+        (error "hoogle is not installed")))))
+
+;;;###autoload
 (defun haskell-hayoo (query)
   "Do a Hayoo search for QUERY."
   (interactive
