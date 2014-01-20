@@ -674,7 +674,7 @@ from `module-buffer'."
         ((string-match "against inferred type `\\[Char\\]'" msg)
          (when haskell-process-suggest-overloaded-strings
            (haskell-process-suggest-pragma session "LANGUAGE" "OverloadedStrings" file)))
-        ((string-match "^Not in scope: `\\(.+\\)'$" msg)
+        ((string-match "^Not in scope: .*`\\(.+\\)'$" msg)
          (when haskell-process-suggest-hoogle-imports
            (haskell-process-suggest-hoogle-imports session msg file)))
         ((string-match "^[ ]+It is a member of the hidden package `\\(.+\\)'.$" msg)
