@@ -171,9 +171,12 @@ Key bindings:
 (defun haskell-interactive-mode-space (n)
   "Handle the space key."
   (interactive "p")
-  (if (haskell-interactive-at-compile-message)
-      (next-error-no-select 0)
-    (self-insert-command n)))
+  (if (and (bound-and-true-p god-local-mode)
+           (fboundp 'god-mode-self-insert))
+      (call-interactively 'god-mode-self-insert)
+      (if (haskell-interactive-at-compile-message)
+          (next-error-no-select 0)
+        (self-insert-command n))))
 
 (defun haskell-interactive-at-prompt ()
   "If at prompt, returns start position of user-input, otherwise returns nil."
