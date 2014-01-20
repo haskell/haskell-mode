@@ -735,7 +735,10 @@ file. Prompts the user before doing so."
   "Given an out of scope identifier, Hoogle for that identifier,
 and if a result comes back, suggest to import that identifier
 now."
-  (let* ((ident (match-string 1 msg))
+  (let* ((ident (let ((i (match-string 1 msg)))
+                  (if (string-match "^[A-Z]\\.\\(.+\\)$" i)
+                      (match-string 1 i)
+                    i)))
          (modules (haskell-process-hoogle-ident ident))
          (module (cond
                   ((> (length modules) 1)
