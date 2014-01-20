@@ -79,8 +79,10 @@
       (if point
           (goto-char point)
         (progn (goto-char (point-min))
-               (when (haskell-navigate-imports-find-forward-line)
-                 (haskell-navigate-imports-go-internal)))))))
+               (if (haskell-navigate-imports-find-forward-line)
+                   (haskell-navigate-imports-go-internal)
+                 (when (search-forward-regexp "^module" nil t 1)
+                   (search-forward "\n\n" nil t 1))))))))
 
 (defun haskell-navigate-imports-goto-end ()
   "Skip a bunch of consequtive import lines."
