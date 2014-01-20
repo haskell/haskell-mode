@@ -133,7 +133,7 @@
     (let ((case-fold-search t))
       (goto-char (point-min))
       (when (re-search-forward
-             (concat "^" (regexp-quote name)
+             (concat "^[ \t]*" (regexp-quote name)
                      ":[ \t]*\\(.*\\(\n[ \t]+[ \t\n].*\\)*\\)")
              nil t)
         (let ((val (match-string 1))
