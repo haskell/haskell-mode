@@ -465,11 +465,14 @@ to be loaded by ghci."
 
       :live
       (lambda (state buffer)
-        (cond ((or (string= (caddr state) "build")
-                   (string= (caddr state) "install"))
-               (haskell-process-live-build (cadr state) buffer t))
-              (t
-               (haskell-process-cabal-live state buffer))))
+        (let ((cmd (replace-regexp-in-string "^\\([a-z]+\\).*"
+                                             "\\1"
+                                             (caddr state))))
+          (cond ((or (string= cmd "build")
+                     (string= cmd "install"))
+                 (haskell-process-live-build (cadr state) buffer t))
+                (t
+                 (haskell-process-cabal-live state buffer)))))
 
       :complete
       (lambda (state response)
