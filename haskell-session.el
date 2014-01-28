@@ -335,6 +335,14 @@ If DONTCREATE is non-nil don't create a new session."
                    set-dir)
           (haskell-session-cabal-dir s))))))
 
+(defun haskell-session-modify (session key update)
+  "Update the value at KEY in SESSION with UPDATE."
+  (haskell-session-set
+   session
+   key
+   (funcall update
+            (haskell-session-get session key))))
+
 (defun haskell-session-get (session key)
   "Get the SESSION's KEY value.
 Returns nil if KEY not set."

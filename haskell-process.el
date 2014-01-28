@@ -39,6 +39,7 @@
 ;; FIXME: haskell-process shouldn't depend on haskell-interactive-mode to avoid module-dep cycles
 (declare-function haskell-interactive-mode-echo "haskell-interactive-mode" (session message &optional mode))
 (declare-function haskell-interactive-mode-compile-error "haskell-interactive-mode" (session message))
+(declare-function haskell-interactive-mode-compile-warning "haskell-interactive-mode" (session message))
 (declare-function haskell-interactive-mode-insert "haskell-interactive-mode" (session message))
 (declare-function haskell-interactive-mode-reset-error "haskell-interactive-mode" (session))
 (declare-function haskell-interactive-show-load-message "haskell-interactive-mode" (session type module-name file-name echo))
@@ -991,6 +992,21 @@ now."
           (haskell-process-send-string process "Prelude.putStrLn \"\"")
           (haskell-process-send-string process ":set -v1"))
 
+    :live (lambda (process buffer)
+            (when (haskell-process-consume
+                   process
+                   "^\*\*\* WARNING: \\(.+\\) is writable by someone else, IGNORING!$")
+              (let ((path (match-string 1 buffer)))
+                (haskell-session-modify
+                 (haskell-process-session process)
+                 'ignored-files
+                 (lambda (files)
+                   (remove-duplicates (cons path files) :test 'string=)))
+                (haskell-interactive-mode-compile-warning
+                 (haskell-process-session process)
+                 (format "GHCi is ignoring: %s (run M-x haskell-process-unignore)"
+                         path)))))
+
     :complete (lambda (process _)
                 (haskell-interactive-mode-echo
                  (haskell-process-session process)
@@ -1256,6 +1272,59 @@ Returns nil if queue is empty."
     (when queue
       (haskell-process-set process 'command-queue (cdr queue))
       (car queue))))
+
+(defun haskell-process-unignore ()
+  "Unignore any files that were specified as being ignored by the
+  inferior GHCi process."
+  (interactive)
+  (let ((session (haskell-session))
+        (changed nil))
+    (if (null (haskell-session-get session
+                                   'ignored-files))
+        (message "Nothing to unignore!")
+      (loop for file in (haskell-session-get session
+                                             'ignored-files)
+            do (case (read-key
+                      (propertize (format "Set permissions? %s (y, n, v: stop and view file)"
+                                          file)
+                                  'face 'minibuffer-prompt))
+                 (?y
+                  (haskell-process-unignore-file session file)
+                  (setq changed t))
+                 (?v
+                  (find-file file)
+                  (return))))
+      (when (and changed
+                 (y-or-n-p "Restart GHCi process now? "))
+        (haskell-process-restart)))))
+
+(defun haskell-process-unignore-file (session file)
+  "
+
+Note to Windows Emacs hackers:
+
+chmod is how to change the mode of files in POSIX
+systems. This will not work on your operating
+system.
+
+There is a command a bit like chmod called \"Calcs\"
+that you can try using here:
+
+http://technet.microsoft.com/en-us/library/bb490872.aspx
+
+If it works, you can submit a patch to this
+function and remove this comment.
+"
+  (shell-command (read-from-minibuffer "Permissions command: "
+                                       (concat "chmod 700 "
+                                               file)))
+  (haskell-session-modify
+   (haskell-session)
+   'ignored-files
+   (lambda (files)
+     (remove-if (lambda (path)
+                  (string= path file))
+                files))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessing commands -- using cl 'defstruct'
