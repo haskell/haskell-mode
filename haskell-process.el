@@ -111,6 +111,12 @@ See `haskell-process-do-cabal' for more details."
   :type 'boolean
   :group 'haskell-interactive)
 
+(defcustom haskell-process-show-debug-tips
+  t
+  "Show debugging tips when starting the process."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defcustom haskell-notify-p
   nil
   "Notify using notifications.el (if loaded)?"
@@ -990,7 +996,13 @@ now."
                  (haskell-process-session process)
                  (concat (nth (random (length haskell-process-greetings))
                               haskell-process-greetings)
-                         " (if I break, run M-x haskell-process-restart; config via M-x customize-mode)"))))))
+                         (when haskell-process-show-debug-tips
+                           "
+If I break, you can:
+  1. Restart:           M-x haskell-process-restart
+  2. Configure logging: C-h v haskell-process-log (useful for debugging)
+  3. General config:    M-x customize-mode
+  4. Hide these tips:   C-h v haskell-process-show-debug-tips")))))))
 
 (defun haskell-process-sentinel (proc event)
   "The sentinel for the process pipe."
