@@ -54,7 +54,7 @@ interference with prompts that look like haskell expressions."
   :group 'haskell-interactive)
 
 (defcustom haskell-interactive-mode-hide-multi-line-errors
-  t
+  nil
   "Hide collapsible multi-line compile messages by default."
   :type 'boolean
   :group 'haskell-interactive)
