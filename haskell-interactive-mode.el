@@ -188,41 +188,45 @@ Key bindings:
 
 (defun haskell-interactive-handle-line ()
   (when (haskell-interactive-at-prompt)
-    (let ((expr (haskell-interactive-mode-input))
-          (session (haskell-session))
-          (process (haskell-process)))
+    (let ((expr (haskell-interactive-mode-input)))
       (when (not (string= "" (replace-regexp-in-string " " "" expr)))
         (haskell-interactive-mode-history-add expr)
-        (goto-char (point-max))
-        (haskell-process-queue-command
-         process
-         (make-haskell-command
-          :state (list session process expr 0)
-          :go (lambda (state)
-                (haskell-process-send-string (cadr state)
-                                             (caddr state)))
-          :live (lambda (state buffer)
-                  (unless (and (string-prefix-p ":q" (caddr state))
-                               (string-prefix-p (caddr state) ":quit"))
-                    (let* ((cursor (cadddr state))
-                           (next (replace-regexp-in-string
-                                  haskell-process-prompt-regex
-                                  "\n"
-                                  (substring buffer cursor))))
-                      (when (= 0 cursor) (insert "\n"))
-                      (haskell-interactive-mode-eval-result (car state) next)
-                      (setf (cdddr state) (list (length buffer)))
-                      nil)))
-          :complete (lambda (state response)
-                      (cond
-                       (haskell-interactive-mode-eval-mode
-                        (haskell-interactive-mode-eval-as-mode (car state) response))
-                       ((haskell-interactive-mode-line-is-query (elt state 2))
-                        (let ((haskell-interactive-mode-eval-mode 'haskell-mode))
-                          (haskell-interactive-mode-eval-as-mode (car state) response)))
-                       (haskell-interactive-mode-eval-pretty
-                        (haskell-interactive-mode-eval-pretty-result (car state) response)))
-                      (haskell-interactive-mode-prompt (car state)))))))))
+        (haskell-interactive-mode-run-line expr)))))
+
+(defun haskell-interactive-mode-run-line (line)
+  "Run the given line."
+  (let ((session (haskell-session))
+        (process (haskell-process)))
+    (goto-char (point-max))
+    (haskell-process-queue-command
+     process
+     (make-haskell-command
+      :state (list session process expr 0)
+      :go (lambda (state)
+            (haskell-process-send-string (cadr state)
+                                         (caddr state)))
+      :live (lambda (state buffer)
+              (unless (and (string-prefix-p ":q" (caddr state))
+                           (string-prefix-p (caddr state) ":quit"))
+                (let* ((cursor (cadddr state))
+                       (next (replace-regexp-in-string
+                              haskell-process-prompt-regex
+                              "\n"
+                              (substring buffer cursor))))
+                  (when (= 0 cursor) (insert "\n"))
+                  (haskell-interactive-mode-eval-result (car state) next)
+                  (setf (cdddr state) (list (length buffer)))
+                  nil)))
+      :complete (lambda (state response)
+                  (cond
+                   (haskell-interactive-mode-eval-mode
+                    (haskell-interactive-mode-eval-as-mode (car state) response))
+                   ((haskell-interactive-mode-line-is-query (elt state 2))
+                    (let ((haskell-interactive-mode-eval-mode 'haskell-mode))
+                      (haskell-interactive-mode-eval-as-mode (car state) response)))
+                   (haskell-interactive-mode-eval-pretty
+                    (haskell-interactive-mode-eval-pretty-result (car state) response)))
+                  (haskell-interactive-mode-prompt (car state)))))))
 
 (defun haskell-interactive-mode-line-is-query (line)
   "Is LINE actually a :t/:k/:i?"
