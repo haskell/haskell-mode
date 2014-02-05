@@ -201,7 +201,7 @@ Key bindings:
     (haskell-process-queue-command
      process
      (make-haskell-command
-      :state (list session process expr 0)
+      :state (list session process line 0)
       :go (lambda (state)
             (haskell-process-send-string (cadr state)
                                          (caddr state)))
