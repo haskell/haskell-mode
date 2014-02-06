@@ -825,15 +825,16 @@ now."
 (defun haskell-process-hoogle-ident (ident)
   "Hoogle for IDENT, returns a list of modules."
   (with-temp-buffer
-    (call-process "hoogle" nil t nil "search" "--exact" ident)
-    (goto-char (point-min))
-    (unless (or (looking-at "^No results found")
-                (looking-at "^package "))
-      (while (re-search-forward "^\\([^ ]+\\).*$" nil t)
-        (replace-match "\\1" nil nil))
-      (remove-if (lambda (a) (string= "" a))
-                 (split-string (buffer-string)
-                               "\n")))))
+    (let ((hoogle-error (call-process "hoogle" nil t nil "search" "--exact" ident)))
+      (goto-char (point-min))
+      (unless (or hoogle-error
+                  (looking-at "^No results found")
+                  (looking-at "^package "))
+        (while (re-search-forward "^\\([^ ]+\\).*$" nil t)
+          (replace-match "\\1" nil nil))
+        (remove-if (lambda (a) (string= "" a))
+                   (split-string (buffer-string)
+                                 "\n"))))))
 
 (defun haskell-process-suggest-remove-import (session file import line)
   "Suggest removing or commenting out IMPORT on LINE."
