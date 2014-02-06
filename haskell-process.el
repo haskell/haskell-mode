@@ -750,16 +750,17 @@ now."
                       (match-string 1 i)
                     i)))
          (modules (haskell-process-hoogle-ident ident))
-         (module (cond
-                  ((> (length modules) 1)
-                   (when (y-or-n-p (format "Identifier `%s' not in scope, choose module to import?"
-                                           ident))
-                     (ido-completing-read "Module: " modules)))
-                  ((= (length modules) 1)
-                   (when (y-or-n-p (format "Identifier `%s' not in scope, import `%s'?"
-                                           ident
-                                           (car modules)))
-                     (car modules))))))
+         (module
+          (cond
+           ((> (length modules) 1)
+            (when (y-or-n-p (format "Identifier `%s' not in scope, choose module to import?"
+                                    ident))
+              (ido-completing-read "Module: " modules)))
+           ((= (length modules) 1)
+            (when (y-or-n-p (format "Identifier `%s' not in scope, import `%s'?"
+                                    ident
+                                    (car modules)))
+              (car modules))))))
     (when module
       (unless (member module haskell-imported-suggested)
         (push module haskell-imported-suggested)
@@ -767,7 +768,8 @@ now."
         (save-excursion
           (goto-char (point-max))
           (haskell-navigate-imports)
-          (insert "import " module "\n")
+          (insert (read-from-minibuffer "Import line: " (concat "import " module))
+                  "\n")
           (haskell-sort-imports)
           (haskell-align-imports))))))
 
