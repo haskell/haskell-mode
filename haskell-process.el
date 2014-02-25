@@ -432,7 +432,7 @@ for various things, but is optional."
   "Prompts for a Cabal command to run."
   (interactive)
   (haskell-process-do-cabal
-   (ido-completing-read "Cabal command: "
+   (funcall completing-read-function "Cabal command: "
                         haskell-cabal-commands)))
 
 (defun haskell-process-add-cabal-autogen ()
@@ -755,7 +755,7 @@ now."
            ((> (length modules) 1)
             (when (y-or-n-p (format "Identifier `%s' not in scope, choose module to import?"
                                     ident))
-              (ido-completing-read "Module: " modules)))
+              (funcall completing-read-function "Module: " modules)))
            ((= (length modules) 1)
             (when (y-or-n-p (format "Identifier `%s' not in scope, import `%s'?"
                                     ident

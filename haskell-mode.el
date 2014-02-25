@@ -715,7 +715,7 @@ Brings up the documentation for haskell-mode-hook."
     (cond ((save-excursion (forward-word -1)
                            (looking-at "^import$"))
            (insert " ")
-           (let ((module (ido-completing-read "Module: " (haskell-session-all-modules))))
+           (let ((module (funcall completing-read-function "Module: " (haskell-session-all-modules))))
              (insert module)
              (haskell-mode-format-imports)))
           ((not (string= "" (save-excursion (forward-char -1) (haskell-ident-at-point))))
