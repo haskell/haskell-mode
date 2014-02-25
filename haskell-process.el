@@ -36,6 +36,8 @@
 (require 'haskell-navigate-imports)
 (with-no-warnings (require 'cl))
 
+(defvar completing-read-function)
+
 ;; FIXME: haskell-process shouldn't depend on haskell-interactive-mode to avoid module-dep cycles
 (declare-function haskell-interactive-mode-echo "haskell-interactive-mode" (session message &optional mode))
 (declare-function haskell-interactive-mode-compile-error "haskell-interactive-mode" (session message))

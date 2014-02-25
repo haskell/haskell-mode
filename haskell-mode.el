@@ -133,6 +133,8 @@
 (require 'haskell-string)
 (with-no-warnings (require 'cl))
 
+(defvar completing-read-function)
+
 ;; FIXME: code-smell: too many forward decls for haskell-session are required here
 (defvar haskell-session)
 (declare-function haskell-process-do-try-info "haskell-process" (sym))

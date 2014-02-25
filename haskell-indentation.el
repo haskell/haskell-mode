@@ -35,6 +35,8 @@
 (require 'syntax)
 (with-no-warnings (require 'cl))
 
+(defvar delete-active-region)
+
 ;; Dynamically scoped variables.
 (defvar following-token)
 (defvar current-token)
