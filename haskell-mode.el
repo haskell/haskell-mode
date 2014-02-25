@@ -133,8 +133,6 @@
 (require 'haskell-string)
 (with-no-warnings (require 'cl))
 
-(defvar completing-read-function)
-
 ;; FIXME: code-smell: too many forward decls for haskell-session are required here
 (defvar haskell-session)
 (declare-function haskell-process-do-try-info "haskell-process" (sym))
@@ -641,6 +639,15 @@ If nil, use the Hoogle web-site."
                  (const "ghc -fno-code")
                  (string :tag "Other command")))
 
+(defcustom haskell-completing-read-function 'ido-completing-read
+  "Default function to use for completion."
+  :group 'haskell
+  :type '(choice
+          (function-item :tag "ido" :value ido-completing-read)
+          (function-item :tag "helm" :value helm--completing-read-default)
+          (function-item :tag "completing-read" :value completing-read)
+          (function :tag "Custom function")))
+
 (defcustom haskell-stylish-on-save nil
   "Whether to run stylish-haskell on the buffer before saving."
   :group 'haskell
@@ -717,7 +724,7 @@ Brings up the documentation for haskell-mode-hook."
     (cond ((save-excursion (forward-word -1)
                            (looking-at "^import$"))
            (insert " ")
-           (let ((module (funcall completing-read-function "Module: " (haskell-session-all-modules))))
+           (let ((module (funcall haskell-completing-read-function "Module: " (haskell-session-all-modules))))
              (insert module)
              (haskell-mode-format-imports)))
           ((not (string= "" (save-excursion (forward-char -1) (haskell-ident-at-point))))
