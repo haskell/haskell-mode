@@ -31,6 +31,8 @@
 (require 'haskell-string)
 (with-no-warnings (require 'cl))
 
+(defvar completing-read-function)
+
 (declare-function haskell-interactive-mode "haskell-interactive-mode" ())
 (declare-function haskell-kill-session-process "haskell-process" (&optional session))
 (declare-function haskell-process-start "haskell-process" (session))
