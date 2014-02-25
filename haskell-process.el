@@ -36,8 +36,6 @@
 (require 'haskell-navigate-imports)
 (with-no-warnings (require 'cl))
 
-(defvar completing-read-function)
-
 ;; FIXME: haskell-process shouldn't depend on haskell-interactive-mode to avoid module-dep cycles
 (declare-function haskell-interactive-mode-echo "haskell-interactive-mode" (session message &optional mode))
 (declare-function haskell-interactive-mode-compile-error "haskell-interactive-mode" (session message))
@@ -434,7 +432,7 @@ for various things, but is optional."
   "Prompts for a Cabal command to run."
   (interactive)
   (haskell-process-do-cabal
-   (funcall completing-read-function "Cabal command: "
+   (funcall haskell-completing-read-function "Cabal command: "
                         haskell-cabal-commands)))
 
 (defun haskell-process-add-cabal-autogen ()
@@ -757,7 +755,7 @@ now."
            ((> (length modules) 1)
             (when (y-or-n-p (format "Identifier `%s' not in scope, choose module to import?"
                                     ident))
-              (funcall completing-read-function "Module: " modules)))
+              (funcall haskell-completing-read-function "Module: " modules)))
            ((= (length modules) 1)
             (when (y-or-n-p (format "Identifier `%s' not in scope, import `%s'?"
                                     ident
