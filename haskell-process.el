@@ -131,7 +131,7 @@ See `haskell-process-do-cabal' for more details."
   :group 'haskell-interactive)
 
 (defcustom haskell-process-suggest-hoogle-imports
-  t
+  nil
   "Suggest to add import statements using Hoogle as a backend."
   :type 'boolean
   :group 'haskell-interactive)
