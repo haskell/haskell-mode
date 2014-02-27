@@ -721,7 +721,7 @@ from `module-buffer'."
   (cond ((let ((case-fold-search nil)) (string-match " -X\\([A-Z][A-Za-z]+\\)" msg))
          (when haskell-process-suggest-language-pragmas
            (haskell-process-suggest-pragma session "LANGUAGE" (match-string 1 msg) file)))
-        ((string-match " The \\(qualified \\)?import of[ ]`\\([^ ]+\\)' is redundant" msg)
+        ((string-match " The \\(qualified \\)?import of[ ][‘`‛]\\([^ ]+\\)['’] is redundant" msg)
          (when haskell-process-suggest-remove-import-lines
            (haskell-process-suggest-remove-import session
                                                   file
@@ -730,13 +730,13 @@ from `module-buffer'."
         ((string-match "Warning: orphan instance: " msg)
          (when haskell-process-suggest-no-warn-orphans
            (haskell-process-suggest-pragma session "OPTIONS" "-fno-warn-orphans" file)))
-        ((string-match "against inferred type `\\[Char\\]'" msg)
+        ((string-match "against inferred type [‘`‛]\\[Char\\]['’]" msg)
          (when haskell-process-suggest-overloaded-strings
            (haskell-process-suggest-pragma session "LANGUAGE" "OverloadedStrings" file)))
-        ((string-match "^Not in scope: .*`\\(.+\\)'$" msg)
+        ((string-match "^Not in scope: .*[‘`‛]\\(.+\\)['’]$" msg)
          (when haskell-process-suggest-hoogle-imports
            (haskell-process-suggest-hoogle-imports session msg file)))
-        ((string-match "^[ ]+It is a member of the hidden package `\\(.+\\)'.$" msg)
+        ((string-match "^[ ]+It is a member of the hidden package [‘`‛]\\(.+\\)['’].$" msg)
          (when haskell-process-suggest-add-package
            (haskell-process-suggest-add-package session msg)))))
 
