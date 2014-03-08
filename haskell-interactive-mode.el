@@ -47,6 +47,10 @@ at the beginning of the line. This should prevent any
 interference with prompts that look like haskell expressions."
   (concat "^" (regexp-quote haskell-interactive-prompt)))
 
+(defvar haskell-interactive-mode-prompt-start
+  nil
+  "Mark used for the beginning of the prompt.")
+
 (defcustom haskell-interactive-mode-eval-mode
   nil
   "Use the given mode's font-locking to render some text."
@@ -174,22 +178,20 @@ Key bindings:
   (if (and (bound-and-true-p god-local-mode)
            (fboundp 'god-mode-self-insert))
       (call-interactively 'god-mode-self-insert)
-      (if (haskell-interactive-at-compile-message)
-          (next-error-no-select 0)
-        (self-insert-command n))))
+    (if (haskell-interactive-at-compile-message)
+        (next-error-no-select 0)
+      (self-insert-command n))))
 
 (defun haskell-interactive-at-prompt ()
   "If at prompt, returns start position of user-input, otherwise returns nil."
-  (let ((current-point (point)))
-    (save-excursion (goto-char (point-max))
-                    (search-backward-regexp (haskell-interactive-prompt-regex))
-                    (when (> current-point (point))
-                      (+ (length haskell-interactive-prompt) (point))))))
+  (>= (point)
+      haskell-interactive-mode-prompt-start))
 
 (defun haskell-interactive-handle-line ()
   (when (haskell-interactive-at-prompt)
     (let ((expr (haskell-interactive-mode-input)))
       (when (not (string= "" (replace-regexp-in-string " " "" expr)))
+        (set-marker haskell-interactive-mode-prompt-start (point-max))
         (haskell-interactive-mode-history-add expr)
         (haskell-interactive-mode-run-line expr)))))
 
@@ -263,8 +265,8 @@ Key bindings:
 (defun haskell-interactive-mode-beginning ()
   "Go to the start of the line."
   (interactive)
-  (if (search-backward-regexp (haskell-interactive-prompt-regex) (line-beginning-position) t 1)
-      (search-forward-regexp (haskell-interactive-prompt-regex) (line-end-position) t 1)
+  (if (haskell-interactive-at-prompt)
+      (goto-char haskell-interactive-mode-prompt-start)
     (move-beginning-of-line nil)))
 
 (defun haskell-interactive-mode-clear ()
@@ -289,13 +291,9 @@ Key bindings:
 
 (defun haskell-interactive-mode-input ()
   "Get the interactive mode input."
-  (substring
-   (buffer-substring-no-properties
-    (save-excursion
-      (goto-char (point-max))
-      (search-backward-regexp (haskell-interactive-prompt-regex)))
-    (line-end-position))
-   (length haskell-interactive-prompt)))
+  (buffer-substring-no-properties
+   haskell-interactive-mode-prompt-start
+   (point-max)))
 
 (defun haskell-interactive-mode-prompt (&optional session)
   "Show a prompt at the end of the REPL buffer.
@@ -310,7 +308,12 @@ SESSION, otherwise operate on the current buffer.
                         'face 'haskell-interactive-face-prompt
                         'read-only t
                         'rear-nonsticky t
-                        'prompt t))))
+                        'prompt t))
+    (let ((marker (set (make-local-variable 'haskell-interactive-mode-prompt-start)
+                       (make-marker))))
+      (set-marker marker
+                  (point)
+                  (current-buffer)))))
 
 (defun haskell-interactive-mode-eval-result (session text)
   "Insert the result of an eval as plain text."
@@ -326,11 +329,8 @@ SESSION, otherwise operate on the current buffer.
 (defun haskell-interactive-mode-eval-as-mode (session text)
   "Insert TEXT font-locked according to `haskell-interactive-mode-eval-mode'."
   (with-current-buffer (haskell-session-interactive-buffer session)
-    (let ((start-point (save-excursion (search-backward-regexp (haskell-interactive-prompt-regex))
-                                       (forward-line 1)
-                                       (point)))
-          (inhibit-read-only t))
-      (delete-region start-point (point))
+    (let ((inhibit-read-only t))
+      (delete-region (1+ haskell-interactive-mode-prompt-start) (point))
       (goto-char (point-max))
       (insert (haskell-fontify-as-mode (concat text "\n")
                                        haskell-interactive-mode-eval-mode)))))
@@ -339,11 +339,8 @@ SESSION, otherwise operate on the current buffer.
   "Insert the result of an eval as a pretty printed Showable, if
   parseable, or otherwise just as-is."
   (with-current-buffer (haskell-session-interactive-buffer session)
-    (let ((start-point (save-excursion (search-backward-regexp (haskell-interactive-prompt-regex))
-                                       (forward-line 1)
-                                       (point)))
-          (inhibit-read-only t))
-      (delete-region start-point (point))
+    (let ((inhibit-read-only t))
+      (delete-region haskell-interactive-mode-prompt-start (point))
       (goto-char (point-max))
       (haskell-show-parse-and-insert text)
       (insert "\n"))))
@@ -409,8 +406,8 @@ SESSION, otherwise operate on the current buffer.
 
 (defun haskell-interactive-mode-goto-end-point ()
   "Go to the 'end' of the buffer (before the prompt.)"
-  (goto-char (point-max))
-  (when (search-backward-regexp (haskell-interactive-prompt-regex) (point-min) t 1)))
+  (goto-char haskell-interactive-mode-prompt-start)
+  (goto-char (line-beginning-position)))
 
 (defun haskell-interactive-mode-history-add (input)
   "Add item to the history."
@@ -455,10 +452,8 @@ SESSION, otherwise operate on the current buffer.
 (defun haskell-interactive-mode-set-prompt (p)
   "Set (and overwrite) the current prompt."
   (with-current-buffer (haskell-session-interactive-buffer (haskell-session))
-    (goto-char (point-max))
-    (goto-char (line-beginning-position))
-    (search-forward-regexp (haskell-interactive-prompt-regex))
-    (delete-region (point) (line-end-position))
+    (goto-char haskell-interactive-mode-prompt-start)
+    (delete-region (point) (point-max))
     (insert p)))
 
 (defun haskell-interactive-buffer ()
