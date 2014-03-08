@@ -433,7 +433,7 @@ for various things, but is optional."
   (interactive)
   (haskell-process-do-cabal
    (funcall haskell-completing-read-function "Cabal command: "
-                        haskell-cabal-commands)))
+            haskell-cabal-commands)))
 
 (defun haskell-process-add-cabal-autogen ()
   "Add <cabal-project-dir>/dist/build/autogen/ to the ghci search
@@ -521,7 +521,7 @@ to be loaded by ghci."
   (setf (cdddr state) (list (length buffer)))
   nil)
 
-(defun haskell-process-load-complete (session process buffer reload module-buffer)
+(defun haskell-process-load-complete (session process buffer reload module-buffer &optional cont)
   "Handle the complete loading response. BUFFER is the string of
 text being sent over the process pipe. MODULE-BUFFER is the
 actual Emacs buffer of the module being loaded."
@@ -538,7 +538,9 @@ actual Emacs buffer of the module being loaded."
                  (haskell-process-reload-with-fbytecode process module-buffer)
                (haskell-process-import-modules process (car modules)))
              (haskell-mode-message-line
-              (if reload "Reloaded OK." "OK.")))))
+              (if reload "Reloaded OK." "OK."))
+             (when cont
+               (funcall cont t)))))
         ((haskell-process-consume process "Failed, modules loaded: \\(.+\\)\\.$")
          (let* ((modules (haskell-process-extract-modules buffer))
                 (cursor (haskell-process-response-cursor process))
@@ -549,7 +551,9 @@ actual Emacs buffer of the module being loaded."
            (if (and (not reload) haskell-process-reload-with-fbytecode)
                (haskell-process-reload-with-fbytecode process module-buffer)
              (haskell-process-import-modules process (car modules)))
-           (haskell-interactive-mode-compile-error session "Compilation failed.")))))
+           (haskell-interactive-mode-compile-error session "Compilation failed.")
+           (when cont
+             (funcall cont nil))))))
 
 (defun haskell-process-reload-with-fbytecode (process module-buffer)
   "Reload FILE-NAME with -fbyte-code set, and then restore -fobject-code."
