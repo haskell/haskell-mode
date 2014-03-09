@@ -1304,6 +1304,44 @@ Returns nil if queue is empty."
                  (y-or-n-p "Restart GHCi process now? "))
         (haskell-process-restart)))))
 
+(defun haskell-process-reload-devel-main ()
+  "Reload the module `DevelMain' and then run
+`DevelMain.update'. This is for doing live update of the code of
+servers or GUI applications. Put your development version of the
+program in `DevelMain', and define `update' to auto-start the
+program on a new thread, and use the `foreign-store' package to
+access the running context across :load/:reloads in GHCi."
+  (interactive)
+  (with-current-buffer (get-buffer "DevelMain.hs")
+    (let ((session (haskell-session)))
+      (let ((process (haskell-process)))
+        (haskell-process-queue-command
+         process
+         (make-haskell-command
+          :state (list :session session
+                       :process process
+                       :buffer (current-buffer))
+          :go (lambda (state)
+                (haskell-process-send-string (plist-get state ':process)
+                                             ":l DevelMain"))
+          :live (lambda (state buffer)
+                  (haskell-process-live-build (plist-get state ':process)
+                                              buffer
+                                              nil))
+          :complete (lambda (state response)
+                      (haskell-process-load-complete
+                       (plist-get state ':session)
+                       (plist-get state ':process)
+                       response
+                       nil
+                       (plist-get state ':buffer)
+                       (lambda (ok)
+                         (when ok
+                           (haskell-process-queue-without-filters
+                            (haskell-process)
+                            "DevelMain.update")
+                           (message "DevelMain updated.")))))))))))
+
 (defun haskell-process-unignore-file (session file)
   "
 
