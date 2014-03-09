@@ -25,8 +25,10 @@
 
 (add-hook 'w3m-display-hook 'w3m-haddock-display)
 
-(defcustom
-  nil)
+(defface w3m-haddock-heading-face
+  '((((class color)) :background "#eeeeee"))
+  "Face for quarantines."
+  :group 'shm)
 
 (defcustom haskell-w3m-haddock-dir
   "~/.cabal/share/doc/"
@@ -130,24 +132,11 @@ You can rebind this if you're using hsenv by adding it to your
                                     'haskell-mode))))
       (goto-line n))))
 
-(defun w3m-haddock-damp-out-version ()
-  "Damp out the Haddock version number."
-  (goto-char (point-max))
-  (search-backward-regexp "^[ ]+Produced by")
-  (goto-char (line-beginning-position))
-  (put-text-property (line-beginning-position)
-                     (point-max)
-                     'face
-                     '(:foreground "#666"))
-  (indent-rigidly (line-beginning-position)
-                  (point-max)
-                  -4))
-
 (defun w3m-haddock-format-heading ()
   "Format a haddock entry."
   (let ((o (make-overlay (line-beginning-position)
                          (1- (save-excursion (w3m-haddock-header-end))))))
-    (overlay-put o 'face '(:background "#333333")))
+    (overlay-put o 'face 'w3m-haddock-heading-face))
   (let ((end (save-excursion
                (w3m-haddock-next-heading)
                (when (w3m-haddock-valid-heading)
