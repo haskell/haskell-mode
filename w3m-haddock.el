@@ -25,8 +25,47 @@
 
 (add-hook 'w3m-display-hook 'w3m-haddock-display)
 
+(defcustom
+  nil)
+
+(defcustom haskell-w3m-haddock-dir
+  "~/.cabal/share/doc/"
+  "The path to your cabal documentation dir. It should contain
+directories of package-name-x.x.
+
+You can rebind this if you're using hsenv by adding it to your
+.dir-locals.el in your project root. E.g.
+
+    ((haskell-mode . ((haskell-w3m-haddock-dir . \"/home/chris/Projects/foobar/.hsenv/cabal/share/doc\"))))
+
+"
+  :group 'shm
+  :type 'string)
+
 (defvar w3m-haddock-entry-regex "^\\(\\(data\\|type\\) \\|[a-z].* :: \\)"
   "Regex to match entry headings.")
+
+(defun haskell-w3m-open-haddock ()
+  "Open a haddock page in w3m."
+  (interactive)
+  (let* ((entries (remove-if (lambda (s) (string= s ""))
+                             (split-string (shell-command-to-string (concat "ls -1 " haskell-w3m-haddock-dir))
+                                           "\n")))
+         (package-dir (ido-completing-read
+                       "Package: "
+                       entries)))
+    (cond
+     ((member package-dir entries)
+      (w3m-browse-url (concat "file://"
+                              haskell-w3m-haddock-dir
+                              "/"
+                              package-dir
+                              "/html/index.html")
+                      t))
+     (t
+      (w3m-browse-url (concat "http://hackage.haskell.org/package/"
+                              package-dir)
+                      t)))))
 
 (defun w3m-haddock-page-p ()
   "Haddock general page?"
