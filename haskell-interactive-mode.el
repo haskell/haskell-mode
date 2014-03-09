@@ -116,17 +116,7 @@ Key bindings:
   (setq next-error-function 'haskell-interactive-next-error-function)
   (setq completion-at-point-functions '(haskell-interactive-mode-completion-at-point-function))
 
-  (haskell-interactive-mode-prompt)
-  (set (make-local-variable 'comment-start) "-- ")
-  (set (make-local-variable 'font-lock-defaults)
-       '(haskell-font-lock-choose-keywords
-         nil nil ((?\' . "w") (?_  . "w")) nil
-         (font-lock-syntactic-keywords
-          . haskell-font-lock-choose-syntactic-keywords)
-         (font-lock-syntactic-face-function
-          . haskell-syntactic-face-function)
-         ;; Get help from font-lock-syntactic-keywords.
-         (parse-sexp-lookup-properties . t))))
+  (haskell-interactive-mode-prompt))
 
 (defface haskell-interactive-face-prompt
   '((t :inherit 'font-lock-function-name-face))
