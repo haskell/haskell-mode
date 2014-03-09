@@ -81,7 +81,8 @@ You can rebind this if you're using hsenv by adding it to your
   (save-excursion
     (goto-char (point-min))
     (or (looking-at "Location: https?://hackage.haskell.org/package/.*/docs/src/")
-        (looking-at "Location: file://.*cabal/share/doc/.*/html/src/"))))
+        (looking-at "Location: file://.*cabal/share/doc/.*/html/src/")
+        (looking-at "Location: .*src/.*.html$"))))
 
 (defun w3m-haddock-p ()
   "Any haddock page?"
