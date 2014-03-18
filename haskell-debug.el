@@ -17,6 +17,14 @@
 
 ;;; Code:
 
+(defun haskell-debug ()
+  "Start the debugger for the current Haskell (GHCi) session."
+  (interactive)
+  (let ((session (haskell-session)))
+    (switch-to-buffer-other-window (haskell-debug-buffer-name))
+    (haskell-debug-mode)
+    (setq haskell-session session)))
+
 (defun haskell-debug/step (&optional expr)
   "Step into the next function."
   (interactive)
@@ -40,6 +48,17 @@
   "Start stepping EXPR."
   (interactive (list (read-from-minibuffer "Expression to step through: ")))
   (haskell-debug/step expr))
+
+(defun haskell-debug/refresh ()
+  "Refresh the debugger buffer."
+  (interactive)
+  (with-current-buffer (haskell-debug-buffer-name)
+    (let ((inhibit-read-only t))
+      (when (= (point-min)
+               (point-max))
+        (insert "Debugging "
+                (haskell-session-name (haskell-session))
+                "\n")))))
 
 (defun haskell-debug/breakpoint-numbers ()
   "List breakpoint numbers."
@@ -70,9 +89,20 @@
            ident))
   (message "Breaking on function: %s" ident))
 
+(defun haskell-debug-buffer-name ()
+  "The debug buffer name for the current session."
+  (format "*debug:%s*"
+          (haskell-session-name (haskell-session))))
+
 (define-derived-mode haskell-debug-mode
   text-mode "Debug"
-  "Major mode for debugging Haskell via GHCi.")
+  "Major mode for debugging Haskell via GHCi."
+  (setq buffer-read-only t)
+  (haskell-debug/refresh))
+
+(define-key haskell-debug-mode-map (kbd "g") 'haskell-debug/refresh)
+(define-key haskell-debug-mode-map (kbd "s") 'haskell-debug/step)
+(define-key haskell-debug-mode-map (kbd "b") 'haskell-debug/break-on-function)
 
 (defun haskell-debug-get-breakpoints ()
   "Get the list of breakpoints currently set."
