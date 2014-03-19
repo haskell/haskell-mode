@@ -186,7 +186,8 @@ Key bindings:
 
 (defun haskell-interactive-at-prompt ()
   "If at prompt, returns start position of user-input, otherwise returns nil."
-  (>= (point)
+  (if (>= (point)
+          haskell-interactive-mode-prompt-start)
       haskell-interactive-mode-prompt-start))
 
 (defun haskell-interactive-handle-expr ()
