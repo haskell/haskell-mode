@@ -212,6 +212,30 @@ imports become available?"
   (expand-file-name "logo.svg" haskell-mode-pkg-base-dir)
   "Haskell logo for notifications.")
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Accessing commands -- using cl 'defstruct'
+(defstruct haskell-command
+  "Data structure representing a command to be executed when with
+  a custom state and three callback."
+  ;; hold the custom command state
+  ;; state :: a
+  state
+  ;; called when to execute a command
+  ;; go :: a -> ()
+  go
+  ;; called whenever output was collected from the haskell process
+  ;; live :: a -> Response -> Bool
+  live
+  ;; called when the output from the haskell process indicates that the command
+  ;; is complete
+  ;; complete :: a -> Response -> ()
+  complete)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Accessing commands
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Specialised commands
 
@@ -1369,28 +1393,6 @@ function and remove this comment.
      (remove-if (lambda (path)
                   (string= path file))
                 files))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Accessing commands -- using cl 'defstruct'
-(defstruct haskell-command
-  "Data structure representing a command to be executed when with
-  a custom state and three callback."
-  ;; hold the custom command state
-  ;; state :: a
-  state
-  ;; called when to execute a command
-  ;; go :: a -> ()
-  go
-  ;; called whenever output was collected from the haskell process
-  ;; live :: a -> Response -> Bool
-  live
-  ;; called when the output from the haskell process indicates that the command
-  ;; is complete
-  ;; complete :: a -> Response -> ()
-  complete)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Accessing commands
 
 (defun haskell-command-exec-go (command)
   "Call the command's go function."
