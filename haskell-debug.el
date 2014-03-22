@@ -106,7 +106,7 @@
             (t
              (if context
                  (message "Computation finished.")
-               (when (y-or-n-p "Computation completed without breaking. Reload the module?")
+               (when (y-or-n-p "Computation completed without breaking. Reload the module and retry?")
                  (message "Reloading and resetting breakpoints...")
                  (haskell-interactive-mode-reset-error (haskell-session))
                  (loop for break in breakpoints
@@ -115,7 +115,8 @@
                            nil
                            nil))
                  (loop for break in breakpoints
-                       do (haskell-debug-break break))))))))))
+                       do (haskell-debug-break break))
+                 (haskell-debug/step expr)))))))))
    (haskell-debug/refresh)))
 
 (defun haskell-debug/start-step (expr)
