@@ -314,6 +314,8 @@ some old history, then display that."
   (haskell-debug-with-breakpoints
    (haskell-process-queue-sync-request (haskell-process) ":abandon")
    (message "Computation abandoned.")
+   (setq haskell-debug-history-cache nil)
+   (setq haskell-debug-bindings-cache nil)
    (haskell-debug/refresh)))
 
 (defun haskell-debug/continue ()
@@ -322,6 +324,8 @@ some old history, then display that."
   (haskell-debug-with-breakpoints
    (haskell-process-queue-sync-request (haskell-process) ":continue")
    (message "Computation continued.")
+   (setq haskell-debug-history-cache nil)
+   (setq haskell-debug-bindings-cache nil)
    (haskell-debug/refresh)))
 
 (defun haskell-debug/break-on-function ()
