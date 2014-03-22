@@ -17,32 +17,93 @@
 
 ;;; Code:
 
+(require 'cl)
+
+(defmacro haskell-debug-with-breakpoints (&rest body)
+  "Breakpoints need to exist to start stepping."
+  `(if (haskell-debug-get-breakpoints)
+       ,@body
+     (error "No breakpoints to step into!")))
+
+(defmacro haskell-debug-with-modules (&rest body)
+  "Modules need to exist to do debugging stuff."
+  `(if (haskell-debug-get-modules)
+       ,@body
+     (error "No modules loaded!")))
+
+(define-derived-mode haskell-debug-mode
+  text-mode "Debug"
+  "Major mode for debugging Haskell via GHCi.")
+
+(define-key haskell-debug-mode-map (kbd "g") 'haskell-debug/refresh)
+(define-key haskell-debug-mode-map (kbd "s") 'haskell-debug/step)
+(define-key haskell-debug-mode-map (kbd "d") 'haskell-debug/delete)
+(define-key haskell-debug-mode-map (kbd "b") 'haskell-debug/break-on-function)
+(define-key haskell-debug-mode-map (kbd "a") 'haskell-debug/abandon)
+(define-key haskell-debug-mode-map (kbd "c") 'haskell-debug/continue)
+(define-key haskell-debug-mode-map (kbd "RET") 'haskell-debug/select)
+
+(defun haskell-debug-session-debugging-p (session)
+  "Does the session have a debugging buffer open?"
+  (not (not (get-buffer (haskell-debug-buffer-name session)))))
+
 (defun haskell-debug ()
   "Start the debugger for the current Haskell (GHCi) session."
   (interactive)
   (let ((session (haskell-session)))
-    (switch-to-buffer-other-window (haskell-debug-buffer-name))
-    (haskell-debug-mode)
-    (setq haskell-session session)))
+    (switch-to-buffer-other-window (haskell-debug-buffer-name session))
+    (unless (eq major-mode 'haskell-debug-mode)
+      (haskell-debug-mode)
+      (haskell-debug-start session))))
+
+(defun haskell-debug/delete ()
+  "Delete whatever's at the point."
+  (interactive)
+  (cond
+   ((get-text-property (point) 'break)
+    (let ((break (get-text-property (point) 'break)))
+      (when (y-or-n-p (format "Delete breakpoint #%d?"
+                              (plist-get break :number)))
+        (haskell-process-queue-sync-request
+         (haskell-process)
+         (format ":delete %d"
+                 (plist-get break :number)))
+        (haskell-debug/refresh))))))
 
 (defun haskell-debug/step (&optional expr)
   "Step into the next function."
   (interactive)
-  (let* ((string
-          (haskell-process-queue-sync-request
-           (haskell-process)
-           (if expr
-               (concat ":step " expr)
-             ":step"))))
-    (cond
-     ((string= string "not stopped at a breakpoint")
-      (call-interactively 'haskell-debug/start-step))
-     (t (let ((maybe-stopped-at (haskell-debug-parse-stopped-at string)))
-          (cond
-           (maybe-stopped-at
-            (message "Computation paused."))
-           (t
-            (message "Computation finished."))))))))
+  (haskell-debug-with-breakpoints
+   (let* ((breakpoints (haskell-debug-get-breakpoints))
+          (context (haskell-debug-get-context))
+          (string
+           (haskell-process-queue-sync-request
+            (haskell-process)
+            (if expr
+                (concat ":step " expr)
+              ":step"))))
+     (cond
+      ((string= string "not stopped at a breakpoint")
+       (call-interactively 'haskell-debug/start-step))
+      (t (let ((maybe-stopped-at (haskell-debug-parse-stopped-at string)))
+           (cond
+            (maybe-stopped-at
+             (message "Computation paused.")
+             (haskell-debug/refresh))
+            (t
+             (if context
+                 (message "Computation finished.")
+               (when (y-or-n-p "Computation completed without breaking. Reload the module?")
+                 (message "Reloading and resetting breakpoints...")
+                 (haskell-interactive-mode-reset-error (haskell-session))
+                 (loop for break in breakpoints
+                       do (haskell-process-file-loadish
+                           (concat "load " (plist-get break :path))
+                           nil
+                           nil))
+                 (loop for break in breakpoints
+                       do (haskell-debug-break break))))))))))
+   (haskell-debug/refresh)))
 
 (defun haskell-debug/start-step (expr)
   "Start stepping EXPR."
@@ -52,13 +113,142 @@
 (defun haskell-debug/refresh ()
   "Refresh the debugger buffer."
   (interactive)
-  (with-current-buffer (haskell-debug-buffer-name)
-    (let ((inhibit-read-only t))
-      (when (= (point-min)
-               (point-max))
-        (insert "Debugging "
-                (haskell-session-name (haskell-session))
-                "\n")))))
+  (with-current-buffer (haskell-debug-buffer-name (haskell-session))
+    (let ((inhibit-read-only t)
+          (p (point)))
+      (erase-buffer)
+      (insert (propertize (concat "Debugging "
+                                  (haskell-session-name (haskell-session))
+                                  "\n\n")
+                          'face `((:weight bold))))
+      (let ((modules (haskell-debug-get-modules))
+            (breakpoints (haskell-debug-get-breakpoints))
+            (context (haskell-debug-get-context))
+            (history (haskell-debug-get-history)))
+        (unless modules
+          (insert (propertize "You have to load a module to start debugging.\n\n"
+                              'face
+                              `((:foreground ,sunburn-red)))))
+        (haskell-debug-insert-bindings modules breakpoints context)
+        (when modules
+          (haskell-debug-insert-current-context context history)
+          (haskell-debug-insert-breakpoints breakpoints))
+        (haskell-debug-insert-modules modules))
+      (insert "\n")
+      (goto-char (min (point-max) p)))))
+
+(defun haskell-debug-break (break)
+  "Set BREAK breakpoint in module at line/col."
+  (haskell-process-queue-without-filters
+   (haskell-process)
+   (format ":break %s %s %d"
+           (plist-get break :module)
+           (plist-get (plist-get break :span) :start-line)
+           (plist-get (plist-get break :span) :start-col))))
+
+(defun haskell-debug-insert-current-context (context history)
+  "Insert the current context."
+  (haskell-debug-insert-header "Context")
+  (if context
+      (haskell-debug-insert-context context history)
+    (haskell-debug-insert-muted "Not debugging right now."))
+  (insert "\n"))
+
+(defun haskell-debug-insert-context (context history)
+  "Insert the context and history."
+  (insert (propertize (plist-get context :name) 'face `((:weight bold)))
+          (haskell-debug-muted " - ")
+          (file-name-nondirectory (plist-get context :path))
+          (haskell-debug-muted " (stopped)")
+          "\n")
+  (let ((history (or history
+                     (list (haskell-debug-make-fake-history context)))))
+    (when history
+      (insert "\n")
+      (let ((i (length history)))
+        (loop for span in history
+              do (let ((string (haskell-debug-get-span-string
+                                (plist-get span :path)
+                                (plist-get span :span)))
+                       (index (plist-get span :index)))
+                   (insert (propertize (format "%4d" i)
+                                       'face `((:weight bold :background ,sunburn-bg+1)))
+                           " "
+                           (haskell-debug-preview-span
+                            (plist-get span :span)
+                            string)
+                           "\n")
+                   (setq i (1- i))))))))
+
+(defun haskell-debug-make-fake-history (context)
+  "Make a fake history item."
+  (list :index -1
+        :path (plist-get context :path)
+        :span (plist-get context :span)))
+
+(defun haskell-debug-preview-span (span string)
+  "Make a one-line preview of the given expression."
+  (with-temp-buffer
+    (haskell-mode)
+    (insert string)
+    (when (/= 0 (plist-get span :start-col))
+      (indent-rigidly (point-min)
+                      (point-max)
+                      1))
+    (font-lock-fontify-buffer)
+    (when (/= 0 (plist-get span :start-col))
+      (indent-rigidly (point-min)
+                      (point-max)
+                      -1))
+    (goto-char (point-min))
+    (replace-regexp-in-string
+     "\n[ ]*"
+     (propertize " " 'face `((:background ,sunburn-bg+1)))
+     (buffer-substring (point-min)
+                       (point-max)))))
+
+(defun haskell-debug-get-span-string (path span)
+  "Get the string from the PATH and the SPAN."
+  (save-window-excursion
+    (find-file path)
+    (buffer-substring-no-properties
+     (save-excursion
+       (goto-char (point-min))
+       (forward-line (1- (plist-get span :start-line)))
+       (forward-char (1- (plist-get span :start-col)))
+       (point))
+     (save-excursion
+       (goto-char (point-min))
+       (forward-line (1- (plist-get span :end-line)))
+       (forward-char (plist-get span :end-col))
+       (point)))))
+
+(defun haskell-debug-insert-bindings (modules breakpoints context)
+  "Insert a list of bindings."
+  (if breakpoints
+      (progn (haskell-debug-insert-binding "s" "step into an expression")
+             (haskell-debug-insert-binding "b" "breakpoint" t))
+    (progn
+      (when modules
+        (haskell-debug-insert-binding "b" "breakpoint"))
+      (when breakpoints
+        (haskell-debug-insert-binding "s" "step into an expression" t))))
+  (when breakpoints
+    (haskell-debug-insert-binding "d" "delete breakpoint"))
+  (when context
+    (haskell-debug-insert-binding "a" "abandon context")
+    (haskell-debug-insert-binding "c" "continue" t))
+  (haskell-debug-insert-binding "g" "refresh" t)
+  (insert "\n"))
+
+(defun haskell-debug-insert-binding (binding desc &optional end)
+  "Insert a helpful keybinding."
+  (insert (propertize binding 'face `((:foreground ,sunburn-blue :weight bold)))
+          (haskell-debug-muted " - ")
+          desc
+          (if end
+              "\n"
+            (haskell-debug-muted ", "))))
 
 (defun haskell-debug/breakpoint-numbers ()
   "List breakpoint numbers."
@@ -76,33 +266,191 @@
 (defun haskell-debug/abandon ()
   "Abandon the current computation."
   (interactive)
-  (haskell-process-queue-sync-request (haskell-process) ":abandon")
-  (message "Computation abandoned."))
+  (haskell-debug-with-breakpoints
+   (haskell-process-queue-sync-request (haskell-process) ":abandon")
+   (message "Computation abandoned.")
+   (haskell-debug/refresh)))
 
-(defun haskell-debug/break-on-function (ident)
+(defun haskell-debug/continue ()
+  "Continue the current computation."
+  (interactive)
+  (haskell-debug-with-breakpoints
+   (haskell-process-queue-sync-request (haskell-process) ":continue")
+   (message "Computation continued.")
+   (haskell-debug/refresh)))
+
+(defun haskell-debug/break-on-function ()
   "Break on function IDENT."
-  (interactive (list (read-from-minibuffer "Function: "
-                                           (haskell-ident-at-point))))
-  (haskell-process-queue-sync-request
-   (haskell-process)
-   (concat ":break "
-           ident))
-  (message "Breaking on function: %s" ident))
+  (interactive)
+  (haskell-debug-with-modules
+   (let ((ident (read-from-minibuffer "Function: "
+                                      (haskell-ident-at-point))))
+     (haskell-process-queue-sync-request
+      (haskell-process)
+      (concat ":break "
+              ident))
+     (message "Breaking on function: %s" ident)
+     (haskell-debug/refresh))))
 
-(defun haskell-debug-buffer-name ()
+(defun haskell-debug/select ()
+  "Select whatever is at point."
+  (interactive)
+  (cond
+   ((get-text-property (point) 'break)
+    (let ((break (get-text-property (point) 'break)))
+      (haskell-debug-highlight (plist-get break :path)
+                               (plist-get break :span))))
+   ((get-text-property (point) 'module)
+    (let ((break (get-text-property (point) 'module)))
+      (haskell-debug-highlight (plist-get break :path))))))
+
+(defun haskell-debug-highlight (path &optional span)
+  "Highlight the file at span."
+  (let ((p (make-overlay
+            (line-beginning-position)
+            (line-end-position))))
+    (overlay-put p 'face `((:background ,sunburn-bg+1)))
+    (with-current-buffer
+        (if span
+            (save-window-excursion
+              (find-file path)
+              (current-buffer))
+          (find-file path)
+          (current-buffer))
+      (let ((o (when span
+                 (make-overlay
+                  (save-excursion
+                    (goto-char (point-min))
+                    (forward-line (1- (plist-get span :start-line)))
+                    (forward-char (1- (plist-get span :start-col)))
+                    (point))
+                  (save-excursion
+                    (goto-char (point-min))
+                    (forward-line (1- (plist-get span :end-line)))
+                    (forward-char (plist-get span :end-col))
+                    (point))))))
+        (when o
+          (overlay-put o 'face `((:background ,sunburn-bg+1))))
+        (sit-for 0.5)
+        (when o
+          (delete-overlay o))
+        (delete-overlay p)))))
+
+(defun haskell-debug-insert-modules (modules)
+  "Insert the list of modules."
+  (haskell-debug-insert-header "Modules")
+  (if (null modules)
+      (haskell-debug-insert-muted "No loaded modules.")
+    (progn (loop for module in modules
+                 do (insert (propertize (plist-get module :module)
+                                        'module module
+                                        'face `((:weight bold)))
+                            (haskell-debug-muted " - ")
+                            (propertize (file-name-nondirectory (plist-get module :path))
+                                        'module module)))
+           (insert "\n"))))
+
+(defun haskell-debug-insert-header (title)
+  "Insert a header title."
+  (insert (propertize title
+                      'face `((:foreground ,sunburn-green)))
+          "\n\n"))
+
+(defun haskell-debug-insert-breakpoints (breakpoints)
+  "Insert the list of breakpoints."
+  (haskell-debug-insert-header "Breakpoints")
+  (if (null breakpoints)
+      (haskell-debug-insert-muted "No active breakpoints.")
+    (loop for break in breakpoints
+          do (insert (propertize (format "%d"
+                                         (plist-get break :number))
+                                 'face `((:weight bold)))
+                     (haskell-debug-muted " - ")
+                     (propertize (plist-get break :module)
+                                 'break break)
+                     (haskell-debug-muted
+                      (format " (%d:%d)"
+                              (plist-get (plist-get break :span) :start-line)
+                              (plist-get (plist-get break :span) :start-col)))
+                     "\n")))
+  (insert "\n"))
+
+(defun haskell-debug-insert-muted (text)
+  "Insert some muted text."
+  (insert (haskell-debug-muted text)
+          "\n"))
+
+(defun haskell-debug-muted (text)
+  "Make some muted text."
+  (propertize text 'face `((:foreground ,sunburn-grey+1))))
+
+(defun haskell-debug-buffer-name (session)
   "The debug buffer name for the current session."
   (format "*debug:%s*"
-          (haskell-session-name (haskell-session))))
+          (haskell-session-name session)))
 
-(define-derived-mode haskell-debug-mode
-  text-mode "Debug"
-  "Major mode for debugging Haskell via GHCi."
+(defun haskell-debug-start (session)
+  "Start the debug mode."
   (setq buffer-read-only t)
+  (haskell-session-assign session)
   (haskell-debug/refresh))
 
-(define-key haskell-debug-mode-map (kbd "g") 'haskell-debug/refresh)
-(define-key haskell-debug-mode-map (kbd "s") 'haskell-debug/step)
-(define-key haskell-debug-mode-map (kbd "b") 'haskell-debug/break-on-function)
+(defun haskell-debug-get-modules ()
+  "Get the list of modules currently set."
+  (let ((string (haskell-process-queue-sync-request
+                 (haskell-process)
+                 ":show modules")))
+    (if (string= string "")
+        (list)
+      (mapcar #'haskell-debug-parse-module
+              (split-string
+               string
+               "\n")))))
+
+(defun haskell-debug-get-context ()
+  "Get the current context."
+  (let ((string (haskell-process-queue-sync-request
+                 (haskell-process)
+                 ":show context")))
+    (if (string= string "")
+        nil
+      (haskell-debug-parse-context string))))
+
+(defun haskell-debug-get-history ()
+  "Get the step history."
+  (let ((string (haskell-process-queue-sync-request
+                 (haskell-process)
+                 ":history")))
+    (if (or (string= string "")
+            (string= string "Not stopped at a breakpoint"))
+        nil
+      (if (string= string "Empty history. Perhaps you forgot to use :trace?")
+          nil
+        (mapcar #'haskell-debug-parse-history-entry
+                (remove-if (lambda (line) (string= "<end of history>" line))
+                           (split-string
+                            string
+                            "\n")))))))
+
+(defun haskell-debug-parse-history-entry (string)
+  "Parse a history entry."
+  (if (string-match "^\\([-0-9]+\\)[ ]+:[ ]+\\([A-Za-z0-9_':]+\\)[ ]+(\\([^:]+\\):\\(.+?\\))$"
+                    string)
+      (list :index (string-to-number (match-string 1 string))
+            :name (match-string 2 string)
+            :path (match-string 3 string)
+            :span (haskell-debug-parse-span (match-string 4 string)))
+    (error "Unable to parse history entry: %s" string)))
+
+(defun haskell-debug-parse-context (string)
+  "Parse the context."
+  (cond
+   ((string-match "^--> \\(.+\\)\n  \\(.+\\)" string)
+    (let ((name (match-string 1 string))
+          (stopped (haskell-debug-parse-stopped-at (match-string 2 string))))
+      (list :name name
+            :path (plist-get stopped :path)
+            :span (plist-get stopped :span))))))
 
 (defun haskell-debug-get-breakpoints ()
   "Get the list of breakpoints currently set."
@@ -124,13 +472,28 @@ For example:
 Stopped at /home/foo/project/src/x.hs:6:25-36
 
 "
-  (let ((index (string-match "Stopped at \\([^:]+\\):\\(.+\\)\n"
+  (let ((index (string-match "Stopped at \\([^:]+\\):\\(.+\\)\n?"
                              string)))
     (when index
       (list :path (match-string 1 string)
             :span (haskell-debug-parse-span (match-string 2 string))
             :types (cdr (split-string (substring string index)
                                       "\n"))))))
+
+(defun haskell-debug-parse-module (string)
+  "Parse a module and path.
+
+For example:
+
+X                ( /home/foo/X.hs, interpreted )
+
+"
+  (if (string-match "^\\([^ ]+\\)[ ]+( \\([^ ]+?\\), [a-z]+ )$"
+                    string)
+      (list :module (match-string 1 string)
+            :path (match-string 2 string))
+    (error "Unable to parse module from string: %s"
+           string)))
 
 (defun haskell-debug-parse-break-point (string)
   "Parse a breakpoint number, module and location from a string.
@@ -183,3 +546,7 @@ variances in source span notation."
              string))))
 
 (provide 'haskell-debug)
+
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; End:
