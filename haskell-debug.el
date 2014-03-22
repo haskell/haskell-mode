@@ -43,6 +43,9 @@
 (define-key haskell-debug-mode-map (kbd "c") 'haskell-debug/continue)
 (define-key haskell-debug-mode-map (kbd "RET") 'haskell-debug/select)
 
+(defvar haskell-debug-history-cache nil
+  "Cache of the tracing history.")
+
 (defun haskell-debug-session-debugging-p (session)
   "Does the session have a debugging buffer open?"
   (not (not (get-buffer (haskell-debug-buffer-name session)))))
@@ -151,8 +154,17 @@
   (haskell-debug-insert-header "Context")
   (if context
       (haskell-debug-insert-context context history)
-    (haskell-debug-insert-muted "Not debugging right now."))
+    (haskell-debug-insert-debug-finished))
   (insert "\n"))
+
+(defun haskell-debug-insert-debug-finished ()
+  "Insert message that no debugging is happening, but if there is
+some old history, then display that."
+  (if haskell-debug-history-cache
+      (progn (haskell-debug-insert-muted "Finished debugging.")
+             (insert "\n")
+             (haskell-debug-insert-history haskell-debug-history-cache))
+    (haskell-debug-insert-muted "Not debugging right now.")))
 
 (defun haskell-debug-insert-context (context history)
   "Insert the context and history."
@@ -165,20 +177,24 @@
                      (list (haskell-debug-make-fake-history context)))))
     (when history
       (insert "\n")
-      (let ((i (length history)))
-        (loop for span in history
-              do (let ((string (haskell-debug-get-span-string
-                                (plist-get span :path)
-                                (plist-get span :span)))
-                       (index (plist-get span :index)))
-                   (insert (propertize (format "%4d" i)
-                                       'face `((:weight bold :background ,sunburn-bg+1)))
-                           " "
-                           (haskell-debug-preview-span
-                            (plist-get span :span)
-                            string)
-                           "\n")
-                   (setq i (1- i))))))))
+      (haskell-debug-insert-history history))))
+
+(defun haskell-debug-insert-history (history)
+  "Insert tracing HISTORY."
+  (let ((i (length history)))
+    (loop for span in history
+          do (let ((string (haskell-debug-get-span-string
+                            (plist-get span :path)
+                            (plist-get span :span)))
+                   (index (plist-get span :index)))
+               (insert (propertize (format "%4d" i)
+                                   'face `((:weight bold :background ,sunburn-bg+1)))
+                       " "
+                       (haskell-debug-preview-span
+                        (plist-get span :span)
+                        string)
+                       "\n")
+               (setq i (1- i))))))
 
 (defun haskell-debug-make-fake-history (context)
   "Make a fake history item."
@@ -426,11 +442,14 @@
         nil
       (if (string= string "Empty history. Perhaps you forgot to use :trace?")
           nil
-        (mapcar #'haskell-debug-parse-history-entry
-                (remove-if (lambda (line) (string= "<end of history>" line))
-                           (split-string
-                            string
-                            "\n")))))))
+        (let ((entries (mapcar #'haskell-debug-parse-history-entry
+                               (remove-if (lambda (line) (string= "<end of history>" line))
+                                          (split-string
+                                           string
+                                           "\n")))))
+          (set (make-local-variable 'haskell-debug-history-cache)
+               entries)
+          entries)))))
 
 (defun haskell-debug-parse-history-entry (string)
   "Parse a history entry."
