@@ -41,10 +41,15 @@
 (define-key haskell-debug-mode-map (kbd "b") 'haskell-debug/break-on-function)
 (define-key haskell-debug-mode-map (kbd "a") 'haskell-debug/abandon)
 (define-key haskell-debug-mode-map (kbd "c") 'haskell-debug/continue)
+(define-key haskell-debug-mode-map (kbd "p") 'haskell-debug/previous)
+(define-key haskell-debug-mode-map (kbd "n") 'haskell-debug/next)
 (define-key haskell-debug-mode-map (kbd "RET") 'haskell-debug/select)
 
 (defvar haskell-debug-history-cache nil
   "Cache of the tracing history.")
+
+(defvar haskell-debug-bindings-cache nil
+  "Cache of the current step's bindings.")
 
 (defun haskell-debug-session-debugging-p (session)
   "Does the session have a debugging buffer open?"
@@ -87,10 +92,15 @@
               ":step"))))
      (cond
       ((string= string "not stopped at a breakpoint")
-       (call-interactively 'haskell-debug/start-step))
+       (if haskell-debug-bindings-cache
+           (progn (setq haskell-debug-bindings-cache nil)
+                  (haskell-debug/refresh))
+         (call-interactively 'haskell-debug/start-step)))
       (t (let ((maybe-stopped-at (haskell-debug-parse-stopped-at string)))
            (cond
             (maybe-stopped-at
+             (set (make-local-variable 'haskell-debug-bindings-cache)
+                  maybe-stopped-at)
              (message "Computation paused.")
              (haskell-debug/refresh))
             (t
@@ -168,11 +178,23 @@ some old history, then display that."
 
 (defun haskell-debug-insert-context (context history)
   "Insert the context and history."
-  (insert (propertize (plist-get context :name) 'face `((:weight bold)))
-          (haskell-debug-muted " - ")
-          (file-name-nondirectory (plist-get context :path))
-          (haskell-debug-muted " (stopped)")
-          "\n")
+  (when context
+    (insert (propertize (plist-get context :name) 'face `((:weight bold)))
+            (haskell-debug-muted " - ")
+            (file-name-nondirectory (plist-get context :path))
+            (haskell-debug-muted " (stopped)")
+            "\n"))
+  (when haskell-debug-bindings-cache
+    (insert "\n")
+    (let ((bindings haskell-debug-bindings-cache))
+      (insert
+       (haskell-debug-get-span-string
+        (plist-get bindings :path)
+        (plist-get bindings :span)))
+      (insert "\n\n")
+      (loop for binding in (plist-get bindings :types)
+            do (insert (haskell-fontify-as-mode binding 'haskell-mode)
+                       "\n"))))
   (let ((history (or history
                      (list (haskell-debug-make-fake-history context)))))
     (when history
@@ -192,7 +214,8 @@ some old history, then display that."
                        " "
                        (haskell-debug-preview-span
                         (plist-get span :span)
-                        string)
+                        string
+                        t)
                        "\n")
                (setq i (1- i))))))
 
@@ -202,7 +225,7 @@ some old history, then display that."
         :path (plist-get context :path)
         :span (plist-get context :span)))
 
-(defun haskell-debug-preview-span (span string)
+(defun haskell-debug-preview-span (span string &optional collapsed)
   "Make a one-line preview of the given expression."
   (with-temp-buffer
     (haskell-mode)
@@ -217,17 +240,19 @@ some old history, then display that."
                       (point-max)
                       -1))
     (goto-char (point-min))
-    (replace-regexp-in-string
-     "\n[ ]*"
-     (propertize " " 'face `((:background ,sunburn-bg+1)))
-     (buffer-substring (point-min)
-                       (point-max)))))
+    (if collapsed
+        (replace-regexp-in-string
+         "\n[ ]*"
+         (propertize " " 'face `((:background ,sunburn-bg+1)))
+         (buffer-substring (point-min)
+                           (point-max)))
+      (buffer-string))))
 
 (defun haskell-debug-get-span-string (path span)
   "Get the string from the PATH and the SPAN."
   (save-window-excursion
     (find-file path)
-    (buffer-substring-no-properties
+    (buffer-substring
      (save-excursion
        (goto-char (point-min))
        (forward-line (1- (plist-get span :start-line)))
@@ -254,6 +279,9 @@ some old history, then display that."
   (when context
     (haskell-debug-insert-binding "a" "abandon context")
     (haskell-debug-insert-binding "c" "continue" t))
+  (when context
+    (haskell-debug-insert-binding "p" "previous step")
+    (haskell-debug-insert-binding "n" "next step" t))
   (haskell-debug-insert-binding "g" "refresh" t)
   (insert "\n"))
 
@@ -319,6 +347,18 @@ some old history, then display that."
    ((get-text-property (point) 'module)
     (let ((break (get-text-property (point) 'module)))
       (haskell-debug-highlight (plist-get break :path))))))
+
+(defun haskell-debug/next ()
+  "Go to next step to inspect bindings."
+  (interactive)
+  (haskell-debug-with-breakpoints
+   (haskell-debug-navigate "forward")))
+
+(defun haskell-debug/previous ()
+  "Go to previous step to inspect the bindings."
+  (interactive)
+  (haskell-debug-with-breakpoints
+   (haskell-debug-navigate "back")))
 
 (defun haskell-debug-highlight (path &optional span)
   "Highlight the file at span."
@@ -431,6 +471,40 @@ some old history, then display that."
     (if (string= string "")
         nil
       (haskell-debug-parse-context string))))
+
+(defun haskell-debug-navigate (direction)
+  "Navigate in DIRECTION \"back\" or \"forward\"."
+  (let ((string (haskell-process-queue-sync-request
+                 (haskell-process)
+                 (concat ":" direction))))
+    (set (make-local-variable 'haskell-debug-logged-cache)
+         (haskell-debug-parse-logged string))
+    (haskell-debug/refresh)))
+
+(defun haskell-debug-parse-logged (string)
+  "Parse the logged breakpoint."
+  (cond
+   ((string= "no more logged breakpoints" string)
+    nil)
+   ((string= "already at the beginning of the history" string)
+    nil)
+   (t
+    (with-temp-buffer
+      (insert string)
+      (goto-char (point-min))
+      (list :path (progn (search-forward " at ")
+                         (buffer-substring-no-properties
+                          (point)
+                          (1- (search-forward ":"))))
+            :span (haskell-debug-parse-span
+                   (buffer-substring-no-properties
+                    (point)
+                    (line-end-position)))
+            :bindings (progn (forward-line)
+                             (split-string (buffer-substring-no-properties
+                                            (point)
+                                            (point-max))
+                                           "\n")))))))
 
 (defun haskell-debug-get-history ()
   "Get the step history."
