@@ -482,8 +482,11 @@ some old history, then display that."
   (let ((string (haskell-process-queue-sync-request
                  (haskell-process)
                  (concat ":" direction))))
-    (set (make-local-variable 'haskell-debug-logged-cache)
-         (haskell-debug-parse-logged string))
+    (let ((bindings (haskell-debug-parse-logged string)))
+      (set (make-local-variable 'haskell-debug-bindings-cache)
+           bindings)
+      (when (not bindings)
+        (message "No more %s results!" direction)))
     (haskell-debug/refresh)))
 
 (defun haskell-debug-parse-logged (string)
@@ -505,11 +508,11 @@ some old history, then display that."
                    (buffer-substring-no-properties
                     (point)
                     (line-end-position)))
-            :bindings (progn (forward-line)
-                             (split-string (buffer-substring-no-properties
-                                            (point)
-                                            (point-max))
-                                           "\n")))))))
+            :types (progn (forward-line)
+                          (split-string (buffer-substring-no-properties
+                                         (point)
+                                         (point-max))
+                                        "\n")))))))
 
 (defun haskell-debug-get-history ()
   "Get the step history."
