@@ -425,9 +425,11 @@ some old history, then display that."
     (loop for break in breakpoints
           do (insert (propertize (format "%d"
                                          (plist-get break :number))
-                                 'face `((:weight bold)))
+                                 'face `((:weight bold))
+                                 'break break)
                      (haskell-debug-muted " - ")
                      (propertize (plist-get break :module)
+                                 'break break
                                  'break break)
                      (haskell-debug-muted
                       (format " (%d:%d)"
