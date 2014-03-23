@@ -186,8 +186,11 @@ Key bindings:
 
 (defun haskell-interactive-at-prompt ()
   "If at prompt, returns start position of user-input, otherwise returns nil."
-  (>= (point)
-      haskell-interactive-mode-prompt-start))
+  (if (>= (point)
+          haskell-interactive-mode-prompt-start)
+      haskell-interactive-mode-prompt-start
+    nil))
+
 
 (defun haskell-interactive-handle-expr ()
   "Handle an inputted expression at the REPL."
