@@ -1416,6 +1416,12 @@ function and remove this comment.
                (haskell-command-state command)
                response))))
 
+(defun haskell-process-cabal-macros ()
+  "Send the cabal macros string."
+  (interactive)
+  (haskell-process-queue-without-filters (haskell-process)
+                                         ":set -optP-include -optPdist/build/autogen/cabal_macros.h"))
+
 (provide 'haskell-process)
 
 ;; Local Variables:
