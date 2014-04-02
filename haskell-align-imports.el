@@ -149,9 +149,11 @@
 
 (defun haskell-align-imports-padding (imports)
   "Find the padding for each part of the import statements."
-  (reduce (lambda (a b) (mapcar* #'max a b))
-          (mapcar (lambda (x) (mapcar #'length (car x)))
-                  imports)))
+  (if (null imports)
+      imports
+    (reduce (lambda (a b) (mapcar* #'max a b))
+            (mapcar (lambda (x) (mapcar #'length (car x)))
+                    imports))))
 
 (defun haskell-align-imports-fill (padding line)
   "Fill an import line using the padding worked out from all statements."
