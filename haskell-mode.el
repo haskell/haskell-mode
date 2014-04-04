@@ -743,11 +743,10 @@ Brings up the documentation for haskell-mode-hook."
     (ignore-errors (when (and (boundp 'haskell-session) haskell-session)
                      (haskell-process-generate-tags))))
   (when haskell-stylish-on-save
-    (ignore-errors (haskell-mode-stylish-buffer)))
-  (let ((before-save-hook '())
-        (after-save-hook '()))
-    (basic-save-buffer))
-  )
+    (ignore-errors (haskell-mode-stylish-buffer))
+    (let ((before-save-hook '())
+          (after-save-hook '()))
+      (basic-save-buffer))))
 
 (defun haskell-mode-buffer-apply-command (cmd)
   "Execute shell command CMD with current buffer as input and
