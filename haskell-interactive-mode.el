@@ -212,6 +212,7 @@ Key bindings:
      (make-haskell-command
       :state (list session process expr 0)
       :go (lambda (state)
+            (insert "\n")
             (haskell-process-send-string (cadr state)
                                          (haskell-interactive-mode-multi-line (caddr state))))
       :live (lambda (state buffer)
@@ -222,7 +223,6 @@ Key bindings:
                               haskell-process-prompt-regex
                               "\n"
                               (substring buffer cursor))))
-                  (when (= 0 cursor) (insert "\n"))
                   (haskell-interactive-mode-eval-result (car state) next)
 
                   (setf (cdddr state) (list (length buffer)))
