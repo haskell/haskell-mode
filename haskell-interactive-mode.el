@@ -221,7 +221,7 @@ Key bindings:
                 (let* ((cursor (cadddr state))
                        (next (replace-regexp-in-string
                               haskell-process-prompt-regex
-                              "\n"
+                              ""
                               (substring buffer cursor))))
                   (haskell-interactive-mode-eval-result (car state) next)
 

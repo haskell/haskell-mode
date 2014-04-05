@@ -197,7 +197,7 @@ imports become available?"
   :group 'haskell-interactive)
 
 (defvar haskell-imported-suggested nil)
-(defvar haskell-process-prompt-regex "\\(^[> ]*> $\\|\n[> ]*> $\\)")
+(defvar haskell-process-prompt-regex "\4")
 (defvar haskell-reload-p nil)
 
 (defvar haskell-process-greetings
@@ -1018,7 +1018,7 @@ now."
     :state process
 
     :go (lambda (process)
-          (haskell-process-send-string process ":set prompt \"> \"")
+          (haskell-process-send-string process ":set prompt \"\\4\"")
           (haskell-process-send-string process "Prelude.putStrLn \"\"")
           (haskell-process-send-string process ":set -v1"))
 
