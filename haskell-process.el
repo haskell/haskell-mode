@@ -1065,10 +1065,12 @@ If I break, you can:
   (haskell-process-log (format "<- %S\n" response))
   (let ((session (haskell-process-project-by-proc proc)))
     (when session
-      (when (haskell-process-cmd (haskell-session-process session))
-        (haskell-process-collect session
+      (if (haskell-process-cmd (haskell-session-process session))
+          (haskell-process-collect session
                                  response
-                                 (haskell-session-process session))))))
+                                 (haskell-session-process session))
+        (haskell-interactive-mode-insert-garbage session
+                                                 response)))))
 
 (defun haskell-process-log (msg)
   "Write MSG to the process log (if enabled)."

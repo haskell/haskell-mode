@@ -138,6 +138,11 @@ Key bindings:
   "Face for the result."
   :group 'haskell-interactive)
 
+(defface haskell-interactive-face-garbage
+  '((t :inherit 'font-lock-string-face))
+  "Face for trailing garbage after a command has completed."
+  :group 'haskell-interactive)
+
 (defun haskell-interactive-mode-newline-indent ()
   "Make newline and indent."
   (interactive)
@@ -460,6 +465,16 @@ SESSION, otherwise operate on the current buffer.
                               'face type
                               'read-only t
                               'rear-nonsticky t)))))))
+
+(defun haskell-interactive-mode-insert-garbage (session message)
+  "Echo a read only piece of text before the prompt."
+  (with-current-buffer (haskell-session-interactive-buffer session)
+    (save-excursion
+      (haskell-interactive-mode-goto-end-point)
+      (insert (propertize message
+                          'face 'haskell-interactive-face-garbage
+                          'read-only t
+                          'rear-nonsticky t)))))
 
 (defun haskell-interactive-mode-insert (session message)
   "Echo a read only piece of text before the prompt."
