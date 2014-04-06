@@ -1068,10 +1068,11 @@ If I break, you can:
     (when session
       (if (haskell-process-cmd (haskell-session-process session))
           (haskell-process-collect session
-                                 response
-                                 (haskell-session-process session))
-        (haskell-interactive-mode-insert-garbage session
-                                                 response)))))
+                                   response
+                                   (haskell-session-process session))
+        (haskell-interactive-mode-insert-garbage
+         session
+         (replace-regexp-in-string "\4" "" response))))))
 
 (defun haskell-process-log (msg)
   "Write MSG to the process log (if enabled)."
