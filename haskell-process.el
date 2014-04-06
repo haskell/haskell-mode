@@ -43,6 +43,7 @@
 (declare-function haskell-interactive-mode-insert "haskell-interactive-mode" (session message))
 (declare-function haskell-interactive-mode-reset-error "haskell-interactive-mode" (session))
 (declare-function haskell-interactive-show-load-message "haskell-interactive-mode" (session type module-name file-name echo))
+(declare-function haskell-interactive-mode-insert-garbage "haskell-interactive-mode" (session message))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configuration
