@@ -521,6 +521,11 @@ to be loaded by ghci."
                              (caddr state)
                              message-count)))
             (haskell-interactive-mode-echo session msg)
+            (when (= message-count 0)
+              (haskell-interactive-mode-echo
+               session
+               "No compiler messages, dumping complete output:")
+              (haskell-interactive-mode-echo session response))
             (haskell-mode-message-line msg)
             (when (and haskell-notify-p
                        (fboundp 'notifications-notify))
