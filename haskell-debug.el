@@ -91,7 +91,7 @@
                 (concat ":step " expr)
               ":step"))))
      (cond
-      ((string= string "not stopped at a breakpoint")
+      ((string= string "not stopped at a breakpoint\n")
        (if haskell-debug-bindings-cache
            (progn (setq haskell-debug-bindings-cache nil)
                   (haskell-debug/refresh))
@@ -458,6 +458,10 @@ some old history, then display that."
   (haskell-session-assign session)
   (haskell-debug/refresh))
 
+(defun haskell-debug-split-string (string)
+  "Split GHCi's line-based output, stripping the trailing newline."
+  (split-string string "\n" t))
+
 (defun haskell-debug-get-modules ()
   "Get the list of modules currently set."
   (let ((string (haskell-process-queue-sync-request
@@ -466,9 +470,7 @@ some old history, then display that."
     (if (string= string "")
         (list)
       (mapcar #'haskell-debug-parse-module
-              (split-string
-               string
-               "\n")))))
+              (haskell-debug-split-string string)))))
 
 (defun haskell-debug-get-context ()
   "Get the current context."
@@ -494,9 +496,9 @@ some old history, then display that."
 (defun haskell-debug-parse-logged (string)
   "Parse the logged breakpoint."
   (cond
-   ((string= "no more logged breakpoints" string)
+   ((string= "no more logged breakpoints\n" string)
     nil)
-   ((string= "already at the beginning of the history" string)
+   ((string= "already at the beginning of the history\n" string)
     nil)
    (t
     (with-temp-buffer
@@ -511,10 +513,10 @@ some old history, then display that."
                     (point)
                     (line-end-position)))
             :types (progn (forward-line)
-                          (split-string (buffer-substring-no-properties
-                                         (point)
-                                         (point-max))
-                                        "\n")))))))
+                          (haskell-debug-split-string
+                           (buffer-substring-no-properties
+                            (point)
+                            (point-max)))))))))
 
 (defun haskell-debug-get-history ()
   "Get the step history."
@@ -522,15 +524,14 @@ some old history, then display that."
                  (haskell-process)
                  ":history")))
     (if (or (string= string "")
-            (string= string "Not stopped at a breakpoint"))
+            (string= string "Not stopped at a breakpoint\n"))
         nil
-      (if (string= string "Empty history. Perhaps you forgot to use :trace?")
+      (if (string= string "Empty history. Perhaps you forgot to use :trace?\n")
           nil
         (let ((entries (mapcar #'haskell-debug-parse-history-entry
-                               (remove-if (lambda (line) (string= "<end of history>" line))
-                                          (split-string
-                                           string
-                                           "\n")))))
+                               (remove-if (lambda (line) (or (string= "<end of history>" line)
+                                                             (string= "..." line)))
+                                          (haskell-debug-split-string string)))))
           (set (make-local-variable 'haskell-debug-history-cache)
                entries)
           entries)))))
@@ -560,12 +561,10 @@ some old history, then display that."
   (let ((string (haskell-process-queue-sync-request
                  (haskell-process)
                  ":show breaks")))
-    (if (string= string "No active breakpoints.")
+    (if (string= string "No active breakpoints.\n")
         (list)
       (mapcar #'haskell-debug-parse-break-point
-              (split-string
-               string
-               "\n")))))
+              (haskell-debug-split-string string)))))
 
 (defun haskell-debug-parse-stopped-at (string)
   "Parse the location stopped at from the given string.
@@ -580,8 +579,7 @@ Stopped at /home/foo/project/src/x.hs:6:25-36
     (when index
       (list :path (match-string 1 string)
             :span (haskell-debug-parse-span (match-string 2 string))
-            :types (cdr (split-string (substring string index)
-                                      "\n"))))))
+            :types (cdr (haskell-debug-split-string (substring string index)))))))
 
 (defun haskell-debug-parse-module (string)
   "Parse a module and path.
