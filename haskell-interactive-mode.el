@@ -28,9 +28,16 @@
 ;;; Code:
 
 (require 'haskell-process)
+(require 'haskell-collapse)
 (require 'haskell-session)
 (require 'haskell-show)
 (with-no-warnings (require 'cl))
+
+(defcustom haskell-interactive-mode-collapse
+  nil
+  "Collapse printed results."
+  :type 'boolean
+  :group 'haskell-interactive)
 
 (defcustom haskell-interactive-mode-eval-pretty
   nil
@@ -403,8 +410,11 @@ SESSION, otherwise operate on the current buffer.
     (let ((inhibit-read-only t))
       (delete-region (1+ haskell-interactive-mode-prompt-start) (point))
       (goto-char (point-max))
-      (insert (haskell-fontify-as-mode (concat text "\n")
-                                       haskell-interactive-mode-eval-mode)))))
+      (let ((start (point)))
+        (insert (haskell-fontify-as-mode (concat text "\n")
+                                         haskell-interactive-mode-eval-mode))
+        (when haskell-interactive-mode-collapse
+          (haskell-collapse start (point)))))))
 
 (defun haskell-interactive-mode-eval-pretty-result (session text)
   "Insert the result of an eval as a pretty printed Showable, if
