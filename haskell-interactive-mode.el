@@ -58,6 +58,10 @@ interference with prompts that look like haskell expressions."
   nil
   "Mark used for the beginning of the prompt.")
 
+(defvar haskell-interactive-mode-old-prompt-start
+  nil
+  "Mark used for the old beginning of the prompt.")
+
 (defcustom haskell-interactive-mode-eval-mode
   nil
   "Use the given mode's font-locking to render some text."
@@ -209,6 +213,8 @@ Key bindings:
   (when (haskell-interactive-at-prompt)
     (let ((expr (haskell-interactive-mode-input)))
       (when (not (string= "" (replace-regexp-in-string " " "" expr)))
+        (setq haskell-interactive-mode-old-prompt-start
+              (copy-marker haskell-interactive-mode-prompt-start))
         (set-marker haskell-interactive-mode-prompt-start (point-max))
         (haskell-interactive-mode-history-add expr)
         (haskell-interactive-mode-run-expr expr)))))
@@ -239,18 +245,53 @@ Key bindings:
 
                   (setf (cdddr state) (list (length buffer)))
                   nil)))
-      :complete (lambda (state response)
-                  (let ((response (haskell-interactive-mode-cleanup-response
-                                   (caddr state) response)))
-                    (cond
-                     (haskell-interactive-mode-eval-mode
-                      (haskell-interactive-mode-eval-as-mode (car state) response))
-                     ((haskell-interactive-mode-line-is-query (elt state 2))
-                      (let ((haskell-interactive-mode-eval-mode 'haskell-mode))
-                        (haskell-interactive-mode-eval-as-mode (car state) response)))
-                     (haskell-interactive-mode-eval-pretty
-                      (haskell-interactive-mode-eval-pretty-result (car state) response))))
-                  (haskell-interactive-mode-prompt (car state)))))))
+      :complete
+      (lambda (state response)
+        (unless (haskell-interactive-mode-trigger-compile-error state response)
+          (haskell-interactive-mode-expr-result state response)))))))
+
+(defun haskell-interactive-mode-trigger-compile-error (state response)
+  "Look for an <interactive> compile error; if there is one, pop
+  that up in a buffer, similar to `debug-on-error'."
+  (when (and (string-match "^\n<interactive>:[0-9]+:[0-9]+:" response)
+             (not (string-match "^\n<interactive>:[0-9]+:[0-9]+:[\n ]+Warning: " response)))
+    (let ((inhibit-read-only t))
+      (delete-region haskell-interactive-mode-prompt-start (point))
+      (set-marker haskell-interactive-mode-prompt-start
+                  haskell-interactive-mode-old-prompt-start)
+      (goto-char (point-max)))
+    (let ((buf (get-buffer-create "*HS-Error*")))
+      (pop-to-buffer buf nil t)
+      (with-current-buffer buf
+        (haskell-error-mode)
+        (let ((inhibit-read-only t))
+          (erase-buffer)
+          (insert (propertize response
+                              'face
+                              'haskell-interactive-face-compile-error))
+          (goto-char (point-min))
+          (delete-blank-lines))))
+    t))
+
+(define-derived-mode haskell-error-mode
+  special-mode "Error"
+  "Major mode for viewing Haskell compile errors.")
+
+;; (define-key haskell-error-mode-map (kbd "q") 'quit-window)
+
+(defun haskell-interactive-mode-expr-result (state response)
+  "Print the result of evaluating the expression."
+  (let ((response (haskell-interactive-mode-cleanup-response
+                   (caddr state) response)))
+    (cond
+     (haskell-interactive-mode-eval-mode
+      (haskell-interactive-mode-eval-as-mode (car state) response))
+     ((haskell-interactive-mode-line-is-query (elt state 2))
+      (let ((haskell-interactive-mode-eval-mode 'haskell-mode))
+        (haskell-interactive-mode-eval-as-mode (car state) response)))
+     (haskell-interactive-mode-eval-pretty
+      (haskell-interactive-mode-eval-pretty-result (car state) response))))
+  (haskell-interactive-mode-prompt (car state)))
 
 (defun haskell-interactive-mode-cleanup-response (expr response)
   "Ignore the mess that GHCi outputs on multi-line input."
