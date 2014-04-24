@@ -1205,7 +1205,7 @@ This uses `accept-process-output' internally."
          (rawstr (haskell-process-queue-sync-request process reqstr)))
     (if (string-prefix-p "unknown command " rawstr)
         (error "GHCi lacks `:complete' support")
-      (let* ((s1 (split-string rawstr "\r?\n"))
+      (let* ((s1 (split-string rawstr "\r?\n" t))
              (cs (mapcar #'haskell-str-literal-decode (cdr s1)))
              (h0 (car s1))) ;; "<cnt1> <cnt2> <quoted-str>"
         (unless (string-match "\\`\\([0-9]+\\) \\([0-9]+\\) \\(\".*\"\\)\\'" h0)
