@@ -307,7 +307,7 @@ possible, using GHCi's :type."
                    (t
                     (with-current-buffer (nth 2 state)
                       (goto-char (line-beginning-position))
-                      (insert (format "%s\n" (replace-regexp-in-string "\n" " " response)))))))))))
+                      (insert (format "%s\n" (replace-regexp-in-string "\n$" "" response)))))))))))
 
 ;;;###autoload
 (defun haskell-process-do-info (&optional prompt-value)
