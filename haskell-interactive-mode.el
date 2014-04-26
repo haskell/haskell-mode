@@ -217,7 +217,14 @@ Key bindings:
               (copy-marker haskell-interactive-mode-prompt-start))
         (set-marker haskell-interactive-mode-prompt-start (point-max))
         (haskell-interactive-mode-history-add expr)
-        (haskell-interactive-mode-run-expr expr)))))
+        (haskell-interactive-mode-do-expr expr)))))
+
+(defun haskell-interactive-mode-do-expr (expr)
+  (cond
+   ((string-match "^:present " expr)
+    (haskell-interactive-mode-do-presentation (replace-regexp-in-string "^:present " "" expr)))
+   (t
+    (haskell-interactive-mode-run-expr expr))))
 
 (defun haskell-interactive-mode-run-expr (expr)
   "Run the given expression."
@@ -786,6 +793,164 @@ FILE-NAME only."
                haskell-session
                (y-or-n-p "Kill the whole session?"))
       (haskell-session-kill t))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Presentation
+
+(defun haskell-interactive-mode-do-presentation (expr)
+  "Present the given expression. Requires the `present` package
+  to be installed. Will automatically import it qualified as Present."
+  (let ((p (haskell-process)))
+    ;; If Present.code isn't available, we probably need to run the
+    ;; setup.
+    (unless (string-match "^Present" (haskell-process-queue-sync-request p ":t Present.encode"))
+      (haskell-interactive-mode-setup-presentation p))
+    ;; Happily, let statements don't affect the `it' binding in any
+    ;; way, so we can fake it, no pun intended.
+    (let ((error (haskell-process-queue-sync-request
+                  p (concat "let it = Present.asData (" expr ")"))))
+      (if (not (string= "" error))
+          (haskell-interactive-mode-eval-result (haskell-session) (concat error "\n"))
+        (let ((presentation (haskell-interactive-mode-present-id (list 0))))
+          (insert "\n")
+          (haskell-interactive-mode-insert-presentation presentation)
+          (haskell-interactive-mode-eval-result (haskell-session) "\n")))
+      (haskell-interactive-mode-prompt (haskell-session)))))
+
+(define-button-type 'haskell-presentation-slot-button
+  'action 'haskell-presentation-present-slot
+  'follow-link t
+  'help-echo "Click to expand…")
+
+(defun haskell-presentation-present-slot (btn)
+  "The callback to evaluate the slot and present it in place of the button."
+  (let ((id (button-get btn 'presentation-id))
+        (parent-rep (button-get btn 'parent-rep)))
+    (let ((point (point)))
+      (button-put btn 'invisible t)
+      (delete-region (button-start btn) (button-end btn))
+      (haskell-interactive-mode-insert-presentation
+       (haskell-interactive-mode-present-id id)
+       parent-rep)
+      (when (> (point) point)
+        (goto-char (1+ point))))))
+
+(defun haskell-interactive-mode-presentation-slot (slot parent-rep)
+  "Make a slot at point, pointing to ID."
+  (let ((type (car slot))
+        (id (cadr slot)))
+    (if (member (intern type) '(Integer Char Int Float Double))
+        (haskell-interactive-mode-insert-presentation
+         (haskell-interactive-mode-present-id id)
+         parent-rep)
+      (haskell-interactive-mode-presentation-slot-button slot parent-rep))))
+
+(defun haskell-interactive-mode-presentation-slot-button (slot parent-rep)
+  (let ((start (point))
+        (type (car slot))
+        (id (cadr slot)))
+    (insert (propertize type 'face '(:height 0.8 :underline t :inherit 'font-lock-comment-face)))
+    (let ((button (make-text-button start (point)
+                                    :type 'haskell-presentation-slot-button)))
+      (button-put button 'hide-on-click t)
+      (button-put button 'presentation-id id)
+      (button-put button 'parent-rep parent-rep))))
+
+(defun haskell-interactive-mode-insert-presentation (presentation &optional parent-rep)
+  "Insert the presentation, hooking up buttons for each slot."
+  (let* ((rep (cadr (assoc 'rep presentation)))
+         (text (cadr (assoc 'text presentation)))
+         (type (cadr (assoc 'type presentation)))
+         (slots (cadr (assoc 'slots presentation)))
+         (nullary (null slots)))
+    (cond
+     ((string= "integer" rep)
+      (insert (propertize text 'face 'font-lock-constant)))
+     ((string= "floating" rep)
+      (insert (propertize text 'face 'font-lock-constant)))
+     ((string= "char" rep)
+      (insert (propertize
+               (if (string= "string" parent-rep)
+                   (replace-regexp-in-string "^'\\(.+\\)'$" "\\1" text)
+                 text)
+               'face 'font-lock-string-face)))
+     ((string= "tuple" rep)
+      (insert "(")
+      (let ((first t))
+        (loop for slot in slots
+              do (unless first (insert ","))
+              do (haskell-interactive-mode-presentation-slot slot rep)
+              do (setq first nil)))
+      (insert ")"))
+     ((string= "list" rep)
+      (if (null slots)
+          (insert "[]")
+        (let ((first t))
+          (when parent-rep (insert "("))
+          (loop for slot in slots
+                do (unless first (insert ":"))
+                do (haskell-interactive-mode-presentation-slot slot rep)
+                do (setq first nil))
+          (when parent-rep (insert ")")))))
+     ((string= "string" rep)
+      (unless (string= "string" parent-rep)
+        (insert (propertize "\"" 'face 'font-lock-string-face)))
+      (loop for slot in slots
+            do (haskell-interactive-mode-presentation-slot slot rep))
+      (unless (string= "string" parent-rep)
+        (insert (propertize "\"" 'face 'font-lock-string-face))))
+     ((string= "alg" rep)
+      (when (and parent-rep (not nullary))
+        (insert "("))
+      (insert (propertize text 'face 'font-lock-type-face))
+      (loop for slot in slots
+            do (insert " ")
+            do (haskell-interactive-mode-presentation-slot slot rep))
+      (when (and parent-rep (not nullary))
+        (insert ")")))
+     (t
+      (let ((err "Unable to present! This very likely means Emacs
+is out of sync with the `present' package. You should make sure
+they're both up to date, or report a bug."))
+        (insert err)
+        (error err))))))
+
+(defun haskell-interactive-mode-present-id (id)
+  "Generate a presentation for the current expression at ID."
+  ;; See below for commentary of this statement.
+  (let ((p (haskell-process)))
+    (haskell-process-queue-without-filters
+     p "let _it = it")
+    (let ((reply
+           (read
+            (haskell-process-queue-sync-request
+             p
+             (format "Present.putStr (Present.encode (Present.fromJust (Present.present (Present.fromJust (Present.fromList [%s])) it)))"
+                     (mapconcat 'identity (mapcar 'number-to-string id) ","))))))
+      ;; Not necessary, but nice to restore it to the expression that
+      ;; the user actually typed in.
+      (haskell-process-queue-without-filters
+       p "let it = _it")
+      reply)))
+
+(defun haskell-interactive-mode-setup-presentation (p)
+  "Setup the GHCi REPL for using presentations.
+
+Using asynchronous queued commands as opposed to sync at this
+stage, as sync would freeze up the UI a bit, and we actually
+don't care when the thing completes as long as it's soonish."
+  ;; Import dependencies under Present.* namespace
+  (haskell-process-queue-without-filters p "import qualified Data.Maybe as Present")
+  (haskell-process-queue-without-filters p "import qualified Data.ByteString.Lazy as Present")
+  (haskell-process-queue-without-filters p "import qualified Data.AttoLisp as Present")
+  (haskell-process-queue-without-filters p "import qualified Data.ID as Present")
+  (haskell-process-queue-without-filters p "import qualified Present as Present")
+  ;; Make a dummy expression to avoid "Loading package" nonsense
+  (haskell-process-queue-without-filters
+   p "Present.present (Present.fromJust (Present.fromList [0])) ()"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Misc
 
 (add-hook 'kill-buffer-hook 'haskell-interactive-kill)
 
