@@ -30,7 +30,7 @@
   "Face for quarantines."
   :group 'shm)
 
-(defcustom haskell-w3m-haddock-dir
+(defcustom haskell-w3m-haddock-dirs
   "~/.cabal/share/doc/"
   "The path to your cabal documentation dir. It should contain
 directories of package-name-x.x.
@@ -38,7 +38,7 @@ directories of package-name-x.x.
 You can rebind this if you're using hsenv by adding it to your
 .dir-locals.el in your project root. E.g.
 
-    ((haskell-mode . ((haskell-w3m-haddock-dir . \"/home/chris/Projects/foobar/.hsenv/cabal/share/doc\"))))
+    ((haskell-mode . ((haskell-w3m-haddock-dirs . (\"/home/chris/Projects/foobar/.hsenv/cabal/share/doc\")))))
 
 "
   :group 'shm
@@ -51,23 +51,34 @@ You can rebind this if you're using hsenv by adding it to your
   "Open a haddock page in w3m."
   (interactive)
   (let* ((entries (remove-if (lambda (s) (string= s ""))
-                             (split-string (shell-command-to-string (concat "ls -1 " haskell-w3m-haddock-dir))
-                                           "\n")))
+                             (apply 'append (mapcar (lambda (dir)
+                                                      (split-string (shell-command-to-string (concat "ls -1 " dir))
+
+                                                                    "\n"))
+                                                    haskell-w3m-haddock-dirs))))
          (package-dir (ido-completing-read
                        "Package: "
                        entries)))
     (cond
      ((member package-dir entries)
-      (w3m-browse-url (concat "file://"
-                              haskell-w3m-haddock-dir
-                              "/"
-                              package-dir
-                              "/html/index.html")
-                      t))
+      (loop for dir in haskell-w3m-haddock-dirs
+            when (w3m-haddock-find-index dir package-dir)
+            do (progn (w3m-browse-url (w3m-haddock-find-index dir package-dir)
+                                      t)
+                      (return))))
      (t
       (w3m-browse-url (concat "http://hackage.haskell.org/package/"
                               package-dir)
                       t)))))
+
+(defun w3m-haddock-find-index (dir package)
+  (let ((html-index (concat dir "/" package "/html/index.html"))
+        (index (concat dir "/" package "/index.html")))
+    (cond
+     ((file-exists-p html-index)
+      html-index)
+     ((file-exists-p index)
+      index))))
 
 (defun w3m-haddock-page-p ()
   "Haddock general page?"
