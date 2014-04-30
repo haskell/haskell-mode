@@ -825,27 +825,30 @@ FILE-NAME only."
 (defun haskell-presentation-present-slot (btn)
   "The callback to evaluate the slot and present it in place of the button."
   (let ((id (button-get btn 'presentation-id))
-        (parent-rep (button-get btn 'parent-rep)))
+        (parent-rep (button-get btn 'parent-rep))
+        (continuation (button-get btn 'continuation)))
     (let ((point (point)))
       (button-put btn 'invisible t)
       (delete-region (button-start btn) (button-end btn))
       (haskell-interactive-mode-insert-presentation
        (haskell-interactive-mode-present-id id)
-       parent-rep)
+       parent-rep
+       continuation)
       (when (> (point) point)
         (goto-char (1+ point))))))
 
-(defun haskell-interactive-mode-presentation-slot (slot parent-rep)
+(defun haskell-interactive-mode-presentation-slot (slot parent-rep &optional continuation)
   "Make a slot at point, pointing to ID."
   (let ((type (car slot))
         (id (cadr slot)))
     (if (member (intern type) '(Integer Char Int Float Double))
         (haskell-interactive-mode-insert-presentation
          (haskell-interactive-mode-present-id id)
-         parent-rep)
-      (haskell-interactive-mode-presentation-slot-button slot parent-rep))))
+         parent-rep
+         continuation)
+      (haskell-interactive-mode-presentation-slot-button slot parent-rep continuation))))
 
-(defun haskell-interactive-mode-presentation-slot-button (slot parent-rep)
+(defun haskell-interactive-mode-presentation-slot-button (slot parent-rep continuation)
   (let ((start (point))
         (type (car slot))
         (id (cadr slot)))
@@ -854,9 +857,10 @@ FILE-NAME only."
                                     :type 'haskell-presentation-slot-button)))
       (button-put button 'hide-on-click t)
       (button-put button 'presentation-id id)
-      (button-put button 'parent-rep parent-rep))))
+      (button-put button 'parent-rep parent-rep)
+      (button-put button 'continuation continuation))))
 
-(defun haskell-interactive-mode-insert-presentation (presentation &optional parent-rep)
+(defun haskell-interactive-mode-insert-presentation (presentation &optional parent-rep continuation)
   "Insert the presentation, hooking up buttons for each slot."
   (let* ((rep (cadr (assoc 'rep presentation)))
          (text (cadr (assoc 'text presentation)))
@@ -884,14 +888,26 @@ FILE-NAME only."
       (insert ")"))
      ((string= "list" rep)
       (if (null slots)
-          (insert "[]")
-        (let ((first t))
-          (when parent-rep (insert "("))
-          (loop for slot in slots
-                do (unless first (insert ":"))
-                do (haskell-interactive-mode-presentation-slot slot rep)
-                do (setq first nil))
-          (when parent-rep (insert ")")))))
+          (if continuation
+              (progn (delete-char -1)
+                     (delete-indentation))
+            (insert "[]"))
+        (let ((i 0))
+          (unless continuation
+            (insert "["))
+          (let ((start-column (current-column)))
+            (loop for slot in slots
+                  do (haskell-interactive-mode-presentation-slot
+                      slot
+                      rep
+                      (= i (1- (length slots))))
+                  do (when (not (= i (1- (length slots))))
+                       (insert "\n")
+                       (indent-to (1- start-column))
+                       (insert ","))
+                  do (setq i (1+ i))))
+          (unless continuation
+            (insert "]")))))
      ((string= "string" rep)
       (unless (string= "string" parent-rep)
         (insert (propertize "\"" 'face 'font-lock-string-face)))
@@ -900,7 +916,9 @@ FILE-NAME only."
       (unless (string= "string" parent-rep)
         (insert (propertize "\"" 'face 'font-lock-string-face))))
      ((string= "alg" rep)
-      (when (and parent-rep (not nullary))
+      (when (and parent-rep
+                 (not nullary)
+                 (not (string= "list" parent-rep)))
         (insert "("))
       (let ((start-column (current-column)))
         (insert (propertize text 'face 'font-lock-type-face))
@@ -909,7 +927,9 @@ FILE-NAME only."
               do (indent-to (+ 2 start-column))
               do (haskell-interactive-mode-presentation-slot slot rep)
               do (setq first nil)))
-      (when (and parent-rep (not nullary))
+      (when (and parent-rep
+                 (not nullary)
+                 (not (string= "list" parent-rep)))
         (insert ")")))
      (t
       (let ((err "Unable to present! This very likely means Emacs
