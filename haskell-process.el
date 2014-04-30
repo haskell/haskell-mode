@@ -637,15 +637,14 @@ from `module-buffer'."
           (concat "\\[[ ]*\\([0-9]+\\) of \\([0-9]+\\)\\]"
                   " Compiling \\([^ ]+\\)[ ]+"
                   "( \\([^ ]+\\), \\([^ ]+\\) )[^\r\n]*[\r\n]+"))
-         (let ((session (haskell-process-session process))
-               (module-name (match-string 3 buffer))
-               (file-name (match-string 4 buffer)))
-           (haskell-interactive-show-load-message
-            session
-            'compiling
-            module-name
-            (haskell-session-strip-dir session file-name)
-            echo-in-repl))
+         (haskell-process-load-message process buffer echo-in-repl nil)
+         t)
+        ((haskell-process-consume
+          process
+          (concat "\\[[ ]*\\([0-9]+\\) of \\([0-9]+\\)\\]"
+                  " Compiling \\[TH\\] \\([^ ]+\\)[ ]+"
+                  "( \\([^ ]+\\), \\([^ ]+\\) )[^\r\n]*[\r\n]+"))
+         (haskell-process-echo-load-message process buffer echo-in-repl t)
          t)
         ((haskell-process-consume process "Loading package \\([^ ]+\\) ... linking ... done.\n")
          (haskell-mode-message-line
@@ -670,6 +669,19 @@ from `module-buffer'."
             (haskell-process-session process)
             msg)
            (haskell-mode-message-line msg)))))
+
+(defun haskell-process-echo-load-message (process buffer echo-in-repl th)
+  "Echo a load message."
+  (let ((session (haskell-process-session process))
+        (module-name (match-string 3 buffer))
+        (file-name (match-string 4 buffer)))
+    (haskell-interactive-show-load-message
+     session
+     'compiling
+     module-name
+     (haskell-session-strip-dir session file-name)
+     echo-in-repl
+     th)))
 
 (defun haskell-process-errors-warnings (session process buffer)
   "Trigger handling type errors or warnings."

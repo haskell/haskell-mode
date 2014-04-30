@@ -599,14 +599,16 @@ SESSION, otherwise operate on the current buffer.
   "Get the interactive buffer of the session."
   (haskell-session-interactive-buffer (haskell-session)))
 
-(defun haskell-interactive-show-load-message (session type module-name file-name echo)
+(defun haskell-interactive-show-load-message (session type module-name file-name echo th)
   "Show the '(Compiling|Loading) X' message."
-  (let ((msg (ecase type
-               ('compiling
-                (if haskell-interactive-mode-include-file-name
-                    (format "Compiling: %s (%s)" module-name file-name)
-                  (format "Compiling: %s" module-name)))
-               ('loading (format "Loading: %s" module-name)))))
+  (let ((msg (concat
+              (ecase type
+                ('compiling
+                 (if haskell-interactive-mode-include-file-name
+                     (format "Compiling: %s (%s)" module-name file-name)
+                   (format "Compiling: %s" module-name)))
+                ('loading (format "Loading: %s" module-name)))
+              (if th " [TH]" ""))))
     (haskell-mode-message-line msg)
     (when haskell-interactive-mode-delete-superseded-errors
       (haskell-interactive-mode-delete-compile-messages session file-name))
