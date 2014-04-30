@@ -902,10 +902,13 @@ FILE-NAME only."
      ((string= "alg" rep)
       (when (and parent-rep (not nullary))
         (insert "("))
-      (insert (propertize text 'face 'font-lock-type-face))
-      (loop for slot in slots
-            do (insert " ")
-            do (haskell-interactive-mode-presentation-slot slot rep))
+      (let ((start-column (current-column)))
+        (insert (propertize text 'face 'font-lock-type-face))
+        (loop for slot in slots
+              do (insert "\n")
+              do (indent-to (+ 2 start-column))
+              do (haskell-interactive-mode-presentation-slot slot rep)
+              do (setq first nil)))
       (when (and parent-rep (not nullary))
         (insert ")")))
      (t
