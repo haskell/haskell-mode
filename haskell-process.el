@@ -637,7 +637,7 @@ from `module-buffer'."
           (concat "\\[[ ]*\\([0-9]+\\) of \\([0-9]+\\)\\]"
                   " Compiling \\([^ ]+\\)[ ]+"
                   "( \\([^ ]+\\), \\([^ ]+\\) )[^\r\n]*[\r\n]+"))
-         (haskell-process-load-message process buffer echo-in-repl nil)
+         (haskell-process-echo-load-message process buffer echo-in-repl nil)
          t)
         ((haskell-process-consume
           process
