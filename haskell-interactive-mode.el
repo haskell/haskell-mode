@@ -927,8 +927,7 @@ FILE-NAME only."
         (loop for slot in slots
               do (insert "\n")
               do (indent-to (+ 2 start-column))
-              do (haskell-interactive-mode-presentation-slot slot rep)
-              do (setq first nil)))
+              do (haskell-interactive-mode-presentation-slot slot rep)))
       (when (and parent-rep
                  (not nullary)
                  (not (string= "list" parent-rep)))
