@@ -967,7 +967,7 @@ don't care when the thing completes as long as it's soonish."
   (haskell-process-queue-without-filters p "import qualified Data.Maybe as Present")
   (haskell-process-queue-without-filters p "import qualified Data.ByteString.Lazy as Present")
   (haskell-process-queue-without-filters p "import qualified Data.AttoLisp as Present")
-  (haskell-process-queue-without-filters p "import qualified Data.ID as Present")
+  (haskell-process-queue-without-filters p "import qualified Present.ID as Present")
   (haskell-process-queue-without-filters p "import qualified Present as Present")
   ;; Make a dummy expression to avoid "Loading package" nonsense
   (haskell-process-queue-without-filters
