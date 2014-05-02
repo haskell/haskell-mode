@@ -932,6 +932,8 @@ FILE-NAME only."
                  (not nullary)
                  (not (string= "list" parent-rep)))
         (insert ")")))
+     ((eq rep nil)
+      (insert (propertize "?" 'face 'font-lock-warning)))
      (t
       (let ((err "Unable to present! This very likely means Emacs
 is out of sync with the `present' package. You should make sure
@@ -945,12 +947,14 @@ they're both up to date, or report a bug."))
   (let ((p (haskell-process)))
     (haskell-process-queue-without-filters
      p "let _it = it")
-    (let ((reply
-           (read
-            (haskell-process-queue-sync-request
-             p
-             (format "Present.putStr (Present.encode (Present.fromJust (Present.present (Present.fromJust (Present.fromList [%s])) it)))"
-                     (mapconcat 'identity (mapcar 'number-to-string id) ","))))))
+    (let* ((text (haskell-process-queue-sync-request
+                  p
+                  (format "Present.putStr (Present.encode (Present.fromJust (Present.present (Present.fromJust (Present.fromList [%s])) it)))"
+                          (mapconcat 'identity (mapcar 'number-to-string id) ","))))
+           (reply
+            (if (string-match "^*** " text)
+                '((rep nil))
+              (read text))))
       ;; Not necessary, but nice to restore it to the expression that
       ;; the user actually typed in.
       (haskell-process-queue-without-filters
