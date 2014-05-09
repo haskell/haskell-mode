@@ -278,7 +278,7 @@ Key bindings:
                             haskell-interactive-mode-prompt-start
                             (point-max))))))
         (cond
-         ((string= resp "")
+         ((not (string-match "<interactive>:" resp))
           (insert "\n"
                   (haskell-fontify-as-mode
                    (haskell-process-queue-sync-request
