@@ -267,18 +267,43 @@ Key bindings:
       (set-marker haskell-interactive-mode-prompt-start
                   haskell-interactive-mode-old-prompt-start)
       (goto-char (point-max)))
-    (let ((buf (get-buffer-create "*HS-Error*")))
-      (pop-to-buffer buf nil t)
-      (with-current-buffer buf
-        (haskell-error-mode)
-        (let ((inhibit-read-only t))
-          (erase-buffer)
-          (insert (propertize response
-                              'face
-                              'haskell-interactive-face-compile-error))
-          (goto-char (point-min))
-          (delete-blank-lines))))
+    (cond
+     ((and (not (haskell-interactive-mode-line-is-query (elt state 2)))
+           (string-match "No instance for (?Show " response))
+      (haskell-process-reset (haskell-process))
+      (let ((resp (haskell-process-queue-sync-request
+                   (haskell-process)
+                   (concat "let it = "
+                           (buffer-substring-no-properties
+                            haskell-interactive-mode-prompt-start
+                            (point-max))))))
+        (cond
+         ((string= resp "")
+          (insert "\n"
+                  (haskell-fontify-as-mode
+                   (haskell-process-queue-sync-request
+                    (haskell-process)
+                    (concat ":t it"))
+                   'haskell-mode))
+          (haskell-interactive-mode-prompt))
+         (t (haskell-interactive-popup-error response)))))
+     (t (haskell-interactive-popup-error response)
+        t))
     t))
+
+(defun haskell-interactive-popup-error (response)
+  "Popup an error."
+  (let ((buf (get-buffer-create "*HS-Error*")))
+    (pop-to-buffer buf nil t)
+    (with-current-buffer buf
+      (haskell-error-mode)
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (insert (propertize response
+                            'face
+                            'haskell-interactive-face-compile-error))
+        (goto-char (point-min))
+        (delete-blank-lines)))))
 
 (define-derived-mode haskell-error-mode
   special-mode "Error"
