@@ -1264,6 +1264,22 @@ Returns newly set VALUE."
 
 ;; Wrappers using haskell-process-{get,set}
 
+(defun haskell-process-set-sent-stdin (p v)
+  "We've sent stdin, so let's not clear the output at the end."
+  (haskell-process-set p 'sent-stdin v))
+
+(defun haskell-process-sent-stdin-p (p)
+  "Did we send any stdin to the process during evaluation?"
+  (haskell-process-get p 'sent-stdin))
+
+(defun haskell-process-set-evaluating (p v)
+  "Set status of evaluating to be on/off."
+  (haskell-process-set p 'evaluating v))
+
+(defun haskell-process-evaluating-p (p)
+  "Set status of evaluating to be on/off."
+  (haskell-process-get p 'evaluating))
+
 (defun haskell-process-set-process (p v)
   "Set the process's inferior process."
   (haskell-process-set p 'inferior-process v))
@@ -1283,6 +1299,8 @@ Return nil if no current command."
 
 (defun haskell-process-set-cmd (p v)
   "Set the process's current command."
+  (haskell-process-set-evaluating p nil)
+  (haskell-process-set-sent-stdin p nil)
   (haskell-process-set p 'current-command v))
 
 (defun haskell-process-response (p)

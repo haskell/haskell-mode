@@ -65,6 +65,11 @@ interference with prompts that look like haskell expressions."
   nil
   "Mark used for the beginning of the prompt.")
 
+(defvar haskell-interactive-mode-result-end
+  nil
+  "Mark used to figure out where the end of the current result
+  output is. Used to distinguish betwen user input.")
+
 (defvar haskell-interactive-mode-old-prompt-start
   nil
   "Mark used for the old beginning of the prompt.")
@@ -219,12 +224,27 @@ Key bindings:
   "Handle an inputted expression at the REPL."
   (when (haskell-interactive-at-prompt)
     (let ((expr (haskell-interactive-mode-input)))
-      (when (not (string= "" (replace-regexp-in-string " " "" expr)))
-        (setq haskell-interactive-mode-old-prompt-start
-              (copy-marker haskell-interactive-mode-prompt-start))
-        (set-marker haskell-interactive-mode-prompt-start (point-max))
-        (haskell-interactive-mode-history-add expr)
-        (haskell-interactive-mode-do-expr expr)))))
+      (unless (string= "" (replace-regexp-in-string " " "" expr))
+        (cond
+         ;; If already evaluating, then the user is trying to send
+         ;; input to the REPL during evaluation. Most likely in
+         ;; response to a getLine-like function.
+         ((and (haskell-process-evaluating-p (haskell-process))
+               (= (line-end-position) (point-max)))
+          (goto-char (point-max))
+          (let ((process (haskell-process))
+                (string (buffer-substring-no-properties
+                         haskell-interactive-mode-result-end
+                         (point))))
+            (insert "\n")
+            (haskell-process-set-sent-stdin process t)
+            (haskell-process-send-string process string)))
+         ;; Otherwise we start a normal evaluation call.
+         (t (setq haskell-interactive-mode-old-prompt-start
+                  (copy-marker haskell-interactive-mode-prompt-start))
+            (set-marker haskell-interactive-mode-prompt-start (point-max))
+            (haskell-interactive-mode-history-add expr)
+            (haskell-interactive-mode-do-expr expr)))))))
 
 (defun haskell-interactive-mode-do-expr (expr)
   (cond
@@ -246,21 +266,19 @@ Key bindings:
       :go (lambda (state)
             (insert "\n")
             (haskell-process-send-string (cadr state)
-                                         (haskell-interactive-mode-multi-line (caddr state))))
+                                         (haskell-interactive-mode-multi-line (caddr state)))
+            (haskell-process-set-evaluating (cadr state) t))
       :live (lambda (state buffer)
               (unless (and (string-prefix-p ":q" (caddr state))
                            (string-prefix-p (caddr state) ":quit"))
                 (let* ((cursor (cadddr state))
-                       (next (replace-regexp-in-string
-                              haskell-process-prompt-regex
-                              ""
-                              (substring buffer cursor))))
+                       (next (substring buffer cursor)))
                   (haskell-interactive-mode-eval-result (car state) next)
-
                   (setf (cdddr state) (list (length buffer)))
                   nil)))
       :complete
       (lambda (state response)
+        (haskell-process-set-evaluating (cadr state) nil)
         (unless (haskell-interactive-mode-trigger-compile-error state response)
           (haskell-interactive-mode-expr-result state response)))))))
 
@@ -324,12 +342,11 @@ Key bindings:
                    (caddr state) response)))
     (cond
      (haskell-interactive-mode-eval-mode
-      (haskell-interactive-mode-eval-as-mode (car state) response))
+      (unless (haskell-process-sent-stdin-p (cadr state))
+        (haskell-interactive-mode-eval-as-mode (car state) response)))
      ((haskell-interactive-mode-line-is-query (elt state 2))
       (let ((haskell-interactive-mode-eval-mode 'haskell-mode))
-        (haskell-interactive-mode-eval-as-mode (car state) response)))
-     (haskell-interactive-mode-eval-pretty
-      (haskell-interactive-mode-eval-pretty-result (car state) response))))
+        (haskell-interactive-mode-eval-as-mode (car state) response)))))
   (haskell-interactive-mode-prompt (car state)))
 
 (defun haskell-interactive-mode-cleanup-response (expr response)
@@ -482,7 +499,12 @@ SESSION, otherwise operate on the current buffer.
                         'rear-nonsticky t
                         'read-only t
                         'prompt t
-                        'result t))))
+                        'result t))
+    (let ((marker (set (make-local-variable 'haskell-interactive-mode-result-end)
+                       (make-marker))))
+      (set-marker marker
+                  (point)
+                  (current-buffer)))))
 
 (defun haskell-interactive-mode-eval-as-mode (session text)
   "Insert TEXT font-locked according to `haskell-interactive-mode-eval-mode'."
@@ -495,16 +517,6 @@ SESSION, otherwise operate on the current buffer.
                                          haskell-interactive-mode-eval-mode))
         (when haskell-interactive-mode-collapse
           (haskell-collapse start (point)))))))
-
-(defun haskell-interactive-mode-eval-pretty-result (session text)
-  "Insert the result of an eval as a pretty printed Showable, if
-  parseable, or otherwise just as-is."
-  (with-current-buffer (haskell-session-interactive-buffer session)
-    (let ((inhibit-read-only t))
-      (delete-region haskell-interactive-mode-prompt-start (point))
-      (goto-char (point-max))
-      (haskell-show-parse-and-insert text)
-      (insert "\n"))))
 
 ;;;###autoload
 (defun haskell-interactive-mode-echo (session message &optional mode)
