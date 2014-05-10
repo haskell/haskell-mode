@@ -39,6 +39,13 @@
   :type 'boolean
   :group 'haskell-interactive)
 
+(defcustom haskell-interactive-types-for-show-ambiguous
+  t
+  "Show types when there's no Show instance or there's an
+ambiguous class constraint."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defcustom haskell-interactive-mode-eval-pretty
   nil
   "Print eval results that can be parsed as Show instances prettily. Requires sexp-show (on Hackage)."
@@ -269,11 +276,12 @@ Key bindings:
       (goto-char (point-max)))
     (cond
      ((and (not (haskell-interactive-mode-line-is-query (elt state 2)))
-           (string-match "No instance for (?Show " response))
+           (or (string-match "No instance for (?Show " response)
+               (string-match "Ambiguous type variable " response)))
       (haskell-process-reset (haskell-process))
       (let ((resp (haskell-process-queue-sync-request
                    (haskell-process)
-                   (concat "let it = "
+                   (concat ":t "
                            (buffer-substring-no-properties
                             haskell-interactive-mode-prompt-start
                             (point-max))))))
@@ -281,9 +289,7 @@ Key bindings:
          ((not (string-match "<interactive>:" resp))
           (insert "\n"
                   (haskell-fontify-as-mode
-                   (haskell-process-queue-sync-request
-                    (haskell-process)
-                    (concat ":t it"))
+                   resp
                    'haskell-mode))
           (haskell-interactive-mode-prompt))
          (t (haskell-interactive-popup-error response)))))
