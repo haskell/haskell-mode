@@ -453,12 +453,15 @@ for various things, but is optional."
   (haskell-process-add-cabal-autogen))
 
 ;;;###autoload
-(defun haskell-process-cabal ()
+(defun haskell-process-cabal (p)
   "Prompts for a Cabal command to run."
-  (interactive)
-  (haskell-process-do-cabal
-   (funcall haskell-completing-read-function "Cabal command: "
-            haskell-cabal-commands)))
+  (interactive "P")
+  (if p
+      (haskell-process-do-cabal
+       (read-from-minibuffer "Cabal command (e.g. install): "))
+    (haskell-process-do-cabal
+     (funcall haskell-completing-read-function "Cabal command: "
+              haskell-cabal-commands))))
 
 (defun haskell-process-add-cabal-autogen ()
   "Add <cabal-project-dir>/dist/build/autogen/ to the ghci search
