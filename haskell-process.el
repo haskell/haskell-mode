@@ -837,24 +837,35 @@ now."
 
 (defun haskell-process-suggest-remove-import (session file import line)
   "Suggest removing or commenting out IMPORT on LINE."
-  (case (read-key (propertize (format "The import line `%s' is redundant. Remove? (y, n, c: comment out)  "
-                                      import)
-                              'face 'minibuffer-prompt))
-    (?y
-     (haskell-process-find-file session file)
-     (save-excursion
-       (goto-char (point-min))
-       (forward-line (1- line))
-       (goto-char (line-beginning-position))
-       (delete-region (line-beginning-position)
-                      (line-end-position))))
-    (?c
-     (haskell-process-find-file session file)
-     (save-excursion
-       (goto-char (point-min))
-       (forward-line (1- line))
-       (goto-char (line-beginning-position))
-       (insert "-- ")))))
+  (let ((continue t)
+        (first t))
+    (while continue
+      (setq continue nil)
+      (case (read-key (propertize (format "%sThe import line `%s' is redundant. Remove? (y, n, c: comment out)  "
+                                          (if (not first)
+                                              "Please answer n, y or c: "
+                                            "")
+                                          import)
+                                  'face 'minibuffer-prompt))
+        (?y
+         (haskell-process-find-file session file)
+         (save-excursion
+           (goto-char (point-min))
+           (forward-line (1- line))
+           (goto-char (line-beginning-position))
+           (delete-region (line-beginning-position)
+                          (line-end-position))))
+        (?n
+         (message "Ignoring redundant import %s" import))
+        (?c
+         (haskell-process-find-file session file)
+         (save-excursion
+           (goto-char (point-min))
+           (forward-line (1- line))
+           (goto-char (line-beginning-position))
+           (insert "-- ")))
+        (t (setq first nil)
+           (setq continue t))))))
 
 (defun haskell-process-suggest-pragma (session pragma extension file)
   "Suggest to add something to the top of the file."
