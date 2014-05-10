@@ -267,7 +267,8 @@ Key bindings:
 (defun haskell-interactive-mode-trigger-compile-error (state response)
   "Look for an <interactive> compile error; if there is one, pop
   that up in a buffer, similar to `debug-on-error'."
-  (when (and (string-match "^\n<interactive>:[0-9]+:[0-9]+:" response)
+  (when (and haskell-interactive-types-for-show-ambiguous
+             (string-match "^\n<interactive>:[0-9]+:[0-9]+:" response)
              (not (string-match "^\n<interactive>:[0-9]+:[0-9]+:[\n ]+Warning: " response)))
     (let ((inhibit-read-only t))
       (delete-region haskell-interactive-mode-prompt-start (point))
