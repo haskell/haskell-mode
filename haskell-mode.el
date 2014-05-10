@@ -896,6 +896,28 @@ given a prefix arg."
                           collect (replace-regexp-in-string "\\.l?hs$" "" part))))
     (mapconcat 'identity (reverse components) ".")))
 
+(defun haskell-auto-insert-module-template ()
+  "Insert a module template for the newly created buffer."
+  (interactive)
+  (when (and (= (point-min)
+                (point-max))
+             (buffer-file-name))
+    (insert
+     "-- | "
+     "\n"
+     "\n"
+     "module "
+     )
+    (let ((name (haskell-guess-module-name)))
+      (if (string= name "")
+          (insert "")
+        (insert name)))
+    (insert " where"
+            "\n"
+            "\n")
+    (goto-char (point-min))
+    (forward-char 4)))
+
 
 ;; Provide ourselves:
 
