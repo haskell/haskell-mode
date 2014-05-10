@@ -491,7 +491,7 @@ SESSION, otherwise operate on the current buffer.
       (delete-region (1+ haskell-interactive-mode-prompt-start) (point))
       (goto-char (point-max))
       (let ((start (point)))
-        (insert (haskell-fontify-as-mode (concat text "\n")
+        (insert (haskell-fontify-as-mode text
                                          haskell-interactive-mode-eval-mode))
         (when haskell-interactive-mode-collapse
           (haskell-collapse start (point)))))))
