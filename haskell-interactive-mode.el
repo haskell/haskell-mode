@@ -272,7 +272,10 @@ Key bindings:
               (unless (and (string-prefix-p ":q" (caddr state))
                            (string-prefix-p (caddr state) ":quit"))
                 (let* ((cursor (cadddr state))
-                       (next (substring buffer cursor)))
+                       (next (replace-regexp-in-string
+                              haskell-process-prompt-regex
+                              ""
+                              (substring buffer cursor))))
                   (haskell-interactive-mode-eval-result (car state) next)
                   (setf (cdddr state) (list (length buffer)))
                   nil)))
