@@ -269,6 +269,8 @@ If DONTCREATE is non-nil don't create a new session."
 
 (defun haskell-session-make (name)
   "Make a Haskell session."
+  (when (haskell-session-lookup name)
+    (error "Session of name %s already exists!" name))
   (let ((session (set (make-local-variable 'haskell-session)
                       (list (cons 'name name)))))
     (add-to-list 'haskell-sessions session)
