@@ -158,9 +158,11 @@ If DONTCREATE is non-nil don't create a new session."
 
 (defun haskell-session-new-assume-from-cabal ()
   "Prompt to create a new project based on a guess from the nearest Cabal file."
-  (when (y-or-n-p (format "Start a new project named “%s”? "
-                          (haskell-session-default-name)))
-    (haskell-session-make (haskell-session-default-name))))
+  (let ((name (haskell-session-default-name)))
+    (unless (haskell-session-lookup name)
+      (when (y-or-n-p (format "Start a new project named “%s”? "
+                              name))
+        (haskell-session-make name)))))
 
 (defun haskell-session-from-buffer ()
   "Get the session based on the buffer."
@@ -187,7 +189,11 @@ If DONTCREATE is non-nil don't create a new session."
   "Make a new session."
   (let ((name (read-from-minibuffer "Project name: " (haskell-session-default-name))))
     (when (not (string= name ""))
-      (haskell-session-make name))))
+      (let ((session (haskell-session-lookup name)))
+        (if session
+            (when (y-or-n-p (format "Session %s already exists. Use it?" name))
+              session)
+          (haskell-session-make name))))))
 
 (defun haskell-session-default-name ()
   "Generate a default project name for the new project prompt."
@@ -206,7 +212,11 @@ If DONTCREATE is non-nil don't create a new session."
   (when haskell-sessions
     (let* ((session-name (funcall haskell-completing-read-function
                                   "Choose Haskell session: "
-                                  (mapcar 'haskell-session-name haskell-sessions)))
+                                  (remove-if (lambda (name)
+                                               (and haskell-session
+                                                    (string= (haskell-session-name haskell-session)
+                                                             name)))
+                                             (mapcar 'haskell-session-name haskell-sessions))))
            (session (find-if (lambda (session)
                                (string= (haskell-session-name session)
                                         session-name))
@@ -220,7 +230,6 @@ If DONTCREATE is non-nil don't create a new session."
 (defun haskell-session-change ()
   "Change the session for the current buffer."
   (interactive)
-  (haskell-session-clear)
   (haskell-session-assign (or (haskell-session-new-assume-from-cabal)
                               (haskell-session-choose)
                               (haskell-session-new))))
@@ -248,6 +257,12 @@ If DONTCREATE is non-nil don't create a new session."
                         (length cur-dir)))
           file)
       file)))
+
+(defun haskell-session-lookup (name)
+  "Get the session by name."
+  (remove-if-not (lambda (s)
+                   (string= name (haskell-session-name s)))
+                 haskell-sessions))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Building the session
