@@ -167,16 +167,19 @@ If DONTCREATE is non-nil don't create a new session."
   (when (and (buffer-file-name)
              (consp haskell-sessions))
     (reduce (lambda (acc a)
-              (if (haskell-is-prefix-of (haskell-session-cabal-dir a)
-                                        (file-name-directory (buffer-file-name)))
-                  (if acc
-                      (if (and
-                           (> (length (haskell-session-cabal-dir a))
-                              (length (haskell-session-cabal-dir acc))))
-                          a
-                        acc)
-                    a)
-                acc))
+              (let ((dir (haskell-session-cabal-dir a t)))
+                (if dir
+                    (if (haskell-is-prefix-of dir
+                                              (file-name-directory (buffer-file-name)))
+                        (if acc
+                            (if (and
+                                 (> (length (haskell-session-cabal-dir a t))
+                                    (length (haskell-session-cabal-dir acc t))))
+                                a
+                              acc)
+                          a)
+                      acc)
+                  acc)))
             haskell-sessions
             :initial-value nil)))
 
@@ -202,8 +205,8 @@ If DONTCREATE is non-nil don't create a new session."
   "Find a session by choosing from a list of the current sessions."
   (when haskell-sessions
     (let* ((session-name (funcall haskell-completing-read-function
-                          "Choose Haskell session: "
-                          (mapcar 'haskell-session-name haskell-sessions)))
+                                  "Choose Haskell session: "
+                                  (mapcar 'haskell-session-name haskell-sessions)))
            (session (find-if (lambda (session)
                                (string= (haskell-session-name session)
                                         session-name))
@@ -325,16 +328,17 @@ If DONTCREATE is non-nil don't create a new session."
     (or dir
         (haskell-process-cd t))))
 
-(defun haskell-session-cabal-dir (s)
+(defun haskell-session-cabal-dir (s &optional no-prompt)
   "Get the session cabal-dir."
   (let ((dir (haskell-session-get s 'cabal-dir)))
     (if dir
         dir
-      (let ((set-dir (haskell-cabal-get-dir)))
-        (if set-dir
-            (progn (haskell-session-set-cabal-dir s set-dir)
-                   set-dir)
-          (haskell-session-cabal-dir s))))))
+      (unless no-prompt
+        (let ((set-dir (haskell-cabal-get-dir)))
+          (if set-dir
+              (progn (haskell-session-set-cabal-dir s set-dir)
+                     set-dir)
+            (haskell-session-cabal-dir s)))))))
 
 (defun haskell-session-modify (session key update)
   "Update the value at KEY in SESSION with UPDATE."

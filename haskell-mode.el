@@ -139,7 +139,7 @@
 (declare-function haskell-process-generate-tags "haskell-process" (&optional and-then-find-this-tag))
 (declare-function haskell-session "haskell-session" ())
 (declare-function haskell-session-all-modules "haskell-session" (&optional DONTCREATE))
-(declare-function haskell-session-cabal-dir "haskell-session" (session))
+(declare-function haskell-session-cabal-dir "haskell-session" (session &optional no-prompt))
 (declare-function haskell-session-maybe "haskell-session" ())
 (declare-function haskell-session-tags-filename "haskell-session" (session))
 (declare-function haskell-session-current-dir "haskell-session" (session))
