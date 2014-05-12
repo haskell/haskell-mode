@@ -298,7 +298,7 @@ Key bindings:
       (goto-char (point-max)))
     (cond
      ((and (not (haskell-interactive-mode-line-is-query (elt state 2)))
-           (or (string-match "No instance for (?Show " response)
+           (or (string-match "No instance for (?Show[ \n]" response)
                (string-match "Ambiguous type variable " response)))
       (haskell-process-reset (haskell-process))
       (let ((resp (haskell-process-queue-sync-request
