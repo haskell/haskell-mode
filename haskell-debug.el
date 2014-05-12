@@ -31,6 +31,41 @@
        ,@body
      (error "No modules loaded!")))
 
+(defgroup haskell-debug nil
+  "Settings for debugging support."
+  :link '(custom-manual "(haskell-mode)haskell-debug")
+  :group 'haskell)
+
+(defface haskell-debug-warning-face
+  '((t :inherit 'compilation-warning))
+  "Face for warnings."
+  :group 'haskell-debug)
+
+(defface haskell-debug-trace-number-face
+  '((t :weight bold :background "#f5f5f5"))
+  "Face for numbers in backtrace."
+  :group 'haskell-debug)
+
+(defface haskell-debug-newline-face
+  '((t :weight bold :background "#f0f0f0"))
+  "Face for newlines in trace steps."
+  :group 'haskell-debug)
+
+(defface haskell-debug-keybinding-face
+  '((t :inherit 'font-lock-type-face :weight bold))
+  "Face for keybindings."
+  :group 'haskell-debug)
+
+(defface haskell-debug-heading-face
+  '((t :inherit 'font-lock-keyword-face))
+  "Face for headings."
+  :group 'haskell-debug)
+
+(defface haskell-debug-muted-face
+  '((t :foreground "#999"))
+  "Face for muteds."
+  :group 'haskell-debug)
+
 (define-derived-mode haskell-debug-mode
   text-mode "Debug"
   "Major mode for debugging Haskell via GHCi.")
@@ -140,9 +175,10 @@
             (context (haskell-debug-get-context))
             (history (haskell-debug-get-history)))
         (unless modules
-          (insert (propertize "You have to load a module to start debugging.\n\n"
+          (insert (propertize "You have to load a module to start debugging."
                               'face
-                              `((:foreground ,sunburn-red)))))
+                              'haskell-debug-warning-face)
+                  "\n\n"))
         (haskell-debug-insert-bindings modules breakpoints context)
         (when modules
           (haskell-debug-insert-current-context context history)
@@ -211,7 +247,7 @@ some old history, then display that."
                             (plist-get span :span)))
                    (index (plist-get span :index)))
                (insert (propertize (format "%4d" i)
-                                   'face `((:weight bold :background ,sunburn-bg+1)))
+                                   'face 'haskell-debug-trace-number-face)
                        " "
                        (haskell-debug-preview-span
                         (plist-get span :span)
@@ -244,7 +280,7 @@ some old history, then display that."
     (if collapsed
         (replace-regexp-in-string
          "\n[ ]*"
-         (propertize " " 'face `((:background ,sunburn-bg+1)))
+         (propertize " " 'face 'haskell-debug-newline-face)
          (buffer-substring (point-min)
                            (point-max)))
       (buffer-string))))
@@ -288,7 +324,7 @@ some old history, then display that."
 
 (defun haskell-debug-insert-binding (binding desc &optional end)
   "Insert a helpful keybinding."
-  (insert (propertize binding 'face `((:foreground ,sunburn-blue :weight bold)))
+  (insert (propertize binding 'face 'haskell-debug-keybinding-face)
           (haskell-debug-muted " - ")
           desc
           (if end
@@ -370,7 +406,7 @@ some old history, then display that."
   (let ((p (make-overlay
             (line-beginning-position)
             (line-end-position))))
-    (overlay-put p 'face `((:background ,sunburn-bg+1)))
+    (overlay-put p 'face `((:background "#eee")))
     (with-current-buffer
         (if span
             (save-window-excursion
@@ -391,7 +427,7 @@ some old history, then display that."
                     (forward-char (plist-get span :end-col))
                     (point))))))
         (when o
-          (overlay-put o 'face `((:background ,sunburn-bg+1))))
+          (overlay-put o 'face `((:background "#eee"))))
         (sit-for 0.5)
         (when o
           (delete-overlay o))
@@ -408,13 +444,13 @@ some old history, then display that."
                                         'face `((:weight bold)))
                             (haskell-debug-muted " - ")
                             (propertize (file-name-nondirectory (plist-get module :path))
-                                        'module module)))
-           (insert "\n"))))
+                                        'module module))
+                 do (insert "\n")))))
 
 (defun haskell-debug-insert-header (title)
   "Insert a header title."
   (insert (propertize title
-                      'face `((:foreground ,sunburn-green)))
+                      'face 'haskell-debug-heading-face)
           "\n\n"))
 
 (defun haskell-debug-insert-breakpoints (breakpoints)
@@ -445,7 +481,7 @@ some old history, then display that."
 
 (defun haskell-debug-muted (text)
   "Make some muted text."
-  (propertize text 'face `((:foreground ,sunburn-grey+1))))
+  (propertize text 'face 'haskell-debug-muted-face))
 
 (defun haskell-debug-buffer-name (session)
   "The debug buffer name for the current session."
