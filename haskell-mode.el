@@ -128,6 +128,7 @@
 (require 'compile)
 (require 'flymake)
 (require 'outline)
+(require 'haskell-compat)
 (require 'haskell-align-imports)
 (require 'haskell-sort-imports)
 (require 'haskell-string)
