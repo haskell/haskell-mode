@@ -136,7 +136,9 @@
 
 ;; FIXME: code-smell: too many forward decls for haskell-session are required here
 (defvar haskell-session)
+(declare-function haskell-process "haskell-process" ())
 (declare-function haskell-process-do-try-info "haskell-process" (sym))
+(declare-function haskell-process-queue-sync-request (process reqstr))
 (declare-function haskell-process-generate-tags "haskell-process" (&optional and-then-find-this-tag))
 (declare-function haskell-session "haskell-session" ())
 (declare-function haskell-session-all-modules "haskell-session" (&optional DONTCREATE))
@@ -845,31 +847,117 @@ remains unchanged."
     (forward-line (1- line))
     (goto-char (+ column (point)))))
 
+(defun haskell-mode-jump-to-def-or-tag (&optional next-p)
+  "Jump to the definition (by consulting GHCi), or (fallback)
+jump to the tag.
+
+Remember: If GHCi is busy doing something, this will delay, but
+it will always be accurate, in contrast to tags, which always
+work but are not always accurate."
+  (interactive "P")
+  (let ((loc (haskell-mode-find-def (haskell-ident-at-point))))
+    (if loc
+        (haskell-mode-handle-generic-loc loc)
+      (call-interactively 'haskell-mode-tag-find))))
+
 (defun haskell-mode-tag-find (&optional next-p)
   "The tag find function, specific for the particular session."
   (interactive "P")
   (cond
    ((eq 'font-lock-string-face
         (get-text-property (point) 'face))
-    (let* ((string (save-excursion
-                    (buffer-substring-no-properties
-                     (1+ (search-backward-regexp "\"" (line-beginning-position) nil 1))
-                     (1- (progn (forward-char 1)
-                                (search-forward-regexp "\"" (line-end-position) nil 1))))))
-           (fp (expand-file-name string
-                                  (haskell-session-cabal-dir (haskell-session)))))
-      (find-file
-       (read-file-name
-        ""
-        fp
-        fp))))
-   (t (let ((tags-file-name (haskell-session-tags-filename (haskell-session)))
-            (tags-revert-without-query t)
-            (ident (haskell-ident-at-point)))
-        (when (not (string= "" (haskell-trim ident)))
-          (cond ((file-exists-p tags-file-name)
-                 (find-tag ident next-p))
-                (t (haskell-process-generate-tags ident))))))))
+    (haskell-mode-jump-to-filename-in-string))
+   (t (call-interactively 'haskell-mode-jump-to-tag))))
+
+(defun haskell-mode-jump-to-filename-in-string ()
+  "Jump to the filename in the current string."
+  (let* ((string (save-excursion
+                   (buffer-substring-no-properties
+                    (1+ (search-backward-regexp "\"" (line-beginning-position) nil 1))
+                    (1- (progn (forward-char 1)
+                               (search-forward-regexp "\"" (line-end-position) nil 1))))))
+         (fp (expand-file-name string
+                               (haskell-session-cabal-dir (haskell-session)))))
+    (find-file
+     (read-file-name
+      ""
+      fp
+      fp))))
+
+(defun haskell-mode-jump-to-tag (&optional next-p)
+  "Jump to the tag of the given identifier."
+  (interactive "P")
+  (let ((ident (haskell-ident-at-point))
+        (tags-file-name (haskell-session-tags-filename (haskell-session)))
+        (tags-revert-without-query t))
+    (when (not (string= "" (haskell-trim ident)))
+      (cond ((file-exists-p tags-file-name)
+             (find-tag ident next-p))
+            (t (haskell-process-generate-tags ident))))))
+
+(defun haskell-mode-jump-to-def (ident)
+  "Jump to definition of identifier at point."
+  (interactive (list (haskell-ident-at-point)))
+  (let ((loc (haskell-mode-find-def ident)))
+    (when loc
+      (haskell-mode-handle-generic-loc loc))))
+
+(defun haskell-mode-handle-generic-loc (loc)
+  "Either jump to or display a generic location. Either a file or
+a library."
+  (case (car loc)
+    (file (haskell-mode-jump-to-loc (cdr loc)))
+    (library (message "Defined in `%s' (%s)."
+                      (elt loc 2)
+                      (elt loc 1)))
+    (module (message "Defined in `%s'."
+                     (elt loc 1)))))
+
+(defun haskell-mode-jump-to-loc (loc)
+  "Jump to the given location.
+LOC = (list FILE LINE COL)"
+  (find-file (elt loc 0))
+  (goto-char (point-min))
+  (forward-line (1- (elt loc 1)))
+  (goto-char (+ (line-beginning-position)
+                (1- (elt loc 2)))))
+
+(defun haskell-mode-find-def (ident)
+  "Find definition location of identifier. Uses the GHCi process
+to find the location.
+
+Returns:
+
+    (library <package> <module>)
+    (file <path> <line> <col>)
+    (module <name>)
+"
+  (let ((reply (haskell-process-queue-sync-request
+                (haskell-process)
+                (format (if (string-match "^[a-zA-Z_]" ident)
+                            ":info %s"
+                          ":info (%s)")
+                        ident))))
+    (let ((match (string-match "-- Defined \\(at\\|in\\) \\(.+\\)$" reply)))
+      (when match
+        (let ((defined (match-string 2 reply)))
+          (let ((match (string-match "\\(.+?\\):\\([0-9]+\\):\\([0-9]+\\)$" defined)))
+            (cond
+             (match
+              (list 'file
+                    (match-string 1 defined)
+                    (string-to-number (match-string 2 defined))
+                    (string-to-number (match-string 3 defined))))
+             (t
+              (let ((match (string-match "`\\(.+?\\):\\(.+?\\)'$" defined)))
+                (if match
+                    (list 'library
+                          (match-string 1 defined)
+                          (match-string 2 defined))
+                  (let ((match (string-match "`\\(.+?\\)'$" defined)))
+                    (if match
+                        (list 'module
+                              (match-string 1 defined))))))))))))))
 
 ;; From Bryan O'Sullivan's blog:
 ;; http://www.serpentine.com/blog/2007/10/09/using-emacs-to-insert-scc-annotations-in-haskell-code/
