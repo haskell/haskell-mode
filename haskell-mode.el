@@ -945,7 +945,8 @@ Returns:
             (cond
              (match
               (list 'file
-                    (match-string 1 defined)
+                    (expand-file-name (match-string 1 defined)
+                                      (haskell-session-current-dir (haskell-session)))
                     (string-to-number (match-string 2 defined))
                     (string-to-number (match-string 3 defined))))
              (t
