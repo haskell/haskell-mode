@@ -827,7 +827,7 @@ now."
   (with-temp-buffer
     (let ((hoogle-error (call-process "hoogle" nil t nil "search" "--exact" ident)))
       (goto-char (point-min))
-      (unless (or hoogle-error
+      (unless (or (/= 0 hoogle-error)
                   (looking-at "^No results found")
                   (looking-at "^package "))
         (while (re-search-forward "^\\([^ ]+\\).*$" nil t)
