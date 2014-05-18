@@ -1476,6 +1476,25 @@ function and remove this comment.
   (haskell-process-queue-without-filters (haskell-process)
                                          ":set -optP-include -optPdist/build/autogen/cabal_macros.h"))
 
+(defun haskell-process-minimal-imports ()
+  "Dump minimal imports."
+  (interactive)
+  (unless (> (save-excursion
+               (goto-char (point-min))
+               (haskell-navigate-imports-go)
+               (point))
+             (point))
+    (goto-char (point-min))
+    (haskell-navigate-imports-go))
+  (haskell-process-queue-sync-request (haskell-process)
+                                      ":set -ddump-minimal-imports")
+  (haskell-process-load-file)
+  (insert-file-contents-literally
+   (concat (haskell-session-current-dir (haskell-session))
+           "/"
+           (haskell-guess-module-name)
+           ".imports")))
+
 (provide 'haskell-process)
 
 ;; Local Variables:
