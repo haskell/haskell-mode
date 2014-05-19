@@ -30,6 +30,12 @@
 
 ;;; Code:
 
+(defvar haskell-sort-imports-regexp
+  (concat "^import[ ]+"
+          "\\(qualified \\)?"
+          "[ ]*\\(\"[^\"]*\" \\)?"
+          "[ ]*\\([A-Za-z0-9_.']*.*\\)"))
+
 ;;;###autoload
 (defun haskell-sort-imports ()
   (interactive)
@@ -52,11 +58,20 @@ within that region."
         (delete-region start (point))
         (mapc (lambda (import)
                 (insert import "\n"))
-              (sort imports #'string<))
+              (sort imports (lambda (a b)
+                              (string< (haskell-sort-imports-normalize a)
+                                       (haskell-sort-imports-normalize b)))))
         (goto-char start)
         (when (search-forward current-string nil t 1)
           (forward-char (- (length current-string)))
           (forward-char current-offset))))))
+
+(defun haskell-sort-imports-normalize (i)
+  "Normalize an import, if possible, so that it can be sorted."
+  (if (string-match haskell-sort-imports-regexp
+                    i)
+      (match-string 3 i)
+    i))
 
 (defun haskell-sort-imports-collect-imports ()
   (let ((imports (list)))
