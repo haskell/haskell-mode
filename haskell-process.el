@@ -730,7 +730,8 @@ from `module-buffer'."
         ((string-match "Warning: orphan instance: " msg)
          (when haskell-process-suggest-no-warn-orphans
            (haskell-process-suggest-pragma session "OPTIONS" "-fno-warn-orphans" file)))
-        ((string-match "against inferred type [‘`‛]\\[Char\\]['’]" msg)
+        ((or (string-match "against inferred type [‘`‛]\\[Char\\]['’]" msg)
+             (string-match "with actual type [‘`‛]\\[Char\\]['’]" msg))
          (when haskell-process-suggest-overloaded-strings
            (haskell-process-suggest-pragma session "LANGUAGE" "OverloadedStrings" file)))
         ((string-match "^Not in scope: .*[‘`‛]\\(.+\\)['’]$" msg)
