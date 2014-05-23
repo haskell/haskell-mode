@@ -48,6 +48,30 @@
 ;; When haskell-align-imports is run within the same buffer, the
 ;; import list is transformed to:
 ;;
+;; import "abc"            Eight
+;; import qualified        Eighteen as PRELUDE hiding (A)
+;; import qualified "defg" Eleven as PRELUDE
+;; import                  Fifteen hiding (A)
+;; import                  Five (A)
+;; import qualified        Four as PRELUDE
+;; import qualified "z"    Fourteen  (A,B)
+;; import "abc"            Nine as TWO
+;; import "abc"            Nineteen hiding (A)
+;; import                  One
+;; import qualified        Seven (A,B)
+;; import qualified        Seventeen hiding (A)
+;; import                  Six (A,B)
+;; import                  Sixteen as TWO hiding (A)
+;; import qualified "abc"  Ten
+;; import "zotconpop"      Thirteen (A,B)
+;; import qualified        Three
+;; import "barmu"          Twelve (A)
+;; import "abc"            Twenty as TWO hiding (A)
+;; import                  Two as A
+;;
+;; If you want everything after module names to be padded out, too,
+;; customize `haskell-align-imports-pad-after-name', and you'll get:
+;;
 ;; import                  One
 ;; import                  Two       as A
 ;; import qualified        Three
@@ -77,7 +101,18 @@
   (concat "^\\(import[ ]+\\)"
           "\\(qualified \\)?"
           "[ ]*\\(\"[^\"]*\" \\)?"
-          "[ ]*\\([A-Za-z0-9_.']*.*\\)"))
+          "[ ]*\\([A-Za-z0-9_.']+\\)"
+          "[ ]*\\([ ]*as [A-Z][^ ]*\\)?"
+          "[ ]*\\((.*)\\)?"
+          "\\([ ]*hiding (.*)\\)?"
+          "\\( -- .*\\)?[ ]*$")
+  "Regex used for matching components of an import.")
+
+(defcustom haskell-align-imports-pad-after-name
+  nil
+  "Pad layout after the module name also."
+  :type 'boolean
+  :group 'haskell-interactive)
 
 ;;;###autoload
 (defun haskell-align-imports ()
@@ -88,6 +123,8 @@
       (goto-char (point-min))
       (let* ((imports (haskell-align-imports-collect))
              (padding (haskell-align-imports-padding imports)))
+        (loop for import in imports
+              do (message "Import: %S" import))
         (mapc (lambda (x)
                 (goto-char (cdr x))
                 (delete-region (point) (line-end-position))
@@ -131,14 +168,23 @@
                                     "")
                                   b))
                         ls))))
-    (list (funcall join (list (aref parts 0)
-                              (aref parts 1)
-                              (aref parts 2)))
-          (aref parts 3)
-          (funcall join (list (aref parts 4)
-                              (aref parts 5)
-                              (aref parts 6)))
-          (aref parts 7))))
+    (if haskell-align-imports-pad-after-name
+        (list (funcall join (list (aref parts 0)
+                                  (aref parts 1)
+                                  (aref parts 2)))
+              (aref parts 3)
+              (funcall join (list (aref parts 4)
+                                  (aref parts 5)
+                                  (aref parts 6)))
+              (aref parts 7))
+      (list (funcall join (list (aref parts 0)
+                                (aref parts 1)
+                                (aref parts 2)))
+            (funcall join (list (aref parts 3)
+                                (aref parts 4)
+                                (aref parts 5)
+                                (aref parts 6)
+                                (aref parts 7)))))))
 
 (defun haskell-align-imports-chomp (str)
   "Chomp leading and tailing whitespace from STR."
