@@ -123,8 +123,6 @@
       (goto-char (point-min))
       (let* ((imports (haskell-align-imports-collect))
              (padding (haskell-align-imports-padding imports)))
-        (loop for import in imports
-              do (message "Import: %S" import))
         (mapc (lambda (x)
                 (goto-char (cdr x))
                 (delete-region (point) (line-end-position))
