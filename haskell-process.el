@@ -197,6 +197,12 @@ imports become available?"
   :type 'boolean
   :group 'haskell-interactive)
 
+(defcustom haskell-process-suggest-restart
+  t
+  "Suggest restarting the process when it has died"
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defvar haskell-imported-suggested nil)
 (defvar haskell-process-prompt-regex "\4")
 (defvar haskell-reload-p nil)
@@ -1163,9 +1169,13 @@ If I break, you can:
 
 (defun haskell-process-prompt-restart (process)
   "Prompt to restart the died process."
-  (when (y-or-n-p (format "The Haskell process `%s' has died. Restart? "
-                          (haskell-process-name process)))
-    (haskell-process-start (haskell-process-session process))))
+  (let ((process-name (haskell-process-name process)))
+    (if haskell-process-suggest-restart
+        (when (y-or-n-p (format "The Haskell process `%s' has died. Restart? "
+                                process-name))
+          (haskell-process-start (haskell-process-session process)))
+      (message (format "The Haskell process `%s' is dearly departed."
+                       process-name)))))
 
 (defun haskell-process-live-updates (process)
   "Process live updates."
