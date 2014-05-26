@@ -219,7 +219,6 @@ Key bindings:
       haskell-interactive-mode-prompt-start
     nil))
 
-
 (defun haskell-interactive-handle-expr ()
   "Handle an inputted expression at the REPL."
   (when (haskell-interactive-at-prompt)
@@ -258,13 +257,15 @@ Key bindings:
   (let ((session (haskell-session))
         (process (haskell-process))
         (lines (length (split-string expr "\n"))))
-    (goto-char (point-max))
     (haskell-process-queue-command
      process
      (make-haskell-command
       :state (list session process expr 0)
       :go (lambda (state)
+            (goto-char (point-max))
             (insert "\n")
+            (setq haskell-interactive-mode-result-end
+                  (point-max))
             (haskell-process-send-string (cadr state)
                                          (haskell-interactive-mode-multi-line (caddr state)))
             (haskell-process-set-evaluating (cadr state) t))
