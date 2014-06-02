@@ -114,6 +114,7 @@ printing compilation messages."
     (define-key map (kbd "C-<up>") 'haskell-interactive-mode-history-previous)
     (define-key map (kbd "C-<down>") 'haskell-interactive-mode-history-next)
     (define-key map (kbd "TAB") 'haskell-interactive-mode-tab)
+    (define-key map (kbd "<C-S-backspace>") 'haskell-interactive-mode-kill-whole-line)
     map)
   "Interactive Haskell mode map.")
 
@@ -171,6 +172,12 @@ Key bindings:
   (interactive)
   (newline)
   (indent-according-to-mode))
+
+(defun haskell-interactive-mode-kill-whole-line ()
+  "Kill the whole REPL line."
+  (interactive)
+  (kill-region haskell-interactive-mode-prompt-start
+               (line-end-position)))
 
 ;;;###autoload
 (defun haskell-interactive-bring ()
