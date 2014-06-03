@@ -802,7 +802,8 @@ file. Prompts the user before doing so."
 and if a result comes back, suggest to import that identifier
 now."
   (let* ((ident (let ((i (match-string 1 msg)))
-                  (if (string-match "^[A-Z]\\.\\(.+\\)$" i)
+                  ;; Skip qualification.
+                  (if (string-match "^[A-Za-z0-9_'.]+\\.\\(.+\\)$" i)
                       (match-string 1 i)
                     i)))
          (modules (haskell-process-hoogle-ident ident))
