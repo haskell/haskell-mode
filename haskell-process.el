@@ -579,7 +579,10 @@ actual Emacs buffer of the module being loaded."
              (haskell-mode-message-line
               (if reload "Reloaded OK." "OK."))
              (when cont
-               (funcall cont t)))))
+               (condition-case e
+                   (funcall cont t)
+                 (error (message "%S" e))
+                 (quit nil))))))
         ((haskell-process-consume process "Failed, modules loaded: \\(.+\\)\\.$")
          (let* ((modules (haskell-process-extract-modules buffer))
                 (cursor (haskell-process-response-cursor process))
@@ -592,7 +595,10 @@ actual Emacs buffer of the module being loaded."
              (haskell-process-import-modules process (car modules)))
            (haskell-interactive-mode-compile-error session "Compilation failed.")
            (when cont
-             (funcall cont nil))))))
+             (condition-case nil
+                 (funcall cont nil)
+               (error (message "%S" e))
+               (quit nil)))))))
 
 (defun haskell-process-reload-with-fbytecode (process module-buffer)
   "Reload FILE-NAME with -fbyte-code set, and then restore -fobject-code."
@@ -1470,9 +1476,12 @@ function and remove this comment.
   "Call the command's complete function."
   (let ((comp-func (haskell-command-complete command)))
     (when comp-func
-      (funcall comp-func
-               (haskell-command-state command)
-               response))))
+      (condition-case e
+          (funcall comp-func
+                   (haskell-command-state command)
+                   response)
+        (quit (message "Quit"))
+        (error (message "Haskell process command errored with: %S" e))))))
 
 (defun haskell-command-exec-live (command response)
   "Trigger the command's live updates callback."
