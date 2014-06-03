@@ -203,7 +203,6 @@ imports become available?"
   :type 'boolean
   :group 'haskell-interactive)
 
-(defvar haskell-imported-suggested nil)
 (defvar haskell-process-prompt-regex "\4")
 (defvar haskell-reload-p nil)
 
@@ -520,8 +519,7 @@ to be loaded by ghci."
         (let* ((process (cadr state))
                (session (haskell-process-session process))
                (message-count 0)
-               (cursor (haskell-process-response-cursor process))
-               (haskell-imported-suggested (list)))
+               (cursor (haskell-process-response-cursor process)))
           (haskell-process-set-response-cursor process 0)
           (while (haskell-process-errors-warnings session process response)
             (setq message-count (1+ message-count)))
@@ -585,8 +583,7 @@ actual Emacs buffer of the module being loaded."
                  (quit nil))))))
         ((haskell-process-consume process "Failed, modules loaded: \\(.+\\)\\.$")
          (let* ((modules (haskell-process-extract-modules buffer))
-                (cursor (haskell-process-response-cursor process))
-                (haskell-imported-suggested (list)))
+                (cursor (haskell-process-response-cursor process)))
            (haskell-process-set-response-cursor process 0)
            (while (haskell-process-errors-warnings session process buffer))
            (haskell-process-set-response-cursor process cursor)
@@ -807,7 +804,9 @@ file. Prompts the user before doing so."
   "Given an out of scope identifier, Hoogle for that identifier,
 and if a result comes back, suggest to import that identifier
 now."
-  (let* ((ident (let ((i (match-string 1 msg)))
+  (let* ((process (haskell-session-process session))
+         (suggested-already (haskell-process-suggested-imports process))
+         (ident (let ((i (match-string 1 msg)))
                   ;; Skip qualification.
                   (if (string-match "^[A-Za-z0-9_'.]+\\.\\(.+\\)$" i)
                       (match-string 1 i)
@@ -820,21 +819,22 @@ now."
                                     ident))
               (funcall haskell-completing-read-function "Module: " modules)))
            ((= (length modules) 1)
-            (when (y-or-n-p (format "Identifier `%s' not in scope, import `%s'?"
-                                    ident
-                                    (car modules)))
-              (car modules))))))
+            (let ((module (car modules)))
+              (unless (member module suggested-already)
+                (haskell-process-set-suggested-imports process (cons module suggested-already))
+                (when (y-or-n-p (format "Identifier `%s' not in scope, import `%s'?"
+                                        ident
+                                        module))
+                  module)))))))
     (when module
-      (unless (member module haskell-imported-suggested)
-        (push module haskell-imported-suggested)
-        (haskell-process-find-file session file)
-        (save-excursion
-          (goto-char (point-max))
-          (haskell-navigate-imports)
-          (insert (read-from-minibuffer "Import line: " (concat "import " module))
-                  "\n")
-          (haskell-sort-imports)
-          (haskell-align-imports))))))
+      (haskell-process-find-file session file)
+      (save-excursion
+        (goto-char (point-max))
+        (haskell-navigate-imports)
+        (insert (read-from-minibuffer "Import line: " (concat "import " module))
+                "\n")
+        (haskell-sort-imports)
+        (haskell-align-imports)))))
 
 (defun haskell-process-hoogle-ident (ident)
   "Hoogle for IDENT, returns a list of modules."
@@ -1291,6 +1291,15 @@ Returns newly set VALUE."
   "Did we send any stdin to the process during evaluation?"
   (haskell-process-get p 'sent-stdin))
 
+(defun haskell-process-set-suggested-imports (p v)
+  "Remember what imports have been suggested, to avoid
+re-asking about the same imports."
+  (haskell-process-set p 'suggested-imported v))
+
+(defun haskell-process-suggested-imports (p)
+  "Get what modules have already been suggested and accepted."
+  (haskell-process-get p 'suggested-imported))
+
 (defun haskell-process-set-evaluating (p v)
   "Set status of evaluating to be on/off."
   (haskell-process-set p 'evaluating v))
@@ -1320,6 +1329,7 @@ Return nil if no current command."
   "Set the process's current command."
   (haskell-process-set-evaluating p nil)
   (haskell-process-set-sent-stdin p nil)
+  (haskell-process-set-suggested-imports p nil)
   (haskell-process-set p 'current-command v))
 
 (defun haskell-process-response (p)
