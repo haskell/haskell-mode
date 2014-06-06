@@ -25,6 +25,12 @@
   :group 'haskell
   :type '(repeat string))
 
+(defcustom haskell-complete-module-max-display
+  10
+  "Maximum items to display in minibuffer."
+  :group 'haskell
+  :type 'number)
+
 (defun haskell-complete-module-read (prompt candidates)
   "Interactively auto-complete from a list of candidates."
   (let ((continue t)
@@ -43,19 +49,23 @@
                                      (propertize pattern 'face 'font-lock-type-face)
                                      "{"
                                      (mapconcat #'identity
-                                                (loop for i from 1 to 10
-                                                      for c = (nth (1- i) candidates)
-                                                      when c
-                                                      collect (if (= i 1)
-                                                                  (propertize c 'face 'ido-first-match-face)
-                                                                c))
+                                                (let* ((i 0))
+                                                  (loop for candidate in candidates
+                                                        while (<= i haskell-complete-module-max-display)
+                                                        do (incf i)
+                                                        collect (cond ((> i haskell-complete-module-max-display)
+                                                                       "...")
+                                                                      ((= i 1)
+                                                                       (propertize candidate 'face 'ido-first-match-face))
+                                                                      (t candidate))))
                                                 " | ")
                                      "}"))))
         (case key
-          (backspace (progn (unless (null stack)
-                               (setq candidates (pop stack)))
-                             (unless (string= "" pattern)
-                               (setq pattern (substring pattern 0 -1)))))
+          (backspace
+           (unless (null stack)
+             (setq candidates (pop stack)))
+           (unless (string= "" pattern)
+             (setq pattern (substring pattern 0 -1))))
           (return (setq result (car candidates)))
           (left (setq candidates (append (last candidates) (butlast candidates))))
           (right (setq candidates (append (cdr candidates) (list (car candidates)))))
