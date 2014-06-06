@@ -27,6 +27,7 @@ ELFILES = \
 	haskell-move-nested.el \
 	haskell-navigate-imports.el \
 	haskell-package.el \
+	haskell-complete-module.el \
 	haskell-process.el \
 	haskell-session.el \
 	haskell-show.el \

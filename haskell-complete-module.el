@@ -17,6 +17,8 @@
 
 ;;; Code:
 
+(require 'cl)
+
 (defcustom haskell-complete-module-preferred
   '()
   "Override ordering of module results by specifying preferred modules."
@@ -50,13 +52,13 @@
                                                 " | ")
                                      "}"))))
         (case key
-          ('backspace (progn (unless (null stack)
+          (backspace (progn (unless (null stack)
                                (setq candidates (pop stack)))
                              (unless (string= "" pattern)
                                (setq pattern (substring pattern 0 -1)))))
-          ('return (setq result (car candidates)))
-          ('left (setq candidates (append (last candidates) (butlast candidates))))
-          ('right (setq candidates (append (cdr candidates) (list (car candidates)))))
+          (return (setq result (car candidates)))
+          (left (setq candidates (append (last candidates) (butlast candidates))))
+          (right (setq candidates (append (cdr candidates) (list (car candidates)))))
           (t (when (characterp key)
                (let ((char (char-to-string key)))
                  (when (string-match "[A-Za-z0-9_'.]+" char)
