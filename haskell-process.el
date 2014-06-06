@@ -592,7 +592,7 @@ actual Emacs buffer of the module being loaded."
              (haskell-process-import-modules process (car modules)))
            (haskell-interactive-mode-compile-error session "Compilation failed.")
            (when cont
-             (condition-case nil
+             (condition-case e
                  (funcall cont nil)
                (error (message "%S" e))
                (quit nil)))))))
