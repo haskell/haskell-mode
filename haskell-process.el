@@ -27,6 +27,7 @@
 
 ;;; Code:
 
+(require 'haskell-complete-module)
 (require 'haskell-mode)
 (require 'haskell-session)
 (require 'haskell-compat)
@@ -817,7 +818,7 @@ now."
            ((> (length modules) 1)
             (when (y-or-n-p (format "Identifier `%s' not in scope, choose module to import?"
                                     ident))
-              (funcall haskell-completing-read-function "Module: " modules)))
+              (haskell-complete-module-read "Module: " modules)))
            ((= (length modules) 1)
             (let ((module (car modules)))
               (unless (member module suggested-already)
