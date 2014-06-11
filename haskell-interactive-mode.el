@@ -33,6 +33,12 @@
 (require 'haskell-show)
 (with-no-warnings (require 'cl))
 
+(defcustom haskell-interactive-popup-errors
+  t
+  "Popup errors in a separate buffer."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defcustom haskell-interactive-mode-collapse
   nil
   "Collapse printed results."
@@ -317,11 +323,7 @@ Key bindings:
                             (point-max))))))
         (cond
          ((not (string-match "<interactive>:" resp))
-          (insert "\n"
-                  (haskell-fontify-as-mode
-                   resp
-                   'haskell-mode))
-          (haskell-interactive-mode-prompt))
+          (haskell-interactive-mode-insert-error resp))
          (t (haskell-interactive-popup-error response)))))
      (t (haskell-interactive-popup-error response)
         t))
@@ -329,17 +331,34 @@ Key bindings:
 
 (defun haskell-interactive-popup-error (response)
   "Popup an error."
-  (let ((buf (get-buffer-create "*HS-Error*")))
-    (pop-to-buffer buf nil t)
-    (with-current-buffer buf
-      (haskell-error-mode)
-      (let ((inhibit-read-only t))
-        (erase-buffer)
-        (insert (propertize response
-                            'face
-                            'haskell-interactive-face-compile-error))
-        (goto-char (point-min))
-        (delete-blank-lines)))))
+  (if haskell-interactive-popup-errors
+      (let ((buf (get-buffer-create "*HS-Error*")))
+        (pop-to-buffer buf nil t)
+        (with-current-buffer buf
+
+          (haskell-error-mode)
+          (let ((inhibit-read-only t))
+            (erase-buffer)
+            (insert (propertize response
+                                'face
+                                'haskell-interactive-face-compile-error))
+            (goto-char (point-min))
+            (delete-blank-lines)
+            (insert (propertize "-- Hit `q' to close this window.\n\n"
+                                'face 'font-lock-comment-face))
+            (save-excursion
+              (goto-char (point-max))
+              (insert (propertize "\n-- To disable popups, customize `haskell-interactive-popup-errors'.\n\n"
+                                  'face 'font-lock-comment-face))))))
+    (haskell-interactive-mode-insert-error response)))
+
+(defun haskell-interactive-mode-insert-error (response)
+  "Insert an error message."
+  (insert "\n"
+          (haskell-fontify-as-mode
+           response
+           'haskell-mode))
+  (haskell-interactive-mode-prompt))
 
 (define-derived-mode haskell-error-mode
   special-mode "Error"
