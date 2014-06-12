@@ -28,7 +28,7 @@
 (ert-deftest single-line ()
   (should (with-temp-buffer
             (insert "import A\n")
-            (goto-line 1)
+            (goto-char (point-min))
             (haskell-sort-imports)
             (string= (buffer-string)
                      "import A\n"))))
@@ -38,7 +38,7 @@
             (insert "import A
 import B
 ")
-            (goto-line 1)
+            (goto-char (point-min))
             (haskell-sort-imports)
             (string= (buffer-string)
                      "import A
@@ -48,7 +48,7 @@ import B
             (insert "import qualified A
 import B
 ")
-            (goto-line 1)
+            (goto-char (point-min))
             (haskell-sort-imports)
             (string= (buffer-string)
                      "import qualified A
@@ -58,7 +58,7 @@ import B
             (insert "import qualified \"mtl\" A
 import B
 ")
-            (goto-line 1)
+            (goto-char (point-min))
             (haskell-sort-imports)
             (string= (buffer-string)
                      "import qualified \"mtl\" A
@@ -70,7 +70,7 @@ import B
             (insert "import B
 import A
 ")
-            (goto-line 1)
+            (goto-char (point-min))
             (haskell-sort-imports)
             (string= (buffer-string)
                      "import A
@@ -83,7 +83,8 @@ import B
 import B
 import A
 ")
-            (goto-line 2)
+            (goto-char (point-min))
+            (forward-line)
             (haskell-sort-imports)
             (string= (buffer-string)
                      "module A where
@@ -96,7 +97,8 @@ import B
 import B
 import A
 ")
-            (goto-line 3)
+            (goto-char (point-min))
+            (forward-line 2)
             (haskell-sort-imports)
             (string= (buffer-string)
                      "module C where
@@ -115,7 +117,7 @@ import Data.Aeson.Parser.Internal (decodeWith, decodeStrictWith,
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as L
 ")
-            (goto-line 1)
+            (goto-char (point-min))
             (haskell-sort-imports)
             (string= (buffer-string)
                      "import Data.Aeson.Encode (encode)
