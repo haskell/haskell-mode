@@ -22,7 +22,10 @@
 ;; Boston, MA 02110-1301, USA.
 
 (require 'cl)
-(require 'w3m)
+(declare-function w3m-buffer-title "w3m")
+(declare-function w3m-browse-url "w3m")
+(defvar w3m-current-url)
+
 
 (add-hook 'w3m-display-hook 'w3m-haddock-display)
 
@@ -143,7 +146,8 @@ You can rebind this if you're using hsenv by adding it to your
           (insert
            (haskell-fontify-as-mode text
                                     'haskell-mode))))
-      (goto-line n))))
+      (goto-char (point-min))
+      (forward-line (1- n)))))
 
 (defun w3m-haddock-format-heading ()
   "Format a haddock entry."
