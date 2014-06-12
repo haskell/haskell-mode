@@ -353,6 +353,24 @@ If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
                               (string-match "^<interactive>" response))
                     (haskell-mode-message-line response)))))))
 
+(defun haskell-process-do-try-type (sym)
+  "Get type of `sym' and echo in the minibuffer."
+  (let ((process (haskell-process)))
+    (haskell-process-queue-command
+     process
+     (make-haskell-command
+      :state (cons process sym)
+      :go (lambda (state)
+            (haskell-process-send-string
+             (car state)
+             (if (string-match "^[A-Za-z_]" (cdr state))
+                 (format ":type %s" (cdr state))
+               (format ":type (%s)" (cdr state)))))
+      :complete (lambda (state response)
+                  (unless (or (string-match "^Top level" response)
+                              (string-match "^<interactive>" response))
+                    (haskell-mode-message-line response)))))))
+
 (defun haskell-process-do-simple-echo (line &optional mode)
   "Send LINE to the GHCi process and echo the result in some
 fashion, such as printing in the minibuffer, or using
