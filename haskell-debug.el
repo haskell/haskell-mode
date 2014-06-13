@@ -19,6 +19,10 @@
 
 (require 'cl)
 
+(require 'haskell-session)
+(require 'haskell-process)
+(require 'haskell-interactive-mode)
+
 (defmacro haskell-debug-with-breakpoints (&rest body)
   "Breakpoints need to exist to start stepping."
   `(if (haskell-debug-get-breakpoints)
