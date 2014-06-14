@@ -516,10 +516,10 @@ to be loaded by ghci."
                  (haskell-session-cabal-dir (car state))
                  (format "%s %s"
                          (ecase haskell-process-type
-                           ('ghci "cabal")
-                           ('cabal-repl "cabal")
-                           ('cabal-ghci "cabal")
-                           ('cabal-dev "cabal-dev"))
+                           ('ghci haskell-process-path-cabal)
+                          ('cabal-repl haskell-process-path-cabal)
+                           ('cabal-ghci haskell-process-path-cabal)
+                           ('cabal-dev haskell-process-path-cabal-dev))
                          (caddr state)))))
 
       :live
@@ -559,10 +559,10 @@ to be loaded by ghci."
                :title (format "*%s*" (haskell-session-name (car state)))
                :body msg
                :app-name (ecase haskell-process-type
-                           ('ghci "cabal")
-                           ('cabal-repl "cabal")
-                           ('cabal-ghci "cabal")
-                           ('cabal-dev "cabal-dev"))
+                           ('ghci haskell-process-path-cabal)
+                           ('cabal-repl haskell-process-path-cabal)
+                           ('cabal-ghci haskell-process-path-cabal)
+                           ('cabal-dev haskell-process-path-cabal-dev))
                :app-icon haskell-process-logo
                )))))))))
 
