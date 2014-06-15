@@ -523,7 +523,7 @@ to be loaded by ghci."
                  (format "%s %s"
                          (ecase haskell-process-type
                            ('ghci haskell-process-path-cabal)
-                          ('cabal-repl haskell-process-path-cabal)
+                           ('cabal-repl haskell-process-path-cabal)
                            ('cabal-ghci haskell-process-path-cabal)
                            ('cabal-dev haskell-process-path-cabal-dev))
                          (caddr state)))))
@@ -1619,6 +1619,26 @@ function and remove this comment.
            "/"
            (haskell-guess-module-name)
            ".imports")))
+
+(defvar interactive-haskell-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-l") 'haskell-process-load-or-reload)
+    (define-key map (kbd "C-c C-t") 'haskell-process-do-type)
+    (define-key map (kbd "C-c C-i") 'haskell-process-do-info)
+    (define-key map (kbd "M-.") 'haskell-mode-jump-to-def-or-tag)
+    (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
+    (define-key map (kbd "C-c C-c") 'haskell-process-cabal-build)
+    (define-key map (kbd "C-c c") 'haskell-process-cabal)
+    (define-key map [?\C-c ?\C-b] 'haskell-interactive-switch)
+    (define-key map [?\C-c ?\C-z] 'haskell-interactive-switch)
+    map)
+  "Keymap for using haskell-interactive-mode.")
+
+;;;###autoload
+(define-minor-mode interactive-haskell-mode
+  "Minor mode for enabling haskell-process interaction."
+  :lighter " Interactive"
+  :keymap interactive-haskell-mode-map)
 
 (provide 'haskell-process)
 

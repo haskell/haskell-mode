@@ -228,34 +228,23 @@ be set to the preferred literate style."
 (defvar haskell-mode-map
   (let ((map (make-sparse-keymap)))
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;; For inferior haskell mode, use the below bindings
-    ;; (define-key map [?\M-C-x]     'inferior-haskell-send-defun)
-    ;; (define-key map [?\C-x ?\C-e] 'inferior-haskell-send-last-sexp)
-    ;; (define-key map [?\C-c ?\C-r] 'inferior-haskell-send-region)
-    (define-key map [?\C-x ?\C-d] 'inferior-haskell-send-decl)
-    (define-key map [?\C-c ?\C-z] 'switch-to-haskell)
-    (define-key map [?\C-c ?\C-l] 'inferior-haskell-load-file)
-    ;; I think it makes sense to bind inferior-haskell-load-and-run to C-c
-    ;; C-r, but since it used to be bound to `reload' until June 2007, I'm
-    ;; going to leave it out for now.
-    ;; (define-key map [?\C-c ?\C-r] 'inferior-haskell-load-and-run)
-    (define-key map [?\C-c ?\C-b] 'switch-to-haskell)
-    ;; (define-key map [?\C-c ?\C-s] 'inferior-haskell-start-process)
-    ;; That's what M-; is for.
-    ;; (define-key map "\C-c\C-c" 'comment-region)
-    (define-key map (kbd "C-c C-t") 'inferior-haskell-type)
-    (define-key map (kbd "C-c C-i") 'inferior-haskell-info)
-    (define-key map (kbd "C-c M-.") 'inferior-haskell-find-definition)
-    (define-key map (kbd "C-c C-d") 'inferior-haskell-find-haddock)
-    (define-key map [?\C-c ?\C-v] 'haskell-check)
-
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;; Editing-specific commands
     (define-key map (kbd "C-c C-.") 'haskell-mode-format-imports)
     (define-key map [remap delete-indentation] 'haskell-delete-indentation)
-
+    (define-key map (kbd "C-c C-l") 'haskell-mode-enable-process-minor-mode)
+    (define-key map (kbd "C-c C-b") 'haskell-mode-enable-process-minor-mode)
+    (define-key map (kbd "C-c C-v") 'haskell-mode-enable-process-minor-mode)
+    (define-key map (kbd "C-c C-t") 'haskell-mode-enable-process-minor-mode)
+    (define-key map (kbd "C-c C-i") 'haskell-mode-enable-process-minor-mode)
     map)
   "Keymap used in Haskell mode.")
+
+(defun haskell-mode-enable-process-minor-mode ()
+  "Tell the user to choose a minor mode for process interaction."
+  (interactive)
+  (error "You tried to do an indentation command, but an interaction mode has not been enabled yet.
+
+Run M-x describe-variable haskell-mode-hook for a list of such modes."))
 
 (easy-menu-define haskell-mode-menu haskell-mode-map
   "Menu for the Haskell major mode."
@@ -267,8 +256,8 @@ be set to the preferred literate style."
     ["Indent region" indent-region mark-active]
     ["(Un)Comment region" comment-region mark-active]
     "---"
-    ["Start interpreter" switch-to-haskell]
-    ["Load file" inferior-haskell-load-file]
+    ["Start interpreter" haskell-process-switch]
+    ["Load file" haskell-process-load-file]
     "---"
     ["Load tidy core" ghc-core-create-core]
     "---"
@@ -407,27 +396,47 @@ May return a qualified name."
 (defcustom haskell-mode-hook nil
   "Hook run after entering `haskell-mode'.
 
-Some of the supported modules that can be activated via this hook:
+You may be looking at this documentation because you haven't
+configured indentation or process interaction.
 
-   `haskell-decl-scan', Graeme E Moss
-     Scans top-level declarations, and places them in a menu.
+Indentation modes:
 
-   `haskell-doc', Hans-Wolfgang Loidl
-     Echoes types of functions or syntax of keywords when the cursor is idle.
-
-   `haskell-indentation', Kristof Bastiaensen
+   `haskell-indentation-mode', Kristof Bastiaensen
      Intelligent semi-automatic indentation Mk2
 
-   `haskell-indent', Guy Lapalme
+   `haskell-indent-mode', Guy Lapalme
      Intelligent semi-automatic indentation.
 
-   `haskell-simple-indent', Graeme E Moss and Heribert Schuetz
+   `haskell-simple-indent-mode', Graeme E Moss and Heribert Schuetz
      Simple indentation.
 
-Module X is activated using the command `turn-on-X'.  For example,
-`haskell-doc' is activated using `turn-on-haskell-doc'.
-For more information on a specific module, see the help for its `X-mode'
-function.  Some modules can be deactivated using `turn-off-X'.
+Interaction modes:
+
+   `interactive-haskell-mode'
+     Interact with per-project GHCi processes through a REPL and
+     directory-aware sessions.
+
+   `inf-haskell-mode'
+     Interact with a GHCi process using comint-mode. Deprecated.
+
+Other modes:
+
+   `haskell-decl-scan-mode', Graeme E Moss
+     Scans top-level declarations, and places them in a menu.
+
+   `haskell-doc-mode', Hans-Wolfgang Loidl
+     Echoes types of functions or syntax of keywords when the cursor is idle.
+
+To activate a minor-mode, simply run the interactive command. For
+example, `M-x haskell-doc-mode'. Run it again to disable it.
+
+To enable a mode for every haskell-mode buffer, add a hook in
+your Emacs configuration. For example, to enable
+haskell-indent-mode and interactive-haskell-mode, use the
+following:
+
+(add-hook 'haskell-mode-hook 'haskell-indent-mode)
+(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
 
 See Info node `(haskell-mode)haskell-mode-hook' for more details.
 
@@ -737,8 +746,11 @@ To be added to `flymake-init-create-temp-buffer-copy'."
 
 (defun haskell-mode-suggest-indent-choice ()
   "Ran when the user tries to indent in the buffer but no indentation mode has been selected.
-Brings up the documentation for haskell-mode-hook."
-  (describe-variable 'haskell-mode-hook))
+Explains what has happened and suggests reading docs for `haskell-mode-hook'."
+  (interactive)
+  (error "You tried to do an interaction command, but an indentation mode has not been enabled yet.
+
+Run M-x describe-variable haskell-mode-hook for a list of such modes."))
 
 (defun haskell-mode-format-imports ()
   "Format the imports by aligning and sorting them."
