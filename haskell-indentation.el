@@ -120,9 +120,9 @@
 
 (defconst haskell-indentation-mode-map
   (let ((keymap (make-sparse-keymap)))
-    (define-key keymap [?\r] 'haskell-newline-and-indent)
-    (define-key keymap [backspace] 'haskell-indentation-delete-backward-char)
-    (define-key keymap [?\C-d] 'haskell-indentation-delete-char)
+    (define-key keymap (kbd "RET") 'haskell-newline-and-indent)
+    (define-key keymap (kbd "DEL") 'haskell-indentation-delete-backward-char)
+    (define-key keymap (kbd "<deletechar>") 'haskell-indentation-delete-char)
     keymap))
 
 ;; Used internally
