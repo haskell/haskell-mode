@@ -722,10 +722,10 @@ from `module-buffer'."
      "\\(Module imports form a cycle:[ \n]+module [^ ]+ ([^)]+)[[:unibyte:][:nonascii:]]+?\\)\nFailed")
     (let ((err (match-string 1 buffer)))
       (when (string-match "module [`'‘‛]\\([^ ]+\\)['’`] (\\([^)]+\\))" err)
-        (let* ((module (match-string 1 err))
+        (let* ((default-directory (haskell-session-current-dir session))
+               (module (match-string 1 err))
                (file (match-string 2 err))
-               (relative-file-name (file-relative-name file
-                                                       (haskell-session-current-dir session))))
+               (relative-file-name (file-relative-name file)))
           (haskell-interactive-show-load-message
            session
            'import-cycle
