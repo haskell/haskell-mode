@@ -719,6 +719,28 @@ from `module-buffer'."
   (cond
    ((haskell-process-consume
      process
+     "\\(Module imports form a cycle:[ \n]+module [^ ]+ ([^)]+)[[:unibyte:][:nonascii:]]+?\\)\nFailed")
+    (let ((err (match-string 1 buffer)))
+      (when (string-match "module [`'‘‛]\\([^ ]+\\)['’`] (\\([^)]+\\))" err)
+        (let* ((module (match-string 1 err))
+               (file (match-string 2 err))
+               (relative-file-name (file-relative-name file
+                                                       (haskell-session-current-dir session))))
+          (haskell-interactive-show-load-message
+           session
+           'import-cycle
+           module
+           relative-file-name
+           nil
+           nil)
+          (haskell-interactive-mode-compile-error
+           session
+           (format "%s:1:0: %s"
+                   relative-file-name
+                   err)))))
+    t)
+   ((haskell-process-consume
+     process
      (concat "[\r\n]\\([^ \r\n:][^:\n\r]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:"
              "[ \n\r]+\\([[:unibyte:][:nonascii:]]+?\\)\n[^ ]"))
     (haskell-process-set-response-cursor process

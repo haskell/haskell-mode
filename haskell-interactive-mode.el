@@ -681,7 +681,8 @@ SESSION, otherwise operate on the current buffer.
                  (if haskell-interactive-mode-include-file-name
                      (format "Compiling: %s (%s)" module-name file-name)
                    (format "Compiling: %s" module-name)))
-                ('loading (format "Loading: %s" module-name)))
+                ('loading (format "Loading: %s" module-name))
+                ('import-cycle (format "Module has an import cycle: %s" module-name)))
               (if th " [TH]" ""))))
     (haskell-mode-message-line msg)
     (when haskell-interactive-mode-delete-superseded-errors
@@ -829,7 +830,7 @@ FILE-NAME only."
                (let ((msg-file-name (match-string-no-properties 1))
                      (msg-startpos (line-beginning-position)))
                  ;; skip over hanging continuation message lines
-                 (while (progn (forward-line) (looking-at "^    ")))
+                 (while (progn (forward-line) (looking-at "^[ ]+")))
 
                  (when (or (not file-name) (string= file-name msg-file-name))
                    (let ((inhibit-read-only t))
