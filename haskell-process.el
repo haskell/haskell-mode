@@ -768,7 +768,9 @@ from `module-buffer'."
 
 (defun haskell-process-trigger-suggestions (session msg file line)
   "Trigger prompting to add any extension suggestions."
-  (cond ((let ((case-fold-search nil)) (string-match " -X\\([A-Z][A-Za-z]+\\)" msg))
+  (cond ((let ((case-fold-search nil))
+           (or (string-match " -X\\([A-Z][A-Za-z]+\\)" msg)
+               (string-match "Use \\([A-Z][A-Za-z]+\\) to permit this" msg)))
          (when haskell-process-suggest-language-pragmas
            (haskell-process-suggest-pragma session "LANGUAGE" (match-string 1 msg) file)))
         ((string-match " The \\(qualified \\)?import of[ ][‘`‛]\\([^ ]+\\)['’] is redundant" msg)
