@@ -138,6 +138,12 @@ See `haskell-process-do-cabal' for more details."
   :type 'boolean
   :group 'haskell-interactive)
 
+(defcustom haskell-process-suggest-haskell-docs-imports
+  nil
+  "Suggest to add import statements using haskell-docs as a backend."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defcustom haskell-process-suggest-add-package
   t
   "Suggest to add packages to your .cabal file when Cabal says it
@@ -789,7 +795,9 @@ from `module-buffer'."
            (haskell-process-suggest-pragma session "LANGUAGE" "OverloadedStrings" file)))
         ((string-match "^Not in scope: .*[‘`‛]\\(.+\\)['’]$" msg)
          (when haskell-process-suggest-hoogle-imports
-           (haskell-process-suggest-hoogle-imports session msg file)))
+           (haskell-process-suggest-hoogle-imports session msg file))
+         (when haskell-process-suggest-haskell-docs-imports
+           (haskell-process-suggest-haskell-docs-imports session msg file)))
         ((string-match "^[ ]+It is a member of the hidden package [‘`‛]\\(.+\\)['’].$" msg)
          (when haskell-process-suggest-add-package
            (haskell-process-suggest-add-package session msg)))))
@@ -879,6 +887,48 @@ now."
                 "\n")
         (haskell-sort-imports)
         (haskell-align-imports)))))
+
+(defun haskell-process-suggest-haskell-docs-imports (session msg file)
+  "Given an out of scope identifier, haskell-docs search for that identifier,
+and if a result comes back, suggest to import that identifier
+now."
+  (let* ((process (haskell-session-process session))
+         (suggested-already (haskell-process-suggested-imports process))
+         (ident (let ((i (match-string 1 msg)))
+                  ;; Skip qualification.
+                  (if (string-match "^[A-Za-z0-9_'.]+\\.\\(.+\\)$" i)
+                      (match-string 1 i)
+                    i)))
+         (modules (haskell-process-haskell-docs-ident ident))
+         (module
+          (cond
+           ((> (length modules) 1)
+            (when (y-or-n-p (format "Identifier `%s' not in scope, choose module to import?"
+                                    ident))
+              (haskell-complete-module-read "Module: " modules)))
+           ((= (length modules) 1)
+            (let ((module (car modules)))
+              (unless (member module suggested-already)
+                (haskell-process-set-suggested-imports process (cons module suggested-already))
+                (when (y-or-n-p (format "Identifier `%s' not in scope, import `%s'?"
+                                        ident
+                                        module))
+                  module)))))))
+    (when module
+      (haskell-process-find-file session file)
+      (save-excursion
+        (goto-char (point-max))
+        (haskell-navigate-imports)
+        (insert (read-from-minibuffer "Import line: " (concat "import " module))
+                "\n")
+        (haskell-sort-imports)
+        (haskell-align-imports)))))
+
+(defun haskell-process-haskell-docs-ident (ident)
+  "Search with haskell-docs for IDENT, returns a list of modules."
+  (remove-if (lambda (a) (string= "" a))
+             (split-string (shell-command-to-string (concat "haskell-docs --modules " ident))
+                           "\n")))
 
 (defun haskell-process-hoogle-ident (ident)
   "Hoogle for IDENT, returns a list of modules."
