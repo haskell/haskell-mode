@@ -597,7 +597,7 @@ If nil, use the Hoogle web-site."
                  string))
 
 ;;;###autoload
-(defun haskell-hoogle (query)
+(defun haskell-hoogle (query &optional info)
   "Do a Hoogle search for QUERY."
   (interactive
    (let ((def (haskell-ident-at-point)))
@@ -605,14 +605,17 @@ If nil, use the Hoogle web-site."
      (list (read-string (if def
                             (format "Hoogle query (default %s): " def)
                           "Hoogle query: ")
-                        nil nil def))))
+                        nil nil def)
+           current-prefix-arg)))
   (if (null haskell-hoogle-command)
       (browse-url (format "http://haskell.org/hoogle/?q=%s" query))
     (lexical-let ((temp-buffer (help-buffer)))
       (with-output-to-temp-buffer temp-buffer
         (with-current-buffer standard-output
           (let ((hoogle-process
-                 (start-process "hoogle" (current-buffer) haskell-hoogle-command query))
+                 (if info
+                     (start-process "hoogle" (current-buffer) haskell-hoogle-command "-i" query)
+                   (start-process "hoogle" (current-buffer) haskell-hoogle-command query)))
                 (scroll-to-top
                  (lambda (process event)
                    (set-window-start (get-buffer-window temp-buffer t) 1))))
