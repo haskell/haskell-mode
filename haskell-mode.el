@@ -1048,6 +1048,39 @@ given a prefix arg."
     (goto-char (point-min))
     (forward-char 4)))
 
+(defun haskell-describe (ident)
+  "Describe the given identifier."
+  (interactive (list (read-from-minibuffer "Describe identifier: ")))
+  (let ((results (read (shell-command-to-string
+                        (concat "haskell-docs --sexp "
+                                ident)))))
+    (help-setup-xref (list #'haskell-describe ident)
+		     (called-interactively-p 'interactive))
+    (save-excursion
+      (with-help-window (help-buffer)
+        (with-current-buffer (help-buffer)
+          (if results
+              (loop for result in results
+                    do (insert ident
+                               " is defined in "
+                               (let ((module (cadr (assoc 'module result))))
+                                 (if module
+                                     (concat module " ")
+                                   ""))
+                               (cadr (assoc 'package result))
+                               "\n\n")
+                    do (let ((type (cadr (assoc 'type results))))
+                         (when type
+                           (haskell-fontify-as-mode type 'haskell-mode)
+                           "\n\n"))
+                    do (let ((args (cadr (assoc 'type results))))
+                         (loop for arg in args
+                               do (insert arg "\n"))
+                         "\n")
+                    do (insert (cadr (assoc 'documentation result)))
+                    do (insert "\n\n"))
+            (insert "No results for " ident)))))))
+
 
 ;; Provide ourselves:
 
