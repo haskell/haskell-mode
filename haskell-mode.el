@@ -1061,7 +1061,8 @@ given a prefix arg."
         (with-current-buffer (help-buffer)
           (if results
               (loop for result in results
-                    do (insert ident
+                    do (insert (propertize ident 'face '((:inherit font-lock-type-face
+                                                                   :underline t)))
                                " is defined in "
                                (let ((module (cadr (assoc 'module result))))
                                  (if module
@@ -1069,14 +1070,14 @@ given a prefix arg."
                                    ""))
                                (cadr (assoc 'package result))
                                "\n\n")
-                    do (let ((type (cadr (assoc 'type results))))
+                    do (let ((type (cadr (assoc 'type result))))
                          (when type
-                           (haskell-fontify-as-mode type 'haskell-mode)
-                           "\n\n"))
+                           (insert (haskell-fontify-as-mode type 'haskell-mode)
+                                   "\n")))
                     do (let ((args (cadr (assoc 'type results))))
                          (loop for arg in args
                                do (insert arg "\n"))
-                         "\n")
+                         (insert "\n"))
                     do (insert (cadr (assoc 'documentation result)))
                     do (insert "\n\n"))
             (insert "No results for " ident)))))))
