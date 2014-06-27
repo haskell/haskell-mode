@@ -888,13 +888,15 @@ FILE-NAME only."
                   p (concat "let it = Present.asData (" expr ")"))))
       (if (not (string= "" error))
           (haskell-interactive-mode-eval-result (haskell-session) (concat error "\n"))
-        (let* ((hash (haskell-interactive-mode-presentation-hash))
-               (presentation (haskell-interactive-mode-present-id
-                              hash
-                              (list 0))))
-          (insert "\n")
-          (haskell-interactive-mode-insert-presentation hash presentation)
-          (haskell-interactive-mode-eval-result (haskell-session) "\n")))
+        (let ((hash (haskell-interactive-mode-presentation-hash)))
+          (haskell-process-queue-sync-request
+           p (format "let %s = Present.asData (%s)" hash expr))
+          (let* ((presentation (haskell-interactive-mode-present-id
+                                hash
+                                (list 0))))
+            (insert "\n")
+            (haskell-interactive-mode-insert-presentation hash presentation)
+            (haskell-interactive-mode-eval-result (haskell-session) "\n"))))
       (haskell-interactive-mode-prompt (haskell-session)))))
 
 (defvar haskell-interactive-mode-presentation-hash 0
@@ -902,8 +904,9 @@ FILE-NAME only."
 
 (defun haskell-interactive-mode-presentation-hash ()
   "Generate a presentation hash."
-  (setq haskell-interactive-mode-presentation-hash
-        (1+ haskell-interactive-mode-presentation-hash)))
+  (format "_present_%s"
+          (setq haskell-interactive-mode-presentation-hash
+                (1+ haskell-interactive-mode-presentation-hash))))
 
 (define-button-type 'haskell-presentation-slot-button
   'action 'haskell-presentation-present-slot
@@ -1040,8 +1043,9 @@ they're both up to date, or report a bug."))
      p "let _it = it")
     (let* ((text (haskell-process-queue-sync-request
                   p
-                  (format "Present.putStr (Present.encode (Present.fromJust (Present.present (Present.fromJust (Present.fromList [%s])) it)))"
-                          (mapconcat 'identity (mapcar 'number-to-string id) ","))))
+                  (format "Present.putStr (Present.encode (Present.fromJust (Present.present (Present.fromJust (Present.fromList [%s])) %s)))"
+                          (mapconcat 'identity (mapcar 'number-to-string id) ",")
+                          hash)))
            (reply
             (if (string-match "^*** " text)
                 '((rep nil))
