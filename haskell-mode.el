@@ -128,6 +128,7 @@
 (require 'compile)
 (require 'flymake)
 (require 'outline)
+(require 'ansi-color)
 (require 'haskell-complete-module)
 (require 'haskell-compat)
 (require 'haskell-align-imports)
@@ -621,11 +622,13 @@ If nil, use the Hoogle web-site."
       (with-output-to-temp-buffer temp-buffer
         (with-current-buffer standard-output
           (let ((hoogle-process
-                 (start-process "hoogle" (current-buffer) haskell-hoogle-command query))
-                (scroll-to-top
+                 (start-process "hoogle" (current-buffer) haskell-hoogle-command "--color" query))
+                (update
                  (lambda (process event)
+                   (with-current-buffer temp-buffer
+                    (ansi-color-apply-on-region (point-min) (point-max)))
                    (set-window-start (get-buffer-window temp-buffer t) 1))))
-            (set-process-sentinel hoogle-process scroll-to-top)))))))
+            (set-process-sentinel hoogle-process update)))))))
 
 ;;;###autoload
 (defalias 'hoogle 'haskell-hoogle)
