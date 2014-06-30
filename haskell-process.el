@@ -1015,16 +1015,21 @@ now."
        process
        (ecase haskell-process-type
          ('ghci
-          (haskell-process-log (format "Starting inferior GHCi process %s ..."
-                                       haskell-process-path-ghci))
+          (haskell-process-log
+           (propertize (format "Starting inferior GHCi process %s ..."
+                               haskell-process-path-ghci)
+                       'face font-lock-comment-face))
           (apply #'start-process
                  (append (list (haskell-session-name session)
                                nil
                                haskell-process-path-ghci)
                          haskell-process-args-ghci)))
          ('cabal-repl
-          (haskell-process-log (format "Starting inferior `cabal repl' process using %s ..."
-                                       haskell-process-path-cabal))
+          (haskell-process-log
+           (propertize
+            (format "Starting inferior `cabal repl' process using %s ..."
+                    haskell-process-path-cabal)
+            'face font-lock-comment-face))
 
           (apply #'start-process
                  (append (list (haskell-session-name session)
@@ -1034,17 +1039,22 @@ now."
                          (let ((target (haskell-session-target session)))
                            (if target (list target) nil)))))
          ('cabal-ghci
-          (haskell-process-log (format "Starting inferior cabal-ghci process using %s ..."
-                                       haskell-process-path-cabal-ghci))
+          (haskell-process-log
+           (propertize
+            (format "Starting inferior cabal-ghci process using %s ..."
+                    haskell-process-path-cabal-ghci)
+            'face font-lock-comment-face))
           (start-process (haskell-session-name session)
                          nil
                          haskell-process-path-cabal-ghci))
          ('cabal-dev
           (let ((dir (concat (haskell-session-cabal-dir session)
                              "/cabal-dev")))
-            (haskell-process-log (format "Starting inferior cabal-dev process %s -s %s ..."
-                                         haskell-process-path-cabal-dev
-                                         dir))
+            (haskell-process-log
+             (propertize (format "Starting inferior cabal-dev process %s -s %s ..."
+                                 haskell-process-path-cabal-dev
+                                 dir)
+                         'face font-lock-comment-face))
             (start-process (haskell-session-name session)
                            nil
                            haskell-process-path-cabal-dev
@@ -1106,7 +1116,9 @@ now."
   (interactive)
   (let* ((session (haskell-session))
          (dir (haskell-session-pwd session t)))
-    (haskell-process-log (format "Changing directory to %s ...\n" dir))
+    (haskell-process-log
+     (propertize (format "Changing directory to %s ...\n" dir)
+                 'face font-lock-comment-face))
     (haskell-process-change-dir session
                                 (haskell-process)
                                 dir)))
@@ -1194,13 +1206,24 @@ If I break, you can:
     (when session
       (let* ((process (haskell-session-process session)))
         (unless (haskell-process-restarting process)
-          (haskell-process-log (format "Event: %S\n" event))
-          (haskell-process-log "Process reset.\n")
+          (haskell-process-log
+           (propertize (format "Event: %S\n" event)
+                       'face '((:weight bold))))
+          (haskell-process-log
+           (propertize "Process reset.\n"
+                       'face font-lock-comment-face))
           (haskell-process-prompt-restart process))))))
 
 (defun haskell-process-filter (proc response)
   "The filter for the process pipe."
-  (haskell-process-log (format "<- %S\n" response))
+  (let ((i 0))
+    (loop for line in (split-string response "\n")
+          do (haskell-process-log
+              (concat (if (= i 0)
+                          (propertize "<- " 'face font-lock-comment-face)
+                        "   ")
+                      (propertize line 'face 'haskell-interactive-face-compile-warning)))
+          do (setq i (1+ i))))
   (let ((session (haskell-process-project-by-proc proc)))
     (when session
       (if (haskell-process-cmd (haskell-session-process session))
@@ -1216,7 +1239,7 @@ If I break, you can:
   (when haskell-process-log
     (with-current-buffer (get-buffer-create "*haskell-process-log*")
       (goto-char (point-max))
-      (insert msg))))
+      (insert msg "\n"))))
 
 (defun haskell-process-project-by-proc (proc)
   "Find project by process."
@@ -1260,7 +1283,10 @@ If I break, you can:
   (let ((child (haskell-process-process process)))
     (if (equal 'run (process-status child))
         (let ((out (concat string "\n")))
-          (haskell-process-log (format "-> %S\n" out))
+          (haskell-process-log
+           (propertize (concat (propertize "-> " 'face font-lock-comment-face)
+                               (propertize string 'face font-lock-string-face))
+                       'face '((:weight bold))))
           (process-send-string child out))
       (unless (haskell-process-restarting process)
         (haskell-process-prompt-restart process)))))
