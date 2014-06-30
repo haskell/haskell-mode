@@ -1269,9 +1269,18 @@ If I break, you can:
   "Prompt to restart the died process."
   (let ((process-name (haskell-process-name process)))
     (if haskell-process-suggest-restart
-        (when (y-or-n-p (format "The Haskell process `%s' has died. Restart? "
-                                process-name))
-          (haskell-process-start (haskell-process-session process)))
+        (case (read-event
+               (propertize (format "The Haskell process `%s' has died. Restart? (y, n, l: show process log)"
+                                   process-name)
+                           'face 'minibuffer-prompt))
+          (?y (haskell-process-start (haskell-process-session process)))
+          (?l (let* ((response (haskell-process-response process))
+                     (buffer (get-buffer "*haskell-process-log*")))
+                (if buffer
+                    (switch-to-buffer buffer)
+                  (progn (switch-to-buffer (get-buffer-create "*haskell-process-log*"))
+                         (insert response)))))
+          (?n))
       (message (format "The Haskell process `%s' is dearly departed."
                        process-name)))))
 
