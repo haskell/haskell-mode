@@ -242,7 +242,7 @@ be set to the preferred literate style."
 (defun haskell-mode-enable-process-minor-mode ()
   "Tell the user to choose a minor mode for process interaction."
   (interactive)
-  (error "You tried to do an indentation command, but an interaction mode has not been enabled yet.
+  (error "You tried to do an interaction command, but an interaction mode has not been enabled yet.
 
 Run M-x describe-variable haskell-mode-hook for a list of such modes."))
 
@@ -748,7 +748,7 @@ To be added to `flymake-init-create-temp-buffer-copy'."
   "Ran when the user tries to indent in the buffer but no indentation mode has been selected.
 Explains what has happened and suggests reading docs for `haskell-mode-hook'."
   (interactive)
-  (error "You tried to do an interaction command, but an indentation mode has not been enabled yet.
+  (error "You tried to do an indentation command, but an indentation mode has not been enabled yet.
 
 Run M-x describe-variable haskell-mode-hook for a list of such modes."))
 
