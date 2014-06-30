@@ -948,33 +948,30 @@ now."
   "Suggest removing or commenting out IMPORT on LINE."
   (let ((continue t)
         (first t))
-    (while continue
-      (setq continue nil)
-      (case (read-key (propertize (format "%sThe import line `%s' is redundant. Remove? (y, n, c: comment out)  "
-                                          (if (not first)
-                                              "Please answer n, y or c: "
-                                            "")
-                                          import)
-                                  'face 'minibuffer-prompt))
-        (?y
-         (haskell-process-find-file session file)
-         (save-excursion
-           (goto-char (point-min))
-           (forward-line (1- line))
-           (goto-char (line-beginning-position))
-           (delete-region (line-beginning-position)
-                          (line-end-position))))
-        (?n
-         (message "Ignoring redundant import %s" import))
-        (?c
-         (haskell-process-find-file session file)
-         (save-excursion
-           (goto-char (point-min))
-           (forward-line (1- line))
-           (goto-char (line-beginning-position))
-           (insert "-- ")))
-        (t (setq first nil)
-           (setq continue t))))))
+    (case (read-event
+           (propertize (format "%sThe import line `%s' is redundant. Remove? (y, n, c: comment out)  "
+                               (if (not first)
+                                   "Please answer n, y or c: "
+                                 "")
+                               import)
+                       'face 'minibuffer-prompt))
+      (?y
+       (haskell-process-find-file session file)
+       (save-excursion
+         (goto-char (point-min))
+         (forward-line (1- line))
+         (goto-char (line-beginning-position))
+         (delete-region (line-beginning-position)
+                        (line-end-position))))
+      (?n
+       (message "Ignoring redundant import %s" import))
+      (?c
+       (haskell-process-find-file session file)
+       (save-excursion
+         (goto-char (point-min))
+         (forward-line (1- line))
+         (goto-char (line-beginning-position))
+         (insert "-- "))))))
 
 (defun haskell-process-suggest-pragma (session pragma extension file)
   "Suggest to add something to the top of the file."
@@ -1490,7 +1487,7 @@ Returns nil if queue is empty."
         (message "Nothing to unignore!")
       (loop for file in (haskell-session-get session
                                              'ignored-files)
-            do (case (read-key
+            do (case (read-event
                       (propertize (format "Set permissions? %s (y, n, v: stop and view file)"
                                           file)
                                   'face 'minibuffer-prompt))
