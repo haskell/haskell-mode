@@ -256,7 +256,7 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
     ["Indent region" indent-region mark-active]
     ["(Un)Comment region" comment-region mark-active]
     "---"
-    ["Start interpreter" haskell-process-switch]
+    ["Start interpreter" haskell-interactive-switch]
     ["Load file" haskell-process-load-file]
     "---"
     ["Load tidy core" ghc-core-create-core]
