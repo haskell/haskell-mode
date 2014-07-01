@@ -32,6 +32,7 @@
 (require 'haskell-session)
 (require 'haskell-compat)
 (require 'haskell-str)
+(require 'haskell-compile)
 (require 'haskell-utils)
 (require 'haskell-presentation-mode)
 (require 'haskell-navigate-imports)
@@ -747,21 +748,18 @@ from `module-buffer'."
     t)
    ((haskell-process-consume
      process
-     (concat "[\r\n]\\([^ \r\n:][^:\n\r]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:"
+     (concat "[\r\n]\\([^ \r\n:][^:\n\r]+\\):\\([0-9()-:]+\\):"
              "[ \n\r]+\\([[:unibyte:][:nonascii:]]+?\\)\n[^ ]"))
     (haskell-process-set-response-cursor process
                                          (- (haskell-process-response-cursor process) 1))
     (let* ((buffer (haskell-process-response process))
            (file (match-string 1 buffer))
-           (line (string-to-number (match-string 2 buffer)))
-           (col (match-string 3 buffer))
-           (col2 (match-string 4 buffer))
-           (error-msg (match-string 5 buffer))
+           (location (match-string 2 buffer))
+           (error-msg (match-string 3 buffer))
            (warning (string-match "^Warning:" error-msg))
-           (final-msg (format "%s:%s:%s%s: %s"
+           (final-msg (format "%s:%s: %s"
                               (haskell-session-strip-dir session file)
-                              line
-                              col (or col2 "")
+                              location
                               error-msg)))
       (funcall (if warning
                    'haskell-interactive-mode-compile-warning
@@ -769,8 +767,28 @@ from `module-buffer'."
                session final-msg)
       (unless warning
         (haskell-mode-message-line final-msg))
-      (haskell-process-trigger-suggestions session error-msg file line))
+      (haskell-process-trigger-suggestions
+       session
+       error-msg
+       file
+       (plist-get (haskell-process-parse-error final-msg) :line)))
     t)))
+
+(defun haskell-process-parse-error (string)
+  "Parse the line number from the error."
+  (let ((span nil))
+    (loop for regex
+          in haskell-compilation-error-regexp-alist
+          do (when (string-match (car regex) string)
+               (setq span
+                     (list :file (match-string 1 string)
+                           :line (string-to-number (match-string 2 string))
+                           :col (string-to-number (match-string 4 string))
+                           :line2 (when (match-string 3 string)
+                                    (string-to-number (match-string 3 string)))
+                           :col2 (when (match-string 5 string)
+                                   (string-to-number (match-string 5 string)))))))
+    span))
 
 (defun haskell-process-trigger-suggestions (session msg file line)
   "Trigger prompting to add any extension suggestions."

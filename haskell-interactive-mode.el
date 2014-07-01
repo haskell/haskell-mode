@@ -733,7 +733,7 @@ SESSION, otherwise operate on the current buffer.
                                 (not visibility)))))))
 
 (defconst haskell-interactive-mode-error-regexp
-  "^\\([^\r\n:]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:")
+  "^\\([^\r\n:]+\\):\\([0-9()-:]+\\):?")
 
 (defun haskell-interactive-at-compile-message ()
   "Am I on a compile message?"
@@ -786,10 +786,11 @@ SESSION, otherwise operate on the current buffer.
 
       (when (string-match haskell-interactive-mode-error-regexp orig-line)
         (let* ((msgmrk (set-marker (make-marker) (line-beginning-position)))
-               (file (match-string 1 orig-line))
-               (line (match-string 2 orig-line))
-               (col1 (match-string 3 orig-line))
-               (col2 (match-string 4 orig-line))
+               (location (haskell-process-parse-error orig-line))
+               (file (plist-get location :file))
+               (line (plist-get location :line))
+               (col1 (plist-get location :col))
+               (col2 (plist-get location :col2))
 
                (cabal-relative-file (expand-file-name file (haskell-session-cabal-dir session)))
                (src-relative-file (expand-file-name file (haskell-session-current-dir session)))
@@ -805,11 +806,11 @@ SESSION, otherwise operate on the current buffer.
                 (with-current-buffer (find-file-noselect real-file)
                   (save-excursion
                     (goto-char (point-min))
-                    (forward-line (1- (string-to-number line)))
-                    (set-marker m1 (+ (string-to-number col1) (point) -1))
+                    (forward-line (1- line))
+                    (set-marker m1 (+ col1 (point) -1))
 
                     (when col2
-                      (set-marker m2 (- (point) (string-to-number col2))))))
+                      (set-marker m2 (- (point) col2)))))
                 ;; ...finally select&hilight error locus
                 (compilation-goto-locus msgmrk m1 (and (marker-position m2) m2)))
             (error "don't know where to find %S" file)))))))
