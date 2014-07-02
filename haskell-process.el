@@ -945,7 +945,7 @@ now."
 
 (defun haskell-process-haskell-docs-ident (ident)
   "Search with haskell-docs for IDENT, returns a list of modules."
-  (remove-if (lambda (a) (string= "" a))
+  (remove-if-not (lambda (a) (string-match "^[A-Z][A-Za-b0-9_'.]+$" a))
              (split-string (shell-command-to-string (concat "haskell-docs --modules " ident))
                            "\n")))
 
