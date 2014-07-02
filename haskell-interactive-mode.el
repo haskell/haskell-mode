@@ -737,9 +737,10 @@ SESSION, otherwise operate on the current buffer.
 
 (defun haskell-interactive-at-compile-message ()
   "Am I on a compile message?"
-  (save-excursion
-    (goto-char (line-beginning-position))
-    (looking-at haskell-interactive-mode-error-regexp)))
+  (and (not (haskell-interactive-at-prompt))
+       (save-excursion
+         (goto-char (line-beginning-position))
+         (looking-at haskell-interactive-mode-error-regexp))))
 
 (defun haskell-interactive-mode-error-backward (&optional count)
   "Go backward to the previous error."
