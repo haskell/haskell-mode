@@ -61,6 +61,7 @@
                                                 " | ")
                                      "}"))))
         (case key
+          (7 (keyboard-quit))
           (backspace
            (unless (null stack)
              (setq candidates (pop stack)))
