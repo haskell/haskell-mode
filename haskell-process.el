@@ -1563,7 +1563,10 @@ program in `DevelMain', and define `update' to auto-start the
 program on a new thread, and use the `foreign-store' package to
 access the running context across :load/:reloads in GHCi."
   (interactive)
-  (with-current-buffer (get-buffer "DevelMain.hs")
+  (with-current-buffer (or (get-buffer "DevelMain.hs")
+                           (if (y-or-n-p "You need to open a buffer named DevelMain.hs. Find now?")
+                               (ido-find-file)
+                             (error "No DevelMain.hs buffer.")))
     (let ((session (haskell-session)))
       (let ((process (haskell-process)))
         (haskell-process-queue-command
