@@ -211,6 +211,13 @@ imports become available?"
   :type 'boolean
   :group 'haskell-interactive)
 
+(defcustom haskell-ask-also-kill-buffers
+  t
+  "Ask whether to kill all associated buffers when a session
+ process is killed."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defvar haskell-process-prompt-regex "\4")
 (defvar haskell-reload-p nil)
 
