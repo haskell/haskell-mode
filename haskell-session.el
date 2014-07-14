@@ -41,6 +41,16 @@
 (defvar haskell-process-type)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Configuration
+
+(defcustom haskell-ask-also-kill-buffers
+  t
+  "Ask whether to kill all associated buffers when a session
+ process is killed."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Globals
 
 (defvar haskell-sessions (list)
