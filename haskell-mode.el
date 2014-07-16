@@ -393,6 +393,12 @@ May return a qualified name."
 
 ;; Various mode variables.
 
+(defcustom haskell-mode-contextual-import-completion
+  t
+  "Enable import completion on haskell-mode-contextual-space."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defcustom haskell-mode-hook nil
   "Hook run after entering `haskell-mode'.
 
@@ -776,8 +782,9 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
   (interactive)
   (if (not (haskell-session-maybe))
       (self-insert-command 1)
-    (cond ((save-excursion (forward-word -1)
-                           (looking-at "^import$"))
+    (cond ((and haskell-mode-contextual-import-completion
+                (save-excursion (forward-word -1)
+                                (looking-at "^import$")))
            (insert " ")
            (let ((module (haskell-complete-module-read "Module: " (haskell-session-all-modules))))
              (insert module)
