@@ -144,7 +144,8 @@ Key bindings:
   (set (make-local-variable 'haskell-interactive-mode-completion-cache) nil)
 
   (setq next-error-function 'haskell-interactive-next-error-function)
-  (setq completion-at-point-functions '(haskell-interactive-mode-completion-at-point-function))
+  (add-hook 'completion-at-point-functions
+            'haskell-interactive-mode-completion-at-point-function nil t)
 
   (haskell-interactive-mode-prompt))
 
