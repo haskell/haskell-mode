@@ -796,7 +796,8 @@ from `module-buffer'."
            (or (string-match " -X\\([A-Z][A-Za-z]+\\)" msg)
                (string-match "Use \\([A-Z][A-Za-z]+\\) to permit this" msg)
                (string-match "Use \\([A-Z][A-Za-z]+\\) to allow" msg)
-               (string-match "use \\([A-Z][A-Za-z]+\\)" msg)))
+               (string-match "use \\([A-Z][A-Za-z]+\\)" msg)
+               (string-match "You need \\([A-Z][A-Za-z]+\\)" msg)))
          (when haskell-process-suggest-language-pragmas
            (haskell-process-suggest-pragma session "LANGUAGE" (match-string 1 msg) file)))
         ((string-match " The \\(qualified \\)?import of[ ][‘`‛]\\([^ ]+\\)['’] is redundant" msg)
