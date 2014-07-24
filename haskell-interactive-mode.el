@@ -150,27 +150,27 @@ Key bindings:
   (haskell-interactive-mode-prompt))
 
 (defface haskell-interactive-face-prompt
-  '((t :inherit 'font-lock-function-name-face))
+  '((t :inherit font-lock-function-name-face))
   "Face for the prompt."
   :group 'haskell-interactive)
 
 (defface haskell-interactive-face-compile-error
-  '((t :inherit 'compilation-error))
+  '((t :inherit compilation-error))
   "Face for compile errors."
   :group 'haskell-interactive)
 
 (defface haskell-interactive-face-compile-warning
-  '((t :inherit 'compilation-warning))
+  '((t :inherit compilation-warning))
   "Face for compiler warnings."
   :group 'haskell-interactive)
 
 (defface haskell-interactive-face-result
-  '((t :inherit 'font-lock-string-face))
+  '((t :inherit font-lock-string-face))
   "Face for the result."
   :group 'haskell-interactive)
 
 (defface haskell-interactive-face-garbage
-  '((t :inherit 'font-lock-string-face))
+  '((t :inherit font-lock-string-face))
   "Face for trailing garbage after a command has completed."
   :group 'haskell-interactive)
 
@@ -949,7 +949,7 @@ FILE-NAME only."
   (let ((start (point))
         (type (car slot))
         (id (cadr slot)))
-    (insert (propertize type 'face '(:height 0.8 :underline t :inherit 'font-lock-comment-face)))
+    (insert (propertize type 'face '(:height 0.8 :underline t :inherit font-lock-comment-face)))
     (let ((button (make-text-button start (point)
                                     :type 'haskell-presentation-slot-button)))
       (button-put button 'hide-on-click t)
