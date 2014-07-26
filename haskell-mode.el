@@ -393,6 +393,12 @@ May return a qualified name."
 
 ;; Various mode variables.
 
+(defcustom haskell-mode-contextual-import-completion
+  t
+  "Enable import completion on haskell-mode-contextual-space."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defcustom haskell-mode-hook nil
   "Hook run after entering `haskell-mode'.
 
@@ -606,7 +612,7 @@ If nil, use the Hoogle web-site."
                  string))
 
 ;;;###autoload
-(defun haskell-hoogle (query)
+(defun haskell-hoogle (query &optional info)
   "Do a Hoogle search for QUERY."
   (interactive
    (let ((def (haskell-ident-at-point)))
@@ -614,14 +620,17 @@ If nil, use the Hoogle web-site."
      (list (read-string (if def
                             (format "Hoogle query (default %s): " def)
                           "Hoogle query: ")
-                        nil nil def))))
+                        nil nil def)
+           current-prefix-arg)))
   (if (null haskell-hoogle-command)
       (browse-url (format "http://haskell.org/hoogle/?q=%s" query))
     (lexical-let ((temp-buffer (help-buffer)))
       (with-output-to-temp-buffer temp-buffer
         (with-current-buffer standard-output
           (let ((hoogle-process
-                 (start-process "hoogle" (current-buffer) haskell-hoogle-command query))
+                 (if info
+                     (start-process "hoogle" (current-buffer) haskell-hoogle-command "-i" query)
+                   (start-process "hoogle" (current-buffer) haskell-hoogle-command query)))
                 (scroll-to-top
                  (lambda (process event)
                    (set-window-start (get-buffer-window temp-buffer t) 1))))
@@ -776,8 +785,9 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
   (interactive)
   (if (not (haskell-session-maybe))
       (self-insert-command 1)
-    (cond ((save-excursion (forward-word -1)
-                           (looking-at "^import$"))
+    (cond ((and haskell-mode-contextual-import-completion
+                (save-excursion (forward-word -1)
+                                (looking-at "^import$")))
            (insert " ")
            (let ((module (haskell-complete-module-read "Module: " (haskell-session-all-modules))))
              (insert module)

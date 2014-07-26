@@ -41,6 +41,16 @@
 (defvar haskell-process-type)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Configuration
+
+(defcustom haskell-ask-also-kill-buffers
+  t
+  "Ask whether to kill all associated buffers when a session
+ process is killed."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Globals
 
 (defvar haskell-sessions (list)
@@ -116,7 +126,9 @@ If DONTCREATE is non-nil don't create a new session."
   (interactive)
   (let* ((session (haskell-session))
          (name (haskell-session-name session))
-         (also-kill-buffers (y-or-n-p (format "Killing `%s'. Also kill all associated buffers?" name))))
+         (also-kill-buffers
+          (and haskell-ask-also-kill-buffers
+               (y-or-n-p (format "Killing `%s'. Also kill all associated buffers?" name)))))
     (haskell-kill-session-process session)
     (unless leave-interactive-buffer
       (kill-buffer (haskell-session-interactive-buffer session)))

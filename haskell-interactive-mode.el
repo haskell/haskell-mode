@@ -144,32 +144,33 @@ Key bindings:
   (set (make-local-variable 'haskell-interactive-mode-completion-cache) nil)
 
   (setq next-error-function 'haskell-interactive-next-error-function)
-  (setq completion-at-point-functions '(haskell-interactive-mode-completion-at-point-function))
+  (add-hook 'completion-at-point-functions
+            'haskell-interactive-mode-completion-at-point-function nil t)
 
   (haskell-interactive-mode-prompt))
 
 (defface haskell-interactive-face-prompt
-  '((t :inherit 'font-lock-function-name-face))
+  '((t :inherit font-lock-function-name-face))
   "Face for the prompt."
   :group 'haskell-interactive)
 
 (defface haskell-interactive-face-compile-error
-  '((t :inherit 'compilation-error))
+  '((t :inherit compilation-error))
   "Face for compile errors."
   :group 'haskell-interactive)
 
 (defface haskell-interactive-face-compile-warning
-  '((t :inherit 'compilation-warning))
+  '((t :inherit compilation-warning))
   "Face for compiler warnings."
   :group 'haskell-interactive)
 
 (defface haskell-interactive-face-result
-  '((t :inherit 'font-lock-string-face))
+  '((t :inherit font-lock-string-face))
   "Face for the result."
   :group 'haskell-interactive)
 
 (defface haskell-interactive-face-garbage
-  '((t :inherit 'font-lock-string-face))
+  '((t :inherit font-lock-string-face))
   "Face for trailing garbage after a command has completed."
   :group 'haskell-interactive)
 
@@ -733,13 +734,14 @@ SESSION, otherwise operate on the current buffer.
                                 (not visibility)))))))
 
 (defconst haskell-interactive-mode-error-regexp
-  "^\\([^\r\n:]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:")
+  "^\\([^\r\n:]+\\):\\([0-9()-:]+\\):?")
 
 (defun haskell-interactive-at-compile-message ()
   "Am I on a compile message?"
-  (save-excursion
-    (goto-char (line-beginning-position))
-    (looking-at haskell-interactive-mode-error-regexp)))
+  (and (not (haskell-interactive-at-prompt))
+       (save-excursion
+         (goto-char (line-beginning-position))
+         (looking-at haskell-interactive-mode-error-regexp))))
 
 (defun haskell-interactive-mode-error-backward (&optional count)
   "Go backward to the previous error."
@@ -786,10 +788,11 @@ SESSION, otherwise operate on the current buffer.
 
       (when (string-match haskell-interactive-mode-error-regexp orig-line)
         (let* ((msgmrk (set-marker (make-marker) (line-beginning-position)))
-               (file (match-string 1 orig-line))
-               (line (match-string 2 orig-line))
-               (col1 (match-string 3 orig-line))
-               (col2 (match-string 4 orig-line))
+               (location (haskell-process-parse-error orig-line))
+               (file (plist-get location :file))
+               (line (plist-get location :line))
+               (col1 (plist-get location :col))
+               (col2 (plist-get location :col2))
 
                (cabal-relative-file (expand-file-name file (haskell-session-cabal-dir session)))
                (src-relative-file (expand-file-name file (haskell-session-current-dir session)))
@@ -805,11 +808,11 @@ SESSION, otherwise operate on the current buffer.
                 (with-current-buffer (find-file-noselect real-file)
                   (save-excursion
                     (goto-char (point-min))
-                    (forward-line (1- (string-to-number line)))
-                    (set-marker m1 (+ (string-to-number col1) (point) -1))
+                    (forward-line (1- line))
+                    (set-marker m1 (+ col1 (point) -1))
 
                     (when col2
-                      (set-marker m2 (- (point) (string-to-number col2))))))
+                      (set-marker m2 (- (point) col2)))))
                 ;; ...finally select&hilight error locus
                 (compilation-goto-locus msgmrk m1 (and (marker-position m2) m2)))
             (error "don't know where to find %S" file)))))))
@@ -946,7 +949,7 @@ FILE-NAME only."
   (let ((start (point))
         (type (car slot))
         (id (cadr slot)))
-    (insert (propertize type 'face '(:height 0.8 :underline t :inherit 'font-lock-comment-face)))
+    (insert (propertize type 'face '(:height 0.8 :underline t :inherit font-lock-comment-face)))
     (let ((button (make-text-button start (point)
                                     :type 'haskell-presentation-slot-button)))
       (button-put button 'hide-on-click t)

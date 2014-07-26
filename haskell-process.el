@@ -32,6 +32,7 @@
 (require 'haskell-session)
 (require 'haskell-compat)
 (require 'haskell-str)
+(require 'haskell-compile)
 (require 'haskell-utils)
 (require 'haskell-presentation-mode)
 (require 'haskell-navigate-imports)
@@ -747,21 +748,18 @@ from `module-buffer'."
     t)
    ((haskell-process-consume
      process
-     (concat "[\r\n]\\([^ \r\n:][^:\n\r]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:"
+     (concat "[\r\n]\\([^ \r\n:][^:\n\r]+\\):\\([0-9()-:]+\\):"
              "[ \n\r]+\\([[:unibyte:][:nonascii:]]+?\\)\n[^ ]"))
     (haskell-process-set-response-cursor process
                                          (- (haskell-process-response-cursor process) 1))
     (let* ((buffer (haskell-process-response process))
            (file (match-string 1 buffer))
-           (line (string-to-number (match-string 2 buffer)))
-           (col (match-string 3 buffer))
-           (col2 (match-string 4 buffer))
-           (error-msg (match-string 5 buffer))
+           (location (match-string 2 buffer))
+           (error-msg (match-string 3 buffer))
            (warning (string-match "^Warning:" error-msg))
-           (final-msg (format "%s:%s:%s%s: %s"
+           (final-msg (format "%s:%s: %s"
                               (haskell-session-strip-dir session file)
-                              line
-                              col (or col2 "")
+                              location
                               error-msg)))
       (funcall (if warning
                    'haskell-interactive-mode-compile-warning
@@ -769,15 +767,37 @@ from `module-buffer'."
                session final-msg)
       (unless warning
         (haskell-mode-message-line final-msg))
-      (haskell-process-trigger-suggestions session error-msg file line))
+      (haskell-process-trigger-suggestions
+       session
+       error-msg
+       file
+       (plist-get (haskell-process-parse-error final-msg) :line)))
     t)))
+
+(defun haskell-process-parse-error (string)
+  "Parse the line number from the error."
+  (let ((span nil))
+    (loop for regex
+          in haskell-compilation-error-regexp-alist
+          do (when (string-match (car regex) string)
+               (setq span
+                     (list :file (match-string 1 string)
+                           :line (string-to-number (match-string 2 string))
+                           :col (string-to-number (match-string 4 string))
+                           :line2 (when (match-string 3 string)
+                                    (string-to-number (match-string 3 string)))
+                           :col2 (when (match-string 5 string)
+                                   (string-to-number (match-string 5 string)))))))
+    span))
 
 (defun haskell-process-trigger-suggestions (session msg file line)
   "Trigger prompting to add any extension suggestions."
   (cond ((let ((case-fold-search nil))
            (or (string-match " -X\\([A-Z][A-Za-z]+\\)" msg)
                (string-match "Use \\([A-Z][A-Za-z]+\\) to permit this" msg)
-               (string-match "use \\([A-Z][A-Za-z]+\\)" msg)))
+               (string-match "Use \\([A-Z][A-Za-z]+\\) to allow" msg)
+               (string-match "use \\([A-Z][A-Za-z]+\\)" msg)
+               (string-match "You need \\([A-Z][A-Za-z]+\\)" msg)))
          (when haskell-process-suggest-language-pragmas
            (haskell-process-suggest-pragma session "LANGUAGE" (match-string 1 msg) file)))
         ((string-match " The \\(qualified \\)?import of[ ][‘`‛]\\([^ ]+\\)['’] is redundant" msg)
@@ -814,43 +834,7 @@ from `module-buffer'."
            (format "Add `%s' to %s?"
                    package-name
                    cabal-file))
-      (haskell-process-add-dependency package-name version))))
-
-(defun haskell-process-add-dependency (package &optional version no-prompt)
-  "Add PACKAGE (and optionally suffix -VERSION) to the cabal
-file. Prompts the user before doing so."
-  (interactive
-   (list (read-from-minibuffer "Package entry: ")
-         nil
-         t))
-  (let ((buffer (current-buffer)))
-    (find-file (haskell-cabal-find-file))
-    (let ((entry (if no-prompt
-                     package
-                   (read-from-minibuffer "Package entry: "
-                                         (concat package
-                                                 (if version
-                                                     (concat " >= "
-                                                             version)
-                                                   ""))))))
-      (save-excursion
-        (goto-char (point-min))
-        (when (search-forward-regexp "^library$" nil t 1)
-          (search-forward-regexp "build-depends:[ ]+")
-          (let ((column (current-column)))
-            (when (y-or-n-p "Add to library?")
-              (insert entry ",\n")
-              (indent-to column))))
-        (goto-char (point-min))
-        (while (search-forward-regexp "^executable " nil t 1)
-          (let ((name (buffer-substring-no-properties (point) (line-end-position))))
-            (search-forward-regexp "build-depends:[ ]+")
-            (let ((column (current-column)))
-              (when (y-or-n-p (format "Add to executable `%s'?" name))
-                (insert entry ",\n")
-                (indent-to column)))))
-        (save-buffer)
-        (switch-to-buffer buffer)))))
+      (haskell-cabal-add-dependency package-name version nil t))))
 
 (defun haskell-process-suggest-hoogle-imports (session msg file)
   "Given an out of scope identifier, Hoogle for that identifier,
@@ -926,9 +910,9 @@ now."
 
 (defun haskell-process-haskell-docs-ident (ident)
   "Search with haskell-docs for IDENT, returns a list of modules."
-  (remove-if (lambda (a) (string= "" a))
-             (split-string (shell-command-to-string (concat "haskell-docs --modules " ident))
-                           "\n")))
+  (remove-if-not (lambda (a) (string-match "^[A-Z][A-Za-b0-9_'.]+$" a))
+                 (split-string (shell-command-to-string (concat "haskell-docs --modules " ident))
+                               "\n")))
 
 (defun haskell-process-hoogle-ident (ident)
   "Hoogle for IDENT, returns a list of modules."
@@ -1544,7 +1528,10 @@ program in `DevelMain', and define `update' to auto-start the
 program on a new thread, and use the `foreign-store' package to
 access the running context across :load/:reloads in GHCi."
   (interactive)
-  (with-current-buffer (get-buffer "DevelMain.hs")
+  (with-current-buffer (or (get-buffer "DevelMain.hs")
+                           (if (y-or-n-p "You need to open a buffer named DevelMain.hs. Find now?")
+                               (ido-find-file)
+                             (error "No DevelMain.hs buffer.")))
     (let ((session (haskell-session)))
       (let ((process (haskell-process)))
         (haskell-process-queue-command
