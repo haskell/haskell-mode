@@ -369,8 +369,10 @@ Key bindings:
 
 (defun haskell-interactive-mode-expr-result (state response)
   "Print the result of evaluating the expression."
-  (let ((response (haskell-interactive-mode-cleanup-response
-                   (caddr state) response)))
+  (let ((response
+         (haskell-interactive-mode-del
+          (haskell-interactive-mode-cleanup-response
+           (caddr state) response))))
     (cond
      (haskell-interactive-mode-eval-mode
       (unless (haskell-process-sent-stdin-p (cadr state))
@@ -379,6 +381,20 @@ Key bindings:
       (let ((haskell-interactive-mode-eval-mode 'haskell-mode))
         (haskell-interactive-mode-eval-as-mode (car state) response)))))
   (haskell-interactive-mode-prompt (car state)))
+
+(defun haskell-interactive-mode-del (response)
+  "Handle ^H in output."
+  (while (string-match "\\(\b+\\)" response)
+    (setq response
+          (concat
+           (substring response
+                      0
+                      (max 0
+                           (- (match-beginning 1)
+                              (length (match-string 1 response)))))
+           (substring response
+                      (match-end 1)))))
+  response)
 
 (defun haskell-interactive-mode-cleanup-response (expr response)
   "Ignore the mess that GHCi outputs on multi-line input."
