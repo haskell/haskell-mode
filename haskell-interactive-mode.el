@@ -370,9 +370,11 @@ Key bindings:
 (defun haskell-interactive-mode-expr-result (state response)
   "Print the result of evaluating the expression."
   (let ((response
-         (haskell-interactive-mode-del
-          (haskell-interactive-mode-cleanup-response
-           (caddr state) response))))
+         (with-temp-buffer
+           (insert (haskell-interactive-mode-cleanup-response
+                    (caddr state) response))
+           (haskell-interactive-mode-handle-h (point-min))
+           (buffer-string))))
     (cond
      (haskell-interactive-mode-eval-mode
       (unless (haskell-process-sent-stdin-p (cadr state))
@@ -382,19 +384,22 @@ Key bindings:
         (haskell-interactive-mode-eval-as-mode (car state) response)))))
   (haskell-interactive-mode-prompt (car state)))
 
-(defun haskell-interactive-mode-del (response)
+(defun haskell-interactive-mode-handle-h (&optional bound)
   "Handle ^H in output."
-  (while (string-match "\\(\b+\\)" response)
-    (setq response
-          (concat
-           (substring response
-                      0
-                      (max 0
-                           (- (match-beginning 1)
-                              (length (match-string 1 response)))))
-           (substring response
-                      (match-end 1)))))
-  response)
+  (let ((bound (point-min))
+        (inhibit-read-only t))
+    (save-excursion
+      (while (search-backward "\b" bound t 1)
+        (save-excursion
+          (forward-char)
+          (let ((end (point)))
+            (if (search-backward-regexp "[^\b]" bound t 1)
+                (forward-char)
+              (goto-char (point-min)))
+            (let ((start (point)))
+              (delete-region (max (- (point) (- end start))
+                                  (point-min))
+                             end))))))))
 
 (defun haskell-interactive-mode-cleanup-response (expr response)
   "Ignore the mess that GHCi outputs on multi-line input."
@@ -541,12 +546,14 @@ SESSION, otherwise operate on the current buffer.
   "Insert the result of an eval as plain text."
   (with-current-buffer (haskell-session-interactive-buffer session)
     (goto-char (point-max))
-    (insert (propertize text
-                        'face 'haskell-interactive-face-result
-                        'rear-nonsticky t
-                        'read-only t
-                        'prompt t
-                        'result t))
+    (let ((start (point)))
+      (insert (propertize text
+                          'face 'haskell-interactive-face-result
+                          'rear-nonsticky t
+                          'read-only t
+                          'prompt t
+                          'result t))
+      (haskell-interactive-mode-handle-h start))
     (let ((marker (set (make-local-variable 'haskell-interactive-mode-result-end)
                        (make-marker))))
       (set-marker marker
