@@ -766,7 +766,7 @@ Preserves indentation and removes extra whitespace"
          (throw 'parse-end nil))))
 
 (defun haskell-indentation-declaration ()
-  (haskell-indentation-expression)
+  (haskell-indentation-separated #'haskell-indentation-expression "," nil)
   (cond ((string= current-token "|")
          (haskell-indentation-with-starter
           (lambda () (haskell-indentation-separated #'haskell-indentation-expression "," "|"))
