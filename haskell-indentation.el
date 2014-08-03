@@ -732,14 +732,25 @@ Preserves indentation and removes extra whitespace"
              (haskell-indentation-read-next-token)) ;; continue
             (end (parse-error "Illegal token: %s" current-token))))))
 
+(defun haskell-indentation-case-alternative ()
+  (setq left-indent (current-column))
+  (haskell-indentation-separated #'haskell-indentation-expression "," nil)
+  (cond ((eq current-token 'end-tokens)
+         (haskell-indentation-add-indentation current-indent))
+        ((string= current-token "->")
+         (haskell-indentation-statement-right #'haskell-indentation-expression))
+        ;; otherwise fallthrough
+        ))
+
 (defun haskell-indentation-case ()
   (haskell-indentation-expression)
   (cond ((eq current-token 'end-tokens)
          (haskell-indentation-add-indentation current-indent))
         ((string= current-token "|")
-         (haskell-indentation-with-starter
-          (lambda () (haskell-indentation-separated #'haskell-indentation-case "|" nil))
-          nil))
+	 (haskell-indentation-with-starter
+	  (lambda ()
+	    (haskell-indentation-separated #'haskell-indentation-case-alternative "|" nil))
+	  nil))
         ((string= current-token "->")
          (haskell-indentation-statement-right #'haskell-indentation-expression))
         ;; otherwise fallthrough
@@ -765,11 +776,17 @@ Preserves indentation and removes extra whitespace"
          (haskell-indentation-add-indentation current-indent)
          (throw 'parse-end nil))))
 
+(defun haskell-indentation-guard ()
+  (setq left-indent (current-column))
+  (haskell-indentation-separated
+   #'haskell-indentation-expression "," nil))
+
 (defun haskell-indentation-declaration ()
   (haskell-indentation-separated #'haskell-indentation-expression "," nil)
   (cond ((string= current-token "|")
          (haskell-indentation-with-starter
-          (lambda () (haskell-indentation-separated #'haskell-indentation-expression "," "|"))
+          (lambda () (haskell-indentation-separated
+		      #'haskell-indentation-guard "|" nil))
           nil))
         ((eq current-token 'end-tokens)
          (when (member following-token '("|" "=" "::" ","))
@@ -890,11 +907,8 @@ Preserves indentation and removes extra whitespace"
 	 (haskell-indentation-with-starter
 	  (lambda ()
 	    (haskell-indentation-separated
-	     (lambda ()
-	       (haskell-indentation-phrase
-		'(haskell-indentation-expression
-		  "->" haskell-indentation-expression)))
-	       "|" nil)) nil)
+	     #'haskell-indentation-case-alternative "|" nil))
+	  nil)
        (haskell-indentation-phrase-rest
 	'(haskell-indentation-expression
 	  "then" haskell-indentation-expression
