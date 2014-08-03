@@ -197,7 +197,7 @@ current line that starts with REGEXP and is not in `font-lock-comment-face'."
   (let (p)
     (loop
      do (setq p (point))
-        (haskell-ds-move-to-start-regexp inc regexp)
+     (haskell-ds-move-to-start-regexp inc regexp)
      while (and (nth 4 (syntax-ppss))
                 (/= p (point))))))
 

@@ -89,7 +89,7 @@ This is the dual operation to `haskell-str-literal-decode'."
                                 (and (>= lc 128) (>= c ?0) (<= c ?9))) ;; "\123\&4"
                             (concat "\\&" (aref haskell-str-literal-encode-ascii-array c))
                           (aref haskell-str-literal-encode-ascii-array c)
-                        ))))))
+                          ))))))
 
       (if no-quotes
           (mapconcat encode str "")

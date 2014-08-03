@@ -57,6 +57,7 @@ Haskell Mode is an Haskell development Environment for GNU Emacs version 23 or l
 * Editing Haskell Code::
 * Unicode::
 * Indentation::
+* Compilation::
 * haskell-decl-scan-mode::
 * inferior-haskell-mode::
 * haskell-interactive-mode::
@@ -279,6 +280,45 @@ In order to enable @code{which-function-mode} for Haskell buffers you need to ad
 (eval-after-load "which-func"
   '(add-to-list 'which-func-modes 'haskell-mode))
 @end lisp
+
+@node Compilation
+@chapter Compilation
+
+@findex haskell-compile
+
+Haskell mode comes equipped with a specialized @dfn{Compilation mode} tailored to GHC's compiler messages with optional support for Cabal projects. @xref{Compilation Mode,,,emacs}, for more information about the basic commands provided by the Compilation mode which are available in the Haskell compilation sub-mode as well. The additional features provided compared to Emacs' basic Compilation mode are:
+
+@itemize
+@item
+DWIM-style auto-detection of compile command (including support for CABAL projects)
+@item
+Support for GHC's compile messages and recognizing error, warning and info source locations (including @option{-ferror-spans} syntax)
+@item
+Support for filtering out GHC's uninteresting @samp{Loading package...} linker messages
+@end itemize
+
+In order to use it, invoke the @code{haskell-compile} command instead of @code{compile} as you would for the ordinary Compilation mode. It's recommended to bind @code{haskell-compile} to a convenient key binding. For instance, you can add the following to your Emacs initialization to bind @code{haskell-compile} to @kbd{C-c C-c}.
+
+@lisp
+(eval-after-load "haskell-mode"
+    '(define-key haskell-mode-map (kbd "C-c C-c") 'haskell-compile))
+
+(eval-after-load "haskell-cabal"
+    '(define-key haskell-cabal-mode-map (kbd "C-c C-c") 'haskell-compile))
+@end lisp
+
+@noindent
+The following description assumes that @code{haskell-compile} has been bound to @kbd{C-c C-c}.
+
+@vindex haskell-compile-cabal-build-command
+@vindex haskell-compile-cabal-build-command-alt
+@vindex haskell-compile-command
+
+When invoked, @code{haskell-compile} tries to guess how to compile the Haskell program your currently visited buffer belongs to, by searching for a @file{.cabal} file in the current of enclosing parent folders. If a @file{.cabal} file was found, the command defined in the @code{haskell-compile-cabal-build-command} option is used. Moreover, when requesting to compile a @file{.cabal}-file is detected and a negative prefix argument (e.g. @kbd{C-- C-c C-c}) was given, the alternative @code{haskell-compile-cabal-build-command-alt} is invoked. By default, @code{haskell-compile-cabal-build-command-alt} contains a @samp{cabal clean -s} command in order to force a full rebuild.
+
+Otherwise if no @file{.cabal} could be found, a single-module compilation is assumed and @code{haskell-compile-command} is used (@emph{if} the currently visited buffer contains Haskell source code).
+
+You can also inspect and modify the compile command to be invoked temporarily by invoking @code{haskell-compile} with a prefix argument (e.g. @kbd{C-u C-c C-c}). If later-on you want to recompile using the same customized compile command, invoke @code{recompile} (bound to @kbd{g}) inside the @samp{*haskell-compilation*} buffer.
 
 @node inferior-haskell-mode
 @chapter @code{inferior-haskell-mode}

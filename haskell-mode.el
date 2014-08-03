@@ -128,6 +128,8 @@
 (require 'compile)
 (require 'flymake)
 (require 'outline)
+(require 'haskell-complete-module)
+(require 'haskell-compat)
 (require 'haskell-align-imports)
 (require 'haskell-sort-imports)
 (require 'haskell-string)
@@ -135,11 +137,13 @@
 
 ;; FIXME: code-smell: too many forward decls for haskell-session are required here
 (defvar haskell-session)
+(declare-function haskell-process "haskell-process" ())
 (declare-function haskell-process-do-try-info "haskell-process" (sym))
+(declare-function haskell-process-queue-sync-request (process reqstr))
 (declare-function haskell-process-generate-tags "haskell-process" (&optional and-then-find-this-tag))
 (declare-function haskell-session "haskell-session" ())
 (declare-function haskell-session-all-modules "haskell-session" (&optional DONTCREATE))
-(declare-function haskell-session-cabal-dir "haskell-session" (session))
+(declare-function haskell-session-cabal-dir "haskell-session" (session &optional no-prompt))
 (declare-function haskell-session-maybe "haskell-session" ())
 (declare-function haskell-session-tags-filename "haskell-session" (session))
 (declare-function haskell-session-current-dir "haskell-session" (session))
@@ -198,7 +202,7 @@ sure all haskell customize definitions have been loaded."
   (interactive)
   ;; make sure all modules with (defcustom ...)s are loaded
   (mapc 'require
-        '(haskell-checkers haskell-doc haskell-font-lock haskell-indentation haskell-indent haskell-interactive-mode haskell-menu haskell-process haskell-yas inf-haskell))
+        '(haskell-checkers haskell-compile haskell-doc haskell-font-lock haskell-indentation haskell-indent haskell-interactive-mode haskell-menu haskell-process haskell-yas inf-haskell))
   (customize-browse 'haskell))
 
 ;; Are we looking at a literate script?
@@ -224,34 +228,23 @@ be set to the preferred literate style."
 (defvar haskell-mode-map
   (let ((map (make-sparse-keymap)))
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;; For inferior haskell mode, use the below bindings
-    ;; (define-key map [?\M-C-x]     'inferior-haskell-send-defun)
-    ;; (define-key map [?\C-x ?\C-e] 'inferior-haskell-send-last-sexp)
-    ;; (define-key map [?\C-c ?\C-r] 'inferior-haskell-send-region)
-    (define-key map [?\C-x ?\C-d] 'inferior-haskell-send-decl)
-    (define-key map [?\C-c ?\C-z] 'switch-to-haskell)
-    (define-key map [?\C-c ?\C-l] 'inferior-haskell-load-file)
-    ;; I think it makes sense to bind inferior-haskell-load-and-run to C-c
-    ;; C-r, but since it used to be bound to `reload' until June 2007, I'm
-    ;; going to leave it out for now.
-    ;; (define-key map [?\C-c ?\C-r] 'inferior-haskell-load-and-run)
-    (define-key map [?\C-c ?\C-b] 'switch-to-haskell)
-    ;; (define-key map [?\C-c ?\C-s] 'inferior-haskell-start-process)
-    ;; That's what M-; is for.
-    ;; (define-key map "\C-c\C-c" 'comment-region)
-    (define-key map (kbd "C-c C-t") 'inferior-haskell-type)
-    (define-key map (kbd "C-c C-i") 'inferior-haskell-info)
-    (define-key map (kbd "C-c M-.") 'inferior-haskell-find-definition)
-    (define-key map (kbd "C-c C-d") 'inferior-haskell-find-haddock)
-    (define-key map [?\C-c ?\C-v] 'haskell-check)
-
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;; Editing-specific commands
     (define-key map (kbd "C-c C-.") 'haskell-mode-format-imports)
     (define-key map [remap delete-indentation] 'haskell-delete-indentation)
-
+    (define-key map (kbd "C-c C-l") 'haskell-mode-enable-process-minor-mode)
+    (define-key map (kbd "C-c C-b") 'haskell-mode-enable-process-minor-mode)
+    (define-key map (kbd "C-c C-v") 'haskell-mode-enable-process-minor-mode)
+    (define-key map (kbd "C-c C-t") 'haskell-mode-enable-process-minor-mode)
+    (define-key map (kbd "C-c C-i") 'haskell-mode-enable-process-minor-mode)
     map)
   "Keymap used in Haskell mode.")
+
+(defun haskell-mode-enable-process-minor-mode ()
+  "Tell the user to choose a minor mode for process interaction."
+  (interactive)
+  (error "You tried to do an interaction command, but an interaction mode has not been enabled yet.
+
+Run M-x describe-variable haskell-mode-hook for a list of such modes."))
 
 (easy-menu-define haskell-mode-menu haskell-mode-map
   "Menu for the Haskell major mode."
@@ -263,8 +256,8 @@ be set to the preferred literate style."
     ["Indent region" indent-region mark-active]
     ["(Un)Comment region" comment-region mark-active]
     "---"
-    ["Start interpreter" switch-to-haskell]
-    ["Load file" inferior-haskell-load-file]
+    ["Start interpreter" haskell-interactive-switch]
+    ["Load file" haskell-process-load-file]
     "---"
     ["Load tidy core" ghc-core-create-core]
     "---"
@@ -346,6 +339,13 @@ be set to the preferred literate style."
 (defun haskell-ident-at-point ()
   "Return the identifier under point, or nil if none found.
 May return a qualified name."
+  (let ((reg (haskell-ident-pos-at-point)))
+    (when reg
+      (buffer-substring-no-properties (car reg) (cdr reg)))))
+
+(defun haskell-ident-pos-at-point ()
+  "Return the span of the identifier under point, or nil if none found.
+May return a qualified name."
   (save-excursion
     ;; Skip whitespace if we're on it.  That way, if we're at "map ", we'll
     ;; see the word "map".
@@ -383,7 +383,7 @@ May return a qualified name."
                     (looking-at "[[:upper:]]"))
           (setq start (point)))
         ;; This is it.
-        (buffer-substring-no-properties start end)))))
+        (cons start end)))))
 
 (defun haskell-delete-indentation (&optional arg)
   "Like `delete-indentation' but ignoring Bird-style \">\"."
@@ -393,30 +393,56 @@ May return a qualified name."
 
 ;; Various mode variables.
 
+(defcustom haskell-mode-contextual-import-completion
+  t
+  "Enable import completion on haskell-mode-contextual-space."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defcustom haskell-mode-hook nil
   "Hook run after entering `haskell-mode'.
 
-Some of the supported modules that can be activated via this hook:
+You may be looking at this documentation because you haven't
+configured indentation or process interaction.
 
-   `haskell-decl-scan', Graeme E Moss
-     Scans top-level declarations, and places them in a menu.
+Indentation modes:
 
-   `haskell-doc', Hans-Wolfgang Loidl
-     Echoes types of functions or syntax of keywords when the cursor is idle.
-
-   `haskell-indentation', Kristof Bastiaensen
+   `haskell-indentation-mode', Kristof Bastiaensen
      Intelligent semi-automatic indentation Mk2
 
-   `haskell-indent', Guy Lapalme
+   `haskell-indent-mode', Guy Lapalme
      Intelligent semi-automatic indentation.
 
-   `haskell-simple-indent', Graeme E Moss and Heribert Schuetz
+   `haskell-simple-indent-mode', Graeme E Moss and Heribert Schuetz
      Simple indentation.
 
-Module X is activated using the command `turn-on-X'.  For example,
-`haskell-doc' is activated using `turn-on-haskell-doc'.
-For more information on a specific module, see the help for its `X-mode'
-function.  Some modules can be deactivated using `turn-off-X'.
+Interaction modes:
+
+   `interactive-haskell-mode'
+     Interact with per-project GHCi processes through a REPL and
+     directory-aware sessions.
+
+   `inf-haskell-mode'
+     Interact with a GHCi process using comint-mode. Deprecated.
+
+Other modes:
+
+   `haskell-decl-scan-mode', Graeme E Moss
+     Scans top-level declarations, and places them in a menu.
+
+   `haskell-doc-mode', Hans-Wolfgang Loidl
+     Echoes types of functions or syntax of keywords when the cursor is idle.
+
+To activate a minor-mode, simply run the interactive command. For
+example, `M-x haskell-doc-mode'. Run it again to disable it.
+
+To enable a mode for every haskell-mode buffer, add a hook in
+your Emacs configuration. For example, to enable
+haskell-indent-mode and interactive-haskell-mode, use the
+following:
+
+(add-hook 'haskell-mode-hook 'haskell-indent-mode)
+(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
 
 See Info node `(haskell-mode)haskell-mode-hook' for more details.
 
@@ -586,7 +612,7 @@ If nil, use the Hoogle web-site."
                  string))
 
 ;;;###autoload
-(defun haskell-hoogle (query)
+(defun haskell-hoogle (query &optional info)
   "Do a Hoogle search for QUERY."
   (interactive
    (let ((def (haskell-ident-at-point)))
@@ -594,14 +620,17 @@ If nil, use the Hoogle web-site."
      (list (read-string (if def
                             (format "Hoogle query (default %s): " def)
                           "Hoogle query: ")
-                        nil nil def))))
+                        nil nil def)
+           current-prefix-arg)))
   (if (null haskell-hoogle-command)
       (browse-url (format "http://haskell.org/hoogle/?q=%s" query))
     (lexical-let ((temp-buffer (help-buffer)))
       (with-output-to-temp-buffer temp-buffer
         (with-current-buffer standard-output
           (let ((hoogle-process
-                 (start-process "hoogle" (current-buffer) haskell-hoogle-command query))
+                 (if info
+                     (start-process "hoogle" (current-buffer) haskell-hoogle-command "-i" query)
+                   (start-process "hoogle" (current-buffer) haskell-hoogle-command query)))
                 (scroll-to-top
                  (lambda (process event)
                    (set-window-start (get-buffer-window temp-buffer t) 1))))
@@ -609,6 +638,45 @@ If nil, use the Hoogle web-site."
 
 ;;;###autoload
 (defalias 'hoogle 'haskell-hoogle)
+
+(defvar hoogle-server-process-name "emacs-local-hoogle")
+(defvar hoogle-server-buffer-name (format "*%s*" hoogle-server-process-name))
+(defvar hoogle-port-number 49513 "Port number.")
+
+(defun hoogle-start-server ()
+  "Start hoogle local server."
+  (interactive)
+  (unless (hoogle-server-live-p)
+    (start-process
+     hoogle-server-process-name
+     (get-buffer-create hoogle-server-buffer-name) "/bin/sh" "-c"
+     (format "hoogle server -p %i" hoogle-port-number))))
+
+(defun hoogle-server-live-p ()
+  "Whether hoogle server is live or not."
+  (condition-case err
+      (process-live-p (get-buffer-create hoogle-server-buffer-name))
+    (error nil)))
+
+(defun hoogle-kill-server ()
+  "Kill hoogle server if it is live."
+  (interactive)
+  (when (hoogle-server-live-p)
+    (kill-process (get-buffer-create hoogle-server-buffer-name))))
+
+;;;###autoload
+(defun hoogle-lookup-from-local ()
+  "Lookup by local hoogle."
+  (interactive)
+  (if (hoogle-server-live-p)
+      (browse-url (format "http://localhost:%i/?hoogle=%s"
+                          hoogle-port-number
+                          (read-string "hoogle: " (haskell-ident-at-point))))
+    (when (y-or-n-p
+           "hoogle server not found, start hoogle server?")
+      (if (executable-find "hoogle")
+          (hoogle-start-server)
+        (error "hoogle is not installed")))))
 
 ;;;###autoload
 (defun haskell-hayoo (query)
@@ -632,6 +700,15 @@ If nil, use the Hoogle web-site."
                  (const "ghc -fno-code")
                  (string :tag "Other command")))
 
+(defcustom haskell-completing-read-function 'ido-completing-read
+  "Default function to use for completion."
+  :group 'haskell
+  :type '(choice
+          (function-item :tag "ido" :value ido-completing-read)
+          (function-item :tag "helm" :value helm--completing-read-default)
+          (function-item :tag "completing-read" :value completing-read)
+          (function :tag "Custom function")))
+
 (defcustom haskell-stylish-on-save nil
   "Whether to run stylish-haskell on the buffer before saving."
   :group 'haskell
@@ -644,6 +721,9 @@ If nil, use the Hoogle web-site."
 
 (defvar haskell-saved-check-command nil
   "Internal use.")
+
+(defcustom haskell-indent-spaces 2
+  "Number of spaces to indent inwards.")
 
 ;; Like Python.  Should be abstracted, sigh.
 (defun haskell-check (command)
@@ -675,8 +755,11 @@ To be added to `flymake-init-create-temp-buffer-copy'."
 
 (defun haskell-mode-suggest-indent-choice ()
   "Ran when the user tries to indent in the buffer but no indentation mode has been selected.
-Brings up the documentation for haskell-mode-hook."
-  (describe-variable 'haskell-mode-hook))
+Explains what has happened and suggests reading docs for `haskell-mode-hook'."
+  (interactive)
+  (error "You tried to do an indentation command, but an indentation mode has not been enabled yet.
+
+Run M-x describe-variable haskell-mode-hook for a list of such modes."))
 
 (defun haskell-mode-format-imports ()
   "Format the imports by aligning and sorting them."
@@ -702,10 +785,11 @@ Brings up the documentation for haskell-mode-hook."
   (interactive)
   (if (not (haskell-session-maybe))
       (self-insert-command 1)
-    (cond ((save-excursion (forward-word -1)
-                           (looking-at "^import$"))
+    (cond ((and haskell-mode-contextual-import-completion
+                (save-excursion (forward-word -1)
+                                (looking-at "^import$")))
            (insert " ")
-           (let ((module (ido-completing-read "Module: " (haskell-session-all-modules))))
+           (let ((module (haskell-complete-module-read "Module: " (haskell-session-all-modules))))
              (insert module)
              (haskell-mode-format-imports)))
           ((not (string= "" (save-excursion (forward-char -1) (haskell-ident-at-point))))
@@ -724,11 +808,10 @@ Brings up the documentation for haskell-mode-hook."
     (ignore-errors (when (and (boundp 'haskell-session) haskell-session)
                      (haskell-process-generate-tags))))
   (when haskell-stylish-on-save
-    (ignore-errors (haskell-mode-stylish-buffer)))
-  (let ((before-save-hook '())
-        (after-save-hook '()))
-    (basic-save-buffer))
-  )
+    (ignore-errors (haskell-mode-stylish-buffer))
+    (let ((before-save-hook '())
+          (after-save-hook '()))
+      (basic-save-buffer))))
 
 (defun haskell-mode-buffer-apply-command (cmd)
   "Execute shell command CMD with current buffer as input and
@@ -787,16 +870,118 @@ remains unchanged."
     (forward-line (1- line))
     (goto-char (+ column (point)))))
 
+(defun haskell-mode-jump-to-def-or-tag (&optional next-p)
+  "Jump to the definition (by consulting GHCi), or (fallback)
+jump to the tag.
+
+Remember: If GHCi is busy doing something, this will delay, but
+it will always be accurate, in contrast to tags, which always
+work but are not always accurate."
+  (interactive "P")
+  (let ((loc (haskell-mode-find-def (haskell-ident-at-point))))
+    (if loc
+        (haskell-mode-handle-generic-loc loc)
+      (call-interactively 'haskell-mode-tag-find))))
+
 (defun haskell-mode-tag-find (&optional next-p)
   "The tag find function, specific for the particular session."
   (interactive "P")
-  (let ((tags-file-name (haskell-session-tags-filename (haskell-session)))
-        (tags-revert-without-query t)
-        (ident (haskell-ident-at-point)))
+  (cond
+   ((eq 'font-lock-string-face
+        (get-text-property (point) 'face))
+    (haskell-mode-jump-to-filename-in-string))
+   (t (call-interactively 'haskell-mode-jump-to-tag))))
+
+(defun haskell-mode-jump-to-filename-in-string ()
+  "Jump to the filename in the current string."
+  (let* ((string (save-excursion
+                   (buffer-substring-no-properties
+                    (1+ (search-backward-regexp "\"" (line-beginning-position) nil 1))
+                    (1- (progn (forward-char 1)
+                               (search-forward-regexp "\"" (line-end-position) nil 1))))))
+         (fp (expand-file-name string
+                               (haskell-session-cabal-dir (haskell-session)))))
+    (find-file
+     (read-file-name
+      ""
+      fp
+      fp))))
+
+(defun haskell-mode-jump-to-tag (&optional next-p)
+  "Jump to the tag of the given identifier."
+  (interactive "P")
+  (let ((ident (haskell-ident-at-point))
+        (tags-file-name (haskell-session-tags-filename (haskell-session)))
+        (tags-revert-without-query t))
     (when (not (string= "" (haskell-trim ident)))
       (cond ((file-exists-p tags-file-name)
              (find-tag ident next-p))
             (t (haskell-process-generate-tags ident))))))
+
+(defun haskell-mode-jump-to-def (ident)
+  "Jump to definition of identifier at point."
+  (interactive (list (haskell-ident-at-point)))
+  (let ((loc (haskell-mode-find-def ident)))
+    (when loc
+      (haskell-mode-handle-generic-loc loc))))
+
+(defun haskell-mode-handle-generic-loc (loc)
+  "Either jump to or display a generic location. Either a file or
+a library."
+  (case (car loc)
+    (file (haskell-mode-jump-to-loc (cdr loc)))
+    (library (message "Defined in `%s' (%s)."
+                      (elt loc 2)
+                      (elt loc 1)))
+    (module (message "Defined in `%s'."
+                     (elt loc 1)))))
+
+(defun haskell-mode-jump-to-loc (loc)
+  "Jump to the given location.
+LOC = (list FILE LINE COL)"
+  (find-file (elt loc 0))
+  (goto-char (point-min))
+  (forward-line (1- (elt loc 1)))
+  (goto-char (+ (line-beginning-position)
+                (1- (elt loc 2)))))
+
+(defun haskell-mode-find-def (ident)
+  "Find definition location of identifier. Uses the GHCi process
+to find the location.
+
+Returns:
+
+    (library <package> <module>)
+    (file <path> <line> <col>)
+    (module <name>)
+"
+  (let ((reply (haskell-process-queue-sync-request
+                (haskell-process)
+                (format (if (string-match "^[a-zA-Z_]" ident)
+                            ":info %s"
+                          ":info (%s)")
+                        ident))))
+    (let ((match (string-match "-- Defined \\(at\\|in\\) \\(.+\\)$" reply)))
+      (when match
+        (let ((defined (match-string 2 reply)))
+          (let ((match (string-match "\\(.+?\\):\\([0-9]+\\):\\([0-9]+\\)$" defined)))
+            (cond
+             (match
+              (list 'file
+                    (expand-file-name (match-string 1 defined)
+                                      (haskell-session-current-dir (haskell-session)))
+                    (string-to-number (match-string 2 defined))
+                    (string-to-number (match-string 3 defined))))
+             (t
+              (let ((match (string-match "`\\(.+?\\):\\(.+?\\)'$" defined)))
+                (if match
+                    (list 'library
+                          (match-string 1 defined)
+                          (match-string 2 defined))
+                  (let ((match (string-match "`\\(.+?\\)'$" defined)))
+                    (if match
+                        (list 'module
+                              (match-string 1 defined))))))))))))))
 
 ;; From Bryan O'Sullivan's blog:
 ;; http://www.serpentine.com/blog/2007/10/09/using-emacs-to-insert-scc-annotations-in-haskell-code/
@@ -844,6 +1029,80 @@ given a prefix arg."
     (rgrep sym
            "*.hs" ;; TODO: common Haskell extensions.
            (haskell-session-current-dir (haskell-session)))))
+
+(defun haskell-fontify-as-mode (text mode)
+  "Fontify TEXT as MODE, returning the fontified text."
+  (with-temp-buffer
+    (funcall mode)
+    (insert text)
+    (font-lock-fontify-buffer)
+    (buffer-substring (point-min) (point-max))))
+
+(defun haskell-guess-module-name ()
+  "Guess the current module name of the buffer."
+  (interactive)
+  (let ((components (loop for part
+                          in (reverse (split-string (buffer-file-name) "/"))
+                          while (let ((case-fold-search nil))
+                                  (string-match "^[A-Z]+" part))
+                          collect (replace-regexp-in-string "\\.l?hs$" "" part))))
+    (mapconcat 'identity (reverse components) ".")))
+
+(defun haskell-auto-insert-module-template ()
+  "Insert a module template for the newly created buffer."
+  (interactive)
+  (when (and (= (point-min)
+                (point-max))
+             (buffer-file-name))
+    (insert
+     "-- | "
+     "\n"
+     "\n"
+     "module "
+     )
+    (let ((name (haskell-guess-module-name)))
+      (if (string= name "")
+          (insert "")
+        (insert name)))
+    (insert " where"
+            "\n"
+            "\n")
+    (goto-char (point-min))
+    (forward-char 4)))
+
+(defun haskell-describe (ident)
+  "Describe the given identifier."
+  (interactive (list (read-from-minibuffer "Describe identifier: ")))
+  (let ((results (read (shell-command-to-string
+                        (concat "haskell-docs --sexp "
+                                ident)))))
+    (help-setup-xref (list #'haskell-describe ident)
+		     (called-interactively-p 'interactive))
+    (save-excursion
+      (with-help-window (help-buffer)
+        (with-current-buffer (help-buffer)
+          (if results
+              (loop for result in results
+                    do (insert (propertize ident 'face '((:inherit font-lock-type-face
+                                                                   :underline t)))
+                               " is defined in "
+                               (let ((module (cadr (assoc 'module result))))
+                                 (if module
+                                     (concat module " ")
+                                   ""))
+                               (cadr (assoc 'package result))
+                               "\n\n")
+                    do (let ((type (cadr (assoc 'type result))))
+                         (when type
+                           (insert (haskell-fontify-as-mode type 'haskell-mode)
+                                   "\n")))
+                    do (let ((args (cadr (assoc 'type results))))
+                         (loop for arg in args
+                               do (insert arg "\n"))
+                         (insert "\n"))
+                    do (insert (cadr (assoc 'documentation result)))
+                    do (insert "\n\n"))
+            (insert "No results for " ident)))))))
 
 
 ;; Provide ourselves:

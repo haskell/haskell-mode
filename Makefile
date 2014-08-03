@@ -14,17 +14,20 @@ ELFILES = \
 	haskell-cabal.el \
 	haskell-checkers.el \
 	haskell-compat.el \
+	haskell-compile.el \
 	haskell-decl-scan.el \
 	haskell-doc.el \
 	haskell-font-lock.el \
 	haskell-indent.el \
 	haskell-indentation.el \
+	haskell-collapse.el \
 	haskell-interactive-mode.el \
 	haskell-menu.el \
 	haskell-mode.el \
 	haskell-move-nested.el \
 	haskell-navigate-imports.el \
 	haskell-package.el \
+	haskell-complete-module.el \
 	haskell-process.el \
 	haskell-session.el \
 	haskell-show.el \

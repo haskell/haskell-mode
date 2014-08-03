@@ -28,8 +28,8 @@
     "Returns non-nil if PROCESS is alive.
 A process is considered alive if its status is `run', `open',
 `listen', `connect' or `stop'."
-  (memq (process-status process)
-        '(run open listen connect stop))))
+    (memq (process-status process)
+          '(run open listen connect stop))))
 
 (provide 'haskell-compat)
 

@@ -62,6 +62,8 @@
 ;; All functions/variables start with
 ;; `(turn-(on/off)-)haskell-simple-indent'.
 
+(require 'haskell-mode)
+
 (defgroup haskell-simple-indent nil
   "Simple Haskell indentation."
   :link '(custom-manual "(haskell-mode)Indentation")
@@ -159,7 +161,7 @@ column, `tab-to-tab-stop' is done instead."
   "Make a newline on the current column and indent on step."
   (interactive)
   (haskell-simple-indent-newline-same-col)
-  (insert "  "))
+  (insert (make-string haskell-indent-spaces ? )))
 
 ;;;###autoload
 (define-minor-mode haskell-simple-indent-mode
