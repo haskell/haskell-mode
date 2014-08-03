@@ -548,10 +548,7 @@ Preserves indentation and removes extra whitespace"
   '(("data" . haskell-indentation-data)
     ("type" . haskell-indentation-data)
     ("newtype" . haskell-indentation-data)
-    ("if"    . (lambda () (haskell-indentation-phrase
-                           '(haskell-indentation-expression
-                             "then" haskell-indentation-expression
-                             "else" haskell-indentation-expression))))
+    ("if"    . haskell-indentation-if)
     ("let"   . (lambda () (haskell-indentation-phrase
                            '(haskell-indentation-declaration-layout
                              "in" haskell-indentation-expression))))
@@ -885,6 +882,24 @@ Preserves indentation and removes extra whitespace"
   ;; so it will not return 'layout-end again
   (when (eq current-token 'layout-end)
     (haskell-indentation-read-next-token))) ;; leave layout at 'layout-end or illegal token
+
+(defun haskell-indentation-if ()
+  (haskell-indentation-with-starter
+   (lambda ()
+     (if (string= current-token "|")
+	 (haskell-indentation-with-starter
+	  (lambda ()
+	    (haskell-indentation-separated
+	     (lambda ()
+	       (haskell-indentation-phrase
+		'(haskell-indentation-expression
+		  "->" haskell-indentation-expression)))
+	       "|" nil)) nil)
+       (haskell-indentation-phrase-rest
+	'(haskell-indentation-expression
+	  "then" haskell-indentation-expression
+	  "else" haskell-indentation-expression))))
+   nil))
 
 (defun haskell-indentation-phrase (phrase)
   (haskell-indentation-with-starter
