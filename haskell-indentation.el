@@ -532,7 +532,7 @@ Preserves indentation and removes extra whitespace"
     ("type" . (lambda () (haskell-indentation-statement-right #'haskell-indentation-data)))
     ("newtype" . (lambda () (haskell-indentation-statement-right #'haskell-indentation-data)))
     ("class" . haskell-indentation-class-declaration)
-    ("instance" . haskell-indentation-class-declaration )))
+    ("instance" . haskell-indentation-class-declaration)))
 
 (defconst haskell-indentation-type-list
   '(("::"    . (lambda () (haskell-indentation-with-starter
@@ -665,7 +665,7 @@ Preserves indentation and removes extra whitespace"
        (haskell-indentation-fundep))
      (when (string= current-token "where")
        (haskell-indentation-with-starter
-        #'haskell-indentation-expression-layout nil)))
+        #'haskell-indentation-declaration-layout nil)))
    nil))
 
 (defun haskell-indentation-module ()
