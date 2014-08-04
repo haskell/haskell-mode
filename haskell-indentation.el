@@ -75,6 +75,11 @@
   :type 'boolean
   :group 'haskell-indentation)
 
+(defcustom haskell-indentation-indent-leftmost 'both
+  "Indent to the left margin after certain keywords (for example after let .. in, case .. of).  If set to t it will only indent to the left.  If nil only relative to the containing expression.  If set to the keyword 'both then both positions are allowed."
+  :type 'symbol
+  :group 'haskell-indentation)
+
 (defcustom haskell-indentation-layout-offset 2
   "Extra indentation to add before expressions in a haskell layout list."
   :type 'integer
@@ -945,16 +950,33 @@ Preserves indentation and removes extra whitespace"
                               left-indent
                             starter-indent)))
         (haskell-indentation-read-next-token)
-        (when (eq current-token 'end-tokens)
-          (haskell-indentation-add-indentation
-           (cond ((member (cadr phrase) '("then" "else"))
-                  (+ starter-indent haskell-indentation-ifte-offset))
-                 ((member (cadr phrase) '("in" "->"))
-                  ;; expression ending in another expression
-                  (if on-new-line
-                      (+ left-indent haskell-indentation-starter-offset)
-                    left-indent))
-                 (t (+ left-indent haskell-indentation-left-offset))))
+	(when (eq current-token 'end-tokens)
+          (cond ((member (cadr phrase) '("then" "else"))
+		 (haskell-indentation-add-indentation
+		  (+ starter-indent haskell-indentation-ifte-offset)))
+
+		((member (cadr phrase) '("in" "->"))
+		 ;; expression ending in another expression
+		 (when (or (not haskell-indentation-indent-leftmost)
+			   (eq haskell-indentation-indent-leftmost 'both))
+		   (haskell-indentation-add-indentation
+		    (+ starter-indent haskell-indentation-starter-offset)))
+		 (when haskell-indentation-indent-leftmost
+		   (haskell-indentation-add-indentation
+		    (if on-new-line
+			(+ left-indent haskell-indentation-starter-offset)
+		      left-indent))))
+
+		 (t
+		  (when (or (not haskell-indentation-indent-leftmost)
+			    (eq haskell-indentation-indent-leftmost 'both))
+		    (haskell-indentation-add-indentation
+		     (+ starter-indent haskell-indentation-starter-offset)))
+		  (when haskell-indentation-indent-leftmost
+		   (haskell-indentation-add-indentation
+		    (if on-new-line
+			(+ left-indent haskell-indentation-starter-offset)
+		      left-indent)))))
           (throw 'parse-end nil))
         (haskell-indentation-phrase-rest (cddr phrase))))
 
