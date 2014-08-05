@@ -124,6 +124,7 @@
 
 ;;; Code:
 
+(require 'ansi-color)
 (require 'dabbrev)
 (require 'compile)
 (require 'flymake)
@@ -629,17 +630,20 @@ is asked to show extra info for the items matching QUERY.."
            current-prefix-arg)))
   (if (null haskell-hoogle-command)
       (browse-url (format "http://haskell.org/hoogle/?q=%s" query))
-    (lexical-let ((temp-buffer (help-buffer)))
-      (with-output-to-temp-buffer temp-buffer
-        (with-current-buffer standard-output
-          (let ((hoogle-process
-                 (if info
-                     (start-process "hoogle" (current-buffer) haskell-hoogle-command "-i" query)
-                   (start-process "hoogle" (current-buffer) haskell-hoogle-command query)))
-                (scroll-to-top
-                 (lambda (process event)
-                   (set-window-start (get-buffer-window temp-buffer t) 1))))
-            (set-process-sentinel hoogle-process scroll-to-top)))))))
+    (let ((output-buffer (get-buffer-create "*hoogle*"))
+          (hoogle-args (append (when info '("-i"))
+                               (list "--color" (shell-quote-argument query)))))
+      (with-current-buffer output-buffer
+        (let ((buffer-read-only nil))
+          (delete-region (point-min) (point-max))
+          (insert (shell-command-to-string
+                   (concat haskell-hoogle-command
+                           (if info " -i " "")
+                           " --color " (shell-quote-argument query))))
+          (ansi-color-apply-on-region (point-min) (point-max)))
+        (goto-char (point-min))
+        (help-mode))
+      (display-buffer output-buffer))))
 
 ;;;###autoload
 (defalias 'hoogle 'haskell-hoogle)
