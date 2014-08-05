@@ -613,7 +613,12 @@ If nil, use the Hoogle web-site."
 
 ;;;###autoload
 (defun haskell-hoogle (query &optional info)
-  "Do a Hoogle search for QUERY."
+  "Do a Hoogle search for QUERY.
+When `haskell-hoogle-command' is non-nil, this command runs
+that.  Otherwise, it opens a hoogle search result in the browser.
+
+If prefix argument INFO is given, then `haskell-hoogle-command'
+is asked to show extra info for the items matching QUERY.."
   (interactive
    (let ((def (haskell-ident-at-point)))
      (if (and def (symbolp def)) (setq def (symbol-name def)))
