@@ -885,12 +885,21 @@ jump to the tag.
 
 Remember: If GHCi is busy doing something, this will delay, but
 it will always be accurate, in contrast to tags, which always
-work but are not always accurate."
+work but are not always accurate.
+
+If the definition or tag is found, the location from which you
+jumped will be pushed onto `find-tag-marker-ring', so you can
+return to that position with `pop-tag-mark'."
   (interactive "P")
-  (let ((loc (haskell-mode-find-def (haskell-ident-at-point))))
+  (let ((initial-loc (point-marker))
+        (loc (haskell-mode-find-def (haskell-ident-at-point))))
     (if loc
-        (haskell-mode-handle-generic-loc loc)
-      (call-interactively 'haskell-mode-tag-find))))
+        (progn
+          (haskell-mode-handle-generic-loc loc))
+      (call-interactively 'haskell-mode-tag-find))
+    (unless (equal initial-loc (point-marker))
+      ;; Store position for return with `pop-tag-mark'
+      (ring-insert find-tag-marker-ring initial-loc))))
 
 (defun haskell-mode-tag-find (&optional next-p)
   "The tag find function, specific for the particular session."
