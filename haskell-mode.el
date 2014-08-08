@@ -894,8 +894,7 @@ return to that position with `pop-tag-mark'."
   (let ((initial-loc (point-marker))
         (loc (haskell-mode-find-def (haskell-ident-at-point))))
     (if loc
-        (progn
-          (haskell-mode-handle-generic-loc loc))
+        (haskell-mode-handle-generic-loc loc)
       (call-interactively 'haskell-mode-tag-find))
     (unless (equal initial-loc (point-marker))
       ;; Store position for return with `pop-tag-mark'
