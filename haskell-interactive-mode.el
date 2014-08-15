@@ -121,8 +121,8 @@ printing compilation messages."
     (define-key map (kbd "C-<down>") 'haskell-interactive-mode-history-next)
     (define-key map (kbd "TAB") 'haskell-interactive-mode-tab)
     (define-key map (kbd "<C-S-backspace>") 'haskell-interactive-mode-kill-whole-line)
-    (define-key map [?\C-c ?\C-b] 'haskell-interactive-mode-switch-to-last-haskell-buffer)
-    (define-key map [?\C-c ?\C-z] 'haskell-interactive-mode-switch-to-last-haskell-buffer)
+    (define-key map [?\C-c ?\C-b] 'haskell-interactive-switch-back)
+    (define-key map [?\C-c ?\C-z] 'haskell-interactive-switch-back)
     map)
   "Interactive Haskell mode map.")
 
@@ -201,13 +201,27 @@ Key bindings:
       (display-buffer buffer)
       (other-window 1))))
 
+(defvar haskell-interactive-previous-buffer nil)
+(make-variable-buffer-local 'haskell-interactive-previous-buffer)
+
 ;;;###autoload
 (defun haskell-interactive-switch ()
   "Switch to the interactive mode for this session."
   (interactive)
-  (let ((buffer (haskell-session-interactive-buffer (haskell-session))))
+  (let ((initial-buffer (current-buffer))
+        (buffer (haskell-session-interactive-buffer (haskell-session))))
     (unless (eq buffer (window-buffer))
+      (with-current-buffer buffer
+        (setq haskell-interactive-previous-buffer initial-buffer))
       (switch-to-buffer-other-window buffer))))
+
+(defun haskell-interactive-switch-back ()
+  "Switch back to the buffer from which this interactive buffer was reached."
+  (interactive)
+  (if haskell-interactive-previous-buffer
+      (switch-to-buffer-other-window haskell-interactive-previous-buffer)
+    (message "No previous buffer.")))
+
 
 (defun haskell-interactive-mode-return ()
   "Handle the return key."
@@ -1102,27 +1116,6 @@ don't care when the thing completes as long as it's soonish."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc
-
-(defvar   *HASKELL-INTERACTIVE-MODE/LAST-HASKELL-BUFFER* (make-hash-table :test 'equal) "State of couple (haskell repl, last buffer).")
-(defconst *HASKELL-INTERACTIVE-MODE/MAJOR-MODE-BUFFER*   'haskell-mode                  "Mode to discriminate a buffer from a repl.")
-(defconst *HASKELL-INTERACTIVE-MODE/MAJOR-MODE-REPL*     'haskell-interactive-mode      "Mode from the repl.")
-
-(defun haskell-interactive-mode-switch-to-relevant-repl-buffer ()
-  "Switch to the haskell repl.
-Keep in memory the current buffer for later use (getting back)."
-  (interactive)
-  (let ((cbuf (current-buffer)))
-    (puthash (haskell-interactive-switch) cbuf *HASKELL-INTERACTIVE-MODE/LAST-HASKELL-BUFFER*))
-  *HASKELL-INTERACTIVE-MODE/LAST-HASKELL-BUFFER*)
-
-(defun haskell-interactive-mode-switch-to-last-haskell-buffer ()
-  "Getting back to the last haskell buffer from where we came from."
-  (interactive)
-  (let* ((key-haskell-repl (current-buffer))
-         (last-buffer      (gethash key-haskell-repl *HASKELL-INTERACTIVE-MODE/LAST-HASKELL-BUFFER*)))
-    (when (and (eq major-mode *HASKELL-PACK/MAJOR-MODE-REPL*) (buffer-live-p last-buffer))
-      (message "Switch back from %s to %s" key-haskell-repl last-buffer)
-      (pop-to-buffer last-buffer))))
 
 (add-hook 'kill-buffer-hook 'haskell-interactive-kill)
 
