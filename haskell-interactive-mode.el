@@ -121,8 +121,8 @@ printing compilation messages."
     (define-key map (kbd "C-<down>") 'haskell-interactive-mode-history-next)
     (define-key map (kbd "TAB") 'haskell-interactive-mode-tab)
     (define-key map (kbd "<C-S-backspace>") 'haskell-interactive-mode-kill-whole-line)
-    (define-key map [?\C-c ?\C-b] 'haskell-interactive-mode-swich-to-haskell-repl-or-back)
-    (define-key map [?\C-c ?\C-z] 'haskell-interactive-mode-swich-to-haskell-repl-or-back)
+    (define-key map [?\C-c ?\C-b] 'haskell-interactive-mode-switch-to-last-haskell-buffer)
+    (define-key map [?\C-c ?\C-z] 'haskell-interactive-mode-switch-to-last-haskell-buffer)
     map)
   "Interactive Haskell mode map.")
 
@@ -1107,27 +1107,22 @@ don't care when the thing completes as long as it's soonish."
 (defconst *HASKELL-INTERACTIVE-MODE/MAJOR-MODE-BUFFER*   'haskell-mode                  "Mode to discriminate a buffer from a repl.")
 (defconst *HASKELL-INTERACTIVE-MODE/MAJOR-MODE-REPL*     'haskell-interactive-mode      "Mode from the repl.")
 
-(defun haskell-interactive-mode--switch-to-relevant-repl-buffer ()
+(defun haskell-interactive-mode-switch-to-relevant-repl-buffer ()
   "Switch to the haskell repl.
 Keep in memory the current buffer for later use (getting back)."
+  (interactive)
   (let ((cbuf (current-buffer)))
     (puthash (haskell-interactive-switch) cbuf *HASKELL-INTERACTIVE-MODE/LAST-HASKELL-BUFFER*))
   *HASKELL-INTERACTIVE-MODE/LAST-HASKELL-BUFFER*)
 
-(defun haskell-interactive-mode--switch-to-last-haskell-buffer ()
+(defun haskell-interactive-mode-switch-to-last-haskell-buffer ()
   "Getting back to the last haskell buffer from where we came from."
+  (interactive)
   (let* ((key-haskell-repl (current-buffer))
          (last-buffer      (gethash key-haskell-repl *HASKELL-INTERACTIVE-MODE/LAST-HASKELL-BUFFER*)))
     (when (and (eq major-mode *HASKELL-PACK/MAJOR-MODE-REPL*) (buffer-live-p last-buffer))
       (message "Switch back from %s to %s" key-haskell-repl last-buffer)
       (pop-to-buffer last-buffer))))
-
-(defun haskell-interactive-mode-swich-to-haskell-repl-or-back ()
-  "If inside an haskell buffer, jump to the repl.
-If inside a repl, jump to the latest haskell buffer from where we came from."
-  (interactive)
-  (funcall (cond ((eq major-mode *HASKELL-PACK/MAJOR-MODE-BUFFER*) 'haskell-interactive-mode--switch-to-relevant-repl-buffer)
-                 ((eq major-mode *HASKELL-PACK/MAJOR-MODE-REPL*)   'haskell-interactive-mode--switch-to-last-haskell-buffer))))
 
 (add-hook 'kill-buffer-hook 'haskell-interactive-kill)
 
