@@ -115,6 +115,7 @@ printing compilation messages."
     (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
     (define-key map (kbd "C-c C-c") 'haskell-process-interrupt)
     (define-key map (kbd "C-c C-f") 'next-error-follow-minor-mode)
+    (define-key map (kbd "C-c C-z") 'haskell-interactive-switch-back)
     (define-key map (kbd "M-p") 'haskell-interactive-mode-history-previous)
     (define-key map (kbd "M-n") 'haskell-interactive-mode-history-next)
     (define-key map (kbd "C-<up>") 'haskell-interactive-mode-history-previous)
@@ -199,13 +200,29 @@ Key bindings:
       (display-buffer buffer)
       (other-window 1))))
 
+(defvar haskell-interactive-previous-buffer nil
+  "Records the buffer to which `haskell-interactive-switch-back' should jump.
+This is set by `haskell-interactive-switch', and should otherwise
+be nil.")
+(make-variable-buffer-local 'haskell-interactive-previous-buffer)
+
 ;;;###autoload
 (defun haskell-interactive-switch ()
   "Switch to the interactive mode for this session."
   (interactive)
-  (let ((buffer (haskell-session-interactive-buffer (haskell-session))))
+  (let ((initial-buffer (current-buffer))
+        (buffer (haskell-session-interactive-buffer (haskell-session))))
+    (with-current-buffer buffer
+      (setq haskell-interactive-previous-buffer initial-buffer))
     (unless (eq buffer (window-buffer))
       (switch-to-buffer-other-window buffer))))
+
+(defun haskell-interactive-switch-back ()
+  "Switch back to the buffer from which this interactive buffer was reached."
+  (interactive)
+  (if haskell-interactive-previous-buffer
+      (switch-to-buffer-other-window haskell-interactive-previous-buffer)
+    (message "No previous buffer.")))
 
 (defun haskell-interactive-mode-return ()
   "Handle the return key."
