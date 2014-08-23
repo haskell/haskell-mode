@@ -396,7 +396,7 @@ Returns the location of the start of the comment, nil otherwise."
    ((looking-at "\\(\\([[:alpha:]]\\(\\sw\\|'\\)*\\)\\|_\\)[ \t\n]*")
     'ident)
    ((looking-at "\\(|[^|]\\)[ \t\n]*") 'guard)
-   ((looking-at "\\(=[^>=]\\|::\\|->\\|<-\\)[ \t\n]*") 'rhs)
+   ((looking-at "\\(=[^>=]\\|::\\|∷\\|→\\|←\\|->\\|<-\\)[ \t\n]*") 'rhs)
    (t 'other)))
 
 (defvar haskell-indent-current-line-first-ident ""
