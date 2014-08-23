@@ -134,8 +134,9 @@
 (require 'haskell-align-imports)
 (require 'haskell-sort-imports)
 (require 'haskell-string)
-(require 'inf-haskell)
 (with-no-warnings (require 'cl))
+
+(defvar find-tag-marker-ring)
 
 ;; FIXME: code-smell: too many forward decls for haskell-session are required here
 (defvar haskell-session)
