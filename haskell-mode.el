@@ -631,20 +631,15 @@ is asked to show extra info for the items matching QUERY.."
            current-prefix-arg)))
   (if (null haskell-hoogle-command)
       (browse-url (format "http://haskell.org/hoogle/?q=%s" query))
-    (let ((output-buffer (get-buffer-create "*hoogle*"))
-          (hoogle-args (append (when info '("-i"))
+    (let ((hoogle-args (append (when info '("-i"))
                                (list "--color" (shell-quote-argument query)))))
-      (with-current-buffer output-buffer
-        (let ((buffer-read-only nil))
-          (delete-region (point-min) (point-max))
-          (insert (shell-command-to-string
-                   (concat haskell-hoogle-command
-                           (if info " -i " "")
-                           " --color " (shell-quote-argument query))))
-          (ansi-color-apply-on-region (point-min) (point-max)))
-        (goto-char (point-min))
-        (help-mode))
-      (display-buffer output-buffer))))
+      (with-help-window "*hoogle*"
+       (with-current-buffer standard-output
+         (insert (shell-command-to-string
+                  (concat haskell-hoogle-command
+                          (if info " -i " "")
+                          " --color " (shell-quote-argument query))))
+         (ansi-color-apply-on-region (point-min) (point-max)))))))
 
 ;;;###autoload
 (defalias 'hoogle 'haskell-hoogle)
