@@ -137,7 +137,6 @@
 (require 'haskell-string)
 (with-no-warnings (require 'cl))
 
-(defvar find-tag-marker-ring)
 
 ;; FIXME: code-smell: too many forward decls for haskell-session are required here
 (defvar haskell-session)
