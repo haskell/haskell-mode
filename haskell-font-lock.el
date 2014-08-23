@@ -322,7 +322,7 @@ Returns keywords suitable for `font-lock-keywords'."
           (concat "\\S_"
                   ;; (regexp-opt '(".." "::" "=" "\\" "|" "<-" "->"
                   ;;            "@" "~" "=>") t)
-                  "\\(->\\|\\.\\.\\|::\\|∷\\|<-\\|=>\\|[=@\\|~]\\)"
+                  "\\(->\\|→\\|\\.\\.\\|::\\|∷\\|<-\\|←\\|=>\\|[=@\\|~]\\)"
                   "\\S_"))
          ;; Reserved identifiers
          (reservedid
