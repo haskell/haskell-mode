@@ -127,6 +127,7 @@
 (require 'ansi-color)
 (require 'dabbrev)
 (require 'compile)
+(require 'etags)
 (require 'flymake)
 (require 'outline)
 (require 'haskell-complete-module)
