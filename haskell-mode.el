@@ -134,6 +134,7 @@
 (require 'haskell-align-imports)
 (require 'haskell-sort-imports)
 (require 'haskell-string)
+(require 'inf-haskell)
 (with-no-warnings (require 'cl))
 
 ;; FIXME: code-smell: too many forward decls for haskell-session are required here
