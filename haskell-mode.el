@@ -788,7 +788,8 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
 (defun haskell-mode-contextual-space ()
   "Contextually do clever stuff when hitting space."
   (interactive)
-  (if (not (haskell-session-maybe))
+  (if (or (not interactive-haskell-mode)
+          (not (haskell-session-maybe)))
       (self-insert-command 1)
     (cond ((and haskell-mode-contextual-import-completion
                 (save-excursion (forward-word -1)
