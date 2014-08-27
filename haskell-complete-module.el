@@ -37,13 +37,19 @@
         (stack (list))
         (pattern "")
         (result nil))
+    (delete-dups candidates)
     (setq candidates
           (sort candidates
                 (lambda (a b)
-                  (if (and (member a haskell-complete-module-preferred)
-                           (not (member b haskell-complete-module-preferred)))
-                      -1
-                    (string< a b)))))
+                  (let ((a-mem (member a haskell-complete-module-preferred))
+                        (b-mem (member b haskell-complete-module-preferred)))
+                    (cond
+                     ((and a-mem (not b-mem))
+                      t)
+                     ((and b-mem (not a-mem))
+                      nil)
+                     (t
+                      (string< a b)))))))
     (while (not result)
       (let ((key (read-event (concat (propertize prompt 'face 'minibuffer-prompt)
                                      (propertize pattern 'face 'font-lock-type-face)
