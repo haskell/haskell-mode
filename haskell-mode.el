@@ -140,6 +140,7 @@
 ;; FIXME: code-smell: too many forward decls for haskell-session are required here
 (defvar haskell-session)
 (declare-function haskell-process "haskell-process" ())
+(declare-function interactive-haskell-mode "haskell-process" (&optional arg))
 (declare-function haskell-process-do-try-info "haskell-process" (sym))
 (declare-function haskell-process-queue-sync-request (process reqstr))
 (declare-function haskell-process-generate-tags "haskell-process" (&optional and-then-find-this-tag))
@@ -788,7 +789,7 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
 (defun haskell-mode-contextual-space ()
   "Contextually do clever stuff when hitting space."
   (interactive)
-  (if (or (not interactive-haskell-mode)
+  (if (or (not (bound-and-true-p interactive-haskell-mode))
           (not (haskell-session-maybe)))
       (self-insert-command 1)
     (cond ((and haskell-mode-contextual-import-completion
