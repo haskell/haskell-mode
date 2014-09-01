@@ -754,7 +754,7 @@ from `module-buffer'."
     t)
    ((haskell-process-consume
      process
-     (concat "[\r\n]\\([^ \r\n:][^:\n\r]+\\):\\([0-9()-:]+\\):"
+     (concat "[\r\n]\\([A-Z]?:?[^ \r\n:][^:\n\r]+\\):\\([0-9()-:]+\\):"
              "[ \n\r]+\\([[:unibyte:][:nonascii:]]+?\\)\n[^ ]"))
     (haskell-process-set-response-cursor process
                                          (- (haskell-process-response-cursor process) 1))
