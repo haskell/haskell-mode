@@ -455,9 +455,9 @@ do the
                        collect (cond ((= i 0)
                                       (concat ":{" "\n" line))
                                      ((= i (1- len))
-                                      (concat (haskell-interactive-trim line) "\n" ":}"))
+                                      (concat line "\n" ":}"))
                                      (t
-                                      (haskell-interactive-trim line)))
+                                      line))
                        do (setq i (1+ i)))
                  "\n"))))
 
