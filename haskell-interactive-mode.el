@@ -33,6 +33,12 @@
 (require 'haskell-show)
 (with-no-warnings (require 'cl))
 
+(defcustom haskell-interactive-mode-scroll-to-bottom
+  nil
+  "Scroll to bottom in the REPL always."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defcustom haskell-interactive-popup-errors
   t
   "Popup errors in a separate buffer."
@@ -557,7 +563,9 @@ SESSION, otherwise operate on the current buffer.
       (when nil
         (let ((o (make-overlay (point) (point-max) nil nil t)))
           (overlay-put o 'line-prefix (make-string (length haskell-interactive-prompt)
-                                                   ? )))))))
+                                                   ? )))))
+    (when haskell-interactive-mode-scroll-to-bottom
+      (haskell-interactive-mode-scroll-to-bottom))))
 
 (defun haskell-interactive-mode-eval-result (session text)
   "Insert the result of an eval as plain text."
@@ -575,7 +583,16 @@ SESSION, otherwise operate on the current buffer.
                        (make-marker))))
       (set-marker marker
                   (point)
-                  (current-buffer)))))
+                  (current-buffer)))
+    (when haskell-interactive-mode-scroll-to-bottom
+      (haskell-interactive-mode-scroll-to-bottom))))
+
+(defun haskell-interactive-mode-scroll-to-bottom ()
+  "Scroll to bottom."
+  (let ((w (get-buffer-window (current-buffer))))
+    (when w
+      (goto-char (point-max))
+      (set-window-point w (point-max)))))
 
 (defun haskell-interactive-mode-eval-as-mode (session text)
   "Insert TEXT font-locked according to `haskell-interactive-mode-eval-mode'."
