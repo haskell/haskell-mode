@@ -1087,7 +1087,8 @@ given a prefix arg."
 
 (defun haskell-describe (ident)
   "Describe the given identifier."
-  (interactive (list (read-from-minibuffer "Describe identifier: ")))
+  (interactive (list (read-from-minibuffer "Describe identifier: "
+                                           (haskell-ident-at-point))))
   (let ((results (read (shell-command-to-string
                         (concat "haskell-docs --sexp "
                                 ident)))))
