@@ -430,7 +430,10 @@ changed. Restarts the process if that is the case."
   (interactive)
   (save-buffer)
   (haskell-interactive-mode-reset-error (haskell-session))
-  (haskell-process-file-loadish (concat "load " (buffer-file-name))
+  (haskell-process-file-loadish (format "load \"%s\"" (replace-regexp-in-string
+                                                       "\""
+                                                       "\\\\\""
+                                                       (buffer-file-name)))
                                 nil
                                 (current-buffer)))
 
