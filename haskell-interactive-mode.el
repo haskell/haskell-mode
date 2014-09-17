@@ -365,16 +365,16 @@ be nil.")
           (let ((inhibit-read-only t))
             (erase-buffer)
             (insert (propertize response
-                                'face
+                                'font-lock-face
                                 'haskell-interactive-face-compile-error))
             (goto-char (point-min))
             (delete-blank-lines)
             (insert (propertize "-- Hit `q' to close this window.\n\n"
-                                'face 'font-lock-comment-face))
+                                'font-lock-face 'font-lock-comment-face))
             (save-excursion
               (goto-char (point-max))
               (insert (propertize "\n-- To disable popups, customize `haskell-interactive-popup-errors'.\n\n"
-                                  'face 'font-lock-comment-face))))))
+                                  'font-lock-face 'font-lock-comment-face))))))
     (haskell-interactive-mode-insert-error response)))
 
 (defun haskell-interactive-mode-insert-error (response)
@@ -552,7 +552,7 @@ SESSION, otherwise operate on the current buffer.
                          (current-buffer))
     (goto-char (point-max))
     (insert (propertize haskell-interactive-prompt
-                        'face 'haskell-interactive-face-prompt
+                        'font-lock-face 'haskell-interactive-face-prompt
                         'read-only t
                         'rear-nonsticky t
                         'prompt t))
@@ -641,12 +641,12 @@ SESSION, otherwise operate on the current buffer.
       (let ((lines (string-match "^\\(.*\\)\n\\([[:unibyte:][:nonascii:]]+\\)" message)))
         (when lines
           (insert (propertize (concat (match-string 1 message) " …\n")
-                              'face type
+                              'font-lock-face type
                               'read-only t
                               'rear-nonsticky t
                               'expandable t))
           (insert (propertize (concat (match-string 2 message) "\n")
-                              'face type
+                              'font-lock-face type
                               'read-only t
                               'rear-nonsticky t
                               'collapsible t
@@ -654,7 +654,7 @@ SESSION, otherwise operate on the current buffer.
                               'message-length (length (match-string 2 message)))))
         (unless lines
           (insert (propertize (concat message "\n")
-                              'face type
+                              'font-lock-face type
                               'read-only t
                               'rear-nonsticky t)))))))
 
@@ -664,7 +664,7 @@ SESSION, otherwise operate on the current buffer.
     (save-excursion
       (haskell-interactive-mode-goto-end-point)
       (insert (propertize message
-                          'face 'haskell-interactive-face-garbage
+                          'font-lock-face 'haskell-interactive-face-garbage
                           'read-only t
                           'rear-nonsticky t)))))
 
@@ -1008,7 +1008,7 @@ FILE-NAME only."
   (let ((start (point))
         (type (car slot))
         (id (cadr slot)))
-    (insert (propertize type 'face '(:height 0.8 :underline t :inherit font-lock-comment-face)))
+    (insert (propertize type 'font-lock-face '(:height 0.8 :underline t :inherit font-lock-comment-face)))
     (let ((button (make-text-button start (point)
                                     :type 'haskell-presentation-slot-button)))
       (button-put button 'hide-on-click t)
@@ -1026,15 +1026,15 @@ FILE-NAME only."
          (nullary (null slots)))
     (cond
      ((string= "integer" rep)
-      (insert (propertize text 'face 'font-lock-constant)))
+      (insert (propertize text 'font-lock-face 'font-lock-constant)))
      ((string= "floating" rep)
-      (insert (propertize text 'face 'font-lock-constant)))
+      (insert (propertize text 'font-lock-face 'font-lock-constant)))
      ((string= "char" rep)
       (insert (propertize
                (if (string= "string" parent-rep)
                    (replace-regexp-in-string "^'\\(.+\\)'$" "\\1" text)
                  text)
-               'face 'font-lock-string-face)))
+               'font-lock-face 'font-lock-string-face)))
      ((string= "tuple" rep)
       (insert "(")
       (let ((first t))
@@ -1068,18 +1068,18 @@ FILE-NAME only."
             (insert "]")))))
      ((string= "string" rep)
       (unless (string= "string" parent-rep)
-        (insert (propertize "\"" 'face 'font-lock-string-face)))
+        (insert (propertize "\"" 'font-lock-face 'font-lock-string-face)))
       (loop for slot in slots
             do (haskell-interactive-mode-presentation-slot hash slot rep))
       (unless (string= "string" parent-rep)
-        (insert (propertize "\"" 'face 'font-lock-string-face))))
+        (insert (propertize "\"" 'font-lock-face 'font-lock-string-face))))
      ((string= "alg" rep)
       (when (and parent-rep
                  (not nullary)
                  (not (string= "list" parent-rep)))
         (insert "("))
       (let ((start-column (current-column)))
-        (insert (propertize text 'face 'font-lock-type-face))
+        (insert (propertize text 'font-lock-face 'font-lock-type-face))
         (loop for slot in slots
               do (insert "\n")
               do (indent-to (+ 2 start-column))
@@ -1089,7 +1089,7 @@ FILE-NAME only."
                  (not (string= "list" parent-rep)))
         (insert ")")))
      ((eq rep nil)
-      (insert (propertize "?" 'face 'font-lock-warning)))
+      (insert (propertize "?" 'font-lock-face 'font-lock-warning)))
      (t
       (let ((err "Unable to present! This very likely means Emacs
 is out of sync with the `present' package. You should make sure
