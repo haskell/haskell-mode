@@ -345,7 +345,6 @@
 (require 'haskell-mode)
 (require 'inf-haskell)
 (require 'imenu)
-(with-no-warnings (require 'cl))
 
 (defgroup haskell-doc nil
   "Show Haskell function types in echo area."

@@ -36,7 +36,6 @@
 (require 'haskell-mode)
 (require 'haskell-decl-scan)
 (require 'haskell-cabal)
-(with-no-warnings (require 'cl))
 
 ;; Dynamically scoped variables.
 (defvar find-tag-marker-ring)

@@ -100,9 +100,9 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'haskell-mode)
 (require 'syntax)
-(with-no-warnings (require 'cl))
 (require 'imenu)
 
 (defgroup haskell-decl-scan nil
@@ -195,7 +195,7 @@ current line that starts with REGEXP and is not in `font-lock-comment-face'."
   "Like haskell-ds-move-to-start-regexp, but uses syntax-ppss to
   skip comments"
   (let (p)
-    (loop
+    (cl-loop
      do (setq p (point))
      (haskell-ds-move-to-start-regexp inc regexp)
      while (and (nth 4 (syntax-ppss))

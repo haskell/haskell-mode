@@ -50,7 +50,6 @@ ELCHECKS=$(addprefix check-, $(ELFILES:.el=))
 
 %.elc: %.el
 	@$(BATCH) \
-	   --eval "(byte-compile-disable-warning 'cl-functions)" \
        -f batch-byte-compile $<
 
 .PHONY: all compile info clean check $(ELCHECKS) elpa package
@@ -63,7 +62,6 @@ $(ELCHECKS): check-%: %.el
 	@$(BATCH) --eval '(when (check-declare-file "$*.el") (error "check-declare failed"))'
 	@$(BATCH) \
 	     --eval "(setq byte-compile-error-on-warn t)" \
-	 	 --eval "(byte-compile-disable-warning 'cl-functions)" \
 		 -f batch-byte-compile $*.el
 	@$(RM) $*.elc
 	@if [ -f "$(<:%.el=tests/%-tests.el)" ]; then \
@@ -121,6 +119,6 @@ $(AUTOLOADS): $(ELFILES) haskell-mode.elc
 # HACK: embed version number into .elc file
 haskell-mode.elc: haskell-mode.el
 	$(SUBST_ATAT) < haskell-mode.el > haskell-mode.tmp.el
-	@$(BATCH) --eval "(byte-compile-disable-warning 'cl-functions)" -f batch-byte-compile haskell-mode.tmp.el
+	@$(BATCH) -f batch-byte-compile haskell-mode.tmp.el
 	mv haskell-mode.tmp.elc haskell-mode.elc
 	$(RM) haskell-mode.tmp.el

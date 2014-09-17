@@ -27,10 +27,10 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'haskell-cabal)
 (require 'haskell-string)
 (require 'haskell-mode)
-(with-no-warnings (require 'cl))
 
 (declare-function haskell-interactive-mode "haskell-interactive-mode" ())
 (declare-function haskell-kill-session-process "haskell-process" (&optional session))
@@ -132,18 +132,18 @@ If DONTCREATE is non-nil don't create a new session."
     (haskell-kill-session-process session)
     (unless leave-interactive-buffer
       (kill-buffer (haskell-session-interactive-buffer session)))
-    (loop for buffer in (buffer-list)
-          do (with-current-buffer buffer
-               (when (and (boundp 'haskell-session)
-                          (string= (haskell-session-name haskell-session) name))
-                 (setq haskell-session nil)
-                 (when also-kill-buffers
-                   (kill-buffer)))))
+    (cl-loop for buffer in (buffer-list)
+             do (with-current-buffer buffer
+                  (when (and (boundp 'haskell-session)
+                             (string= (haskell-session-name haskell-session) name))
+                    (setq haskell-session nil)
+                    (when also-kill-buffers
+                      (kill-buffer)))))
     (setq haskell-sessions
-          (remove-if (lambda (session)
-                       (string= (haskell-session-name session)
-                                name))
-                     haskell-sessions))))
+          (cl-remove-if (lambda (session)
+                          (string= (haskell-session-name session)
+                                   name))
+                        haskell-sessions))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Finding/clearing the session
@@ -180,22 +180,22 @@ If DONTCREATE is non-nil don't create a new session."
   "Get the session based on the buffer."
   (when (and (buffer-file-name)
              (consp haskell-sessions))
-    (reduce (lambda (acc a)
-              (let ((dir (haskell-session-cabal-dir a t)))
-                (if dir
-                    (if (haskell-is-prefix-of dir
-                                              (file-name-directory (buffer-file-name)))
-                        (if acc
-                            (if (and
-                                 (> (length (haskell-session-cabal-dir a t))
-                                    (length (haskell-session-cabal-dir acc t))))
-                                a
-                              acc)
-                          a)
-                      acc)
-                  acc)))
-            haskell-sessions
-            :initial-value nil)))
+    (cl-reduce (lambda (acc a)
+                 (let ((dir (haskell-session-cabal-dir a t)))
+                   (if dir
+                       (if (haskell-is-prefix-of dir
+                                                 (file-name-directory (buffer-file-name)))
+                           (if acc
+                               (if (and
+                                    (> (length (haskell-session-cabal-dir a t))
+                                       (length (haskell-session-cabal-dir acc t))))
+                                   a
+                                 acc)
+                             a)
+                         acc)
+                     acc)))
+               haskell-sessions
+               :initial-value nil)))
 
 (defun haskell-session-new ()
   "Make a new session."
@@ -224,15 +224,15 @@ If DONTCREATE is non-nil don't create a new session."
   (when haskell-sessions
     (let* ((session-name (funcall haskell-completing-read-function
                                   "Choose Haskell session: "
-                                  (remove-if (lambda (name)
-                                               (and haskell-session
-                                                    (string= (haskell-session-name haskell-session)
-                                                             name)))
-                                             (mapcar 'haskell-session-name haskell-sessions))))
-           (session (find-if (lambda (session)
-                               (string= (haskell-session-name session)
-                                        session-name))
-                             haskell-sessions)))
+                                  (cl-remove-if (lambda (name)
+                                                  (and haskell-session
+                                                       (string= (haskell-session-name haskell-session)
+                                                                name)))
+                                                (mapcar 'haskell-session-name haskell-sessions))))
+           (session (cl-find-if (lambda (session)
+                                  (string= (haskell-session-name session)
+                                           session-name))
+                                haskell-sessions)))
       session)))
 
 (defun haskell-session-clear ()
@@ -272,9 +272,9 @@ If DONTCREATE is non-nil don't create a new session."
 
 (defun haskell-session-lookup (name)
   "Get the session by name."
-  (remove-if-not (lambda (s)
-                   (string= name (haskell-session-name s)))
-                 haskell-sessions))
+  (cl-remove-if-not (lambda (s)
+                      (string= name (haskell-session-name s)))
+                    haskell-sessions))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Building the session
