@@ -27,6 +27,7 @@
 
 ;;; Code:
 
+(require 'ansi-color)
 (require 'haskell-process)
 (require 'haskell-collapse)
 (require 'haskell-session)
@@ -572,12 +573,13 @@ SESSION, otherwise operate on the current buffer.
   (with-current-buffer (haskell-session-interactive-buffer session)
     (goto-char (point-max))
     (let ((start (point)))
-      (insert (propertize text
-                          'face 'haskell-interactive-face-result
-                          'rear-nonsticky t
-                          'read-only t
-                          'prompt t
-                          'result t))
+      (insert (ansi-color-apply
+               (propertize text
+                           'font-lock-face 'haskell-interactive-face-result
+                           'rear-nonsticky t
+                           'read-only t
+                           'prompt t
+                           'result t)))
       (haskell-interactive-mode-handle-h start))
     (let ((marker (set (make-local-variable 'haskell-interactive-mode-result-end)
                        (make-marker))))
