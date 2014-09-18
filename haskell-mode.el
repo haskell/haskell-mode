@@ -902,8 +902,7 @@ return to that position with `pop-tag-mark'."
   "The tag find function, specific for the particular session."
   (interactive "P")
   (cond
-   ((eq 'font-lock-string-face
-        (get-text-property (point) 'face))
+   ((elt (syntax-ppss) 3) ;; Inside a string
     (haskell-mode-jump-to-filename-in-string))
    (t (call-interactively 'haskell-mode-jump-to-tag))))
 
