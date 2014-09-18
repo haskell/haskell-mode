@@ -1098,8 +1098,9 @@ given a prefix arg."
         (with-current-buffer (help-buffer)
           (if results
               (loop for result in results
-                    do (insert (propertize ident 'face '((:inherit font-lock-type-face
-                                                                   :underline t)))
+                    do (insert (propertize ident 'font-lock-face
+                                           '((:inherit font-lock-type-face
+                                                       :underline t)))
                                " is defined in "
                                (let ((module (cadr (assoc 'module result))))
                                  (if module
