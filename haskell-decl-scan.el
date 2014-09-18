@@ -258,8 +258,7 @@ then point does not move if already at the start of a declaration."
                      ;; here seems to be the only addition to make this
                      ;; module support LaTeX-style literate scripts.
                      (if (and (looking-at start-decl-re)
-                              (not (eq (get-text-property (point) 'face)
-                                       'font-lock-comment-face)))
+                              (not (elt (syntax-ppss) 4)))
                          (match-beginning 1)))))
         (if (and start
                  ;; This complicated boolean determines whether we

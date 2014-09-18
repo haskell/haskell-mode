@@ -236,9 +236,7 @@ Regexp match data 0 points to the chars."
          sym-data)
     (if (or (memq (char-syntax (or (char-before start) ?\ )) syntaxes)
             (memq (char-syntax (or (char-after end) ?\ )) syntaxes)
-            (memq (get-text-property start 'face)
-                  '(font-lock-doc-face font-lock-string-face
-                                       font-lock-comment-face))
+            (or (elt (syntax-ppss) 3) (elt (syntax-ppss) 4))
             (and (consp (setq sym-data (cdr (assoc (match-string 0) alist))))
                  (let ((pred (cadr sym-data)))
                    (setq sym-data (car sym-data))
