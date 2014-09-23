@@ -174,8 +174,4 @@ name - user visible name for this mode"
 
 (provide 'haskell-checkers)
 
-;; Local Variables:
-;; byte-compile-warnings: (not cl-functions)
-;; End:
-
 ;;; haskell-checkers.el ends here

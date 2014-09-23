@@ -601,8 +601,4 @@ Invokes `haskell-decl-scan-mode-hook' on activation."
 
 (provide 'haskell-decl-scan)
 
-;; Local Variables:
-;; byte-compile-warnings: (not cl-functions)
-;; End:
-
 ;;; haskell-decl-scan.el ends here

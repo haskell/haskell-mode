@@ -824,8 +824,4 @@ we load it."
 
 (provide 'inf-haskell)
 
-;; Local Variables:
-;; byte-compile-warnings: (not cl-functions)
-;; End:
-
 ;;; inf-haskell.el ends here

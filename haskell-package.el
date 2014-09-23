@@ -154,8 +154,4 @@
 
 (provide 'haskell-package)
 
-;; Local Variables:
-;; byte-compile-warnings: (not cl-functions)
-;; End:
-
 ;;; haskell-package.el ends here
