@@ -17,8 +17,7 @@
 
 ;;; Code:
 
-(require 'cl)
-
+(require 'cl-lib)
 (require 'haskell-session)
 (require 'haskell-process)
 (require 'haskell-interactive-mode)
@@ -148,13 +147,13 @@
                (when (y-or-n-p "Computation completed without breaking. Reload the module and retry?")
                  (message "Reloading and resetting breakpoints...")
                  (haskell-interactive-mode-reset-error (haskell-session))
-                 (loop for break in breakpoints
-                       do (haskell-process-file-loadish
-                           (concat "load " (plist-get break :path))
-                           nil
-                           nil))
-                 (loop for break in breakpoints
-                       do (haskell-debug-break break))
+                 (cl-loop for break in breakpoints
+                          do (haskell-process-file-loadish
+                              (concat "load " (plist-get break :path))
+                              nil
+                              nil))
+                 (cl-loop for break in breakpoints
+                          do (haskell-debug-break break))
                  (haskell-debug/step expr)))))))))
    (haskell-debug/refresh)))
 
@@ -233,9 +232,9 @@ some old history, then display that."
         (plist-get bindings :path)
         (plist-get bindings :span)))
       (insert "\n\n")
-      (loop for binding in (plist-get bindings :types)
-            do (insert (haskell-fontify-as-mode binding 'haskell-mode)
-                       "\n"))))
+      (cl-loop for binding in (plist-get bindings :types)
+               do (insert (haskell-fontify-as-mode binding 'haskell-mode)
+                          "\n"))))
   (let ((history (or history
                      (list (haskell-debug-make-fake-history context)))))
     (when history
@@ -245,20 +244,20 @@ some old history, then display that."
 (defun haskell-debug-insert-history (history)
   "Insert tracing HISTORY."
   (let ((i (length history)))
-    (loop for span in history
-          do (let ((string (haskell-debug-get-span-string
-                            (plist-get span :path)
-                            (plist-get span :span)))
-                   (index (plist-get span :index)))
-               (insert (propertize (format "%4d" i)
-                                   'face 'haskell-debug-trace-number-face)
-                       " "
-                       (haskell-debug-preview-span
-                        (plist-get span :span)
-                        string
-                        t)
-                       "\n")
-               (setq i (1- i))))))
+    (cl-loop for span in history
+             do (let ((string (haskell-debug-get-span-string
+                               (plist-get span :path)
+                               (plist-get span :span)))
+                      (index (plist-get span :index)))
+                  (insert (propertize (format "%4d" i)
+                                      'face 'haskell-debug-trace-number-face)
+                          " "
+                          (haskell-debug-preview-span
+                           (plist-get span :span)
+                           string
+                           t)
+                          "\n")
+                  (setq i (1- i))))))
 
 (defun haskell-debug-make-fake-history (context)
   "Make a fake history item."
@@ -442,14 +441,14 @@ some old history, then display that."
   (haskell-debug-insert-header "Modules")
   (if (null modules)
       (haskell-debug-insert-muted "No loaded modules.")
-    (progn (loop for module in modules
-                 do (insert (propertize (plist-get module :module)
-                                        'module module
-                                        'face `((:weight bold)))
-                            (haskell-debug-muted " - ")
-                            (propertize (file-name-nondirectory (plist-get module :path))
-                                        'module module))
-                 do (insert "\n")))))
+    (progn (cl-loop for module in modules
+                    do (insert (propertize (plist-get module :module)
+                                           'module module
+                                           'face `((:weight bold)))
+                               (haskell-debug-muted " - ")
+                               (propertize (file-name-nondirectory (plist-get module :path))
+                                           'module module))
+                    do (insert "\n")))))
 
 (defun haskell-debug-insert-header (title)
   "Insert a header title."
@@ -462,20 +461,20 @@ some old history, then display that."
   (haskell-debug-insert-header "Breakpoints")
   (if (null breakpoints)
       (haskell-debug-insert-muted "No active breakpoints.")
-    (loop for break in breakpoints
-          do (insert (propertize (format "%d"
-                                         (plist-get break :number))
-                                 'face `((:weight bold))
-                                 'break break)
-                     (haskell-debug-muted " - ")
-                     (propertize (plist-get break :module)
-                                 'break break
-                                 'break break)
-                     (haskell-debug-muted
-                      (format " (%d:%d)"
-                              (plist-get (plist-get break :span) :start-line)
-                              (plist-get (plist-get break :span) :start-col)))
-                     "\n")))
+    (cl-loop for break in breakpoints
+             do (insert (propertize (format "%d"
+                                            (plist-get break :number))
+                                    'face `((:weight bold))
+                                    'break break)
+                        (haskell-debug-muted " - ")
+                        (propertize (plist-get break :module)
+                                    'break break
+                                    'break break)
+                        (haskell-debug-muted
+                         (format " (%d:%d)"
+                                 (plist-get (plist-get break :span) :start-line)
+                                 (plist-get (plist-get break :span) :start-col)))
+                        "\n")))
   (insert "\n"))
 
 (defun haskell-debug-insert-muted (text)
@@ -569,9 +568,9 @@ some old history, then display that."
       (if (string= string "Empty history. Perhaps you forgot to use :trace?\n")
           nil
         (let ((entries (mapcar #'haskell-debug-parse-history-entry
-                               (remove-if (lambda (line) (or (string= "<end of history>" line)
-                                                             (string= "..." line)))
-                                          (haskell-debug-split-string string)))))
+                               (cl-remove-if (lambda (line) (or (string= "<end of history>" line)
+                                                                (string= "..." line)))
+                                             (haskell-debug-split-string string)))))
           (set (make-local-variable 'haskell-debug-history-cache)
                entries)
           entries)))))

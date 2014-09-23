@@ -33,7 +33,7 @@
 ;;; Code:
 
 (require 'syntax)
-(with-no-warnings (require 'cl))
+(require 'cl-lib)
 
 (defvar delete-active-region)
 
@@ -183,7 +183,7 @@ autofill-mode."
       (while (< (point) start)
         (if (= (char-after) ?\t)
             (setq cc (* 8 (+ 1 (/ cc 8))))
-          (incf cc))
+          (cl-incf cc))
         (forward-char))
       cc)))
 

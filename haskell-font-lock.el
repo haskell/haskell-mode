@@ -87,9 +87,9 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'haskell-mode)
 (require 'font-lock)
-(with-no-warnings (require 'cl))
 
 (defcustom haskell-font-lock-symbols nil
   "Display \\ and -> and such using symbols in fonts.
@@ -439,7 +439,7 @@ Returns keywords suitable for `font-lock-keywords'."
 
             (haskell-font-lock-find-pragma 0 haskell-pragma-face t)))
     (unless (boundp 'font-lock-syntactic-keywords)
-      (case literate
+      (cl-case literate
         (bird
          (setq keywords
                `(("^[^>\n].*$" 0 haskell-comment-face t)
@@ -600,14 +600,14 @@ that should be commented under LaTeX-style literate scripts."
 ;;;###autoload
 (defun haskell-font-lock-choose-keywords ()
   (let ((literate (if (boundp 'haskell-literate) haskell-literate)))
-    (case literate
+    (cl-case literate
       (bird haskell-font-lock-bird-literate-keywords)
       ((latex tex) haskell-font-lock-latex-literate-keywords)
       (t haskell-font-lock-keywords))))
 
 (defun haskell-font-lock-choose-syntactic-keywords ()
   (let ((literate (if (boundp 'haskell-literate) haskell-literate)))
-    (case literate
+    (cl-case literate
       (bird haskell-bird-syntactic-keywords)
       ((latex tex) haskell-latex-syntactic-keywords)
       (t haskell-basic-syntactic-keywords))))

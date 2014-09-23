@@ -17,7 +17,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(require 'cl-lib)
 
 (defcustom haskell-complete-module-preferred
   '()
@@ -56,17 +56,17 @@
                                      "{"
                                      (mapconcat #'identity
                                                 (let* ((i 0))
-                                                  (loop for candidate in candidates
-                                                        while (<= i haskell-complete-module-max-display)
-                                                        do (incf i)
-                                                        collect (cond ((> i haskell-complete-module-max-display)
-                                                                       "...")
-                                                                      ((= i 1)
-                                                                       (propertize candidate 'face 'ido-first-match-face))
-                                                                      (t candidate))))
+                                                  (cl-loop for candidate in candidates
+                                                           while (<= i haskell-complete-module-max-display)
+                                                           do (cl-incf i)
+                                                           collect (cond ((> i haskell-complete-module-max-display)
+                                                                          "...")
+                                                                         ((= i 1)
+                                                                          (propertize candidate 'face 'ido-first-match-face))
+                                                                         (t candidate))))
                                                 " | ")
                                      "}"))))
-        (case key
+        (cl-case key
           (7 (keyboard-quit))
           (backspace
            (unless (null stack)
@@ -87,9 +87,9 @@
 (defun haskell-complete-module (pattern candidates)
   "Filter the CANDIDATES using PATTERN."
   (let ((case-fold-search t))
-    (loop for candidate in candidates
-          when (haskell-complete-module-match pattern candidate)
-          collect candidate)))
+    (cl-loop for candidate in candidates
+             when (haskell-complete-module-match pattern candidate)
+             collect candidate)))
 
 (defun haskell-complete-module-match (pattern text)
   "Match PATTERN against TEXT."

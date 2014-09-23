@@ -130,12 +130,12 @@
 (require 'etags)
 (require 'flymake)
 (require 'outline)
+(require 'cl-lib)
 (require 'haskell-complete-module)
 (require 'haskell-compat)
 (require 'haskell-align-imports)
 (require 'haskell-sort-imports)
 (require 'haskell-string)
-(with-no-warnings (require 'cl))
 
 ;; FIXME: code-smell: too many forward decls for haskell-session are required here
 (defvar haskell-session)
@@ -357,7 +357,7 @@ May return a qualified name."
         (skip-chars-backward " \t"))
 
     (let ((case-fold-search nil))
-      (multiple-value-bind (start end)
+      (cl-multiple-value-bind (start end)
           (if (looking-at "\\s_")
               (list (progn (skip-syntax-backward "_") (point))
                     (progn (skip-syntax-forward "_") (point)))
@@ -942,7 +942,7 @@ return to that position with `pop-tag-mark'."
 (defun haskell-mode-handle-generic-loc (loc)
   "Either jump to or display a generic location. Either a file or
 a library."
-  (case (car loc)
+  (cl-case (car loc)
     (file (haskell-mode-jump-to-loc (cdr loc)))
     (library (message "Defined in `%s' (%s)."
                       (elt loc 2)
@@ -1055,11 +1055,11 @@ given a prefix arg."
 (defun haskell-guess-module-name ()
   "Guess the current module name of the buffer."
   (interactive)
-  (let ((components (loop for part
-                          in (reverse (split-string (buffer-file-name) "/"))
-                          while (let ((case-fold-search nil))
-                                  (string-match "^[A-Z]+" part))
-                          collect (replace-regexp-in-string "\\.l?hs$" "" part))))
+  (let ((components (cl-loop for part
+                             in (reverse (split-string (buffer-file-name) "/"))
+                             while (let ((case-fold-search nil))
+                                     (string-match "^[A-Z]+" part))
+                             collect (replace-regexp-in-string "\\.l?hs$" "" part))))
     (mapconcat 'identity (reverse components) ".")))
 
 (defun haskell-auto-insert-module-template ()
@@ -1097,27 +1097,27 @@ given a prefix arg."
       (with-help-window (help-buffer)
         (with-current-buffer (help-buffer)
           (if results
-              (loop for result in results
-                    do (insert (propertize ident 'font-lock-face
-                                           '((:inherit font-lock-type-face
-                                                       :underline t)))
-                               " is defined in "
-                               (let ((module (cadr (assoc 'module result))))
-                                 (if module
-                                     (concat module " ")
-                                   ""))
-                               (cadr (assoc 'package result))
-                               "\n\n")
-                    do (let ((type (cadr (assoc 'type result))))
-                         (when type
-                           (insert (haskell-fontify-as-mode type 'haskell-mode)
-                                   "\n")))
-                    do (let ((args (cadr (assoc 'type results))))
-                         (loop for arg in args
-                               do (insert arg "\n"))
-                         (insert "\n"))
-                    do (insert (cadr (assoc 'documentation result)))
-                    do (insert "\n\n"))
+              (cl-loop for result in results
+                       do (insert (propertize ident 'font-lock-face
+                                              '((:inherit font-lock-type-face
+                                                          :underline t)))
+                                  " is defined in "
+                                  (let ((module (cadr (assoc 'module result))))
+                                    (if module
+                                        (concat module " ")
+                                      ""))
+                                  (cadr (assoc 'package result))
+                                  "\n\n")
+                       do (let ((type (cadr (assoc 'type result))))
+                            (when type
+                              (insert (haskell-fontify-as-mode type 'haskell-mode)
+                                      "\n")))
+                       do (let ((args (cadr (assoc 'type results))))
+                            (loop for arg in args
+                                  do (insert arg "\n"))
+                            (insert "\n"))
+                       do (insert (cadr (assoc 'documentation result)))
+                       do (insert "\n\n"))
             (insert "No results for " ident)))))))
 
 

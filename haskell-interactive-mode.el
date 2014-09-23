@@ -28,11 +28,11 @@
 ;;; Code:
 
 (require 'ansi-color)
+(require 'cl-lib)
 (require 'haskell-process)
 (require 'haskell-collapse)
 (require 'haskell-session)
 (require 'haskell-show)
-(with-no-warnings (require 'cl))
 
 (defcustom haskell-interactive-mode-scroll-to-bottom
   nil
@@ -200,8 +200,8 @@ Key bindings:
   (interactive)
   (let* ((session (haskell-session))
          (buffer (haskell-session-interactive-buffer session)))
-    (unless (and (find-if (lambda (window) (equal (window-buffer window) buffer))
-                          (window-list))
+    (unless (and (cl-find-if (lambda (window) (equal (window-buffer window) buffer))
+                             (window-list))
                  (= 2 (length (window-list))))
       (delete-other-windows)
       (display-buffer buffer)
@@ -305,18 +305,18 @@ be nil.")
             (setq haskell-interactive-mode-result-end
                   (point-max))
             (haskell-process-send-string (cadr state)
-                                         (haskell-interactive-mode-multi-line (caddr state)))
+                                         (haskell-interactive-mode-multi-line (cl-caddr state)))
             (haskell-process-set-evaluating (cadr state) t))
       :live (lambda (state buffer)
-              (unless (and (string-prefix-p ":q" (caddr state))
-                           (string-prefix-p (caddr state) ":quit"))
-                (let* ((cursor (cadddr state))
+              (unless (and (string-prefix-p ":q" (cl-caddr state))
+                           (string-prefix-p (cl-caddr state) ":quit"))
+                (let* ((cursor (cl-cadddr state))
                        (next (replace-regexp-in-string
                               haskell-process-prompt-regex
                               ""
                               (substring buffer cursor))))
                   (haskell-interactive-mode-eval-result (car state) next)
-                  (setf (cdddr state) (list (length buffer)))
+                  (setf (cl-cdddr state) (list (length buffer)))
                   nil)))
       :complete
       (lambda (state response)
@@ -396,7 +396,7 @@ be nil.")
   (let ((response
          (with-temp-buffer
            (insert (haskell-interactive-mode-cleanup-response
-                    (caddr state) response))
+                    (cl-caddr state) response))
            (haskell-interactive-mode-handle-h (point-min))
            (buffer-string))))
     (cond
@@ -432,13 +432,13 @@ be nil.")
     (let ((i 0)
           (out "")
           (lines (length (split-string expr "\n"))))
-      (loop for part in (split-string response "| ")
-            do (setq out
-                     (concat out
-                             (if (> i lines)
-                                 (concat (if (or (= i 0) (= i (1+ lines))) "" "| ") part)
-                               "")))
-            do (setq i (1+ i)))
+      (cl-loop for part in (split-string response "| ")
+               do (setq out
+                        (concat out
+                                (if (> i lines)
+                                    (concat (if (or (= i 0) (= i (1+ lines))) "" "| ") part)
+                                  "")))
+               do (setq i (1+ i)))
       out)))
 
 (defun haskell-interactive-mode-multi-line (expr)
@@ -458,14 +458,14 @@ do the
            (indent (make-string (length haskell-interactive-prompt)
                                 ? )))
       (mapconcat 'identity
-                 (loop for line in lines
-                       collect (cond ((= i 0)
-                                      (concat ":{" "\n" line))
-                                     ((= i (1- len))
-                                      (concat line "\n" ":}"))
-                                     (t
-                                      line))
-                       do (setq i (1+ i)))
+                 (cl-loop for line in lines
+                          collect (cond ((= i 0)
+                                         (concat ":{" "\n" line))
+                                        ((= i (1- len))
+                                         (concat line "\n" ":}"))
+                                        (t
+                                         line))
+                          do (setq i (1+ i)))
                  "\n"))))
 
 (defun haskell-interactive-trim (line)
@@ -687,8 +687,8 @@ SESSION, otherwise operate on the current buffer.
   (setq haskell-interactive-mode-history
         (cons ""
               (cons input
-                    (remove-if (lambda (i) (or (string= i input) (string= i "")))
-                               haskell-interactive-mode-history))))
+                    (cl-remove-if (lambda (i) (or (string= i input) (string= i "")))
+                                  haskell-interactive-mode-history))))
   (setq haskell-interactive-mode-history-index
         0))
 
@@ -736,7 +736,7 @@ SESSION, otherwise operate on the current buffer.
 (defun haskell-interactive-show-load-message (session type module-name file-name echo th)
   "Show the '(Compiling|Loading) X' message."
   (let ((msg (concat
-              (ecase type
+              (cl-ecase type
                 ('compiling
                  (if haskell-interactive-mode-include-file-name
                      (format "Compiling: %s (%s)" module-name file-name)
@@ -1038,10 +1038,10 @@ FILE-NAME only."
      ((string= "tuple" rep)
       (insert "(")
       (let ((first t))
-        (loop for slot in slots
-              do (unless first (insert ","))
-              do (haskell-interactive-mode-presentation-slot hash slot rep)
-              do (setq first nil)))
+        (cl-loop for slot in slots
+                 do (unless first (insert ","))
+                 do (haskell-interactive-mode-presentation-slot hash slot rep)
+                 do (setq first nil)))
       (insert ")"))
      ((string= "list" rep)
       (if (null slots)
@@ -1053,24 +1053,24 @@ FILE-NAME only."
           (unless continuation
             (insert "["))
           (let ((start-column (current-column)))
-            (loop for slot in slots
-                  do (haskell-interactive-mode-presentation-slot
-                      hash
-                      slot
-                      rep
-                      (= i (1- (length slots))))
-                  do (when (not (= i (1- (length slots))))
-                       (insert "\n")
-                       (indent-to (1- start-column))
-                       (insert ","))
-                  do (setq i (1+ i))))
+            (cl-loop for slot in slots
+                     do (haskell-interactive-mode-presentation-slot
+                         hash
+                         slot
+                         rep
+                         (= i (1- (length slots))))
+                     do (when (not (= i (1- (length slots))))
+                          (insert "\n")
+                          (indent-to (1- start-column))
+                          (insert ","))
+                     do (setq i (1+ i))))
           (unless continuation
             (insert "]")))))
      ((string= "string" rep)
       (unless (string= "string" parent-rep)
         (insert (propertize "\"" 'font-lock-face 'font-lock-string-face)))
-      (loop for slot in slots
-            do (haskell-interactive-mode-presentation-slot hash slot rep))
+      (cl-loop for slot in slots
+               do (haskell-interactive-mode-presentation-slot hash slot rep))
       (unless (string= "string" parent-rep)
         (insert (propertize "\"" 'font-lock-face 'font-lock-string-face))))
      ((string= "alg" rep)
@@ -1080,10 +1080,10 @@ FILE-NAME only."
         (insert "("))
       (let ((start-column (current-column)))
         (insert (propertize text 'font-lock-face 'font-lock-type-face))
-        (loop for slot in slots
-              do (insert "\n")
-              do (indent-to (+ 2 start-column))
-              do (haskell-interactive-mode-presentation-slot hash slot rep)))
+        (cl-loop for slot in slots
+                 do (insert "\n")
+                 do (indent-to (+ 2 start-column))
+                 do (haskell-interactive-mode-presentation-slot hash slot rep)))
       (when (and parent-rep
                  (not nullary)
                  (not (string= "list" parent-rep)))

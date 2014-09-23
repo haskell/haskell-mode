@@ -48,7 +48,7 @@
 ;;          (fields (mapcar (lambda (sym) (substring-no-properties sym 0 -1)) syms)))
 ;;     fields))
 
-(with-no-warnings (require 'cl))
+(require 'cl-lib)
 (require 'haskell-utils)
 
 (defconst haskell-cabal-general-fields
@@ -229,9 +229,9 @@ a list is returned instead of failing with a nil result."
   ;;  http://hackage.haskell.org/packages/archive/Cabal/1.16.0.3/doc/html/Distribution-Simple-Utils.html
   ;; but without the exception throwing.
   (let* ((cabal-files
-          (remove-if 'file-directory-p
-                     (remove-if-not 'file-exists-p
-                                    (directory-files dir t ".\\.cabal\\'")))))
+          (cl-remove-if 'file-directory-p
+                        (cl-remove-if-not 'file-exists-p
+                                          (directory-files dir t ".\\.cabal\\'")))))
     (cond
      ((= (length cabal-files) 1) (car cabal-files)) ;; exactly one candidate found
      (allow-multiple cabal-files) ;; pass-thru multiple candidates
@@ -323,12 +323,12 @@ OTHER-WINDOW use `find-file-other-window'."
 
 (defun haskell-cabal-header-p ()
   "Is the current line a section or subsection header?"
-  (case (haskell-cabal-classify-line)
+  (cl-case (haskell-cabal-classify-line)
     ((section-header subsection-header) t)))
 
 (defun haskell-cabal-section-header-p ()
   "Is the current line a section or subsection header?"
-  (case (haskell-cabal-classify-line)
+  (cl-case (haskell-cabal-classify-line)
     ((section-header) t)))
 
 
@@ -551,7 +551,7 @@ resultung buffer-content"
 
 (defun haskell-cabal-listify ()
   "Add commas so that buffer contains a comma-seperated list"
-  (case haskell-cabal-list-comma-position
+  (cl-case haskell-cabal-list-comma-position
     ('before
      (goto-char (point-min))
      (while (haskell-cabal-ignore-line-p) (forward-line))
@@ -842,7 +842,7 @@ Source names from main-is and c-sources sections are left untouched
 (defun haskell-cabal-line-entry-column ()
   "Column at which the line entry starts"
   (save-excursion
-    (case (haskell-cabal-classify-line)
+    (cl-case (haskell-cabal-classify-line)
       (section-data (beginning-of-line)
                     (when (looking-at "[ ]*\\(?:,[ ]*\\)?")
                       (goto-char  (match-end 0))
@@ -860,7 +860,7 @@ Source names from main-is and c-sources sections are left untouched
 (defun haskell-cabal-indent-line ()
   "Indent current line according to subsection"
   (interactive)
-  (case (haskell-cabal-classify-line)
+  (cl-case (haskell-cabal-classify-line)
     (section-data
      (save-excursion
        (let ((indent (haskell-cabal-section-data-start-column

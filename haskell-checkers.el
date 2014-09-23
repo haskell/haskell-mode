@@ -26,7 +26,6 @@
 ;;; Code:
 
 (require 'compile)
-(with-no-warnings (require 'cl))
 
 (defgroup haskell-checkers nil
   "Run HLint as inferior of Emacs, parse error messages."

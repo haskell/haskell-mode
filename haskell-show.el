@@ -30,8 +30,8 @@
 ;;; Code:
 
 (defvar sexp-show "sexp-show")
+(require 'cl-lib)
 (require 'haskell-string)
-(with-no-warnings (require 'cl))
 
 (defun haskell-show-replace-region ()
   "Replace the given region with a pretty printed version."
@@ -76,7 +76,7 @@
 
 (defun haskell-show-insert-pretty (column tree &optional parens)
   "Insert a Show `tree' into the current buffer with collapsible nodes."
-  (case (car tree)
+  (cl-case (car tree)
     ('list (let ((start (point)))
              (insert "[")
              (haskell-show-mapcar/i (lambda (x i len)
@@ -196,7 +196,7 @@
 
 (defun haskell-show-pretty (tree &optional parens)
   "Show a Show `tree'."
-  (case (car tree)
+  (cl-case (car tree)
     ('list (format "[%s]"
                    (mapconcat
                     (lambda (x)
