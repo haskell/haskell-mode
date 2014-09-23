@@ -1049,7 +1049,9 @@ given a prefix arg."
   (with-temp-buffer
     (funcall mode)
     (insert text)
-    (font-lock-fontify-buffer)
+    (if (fboundp 'font-lock-ensure)
+        (font-lock-ensure)
+      (with-no-warnings (font-lock-fontify-buffer)))
     (buffer-substring (point-min) (point-max))))
 
 (defun haskell-guess-module-name ()
