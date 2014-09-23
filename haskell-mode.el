@@ -1113,8 +1113,8 @@ given a prefix arg."
                               (insert (haskell-fontify-as-mode type 'haskell-mode)
                                       "\n")))
                        do (let ((args (cadr (assoc 'type results))))
-                            (loop for arg in args
-                                  do (insert arg "\n"))
+                            (cl-loop for arg in args
+                                     do (insert arg "\n"))
                             (insert "\n"))
                        do (insert (cadr (assoc 'documentation result)))
                        do (insert "\n\n"))
