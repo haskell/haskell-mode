@@ -70,6 +70,12 @@ Alternatively, you can also download the `.tar` file via the
 _Download_ link at http://marmalade-repo.org/packages/haskell-mode and
 install the package `.tar`-file via `M-x package-install-file`
 
+Note that in this case you will also need to have a sufficiently
+recent version of `cl-lib.el`, upon which `haskell-mode` depends.
+This is bundled with Emacs 24.x, and a backported version for use with
+Emacs 23 can be obtained from
+[GNU ELPA](http://elpa.gnu.org/packages/cl-lib.html).
+
 #### MELPA
 
 **Unstable snapshots** can be installed via the
