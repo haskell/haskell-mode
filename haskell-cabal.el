@@ -937,8 +937,4 @@ If SILENT ist nil the user is prompted for each source-section
 
 (provide 'haskell-cabal)
 
-;; Local Variables:
-;; byte-compile-warnings: (not cl-functions)
-;; End:
-
 ;;; haskell-cabal.el ends here

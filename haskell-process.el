@@ -1670,8 +1670,4 @@ function and remove this comment.
 
 (provide 'haskell-process)
 
-;; Local Variables:
-;; byte-compile-warnings: (not cl-functions)
-;; End:
-
 ;;; haskell-process.el ends here

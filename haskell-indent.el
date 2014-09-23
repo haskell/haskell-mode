@@ -1583,8 +1583,4 @@ Invokes `haskell-indent-hook' if not nil."
 
 (provide 'haskell-indent)
 
-;; Local Variables:
-;; byte-compile-warnings: (not cl-functions)
-;; End:
-
 ;;; haskell-indent.el ends here

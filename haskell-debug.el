@@ -688,7 +688,4 @@ variances in source span notation."
              string))))
 
 (provide 'haskell-debug)
-
-;; Local Variables:
-;; byte-compile-warnings: (not cl-functions)
-;; End:
+;;; haskell-debug.el ends here

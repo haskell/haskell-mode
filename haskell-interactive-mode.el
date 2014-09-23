@@ -1141,8 +1141,4 @@ don't care when the thing completes as long as it's soonish."
 
 (provide 'haskell-interactive-mode)
 
-;; Local Variables:
-;; byte-compile-warnings: (not cl-functions)
-;; End:
-
 ;;; haskell-interactive-mode.el ends here

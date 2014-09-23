@@ -1973,8 +1973,4 @@ This function switches to and potentially loads many buffers."
 
 (provide 'haskell-doc)
 
-;; Local Variables:
-;; byte-compile-warnings: (not cl-functions)
-;; End:
-
 ;;; haskell-doc.el ends here

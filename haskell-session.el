@@ -393,8 +393,4 @@ Returns newly set VALUE."
 
 (provide 'haskell-session)
 
-;; Local Variables:
-;; byte-compile-warnings: (not cl-functions)
-;; End:
-
 ;;; haskell-session.el ends here

@@ -227,8 +227,4 @@
 
 (provide 'haskell-align-imports)
 
-;; Local Variables:
-;; byte-compile-warnings: (not cl-functions)
-;; End:
-
 ;;; haskell-align-imports.el ends here
