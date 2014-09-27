@@ -571,7 +571,7 @@ that should be commented under LaTeX-style literate scripts."
            (goto-char (nth 8 state))
            (or (looking-at "\\(-- \\|{-\\)[ \\t]*[|^]")
                (and haskell-font-lock-seen-haddock
-                    (looking-at "-- ")
+                    (looking-at "--")
                     (let ((doc nil)
                           pos)
                       (while (and (not doc)
