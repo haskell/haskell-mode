@@ -36,9 +36,7 @@
 (declare-function haskell-kill-session-process "haskell-process" (&optional session))
 (declare-function haskell-process-start "haskell-process" (session))
 (declare-function haskell-process-cd "haskell-process" (&optional not-interactive))
-
-;; Dynamically scoped variables.
-(defvar haskell-process-type)
+(declare-function haskell-process-type "haskell-process" ())
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configuration
@@ -85,11 +83,10 @@ If DONTCREATE is non-nil don't create a new session."
   ;;
   ;; Ugliness aside, if it saves us time to type it's a winner.
   ;;
-  ;; FIXME/TODO: add support for (eq 'cabal-repl haskell-process-type)
-  (require 'haskell-process) ; hack for accessing haskell-process-type
+  ;; FIXME/TODO: add support for (eq 'cabal-repl (haskell-process-type))
   (let ((modules (shell-command-to-string
                   (format "%s | %s | %s"
-                          (if (eq 'cabal-dev haskell-process-type)
+                          (if (eq 'cabal-dev (haskell-process-type))
                               (if (or (not dontcreate) (haskell-session-maybe))
                                   (format "cabal-dev -s %s/cabal-dev ghc-pkg dump"
                                           (haskell-session-cabal-dir (haskell-session)))
