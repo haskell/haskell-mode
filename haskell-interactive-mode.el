@@ -658,6 +658,15 @@ SESSION, otherwise operate on the current buffer.
                               'read-only t
                               'rear-nonsticky t)))))))
 
+(defun haskell-interactive-mode-compile-splice (session message)
+  "Echo a compiler splice."
+  (with-current-buffer (haskell-session-interactive-buffer session)
+    (setq next-error-last-buffer (current-buffer))
+    (save-excursion
+      (haskell-interactive-mode-goto-end-point)
+      (insert (haskell-fontify-as-mode message 'haskell-mode)
+              "\n"))))
+
 (defun haskell-interactive-mode-insert-garbage (session message)
   "Echo a read only piece of text before the prompt."
   (with-current-buffer (haskell-session-interactive-buffer session)

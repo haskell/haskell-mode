@@ -269,14 +269,14 @@ imports become available?"
                  (format ":!powershell -Command \"& { cd %s ; hasktags -e -x (ls -fi *.hs -exclude \\\"#*#\\\" -name -r) ; exit }\""
                          (haskell-session-cabal-dir
                           (haskell-process-session (car state)))))
-                (haskell-process-send-string
-                 (car state)
-                 (format ":!cd %s && %s | %s | %s"
-                         (haskell-session-cabal-dir
-                          (haskell-process-session (car state)))
-                         "find . -name '*.hs*'"
-                         "grep -v '#'" ; To avoid Emacs back-up files. Yeah.
-                         "xargs hasktags -e -x"))))
+              (haskell-process-send-string
+               (car state)
+               (format ":!cd %s && %s | %s | %s"
+                       (haskell-session-cabal-dir
+                        (haskell-process-session (car state)))
+                       "find . -name '*.hs*'"
+                       "grep -v '#'" ; To avoid Emacs back-up files. Yeah.
+                       "xargs hasktags -e -x"))))
       :complete (lambda (state response)
                   (when (cdr state)
                     (let ((tags-file-name
@@ -777,13 +777,16 @@ from `module-buffer'."
            (location (match-string 2 buffer))
            (error-msg (match-string 3 buffer))
            (warning (string-match "^Warning:" error-msg))
+           (splice (string-match "^Splicing " error-msg))
            (final-msg (format "%s:%s: %s"
                               (haskell-session-strip-dir session file)
                               location
                               error-msg)))
-      (funcall (if warning
-                   'haskell-interactive-mode-compile-warning
-                 'haskell-interactive-mode-compile-error)
+      (funcall (cond (warning
+                      'haskell-interactive-mode-compile-warning)
+                     (splice
+                      'haskell-interactive-mode-compile-splice)
+                     (t 'haskell-interactive-mode-compile-error))
                session final-msg)
       (unless warning
         (haskell-mode-message-line final-msg))
