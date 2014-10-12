@@ -28,6 +28,9 @@
 
 ;;; Code:
 
+(eval-when-compile
+  (require 'yasnippet nil t))
+
 (defgroup haskell-yas nil
   "Customizations for Luke Hoersten's yasnippet collection for haskell-mode."
   :group 'haskell
@@ -47,6 +50,19 @@
 ;;;###autoload
 (defun haskell-yas-complete (&rest args)
   (apply haskell-yas-completing-function args))
+
+;;;###autoload
+(defun haskell-snippets-initialize ()
+  "Register haskell snippets with yasnippet."
+  (let* ((this-dir (file-name-directory (or (buffer-file-name) load-file-name)))
+         (haskell-snippets-dir (expand-file-name "snippets" this-dir)))
+    (add-to-list 'yas-snippet-dirs haskell-snippets-dir t)
+    (yas-load-directory haskell-snippets-dir)))
+
+;;;###autoload
+(eval-after-load 'yasnippet
+  '(haskell-snippets-initialize))
+
 
 ;; Provide ourselves:
 
