@@ -51,13 +51,14 @@
 (defun haskell-yas-complete (&rest args)
   (apply haskell-yas-completing-function args))
 
+(defconst haskell-snippets-dir
+  (expand-file-name "snippets" (file-name-directory (or (buffer-file-name) load-file-name))))
+
 ;;;###autoload
 (defun haskell-snippets-initialize ()
   "Register haskell snippets with yasnippet."
-  (let* ((this-dir (file-name-directory (or (buffer-file-name) load-file-name)))
-         (haskell-snippets-dir (expand-file-name "snippets" this-dir)))
-    (add-to-list 'yas-snippet-dirs haskell-snippets-dir t)
-    (yas-load-directory haskell-snippets-dir)))
+  (add-to-list 'yas-snippet-dirs haskell-snippets-dir t)
+  (yas-load-directory haskell-snippets-dir))
 
 ;;;###autoload
 (eval-after-load 'yasnippet
