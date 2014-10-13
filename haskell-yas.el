@@ -54,6 +54,10 @@
 (defconst haskell-snippets-dir
   (expand-file-name "snippets" (file-name-directory (or (buffer-file-name) load-file-name))))
 
+(defvar yas-snippet-dirs)
+(declare-function yas-load-directory "ext:yasnippet"
+                  (top-level-dir &optional use-jit interactive))
+
 ;;;###autoload
 (defun haskell-snippets-initialize ()
   "Register haskell snippets with yasnippet."
