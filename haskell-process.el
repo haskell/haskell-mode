@@ -831,7 +831,9 @@ from `module-buffer'."
                                                   line)))
         ;; This can be a multi-line output, and we only catch the
         ;; first line, but it's better than nothing
-        ((string-match " The import of[ ][‘`‛]\\(.+\\)[,’]" msg)
+        ((or
+          (string-match " The import of[ ][‘`‛]\\(.+\\)[’] from module " msg)
+          (string-match " The import of[ ][‘`‛]\\(.+\\)[,]" msg))
          (when haskell-process-suggest-remove-import-lines
            (haskell-process-suggest-remove-import-names session
                                                        file
