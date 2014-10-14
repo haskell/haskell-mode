@@ -994,7 +994,7 @@ now."
     (let ((continue t)
           (first t))
       (case (read-event
-             (propertize (format "%sThe import line `%s' is redundant. Remove? (y, n, c: comment out)  "
+             (propertize (format "%sThe import `%s' is redundant. Remove? (y, n)  "
                                  (if (not first)
                                      "Please answer n or y: "
                                    "")
