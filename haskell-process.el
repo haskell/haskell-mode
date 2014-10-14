@@ -535,15 +535,15 @@ to be loaded by ghci."
 (defun haskell-process-type ()
   "Return `haskell-process-type', or a guess if that variable is 'auto."
   (if (eq 'auto haskell-process-type)
-      (let ((nix-shell-found (locate-dominating-file default-directory
-                                               (lambda (f)
-                                                 (string= "shell.nix" f))))
-            (cabal-found (locate-dominating-file default-directory
-                          (lambda (d)
-                            (or (file-directory-p (expand-file-name ".cabal-sandbox" d))
-                                (cl-find-if (lambda (f) (string-match-p "\\.cabal\\'" f)) (directory-files d)))))))
-        (cond ((and cabal-found nix-shell-found) 'nix-shell-cabal-repl)
-              (cabal-found 'cabal-repl)
+      (let ((nix-shell-found (locate-dominating-file default-directory "shell.nix"))
+            (cabal-sandbox-found (locate-dominating-file
+                                  default-directory
+                                  (lambda (d)
+                                    (or (file-directory-p (expand-file-name ".cabal-sandbox" d))
+                                        (cl-find-if (lambda (f) (string-match-p "\\.cabal\\'" f))
+                                                    (directory-files d)))))))
+        (cond ((and cabal-sandbox-found nix-shell-found) 'nix-shell-cabal-repl)
+              (cabal-sandbox-found 'cabal-repl)
               (nix-shell-found 'nix-shell-ghci)
               (t 'ghci)))
     haskell-process-type))
@@ -577,7 +577,7 @@ to be loaded by ghci."
                                                           haskell-process-args-nix-shell
                                                           " --command '")))
                          (caddr state)
-                         (case haskell-process-type
+                         (cl-case haskell-process-type
                            ('nix-shell-ghci "'")
                            ('nix-shell-cabal-repl "'")
                            (t ""))))))
