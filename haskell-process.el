@@ -86,7 +86,7 @@
 
 (defcustom haskell-process-args-nix-shell
   '("shell.nix")
-  "The path for starting nix-shell."
+  "Any arguments for starting nix-shell."
   :group 'haskell-interactive
   :type '(choice string (repeat string)))
 
@@ -120,7 +120,7 @@ See `haskell-process-do-cabal' for more details."
   'auto
   "The inferior Haskell process type to use."
   :type '(choice (const auto) (const ghci) (const cabal-repl) (const cabal-dev) (const cabal-ghci)
-                 (const nix-shell-ghci) (const nix-shell-cabal-repl)
+                 (const nix-shell-ghci) (const nix-shell-cabal-repl))
   :group 'haskell-interactive)
 
 (defcustom haskell-process-log
@@ -535,13 +535,17 @@ to be loaded by ghci."
 (defun haskell-process-type ()
   "Return `haskell-process-type', or a guess if that variable is 'auto."
   (if (eq 'auto haskell-process-type)
-      (if (locate-dominating-file
-           default-directory
-           (lambda (d)
-             (or (file-directory-p (expand-file-name ".cabal-sandbox" d))
-                 (cl-find-if (lambda (f) (string-match-p "\\.cabal\\'" f)) (directory-files d)))))
-          'cabal-repl
-        'ghci)
+      (let ((nix-shell-found (locate-dominating-file default-directory
+                                               (lambda (f)
+                                                 (string= "shell.nix" f))))
+            (cabal-found (locate-dominating-file default-directory
+                          (lambda (d)
+                            (or (file-directory-p (expand-file-name ".cabal-sandbox" d))
+                                (cl-find-if (lambda (f) (string-match-p "\\.cabal\\'" f)) (directory-files d)))))))
+        (cond ((and cabal-found nix-shell-found) 'nix-shell-cabal-repl)
+              (cabal-found 'cabal-repl)
+              (nix-shell-found 'nix-shell-ghci)
+              (t 'ghci)))
     haskell-process-type))
 
 (defun haskell-process-do-cabal (command)
