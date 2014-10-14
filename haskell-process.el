@@ -993,26 +993,19 @@ now."
   (dolist (import (split-string imports ", "))
     (let ((continue t)
           (first t))
-      (case (read-event
-             (propertize (format "%sThe import `%s' is redundant. Remove? (y, n)  "
-                                 (if (not first)
-                                     "Please answer n or y: "
-                                   "")
-                                 import)
-                         'face 'minibuffer-prompt))
-        (?y
-         (haskell-process-find-file session file)
-         (save-excursion
-           (goto-char (point-min))
-           (forward-line (1- line))
-           (let ((rx1 (format "(%s, " import))
-                 (rx2 (format ", ?%s," import))
-                 (rx3 (format ", ?%s)" import)))
-             (replace-regexp rx1 "(" nil (line-beginning-position) (line-end-position))
-             (replace-regexp rx2 "," nil (line-beginning-position) (line-end-position))
-             (replace-regexp rx3 ")" nil (line-beginning-position) (line-end-position)))))
-        (?n
-         (message "Ignoring redundant import of %s" import))))))
+      (if (y-or-n-p (format "The import `%s' is redundant. Remove?" import))
+          (progn
+            (haskell-process-find-file session file)
+            (save-excursion
+              (goto-char (point-min))
+              (forward-line (1- line))
+              (let ((rx1 (format "(%s, " import))
+                    (rx2 (format ", ?%s," import))
+                    (rx3 (format ", ?%s)" import)))
+                (replace-regexp rx1 "(" nil (line-beginning-position) (line-end-position))
+                (replace-regexp rx2 "," nil (line-beginning-position) (line-end-position))
+                (replace-regexp rx3 ")" nil (line-beginning-position) (line-end-position)))))
+        (message "Ignoring redundant import of %s" import)))))
 
 (defun haskell-process-suggest-pragma (session pragma extension file)
   "Suggest to add something to the top of the file."
