@@ -829,6 +829,14 @@ from `module-buffer'."
                                                   file
                                                   (match-string 2 msg)
                                                   line)))
+        ;; This can be a multi-line output, and we only catch the
+        ;; first line, but it's better than nothing
+        ((string-match " The import of[ ][‘`‛]\\(.+\\)[,’]" msg)
+         (when haskell-process-suggest-remove-import-lines
+           (haskell-process-suggest-remove-import-names session
+                                                       file
+                                                       (match-string 1 msg)
+                                                       line)))
         ((string-match "Warning: orphan instance: " msg)
          (when haskell-process-suggest-no-warn-orphans
            (haskell-process-suggest-pragma session "OPTIONS" "-fno-warn-orphans" file)))
@@ -979,6 +987,32 @@ now."
          (forward-line (1- line))
          (goto-char (line-beginning-position))
          (insert "-- "))))))
+
+(defun haskell-process-suggest-remove-import-names (session file imports line)
+  "Suggest removing or commenting out a NAME on an IMPORT LINE."
+  (dolist (import (split-string imports ", "))
+    (let ((continue t)
+          (first t))
+      (case (read-event
+             (propertize (format "%sThe import line `%s' is redundant. Remove? (y, n, c: comment out)  "
+                                 (if (not first)
+                                     "Please answer n or y: "
+                                   "")
+                                 import)
+                         'face 'minibuffer-prompt))
+        (?y
+         (haskell-process-find-file session file)
+         (save-excursion
+           (goto-char (point-min))
+           (forward-line (1- line))
+           (let ((rx1 (format "(%s, " import))
+                 (rx2 (format ", ?%s," import))
+                 (rx3 (format ", ?%s)" import)))
+             (replace-regexp rx1 "(" nil (line-beginning-position) (line-end-position))
+             (replace-regexp rx2 "," nil (line-beginning-position) (line-end-position))
+             (replace-regexp rx3 ")" nil (line-beginning-position) (line-end-position)))))
+        (?n
+         (message "Ignoring redundant import of %s" import))))))
 
 (defun haskell-process-suggest-pragma (session pragma extension file)
   "Suggest to add something to the top of the file."
