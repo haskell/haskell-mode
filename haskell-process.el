@@ -982,6 +982,10 @@ now."
                       (split-string (buffer-string)
                                     "\n"))))))
 
+(defvar haskell-process-hayoo-ident--session)
+(defvar haskell-process-hayoo-ident--file)
+(defvar haskell-process-hayoo-ident--ident)
+(defvar haskell-process-hayoo-ident--callback)
 (defun haskell-process-hayoo-ident (session file ident callback)
   "Hayoo for IDENT, returns a list of modules asyncronously through CALLBACK."
   ;; This is a bit mysterious, but otherwise these are all unset
