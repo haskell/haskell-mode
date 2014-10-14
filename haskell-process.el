@@ -999,14 +999,18 @@ now."
           (progn
             (haskell-process-find-file session file)
             (save-excursion
-              (goto-char (point-min))
-              (forward-line (1- line))
-              (let ((rx1 (format "(%s, " import))
-                    (rx2 (format ", ?%s," import))
-                    (rx3 (format ", ?%s)" import)))
-                (replace-regexp rx1 "(" nil (line-beginning-position) (line-end-position))
-                (replace-regexp rx2 "," nil (line-beginning-position) (line-end-position))
-                (replace-regexp rx3 ")" nil (line-beginning-position) (line-end-position)))))
+              (save-restriction
+               (goto-char (point-min))
+               (forward-line (1- line))
+               (narrow-to-region (line-beginning-position) (line-end-position))
+               (let ((rx1 (format "(%s, " import))
+                     (rx2 (format ", ?%s," import))
+                     (rx3 (format ", ?%s)" import)))
+                 (dolist (rx `((,rx1 . "(") (,rx2 . ",") (,rx3 . ")")))
+                   ;; Stupid emacs won't let me simply use replace-regexp
+                   (goto-char (point-min))
+                   (while (search-forward-regexp (car rx) nil t)
+                     (replace-match (cdr rx))))))))
         (message "Ignoring redundant import of %s" import)))))
 
 (defun haskell-process-suggest-pragma (session pragma extension file)
