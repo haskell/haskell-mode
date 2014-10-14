@@ -28,6 +28,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'json)
 (require 'haskell-complete-module)
 (require 'haskell-mode)
 (require 'haskell-session)
