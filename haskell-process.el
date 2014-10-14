@@ -576,7 +576,7 @@ to be loaded by ghci."
                                                           " "
                                                           haskell-process-args-nix-shell
                                                           " --command '")))
-                         (caddr state)
+                         (cl-caddr state)
                          (cl-case haskell-process-type
                            ('nix-shell-ghci "'")
                            ('nix-shell-cabal-repl "'")
