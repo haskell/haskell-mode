@@ -1670,7 +1670,7 @@ function and remove this comment.
     (define-key map (kbd "M-.") 'haskell-mode-jump-to-def-or-tag)
     (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
     (define-key map (kbd "C-c C-c") 'haskell-process-cabal-build)
-    (define-key map (kbd "C-c c") 'haskell-process-cabal)
+    (define-key map (kbd "C-c C-x") 'haskell-process-cabal)
     (define-key map [?\C-c ?\C-b] 'haskell-interactive-switch)
     (define-key map [?\C-c ?\C-z] 'haskell-interactive-switch)
     map)
