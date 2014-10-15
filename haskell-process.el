@@ -947,8 +947,8 @@ from `module-buffer'."
    (lambda (status)
      (message "Hayoo server returned a result")
      (re-search-forward "\r?\n\r?\n")
-     (let* ((res (setq asdf0 (json-read-object)))
-            (results (setq asdf (assoc-default 'result res)))
+     (let* ((res (json-read-object))
+            (results (assoc-default 'result res))
             ;; TODO: gather packages as well, and when we choose a
             ;; given import, check that we have the package in the
             ;; cabal file as well.
