@@ -29,6 +29,7 @@
 
 (require 'cl-lib)
 (require 'json)
+(require 'url-util)
 (require 'haskell-complete-module)
 (require 'haskell-mode)
 (require 'haskell-session)
@@ -850,12 +851,19 @@ from `module-buffer'."
          (when haskell-process-suggest-overloaded-strings
            (haskell-process-suggest-pragma session "LANGUAGE" "OverloadedStrings" file)))
         ((string-match "^Not in scope: .*[‘`‛]\\(.+\\)['’]$" msg)
-         (when haskell-process-suggest-hoogle-imports
-           (haskell-process-suggest-hoogle-imports session msg file))
-         (when haskell-process-suggest-hayoo-imports
-           (haskell-process-suggest-hayoo-imports session msg file))
-         (when haskell-process-suggest-haskell-docs-imports
-           (haskell-process-suggest-haskell-docs-imports session msg file)))
+         (let* ((match1 (match-string 1 msg))
+                (ident (if (string-match "^[A-Za-z0-9_'.]+\\.\\(.+\\)$" match1)
+                           ;; Skip qualification.
+                           (match-string 1 match1)
+                         match1)))
+           (when haskell-process-suggest-hoogle-imports
+             (let ((modules (haskell-process-hoogle-ident ident)))
+               (haskell-process-suggest-imports session file modules ident)))
+           (when haskell-process-suggest-hayoo-imports
+             (haskell-process-hayoo-ident session file ident #'haskell-process-suggest-imports))
+           (when haskell-process-suggest-haskell-docs-imports
+             (let ((modules (haskell-process-haskell-docs-ident ident)))
+               (haskell-process-suggest-imports session file modules ident)))))
         ((string-match "^[ ]+It is a member of the hidden package [‘`‛]\\(.+\\)['’].$" msg)
          (when haskell-process-suggest-add-package
            (haskell-process-suggest-add-package session msg)))))
@@ -903,66 +911,6 @@ from `module-buffer'."
         (haskell-sort-imports)
         (haskell-align-imports)))))
 
-(defun haskell-process-suggest-hoogle-imports (session msg file)
-  "Given an out of scope identifier, Hoogle for that identifier,
-and if a result comes back, suggest to import that identifier
-now."
-  (let* ((ident (let ((i (match-string 1 msg)))
-                  ;; Skip qualification.
-                  (if (string-match "^[A-Za-z0-9_'.]+\\.\\(.+\\)$" i)
-                      (match-string 1 i)
-                    i)))
-         (modules (haskell-process-hoogle-ident ident)))
-    (haskell-process-suggest-imports session file modules ident)))
-
-(defun haskell-process-suggest-hayoo-imports (session msg file)
-  "Given an out of scope identifier, Hayoo for that identifier,
-and if a result comes back, suggest to import that identifier
-now."
-  (let* ((ident (let ((i (match-string 1 msg)))
-                  ;; Skip qualification.
-                  (if (string-match "^[A-Za-z0-9_'.]+\\.\\(.+\\)$" i)
-                      (match-string 1 i)
-                    i))))
-    (haskell-process-hayoo-ident session file ident #'haskell-process-suggest-imports)))
-
-
-(defun haskell-process-suggest-haskell-docs-imports (session msg file)
-  "Given an out of scope identifier, haskell-docs search for that identifier,
-and if a result comes back, suggest to import that identifier
-now."
-  (let* ((process (haskell-session-process session))
-         (suggested-already (haskell-process-suggested-imports process))
-         (ident (let ((i (match-string 1 msg)))
-                  ;; Skip qualification.
-                  (if (string-match "^[A-Za-z0-9_'.]+\\.\\(.+\\)$" i)
-                      (match-string 1 i)
-                    i)))
-         (modules (haskell-process-haskell-docs-ident ident))
-         (module
-          (cond
-           ((> (length modules) 1)
-            (when (y-or-n-p (format "Identifier `%s' not in scope, choose module to import?"
-                                    ident))
-              (haskell-complete-module-read "Module: " modules)))
-           ((= (length modules) 1)
-            (let ((module (car modules)))
-              (unless (member module suggested-already)
-                (haskell-process-set-suggested-imports process (cons module suggested-already))
-                (when (y-or-n-p (format "Identifier `%s' not in scope, import `%s'?"
-                                        ident
-                                        module))
-                  module)))))))
-    (when module
-      (haskell-process-find-file session file)
-      (save-excursion
-        (goto-char (point-max))
-        (haskell-navigate-imports)
-        (insert (read-from-minibuffer "Import line: " (concat "import " module))
-                "\n")
-        (haskell-sort-imports)
-        (haskell-align-imports)))))
-
 (defun haskell-process-haskell-docs-ident (ident)
   "Search with haskell-docs for IDENT, returns a list of modules."
   (cl-remove-if-not (lambda (a) (string-match "^[A-Z][A-Za-b0-9_'.]+$" a))
@@ -995,21 +943,24 @@ now."
         haskell-process-hayoo-ident--ident ident
         haskell-process-hayoo-ident--callback callback)
   (url-retrieve
-     (format haskell-process-hayoo-query-url ident)
-     (lambda (status)
-       (re-search-forward "\r?\n\r?\n")
-       (let* ((res (json-read-object))
-              (results (assoc-default 'result res))
-              ;; TODO: gather packages as well, and when we choose a
-              ;; given import, check that we have the package in the
-              ;; cabal file as well.
-              (modules-l (cl-mapcar (lambda (r) (cl-mapcar 'identity (assoc-default 'resultModules r))) results))
-              (modules (apply #'append modules-l) ))
-         (funcall haskell-process-hayoo-ident--callback
-                  haskell-process-hayoo-ident--session
-                  haskell-process-hayoo-ident--file
-                  modules
-                  haskell-process-hayoo-ident--ident)))))
+   (format haskell-process-hayoo-query-url (url-hexify-string ident))
+   (lambda (status)
+     (message "Hayoo server returned a result")
+     (re-search-forward "\r?\n\r?\n")
+     (let* ((res (setq asdf0 (json-read-object)))
+            (results (setq asdf (assoc-default 'result res)))
+            ;; TODO: gather packages as well, and when we choose a
+            ;; given import, check that we have the package in the
+            ;; cabal file as well.
+            (modules (cl-mapcan (lambda (r)
+                                  ;; append converts from vector -> list
+                                  (append (assoc-default 'resultModules r) nil))
+                                results)))
+       (funcall haskell-process-hayoo-ident--callback
+                haskell-process-hayoo-ident--session
+                haskell-process-hayoo-ident--file
+                modules
+                haskell-process-hayoo-ident--ident)))))
 
 (defun haskell-process-suggest-remove-import (session file import line)
   "Suggest removing or commenting out IMPORT on LINE."
