@@ -931,36 +931,29 @@ from `module-buffer'."
                       (split-string (buffer-string)
                                     "\n"))))))
 
-(defvar haskell-process-hayoo-ident--session)
-(defvar haskell-process-hayoo-ident--file)
-(defvar haskell-process-hayoo-ident--ident)
-(defvar haskell-process-hayoo-ident--callback)
 (defun haskell-process-hayoo-ident (session file ident callback)
   "Hayoo for IDENT, returns a list of modules asyncronously through CALLBACK."
   ;; This is a bit mysterious, but otherwise these are all unset
-  (setq haskell-process-hayoo-ident--session session
-        haskell-process-hayoo-ident--file file
-        haskell-process-hayoo-ident--ident ident
-        haskell-process-hayoo-ident--callback callback)
-  (url-retrieve
-   (format haskell-process-hayoo-query-url (url-hexify-string ident))
-   (lambda (status)
-     (message "Hayoo server returned a result")
-     (re-search-forward "\r?\n\r?\n")
-     (let* ((res (json-read-object))
-            (results (assoc-default 'result res))
-            ;; TODO: gather packages as well, and when we choose a
-            ;; given import, check that we have the package in the
-            ;; cabal file as well.
-            (modules (cl-mapcan (lambda (r)
-                                  ;; append converts from vector -> list
-                                  (append (assoc-default 'resultModules r) nil))
-                                results)))
-       (funcall haskell-process-hayoo-ident--callback
-                haskell-process-hayoo-ident--session
-                haskell-process-hayoo-ident--file
-                modules
-                haskell-process-hayoo-ident--ident)))))
+
+  (lexical-let ((session session)
+                (file file)
+                (ident ident)
+                (callback callback))
+   (url-retrieve
+    (format haskell-process-hayoo-query-url (url-hexify-string ident))
+    (lambda (status)
+      (message "Hayoo server returned a result")
+      (re-search-forward "\r?\n\r?\n")
+      (let* ((res (json-read-object))
+             (results (assoc-default 'result res))
+             ;; TODO: gather packages as well, and when we choose a
+             ;; given import, check that we have the package in the
+             ;; cabal file as well.
+             (modules (cl-mapcan (lambda (r)
+                                   ;; append converts from vector -> list
+                                   (append (assoc-default 'resultModules r) nil))
+                                 results)))
+        (funcall callback session file modules ident))))))
 
 (defun haskell-process-suggest-remove-import (session file import line)
   "Suggest removing or commenting out IMPORT on LINE."
