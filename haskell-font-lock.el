@@ -573,8 +573,7 @@ that should be commented under LaTeX-style literate scripts."
    ((and haskell-font-lock-haddock
          (save-excursion
            (goto-char (nth 8 state))
-           (or (looking-at "\\(-- \\|{-\\)[ \\t]*[|^]")
-               (looking-at "--[ \\t]\\*+")
+           (or (looking-at "[{-]-[ \\t]*[|^*]")
                (and haskell-font-lock-seen-haddock
                     (looking-at "--")
                     (let ((doc nil)
@@ -583,7 +582,7 @@ that should be commented under LaTeX-style literate scripts."
                                   (setq pos (line-beginning-position))
                                   (forward-comment -1)
                                   (eq (line-beginning-position 2) pos)
-                                  (looking-at "--\\( [|^]\\)?"))
+                                  (looking-at "--\\([ \\t]*[|^*]\\)?"))
                         (setq doc (match-beginning 1)))
                       doc)))))
     (setq haskell-font-lock-seen-haddock t)
