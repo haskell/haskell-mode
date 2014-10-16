@@ -862,11 +862,11 @@ from `module-buffer'."
            (when haskell-process-suggest-hoogle-imports
              (let ((modules (haskell-process-hoogle-ident ident)))
                (haskell-process-suggest-imports session file modules ident)))
-           (when haskell-process-suggest-hayoo-imports
-             (haskell-process-hayoo-ident session file ident #'haskell-process-suggest-imports))
            (when haskell-process-suggest-haskell-docs-imports
              (let ((modules (haskell-process-haskell-docs-ident ident)))
-               (haskell-process-suggest-imports session file modules ident)))))
+               (haskell-process-suggest-imports session file modules ident)))
+           (when haskell-process-suggest-hayoo-imports
+             (haskell-process-hayoo-ident session file ident #'haskell-process-suggest-imports))))
         ((string-match "^[ ]+It is a member of the hidden package [‘`‛]\\(.+\\)['’].$" msg)
          (when haskell-process-suggest-add-package
            (haskell-process-suggest-add-package session msg)))))
