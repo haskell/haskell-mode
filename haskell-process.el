@@ -28,8 +28,6 @@
 ;;; Code:
 
 (require 'cl-lib)
-;; For lexical-let.  TODO: Remove when converting to lexical bindings
-(eval-when-compile (require 'cl))
 (require 'json)
 (require 'url-util)
 (require 'haskell-complete-module)
@@ -866,7 +864,8 @@ from `module-buffer'."
              (let ((modules (haskell-process-haskell-docs-ident ident)))
                (haskell-process-suggest-imports session file modules ident)))
            (when haskell-process-suggest-hayoo-imports
-             (haskell-process-hayoo-ident session file ident #'haskell-process-suggest-imports))))
+             (let ((modules (haskell-process-hayoo-ident ident)))
+               (haskell-process-suggest-imports session file modules ident)))))
         ((string-match "^[ ]+It is a member of the hidden package [‘`‛]\\(.+\\)['’].$" msg)
          (when haskell-process-suggest-add-package
            (haskell-process-suggest-add-package session msg)))))
@@ -934,32 +933,28 @@ from `module-buffer'."
                       (split-string (buffer-string)
                                     "\n"))))))
 
-(defun haskell-process-hayoo-ident (session file ident callback)
+(defun haskell-process-hayoo-ident (ident)
   "Hayoo for IDENT, returns a list of modules asyncronously through CALLBACK."
   ;; We need a real/simulated closure, because otherwise these
   ;; variables will be unbound when the url-retrieve callback is
   ;; called.
   ;; TODO: Remove when this code is converted to lexical bindings by
   ;; default (Emacs 24.1+)
-  (lexical-let ((session session)
-                (file file)
-                (ident ident)
-                (callback callback))
-    (url-retrieve
-     (format haskell-process-hayoo-query-url (url-hexify-string ident))
-     (lambda (status)
-       (message "Hayoo server returned a result")
-       (re-search-forward "\r?\n\r?\n")
-       (let* ((res (json-read-object))
-              (results (assoc-default 'result res))
-              ;; TODO: gather packages as well, and when we choose a
-              ;; given import, check that we have the package in the
-              ;; cabal file as well.
-              (modules (cl-mapcan (lambda (r)
-                                    ;; append converts from vector -> list
-                                    (append (assoc-default 'resultModules r) nil))
-                                  results)))
-         (funcall callback session file modules ident))))))
+  (let ((url (format haskell-process-hayoo-query-url (url-hexify-string ident))))
+    (with-current-buffer (url-retrieve-synchronously url)
+      (if (= 200 url-http-response-status)
+          (progn
+            (goto-char url-http-end-of-headers)
+            (let* ((res (json-read))
+                   (results (assoc-default 'result res)))
+                   ;; TODO: gather packages as well, and when we choose a
+                   ;; given import, check that we have the package in the
+                   ;; cabal file as well.
+              (cl-mapcan (lambda (r)
+                           ;; append converts from vector -> list
+                           (append (assoc-default 'resultModules r) nil))
+                         results)))
+        (warn "HTTP error %s fetching %s" url-http-response-status url)))))
 
 (defun haskell-process-suggest-remove-import (session file import line)
   "Suggest removing or commenting out IMPORT on LINE."
