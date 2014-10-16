@@ -535,10 +535,11 @@ to be loaded by ghci."
 (defun haskell-process-type ()
   "Return `haskell-process-type', or a guess if that variable is 'auto."
   (if (eq 'auto haskell-process-type)
-      (if (locate-dominating-file default-directory
-                                  (lambda (f)
-                                    (or (string= ".cabal-sandbox" f)
-                                        (string-match-p "\\.cabal\\'" f))))
+      (if (locate-dominating-file
+           default-directory
+           (lambda (d)
+             (or (file-directory-p (expand-file-name ".cabal-sandbox" d))
+                 (cl-find-if (lambda (f) (string-match-p "\\.cabal\\'" f)) (directory-files d)))))
           'cabal-repl
         'ghci)
     haskell-process-type))
