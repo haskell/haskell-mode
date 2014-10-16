@@ -586,7 +586,7 @@ that should be commented under LaTeX-style literate scripts."
                                   (looking-at "--\\( [|^]\\)?"))
                         (setq doc (match-beginning 1)))
                       doc)))))
-    (set (make-local-variable 'haskell-font-lock-seen-haddock) t)
+    (setq haskell-font-lock-seen-haddock t)
     font-lock-doc-face)
    (t font-lock-comment-face)))
 
