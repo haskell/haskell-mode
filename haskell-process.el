@@ -28,6 +28,8 @@
 ;;; Code:
 
 (require 'cl-lib)
+;; For lexical-let.  TODO: Remove when converting to lexical bindings
+(eval-when-compile (require 'cl))
 (require 'json)
 (require 'url-util)
 (require 'haskell-complete-module)
@@ -933,27 +935,30 @@ from `module-buffer'."
 
 (defun haskell-process-hayoo-ident (session file ident callback)
   "Hayoo for IDENT, returns a list of modules asyncronously through CALLBACK."
-  ;; This is a bit mysterious, but otherwise these are all unset
-
+  ;; We need a real/simulated closure, because otherwise these
+  ;; variables will be unbound when the url-retrieve callback is
+  ;; called.
+  ;; TODO: Remove when this code is converted to lexical bindings by
+  ;; default (Emacs 24.1+)
   (lexical-let ((session session)
                 (file file)
                 (ident ident)
                 (callback callback))
-   (url-retrieve
-    (format haskell-process-hayoo-query-url (url-hexify-string ident))
-    (lambda (status)
-      (message "Hayoo server returned a result")
-      (re-search-forward "\r?\n\r?\n")
-      (let* ((res (json-read-object))
-             (results (assoc-default 'result res))
-             ;; TODO: gather packages as well, and when we choose a
-             ;; given import, check that we have the package in the
-             ;; cabal file as well.
-             (modules (cl-mapcan (lambda (r)
-                                   ;; append converts from vector -> list
-                                   (append (assoc-default 'resultModules r) nil))
-                                 results)))
-        (funcall callback session file modules ident))))))
+    (url-retrieve
+     (format haskell-process-hayoo-query-url (url-hexify-string ident))
+     (lambda (status)
+       (message "Hayoo server returned a result")
+       (re-search-forward "\r?\n\r?\n")
+       (let* ((res (json-read-object))
+              (results (assoc-default 'result res))
+              ;; TODO: gather packages as well, and when we choose a
+              ;; given import, check that we have the package in the
+              ;; cabal file as well.
+              (modules (cl-mapcan (lambda (r)
+                                    ;; append converts from vector -> list
+                                    (append (assoc-default 'resultModules r) nil))
+                                  results)))
+         (funcall callback session file modules ident))))))
 
 (defun haskell-process-suggest-remove-import (session file import line)
   "Suggest removing or commenting out IMPORT on LINE."
