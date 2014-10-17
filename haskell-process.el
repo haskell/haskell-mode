@@ -515,7 +515,8 @@ for various things, but is optional."
        (read-from-minibuffer "Cabal command (e.g. install): "))
     (haskell-process-do-cabal
      (funcall haskell-completing-read-function "Cabal command: "
-              haskell-cabal-commands))))
+              (append haskell-cabal-commands
+                      (list "build --ghc-options=-fforce-recomp"))))))
 
 (defun haskell-process-add-cabal-autogen ()
   "Add <cabal-project-dir>/dist/build/autogen/ to the ghci search
