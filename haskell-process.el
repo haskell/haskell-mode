@@ -933,6 +933,9 @@ from `module-buffer'."
                       (split-string (buffer-string)
                                     "\n"))))))
 
+(defvar url-http-response-status)
+(defvar url-http-end-of-headers)
+
 (defun haskell-process-hayoo-ident (ident)
   "Hayoo for IDENT, returns a list of modules asyncronously through CALLBACK."
   ;; We need a real/simulated closure, because otherwise these
