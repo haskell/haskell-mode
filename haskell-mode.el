@@ -889,6 +889,11 @@ command from GHCi."
       (forward-line (1- (plist-get loc :start-line)))
       (forward-char (plist-get loc :start-col)))))
 
+(defun haskell-mode-show-type-at ()
+  "Show the type of the thing at point."
+  (interactive)
+  (message "%s" (haskell-mode-type-at)))
+
 (defun haskell-mode-loc-at ()
   "Get the location at point. Requires the :loc-at command from
 GHCi."
@@ -923,6 +928,33 @@ GHCi."
               (error (propertize reply 'face 'compilation-error)))
           (error (propertize "No reply. Is :loc-at supported?"
                              'face 'compilation-error)))))))
+
+(defun haskell-mode-type-at ()
+  "Get the type of the thing at point. Requires the :type-at
+command from GHCi."
+  (let ((pos (or (when (region-active-p)
+                   (cons (region-beginning)
+                         (region-end)))
+                 (ghc-ident-pos-at-point)
+                 (cons (point)
+                       (point)))))
+    (when pos
+      (replace-regexp-in-string
+       "\n$"
+       ""
+       (save-excursion
+         (haskell-process-queue-sync-request
+          (haskell-process)
+          (format ":type-at %s %d %d %d %d %s"
+                  (buffer-file-name)
+                  (progn (goto-char (car pos))
+                         (line-number-at-pos))
+                  (current-column)
+                  (progn (goto-char (cdr pos))
+                         (line-number-at-pos))
+                  (current-column)
+                  (buffer-substring-no-properties (car pos)
+                                                  (cdr pos)))))))))
 
 (defun haskell-mode-jump-to-def-or-tag (&optional next-p)
   "Jump to the definition (by consulting GHCi), or (fallback)
