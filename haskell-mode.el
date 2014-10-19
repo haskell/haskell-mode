@@ -901,7 +901,7 @@ GHCi."
   (let ((pos (or (when (region-active-p)
                    (cons (region-beginning)
                          (region-end)))
-                 (ghc-ident-pos-at-point)
+                 (haskell-ident-pos-at-point)
                  (cons (point)
                        (point)))))
     (when pos
@@ -936,7 +936,7 @@ command from GHCi."
   (let ((pos (or (when (region-active-p)
                    (cons (region-beginning)
                          (region-end)))
-                 (ghc-ident-pos-at-point)
+                 (haskell-ident-pos-at-point)
                  (cons (point)
                        (point)))))
     (when pos
