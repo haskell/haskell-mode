@@ -892,7 +892,8 @@ command from GHCi."
 (defun haskell-mode-show-type-at ()
   "Show the type of the thing at point."
   (interactive)
-  (message "%s" (haskell-mode-type-at)))
+  (message "%s" (haskell-fontify-as-mode (haskell-mode-type-at)
+                                         'haskell-mode)))
 
 (defun haskell-mode-loc-at ()
   "Get the location at point. Requires the :loc-at command from
@@ -945,16 +946,19 @@ command from GHCi."
        (save-excursion
          (haskell-process-queue-sync-request
           (haskell-process)
-          (format ":type-at %s %d %d %d %d %s"
-                  (buffer-file-name)
-                  (progn (goto-char (car pos))
-                         (line-number-at-pos))
-                  (current-column)
-                  (progn (goto-char (cdr pos))
-                         (line-number-at-pos))
-                  (current-column)
-                  (buffer-substring-no-properties (car pos)
-                                                  (cdr pos)))))))))
+          (replace-regexp-in-string
+           "\n"
+           " "
+           (format ":type-at %s %d %d %d %d %s"
+                   (buffer-file-name)
+                   (progn (goto-char (car pos))
+                          (line-number-at-pos))
+                   (current-column)
+                   (progn (goto-char (cdr pos))
+                          (line-number-at-pos))
+                   (current-column)
+                   (buffer-substring-no-properties (car pos)
+                                                   (cdr pos))))))))))
 
 (defun haskell-mode-jump-to-def-or-tag (&optional next-p)
   "Jump to the definition (by consulting GHCi), or (fallback)
