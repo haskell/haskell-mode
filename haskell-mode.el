@@ -635,12 +635,12 @@ is asked to show extra info for the items matching QUERY.."
     (let ((hoogle-args (append (when info '("-i"))
                                (list "--color" (shell-quote-argument query)))))
       (with-help-window "*hoogle*"
-       (with-current-buffer standard-output
-         (insert (shell-command-to-string
-                  (concat haskell-hoogle-command
-                          (if info " -i " "")
-                          " --color " (shell-quote-argument query))))
-         (ansi-color-apply-on-region (point-min) (point-max)))))))
+        (with-current-buffer standard-output
+          (insert (shell-command-to-string
+                   (concat haskell-hoogle-command
+                           (if info " -i " "")
+                           " --color " (shell-quote-argument query))))
+          (ansi-color-apply-on-region (point-min) (point-max)))))))
 
 ;;;###autoload
 (defalias 'hoogle 'haskell-hoogle)
@@ -876,6 +876,53 @@ remains unchanged."
     (goto-char (point-min))
     (forward-line (1- line))
     (goto-char (+ column (point)))))
+
+(defun haskell-mode-goto-loc ()
+  "Go to the location of the thing at point. Requires the :loc-at
+command from GHCi."
+  (interactive)
+  (let ((loc (haskell-mode-loc-at)))
+    (when loc
+      (find-file (expand-file-name (plist-get loc :path)
+                                   (haskell-session-cabal-dir (haskell-session))))
+      (goto-char (point-min))
+      (forward-line (1- (plist-get loc :start-line)))
+      (forward-char (plist-get loc :start-col)))))
+
+(defun haskell-mode-loc-at ()
+  "Get the location at point. Requires the :loc-at command from
+GHCi."
+  (let ((pos (or (when (region-active-p)
+                   (cons (region-beginning)
+                         (region-end)))
+                 (ghc-ident-pos-at-point)
+                 (cons (point)
+                       (point)))))
+    (when pos
+      (let ((reply (haskell-process-queue-sync-request
+                    (haskell-process)
+                    (save-excursion
+                      (format ":loc-at %s %d %d %d %d %s"
+                              (buffer-file-name)
+                              (progn (goto-char (car pos))
+                                     (line-number-at-pos))
+                              (current-column)
+                              (progn (goto-char (cdr pos))
+                                     (line-number-at-pos))
+                              (current-column)
+                              (buffer-substring-no-properties (car pos)
+                                                              (cdr pos)))))))
+        (if reply
+            (if (string-match "\\(.*?\\):\\([0-9]+\\):\\([0-9]+\\)-\\([0-9]+\\):\\([0-9]+\\)"
+                              reply)
+                (list :path (match-string 1 reply)
+                      :start-line (string-to-number (match-string 2 reply))
+                      :start-col (string-to-number (match-string 3 reply))
+                      :end-line (string-to-number (match-string 4 reply))
+                      :end-col-line (string-to-number (match-string 5 reply)))
+              (error (propertize reply 'face 'compilation-error)))
+          (error (propertize "No reply. Is :loc-at supported?"
+                             'face 'compilation-error)))))))
 
 (defun haskell-mode-jump-to-def-or-tag (&optional next-p)
   "Jump to the definition (by consulting GHCi), or (fallback)
