@@ -889,11 +889,15 @@ command from GHCi."
       (forward-line (1- (plist-get loc :start-line)))
       (forward-char (plist-get loc :start-col)))))
 
-(defun haskell-mode-show-type-at ()
+(defun haskell-mode-show-type-at (&optional insert-value)
   "Show the type of the thing at point."
-  (interactive)
-  (message "%s" (haskell-fontify-as-mode (haskell-mode-type-at)
-                                         'haskell-mode)))
+  (interactive "P")
+  (let ((ty (haskell-mode-type-at)))
+    (if insert-value
+        (insert (format "%s :: %s\n"
+                        (haskell-ident-at-point)
+                        (haskell-fontify-as-mode ty 'haskell-mode)))
+      (message "%s" (haskell-fontify-as-mode ty 'haskell-mode)))))
 
 (defun haskell-mode-loc-at ()
   "Get the location at point. Requires the :loc-at command from
