@@ -894,9 +894,10 @@ command from GHCi."
   (interactive "P")
   (let ((ty (haskell-mode-type-at)))
     (if insert-value
-        (insert (format "%s :: %s\n"
-                        (haskell-ident-at-point)
-                        (haskell-fontify-as-mode ty 'haskell-mode)))
+        (progn (goto-char (line-beginning-position))
+               (insert (format "%s :: %s\n"
+                               (haskell-ident-at-point)
+                               (haskell-fontify-as-mode ty 'haskell-mode))))
       (message "%s" (haskell-fontify-as-mode ty 'haskell-mode)))))
 
 (defun haskell-mode-loc-at ()
