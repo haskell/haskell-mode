@@ -274,6 +274,9 @@ be nil.")
                          haskell-interactive-mode-result-end
                          (point))))
             (insert "\n")
+            ;; Bring the marker forward
+            (setq haskell-interactive-mode-result-end
+                  (point-max))
             (haskell-process-set-sent-stdin process t)
             (haskell-process-send-string process string)))
          ;; Otherwise we start a normal evaluation call.
