@@ -79,14 +79,14 @@ for use with older Emacs versions can be obtained from
 #### MELPA
 
 **Unstable snapshots** can be installed via the
-[MELPA](http://melpa.milkbox.net) community maintained repository.
+[MELPA](http://melpa.org) community maintained repository.
 
 For MELPA the code you need to add is:
 
 ```lisp
 (require 'package)
 (add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+             '("melpa" . "http://melpa.org/packages/") t)
 (package-initialize)
 ```
 
