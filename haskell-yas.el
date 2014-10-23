@@ -52,7 +52,7 @@
   (apply haskell-yas-completing-function args))
 
 (defconst haskell-snippets-dir
-  (expand-file-name "snippets" (file-name-directory (or (buffer-file-name) load-file-name))))
+  (expand-file-name "snippets" (file-name-directory load-file-name)))
 
 (defvar yas-snippet-dirs)
 (declare-function yas-load-directory "ext:yasnippet"
