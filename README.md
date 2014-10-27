@@ -78,7 +78,7 @@ for use with older Emacs versions can be obtained from
 
 #### MELPA
 
-**Unstable snapshots** can be installed via the
+**Development snapshots** can be installed via the
 [MELPA](http://melpa.org) community maintained repository.
 
 For MELPA the code you need to add is:
