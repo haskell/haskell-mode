@@ -832,7 +832,8 @@ from `module-buffer'."
 (defun haskell-process-trigger-suggestions (session msg file line)
   "Trigger prompting to add any extension suggestions."
   (cond ((let ((case-fold-search nil))
-           (or (string-match " -X\\([A-Z][A-Za-z]+\\)" msg)
+           (or (and (string-match " -X\\([A-Z][A-Za-z]+\\)" msg)
+                    (not (string-match "\\([A-Z][A-Za-z]+\\) is deprecated" msg)))
                (string-match "Use \\([A-Z][A-Za-z]+\\) to permit this" msg)
                (string-match "Use \\([A-Z][A-Za-z]+\\) to allow" msg)
                (string-match "use \\([A-Z][A-Za-z]+\\)" msg)
