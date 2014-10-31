@@ -82,7 +82,7 @@ within that region."
         (goto-char (min (1+ (cdr points))
                         (point-max)))
         (setq imports (cons string imports))))
-    (delq nil (delete-dups imports))))
+    (reverse (delq nil (delete-dups imports)))))
 
 (defun haskell-sort-imports-goto-group-start ()
   "Go to the start of the import group."
