@@ -916,10 +916,10 @@ GHCi."
                               (buffer-file-name)
                               (progn (goto-char (car pos))
                                      (line-number-at-pos))
-                              (current-column)
+                              (1+ (current-column)) ;; GHC uses 1-based columns.
                               (progn (goto-char (cdr pos))
                                      (line-number-at-pos))
-                              (current-column)
+                              (1+ (current-column)) ;; GHC uses 1-based columns.
                               (buffer-substring-no-properties (car pos)
                                                               (cdr pos)))))))
         (if reply
@@ -927,9 +927,11 @@ GHCi."
                               reply)
                 (list :path (match-string 1 reply)
                       :start-line (string-to-number (match-string 2 reply))
-                      :start-col (string-to-number (match-string 3 reply))
+                      ;; ;; GHC uses 1-based columns.
+                      :start-col (1- (string-to-number (match-string 3 reply)))
                       :end-line (string-to-number (match-string 4 reply))
-                      :end-col-line (string-to-number (match-string 5 reply)))
+                      ;; GHC uses 1-based columns.
+                      :end-col (1- (string-to-number (match-string 5 reply))))
               (error (propertize reply 'face 'compilation-error)))
           (error (propertize "No reply. Is :loc-at supported?"
                              'face 'compilation-error)))))))
@@ -957,10 +959,10 @@ command from GHCi."
                    (buffer-file-name)
                    (progn (goto-char (car pos))
                           (line-number-at-pos))
-                   (current-column)
+                   (1+ (current-column))
                    (progn (goto-char (cdr pos))
                           (line-number-at-pos))
-                   (current-column)
+                   (1+ (current-column))
                    (buffer-substring-no-properties (car pos)
                                                    (cdr pos))))))))))
 
