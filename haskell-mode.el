@@ -923,7 +923,7 @@ GHCi."
                               (buffer-substring-no-properties (car pos)
                                                               (cdr pos)))))))
         (if reply
-            (if (string-match "\\(.*?\\):\\([0-9]+\\):\\([0-9]+\\)-\\([0-9]+\\):\\([0-9]+\\)"
+            (if (string-match "\\(.*?\\):(\\([0-9]+\\),\\([0-9]+\\))-(\\([0-9]+\\),\\([0-9]+\\))"
                               reply)
                 (list :path (match-string 1 reply)
                       :start-line (string-to-number (match-string 2 reply))
