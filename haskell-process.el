@@ -538,7 +538,7 @@ to be loaded by ghci."
            default-directory
            (lambda (d)
              (or (file-directory-p (expand-file-name ".cabal-sandbox" d))
-                 (cl-find-if (lambda (f) (string-match-p "\\.cabal\\'" f)) (directory-files d)))))
+                 (cl-find-if (lambda (f) (string-match-p ".\\.cabal\\'" f)) (directory-files d)))))
           'cabal-repl
         'ghci)
     haskell-process-type))
