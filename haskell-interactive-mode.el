@@ -530,7 +530,10 @@ do the
       (remove-overlays)
       (haskell-interactive-mode-prompt session)
       (haskell-session-set session 'next-error-region nil)
-      (haskell-session-set session 'next-error-locus nil))))
+      (haskell-session-set session 'next-error-locus nil))
+    (with-current-buffer (get-buffer-create "*haskell-process-log*")
+      (delete-region (point-min) (point-max))
+      (remove-overlays))))
 
 (defun haskell-interactive-mode-input-partial ()
   "Get the interactive mode input up to point."
