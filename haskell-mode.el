@@ -343,8 +343,8 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
   "Return the identifier under point, or nil if none found.
 May return a qualified name."
   (let ((reg (haskell-ident-pos-at-point)))
-    (unless (= (car reg) (cdr reg))
-      (when reg
+    (when reg
+      (unless (= (car reg) (cdr reg))
         (buffer-substring-no-properties (car reg) (cdr reg))))))
 
 (defun haskell-ident-pos-at-point ()
