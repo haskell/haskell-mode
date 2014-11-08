@@ -343,8 +343,9 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
   "Return the identifier under point, or nil if none found.
 May return a qualified name."
   (let ((reg (haskell-ident-pos-at-point)))
-    (when reg
-      (buffer-substring-no-properties (car reg) (cdr reg)))))
+    (unless (= (car reg) (cdr reg))
+      (when reg
+        (buffer-substring-no-properties (car reg) (cdr reg))))))
 
 (defun haskell-ident-pos-at-point ()
   "Return the span of the identifier under point, or nil if none found.
@@ -358,13 +359,9 @@ May return a qualified name."
 
     (let ((case-fold-search nil))
       (cl-multiple-value-bind (start end)
-          (if (looking-at "\\s_")
-              (list (progn (skip-syntax-backward "_") (point))
-                    (progn (skip-syntax-forward "_") (point)))
-            (list
-             (progn (skip-syntax-backward "w'")
-                    (skip-syntax-forward "'") (point))
-             (progn (skip-syntax-forward "w'") (point))))
+          (list
+           (progn (skip-syntax-backward "w_") (point))
+           (progn (skip-syntax-forward "w_") (point)))
         ;; If we're looking at a module ID that qualifies further IDs, add
         ;; those IDs.
         (goto-char start)
