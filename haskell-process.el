@@ -111,6 +111,30 @@ See `haskell-process-do-cabal' for more details."
   :type '(choice (const auto) (const ghci) (const cabal-repl) (const cabal-dev) (const cabal-ghci))
   :group 'haskell-interactive)
 
+(defcustom haskell-process-wrapper
+  nil
+  "A wrapper to launch the Haskell process defined by `haskell-process-type`.
+Nix users may want to use the value (\"nix-shell\" \"--command\"),
+Docker users may want to use something like \"run-my-docker\"."
+  :group 'haskell-interactive
+  :type '(choice string (repeat string)))
+
+(defun haskell-process-stringify-cmd (cmd &optional args)
+  "Stringify the CMD with optional ARGS."
+  (format "%s" (mapconcat 'identity (cons cmd args) " ")))
+
+(defun haskell-process-wrapper-command (cmd &optional cmd-args)
+  "Compute the haskell command to execute to launch the haskell-process type.
+if haskell-process-wrapper is set, return a wrapper of the CMD as list.
+Otherwise, return CMD as list.
+Deal with optional CMD-ARGS for the CMD."
+  (if haskell-process-wrapper
+      (let ((wrapped-cmd (haskell-process-stringify-cmd cmd cmd-args)))
+        (if (stringp haskell-process-wrapper)
+            (list haskell-process-wrapper wrapped-cmd)
+          (append haskell-process-wrapper (list wrapped-cmd))))
+    (cons cmd cmd-args)))
+
 (defcustom haskell-process-log
   nil
   "Enable debug logging to \"*haskell-process-log*\" buffer."
@@ -1010,6 +1034,36 @@ from `module-buffer'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Building the process
 
+(defun haskell-process-compute-process-log-and-command (session hptype)
+  "Compute the log and process to start command for the SESSION from the HPTYPE.
+Do not actually start any process.
+HPTYPE is the result of calling `'haskell-process-type`' function."
+  (let ((session-name (haskell-session-name session)))
+    (cl-ecase hptype
+      ('ghci
+       (append (list (format "Starting inferior GHCi process %s ..." haskell-process-path-ghci)
+                     session-name
+                     nil)
+               (haskell-process-wrapper-command haskell-process-path-ghci haskell-process-args-ghci)))
+      ('cabal-repl
+       (append (list (format "Starting inferior `cabal repl' process using %s ..." haskell-process-path-cabal)
+                     session-name
+                     nil)
+               (haskell-process-wrapper-command haskell-process-path-cabal (cons "repl" haskell-process-args-cabal-repl))
+               (let ((target (haskell-session-target session)))
+                 (if target (list target) nil))))
+      ('cabal-ghci
+       (append (list (format "Starting inferior cabal-ghci process using %s ..." haskell-process-path-cabal-ghci)
+                     session-name
+                     nil)
+               (haskell-process-wrapper-command haskell-process-path-cabal-ghci)))
+      ('cabal-dev
+       (let ((dir (concat (haskell-session-cabal-dir session) "/cabal-dev")))
+         (append (list (format "Starting inferior cabal-dev process %s -s %s ..." haskell-process-path-cabal-dev dir)
+                       session-name
+                       nil)
+                 (haskell-process-wrapper-command haskell-process-path-cabal-dev (list "ghci" "-s" dir))))))))
+
 ;;;###autoload
 (defun haskell-process-start (session)
   "Start the inferior Haskell process."
@@ -1026,58 +1080,14 @@ from `module-buffer'."
     (haskell-process-set-session process session)
     (haskell-process-set-cmd process nil)
     (haskell-process-set (haskell-session-process session) 'is-restarting nil)
-    (let ((default-directory (haskell-session-cabal-dir session)))
+    (let ((default-directory (haskell-session-cabal-dir session))
+          (log-and-process-to-start (haskell-process-compute-process-log-and-command session (haskell-process-type))))
       (haskell-session-pwd session)
       (haskell-process-set-process
        process
-       (cl-ecase (haskell-process-type)
-         ('ghci
-          (haskell-process-log
-           (propertize (format "Starting inferior GHCi process %s ..."
-                               haskell-process-path-ghci)
-                       'face font-lock-comment-face))
-          (apply #'start-process
-                 (append (list (haskell-session-name session)
-                               nil
-                               haskell-process-path-ghci)
-                         haskell-process-args-ghci)))
-         ('cabal-repl
-          (haskell-process-log
-           (propertize
-            (format "Starting inferior `cabal repl' process using %s ..."
-                    haskell-process-path-cabal)
-            'face font-lock-comment-face))
-
-          (apply #'start-process
-                 (append (list (haskell-session-name session)
-                               nil
-                               haskell-process-path-cabal)
-                         '("repl") haskell-process-args-cabal-repl
-                         (let ((target (haskell-session-target session)))
-                           (if target (list target) nil)))))
-         ('cabal-ghci
-          (haskell-process-log
-           (propertize
-            (format "Starting inferior cabal-ghci process using %s ..."
-                    haskell-process-path-cabal-ghci)
-            'face font-lock-comment-face))
-          (start-process (haskell-session-name session)
-                         nil
-                         haskell-process-path-cabal-ghci))
-         ('cabal-dev
-          (let ((dir (concat (haskell-session-cabal-dir session)
-                             "/cabal-dev")))
-            (haskell-process-log
-             (propertize (format "Starting inferior cabal-dev process %s -s %s ..."
-                                 haskell-process-path-cabal-dev
-                                 dir)
-                         'face font-lock-comment-face))
-            (start-process (haskell-session-name session)
-                           nil
-                           haskell-process-path-cabal-dev
-                           "ghci"
-                           "-s"
-                           dir))))))
+       (progn
+         (haskell-process-log (propertize (car log-and-process-to-start) 'face font-lock-comment-face))
+         (apply #'start-process (cdr log-and-process-to-start)))))
     (progn (set-process-sentinel (haskell-process-process process) 'haskell-process-sentinel)
            (set-process-filter (haskell-process-process process) 'haskell-process-filter))
     (haskell-process-send-startup process)
