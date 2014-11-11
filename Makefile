@@ -69,6 +69,9 @@ ELCHECKS=$(addprefix check-, $(ELFILES:.el=))
 
 .PHONY: all compile info clean check $(ELCHECKS) elpa package
 
+deps:
+	curl -fsSkL https://raw.github.com/cask/cask/master/go | python
+
 all: compile $(AUTOLOADS) info
 
 compile: $(ELCFILES)
@@ -76,7 +79,7 @@ compile: $(ELCFILES)
 $(ELCHECKS): check-%: %.el %.elc
 	@$(BATCH) --eval '(when (check-declare-file "$*.el") (error "check-declare failed"))'
 	@if [ -f "$(<:%.el=tests/%-tests.el)" ]; then \
-		$(BATCH) -l "$(<:%.el=tests/%-tests.el)" -f ert-run-tests-batch-and-exit; \
+		cask exec $(BATCH) -l "$(<:%.el=tests/%-tests.el)" -f ert-run-tests-batch-and-exit; \
 	fi
 	@echo "--"
 
