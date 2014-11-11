@@ -5,6 +5,8 @@ env:
     - EMACS=emacs23
     - EMACS=emacs24
     - EMACS=emacs-snapshot
+  global:
+    - PATH=$HOME/.cask/bin:$PATH
 
 matrix:
   allow_failures:
@@ -27,6 +29,9 @@ install:
         sudo apt-get install -qq emacs-snapshot &&
         sudo apt-get install -qq emacs-snapshot-el emacs-snapshot-gtk;
     fi
+  - make deps
+  - cask --version
+  - cask
 
 script:
   lsb_release -a && $EMACS --version && make EMACS=$EMACS check

@@ -10,6 +10,7 @@
 ;;          2003      Dave Love <fx@gnu.org>
 ;; Keywords: faces files Haskell
 ;; URL: https://github.com/haskell/haskell-mode
+;; Version: 13.07
 
 ;; This file is not part of GNU Emacs.
 
