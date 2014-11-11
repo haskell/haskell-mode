@@ -402,13 +402,9 @@ be nil.")
                     (cl-caddr state) response))
            (haskell-interactive-mode-handle-h (point-min))
            (buffer-string))))
-    (cond
-     (haskell-interactive-mode-eval-mode
-      (unless (haskell-process-sent-stdin-p (cadr state))
-        (haskell-interactive-mode-eval-as-mode (car state) response)))
-     ((haskell-interactive-mode-line-is-query (elt state 2))
-      (let ((haskell-interactive-mode-eval-mode 'haskell-mode))
-        (haskell-interactive-mode-eval-as-mode (car state) response)))))
+    (when haskell-interactive-mode-eval-mode
+     (unless (haskell-process-sent-stdin-p (cadr state))
+       (haskell-interactive-mode-eval-as-mode (car state) response))))
   (haskell-interactive-mode-prompt (car state)))
 
 (defun haskell-interactive-mode-handle-h (&optional bound)
