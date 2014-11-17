@@ -117,9 +117,9 @@ See `haskell-process-do-cabal' for more details."
 
 If no wrapper is needed, then using 'identify function is sufficient.
 Otherwise, define a function which takes a list of arguments.
-For example: (lambda (argv)
-                (append '(\"nix-shell\" \"haskell-lab.nix\" \"--command\")
-                  (shell-quote-argument argv)))")
+For example:
+  (lambda (argv) (append (list \"nix-shell\" \"default.nix\" \"--command\" )
+                    (list (mapconcat 'identity argv \" \"))))")
 
 (defcustom haskell-process-log
   nil
