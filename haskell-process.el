@@ -111,29 +111,15 @@ See `haskell-process-do-cabal' for more details."
   :type '(choice (const auto) (const ghci) (const cabal-repl) (const cabal-dev) (const cabal-ghci))
   :group 'haskell-interactive)
 
-(defcustom haskell-process-wrapper
-  nil
-  "A wrapper to launch the Haskell process defined by `haskell-process-type`.
-Nix users may want to use the value (\"nix-shell\" \"--command\"),
-Docker users may want to use something like \"run-my-docker\"."
-  :group 'haskell-interactive
-  :type '(choice string (repeat string)))
+(defcustom haskell-process-wrapper-function
+  #'identity
+  "A default wrapper function to deal with an eventual haskell-process-wrapper.
 
-(defun haskell-process-stringify-cmd (cmd &optional args)
-  "Stringify the CMD with optional ARGS."
-  (format "%s" (mapconcat 'identity (cons cmd args) " ")))
-
-(defun haskell-process-wrapper-command (cmd &optional cmd-args)
-  "Compute the haskell command to execute to launch the haskell-process type.
-if haskell-process-wrapper is set, return a wrapper of the CMD as list.
-Otherwise, return CMD as list.
-Deal with optional CMD-ARGS for the CMD."
-  (if haskell-process-wrapper
-      (let ((wrapped-cmd (haskell-process-stringify-cmd cmd cmd-args)))
-        (if (stringp haskell-process-wrapper)
-            (list haskell-process-wrapper wrapped-cmd)
-          (append haskell-process-wrapper (list wrapped-cmd))))
-    (cons cmd cmd-args)))
+If no wrapper is needed, then using 'identify function is sufficient.
+Otherwise, define a function which takes a list of arguments.
+For example: (lambda (argv)
+                (append '(\"nix-shell\" \"haskell-lab.nix\" \"--command\")
+                  (shell-quote-argument argv)))")
 
 (defcustom haskell-process-log
   nil
@@ -1044,25 +1030,25 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
        (append (list (format "Starting inferior GHCi process %s ..." haskell-process-path-ghci)
                      session-name
                      nil)
-               (haskell-process-wrapper-command haskell-process-path-ghci haskell-process-args-ghci)))
+               (apply haskell-process-wrapper-function (list (cons haskell-process-path-ghci haskell-process-args-ghci)))))
       ('cabal-repl
        (append (list (format "Starting inferior `cabal repl' process using %s ..." haskell-process-path-cabal)
                      session-name
                      nil)
-               (haskell-process-wrapper-command haskell-process-path-cabal (cons "repl" haskell-process-args-cabal-repl))
+               (apply haskell-process-wrapper-function (list (cons haskell-process-path-cabal (cons "repl" haskell-process-args-cabal-repl))))
                (let ((target (haskell-session-target session)))
                  (if target (list target) nil))))
       ('cabal-ghci
        (append (list (format "Starting inferior cabal-ghci process using %s ..." haskell-process-path-cabal-ghci)
                      session-name
                      nil)
-               (haskell-process-wrapper-command haskell-process-path-cabal-ghci)))
+               (apply haskell-process-wrapper-function (list (list haskell-process-path-cabal-ghci)))))
       ('cabal-dev
        (let ((dir (concat (haskell-session-cabal-dir session) "/cabal-dev")))
          (append (list (format "Starting inferior cabal-dev process %s -s %s ..." haskell-process-path-cabal-dev dir)
                        session-name
                        nil)
-                 (haskell-process-wrapper-command haskell-process-path-cabal-dev (list "ghci" "-s" dir))))))))
+                 (apply haskell-process-wrapper-function (list (cons haskell-process-path-cabal-dev (list "ghci" "-s" dir))))))))))
 
 ;;;###autoload
 (defun haskell-process-start (session)
