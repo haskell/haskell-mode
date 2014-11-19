@@ -521,6 +521,11 @@ see documentation for that variable for more details."
   ;; TABs stops are 8 chars apart, as mandated by the Haskell Report.  --Stef
   (set (make-local-variable 'indent-tabs-mode) nil)
   (set (make-local-variable 'tab-width) 8)
+  ;; Haskell is not generally suitable for electric indentation, since
+  ;; there is no unambiguously correct indent level for any given line.
+  (when (boundp 'electric-indent-inhibit)
+    (setq electric-indent-inhibit t))
+
   ;; dynamic abbrev support: recognize Haskell identifiers
   ;; Haskell is case-sensitive language
   (set (make-local-variable 'dabbrev-case-fold-search) nil)
