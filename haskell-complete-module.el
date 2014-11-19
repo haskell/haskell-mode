@@ -79,7 +79,8 @@
           (unless (string= "" pattern)
             (setq pattern (substring pattern 0 -1))))
          ((string= key "RET")
-          (setq result (car candidates)))
+          (setq result (or (car candidates)
+                           pattern)))
          ((string= key "<left>")
           (setq candidates
                 (append (last candidates)
