@@ -30,7 +30,7 @@
 (add-hook 'w3m-display-hook 'w3m-haddock-display)
 
 (defface w3m-haddock-heading-face
-  '((((class color)) :background "#eeeeee"))
+  '((((class color)) :inherit magit-item-highlight))
   "Face for quarantines."
   :group 'shm)
 
