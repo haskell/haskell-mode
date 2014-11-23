@@ -523,8 +523,10 @@ see documentation for that variable for more details."
   (set (make-local-variable 'tab-width) 8)
   ;; Haskell is not generally suitable for electric indentation, since
   ;; there is no unambiguously correct indent level for any given line.
-  (when (boundp 'electric-indent-inhibit)
-    (setq electric-indent-inhibit t))
+  (when (fboundp 'electric-indent-mode)
+    (if (boundp 'electric-indent-inhibit)
+        (setq electric-indent-inhibit t)
+      (electric-indent-local-mode -1)))
 
   ;; dynamic abbrev support: recognize Haskell identifiers
   ;; Haskell is case-sensitive language
