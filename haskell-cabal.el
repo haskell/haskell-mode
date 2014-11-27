@@ -153,6 +153,7 @@
   (set (make-local-variable 'comment-end) "")
   (set (make-local-variable 'comment-end-skip) "[ \t]*\\(\\s>\\|\n\\)")
   (set (make-local-variable 'indent-line-function) 'haskell-cabal-indent-line)
+  (setq indent-tabs-mode nil)
   )
 
 (defun haskell-cabal-get-setting (name)
