@@ -846,6 +846,16 @@ from `module-buffer'."
                                                   file
                                                   (match-string 2 msg)
                                                   line)))
+        ;; This can be a multi-line output, and we only catch the
+        ;; first line, but it's better than nothing
+        ((or
+          (string-match " The import of[ ][‘`‛]\\(.+\\)[’] from module " msg)
+          (string-match " The import of[ ][‘`‛]\\(.+\\)[,]" msg))
+         (when haskell-process-suggest-remove-import-lines
+           (haskell-process-suggest-remove-import-names session
+                                                       file
+                                                       (match-string 1 msg)
+                                                       line)))
         ((string-match "Warning: orphan instance: " msg)
          (when haskell-process-suggest-no-warn-orphans
            (haskell-process-suggest-pragma session "OPTIONS" "-fno-warn-orphans" file)))
@@ -989,6 +999,29 @@ from `module-buffer'."
          (forward-line (1- line))
          (goto-char (line-beginning-position))
          (insert "-- "))))))
+
+(defun haskell-process-suggest-remove-import-names (session file imports line)
+  "Suggest removing or commenting out a NAME on an IMPORT LINE."
+  (dolist (import (split-string imports ", "))
+    (let ((continue t)
+          (first t))
+      (if (y-or-n-p (format "The import `%s' is redundant. Remove?" import))
+          (progn
+            (haskell-process-find-file session file)
+            (save-excursion
+              (save-restriction
+               (goto-char (point-min))
+               (forward-line (1- line))
+               (narrow-to-region (line-beginning-position) (line-end-position))
+               (let ((rx1 (format "(%s, " import))
+                     (rx2 (format ", ?%s," import))
+                     (rx3 (format ", ?%s)" import)))
+                 (dolist (rx `((,rx1 . "(") (,rx2 . ",") (,rx3 . ")")))
+                   ;; Stupid emacs won't let me simply use replace-regexp
+                   (goto-char (point-min))
+                   (while (search-forward-regexp (car rx) nil t)
+                     (replace-match (cdr rx))))))))
+        (message "Ignoring redundant import of %s" import)))))
 
 (defun haskell-process-suggest-pragma (session pragma extension file)
   "Suggest to add something to the top of the file."
