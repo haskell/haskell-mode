@@ -22,16 +22,11 @@
 (require 'haskell-interactive-mode)
 (require 'haskell-presentation-mode)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Basic configuration hooks
+
 (add-hook 'haskell-process-ended-hook 'haskell-process-prompt-restart)
 (add-hook 'kill-buffer-hook 'haskell-interactive-kill)
-
-(defun haskell-interactive-mode-insert-error (response)
-  "Insert an error message."
-  (insert "\n"
-          (haskell-fontify-as-mode
-           response
-           'haskell-mode))
-  (haskell-interactive-mode-prompt))
 
 (defun haskell-interactive-mode-trigger-compile-error (state response)
   "Look for an <interactive> compile error; if there is one, pop
@@ -141,29 +136,6 @@
     (next-error-internal))
    (t
     (haskell-interactive-handle-expr))))
-
-(defun haskell-interactive-popup-error (response)
-  "Popup an error."
-  (if haskell-interactive-popup-errors
-      (let ((buf (get-buffer-create "*HS-Error*")))
-        (pop-to-buffer buf nil t)
-        (with-current-buffer buf
-
-          (haskell-error-mode)
-          (let ((inhibit-read-only t))
-            (erase-buffer)
-            (insert (propertize response
-                                'font-lock-face
-                                'haskell-interactive-face-compile-error))
-            (goto-char (point-min))
-            (delete-blank-lines)
-            (insert (propertize "-- Hit `q' to close this window.\n\n"
-                                'font-lock-face 'font-lock-comment-face))
-            (save-excursion
-              (goto-char (point-max))
-              (insert (propertize "\n-- To disable popups, customize `haskell-interactive-popup-errors'.\n\n"
-                                  'font-lock-face 'font-lock-comment-face))))))
-    (haskell-interactive-mode-insert-error response)))
 
 (defun haskell-session-kill (&optional leave-interactive-buffer)
   "Kill the session process and buffer, delete the session.
@@ -324,90 +296,6 @@
                (result (list (- (point) rlen) (point) coll)))
           (setq haskell-interactive-mode-completion-cache (cons inp result))
           result)))))
-
-(defun haskell-interactive-next-error-function (&optional n reset)
-  "See `next-error-function' for more information."
-
-  (let* ((session (haskell-session))
-         (next-error-region (haskell-session-get session 'next-error-region))
-         (next-error-locus (haskell-session-get session 'next-error-locus))
-         (reset-locus nil))
-
-    (when (and next-error-region (or reset (and (/= n 0) (not next-error-locus))))
-      (goto-char (car next-error-region))
-      (unless (looking-at haskell-interactive-mode-error-regexp)
-        (haskell-interactive-mode-error-forward))
-
-      (setq reset-locus t)
-      (unless (looking-at haskell-interactive-mode-error-regexp)
-        (error "no errors found")))
-
-    ;; move point if needed
-    (cond
-     (reset-locus nil)
-     ((> n 0) (unless (haskell-interactive-mode-error-forward n)
-                (error "no more errors")))
-
-     ((< n 0) (unless (haskell-interactive-mode-error-backward (- n))
-                (error "no more errors"))))
-
-    (let ((orig-line (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
-
-      (when (string-match haskell-interactive-mode-error-regexp orig-line)
-        (let* ((msgmrk (set-marker (make-marker) (line-beginning-position)))
-               (location (haskell-process-parse-error orig-line))
-               (file (plist-get location :file))
-               (line (plist-get location :line))
-               (col1 (plist-get location :col))
-               (col2 (plist-get location :col2))
-
-               (cabal-relative-file (expand-file-name file (haskell-session-cabal-dir session)))
-               (src-relative-file (expand-file-name file (haskell-session-current-dir session)))
-
-               (real-file (cond ((file-exists-p cabal-relative-file) cabal-relative-file)
-                                ((file-exists-p src-relative-file) src-relative-file))))
-
-          (haskell-session-set session 'next-error-locus msgmrk)
-
-          (if real-file
-              (let ((m1 (make-marker))
-                    (m2 (make-marker)))
-                (with-current-buffer (find-file-noselect real-file)
-                  (save-excursion
-                    (goto-char (point-min))
-                    (forward-line (1- line))
-                    (set-marker m1 (+ col1 (point) -1))
-
-                    (when col2
-                      (set-marker m2 (- (point) col2)))))
-                ;; ...finally select&hilight error locus
-                (compilation-goto-locus msgmrk m1 (and (marker-position m2) m2)))
-            (error "don't know where to find %S" file)))))))
-
-(defun haskell-interactive-mode-do-presentation (expr)
-  "Present the given expression. Requires the `present` package
-  to be installed. Will automatically import it qualified as Present."
-  (let ((p (haskell-process)))
-    ;; If Present.code isn't available, we probably need to run the
-    ;; setup.
-    (unless (string-match "^Present" (haskell-process-queue-sync-request p ":t Present.encode"))
-      (haskell-interactive-mode-setup-presentation p))
-    ;; Happily, let statements don't affect the `it' binding in any
-    ;; way, so we can fake it, no pun intended.
-    (let ((error (haskell-process-queue-sync-request
-                  p (concat "let it = Present.asData (" expr ")"))))
-      (if (not (string= "" error))
-          (haskell-interactive-mode-eval-result (haskell-session) (concat error "\n"))
-        (let ((hash (haskell-interactive-mode-presentation-hash)))
-          (haskell-process-queue-sync-request
-           p (format "let %s = Present.asData (%s)" hash expr))
-          (let* ((presentation (haskell-interactive-mode-present-id
-                                hash
-                                (list 0))))
-            (insert "\n")
-            (haskell-interactive-mode-insert-presentation hash presentation)
-            (haskell-interactive-mode-eval-result (haskell-session) "\n"))))
-      (haskell-interactive-mode-prompt (haskell-session)))))
 
 (defun haskell-session-new ()
   "Make a new session."
@@ -887,179 +775,6 @@ command from GHCi."
   (interactive)
   (haskell-process-queue-without-filters (haskell-process)
                                          ":set -optP-include -optPdist/build/autogen/cabal_macros.h"))
-
-(defun haskell-interactive-mode-present-id (hash id)
-  "Generate a presentation for the current expression at ID."
-  ;; See below for commentary of this statement.
-  (let ((p (haskell-process)))
-    (haskell-process-queue-without-filters
-     p "let _it = it")
-    (let* ((text (haskell-process-queue-sync-request
-                  p
-                  (format "Present.putStr (Present.encode (Present.fromJust (Present.present (Present.fromJust (Present.fromList [%s])) %s)))"
-                          (mapconcat 'identity (mapcar 'number-to-string id) ",")
-                          hash)))
-           (reply
-            (if (string-match "^*** " text)
-                '((rep nil))
-              (read text))))
-      ;; Not necessary, but nice to restore it to the expression that
-      ;; the user actually typed in.
-      (haskell-process-queue-without-filters
-       p "let it = _it")
-      reply)))
-
-(defun haskell-presentation-present-slot (btn)
-  "The callback to evaluate the slot and present it in place of the button."
-  (let ((id (button-get btn 'presentation-id))
-        (hash (button-get btn 'hash))
-        (parent-rep (button-get btn 'parent-rep))
-        (continuation (button-get btn 'continuation)))
-    (let ((point (point)))
-      (button-put btn 'invisible t)
-      (delete-region (button-start btn) (button-end btn))
-      (haskell-interactive-mode-insert-presentation
-       hash
-       (haskell-interactive-mode-present-id hash id)
-       parent-rep
-       continuation)
-      (when (> (point) point)
-        (goto-char (1+ point))))))
-
-(defun haskell-interactive-mode-presentation-slot (hash slot parent-rep &optional continuation)
-  "Make a slot at point, pointing to ID."
-  (let ((type (car slot))
-        (id (cadr slot)))
-    (if (member (intern type) '(Integer Char Int Float Double))
-        (haskell-interactive-mode-insert-presentation
-         hash
-         (haskell-interactive-mode-present-id hash id)
-         parent-rep
-         continuation)
-      (haskell-interactive-mode-presentation-slot-button slot parent-rep continuation hash))))
-
-(defun haskell-interactive-mode-presentation-slot-button (slot parent-rep continuation hash)
-  (let ((start (point))
-        (type (car slot))
-        (id (cadr slot)))
-    (insert (propertize type 'font-lock-face '(:height 0.8 :underline t :inherit font-lock-comment-face)))
-    (let ((button (make-text-button start (point)
-                                    :type 'haskell-presentation-slot-button)))
-      (button-put button 'hide-on-click t)
-      (button-put button 'presentation-id id)
-      (button-put button 'parent-rep parent-rep)
-      (button-put button 'continuation continuation)
-      (button-put button 'hash hash))))
-
-(defun haskell-interactive-mode-insert-presentation (hash presentation &optional parent-rep continuation)
-  "Insert the presentation, hooking up buttons for each slot."
-  (let* ((rep (cadr (assoc 'rep presentation)))
-         (text (cadr (assoc 'text presentation)))
-         (type (cadr (assoc 'type presentation)))
-         (slots (cadr (assoc 'slots presentation)))
-         (nullary (null slots)))
-    (cond
-     ((string= "integer" rep)
-      (insert (propertize text 'font-lock-face 'font-lock-constant)))
-     ((string= "floating" rep)
-      (insert (propertize text 'font-lock-face 'font-lock-constant)))
-     ((string= "char" rep)
-      (insert (propertize
-               (if (string= "string" parent-rep)
-                   (replace-regexp-in-string "^'\\(.+\\)'$" "\\1" text)
-                 text)
-               'font-lock-face 'font-lock-string-face)))
-     ((string= "tuple" rep)
-      (insert "(")
-      (let ((first t))
-        (cl-loop for slot in slots
-                 do (unless first (insert ","))
-                 do (haskell-interactive-mode-presentation-slot hash slot rep)
-                 do (setq first nil)))
-      (insert ")"))
-     ((string= "list" rep)
-      (if (null slots)
-          (if continuation
-              (progn (delete-char -1)
-                     (delete-indentation))
-            (insert "[]"))
-        (let ((i 0))
-          (unless continuation
-            (insert "["))
-          (let ((start-column (current-column)))
-            (cl-loop for slot in slots
-                     do (haskell-interactive-mode-presentation-slot
-                         hash
-                         slot
-                         rep
-                         (= i (1- (length slots))))
-                     do (when (not (= i (1- (length slots))))
-                          (insert "\n")
-                          (indent-to (1- start-column))
-                          (insert ","))
-                     do (setq i (1+ i))))
-          (unless continuation
-            (insert "]")))))
-     ((string= "string" rep)
-      (unless (string= "string" parent-rep)
-        (insert (propertize "\"" 'font-lock-face 'font-lock-string-face)))
-      (cl-loop for slot in slots
-               do (haskell-interactive-mode-presentation-slot hash slot rep))
-      (unless (string= "string" parent-rep)
-        (insert (propertize "\"" 'font-lock-face 'font-lock-string-face))))
-     ((string= "alg" rep)
-      (when (and parent-rep
-                 (not nullary)
-                 (not (string= "list" parent-rep)))
-        (insert "("))
-      (let ((start-column (current-column)))
-        (insert (propertize text 'font-lock-face 'font-lock-type-face))
-        (cl-loop for slot in slots
-                 do (insert "\n")
-                 do (indent-to (+ 2 start-column))
-                 do (haskell-interactive-mode-presentation-slot hash slot rep)))
-      (when (and parent-rep
-                 (not nullary)
-                 (not (string= "list" parent-rep)))
-        (insert ")")))
-     ((eq rep nil)
-      (insert (propertize "?" 'font-lock-face 'font-lock-warning)))
-     (t
-      (let ((err "Unable to present! This very likely means Emacs
-is out of sync with the `present' package. You should make sure
-they're both up to date, or report a bug."))
-        (insert err)
-        (error err))))))
-
-(defun haskell-interactive-mode-setup-presentation (p)
-  "Setup the GHCi REPL for using presentations.
-
-Using asynchronous queued commands as opposed to sync at this
-stage, as sync would freeze up the UI a bit, and we actually
-don't care when the thing completes as long as it's soonish."
-  ;; Import dependencies under Present.* namespace
-  (haskell-process-queue-without-filters p "import qualified Data.Maybe as Present")
-  (haskell-process-queue-without-filters p "import qualified Data.ByteString.Lazy as Present")
-  (haskell-process-queue-without-filters p "import qualified Data.AttoLisp as Present")
-  (haskell-process-queue-without-filters p "import qualified Present.ID as Present")
-  (haskell-process-queue-without-filters p "import qualified Present as Present")
-  ;; Make a dummy expression to avoid "Loading package" nonsense
-  (haskell-process-queue-without-filters
-   p "Present.present (Present.fromJust (Present.fromList [0])) ()"))
-
-(defvar haskell-interactive-mode-presentation-hash 0
-  "Counter for the hash.")
-
-(defun haskell-interactive-mode-presentation-hash ()
-  "Generate a presentation hash."
-  (format "_present_%s"
-          (setq haskell-interactive-mode-presentation-hash
-                (1+ haskell-interactive-mode-presentation-hash))))
-
-(define-button-type 'haskell-presentation-slot-button
-  'action 'haskell-presentation-present-slot
-  'follow-link t
-  'help-echo "Click to expand…")
 
 (defun haskell-mode-show-type-at (&optional insert-value)
   "Show the type of the thing at point."
