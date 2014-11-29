@@ -1,6 +1,6 @@
 ;;; haskell-process.el --- Communicating with the inferior Haskell process
 
-;; Copyright (C) 2011-2012  Chris Done
+;; Copyright (C) 2011  Chris Done
 
 ;; Author: Chris Done <chrisdone@gmail.com>
 
@@ -20,10 +20,6 @@
 ;; along with GNU Emacs; see the file COPYING.  If not, write to
 ;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
-
-;;; Commentary:
-
-;;; Todo:
 
 ;;; Code:
 
@@ -70,14 +66,7 @@
   complete)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Accessing commands
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Specialised commands
-
-
-
 
 (defun haskell-process-reload-with-fbytecode (process module-buffer)
   "Reload FILE-NAME with -fbyte-code set, and then restore -fobject-code."
@@ -143,7 +132,6 @@ from `module-buffer'."
           file)
       file)))
 
-
 (defun haskell-process-haskell-docs-ident (ident)
   "Search with haskell-docs for IDENT, returns a list of modules."
   (cl-remove-if-not (lambda (a) (string-match "^[A-Z][A-Za-b0-9_'.]+$" a))
@@ -205,8 +193,6 @@ from `module-buffer'."
   "Make an inferior Haskell process."
   (list (cons 'name name)))
 
-
-
 (defun haskell-session-pwd (session &optional change)
   "Prompt for the current directory."
   (or (unless change
@@ -224,7 +210,6 @@ from `module-buffer'."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Process communication
-
 
 (defun haskell-process-sentinel (proc event)
   "The sentinel for the process pipe."
