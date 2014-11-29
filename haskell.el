@@ -20,6 +20,7 @@
 (require 'haskell-process)
 (require 'haskell-debug)
 (require 'haskell-interactive-mode)
+(require 'haskell-repl)
 (require 'haskell-presentation-mode)
 (require 'haskell-commands)
 
@@ -28,106 +29,6 @@
 
 (add-hook 'haskell-process-ended-hook 'haskell-process-prompt-restart)
 (add-hook 'kill-buffer-hook 'haskell-interactive-kill)
-
-(defun haskell-interactive-mode-trigger-compile-error (state response)
-  "Look for an <interactive> compile error; if there is one, pop
-  that up in a buffer, similar to `debug-on-error'."
-  (when (and haskell-interactive-types-for-show-ambiguous
-             (string-match "^\n<interactive>:[0-9]+:[0-9]+:" response)
-             (not (string-match "^\n<interactive>:[0-9]+:[0-9]+:[\n ]+Warning:" response)))
-    (let ((inhibit-read-only t))
-      (delete-region haskell-interactive-mode-prompt-start (point))
-      (set-marker haskell-interactive-mode-prompt-start
-                  haskell-interactive-mode-old-prompt-start)
-      (goto-char (point-max)))
-    (cond
-     ((and (not (haskell-interactive-mode-line-is-query (elt state 2)))
-           (or (string-match "No instance for (?Show[ \n]" response)
-               (string-match "Ambiguous type variable " response)))
-      (haskell-process-reset (haskell-process))
-      (let ((resp (haskell-process-queue-sync-request
-                   (haskell-process)
-                   (concat ":t "
-                           (buffer-substring-no-properties
-                            haskell-interactive-mode-prompt-start
-                            (point-max))))))
-        (cond
-         ((not (string-match "<interactive>:" resp))
-          (haskell-interactive-mode-insert-error resp))
-         (t (haskell-interactive-popup-error response)))))
-     (t (haskell-interactive-popup-error response)
-        t))
-    t))
-
-(defun haskell-interactive-mode-run-expr (expr)
-  "Run the given expression."
-  (let ((session (haskell-session))
-        (process (haskell-process))
-        (lines (length (split-string expr "\n"))))
-    (haskell-process-queue-command
-     process
-     (make-haskell-command
-      :state (list session process expr 0)
-      :go (lambda (state)
-            (goto-char (point-max))
-            (insert "\n")
-            (setq haskell-interactive-mode-result-end
-                  (point-max))
-            (haskell-process-send-string (cadr state)
-                                         (haskell-interactive-mode-multi-line (cl-caddr state)))
-            (haskell-process-set-evaluating (cadr state) t))
-      :live (lambda (state buffer)
-              (unless (and (string-prefix-p ":q" (cl-caddr state))
-                           (string-prefix-p (cl-caddr state) ":quit"))
-                (let* ((cursor (cl-cadddr state))
-                       (next (replace-regexp-in-string
-                              haskell-process-prompt-regex
-                              ""
-                              (substring buffer cursor))))
-                  (haskell-interactive-mode-eval-result (car state) next)
-                  (setf (cl-cdddr state) (list (length buffer)))
-                  nil)))
-      :complete
-      (lambda (state response)
-        (haskell-process-set-evaluating (cadr state) nil)
-        (unless (haskell-interactive-mode-trigger-compile-error state response)
-          (haskell-interactive-mode-expr-result state response)))))))
-
-(defun haskell-interactive-mode-do-expr (expr)
-  (cond
-   ((string-match "^:present " expr)
-    (haskell-interactive-mode-do-presentation (replace-regexp-in-string "^:present " "" expr)))
-   (t
-    (haskell-interactive-mode-run-expr expr))))
-
-(defun haskell-interactive-handle-expr ()
-  "Handle an inputted expression at the REPL."
-  (when (haskell-interactive-at-prompt)
-    (let ((expr (haskell-interactive-mode-input)))
-      (unless (string= "" (replace-regexp-in-string " " "" expr))
-        (cond
-         ;; If already evaluating, then the user is trying to send
-         ;; input to the REPL during evaluation. Most likely in
-         ;; response to a getLine-like function.
-         ((and (haskell-process-evaluating-p (haskell-process))
-               (= (line-end-position) (point-max)))
-          (goto-char (point-max))
-          (let ((process (haskell-process))
-                (string (buffer-substring-no-properties
-                         haskell-interactive-mode-result-end
-                         (point))))
-            (insert "\n")
-            ;; Bring the marker forward
-            (setq haskell-interactive-mode-result-end
-                  (point-max))
-            (haskell-process-set-sent-stdin process t)
-            (haskell-process-send-string process string)))
-         ;; Otherwise we start a normal evaluation call.
-         (t (setq haskell-interactive-mode-old-prompt-start
-                  (copy-marker haskell-interactive-mode-prompt-start))
-            (set-marker haskell-interactive-mode-prompt-start (point-max))
-            (haskell-interactive-mode-history-add expr)
-            (haskell-interactive-mode-do-expr expr)))))))
 
 (defun haskell-interactive-mode-return ()
   "Handle the return key."
@@ -227,76 +128,6 @@
       (setq haskell-interactive-previous-buffer initial-buffer))
     (unless (eq buffer (window-buffer))
       (switch-to-buffer-other-window buffer))))
-
-(defun haskell-interactive-mode-clear ()
-  "Clear the screen and put any current input into the history."
-  (interactive)
-  (let ((session (haskell-session)))
-    (with-current-buffer (haskell-session-interactive-buffer session)
-      (let ((inhibit-read-only t))
-        (set-text-properties (point-min) (point-max) nil))
-      (delete-region (point-min) (point-max))
-      (remove-overlays)
-      (haskell-interactive-mode-prompt session)
-      (haskell-session-set session 'next-error-region nil)
-      (haskell-session-set session 'next-error-locus nil))
-    (with-current-buffer (get-buffer-create "*haskell-process-log*")
-      (delete-region (point-min) (point-max))
-      (remove-overlays))))
-
-(defun haskell-interactive-mode-set-prompt (p)
-  "Set (and overwrite) the current prompt."
-  (with-current-buffer (haskell-session-interactive-buffer (haskell-session))
-    (goto-char haskell-interactive-mode-prompt-start)
-    (delete-region (point) (point-max))
-    (insert p)))
-
-(defun haskell-interactive-mode-history-toggle (n)
-  "Toggle the history n items up or down."
-  (unless (null haskell-interactive-mode-history)
-    (setq haskell-interactive-mode-history-index
-          (mod (+ haskell-interactive-mode-history-index n)
-               (length haskell-interactive-mode-history)))
-    (unless (zerop haskell-interactive-mode-history-index)
-      (message "History item: %d" haskell-interactive-mode-history-index))
-    (haskell-interactive-mode-set-prompt
-     (nth haskell-interactive-mode-history-index
-          haskell-interactive-mode-history))))
-
-(defun haskell-interactive-mode-history-previous (arg)
-  "Cycle backwards through input history."
-  (interactive "*p")
-  (when (haskell-interactive-at-prompt)
-    (if (not (zerop arg))
-        (haskell-interactive-mode-history-toggle arg)
-      (setq haskell-interactive-mode-history-index 0)
-      (haskell-interactive-mode-history-toggle 1))))
-
-(defun haskell-interactive-mode-history-next (arg)
-  "Cycle forward through input history."
-  (interactive "*p")
-  (when (haskell-interactive-at-prompt)
-    (if (not (zerop arg))
-        (haskell-interactive-mode-history-toggle (- arg))
-      (setq haskell-interactive-mode-history-index 0)
-      (haskell-interactive-mode-history-toggle -1))))
-
-(defun haskell-interactive-mode-completion-at-point-function ()
-  "Offer completions for partial expression between prompt and point"
-  (when (haskell-interactive-at-prompt)
-    (let* ((process (haskell-process))
-           (session (haskell-session))
-           (inp (haskell-interactive-mode-input-partial)))
-      (if (string= inp (car-safe haskell-interactive-mode-completion-cache))
-          (cdr haskell-interactive-mode-completion-cache)
-        (let* ((resp2 (haskell-process-get-repl-completions process inp))
-               (rlen (-  (length inp) (length (car resp2))))
-               (coll (append (if (string-prefix-p inp "import") '("import"))
-                             (if (string-prefix-p inp "let") '("let"))
-                             (cdr resp2)))
-               (result (list (- (point) rlen) (point) coll)))
-          (setq haskell-interactive-mode-completion-cache (cons inp result))
-          result)))))
 
 (defun haskell-session-new ()
   "Make a new session."
@@ -1146,18 +977,6 @@ actual Emacs buffer of the module being loaded."
                (haskell-mode-message-line orig-line)
                t))))))
 
-(defun haskell-interactive-mode-eval-as-mode (session text)
-  "Insert TEXT font-locked according to `haskell-interactive-mode-eval-mode'."
-  (with-current-buffer (haskell-session-interactive-buffer session)
-    (let ((inhibit-read-only t))
-      (delete-region (1+ haskell-interactive-mode-prompt-start) (point))
-      (goto-char (point-max))
-      (let ((start (point)))
-        (insert (haskell-fontify-as-mode text
-                                         haskell-interactive-mode-eval-mode))
-        (when haskell-interactive-mode-collapse
-          (haskell-collapse start (point)))))))
-
 ;;;###autoload
 (defun haskell-interactive-mode-echo (session message &optional mode)
   "Echo a read only piece of text before the prompt."
@@ -1171,7 +990,6 @@ actual Emacs buffer of the module being loaded."
                 (propertize (concat message "\n")
                             'read-only t
                             'rear-nonsticky t))))))
-
 
 (defun haskell-interactive-mode-compile-splice (session message)
   "Echo a compiler splice."
@@ -1191,19 +1009,6 @@ actual Emacs buffer of the module being loaded."
                           'font-lock-face 'haskell-interactive-face-garbage
                           'read-only t
                           'rear-nonsticky t)))))
-
-(defun haskell-interactive-mode-expr-result (state response)
-  "Print the result of evaluating the expression."
-  (let ((response
-         (with-temp-buffer
-           (insert (haskell-interactive-mode-cleanup-response
-                    (cl-caddr state) response))
-           (haskell-interactive-mode-handle-h (point-min))
-           (buffer-string))))
-    (when haskell-interactive-mode-eval-mode
-      (unless (haskell-process-sent-stdin-p (cadr state))
-        (haskell-interactive-mode-eval-as-mode (car state) response))))
-  (haskell-interactive-mode-prompt (car state)))
 
 (defun haskell-process-do-cabal (command)
   "Run a Cabal command."

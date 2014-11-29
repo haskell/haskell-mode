@@ -888,6 +888,106 @@ don't care when the thing completes as long as it's soonish."
   'follow-link t
   'help-echo "Click to expand…")
 
+(defun haskell-interactive-mode-history-toggle (n)
+  "Toggle the history n items up or down."
+  (unless (null haskell-interactive-mode-history)
+    (setq haskell-interactive-mode-history-index
+          (mod (+ haskell-interactive-mode-history-index n)
+               (length haskell-interactive-mode-history)))
+    (unless (zerop haskell-interactive-mode-history-index)
+      (message "History item: %d" haskell-interactive-mode-history-index))
+    (haskell-interactive-mode-set-prompt
+     (nth haskell-interactive-mode-history-index
+          haskell-interactive-mode-history))))
+
+(defun haskell-interactive-mode-set-prompt (p)
+  "Set (and overwrite) the current prompt."
+  (with-current-buffer (haskell-session-interactive-buffer (haskell-interactive-session))
+    (goto-char haskell-interactive-mode-prompt-start)
+    (delete-region (point) (point-max))
+    (insert p)))
+
+(defun haskell-interactive-mode-history-previous (arg)
+  "Cycle backwards through input history."
+  (interactive "*p")
+  (when (haskell-interactive-at-prompt)
+    (if (not (zerop arg))
+        (haskell-interactive-mode-history-toggle arg)
+      (setq haskell-interactive-mode-history-index 0)
+      (haskell-interactive-mode-history-toggle 1))))
+
+(defun haskell-interactive-mode-history-next (arg)
+  "Cycle forward through input history."
+  (interactive "*p")
+  (when (haskell-interactive-at-prompt)
+    (if (not (zerop arg))
+        (haskell-interactive-mode-history-toggle (- arg))
+      (setq haskell-interactive-mode-history-index 0)
+      (haskell-interactive-mode-history-toggle -1))))
+
+(defun haskell-interactive-mode-clear ()
+  "Clear the screen and put any current input into the history."
+  (interactive)
+  (let ((session (haskell-interactive-session)))
+    (with-current-buffer (haskell-session-interactive-buffer session)
+      (let ((inhibit-read-only t))
+        (set-text-properties (point-min) (point-max) nil))
+      (delete-region (point-min) (point-max))
+      (remove-overlays)
+      (haskell-interactive-mode-prompt session)
+      (haskell-session-set session 'next-error-region nil)
+      (haskell-session-set session 'next-error-locus nil))
+    (with-current-buffer (get-buffer-create "*haskell-process-log*")
+      (delete-region (point-min) (point-max))
+      (remove-overlays))))
+
+(defun haskell-interactive-mode-completion-at-point-function ()
+  "Offer completions for partial expression between prompt and point"
+  (when (haskell-interactive-at-prompt)
+    (let* ((process (haskell-interactive-process))
+           (session (haskell-interactive-session))
+           (inp (haskell-interactive-mode-input-partial)))
+      (if (string= inp (car-safe haskell-interactive-mode-completion-cache))
+          (cdr haskell-interactive-mode-completion-cache)
+        (let* ((resp2 (haskell-process-get-repl-completions process inp))
+               (rlen (-  (length inp) (length (car resp2))))
+               (coll (append (if (string-prefix-p inp "import") '("import"))
+                             (if (string-prefix-p inp "let") '("let"))
+                             (cdr resp2)))
+               (result (list (- (point) rlen) (point) coll)))
+          (setq haskell-interactive-mode-completion-cache (cons inp result))
+          result)))))
+
+(defun haskell-interactive-mode-trigger-compile-error (state response)
+  "Look for an <interactive> compile error; if there is one, pop
+  that up in a buffer, similar to `debug-on-error'."
+  (when (and haskell-interactive-types-for-show-ambiguous
+             (string-match "^\n<interactive>:[0-9]+:[0-9]+:" response)
+             (not (string-match "^\n<interactive>:[0-9]+:[0-9]+:[\n ]+Warning:" response)))
+    (let ((inhibit-read-only t))
+      (delete-region haskell-interactive-mode-prompt-start (point))
+      (set-marker haskell-interactive-mode-prompt-start
+                  haskell-interactive-mode-old-prompt-start)
+      (goto-char (point-max)))
+    (cond
+     ((and (not (haskell-interactive-mode-line-is-query (elt state 2)))
+           (or (string-match "No instance for (?Show[ \n]" response)
+               (string-match "Ambiguous type variable " response)))
+      (haskell-process-reset (haskell-interactive-process))
+      (let ((resp (haskell-process-queue-sync-request
+                   (haskell-interactive-process)
+                   (concat ":t "
+                           (buffer-substring-no-properties
+                            haskell-interactive-mode-prompt-start
+                            (point-max))))))
+        (cond
+         ((not (string-match "<interactive>:" resp))
+          (haskell-interactive-mode-insert-error resp))
+         (t (haskell-interactive-popup-error response)))))
+     (t (haskell-interactive-popup-error response)
+        t))
+    t))
+
 (provide 'haskell-interactive-mode)
 
 ;;; haskell-interactive-mode.el ends here
