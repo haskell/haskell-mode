@@ -55,6 +55,239 @@ Used for locating additional package data files.")
   :group 'haskell-interactive)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Configuration
+
+(defvar haskell-process-end-hook nil
+  "Hook for when the haskell process ends.")
+
+(defgroup haskell-interactive nil
+  "Settings for REPL interaction via `haskell-interactive-mode'"
+  :link '(custom-manual "(haskell-mode)haskell-interactive-mode")
+  :group 'haskell)
+
+(defcustom haskell-process-path-ghci
+  "ghci"
+  "The path for starting ghci."
+  :group 'haskell-interactive
+  :type '(choice string (repeat string)))
+
+(defcustom haskell-process-path-cabal
+  "cabal"
+  "Path to the `cabal' executable."
+  :group 'haskell-interactive
+  :type '(choice string (repeat string)))
+
+(defcustom haskell-process-path-cabal-ghci
+  "cabal-ghci"
+  "The path for starting cabal-ghci."
+  :group 'haskell-interactive
+  :type '(choice string (repeat string)))
+
+(defcustom haskell-process-path-cabal-dev
+  "cabal-dev"
+  "The path for starting cabal-dev."
+  :group 'haskell-interactive
+  :type '(choice string (repeat string)))
+
+(defcustom haskell-process-args-ghci
+  '("-ferror-spans")
+  "Any arguments for starting ghci."
+  :group 'haskell-interactive
+  :type '(repeat (string :tag "Argument")))
+
+(defcustom haskell-process-args-cabal-repl
+  '("--ghc-option=-ferror-spans")
+  "Additional arguments to for `cabal repl' invocation.
+Note: The settings in `haskell-process-path-ghci' and
+`haskell-process-args-ghci' are not automatically reused as `cabal repl'
+currently invokes `ghc --interactive'. Use
+`--with-ghc=<path-to-executable>' if you want to use a different
+interactive GHC frontend; use `--ghc-option=<ghc-argument>' to
+pass additional flags to `ghc'."
+  :group 'haskell-interactive
+  :type '(repeat (string :tag "Argument")))
+
+(defcustom haskell-process-do-cabal-format-string
+  ":!cd %s && %s"
+  "The way to run cabal comands. It takes two arguments -- the directory and the command.
+See `haskell-process-do-cabal' for more details."
+  :group 'haskell-interactive
+  :type 'string)
+
+(defcustom haskell-process-log
+  nil
+  "Enable debug logging to \"*haskell-process-log*\" buffer."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-process-show-debug-tips
+  t
+  "Show debugging tips when starting the process."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-notify-p
+  nil
+  "Notify using notifications.el (if loaded)?"
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-process-suggest-no-warn-orphans
+  t
+  "Suggest adding -fno-warn-orphans pragma to file when getting orphan warnings."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-process-suggest-hoogle-imports
+  nil
+  "Suggest to add import statements using Hoogle as a backend."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-process-suggest-hayoo-imports
+  nil
+  "Suggest to add import statements using Hayoo as a backend."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-process-hayoo-query-url
+  "http://hayoo.fh-wedel.de/json/?query=%s"
+  "Query url for json hayoo results."
+  :type 'string
+  :group 'haskell-interactive)
+
+(defcustom haskell-process-suggest-haskell-docs-imports
+  nil
+  "Suggest to add import statements using haskell-docs as a backend."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-process-suggest-add-package
+  t
+  "Suggest to add packages to your .cabal file when Cabal says it
+is a member of the hidden package, blah blah."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-process-suggest-language-pragmas
+  t
+  "Suggest adding LANGUAGE pragmas recommended by GHC."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-process-suggest-remove-import-lines
+  nil
+  "Suggest removing import lines as warned by GHC."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-process-suggest-overloaded-strings
+  t
+  "Suggest adding OverloadedStrings pragma to file when getting type mismatches with [Char]."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-process-check-cabal-config-on-load
+  t
+  "Check changes cabal config on loading Haskell files and
+restart the GHCi process if changed.."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-process-prompt-restart-on-cabal-change
+  t
+  "Ask whether to restart the GHCi process when the Cabal file
+has changed?"
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-process-auto-import-loaded-modules
+  nil
+  "Auto import the modules reported by GHC to have been loaded?"
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-process-reload-with-fbytecode
+  nil
+  "When using -fobject-code, auto reload with -fbyte-code (and
+then restore the -fobject-code) so that all module info and
+imports become available?"
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-process-use-presentation-mode
+  nil
+  "Use presentation mode to show things like type info instead of
+  printing to the message area."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-process-suggest-restart
+  t
+  "Suggest restarting the process when it has died"
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-interactive-mode-scroll-to-bottom
+  nil
+  "Scroll to bottom in the REPL always."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-interactive-popup-errors
+  t
+  "Popup errors in a separate buffer."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-interactive-mode-collapse
+  nil
+  "Collapse printed results."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-interactive-types-for-show-ambiguous
+  t
+  "Show types when there's no Show instance or there's an
+ambiguous class constraint."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-interactive-mode-eval-pretty
+  nil
+  "Print eval results that can be parsed as Show instances prettily. Requires sexp-show (on Hackage)."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defvar haskell-interactive-prompt "λ> "
+  "The prompt to use.")
+
+(defcustom haskell-interactive-mode-eval-mode
+  nil
+  "Use the given mode's font-locking to render some text."
+  :type '(choice function (const :tag "None" nil))
+  :group 'haskell-interactive)
+
+(defcustom haskell-interactive-mode-hide-multi-line-errors
+  nil
+  "Hide collapsible multi-line compile messages by default."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-interactive-mode-delete-superseded-errors
+  t
+  "Whether to delete compile messages superseded by recompile/reloads."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-interactive-mode-include-file-name
+  t
+  "Include the file name of the module being compiled when
+printing compilation messages."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessor functions
 
 (defun haskell-process-type ()

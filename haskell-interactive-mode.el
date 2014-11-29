@@ -38,48 +38,14 @@
 (require 'haskell-session)
 (require 'haskell-show)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Customization
-
-(defcustom haskell-interactive-mode-scroll-to-bottom
-  nil
-  "Scroll to bottom in the REPL always."
-  :type 'boolean
-  :group 'haskell-interactive)
-
-(defcustom haskell-interactive-popup-errors
-  t
-  "Popup errors in a separate buffer."
-  :type 'boolean
-  :group 'haskell-interactive)
-
-(defcustom haskell-interactive-mode-collapse
-  nil
-  "Collapse printed results."
-  :type 'boolean
-  :group 'haskell-interactive)
-
-(defcustom haskell-interactive-types-for-show-ambiguous
-  t
-  "Show types when there's no Show instance or there's an
-ambiguous class constraint."
-  :type 'boolean
-  :group 'haskell-interactive)
-
-(defcustom haskell-interactive-mode-eval-pretty
-  nil
-  "Print eval results that can be parsed as Show instances prettily. Requires sexp-show (on Hackage)."
-  :type 'boolean
-  :group 'haskell-interactive)
-
-(defvar haskell-interactive-prompt "λ> "
-  "The prompt to use.")
-
 (defun haskell-interactive-prompt-regex ()
   "Generate a regex for searching for any occurence of the prompt
 at the beginning of the line. This should prevent any
 interference with prompts that look like haskell expressions."
   (concat "^" (regexp-quote haskell-interactive-prompt)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Globals used internally
 
 (defvar haskell-interactive-mode-prompt-start
   nil
@@ -94,32 +60,26 @@ interference with prompts that look like haskell expressions."
   nil
   "Mark used for the old beginning of the prompt.")
 
-(defcustom haskell-interactive-mode-eval-mode
-  nil
-  "Use the given mode's font-locking to render some text."
-  :type '(choice function (const :tag "None" nil))
-  :group 'haskell-interactive)
+(defvar haskell-interactive-mode-history)
 
-(defcustom haskell-interactive-mode-hide-multi-line-errors
-  nil
-  "Hide collapsible multi-line compile messages by default."
-  :type 'boolean
-  :group 'haskell-interactive)
+(defvar haskell-interactive-mode-history-index)
 
-(defcustom haskell-interactive-mode-delete-superseded-errors
-  t
-  "Whether to delete compile messages superseded by recompile/reloads."
-  :type 'boolean
-  :group 'haskell-interactive)
+(defvar haskell-interactive-mode-completion-cache)
 
-(defcustom haskell-interactive-mode-include-file-name
-  t
-  "Include the file name of the module being compiled when
-printing compilation messages."
-  :type 'boolean
-  :group 'haskell-interactive)
+(defvar haskell-interactive-previous-buffer nil
+  "Records the buffer to which `haskell-interactive-switch-back' should jump.
+This is set by `haskell-interactive-switch', and should otherwise
+be nil.")
+
+(make-variable-buffer-local 'haskell-interactive-previous-buffer)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Hooks
 
 (add-hook 'haskell-process-ended-hook 'haskell-process-prompt-restart)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Mode
 
 (defvar haskell-interactive-mode-map
   (let ((map (make-sparse-keymap)))
@@ -141,11 +101,6 @@ printing compilation messages."
     map)
   "Interactive Haskell mode map.")
 
-;; buffer-local variables used internally by `haskell-interactive-mode'
-(defvar haskell-interactive-mode-history)
-(defvar haskell-interactive-mode-history-index)
-(defvar haskell-interactive-mode-completion-cache)
-
 ;;;###autoload
 (define-derived-mode haskell-interactive-mode fundamental-mode "Interactive-Haskell"
   "Interactive mode for Haskell.
@@ -165,6 +120,9 @@ Key bindings:
             'haskell-interactive-mode-completion-at-point-function nil t)
 
   (haskell-interactive-mode-prompt))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Faces
 
 (defface haskell-interactive-face-prompt
   '((t :inherit font-lock-function-name-face))
@@ -191,6 +149,9 @@ Key bindings:
   "Face for trailing garbage after a command has completed."
   :group 'haskell-interactive)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Actions
+
 (defun haskell-interactive-mode-newline-indent ()
   "Make newline and indent."
   (interactive)
@@ -215,12 +176,6 @@ Key bindings:
       (delete-other-windows)
       (display-buffer buffer)
       (other-window 1))))
-
-(defvar haskell-interactive-previous-buffer nil
-  "Records the buffer to which `haskell-interactive-switch-back' should jump.
-This is set by `haskell-interactive-switch', and should otherwise
-be nil.")
-(make-variable-buffer-local 'haskell-interactive-previous-buffer)
 
 ;;;###autoload
 (defun haskell-interactive-switch ()
