@@ -23,6 +23,7 @@
 
 (require 'cl-lib)
 (require 'haskell-mode)
+(require 'haskell-font-lock)
 
 (declare-function w3m-buffer-title "w3m")
 (declare-function w3m-browse-url "w3m")

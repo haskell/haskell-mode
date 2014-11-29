@@ -47,6 +47,11 @@
 (defvar haskell-interactive-mode-completion-cache)
 (make-variable-buffer-local 'haskell-interactive-mode-completion-cache)
 
+(defvar haskell-interactive-mode-old-prompt-start
+  nil
+  "Mark used for the old beginning of the prompt.")
+(make-variable-buffer-local 'haskell-interactive-mode-old-prompt-start)
+
 (defun haskell-interactive-prompt-regex ()
   "Generate a regex for searching for any occurence of the prompt
 at the beginning of the line. This should prevent any
