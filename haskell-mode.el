@@ -138,19 +138,6 @@
 (require 'haskell-sort-imports)
 (require 'haskell-string)
 
-;; FIXME: code-smell: too many forward decls for haskell-session are required here
-(defvar haskell-session)
-(declare-function haskell-process "haskell-process" ())
-(declare-function interactive-haskell-mode "haskell-process" (&optional arg))
-(declare-function haskell-process-do-try-info "haskell-process" (sym))
-(declare-function haskell-process-generate-tags "haskell-process" (&optional and-then-find-this-tag))
-(declare-function haskell-session "haskell-session" ())
-(declare-function haskell-session-all-modules "haskell-session" (&optional DONTCREATE))
-(declare-function haskell-session-cabal-dir "haskell-session" (session &optional no-prompt))
-(declare-function haskell-session-maybe "haskell-session" ())
-(declare-function haskell-session-tags-filename "haskell-session" (session))
-(declare-function haskell-session-current-dir "haskell-session" (session))
-
 ;; All functions/variables start with `(literate-)haskell-'.
 
 ;; Version of mode.
@@ -749,140 +736,9 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
     (goto-char (+ (line-beginning-position)
                   col))))
 
-(defun haskell-mode-message-line (str)
-  "Message only one line, multiple lines just disturbs the programmer."
-  (let ((lines (split-string str "\n" t)))
-    (when (and (car lines) (stringp (car lines)))
-      (message "%s"
-               (concat (car lines)
-                       (if (and (cdr lines) (stringp (cadr lines)))
-                           (format " [ %s .. ]" (haskell-string-take (haskell-trim (cadr lines)) 10))
-                         ""))))))
-
-(defun haskell-mode-contextual-space ()
-  "Contextually do clever stuff when hitting space."
-  (interactive)
-  (if (or (not (bound-and-true-p interactive-haskell-mode))
-          (not (haskell-session-maybe)))
-      (self-insert-command 1)
-    (cond ((and haskell-mode-contextual-import-completion
-                (save-excursion (forward-word -1)
-                                (looking-at "^import$")))
-           (insert " ")
-           (let ((module (haskell-complete-module-read "Module: " (haskell-session-all-modules))))
-             (insert module)
-             (haskell-mode-format-imports)))
-          ((not (string= "" (save-excursion (forward-char -1) (haskell-ident-at-point))))
-           (let ((ident (save-excursion (forward-char -1) (haskell-ident-at-point))))
-             (insert " ")
-             (haskell-process-do-try-info ident)))
-          (t (insert " ")))))
-
 (defun haskell-mode-before-save-handler ()
   "Function that will be called before buffer's saving."
   )
-
-(defun haskell-mode-after-save-handler ()
-  "Function that will be called after buffer's saving."
-  (when haskell-tags-on-save
-    (ignore-errors (when (and (boundp 'haskell-session) haskell-session)
-                     (haskell-process-generate-tags))))
-  (when haskell-stylish-on-save
-    (ignore-errors (haskell-mode-stylish-buffer))
-    (let ((before-save-hook '())
-          (after-save-hook '()))
-      (basic-save-buffer))))
-
-(defun haskell-mode-buffer-apply-command (cmd)
-  "Execute shell command CMD with current buffer as input and
-replace the whole buffer with the output. If CMD fails the buffer
-remains unchanged."
-  (set-buffer-modified-p t)
-  (let* ((chomp (lambda (str)
-                  (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'" str)
-                    (setq str (replace-match "" t t str)))
-                  str))
-         (errout (lambda (fmt &rest args)
-                   (let* ((warning-fill-prefix "    "))
-                     (display-warning cmd (apply 'format fmt args) :warning))))
-         (filename (buffer-file-name (current-buffer)))
-         (cmd-prefix (replace-regexp-in-string " .*" "" cmd))
-         (tmp-file (make-temp-file cmd-prefix))
-         (err-file (make-temp-file cmd-prefix))
-         (default-directory (if (and (boundp 'haskell-session)
-                                     haskell-session)
-                                (haskell-session-cabal-dir haskell-session)
-                              default-directory))
-         (errcode (with-temp-file tmp-file
-                    (call-process cmd filename
-                                  (list (current-buffer) err-file) nil)))
-         (stderr-output
-          (with-temp-buffer
-            (insert-file-contents err-file)
-            (funcall chomp (buffer-substring-no-properties (point-min) (point-max)))))
-         (stdout-output
-          (with-temp-buffer
-            (insert-file-contents tmp-file)
-            (buffer-substring-no-properties (point-min) (point-max)))))
-    (if (string= "" stderr-output)
-        (if (string= "" stdout-output)
-            (funcall errout
-                     "Error: %s produced no output, leaving buffer alone" cmd)
-          (save-restriction
-            (widen)
-            ;; command successful, insert file with replacement to preserve
-            ;; markers.
-            (insert-file-contents tmp-file nil nil nil t)))
-      ;; non-null stderr, command must have failed
-      (funcall errout "%s failed: %s" cmd stderr-output)
-      )
-    (delete-file tmp-file)
-    (delete-file err-file)
-    ))
-
-(defun haskell-mode-stylish-buffer ()
-  "Apply stylish-haskell to the current buffer."
-  (interactive)
-  (let ((column (current-column))
-        (line (line-number-at-pos)))
-    (haskell-mode-buffer-apply-command "stylish-haskell")
-    (goto-char (point-min))
-    (forward-line (1- line))
-    (goto-char (+ column (point)))))
-
-(defun haskell-mode-tag-find (&optional next-p)
-  "The tag find function, specific for the particular session."
-  (interactive "P")
-  (cond
-   ((elt (syntax-ppss) 3) ;; Inside a string
-    (haskell-mode-jump-to-filename-in-string))
-   (t (call-interactively 'haskell-mode-jump-to-tag))))
-
-(defun haskell-mode-jump-to-filename-in-string ()
-  "Jump to the filename in the current string."
-  (let* ((string (save-excursion
-                   (buffer-substring-no-properties
-                    (1+ (search-backward-regexp "\"" (line-beginning-position) nil 1))
-                    (1- (progn (forward-char 1)
-                               (search-forward-regexp "\"" (line-end-position) nil 1))))))
-         (fp (expand-file-name string
-                               (haskell-session-cabal-dir (haskell-session)))))
-    (find-file
-     (read-file-name
-      ""
-      fp
-      fp))))
-
-(defun haskell-mode-jump-to-tag (&optional next-p)
-  "Jump to the tag of the given identifier."
-  (interactive "P")
-  (let ((ident (haskell-ident-at-point))
-        (tags-file-name (haskell-session-tags-filename (haskell-session)))
-        (tags-revert-without-query t))
-    (when (not (string= "" (haskell-trim ident)))
-      (cond ((file-exists-p tags-file-name)
-             (find-tag ident next-p))
-            (t (haskell-process-generate-tags ident))))))
 
 (defun haskell-mode-jump-to-loc (loc)
   "Jump to the given location.
@@ -927,18 +783,6 @@ LOC = (list FILE LINE COL)"
                (> (match-end 1) old-point))
           (kill-region (match-beginning 0) (match-end 0))
         (error "No SCC at point")))))
-
-(defun haskell-rgrep (&optional prompt)
-  "Grep the effective project for the symbol at point. Very
-useful for codebase navigation. Prompts for an arbitrary regexp
-given a prefix arg."
-  (interactive "P")
-  (let ((sym (if prompt
-                 (read-from-minibuffer "Look for: ")
-               (haskell-ident-at-point))))
-    (rgrep sym
-           "*.hs" ;; TODO: common Haskell extensions.
-           (haskell-session-current-dir (haskell-session)))))
 
 (defun haskell-fontify-as-mode (text mode)
   "Fontify TEXT as MODE, returning the fontified text."
