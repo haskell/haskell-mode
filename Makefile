@@ -10,35 +10,42 @@ SUBST_ATAT = sed -e 's/@@GIT_VERSION@@/$(GIT_VERSION)/g;s/@GIT_VERSION@/$(GIT_VE
 ELFILES = \
 	ghc-core.el \
 	haskell-align-imports.el \
-	haskell-c.el \
+	haskell-bot.el \
 	haskell-cabal.el \
+	haskell-c.el \
 	haskell-checkers.el \
+	haskell-collapse.el \
+	haskell-commands.el \
 	haskell-compat.el \
 	haskell-compile.el \
+	haskell-complete-module.el \
+	haskell-customize.el \
+	haskell-debug.el \
 	haskell-decl-scan.el \
 	haskell-doc.el \
+	haskell.el \
 	haskell-font-lock.el \
-	haskell-indent.el \
 	haskell-indentation.el \
-	haskell-collapse.el \
+	haskell-indent.el \
 	haskell-interactive-mode.el \
+	haskell-load.el \
 	haskell-menu.el \
 	haskell-mode.el \
 	haskell-move-nested.el \
 	haskell-navigate-imports.el \
 	haskell-package.el \
-	haskell-complete-module.el \
+	haskell-presentation-mode.el \
 	haskell-process.el \
+	haskell-repl.el \
 	haskell-session.el \
 	haskell-show.el \
 	haskell-simple-indent.el \
 	haskell-sort-imports.el \
-	haskell-string.el \
 	haskell-str.el \
+	haskell-string.el \
 	haskell-unicode-input-method.el \
 	haskell-utils.el \
 	haskell-yas.el \
-	haskell-presentation-mode.el \
 	inf-haskell.el
 
 ELCFILES = $(ELFILES:.el=.elc)
