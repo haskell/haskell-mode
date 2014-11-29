@@ -747,17 +747,6 @@ command from GHCi."
                    (buffer-substring-no-properties (car pos)
                                                    (cdr pos))))))))))
 
-(defun haskell-process-clear ()
-  "Clear the current process."
-  (interactive)
-  (haskell-process-reset (haskell-process))
-  (haskell-process-set (haskell-process) 'command-queue nil))
-
-(defun haskell-process-interrupt ()
-  "Interrupt the process (SIGINT)."
-  (interactive)
-  (interrupt-process (haskell-process-process (haskell-process))))
-
 (defun haskell-process-cd (&optional not-interactive)
   "Change directory."
   (interactive)
@@ -769,6 +758,21 @@ command from GHCi."
     (haskell-process-change-dir session
                                 (haskell-process)
                                 dir)))
+
+(defun haskell-session-pwd (session &optional change)
+  "Prompt for the current directory."
+  (or (unless change
+        (haskell-session-get session 'current-dir))
+      (progn (haskell-session-set-current-dir
+              session
+              (haskell-utils-read-directory-name
+               (if change "Change directory: " "Set current directory: ")
+               (or (haskell-session-get session 'current-dir)
+                   (haskell-session-get session 'cabal-dir)
+                   (if (buffer-file-name)
+                       (file-name-directory (buffer-file-name))
+                     "~/"))))
+             (haskell-session-get session 'current-dir))))
 
 (defun haskell-process-cabal-macros ()
   "Send the cabal macros string."
@@ -1650,5 +1654,120 @@ given a prefix arg."
                        do (insert (cadr (assoc 'documentation result)))
                        do (insert "\n\n"))
             (insert "No results for " ident)))))))
+
+(defun haskell-process-clear ()
+  "Clear the current process."
+  (interactive)
+  (haskell-process-reset (haskell-process))
+  (haskell-process-set (haskell-process) 'command-queue nil))
+
+(defun haskell-process-interrupt ()
+  "Interrupt the process (SIGINT)."
+  (interactive)
+  (interrupt-process (haskell-process-process (haskell-process))))
+
+(defun haskell-process-reload-with-fbytecode (process module-buffer)
+  "Reload FILE-NAME with -fbyte-code set, and then restore -fobject-code."
+  (haskell-process-queue-without-filters process ":set -fbyte-code")
+  (haskell-process-touch-buffer process module-buffer)
+  (haskell-process-queue-without-filters process ":reload")
+  (haskell-process-queue-without-filters process ":set -fobject-code"))
+
+(defun haskell-process-touch-buffer (process buffer)
+  "Updates mtime on the file for BUFFER by queing a touch on
+PROCESS."
+  (interactive)
+  (haskell-process-queue-command
+   process
+   (make-haskell-command
+    :state (cons process buffer)
+    :go (lambda (state)
+          (haskell-process-send-string
+           (car state)
+           (format ":!%s %s"
+                   "touch"
+                   (shell-quote-argument (buffer-file-name
+                                          (cdr state))))))
+    :complete (lambda (state _)
+                (with-current-buffer (cdr state)
+                  (clear-visited-file-modtime))))))
+
+(defun haskell-process-extract-modules (buffer)
+  "Extract the modules from the process buffer."
+  (let* ((modules-string (match-string 1 buffer))
+         (modules (split-string modules-string ", ")))
+    (cons modules modules-string)))
+
+(defun haskell-process-import-modules (process modules)
+  "Import `modules' with :m +, and send any import statements
+from `module-buffer'."
+  (when haskell-process-auto-import-loaded-modules
+    (haskell-process-queue-command
+     process
+     (make-haskell-command
+      :state (cons process modules)
+      :go (lambda (state)
+            (haskell-process-send-string
+             (car state)
+             (format ":m + %s" (mapconcat 'identity (cdr state) " "))))))))
+
+(defun haskell-session-strip-dir (session file)
+  "Strip the load dir from the file path."
+  (let ((cur-dir (haskell-session-current-dir session)))
+    (if (> (length file) (length cur-dir))
+        (if (string= (substring file 0 (length cur-dir))
+                     cur-dir)
+            (replace-regexp-in-string
+             "^[/\\]" ""
+             (substring file
+                        (length cur-dir)))
+          file)
+      file)))
+
+(defun haskell-process-haskell-docs-ident (ident)
+  "Search with haskell-docs for IDENT, returns a list of modules."
+  (cl-remove-if-not (lambda (a) (string-match "^[A-Z][A-Za-b0-9_'.]+$" a))
+                    (split-string (shell-command-to-string (concat "haskell-docs --modules " ident))
+                                  "\n")))
+
+(defun haskell-process-hoogle-ident (ident)
+  "Hoogle for IDENT, returns a list of modules."
+  (with-temp-buffer
+    (let ((hoogle-error (call-process "hoogle" nil t nil "search" "--exact" ident)))
+      (goto-char (point-min))
+      (unless (or (/= 0 hoogle-error)
+                  (looking-at "^No results found")
+                  (looking-at "^package "))
+        (while (re-search-forward "^\\([^ ]+\\).*$" nil t)
+          (replace-match "\\1" nil nil))
+        (cl-remove-if (lambda (a) (string= "" a))
+                      (split-string (buffer-string)
+                                    "\n"))))))
+
+(defvar url-http-response-status)
+(defvar url-http-end-of-headers)
+
+(defun haskell-process-hayoo-ident (ident)
+  "Hayoo for IDENT, returns a list of modules asyncronously through CALLBACK."
+  ;; We need a real/simulated closure, because otherwise these
+  ;; variables will be unbound when the url-retrieve callback is
+  ;; called.
+  ;; TODO: Remove when this code is converted to lexical bindings by
+  ;; default (Emacs 24.1+)
+  (let ((url (format haskell-process-hayoo-query-url (url-hexify-string ident))))
+    (with-current-buffer (url-retrieve-synchronously url)
+      (if (= 200 url-http-response-status)
+          (progn
+            (goto-char url-http-end-of-headers)
+            (let* ((res (json-read))
+                   (results (assoc-default 'result res)))
+              ;; TODO: gather packages as well, and when we choose a
+              ;; given import, check that we have the package in the
+              ;; cabal file as well.
+              (cl-mapcan (lambda (r)
+                           ;; append converts from vector -> list
+                           (append (assoc-default 'resultModules r) nil))
+                         results)))
+        (warn "HTTP error %s fetching %s" url-http-response-status url)))))
 
 (provide 'haskell)

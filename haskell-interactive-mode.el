@@ -569,6 +569,14 @@ FILE-NAME only."
          (goto-char (line-beginning-position))
          (insert "-- "))))))
 
+(defun haskell-process-find-file (session file)
+  "Find the given file in the project."
+  (find-file (cond ((file-exists-p (concat (haskell-session-current-dir session) "/" file))
+                    (concat (haskell-session-current-dir session) "/" file))
+                   ((file-exists-p (concat (haskell-session-cabal-dir session) "/" file))
+                    (concat (haskell-session-cabal-dir session) "/" file))
+                   (t file))))
+
 (defun haskell-process-suggest-pragma (session pragma extension file)
   "Suggest to add something to the top of the file."
   (let ((string  (format "{-# %s %s #-}" pragma extension)))

@@ -177,6 +177,12 @@ If DONTCREATE is non-nil don't create a new session."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessing the session
 
+(defun haskell-session-current-dir (s)
+  "Get the session current directory."
+  (let ((dir (haskell-session-get s 'current-dir)))
+    (or dir
+        (error "No current directory."))))
+
 (defun haskell-session-name (s)
   "Get the session name."
   (haskell-session-get s 'name))
