@@ -142,7 +142,6 @@
 (declare-function haskell-process "haskell-process" ())
 (declare-function interactive-haskell-mode "haskell-process" (&optional arg))
 (declare-function haskell-process-do-try-info "haskell-process" (sym))
-(declare-function haskell-process-queue-sync-request (process reqstr))
 (declare-function haskell-process-generate-tags "haskell-process" (&optional and-then-find-this-tag))
 (declare-function haskell-session "haskell-session" ())
 (declare-function haskell-session-all-modules "haskell-session" (&optional DONTCREATE))
@@ -879,116 +878,6 @@ remains unchanged."
     (forward-line (1- line))
     (goto-char (+ column (point)))))
 
-(defun haskell-mode-goto-loc ()
-  "Go to the location of the thing at point. Requires the :loc-at
-command from GHCi."
-  (interactive)
-  (let ((loc (haskell-mode-loc-at)))
-    (when loc
-      (find-file (expand-file-name (plist-get loc :path)
-                                   (haskell-session-cabal-dir (haskell-session))))
-      (goto-char (point-min))
-      (forward-line (1- (plist-get loc :start-line)))
-      (forward-char (plist-get loc :start-col)))))
-
-(defun haskell-mode-show-type-at (&optional insert-value)
-  "Show the type of the thing at point."
-  (interactive "P")
-  (let ((ty (haskell-mode-type-at)))
-    (if insert-value
-        (progn (goto-char (line-beginning-position))
-               (insert (haskell-fontify-as-mode ty 'haskell-mode)
-                       "\n"))
-      (message "%s" (haskell-fontify-as-mode ty 'haskell-mode)))))
-
-(defun haskell-mode-loc-at ()
-  "Get the location at point. Requires the :loc-at command from
-GHCi."
-  (let ((pos (or (when (region-active-p)
-                   (cons (region-beginning)
-                         (region-end)))
-                 (haskell-ident-pos-at-point)
-                 (cons (point)
-                       (point)))))
-    (when pos
-      (let ((reply (haskell-process-queue-sync-request
-                    (haskell-process)
-                    (save-excursion
-                      (format ":loc-at %s %d %d %d %d %s"
-                              (buffer-file-name)
-                              (progn (goto-char (car pos))
-                                     (line-number-at-pos))
-                              (1+ (current-column)) ;; GHC uses 1-based columns.
-                              (progn (goto-char (cdr pos))
-                                     (line-number-at-pos))
-                              (1+ (current-column)) ;; GHC uses 1-based columns.
-                              (buffer-substring-no-properties (car pos)
-                                                              (cdr pos)))))))
-        (if reply
-            (if (string-match "\\(.*?\\):(\\([0-9]+\\),\\([0-9]+\\))-(\\([0-9]+\\),\\([0-9]+\\))"
-                              reply)
-                (list :path (match-string 1 reply)
-                      :start-line (string-to-number (match-string 2 reply))
-                      ;; ;; GHC uses 1-based columns.
-                      :start-col (1- (string-to-number (match-string 3 reply)))
-                      :end-line (string-to-number (match-string 4 reply))
-                      ;; GHC uses 1-based columns.
-                      :end-col (1- (string-to-number (match-string 5 reply))))
-              (error (propertize reply 'face 'compilation-error)))
-          (error (propertize "No reply. Is :loc-at supported?"
-                             'face 'compilation-error)))))))
-
-(defun haskell-mode-type-at ()
-  "Get the type of the thing at point. Requires the :type-at
-command from GHCi."
-  (let ((pos (or (when (region-active-p)
-                   (cons (region-beginning)
-                         (region-end)))
-                 (haskell-ident-pos-at-point)
-                 (cons (point)
-                       (point)))))
-    (when pos
-      (replace-regexp-in-string
-       "\n$"
-       ""
-       (save-excursion
-         (haskell-process-queue-sync-request
-          (haskell-process)
-          (replace-regexp-in-string
-           "\n"
-           " "
-           (format ":type-at %s %d %d %d %d %s"
-                   (buffer-file-name)
-                   (progn (goto-char (car pos))
-                          (line-number-at-pos))
-                   (1+ (current-column))
-                   (progn (goto-char (cdr pos))
-                          (line-number-at-pos))
-                   (1+ (current-column))
-                   (buffer-substring-no-properties (car pos)
-                                                   (cdr pos))))))))))
-
-(defun haskell-mode-jump-to-def-or-tag (&optional next-p)
-  "Jump to the definition (by consulting GHCi), or (fallback)
-jump to the tag.
-
-Remember: If GHCi is busy doing something, this will delay, but
-it will always be accurate, in contrast to tags, which always
-work but are not always accurate.
-
-If the definition or tag is found, the location from which you
-jumped will be pushed onto `find-tag-marker-ring', so you can
-return to that position with `pop-tag-mark'."
-  (interactive "P")
-  (let ((initial-loc (point-marker))
-        (loc (haskell-mode-find-def (haskell-ident-at-point))))
-    (if loc
-        (haskell-mode-handle-generic-loc loc)
-      (call-interactively 'haskell-mode-tag-find))
-    (unless (equal initial-loc (point-marker))
-      ;; Store position for return with `pop-tag-mark'
-      (ring-insert find-tag-marker-ring initial-loc))))
-
 (defun haskell-mode-tag-find (&optional next-p)
   "The tag find function, specific for the particular session."
   (interactive "P")
@@ -1023,24 +912,6 @@ return to that position with `pop-tag-mark'."
              (find-tag ident next-p))
             (t (haskell-process-generate-tags ident))))))
 
-(defun haskell-mode-jump-to-def (ident)
-  "Jump to definition of identifier at point."
-  (interactive (list (haskell-ident-at-point)))
-  (let ((loc (haskell-mode-find-def ident)))
-    (when loc
-      (haskell-mode-handle-generic-loc loc))))
-
-(defun haskell-mode-handle-generic-loc (loc)
-  "Either jump to or display a generic location. Either a file or
-a library."
-  (cl-case (car loc)
-    (file (haskell-mode-jump-to-loc (cdr loc)))
-    (library (message "Defined in `%s' (%s)."
-                      (elt loc 2)
-                      (elt loc 1)))
-    (module (message "Defined in `%s'."
-                     (elt loc 1)))))
-
 (defun haskell-mode-jump-to-loc (loc)
   "Jump to the given location.
 LOC = (list FILE LINE COL)"
@@ -1049,44 +920,6 @@ LOC = (list FILE LINE COL)"
   (forward-line (1- (elt loc 1)))
   (goto-char (+ (line-beginning-position)
                 (1- (elt loc 2)))))
-
-(defun haskell-mode-find-def (ident)
-  "Find definition location of identifier. Uses the GHCi process
-to find the location.
-
-Returns:
-
-    (library <package> <module>)
-    (file <path> <line> <col>)
-    (module <name>)
-"
-  (let ((reply (haskell-process-queue-sync-request
-                (haskell-process)
-                (format (if (string-match "^[a-zA-Z_]" ident)
-                            ":info %s"
-                          ":info (%s)")
-                        ident))))
-    (let ((match (string-match "-- Defined \\(at\\|in\\) \\(.+\\)$" reply)))
-      (when match
-        (let ((defined (match-string 2 reply)))
-          (let ((match (string-match "\\(.+?\\):\\([0-9]+\\):\\([0-9]+\\)$" defined)))
-            (cond
-             (match
-              (list 'file
-                    (expand-file-name (match-string 1 defined)
-                                      (haskell-session-current-dir (haskell-session)))
-                    (string-to-number (match-string 2 defined))
-                    (string-to-number (match-string 3 defined))))
-             (t
-              (let ((match (string-match "`\\(.+?\\):\\(.+?\\)'$" defined)))
-                (if match
-                    (list 'library
-                          (match-string 1 defined)
-                          (match-string 2 defined))
-                  (let ((match (string-match "`\\(.+?\\)'$" defined)))
-                    (if match
-                        (list 'module
-                              (match-string 1 defined))))))))))))))
 
 ;; From Bryan O'Sullivan's blog:
 ;; http://www.serpentine.com/blog/2007/10/09/using-emacs-to-insert-scc-annotations-in-haskell-code/
