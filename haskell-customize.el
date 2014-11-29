@@ -22,6 +22,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Customization variables
 
+(defgroup haskell nil
+  "Major mode for editing Haskell programs."
+  :link '(custom-manual "(haskell-mode)")
+  :group 'languages
+  :prefix "haskell-")
+
+(defvar haskell-mode-pkg-base-dir (file-name-directory load-file-name)
+  "Package base directory of installed `haskell-mode'.
+Used for locating additional package data files.")
+
 (defcustom haskell-completing-read-function 'ido-completing-read
   "Default function to use for completion."
   :group 'haskell
@@ -58,5 +68,16 @@
           'cabal-repl
         'ghci)
     haskell-process-type))
+
+;;;###autoload
+(defun haskell-customize ()
+  "Browse the haskell customize sub-tree.
+This calls 'customize-browse' with haskell as argument and makes
+sure all haskell customize definitions have been loaded."
+  (interactive)
+  ;; make sure all modules with (defcustom ...)s are loaded
+  (mapc 'require
+        '(haskell-checkers haskell-compile haskell-doc haskell-font-lock haskell-indentation haskell-indent haskell-interactive-mode haskell-menu haskell-process haskell-yas inf-haskell))
+  (customize-browse 'haskell))
 
 (provide 'haskell-customize)

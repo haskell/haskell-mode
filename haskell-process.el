@@ -27,18 +27,11 @@
 
 ;;; Code:
 
-(require 'cl-lib)
 (require 'json)
 (require 'url-util)
-(require 'haskell-complete-module)
-(require 'haskell-compat)
 (require 'haskell-session)
 (require 'haskell-customize)
 (require 'haskell-str)
-(require 'haskell-compile)
-(require 'haskell-utils)
-(require 'haskell-presentation-mode)
-(require 'haskell-navigate-imports)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configuration

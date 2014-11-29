@@ -29,6 +29,10 @@
 
 (require 'ansi-color)
 (require 'cl-lib)
+(require 'haskell-mode)
+(require 'haskell-compile)
+(require 'haskell-presentation-mode)
+(require 'haskell-navigate-imports)
 (require 'haskell-process)
 (require 'haskell-collapse)
 (require 'haskell-session)

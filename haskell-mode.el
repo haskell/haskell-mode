@@ -124,6 +124,7 @@
 
 ;;; Code:
 
+(require 'haskell-customize)
 (require 'ansi-color)
 (require 'dabbrev)
 (require 'compile)
@@ -159,10 +160,6 @@
 (defconst haskell-git-version "@GIT_VERSION@"
   "The Git version of `haskell-mode'.")
 
-(defvar haskell-mode-pkg-base-dir (file-name-directory load-file-name)
-  "Package base directory of installed `haskell-mode'.
-Used for locating additional package data files.")
-
 ;;;###autoload
 (defun haskell-version (&optional here)
   "Show the `haskell-mode` version in the echo area.
@@ -189,23 +186,6 @@ When MESSAGE is non-nil, display a message with the version."
     (hide-sublevels 1)
     (outline-next-visible-heading 1)
     (show-subtree)))
-
-(defgroup haskell nil
-  "Major mode for editing Haskell programs."
-  :link '(custom-manual "(haskell-mode)")
-  :group 'languages
-  :prefix "haskell-")
-
-;;;###autoload
-(defun haskell-customize ()
-  "Browse the haskell customize sub-tree.
-This calls 'customize-browse' with haskell as argument and makes
-sure all haskell customize definitions have been loaded."
-  (interactive)
-  ;; make sure all modules with (defcustom ...)s are loaded
-  (mapc 'require
-        '(haskell-checkers haskell-compile haskell-doc haskell-font-lock haskell-indentation haskell-indent haskell-interactive-mode haskell-menu haskell-process haskell-yas inf-haskell))
-  (customize-browse 'haskell))
 
 ;; Are we looking at a literate script?
 (defvar haskell-literate nil
@@ -721,7 +701,8 @@ is asked to show extra info for the items matching QUERY.."
   "Internal use.")
 
 (defcustom haskell-indent-spaces 2
-  "Number of spaces to indent inwards.")
+  "Number of spaces to indent inwards."
+  :group 'haskell)
 
 ;; Like Python.  Should be abstracted, sigh.
 (defun haskell-check (command)
