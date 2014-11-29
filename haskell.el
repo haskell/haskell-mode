@@ -21,6 +21,7 @@
 (require 'haskell-debug)
 (require 'haskell-interactive-mode)
 (require 'haskell-presentation-mode)
+(require 'haskell-commands)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic configuration hooks
@@ -1654,43 +1655,6 @@ given a prefix arg."
                        do (insert (cadr (assoc 'documentation result)))
                        do (insert "\n\n"))
             (insert "No results for " ident)))))))
-
-(defun haskell-process-clear ()
-  "Clear the current process."
-  (interactive)
-  (haskell-process-reset (haskell-process))
-  (haskell-process-set (haskell-process) 'command-queue nil))
-
-(defun haskell-process-interrupt ()
-  "Interrupt the process (SIGINT)."
-  (interactive)
-  (interrupt-process (haskell-process-process (haskell-process))))
-
-(defun haskell-process-reload-with-fbytecode (process module-buffer)
-  "Reload FILE-NAME with -fbyte-code set, and then restore -fobject-code."
-  (haskell-process-queue-without-filters process ":set -fbyte-code")
-  (haskell-process-touch-buffer process module-buffer)
-  (haskell-process-queue-without-filters process ":reload")
-  (haskell-process-queue-without-filters process ":set -fobject-code"))
-
-(defun haskell-process-touch-buffer (process buffer)
-  "Updates mtime on the file for BUFFER by queing a touch on
-PROCESS."
-  (interactive)
-  (haskell-process-queue-command
-   process
-   (make-haskell-command
-    :state (cons process buffer)
-    :go (lambda (state)
-          (haskell-process-send-string
-           (car state)
-           (format ":!%s %s"
-                   "touch"
-                   (shell-quote-argument (buffer-file-name
-                                          (cdr state))))))
-    :complete (lambda (state _)
-                (with-current-buffer (cdr state)
-                  (clear-visited-file-modtime))))))
 
 (defun haskell-process-extract-modules (buffer)
   "Extract the modules from the process buffer."
