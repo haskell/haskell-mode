@@ -173,6 +173,18 @@ If DONTCREATE is non-nil don't create a new session."
                        "egrep '^module[\t\r ]+[^(\t\r ]+' . -r -I --include='*.*hs' --include='*.hsc' -s -o -h | sed 's/^module[\t\r ]*//' | sort | uniq"))))
         (split-string modules))))
 
+(defun haskell-session-strip-dir (session file)
+  "Strip the load dir from the file path."
+  (let ((cur-dir (haskell-session-current-dir session)))
+    (if (> (length file) (length cur-dir))
+        (if (string= (substring file 0 (length cur-dir))
+                     cur-dir)
+            (replace-regexp-in-string
+             "^[/\\]" ""
+             (substring file
+                        (length cur-dir)))
+          file)
+      file)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessing the session

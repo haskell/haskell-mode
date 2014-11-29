@@ -34,6 +34,7 @@
 (require 'haskell-session)
 (require 'haskell-show)
 (require 'haskell-font-lock)
+(require 'haskell-presentation-mode)
 
 (require 'ansi-color)
 (require 'cl-lib)
@@ -62,6 +63,25 @@ interference with prompts that look like haskell expressions."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Globals used internally
 
+(defvar haskell-interactive-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "RET") 'haskell-interactive-mode-return)
+    (define-key map (kbd "SPC") 'haskell-interactive-mode-space)
+    (define-key map (kbd "C-j") 'haskell-interactive-mode-newline-indent)
+    (define-key map (kbd "C-a") 'haskell-interactive-mode-beginning)
+    (define-key map (kbd "<home>") 'haskell-interactive-mode-beginning)
+    (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
+    (define-key map (kbd "C-c C-c") 'haskell-process-interrupt)
+    (define-key map (kbd "C-c C-f") 'next-error-follow-minor-mode)
+    (define-key map (kbd "C-c C-z") 'haskell-interactive-switch-back)
+    (define-key map (kbd "M-p") 'haskell-interactive-mode-history-previous)
+    (define-key map (kbd "M-n") 'haskell-interactive-mode-history-next)
+    (define-key map (kbd "C-<up>") 'haskell-interactive-mode-history-previous)
+    (define-key map (kbd "C-<down>") 'haskell-interactive-mode-history-next)
+    (define-key map (kbd "TAB") 'haskell-interactive-mode-tab)
+    (define-key map (kbd "<C-S-backspace>") 'haskell-interactive-mode-kill-whole-line)
+    map)
+  "Interactive Haskell mode map.")
 
 (define-derived-mode haskell-interactive-mode fundamental-mode "Interactive-Haskell"
   "Interactive mode for Haskell.
@@ -987,6 +1007,106 @@ don't care when the thing completes as long as it's soonish."
      (t (haskell-interactive-popup-error response)
         t))
     t))
+
+;;;###autoload
+(defun haskell-interactive-mode-echo (session message &optional mode)
+  "Echo a read only piece of text before the prompt."
+  (with-current-buffer (haskell-session-interactive-buffer session)
+    (save-excursion
+      (haskell-interactive-mode-goto-end-point)
+      (insert (if mode
+                  (haskell-fontify-as-mode
+                   (concat message "\n")
+                   mode)
+                (propertize (concat message "\n")
+                            'read-only t
+                            'rear-nonsticky t))))))
+
+(defun haskell-interactive-mode-compile-splice (session message)
+  "Echo a compiler splice."
+  (with-current-buffer (haskell-session-interactive-buffer session)
+    (setq next-error-last-buffer (current-buffer))
+    (save-excursion
+      (haskell-interactive-mode-goto-end-point)
+      (insert (haskell-fontify-as-mode message 'haskell-mode)
+              "\n"))))
+
+(defun haskell-interactive-mode-insert-garbage (session message)
+  "Echo a read only piece of text before the prompt."
+  (with-current-buffer (haskell-session-interactive-buffer session)
+    (save-excursion
+      (haskell-interactive-mode-goto-end-point)
+      (insert (propertize message
+                          'font-lock-face 'haskell-interactive-face-garbage
+                          'read-only t
+                          'rear-nonsticky t)))))
+
+;;;###autoload
+(defun haskell-process-do-simple-echo (line &optional mode)
+  "Send LINE to the GHCi process and echo the result in some
+fashion, such as printing in the minibuffer, or using
+haskell-present, depending on configuration."
+  (let ((process (haskell-interactive-process)))
+    (haskell-process-queue-command
+     process
+     (make-haskell-command
+      :state (list process line mode)
+      :go (lambda (state)
+            (haskell-process-send-string (car state) (cadr state)))
+      :complete (lambda (state response)
+                  ;; TODO: TBD: don't do this if
+                  ;; `haskell-process-use-presentation-mode' is t.
+                  (haskell-interactive-mode-echo
+                   (haskell-process-session (car state))
+                   response
+                   (cl-caddr state))
+                  (if haskell-process-use-presentation-mode
+                      (progn (haskell-present (cadr state)
+                                              (haskell-process-session (car state))
+                                              response)
+                             (haskell-session-assign
+                              (haskell-process-session (car state))))
+                    (haskell-mode-message-line response)))))))
+
+(defun haskell-interactive-jump-to-error-line ()
+  "Jump to the error line."
+  (let ((orig-line (buffer-substring-no-properties (line-beginning-position)
+                                                   (line-end-position))))
+    (and (string-match "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:" orig-line)
+         (let* ((file (match-string 1 orig-line))
+                (line (match-string 2 orig-line))
+                (col (match-string 3 orig-line))
+                (session (haskell-interactive-session))
+                (cabal-path (haskell-session-cabal-dir session))
+                (src-path (haskell-session-current-dir session))
+                (cabal-relative-file (expand-file-name file cabal-path))
+                (src-relative-file (expand-file-name file src-path)))
+           (let ((file (cond ((file-exists-p cabal-relative-file)
+                              cabal-relative-file)
+                             ((file-exists-p src-relative-file)
+                              src-relative-file))))
+             (when file
+               (other-window 1)
+               (find-file file)
+               (haskell-interactive-bring)
+               (goto-char (point-min))
+               (forward-line (1- (string-to-number line)))
+               (goto-char (+ (point) (string-to-number col) -1))
+               (haskell-mode-message-line orig-line)
+               t))))))
+
+;;;###autoload
+(defun haskell-interactive-bring ()
+  "Bring up the interactive mode for this session."
+  (interactive)
+  (let* ((session (haskell-interactive-session))
+         (buffer (haskell-session-interactive-buffer session)))
+    (unless (and (cl-find-if (lambda (window) (equal (window-buffer window) buffer))
+                             (window-list))
+                 (= 2 (length (window-list))))
+      (delete-other-windows)
+      (display-buffer buffer)
+      (other-window 1))))
 
 (provide 'haskell-interactive-mode)
 
