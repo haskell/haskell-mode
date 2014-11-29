@@ -49,7 +49,7 @@ ELFILES = \
 	inf-haskell.el
 
 ELCFILES = $(ELFILES:.el=.elc)
-HASKELL = haskell.el
+AUTOLOADS = haskell-mode-autoloads.el
 
 PKG_DIST_FILES = $(ELFILES) logo.svg NEWS haskell-mode.info dir
 PKG_TAR = haskell-mode-$(VERSION).tar
@@ -61,7 +61,7 @@ ELCHECKS=$(addprefix check-, $(ELFILES:.el=))
 
 .PHONY: all compile info clean check $(ELCHECKS) elpa package
 
-all: compile $(HASKELL) info
+all: compile $(AUTOLOADS) info
 
 compile: $(ELCFILES)
 
@@ -85,7 +85,7 @@ check: clean $(ELCHECKS)
 	@echo "checks passed!"
 
 clean:
-	$(RM) $(ELCFILES) $(PKG_TAR) haskell-mode.tmp.texi haskell-mode.info dir
+	$(RM) $(ELCFILES) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) $(PKG_TAR) haskell-mode.tmp.texi haskell-mode.info dir
 
 info: haskell-mode.info dir
 
@@ -116,6 +116,12 @@ $(PKG_TAR): $(PKG_DIST_FILES) haskell-mode-pkg.el.in
 	rm -rf haskell-mode-$(VERSION)
 	@echo
 	@echo "Created ELPA compatible distribution package '$@' from $(GIT_VERSION)"
+
+$(AUTOLOADS): $(ELFILES) haskell-mode.elc
+	$(BATCH) \
+		--eval '(setq make-backup-files nil)' \
+		--eval '(setq generated-autoload-file "$(CURDIR)/$@")' \
+		-f batch-update-autoloads "."
 
 # HACK: embed version number into .elc file
 haskell-mode.elc: haskell-mode.el
