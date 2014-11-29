@@ -250,4 +250,142 @@
       fp
       fp))))
 
+;;;###autoload
+(defun haskell-interactive-bring ()
+  "Bring up the interactive mode for this session."
+  (interactive)
+  (let* ((session (haskell-session))
+         (buffer (haskell-session-interactive-buffer session)))
+    (unless (and (cl-find-if (lambda (window) (equal (window-buffer window) buffer))
+                             (window-list))
+                 (= 2 (length (window-list))))
+      (delete-other-windows)
+      (display-buffer buffer)
+      (other-window 1))))
+
+(defun haskell-process-load-file ()
+  "Load the current buffer file."
+  (interactive)
+  (save-buffer)
+  (haskell-interactive-mode-reset-error (haskell-session))
+  (haskell-process-file-loadish (format "load \"%s\"" (replace-regexp-in-string
+                                                       "\""
+                                                       "\\\\\""
+                                                       (buffer-file-name)))
+                                nil
+                                (current-buffer)))
+
+;;;###autoload
+(defun haskell-process-reload-file ()
+  "Re-load the current buffer file."
+  (interactive)
+  (save-buffer)
+  (haskell-interactive-mode-reset-error (haskell-session))
+  (haskell-process-file-loadish "reload" t nil))
+
+;;;###autoload
+(defun haskell-process-load-or-reload (&optional toggle)
+  "Load or reload. Universal argument toggles which."
+  (interactive "P")
+  (if toggle
+      (progn (setq haskell-reload-p (not haskell-reload-p))
+             (message "%s (No action taken this time)"
+                      (if haskell-reload-p
+                          "Now running :reload."
+                        "Now running :load <buffer-filename>.")))
+    (if haskell-reload-p (haskell-process-reload-file) (haskell-process-load-file))))
+
+;;;###autoload
+(defun haskell-process-cabal-build ()
+  "Build the Cabal project."
+  (interactive)
+  (haskell-process-do-cabal "build")
+  (haskell-process-add-cabal-autogen))
+
+;;;###autoload
+(defun haskell-process-cabal (p)
+  "Prompts for a Cabal command to run."
+  (interactive "P")
+  (if p
+      (haskell-process-do-cabal
+       (read-from-minibuffer "Cabal command (e.g. install): "))
+    (haskell-process-do-cabal
+     (funcall haskell-completing-read-function "Cabal command: "
+              (append haskell-cabal-commands
+                      (list "build --ghc-options=-fforce-recomp"))))))
+
+(defun haskell-process-file-loadish (command reload-p module-buffer)
+  "Run a loading-ish COMMAND that wants to pick up type errors
+and things like that. RELOAD-P indicates whether the notification
+should say 'reloaded' or 'loaded'. MODULE-BUFFER may be used
+for various things, but is optional."
+  (let ((session (haskell-session)))
+    (haskell-session-current-dir session)
+    (when haskell-process-check-cabal-config-on-load
+      (haskell-process-look-config-changes session))
+    (let ((process (haskell-process)))
+      (haskell-process-queue-command
+       process
+       (make-haskell-command
+        :state (list session process command reload-p module-buffer)
+        :go (lambda (state)
+              (haskell-process-send-string
+               (cadr state) (format ":%s" (cl-caddr state))))
+        :live (lambda (state buffer)
+                (haskell-process-live-build
+                 (cadr state) buffer nil))
+        :complete (lambda (state response)
+                    (haskell-process-load-complete
+                     (car state)
+                     (cadr state)
+                     response
+                     (cl-cadddr state)
+                     (cl-cadddr (cdr state)))))))))
+
+(defun haskell-process-minimal-imports ()
+  "Dump minimal imports."
+  (interactive)
+  (unless (> (save-excursion
+               (goto-char (point-min))
+               (haskell-navigate-imports-go)
+               (point))
+             (point))
+    (goto-char (point-min))
+    (haskell-navigate-imports-go))
+  (haskell-process-queue-sync-request (haskell-process)
+                                      ":set -ddump-minimal-imports")
+  (haskell-process-load-file)
+  (insert-file-contents-literally
+   (concat (haskell-session-current-dir (haskell-session))
+           "/"
+           (haskell-guess-module-name)
+           ".imports")))
+
+(defun haskell-interactive-jump-to-error-line ()
+  "Jump to the error line."
+  (let ((orig-line (buffer-substring-no-properties (line-beginning-position)
+                                                   (line-end-position))))
+    (and (string-match "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:" orig-line)
+         (let* ((file (match-string 1 orig-line))
+                (line (match-string 2 orig-line))
+                (col (match-string 3 orig-line))
+                (session (haskell-interactive-session))
+                (cabal-path (haskell-session-cabal-dir session))
+                (src-path (haskell-session-current-dir session))
+                (cabal-relative-file (expand-file-name file cabal-path))
+                (src-relative-file (expand-file-name file src-path)))
+           (let ((file (cond ((file-exists-p cabal-relative-file)
+                              cabal-relative-file)
+                             ((file-exists-p src-relative-file)
+                              src-relative-file))))
+             (when file
+               (other-window 1)
+               (find-file file)
+               (haskell-interactive-bring)
+               (goto-char (point-min))
+               (forward-line (1- (string-to-number line)))
+               (goto-char (+ (point) (string-to-number col) -1))
+               (haskell-mode-message-line orig-line)
+               t))))))
+
 (provide 'haskell)

@@ -700,14 +700,15 @@ FILE-NAME only."
   "Get the `haskell-session', throw an error if it's not
   available."
   (or (haskell-session-maybe)
-      (error "No session associated with this interactive
-      buffer. This is a strange circumstance. Suggest killing the
-      buffer and starting over.")))
+      (haskell-session-assign
+       (or (haskell-session-from-buffer)
+           (haskell-session-choose)
+           (error "No session associated with this buffer. Try M-x haskell-session-change or report this as a bug.")))))
 
 (defun haskell-interactive-process ()
   "Get the Haskell session."
-  (or (haskell-session-process (haskell-session-maybe))
-      (error "No Haskell session/process associated with this debug
+  (or (haskell-session-process (haskell-interactive-session))
+      (error "No Haskell session/process associated with this
       buffer. Maybe run M-x haskell-process-restart?")))
 
 (defun haskell-interactive-mode-do-presentation (expr)
@@ -1067,46 +1068,6 @@ haskell-present, depending on configuration."
                              (haskell-session-assign
                               (haskell-process-session (car state))))
                     (haskell-mode-message-line response)))))))
-
-(defun haskell-interactive-jump-to-error-line ()
-  "Jump to the error line."
-  (let ((orig-line (buffer-substring-no-properties (line-beginning-position)
-                                                   (line-end-position))))
-    (and (string-match "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:" orig-line)
-         (let* ((file (match-string 1 orig-line))
-                (line (match-string 2 orig-line))
-                (col (match-string 3 orig-line))
-                (session (haskell-interactive-session))
-                (cabal-path (haskell-session-cabal-dir session))
-                (src-path (haskell-session-current-dir session))
-                (cabal-relative-file (expand-file-name file cabal-path))
-                (src-relative-file (expand-file-name file src-path)))
-           (let ((file (cond ((file-exists-p cabal-relative-file)
-                              cabal-relative-file)
-                             ((file-exists-p src-relative-file)
-                              src-relative-file))))
-             (when file
-               (other-window 1)
-               (find-file file)
-               (haskell-interactive-bring)
-               (goto-char (point-min))
-               (forward-line (1- (string-to-number line)))
-               (goto-char (+ (point) (string-to-number col) -1))
-               (haskell-mode-message-line orig-line)
-               t))))))
-
-;;;###autoload
-(defun haskell-interactive-bring ()
-  "Bring up the interactive mode for this session."
-  (interactive)
-  (let* ((session (haskell-interactive-session))
-         (buffer (haskell-session-interactive-buffer session)))
-    (unless (and (cl-find-if (lambda (window) (equal (window-buffer window) buffer))
-                             (window-list))
-                 (= 2 (length (window-list))))
-      (delete-other-windows)
-      (display-buffer buffer)
-      (other-window 1))))
 
 (provide 'haskell-interactive-mode)
 

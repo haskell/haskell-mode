@@ -17,7 +17,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(with-no-warnings (require 'cl))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Customization variables
