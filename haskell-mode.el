@@ -707,15 +707,6 @@ is asked to show extra info for the items matching QUERY.."
                  (const "ghc -fno-code")
                  (string :tag "Other command")))
 
-(defcustom haskell-completing-read-function 'ido-completing-read
-  "Default function to use for completion."
-  :group 'haskell
-  :type '(choice
-          (function-item :tag "ido" :value ido-completing-read)
-          (function-item :tag "helm" :value helm--completing-read-default)
-          (function-item :tag "completing-read" :value completing-read)
-          (function :tag "Custom function")))
-
 (defcustom haskell-stylish-on-save nil
   "Whether to run stylish-haskell on the buffer before saving."
   :group 'haskell

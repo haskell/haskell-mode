@@ -22,6 +22,8 @@
 ;; Boston, MA 02110-1301, USA.
 
 (require 'cl-lib)
+(require 'haskell-mode)
+
 (declare-function w3m-buffer-title "w3m")
 (declare-function w3m-browse-url "w3m")
 (defvar w3m-current-url)

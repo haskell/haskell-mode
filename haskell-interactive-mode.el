@@ -34,6 +34,9 @@
 (require 'haskell-session)
 (require 'haskell-show)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Customization
+
 (defcustom haskell-interactive-mode-scroll-to-bottom
   nil
   "Scroll to bottom in the REPL always."
@@ -111,6 +114,8 @@ interference with prompts that look like haskell expressions."
 printing compilation messages."
   :type 'boolean
   :group 'haskell-interactive)
+
+(add-hook 'haskell-process-ended-hook 'haskell-process-prompt-restart)
 
 (defvar haskell-interactive-mode-map
   (let ((map (make-sparse-keymap)))
@@ -403,8 +408,8 @@ be nil.")
            (haskell-interactive-mode-handle-h (point-min))
            (buffer-string))))
     (when haskell-interactive-mode-eval-mode
-     (unless (haskell-process-sent-stdin-p (cadr state))
-       (haskell-interactive-mode-eval-as-mode (car state) response))))
+      (unless (haskell-process-sent-stdin-p (cadr state))
+        (haskell-interactive-mode-eval-as-mode (car state) response))))
   (haskell-interactive-mode-prompt (car state)))
 
 (defun haskell-interactive-mode-handle-h (&optional bound)
@@ -1149,6 +1154,945 @@ don't care when the thing completes as long as it's soonish."
 ;; Misc
 
 (add-hook 'kill-buffer-hook 'haskell-interactive-kill)
+
+(defun haskell-session-kill (&optional leave-interactive-buffer)
+  "Kill the session process and buffer, delete the session.
+0. Prompt to kill all associated buffers.
+1. Kill the process.
+2. Kill the interactive buffer.
+3. Walk through all the related buffers and set their haskell-session to nil.
+4. Remove the session from the sessions list."
+  (interactive)
+  (let* ((session (haskell-session))
+         (name (haskell-session-name session))
+         (also-kill-buffers
+          (and haskell-ask-also-kill-buffers
+               (y-or-n-p (format "Killing `%s'. Also kill all associated buffers?" name)))))
+    (haskell-kill-session-process session)
+    (unless leave-interactive-buffer
+      (kill-buffer (haskell-session-interactive-buffer session)))
+    (cl-loop for buffer in (buffer-list)
+             do (with-current-buffer buffer
+                  (when (and (boundp 'haskell-session)
+                             (string= (haskell-session-name haskell-session) name))
+                    (setq haskell-session nil)
+                    (when also-kill-buffers
+                      (kill-buffer)))))
+    (setq haskell-sessions
+          (cl-remove-if (lambda (session)
+                          (string= (haskell-session-name session)
+                                   name))
+                        haskell-sessions))))
+
+(defun haskell-process-do-simple-echo (line &optional mode)
+  "Send LINE to the GHCi process and echo the result in some
+fashion, such as printing in the minibuffer, or using
+haskell-present, depending on configuration."
+  (let ((process (haskell-process)))
+    (haskell-process-queue-command
+     process
+     (make-haskell-command
+      :state (list process line mode)
+      :go (lambda (state)
+            (haskell-process-send-string (car state) (cadr state)))
+      :complete (lambda (state response)
+                  ;; TODO: TBD: don't do this if
+                  ;; `haskell-process-use-presentation-mode' is t.
+                  (haskell-interactive-mode-echo
+                   (haskell-process-session (car state))
+                   response
+                   (cl-caddr state))
+                  (if haskell-process-use-presentation-mode
+                      (progn (haskell-present (cadr state)
+                                              (haskell-process-session (car state))
+                                              response)
+                             (haskell-session-assign
+                              (haskell-process-session (car state))))
+                    (haskell-mode-message-line response)))))))
+
+;;;###autoload
+(defun haskell-process-do-type (&optional insert-value)
+  "Print the type of the given expression."
+  (interactive "P")
+  (if insert-value
+      (haskell-process-insert-type)
+    (haskell-process-do-simple-echo
+     (let ((ident (haskell-ident-at-point)))
+       ;; TODO: Generalize all these `string-match' of ident calls into
+       ;; one function.
+       (format (if (string-match "^[_[:lower:][:upper:]]" ident)
+                   ":type %s"
+                 ":type (%s)")
+               ident))
+     'haskell-mode)))
+
+;;;###autoload
+(defun haskell-process-do-info (&optional prompt-value)
+  "Print info on the identifier at point.
+If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
+  (interactive "P")
+  (haskell-process-do-simple-echo
+   (let ((ident (if prompt-value
+                    (read-from-minibuffer "Info: " (haskell-ident-at-point))
+                  (haskell-ident-at-point)))
+         (modname (unless prompt-value
+                    (haskell-utils-parse-import-statement-at-point))))
+     (if modname
+         (format ":browse! %s" modname)
+       (format (if (string-match "^[a-zA-Z_]" ident)
+                   ":info %s"
+                 ":info (%s)")
+               (or ident
+                   (haskell-ident-at-point)))))
+   'haskell-mode))
+
+(defun haskell-session-interactive-buffer (s)
+  "Get the session interactive buffer."
+  (let ((buffer (haskell-session-get s 'interactive-buffer)))
+    (if (and buffer (buffer-live-p buffer))
+        buffer
+      (let ((buffer (get-buffer-create (format "*%s*" (haskell-session-name s)))))
+        (haskell-session-set-interactive-buffer s buffer)
+        (with-current-buffer buffer
+          (haskell-interactive-mode)
+          (haskell-session-assign s))
+        (switch-to-buffer-other-window buffer)
+        buffer))))
+
+(defun haskell-session-make (name)
+  "Make a Haskell session."
+  (when (haskell-session-lookup name)
+    (error "Session of name %s already exists!" name))
+  (let ((session (setq haskell-session
+                       (list (cons 'name name)))))
+    (add-to-list 'haskell-sessions session)
+    (haskell-process-start session)
+    session))
+
+(defun haskell-session-new-assume-from-cabal ()
+  "Prompt to create a new project based on a guess from the nearest Cabal file."
+  (let ((name (haskell-session-default-name)))
+    (unless (haskell-session-lookup name)
+      (when (y-or-n-p (format "Start a new project named “%s”? "
+                              name))
+        (haskell-session-make name)))))
+
+;;;###autoload
+(defun haskell-session ()
+  "Get the Haskell session, prompt if there isn't one or fail."
+  (or (haskell-session-maybe)
+      (haskell-session-assign
+       (or (haskell-session-from-buffer)
+           (haskell-session-new-assume-from-cabal)
+           (haskell-session-choose)
+           (haskell-session-new)))))
+
+(defun haskell-session-new ()
+  "Make a new session."
+  (let ((name (read-from-minibuffer "Project name: " (haskell-session-default-name))))
+    (when (not (string= name ""))
+      (let ((session (haskell-session-lookup name)))
+        (if session
+            (when (y-or-n-p (format "Session %s already exists. Use it?" name))
+              session)
+          (haskell-session-make name))))))
+
+;;;###autoload
+(defun haskell-session-installed-modules (&optional dontcreate)
+  "Get the modules installed in the current package set.
+If DONTCREATE is non-nil don't create a new session."
+  ;; TODO: Again, this makes HEAVY use of unix utilities. It'll work
+  ;; fine in Linux, probably okay on OS X, and probably not at all on
+  ;; Windows. Again, if someone wants to test on Windows and come up
+  ;; with alternatives that's OK.
+  ;;
+  ;; Ideally all these package queries can be provided by a Haskell
+  ;; program based on the Cabal API. Possibly as a nice service. Such
+  ;; a service could cache and do nice things like that. For now, this
+  ;; simple shell script takes us far.
+  ;;
+  ;; Probably also we can take the code from inferior-haskell-mode.
+  ;;
+  ;; Ugliness aside, if it saves us time to type it's a winner.
+  ;;
+  ;; FIXME/TODO: add support for (eq 'cabal-repl (haskell-process-type))
+  (let ((modules (shell-command-to-string
+                  (format "%s | %s | %s"
+                          (if (eq 'cabal-dev (haskell-process-type))
+                              (if (or (not dontcreate) (haskell-session-maybe))
+                                  (format "cabal-dev -s %s/cabal-dev ghc-pkg dump"
+                                          (haskell-session-cabal-dir (haskell-session)))
+                                "echo ''")
+                            "ghc-pkg dump")
+                          "egrep '^(exposed-modules: |                 )[A-Z]'"
+                          "cut -c18-"))))
+    (split-string modules)))
+
+;;;###autoload
+(defun haskell-session-all-modules (&optional dontcreate)
+  "Get all modules -- installed or in the current project.
+If DONTCREATE is non-nil don't create a new session."
+  (append (haskell-session-installed-modules dontcreate)
+          (haskell-session-project-modules dontcreate)))
+
+(defun haskell-session-change ()
+  "Change the session for the current buffer."
+  (interactive)
+  (haskell-session-assign (or (haskell-session-new-assume-from-cabal)
+                              (haskell-session-choose)
+                              (haskell-session-new))))
+
+(defun haskell-session-project-modules (&optional dontcreate)
+  "Get the modules of the current project.
+If DONTCREATE is non-nil don't create a new session."
+  (if (or (not dontcreate) (haskell-session-maybe))
+      (let* ((session (haskell-session))
+             (modules
+              (shell-command-to-string
+               (format "%s && %s"
+                       (format "cd %s" (haskell-session-cabal-dir session))
+                       ;; TODO: Use a different, better source. Possibly hasktags or some such.
+                       ;; TODO: At least make it cross-platform. Linux
+                       ;; (and possibly OS X) have egrep, Windows
+                       ;; doesn't -- or does it via Cygwin or MinGW?
+                       ;; This also doesn't handle module\nName. But those gits can just cut it out!
+                       "egrep '^module[\t\r ]+[^(\t\r ]+' . -r -I --include='*.*hs' --include='*.hsc' -s -o -h | sed 's/^module[\t\r ]*//' | sort | uniq"))))
+        (split-string modules))))
+
+(defun haskell-mode-find-def (ident)
+  "Find definition location of identifier. Uses the GHCi process
+to find the location.
+
+Returns:
+
+    (library <package> <module>)
+    (file <path> <line> <col>)
+    (module <name>)
+"
+  (let ((reply (haskell-process-queue-sync-request
+                (haskell-process)
+                (format (if (string-match "^[a-zA-Z_]" ident)
+                            ":info %s"
+                          ":info (%s)")
+                        ident))))
+    (let ((match (string-match "-- Defined \\(at\\|in\\) \\(.+\\)$" reply)))
+      (when match
+        (let ((defined (match-string 2 reply)))
+          (let ((match (string-match "\\(.+?\\):\\([0-9]+\\):\\([0-9]+\\)$" defined)))
+            (cond
+             (match
+              (list 'file
+                    (expand-file-name (match-string 1 defined)
+                                      (haskell-session-current-dir (haskell-session)))
+                    (string-to-number (match-string 2 defined))
+                    (string-to-number (match-string 3 defined))))
+             (t
+              (let ((match (string-match "`\\(.+?\\):\\(.+?\\)'$" defined)))
+                (if match
+                    (list 'library
+                          (match-string 1 defined)
+                          (match-string 2 defined))
+                  (let ((match (string-match "`\\(.+?\\)'$" defined)))
+                    (if match
+                        (list 'module
+                              (match-string 1 defined))))))))))))))
+
+(defun haskell-mode-jump-to-def (ident)
+  "Jump to definition of identifier at point."
+  (interactive (list (haskell-ident-at-point)))
+  (let ((loc (haskell-mode-find-def ident)))
+    (when loc
+      (haskell-mode-handle-generic-loc loc))))
+
+(defun haskell-process-minimal-imports ()
+  "Dump minimal imports."
+  (interactive)
+  (unless (> (save-excursion
+               (goto-char (point-min))
+               (haskell-navigate-imports-go)
+               (point))
+             (point))
+    (goto-char (point-min))
+    (haskell-navigate-imports-go))
+  (haskell-process-queue-sync-request (haskell-process)
+                                      ":set -ddump-minimal-imports")
+  (haskell-process-load-file)
+  (insert-file-contents-literally
+   (concat (haskell-session-current-dir (haskell-session))
+           "/"
+           (haskell-guess-module-name)
+           ".imports")))
+
+(defun haskell-mode-jump-to-def-or-tag (&optional next-p)
+  "Jump to the definition (by consulting GHCi), or (fallback)
+jump to the tag.
+
+Remember: If GHCi is busy doing something, this will delay, but
+it will always be accurate, in contrast to tags, which always
+work but are not always accurate.
+
+If the definition or tag is found, the location from which you
+jumped will be pushed onto `find-tag-marker-ring', so you can
+return to that position with `pop-tag-mark'."
+  (interactive "P")
+  (let ((initial-loc (point-marker))
+        (loc (haskell-mode-find-def (haskell-ident-at-point))))
+    (if loc
+        (haskell-mode-handle-generic-loc loc)
+      (call-interactively 'haskell-mode-tag-find))
+    (unless (equal initial-loc (point-marker))
+      ;; Store position for return with `pop-tag-mark'
+      (ring-insert find-tag-marker-ring initial-loc))))
+
+(defun haskell-mode-goto-loc ()
+  "Go to the location of the thing at point. Requires the :loc-at
+command from GHCi."
+  (interactive)
+  (let ((loc (haskell-mode-loc-at)))
+    (when loc
+      (find-file (expand-file-name (plist-get loc :path)
+                                   (haskell-session-cabal-dir (haskell-session))))
+      (goto-char (point-min))
+      (forward-line (1- (plist-get loc :start-line)))
+      (forward-char (plist-get loc :start-col)))))
+
+;;;###autoload
+(defun haskell-process-load-file ()
+  "Load the current buffer file."
+  (interactive)
+  (save-buffer)
+  (haskell-interactive-mode-reset-error (haskell-session))
+  (haskell-process-file-loadish (format "load \"%s\"" (replace-regexp-in-string
+                                                       "\""
+                                                       "\\\\\""
+                                                       (buffer-file-name)))
+                                nil
+                                (current-buffer)))
+
+;;;###autoload
+(defun haskell-process-reload-file ()
+  "Re-load the current buffer file."
+  (interactive)
+  (save-buffer)
+  (haskell-interactive-mode-reset-error (haskell-session))
+  (haskell-process-file-loadish "reload" t nil))
+
+;;;###autoload
+(defun haskell-process-load-or-reload (&optional toggle)
+  "Load or reload. Universal argument toggles which."
+  (interactive "P")
+  (if toggle
+      (progn (setq haskell-reload-p (not haskell-reload-p))
+             (message "%s (No action taken this time)"
+                      (if haskell-reload-p
+                          "Now running :reload."
+                        "Now running :load <buffer-filename>.")))
+    (if haskell-reload-p (haskell-process-reload-file) (haskell-process-load-file))))
+
+(defun haskell-process-file-loadish (command reload-p module-buffer)
+  "Run a loading-ish COMMAND that wants to pick up type errors
+and things like that. RELOAD-P indicates whether the notification
+should say 'reloaded' or 'loaded'. MODULE-BUFFER may be used
+for various things, but is optional."
+  (let ((session (haskell-session)))
+    (haskell-session-current-dir session)
+    (when haskell-process-check-cabal-config-on-load
+      (haskell-process-look-config-changes session))
+    (let ((process (haskell-process)))
+      (haskell-process-queue-command
+       process
+       (make-haskell-command
+        :state (list session process command reload-p module-buffer)
+        :go (lambda (state)
+              (haskell-process-send-string
+               (cadr state) (format ":%s" (cl-caddr state))))
+        :live (lambda (state buffer)
+                (haskell-process-live-build
+                 (cadr state) buffer nil))
+        :complete (lambda (state response)
+                    (haskell-process-load-complete
+                     (car state)
+                     (cadr state)
+                     response
+                     (cl-cadddr state)
+                     (cl-cadddr (cdr state)))))))))
+
+;;;###autoload
+(defun haskell-process-cabal-build ()
+  "Build the Cabal project."
+  (interactive)
+  (haskell-process-do-cabal "build")
+  (haskell-process-add-cabal-autogen))
+
+;;;###autoload
+(defun haskell-process-cabal (p)
+  "Prompts for a Cabal command to run."
+  (interactive "P")
+  (if p
+      (haskell-process-do-cabal
+       (read-from-minibuffer "Cabal command (e.g. install): "))
+    (haskell-process-do-cabal
+     (funcall haskell-completing-read-function "Cabal command: "
+              (append haskell-cabal-commands
+                      (list "build --ghc-options=-fforce-recomp"))))))
+
+(defun haskell-process-add-cabal-autogen ()
+  "Add <cabal-project-dir>/dist/build/autogen/ to the ghci search
+path. This allows modules such as 'Path_...', generated by cabal,
+to be loaded by ghci."
+  (unless (eq 'cabal-repl (haskell-process-type)) ;; redundant with "cabal repl"
+    (let*
+        ((session       (haskell-session))
+         (cabal-dir     (haskell-session-cabal-dir session))
+         (ghci-gen-dir  (format "%sdist/build/autogen/" cabal-dir)))
+      (haskell-process-queue-without-filters
+       (haskell-process)
+       (format ":set -i%s" ghci-gen-dir)))))
+
+(defun haskell-process-do-cabal (command)
+  "Run a Cabal command."
+  (let ((process (haskell-process)))
+    (haskell-process-queue-command
+     process
+     (make-haskell-command
+      :state (list (haskell-session) process command 0)
+
+      :go
+      (lambda (state)
+        (haskell-process-send-string
+         (cadr state)
+         (format haskell-process-do-cabal-format-string
+                 (haskell-session-cabal-dir (car state))
+                 (format "%s %s"
+                         (cl-ecase (haskell-process-type)
+                           ('ghci haskell-process-path-cabal)
+                           ('cabal-repl haskell-process-path-cabal)
+                           ('cabal-ghci haskell-process-path-cabal)
+                           ('cabal-dev haskell-process-path-cabal-dev))
+                         (cl-caddr state)))))
+
+      :live
+      (lambda (state buffer)
+        (let ((cmd (replace-regexp-in-string "^\\([a-z]+\\).*"
+                                             "\\1"
+                                             (cl-caddr state))))
+          (cond ((or (string= cmd "build")
+                     (string= cmd "install"))
+                 (haskell-process-live-build (cadr state) buffer t))
+                (t
+                 (haskell-process-cabal-live state buffer)))))
+
+      :complete
+      (lambda (state response)
+        (let* ((process (cadr state))
+               (session (haskell-process-session process))
+               (message-count 0)
+               (cursor (haskell-process-response-cursor process)))
+          (haskell-process-set-response-cursor process 0)
+          (while (haskell-process-errors-warnings session process response)
+            (setq message-count (1+ message-count)))
+          (haskell-process-set-response-cursor process cursor)
+          (let ((msg (format "Complete: cabal %s (%s compiler messages)"
+                             (cl-caddr state)
+                             message-count)))
+            (haskell-interactive-mode-echo session msg)
+            (when (= message-count 0)
+              (haskell-interactive-mode-echo
+               session
+               "No compiler messages, dumping complete output:")
+              (haskell-interactive-mode-echo session response))
+            (haskell-mode-message-line msg)
+            (when (and haskell-notify-p
+                       (fboundp 'notifications-notify))
+              (notifications-notify
+               :title (format "*%s*" (haskell-session-name (car state)))
+               :body msg
+               :app-name (cl-ecase (haskell-process-type)
+                           ('ghci haskell-process-path-cabal)
+                           ('cabal-repl haskell-process-path-cabal)
+                           ('cabal-ghci haskell-process-path-cabal)
+                           ('cabal-dev haskell-process-path-cabal-dev))
+               :app-icon haskell-process-logo
+               )))))))))
+
+(defun haskell-process-look-config-changes (session)
+  "Checks whether a cabal configuration file has
+changed. Restarts the process if that is the case."
+  (let ((current-checksum (haskell-session-get session 'cabal-checksum))
+        (new-checksum (haskell-cabal-compute-checksum
+                       (haskell-session-get session 'cabal-dir))))
+    (when (not (string= current-checksum new-checksum))
+      (haskell-interactive-mode-echo session (format "Cabal file changed: %s" new-checksum))
+      (haskell-session-set-cabal-checksum session
+                                          (haskell-session-get session 'cabal-dir))
+      (unless (and haskell-process-prompt-restart-on-cabal-change
+                   (not (y-or-n-p "Cabal file changed; restart GHCi process? ")))
+        (haskell-process-start (haskell-session))))))
+
+;;;###autoload
+(defun haskell-process-start (session)
+  "Start the inferior Haskell process."
+  (let ((existing-process (get-process (haskell-session-name (haskell-session)))))
+    (when (processp existing-process)
+      (haskell-interactive-mode-echo session "Restarting process ...")
+      (haskell-process-set (haskell-session-process session) 'is-restarting t)
+      (delete-process existing-process)))
+  (let ((process (or (haskell-session-process session)
+                     (haskell-process-make (haskell-session-name session))))
+        (old-queue (haskell-process-get (haskell-session-process session)
+                                        'command-queue)))
+    (haskell-session-set-process session process)
+    (haskell-process-set-session process session)
+    (haskell-process-set-cmd process nil)
+    (haskell-process-set (haskell-session-process session) 'is-restarting nil)
+    (let ((default-directory (haskell-session-cabal-dir session)))
+      (haskell-session-pwd session)
+      (haskell-process-set-process
+       process
+       (cl-ecase (haskell-process-type)
+         ('ghci
+          (haskell-process-log
+           (propertize (format "Starting inferior GHCi process %s ..."
+                               haskell-process-path-ghci)
+                       'face font-lock-comment-face))
+          (apply #'start-process
+                 (append (list (haskell-session-name session)
+                               nil
+                               haskell-process-path-ghci)
+                         haskell-process-args-ghci)))
+         ('cabal-repl
+          (haskell-process-log
+           (propertize
+            (format "Starting inferior `cabal repl' process using %s ..."
+                    haskell-process-path-cabal)
+            'face font-lock-comment-face))
+
+          (apply #'start-process
+                 (append (list (haskell-session-name session)
+                               nil
+                               haskell-process-path-cabal)
+                         '("repl") haskell-process-args-cabal-repl
+                         (let ((target (haskell-session-target session)))
+                           (if target (list target) nil)))))
+         ('cabal-ghci
+          (haskell-process-log
+           (propertize
+            (format "Starting inferior cabal-ghci process using %s ..."
+                    haskell-process-path-cabal-ghci)
+            'face font-lock-comment-face))
+          (start-process (haskell-session-name session)
+                         nil
+                         haskell-process-path-cabal-ghci))
+         ('cabal-dev
+          (let ((dir (concat (haskell-session-cabal-dir session)
+                             "/cabal-dev")))
+            (haskell-process-log
+             (propertize (format "Starting inferior cabal-dev process %s -s %s ..."
+                                 haskell-process-path-cabal-dev
+                                 dir)
+                         'face font-lock-comment-face))
+            (start-process (haskell-session-name session)
+                           nil
+                           haskell-process-path-cabal-dev
+                           "ghci"
+                           "-s"
+                           dir))))))
+    (progn (set-process-sentinel (haskell-process-process process) 'haskell-process-sentinel)
+           (set-process-filter (haskell-process-process process) 'haskell-process-filter))
+    (haskell-process-send-startup process)
+    (unless (eq 'cabal-repl (haskell-process-type)) ;; "cabal repl" sets the proper CWD
+      (haskell-process-change-dir session
+                                  process
+                                  (haskell-session-current-dir session)))
+    (haskell-process-set process 'command-queue
+                         (append (haskell-process-get (haskell-session-process session)
+                                                      'command-queue)
+                                 old-queue))
+    process))
+
+(defun haskell-process-restart ()
+  "Restart the inferior Haskell process."
+  (interactive)
+  (haskell-process-reset (haskell-process))
+  (haskell-process-set (haskell-process) 'command-queue nil)
+  (haskell-process-start (haskell-session)))
+
+(defun haskell-kill-session-process (&optional session)
+  "Kill the process."
+  (interactive)
+  (let* ((session (or session (haskell-session)))
+         (existing-process (get-process (haskell-session-name session))))
+    (when (processp existing-process)
+      (haskell-interactive-mode-echo session "Killing process ...")
+      (haskell-process-set (haskell-session-process session) 'is-restarting t)
+      (delete-process existing-process))))
+
+(defun haskell-process-unignore ()
+  "Unignore any files that were specified as being ignored by the
+  inferior GHCi process."
+  (interactive)
+  (let ((session (haskell-session))
+        (changed nil))
+    (if (null (haskell-session-get session
+                                   'ignored-files))
+        (message "Nothing to unignore!")
+      (cl-loop for file in (haskell-session-get session
+                                                'ignored-files)
+               do (cl-case (read-event
+                            (propertize (format "Set permissions? %s (y, n, v: stop and view file)"
+                                                file)
+                                        'face 'minibuffer-prompt))
+                    (?y
+                     (haskell-process-unignore-file session file)
+                     (setq changed t))
+                    (?v
+                     (find-file file)
+                     (cl-return))))
+      (when (and changed
+                 (y-or-n-p "Restart GHCi process now? "))
+        (haskell-process-restart)))))
+
+(defun haskell-process-reload-devel-main ()
+  "Reload the module `DevelMain' and then run
+`DevelMain.update'. This is for doing live update of the code of
+servers or GUI applications. Put your development version of the
+program in `DevelMain', and define `update' to auto-start the
+program on a new thread, and use the `foreign-store' package to
+access the running context across :load/:reloads in GHCi."
+  (interactive)
+  (with-current-buffer (or (get-buffer "DevelMain.hs")
+                           (if (y-or-n-p "You need to open a buffer named DevelMain.hs. Find now?")
+                               (ido-find-file)
+                             (error "No DevelMain.hs buffer.")))
+    (let ((session (haskell-session)))
+      (let ((process (haskell-process)))
+        (haskell-process-queue-command
+         process
+         (make-haskell-command
+          :state (list :session session
+                       :process process
+                       :buffer (current-buffer))
+          :go (lambda (state)
+                (haskell-process-send-string (plist-get state ':process)
+                                             ":l DevelMain"))
+          :live (lambda (state buffer)
+                  (haskell-process-live-build (plist-get state ':process)
+                                              buffer
+                                              nil))
+          :complete (lambda (state response)
+                      (haskell-process-load-complete
+                       (plist-get state ':session)
+                       (plist-get state ':process)
+                       response
+                       nil
+                       (plist-get state ':buffer)
+                       (lambda (ok)
+                         (when ok
+                           (haskell-process-queue-without-filters
+                            (haskell-process)
+                            "DevelMain.update")
+                           (message "DevelMain updated.")))))))))))
+
+;;;###autoload
+(defun haskell-process ()
+  "Get the current process from the current session."
+  (haskell-session-process (haskell-session)))
+
+;;;###autoload
+(defun haskell-process-generate-tags (&optional and-then-find-this-tag)
+  "Regenerate the TAGS table."
+  (interactive)
+  (let ((process (haskell-process)))
+    (haskell-process-queue-command
+     process
+     (make-haskell-command
+      :state (cons process and-then-find-this-tag)
+      :go (lambda (state)
+            (if (eq system-type 'windows-nt)
+                (haskell-process-send-string
+                 (car state)
+                 (format ":!powershell -Command \"& { cd %s ; hasktags -e -x (ls -fi *.hs -exclude \\\"#*#\\\" -name -r) ; exit }\""
+                         (haskell-session-cabal-dir
+                          (haskell-process-session (car state)))))
+              (haskell-process-send-string
+               (car state)
+               (format ":!cd %s && %s | %s | %s"
+                       (haskell-session-cabal-dir
+                        (haskell-process-session (car state)))
+                       "find . -name '*.hs*'"
+                       "grep -v '#'" ; To avoid Emacs back-up files. Yeah.
+                       "xargs hasktags -e -x"))))
+      :complete (lambda (state response)
+                  (when (cdr state)
+                    (let ((tags-file-name
+                           (haskell-session-tags-filename
+                            (haskell-process-session (car state)))))
+                      (find-tag (cdr state))))
+                  (haskell-mode-message-line "Tags generated."))))))
+
+(defun haskell-process-insert-type ()
+  "Get the identifer at the point and insert its type, if
+possible, using GHCi's :type."
+  (let ((process (haskell-process))
+        (query (let ((ident (haskell-ident-at-point)))
+                 (format (if (string-match "^[_[:lower:][:upper:]]" ident)
+                             ":type %s"
+                           ":type (%s)")
+                         ident))))
+    (haskell-process-queue-command
+     process
+     (make-haskell-command
+      :state (list process query (current-buffer))
+      :go (lambda (state)
+            (haskell-process-send-string (nth 0 state)
+                                         (nth 1 state)))
+      :complete (lambda (state response)
+                  (cond
+                   ;; TODO: Generalize this into a function.
+                   ((or (string-match "^Top level" response)
+                        (string-match "^<interactive>" response))
+                    (message response))
+                   (t
+                    (with-current-buffer (nth 2 state)
+                      (goto-char (line-beginning-position))
+                      (insert (format "%s\n" (replace-regexp-in-string "\n$" "" response)))))))))))
+
+(defun haskell-process-do-try-info (sym)
+  "Get info of `sym' and echo in the minibuffer."
+  (let ((process (haskell-process)))
+    (haskell-process-queue-command
+     process
+     (make-haskell-command
+      :state (cons process sym)
+      :go (lambda (state)
+            (haskell-process-send-string
+             (car state)
+             (if (string-match "^[A-Za-z_]" (cdr state))
+                 (format ":info %s" (cdr state))
+               (format ":info (%s)" (cdr state)))))
+      :complete (lambda (state response)
+                  (unless (or (string-match "^Top level" response)
+                              (string-match "^<interactive>" response))
+                    (haskell-mode-message-line response)))))))
+
+(defun haskell-process-do-try-type (sym)
+  "Get type of `sym' and echo in the minibuffer."
+  (let ((process (haskell-process)))
+    (haskell-process-queue-command
+     process
+     (make-haskell-command
+      :state (cons process sym)
+      :go (lambda (state)
+            (haskell-process-send-string
+             (car state)
+             (if (string-match "^[A-Za-z_]" (cdr state))
+                 (format ":type %s" (cdr state))
+               (format ":type (%s)" (cdr state)))))
+      :complete (lambda (state response)
+                  (unless (or (string-match "^Top level" response)
+                              (string-match "^<interactive>" response))
+                    (haskell-mode-message-line response)))))))
+
+(defun haskell-mode-show-type-at (&optional insert-value)
+  "Show the type of the thing at point."
+  (interactive "P")
+  (let ((ty (haskell-mode-type-at)))
+    (if insert-value
+        (progn (goto-char (line-beginning-position))
+               (insert (haskell-fontify-as-mode ty 'haskell-mode)
+                       "\n"))
+      (message "%s" (haskell-fontify-as-mode ty 'haskell-mode)))))
+
+(defun haskell-mode-loc-at ()
+  "Get the location at point. Requires the :loc-at command from
+GHCi."
+  (let ((pos (or (when (region-active-p)
+                   (cons (region-beginning)
+                         (region-end)))
+                 (haskell-ident-pos-at-point)
+                 (cons (point)
+                       (point)))))
+    (when pos
+      (let ((reply (haskell-process-queue-sync-request
+                    (haskell-process)
+                    (save-excursion
+                      (format ":loc-at %s %d %d %d %d %s"
+                              (buffer-file-name)
+                              (progn (goto-char (car pos))
+                                     (line-number-at-pos))
+                              (1+ (current-column)) ;; GHC uses 1-based columns.
+                              (progn (goto-char (cdr pos))
+                                     (line-number-at-pos))
+                              (1+ (current-column)) ;; GHC uses 1-based columns.
+                              (buffer-substring-no-properties (car pos)
+                                                              (cdr pos)))))))
+        (if reply
+            (if (string-match "\\(.*?\\):(\\([0-9]+\\),\\([0-9]+\\))-(\\([0-9]+\\),\\([0-9]+\\))"
+                              reply)
+                (list :path (match-string 1 reply)
+                      :start-line (string-to-number (match-string 2 reply))
+                      ;; ;; GHC uses 1-based columns.
+                      :start-col (1- (string-to-number (match-string 3 reply)))
+                      :end-line (string-to-number (match-string 4 reply))
+                      ;; GHC uses 1-based columns.
+                      :end-col (1- (string-to-number (match-string 5 reply))))
+              (error (propertize reply 'face 'compilation-error)))
+          (error (propertize "No reply. Is :loc-at supported?"
+                             'face 'compilation-error)))))))
+
+(defun haskell-mode-type-at ()
+  "Get the type of the thing at point. Requires the :type-at
+command from GHCi."
+  (let ((pos (or (when (region-active-p)
+                   (cons (region-beginning)
+                         (region-end)))
+                 (haskell-ident-pos-at-point)
+                 (cons (point)
+                       (point)))))
+    (when pos
+      (replace-regexp-in-string
+       "\n$"
+       ""
+       (save-excursion
+         (haskell-process-queue-sync-request
+          (haskell-process)
+          (replace-regexp-in-string
+           "\n"
+           " "
+           (format ":type-at %s %d %d %d %d %s"
+                   (buffer-file-name)
+                   (progn (goto-char (car pos))
+                          (line-number-at-pos))
+                   (1+ (current-column))
+                   (progn (goto-char (cdr pos))
+                          (line-number-at-pos))
+                   (1+ (current-column))
+                   (buffer-substring-no-properties (car pos)
+                                                   (cdr pos))))))))))
+
+(defun haskell-mode-handle-generic-loc (loc)
+  "Either jump to or display a generic location. Either a file or
+a library."
+  (cl-case (car loc)
+    (file (haskell-mode-jump-to-loc (cdr loc)))
+    (library (message "Defined in `%s' (%s)."
+                      (elt loc 2)
+                      (elt loc 1)))
+    (module (message "Defined in `%s'."
+                     (elt loc 1)))))
+
+(defun haskell-process-clear ()
+  "Clear the current process."
+  (interactive)
+  (haskell-process-reset (haskell-process))
+  (haskell-process-set (haskell-process) 'command-queue nil))
+
+(defun haskell-process-interrupt ()
+  "Interrupt the process (SIGINT)."
+  (interactive)
+  (interrupt-process (haskell-process-process (haskell-process))))
+
+(defun haskell-process-cd (&optional not-interactive)
+  "Change directory."
+  (interactive)
+  (let* ((session (haskell-session))
+         (dir (haskell-session-pwd session t)))
+    (haskell-process-log
+     (propertize (format "Changing directory to %s ...\n" dir)
+                 'face font-lock-comment-face))
+    (haskell-process-change-dir session
+                                (haskell-process)
+                                dir)))
+
+(defun haskell-process-prompt-restart (process)
+  "Prompt to restart the died process."
+  (let ((process-name (haskell-process-name process)))
+    (if haskell-process-suggest-restart
+        (cl-case (read-event
+                  (propertize (format "The Haskell process `%s' has died. Restart? (y, n, l: show process log)"
+                                      process-name)
+                              'face 'minibuffer-prompt))
+          (?y (haskell-process-start (haskell-process-session process)))
+          (?l (let* ((response (haskell-process-response process))
+                     (buffer (get-buffer "*haskell-process-log*")))
+                (if buffer
+                    (switch-to-buffer buffer)
+                  (progn (switch-to-buffer (get-buffer-create "*haskell-process-log*"))
+                         (insert response)))))
+          (?n))
+      (message (format "The Haskell process `%s' is dearly departed."
+                       process-name)))))
+
+(defun haskell-process-cabal-macros ()
+  "Send the cabal macros string."
+  (interactive)
+  (haskell-process-queue-without-filters (haskell-process)
+                                         ":set -optP-include -optPdist/build/autogen/cabal_macros.h"))
+
+(defun haskell-session-change-target (target)
+  "Set the build target for cabal repl"
+  (interactive "sNew build target:")
+  (let* ((session haskell-session)
+         (old-target (haskell-session-get session 'target)))
+    (when session
+      (haskell-session-set-target session target)
+      (when (and (not (string= old-target target))
+                 (y-or-n-p "Target changed, restart haskell process?"))
+        (haskell-process-start session)))))
+
+(defun haskell-process-live-build (process buffer echo-in-repl)
+  "Show live updates for loading files."
+  (cond ((haskell-process-consume
+          process
+          (concat "\\[[ ]*\\([0-9]+\\) of \\([0-9]+\\)\\]"
+                  " Compiling \\([^ ]+\\)[ ]+"
+                  "( \\([^ ]+\\), \\([^ ]+\\) )[^\r\n]*[\r\n]+"))
+         (haskell-process-echo-load-message process buffer echo-in-repl nil)
+         t)
+        ((haskell-process-consume
+          process
+          (concat "\\[[ ]*\\([0-9]+\\) of \\([0-9]+\\)\\]"
+                  " Compiling \\[TH\\] \\([^ ]+\\)[ ]+"
+                  "( \\([^ ]+\\), \\([^ ]+\\) )[^\r\n]*[\r\n]+"))
+         (haskell-process-echo-load-message process buffer echo-in-repl t)
+         t)
+        ((haskell-process-consume process "Loading package \\([^ ]+\\) ... linking ... done.\n")
+         (haskell-mode-message-line
+          (format "Loading: %s"
+                  (match-string 1 buffer)))
+         t)
+        ((haskell-process-consume
+          process
+          "^Preprocessing executables for \\(.+?\\)\\.\\.\\.")
+         (let ((msg (format "Preprocessing: %s" (match-string 1 buffer))))
+           (haskell-interactive-mode-echo
+            (haskell-process-session process)
+            msg)
+           (haskell-mode-message-line msg)))
+        ((haskell-process-consume process "Linking \\(.+?\\) \\.\\.\\.")
+         (let ((msg (format "Linking: %s" (match-string 1 buffer))))
+           (haskell-interactive-mode-echo (haskell-process-session process) msg)
+           (haskell-mode-message-line msg)))
+        ((haskell-process-consume process "\nBuilding \\(.+?\\)\\.\\.\\.")
+         (let ((msg (format "Building: %s" (match-string 1 buffer))))
+           (haskell-interactive-mode-echo
+            (haskell-process-session process)
+            msg)
+           (haskell-mode-message-line msg)))))
+
+
+(defun haskell-process-echo-load-message (process buffer echo-in-repl th)
+  "Echo a load message."
+  (let ((session (haskell-process-session process))
+        (module-name (match-string 3 buffer))
+        (file-name (match-string 4 buffer)))
+    (haskell-interactive-show-load-message
+     session
+     'compiling
+     module-name
+     (haskell-session-strip-dir session file-name)
+     echo-in-repl
+     th)))
 
 (provide 'haskell-interactive-mode)
 
