@@ -31,7 +31,6 @@
 (require 'json)
 (require 'url-util)
 (require 'haskell-complete-module)
-(require 'haskell-mode)
 (require 'haskell-compat)
 (require 'haskell-session)
 (require 'haskell-customize)
@@ -40,15 +39,6 @@
 (require 'haskell-utils)
 (require 'haskell-presentation-mode)
 (require 'haskell-navigate-imports)
-
-;; FIXME: haskell-process shouldn't depend on haskell-interactive-mode to avoid module-dep cycles
-(declare-function haskell-interactive-mode-echo "haskell-interactive-mode" (session message &optional mode))
-(declare-function haskell-interactive-mode-compile-error "haskell-interactive-mode" (session message))
-(declare-function haskell-interactive-mode-compile-warning "haskell-interactive-mode" (session message))
-(declare-function haskell-interactive-mode-insert "haskell-interactive-mode" (session message))
-(declare-function haskell-interactive-mode-reset-error "haskell-interactive-mode" (session))
-(declare-function haskell-interactive-show-load-message "haskell-interactive-mode" (session type module-name file-name echo th))
-(declare-function haskell-interactive-mode-insert-garbage "haskell-interactive-mode" (session message))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configuration
@@ -267,55 +257,7 @@ imports become available?"
 ;; Specialised commands
 
 
-(defun haskell-process-cabal-live (state buffer)
-  "Do live updates for Cabal processes."
-  (haskell-interactive-mode-insert
-   (haskell-process-session (cadr state))
-   (replace-regexp-in-string
-    haskell-process-prompt-regex
-    ""
-    (substring buffer (cl-cadddr state))))
-  (setf (cl-cdddr state) (list (length buffer)))
-  nil)
 
-(defun haskell-process-load-complete (session process buffer reload module-buffer &optional cont)
-  "Handle the complete loading response. BUFFER is the string of
-text being sent over the process pipe. MODULE-BUFFER is the
-actual Emacs buffer of the module being loaded."
-  (cond ((haskell-process-consume process "Ok, modules loaded: \\(.+\\)\\.$")
-         (let* ((modules (haskell-process-extract-modules buffer))
-                (cursor (haskell-process-response-cursor process)))
-           (haskell-process-set-response-cursor process 0)
-           (let ((warning-count 0))
-             (while (haskell-process-errors-warnings session process buffer)
-               (setq warning-count (1+ warning-count)))
-             (haskell-process-set-response-cursor process cursor)
-             (if (and (not reload)
-                      haskell-process-reload-with-fbytecode)
-                 (haskell-process-reload-with-fbytecode process module-buffer)
-               (haskell-process-import-modules process (car modules)))
-             (haskell-mode-message-line
-              (if reload "Reloaded OK." "OK."))
-             (when cont
-               (condition-case e
-                   (funcall cont t)
-                 (error (message "%S" e))
-                 (quit nil))))))
-        ((haskell-process-consume process "Failed, modules loaded: \\(.+\\)\\.$")
-         (let* ((modules (haskell-process-extract-modules buffer))
-                (cursor (haskell-process-response-cursor process)))
-           (haskell-process-set-response-cursor process 0)
-           (while (haskell-process-errors-warnings session process buffer))
-           (haskell-process-set-response-cursor process cursor)
-           (if (and (not reload) haskell-process-reload-with-fbytecode)
-               (haskell-process-reload-with-fbytecode process module-buffer)
-             (haskell-process-import-modules process (car modules)))
-           (haskell-interactive-mode-compile-error session "Compilation failed.")
-           (when cont
-             (condition-case e
-                 (funcall cont nil)
-               (error (message "%S" e))
-               (quit nil)))))))
 
 (defun haskell-process-reload-with-fbytecode (process module-buffer)
   "Reload FILE-NAME with -fbyte-code set, and then restore -fobject-code."
@@ -381,163 +323,6 @@ from `module-buffer'."
           file)
       file)))
 
-(defun haskell-process-errors-warnings (session process buffer)
-  "Trigger handling type errors or warnings."
-  (cond
-   ((haskell-process-consume
-     process
-     "\\(Module imports form a cycle:[ \n]+module [^ ]+ ([^)]+)[[:unibyte:][:nonascii:]]+?\\)\nFailed")
-    (let ((err (match-string 1 buffer)))
-      (when (string-match "module [`'‘‛]\\([^ ]+\\)['’`] (\\([^)]+\\))" err)
-        (let* ((default-directory (haskell-session-current-dir session))
-               (module (match-string 1 err))
-               (file (match-string 2 err))
-               (relative-file-name (file-relative-name file)))
-          (haskell-interactive-show-load-message
-           session
-           'import-cycle
-           module
-           relative-file-name
-           nil
-           nil)
-          (haskell-interactive-mode-compile-error
-           session
-           (format "%s:1:0: %s"
-                   relative-file-name
-                   err)))))
-    t)
-   ((haskell-process-consume
-     process
-     (concat "[\r\n]\\([A-Z]?:?[^ \r\n:][^:\n\r]+\\):\\([0-9()-:]+\\):"
-             "[ \n\r]+\\([[:unibyte:][:nonascii:]]+?\\)\n[^ ]"))
-    (haskell-process-set-response-cursor process
-                                         (- (haskell-process-response-cursor process) 1))
-    (let* ((buffer (haskell-process-response process))
-           (file (match-string 1 buffer))
-           (location (match-string 2 buffer))
-           (error-msg (match-string 3 buffer))
-           (warning (string-match "^Warning:" error-msg))
-           (splice (string-match "^Splicing " error-msg))
-           (final-msg (format "%s:%s: %s"
-                              (haskell-session-strip-dir session file)
-                              location
-                              error-msg)))
-      (funcall (cond (warning
-                      'haskell-interactive-mode-compile-warning)
-                     (splice
-                      'haskell-interactive-mode-compile-splice)
-                     (t 'haskell-interactive-mode-compile-error))
-               session final-msg)
-      (unless warning
-        (haskell-mode-message-line final-msg))
-      (haskell-process-trigger-suggestions
-       session
-       error-msg
-       file
-       (plist-get (haskell-process-parse-error final-msg) :line)))
-    t)))
-
-(defun haskell-process-parse-error (string)
-  "Parse the line number from the error."
-  (let ((span nil))
-    (cl-loop for regex
-             in haskell-compilation-error-regexp-alist
-             do (when (string-match (car regex) string)
-                  (setq span
-                        (list :file (match-string 1 string)
-                              :line (string-to-number (match-string 2 string))
-                              :col (string-to-number (match-string 4 string))
-                              :line2 (when (match-string 3 string)
-                                       (string-to-number (match-string 3 string)))
-                              :col2 (when (match-string 5 string)
-                                      (string-to-number (match-string 5 string)))))))
-    span))
-
-(defun haskell-process-trigger-suggestions (session msg file line)
-  "Trigger prompting to add any extension suggestions."
-  (cond ((let ((case-fold-search nil))
-           (or (and (string-match " -X\\([A-Z][A-Za-z]+\\)" msg)
-                    (not (string-match "\\([A-Z][A-Za-z]+\\) is deprecated" msg)))
-               (string-match "Use \\([A-Z][A-Za-z]+\\) to permit this" msg)
-               (string-match "Use \\([A-Z][A-Za-z]+\\) to allow" msg)
-               (string-match "use \\([A-Z][A-Za-z]+\\)" msg)
-               (string-match "You need \\([A-Z][A-Za-z]+\\)" msg)))
-         (when haskell-process-suggest-language-pragmas
-           (haskell-process-suggest-pragma session "LANGUAGE" (match-string 1 msg) file)))
-        ((string-match " The \\(qualified \\)?import of[ ][‘`‛]\\([^ ]+\\)['’] is redundant" msg)
-         (when haskell-process-suggest-remove-import-lines
-           (haskell-process-suggest-remove-import session
-                                                  file
-                                                  (match-string 2 msg)
-                                                  line)))
-        ((string-match "Warning: orphan instance: " msg)
-         (when haskell-process-suggest-no-warn-orphans
-           (haskell-process-suggest-pragma session "OPTIONS" "-fno-warn-orphans" file)))
-        ((or (string-match "against inferred type [‘`‛]\\[Char\\]['’]" msg)
-             (string-match "with actual type [‘`‛]\\[Char\\]['’]" msg))
-         (when haskell-process-suggest-overloaded-strings
-           (haskell-process-suggest-pragma session "LANGUAGE" "OverloadedStrings" file)))
-        ((string-match "^Not in scope: .*[‘`‛]\\(.+\\)['’]$" msg)
-         (let* ((match1 (match-string 1 msg))
-                (ident (if (string-match "^[A-Za-z0-9_'.]+\\.\\(.+\\)$" match1)
-                           ;; Skip qualification.
-                           (match-string 1 match1)
-                         match1)))
-           (when haskell-process-suggest-hoogle-imports
-             (let ((modules (haskell-process-hoogle-ident ident)))
-               (haskell-process-suggest-imports session file modules ident)))
-           (when haskell-process-suggest-haskell-docs-imports
-             (let ((modules (haskell-process-haskell-docs-ident ident)))
-               (haskell-process-suggest-imports session file modules ident)))
-           (when haskell-process-suggest-hayoo-imports
-             (let ((modules (haskell-process-hayoo-ident ident)))
-               (haskell-process-suggest-imports session file modules ident)))))
-        ((string-match "^[ ]+It is a member of the hidden package [‘`‛]\\(.+\\)['’].$" msg)
-         (when haskell-process-suggest-add-package
-           (haskell-process-suggest-add-package session msg)))))
-
-(defun haskell-process-suggest-add-package (session msg)
-  "Add the (matched) module to your cabal file."
-  (let* ((suggested-package (match-string 1 msg))
-         (package-name (replace-regexp-in-string "-[^-]+$" "" suggested-package))
-         (version (progn (string-match "\\([^-]+\\)$" suggested-package)
-                         (match-string 1 suggested-package)))
-         (cabal-file (concat (haskell-session-name session)
-                             ".cabal")))
-    (when (y-or-n-p
-           (format "Add `%s' to %s?"
-                   package-name
-                   cabal-file))
-      (haskell-cabal-add-dependency package-name version nil t))))
-
-(defun haskell-process-suggest-imports (session file modules ident)
-  "Given a list of MODULES, suggest adding them to the import section."
-  (cl-assert session)
-  (cl-assert file)
-  (cl-assert ident)
-  (let* ((process (haskell-session-process session))
-         (suggested-already (haskell-process-suggested-imports process))
-         (module (cond ((> (length modules) 1)
-                        (when (y-or-n-p (format "Identifier `%s' not in scope, choose module to import?"
-                                                ident))
-                          (haskell-complete-module-read "Module: " modules)))
-                       ((= (length modules) 1)
-                        (let ((module (car modules)))
-                          (unless (member module suggested-already)
-                            (haskell-process-set-suggested-imports process (cons module suggested-already))
-                            (when (y-or-n-p (format "Identifier `%s' not in scope, import `%s'?"
-                                                    ident
-                                                    module))
-                              module)))))))
-    (when module
-      (haskell-process-find-file session file)
-      (save-excursion
-        (goto-char (point-max))
-        (haskell-navigate-imports)
-        (insert (read-from-minibuffer "Import line: " (concat "import " module))
-                "\n")
-        (haskell-sort-imports)
-        (haskell-align-imports)))))
 
 (defun haskell-process-haskell-docs-ident (ident)
   "Search with haskell-docs for IDENT, returns a list of modules."
@@ -576,52 +361,14 @@ from `module-buffer'."
             (goto-char url-http-end-of-headers)
             (let* ((res (json-read))
                    (results (assoc-default 'result res)))
-                   ;; TODO: gather packages as well, and when we choose a
-                   ;; given import, check that we have the package in the
-                   ;; cabal file as well.
+              ;; TODO: gather packages as well, and when we choose a
+              ;; given import, check that we have the package in the
+              ;; cabal file as well.
               (cl-mapcan (lambda (r)
                            ;; append converts from vector -> list
                            (append (assoc-default 'resultModules r) nil))
                          results)))
         (warn "HTTP error %s fetching %s" url-http-response-status url)))))
-
-(defun haskell-process-suggest-remove-import (session file import line)
-  "Suggest removing or commenting out IMPORT on LINE."
-  (let ((continue t)
-        (first t))
-    (cl-case (read-event
-              (propertize (format "%sThe import line `%s' is redundant. Remove? (y, n, c: comment out)  "
-                                  (if (not first)
-                                      "Please answer n, y or c: "
-                                    "")
-                                  import)
-                          'face 'minibuffer-prompt))
-      (?y
-       (haskell-process-find-file session file)
-       (save-excursion
-         (goto-char (point-min))
-         (forward-line (1- line))
-         (goto-char (line-beginning-position))
-         (delete-region (line-beginning-position)
-                        (line-end-position))))
-      (?n
-       (message "Ignoring redundant import %s" import))
-      (?c
-       (haskell-process-find-file session file)
-       (save-excursion
-         (goto-char (point-min))
-         (forward-line (1- line))
-         (goto-char (line-beginning-position))
-         (insert "-- "))))))
-
-(defun haskell-process-suggest-pragma (session pragma extension file)
-  "Suggest to add something to the top of the file."
-  (let ((string  (format "{-# %s %s #-}" pragma extension)))
-    (when (y-or-n-p (format "Add %s to the top of the file? " string))
-      (haskell-process-find-file session file)
-      (save-excursion
-        (goto-char (point-min))
-        (insert (concat string "\n"))))))
 
 (defun haskell-process-find-file (session file)
   "Find the given file in the project."
@@ -655,67 +402,9 @@ from `module-buffer'."
                      "~/"))))
              (haskell-session-get session 'current-dir))))
 
-(defun haskell-process-change-dir (session process dir)
-  "Change the directory of the current process."
-  (haskell-process-queue-command
-   process
-   (make-haskell-command
-    :state (list session process dir)
-
-    :go
-    (lambda (state)
-      (haskell-process-send-string
-       (cadr state) (format ":cd %s" (cl-caddr state))))
-
-    :complete
-    (lambda (state _)
-      (haskell-session-set-current-dir (car state) (cl-caddr state))
-      (haskell-interactive-mode-echo (car state)
-                                     (format "Changed directory: %s"
-                                             (cl-caddr state)))))))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Process communication
 
-(defun haskell-process-send-startup (process)
-  "Send the necessary start messages."
-  (haskell-process-queue-command
-   process
-   (make-haskell-command
-    :state process
-
-    :go (lambda (process)
-          (haskell-process-send-string process ":set prompt \"\\4\"")
-          (haskell-process-send-string process "Prelude.putStrLn \"\"")
-          (haskell-process-send-string process ":set -v1"))
-
-    :live (lambda (process buffer)
-            (when (haskell-process-consume
-                   process
-                   "^\*\*\* WARNING: \\(.+\\) is writable by someone else, IGNORING!$")
-              (let ((path (match-string 1 buffer)))
-                (haskell-session-modify
-                 (haskell-process-session process)
-                 'ignored-files
-                 (lambda (files)
-                   (cl-remove-duplicates (cons path files) :test 'string=)))
-                (haskell-interactive-mode-compile-warning
-                 (haskell-process-session process)
-                 (format "GHCi is ignoring: %s (run M-x haskell-process-unignore)"
-                         path)))))
-
-    :complete (lambda (process _)
-                (haskell-interactive-mode-echo
-                 (haskell-process-session process)
-                 (concat (nth (random (length haskell-process-greetings))
-                              haskell-process-greetings)
-                         (when haskell-process-show-debug-tips
-                           "
-If I break, you can:
-  1. Restart:           M-x haskell-process-restart
-  2. Configure logging: C-h v haskell-process-log (useful for debugging)
-  3. General config:    M-x customize-mode
-  4. Hide these tips:   C-h v haskell-process-show-debug-tips")))))))
 
 (defun haskell-process-sentinel (proc event)
   "The sentinel for the process pipe."
@@ -747,8 +436,7 @@ If I break, you can:
           (haskell-process-collect session
                                    response
                                    (haskell-session-process session))
-        (haskell-interactive-mode-insert-garbage
-         session
+        (haskell-process-log
          (replace-regexp-in-string "\4" "" response))))))
 
 (defun haskell-process-log (msg)
