@@ -420,37 +420,12 @@
           (haskell-session-make name))))))
 
 ;;;###autoload
-(defun haskell-session-all-modules (&optional dontcreate)
-  "Get all modules -- installed or in the current project.
-If DONTCREATE is non-nil don't create a new session."
-  (append (haskell-session-installed-modules dontcreate)
-          (haskell-session-project-modules dontcreate)))
-
-;;;###autoload
 (defun haskell-session-change ()
   "Change the session for the current buffer."
   (interactive)
   (haskell-session-assign (or (haskell-session-new-assume-from-cabal)
                               (haskell-session-choose)
                               (haskell-session-new))))
-
-;;;###autoload
-(defun haskell-session-project-modules (&optional dontcreate)
-  "Get the modules of the current project.
-If DONTCREATE is non-nil don't create a new session."
-  (if (or (not dontcreate) (haskell-session-maybe))
-      (let* ((session (haskell-session))
-             (modules
-              (shell-command-to-string
-               (format "%s && %s"
-                       (format "cd %s" (haskell-session-cabal-dir session))
-                       ;; TODO: Use a different, better source. Possibly hasktags or some such.
-                       ;; TODO: At least make it cross-platform. Linux
-                       ;; (and possibly OS X) have egrep, Windows
-                       ;; doesn't -- or does it via Cygwin or MinGW?
-                       ;; This also doesn't handle module\nName. But those gits can just cut it out!
-                       "egrep '^module[\t\r ]+[^(\t\r ]+' . -r -I --include='*.*hs' --include='*.hsc' -s -o -h | sed 's/^module[\t\r ]*//' | sort | uniq"))))
-        (split-string modules))))
 
 ;;;###autoload
 (defun haskell-mode-find-def (ident)
@@ -1420,37 +1395,6 @@ actual Emacs buffer of the module being loaded."
   "Get the current process from the current session."
   (haskell-session-process (haskell-session)))
 
-;;;###autoload
-(defun haskell-session-installed-modules (&optional dontcreate)
-  "Get the modules installed in the current package set.
-If DONTCREATE is non-nil don't create a new session."
-  ;; TODO: Again, this makes HEAVY use of unix utilities. It'll work
-  ;; fine in Linux, probably okay on OS X, and probably not at all on
-  ;; Windows. Again, if someone wants to test on Windows and come up
-  ;; with alternatives that's OK.
-  ;;
-  ;; Ideally all these package queries can be provided by a Haskell
-  ;; program based on the Cabal API. Possibly as a nice service. Such
-  ;; a service could cache and do nice things like that. For now, this
-  ;; simple shell script takes us far.
-  ;;
-  ;; Probably also we can take the code from inferior-haskell-mode.
-  ;;
-  ;; Ugliness aside, if it saves us time to type it's a winner.
-  ;;
-  ;; FIXME/TODO: add support for (eq 'cabal-repl (haskell-process-type))
-  (let ((modules (shell-command-to-string
-                  (format "%s | %s | %s"
-                          (if (eq 'cabal-dev (haskell-process-type))
-                              (if (or (not dontcreate) (haskell-session-maybe))
-                                  (format "cabal-dev -s %s/cabal-dev ghc-pkg dump"
-                                          (haskell-session-cabal-dir (haskell-session)))
-                                "echo ''")
-                            "ghc-pkg dump")
-                          "egrep '^(exposed-modules: |                 )[A-Z]'"
-                          "cut -c18-"))))
-    (split-string modules)))
-
 (defun haskell-interactive-buffer ()
   "Get the interactive buffer of the session."
   (haskell-session-interactive-buffer (haskell-session)))
@@ -1833,7 +1777,9 @@ If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
                 (save-excursion (forward-word -1)
                                 (looking-at "^import$")))
            (insert " ")
-           (let ((module (haskell-complete-module-read "Module: " (haskell-session-all-modules))))
+           (let ((module (haskell-complete-module-read
+                          "Module: "
+                          (haskell-session-all-modules (haskell-session)))))
              (insert module)
              (haskell-mode-format-imports)))
           ((not (string= "" (save-excursion (forward-char -1) (haskell-ident-at-point))))
