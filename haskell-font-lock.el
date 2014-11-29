@@ -693,6 +693,16 @@ Invokes `haskell-font-lock-hook' if not nil."
   "Turns off font locking in current buffer."
   (font-lock-mode -1))
 
+(defun haskell-fontify-as-mode (text mode)
+  "Fontify TEXT as MODE, returning the fontified text."
+  (with-temp-buffer
+    (funcall mode)
+    (insert text)
+    (if (fboundp 'font-lock-ensure)
+        (font-lock-ensure)
+      (with-no-warnings (font-lock-fontify-buffer)))
+    (buffer-substring (point-min) (point-max))))
+
 ;; Provide ourselves:
 
 (provide 'haskell-font-lock)

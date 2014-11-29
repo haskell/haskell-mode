@@ -31,6 +31,7 @@
 (require 'haskell-compat)
 (require 'haskell-session)
 (require 'haskell-process)
+(require 'haskell-interactive-mode)
 
 (defcustom haskell-menu-buffer-name "*haskell-menu*"
   "The name of the Haskell session menu buffer"
