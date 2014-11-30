@@ -347,8 +347,8 @@ OTHER-WINDOW use `find-file-other-window'."
 )
 
 (defun haskell-cabal-section-end ()
-  (interactive)
   "Find the end of the current section"
+  (interactive)
   (save-excursion
     (if  (re-search-forward "\n\\([ \t]*\n\\)*[[:alnum:]]" nil t)
          (match-beginning 0)

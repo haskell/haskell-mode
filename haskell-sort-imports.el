@@ -38,12 +38,12 @@
 
 ;;;###autoload
 (defun haskell-sort-imports ()
-  (interactive)
   "Sort the import list at point. It sorts the current group
 i.e. an import list separated by blank lines on either side.
 
 If the region is active, it will restrict the imports to sort
 within that region."
+  (interactive)
   (when (haskell-sort-imports-at-import)
     (let* ((points (haskell-sort-imports-decl-points))
            (current-string (buffer-substring-no-properties (car points)
