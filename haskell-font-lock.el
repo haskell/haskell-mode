@@ -415,6 +415,9 @@ Returns keywords suitable for `font-lock-keywords'."
              (2 haskell-keyword-face nil lax)
              (3 haskell-keyword-face nil lax))
 
+            ;; Highlight 'error' and 'undefined', like 'error' in emacs-lisp-mode
+            ("\\_<\\(error\\|undefined\\)\\_>" 0 'font-lock-warning-face)
+
             ;; Toplevel Declarations.
             ;; Place them *before* generic id-and-op highlighting.
             (,topdecl-var  (1 haskell-definition-face))
