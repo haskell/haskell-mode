@@ -137,6 +137,7 @@
 (require 'haskell-sort-imports)
 (require 'haskell-string)
 
+
 ;; FIXME: code-smell: too many forward decls for haskell-session are required here
 (defvar haskell-session)
 (declare-function haskell-process "haskell-process" ())
