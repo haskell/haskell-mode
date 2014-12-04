@@ -708,6 +708,13 @@ is asked to show extra info for the items matching QUERY.."
                  (const "ghc -fno-code")
                  (string :tag "Other command")))
 
+(defcustom haskell-flymake-check-command "hlint"
+  "*Command used by flymake for on-the-fly syntax checking of a Haskell file."
+  :group 'haskell
+  :type '(choice (const "hlint")
+                 (const "ghc -fno-code")
+                 (string :tag "Other command")))
+
 (defcustom haskell-completing-read-function 'ido-completing-read
   "Default function to use for completion."
   :group 'haskell
@@ -752,8 +759,8 @@ See `haskell-check-command' for the default."
 (defun haskell-flymake-init ()
   "Flymake init function for Haskell.
 To be added to `flymake-init-create-temp-buffer-copy'."
-  (let ((checker-elts (and haskell-check-command
-                           (split-string haskell-check-command))))
+  (let* ((checker-elts (and haskell-flymake-check-command
+                           (split-string haskell-flymake-check-command))))
     (list (car checker-elts)
           (append (cdr checker-elts)
                   (list (flymake-init-create-temp-buffer-copy
