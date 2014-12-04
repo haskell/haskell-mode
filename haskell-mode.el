@@ -759,7 +759,7 @@ See `haskell-check-command' for the default."
 (defun haskell-flymake-init ()
   "Flymake init function for Haskell.
 To be added to `flymake-init-create-temp-buffer-copy'."
-  (let* ((checker-elts (and haskell-flymake-check-command
+  (let ((checker-elts (and haskell-flymake-check-command
                            (split-string haskell-flymake-check-command))))
     (list (car checker-elts)
           (append (cdr checker-elts)
