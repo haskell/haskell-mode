@@ -22,6 +22,7 @@
 (require 'haskell-font-lock)
 (require 'haskell-interactive-mode)
 (require 'haskell-session)
+(require 'highlight-uses-mode)
 
 (defun haskell-process-restart ()
   "Restart the inferior Haskell process."
@@ -365,11 +366,16 @@ command from GHCi."
   (interactive)
   (let ((loc (haskell-mode-loc-at)))
     (when loc
-      (find-file (expand-file-name (plist-get loc :path)
-                                   (haskell-session-cabal-dir (haskell-interactive-session))))
-      (goto-char (point-min))
-      (forward-line (1- (plist-get loc :start-line)))
-      (forward-char (plist-get loc :start-col)))))
+      (haskell-mode-goto-span loc))))
+
+(defun haskell-mode-goto-span (span)
+  "Jump to the span, whatever file and line and column it needs
+to to get there."
+  (find-file (expand-file-name (plist-get span :path)
+                               (haskell-session-cabal-dir (haskell-interactive-session))))
+  (goto-char (point-min))
+  (forward-line (1- (plist-get span :start-line)))
+  (forward-char (plist-get span :start-col)))
 
 (defun haskell-process-insert-type ()
   "Get the identifer at the point and insert its type, if
@@ -751,5 +757,74 @@ remains unchanged."
       (funcall errout "%s failed: %s" cmd stderr-output))
     (delete-file tmp-file)
     (delete-file err-file)))
+
+(defun haskell-mode-find-uses ()
+  "Find uses of the identifier at point, highlight them all."
+  (interactive)
+  (let ((spans (haskell-mode-uses-at)))
+    (unless (null spans)
+      (highlight-uses-mode 1)
+      (cl-loop for span in spans
+               do (haskell-mode-make-use-highlight span)))))
+
+(defun haskell-mode-make-use-highlight (span)
+  "Make a highlight overlay at the given span."
+  (save-window-excursion
+    (save-excursion
+      (haskell-mode-goto-span span)
+      (save-excursion
+        (highlight-uses-mode-highlight
+         (progn
+           (goto-char (point-min))
+           (forward-line (1- (plist-get span :start-line)))
+           (forward-char (plist-get span :start-col))
+           (point))
+         (progn
+           (goto-char (point-min))
+           (forward-line (1- (plist-get span :end-line)))
+           (forward-char (plist-get span :end-col))
+           (point)))))))
+
+(defun haskell-mode-uses-at ()
+  "Get the locations of uses for the ident at point. Requires
+the :uses command from GHCi."
+  (let ((pos (or (when (region-active-p)
+                   (cons (region-beginning)
+                         (region-end)))
+                 (haskell-ident-pos-at-point)
+                 (cons (point)
+                       (point)))))
+    (when pos
+      (let ((reply (haskell-process-queue-sync-request
+                    (haskell-interactive-process)
+                    (save-excursion
+                      (format ":uses %s %d %d %d %d %s"
+                              (buffer-file-name)
+                              (progn (goto-char (car pos))
+                                     (line-number-at-pos))
+                              (1+ (current-column)) ;; GHC uses 1-based columns.
+                              (progn (goto-char (cdr pos))
+                                     (line-number-at-pos))
+                              (1+ (current-column)) ;; GHC uses 1-based columns.
+                              (buffer-substring-no-properties (car pos)
+                                                              (cdr pos)))))))
+        (if reply
+            (let ((lines (split-string reply "\n" t)))
+              (cl-remove-if
+               #'null
+               (mapcar (lambda (line)
+                         (if (string-match "\\(.*?\\):(\\([0-9]+\\),\\([0-9]+\\))-(\\([0-9]+\\),\\([0-9]+\\))"
+                                           line)
+                             (list :path (match-string 1 line)
+                                   :start-line (string-to-number (match-string 2 line))
+                                   ;; ;; GHC uses 1-based columns.
+                                   :start-col (1- (string-to-number (match-string 3 line)))
+                                   :end-line (string-to-number (match-string 4 line))
+                                   ;; GHC uses 1-based columns.
+                                   :end-col (1- (string-to-number (match-string 5 line))))
+                           (error (propertize line 'face 'compilation-error))))
+                       lines)))
+          (error (propertize "No reply. Is :uses supported?"
+                             'face 'compilation-error)))))))
 
 (provide 'haskell-commands)

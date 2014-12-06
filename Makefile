@@ -9,6 +9,7 @@ SUBST_ATAT = sed -e 's/@@GIT_VERSION@@/$(GIT_VERSION)/g;s/@GIT_VERSION@/$(GIT_VE
 
 ELFILES = \
 	ghc-core.el \
+	highlight-uses-mode.el \
 	haskell-align-imports.el \
 	haskell-bot.el \
 	haskell-cabal.el \
