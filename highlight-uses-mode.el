@@ -22,16 +22,30 @@
     (define-key map (kbd "TAB") 'highlight-uses-mode-next)
     (define-key map (kbd "S-TAB") 'highlight-uses-mode-prev)
     (define-key map (kbd "<backtab>") 'highlight-uses-mode-prev)
+    (define-key map (kbd "RET") 'highlight-uses-mode-stop-here)
     (define-key map (kbd "C-g") 'highlight-uses-mode)
     map)
   "Keymap for using haskell-interactive-mode.")
+
+(defvar highlight-uses-mode-point nil)
+(make-variable-buffer-local 'highlight-uses-mode-point)
 
 ;;;###autoload
 (define-minor-mode highlight-uses-mode
   "Minor mode for highlighting and jumping between uses."
   :lighter " Uses"
   :keymap highlight-uses-mode-map
+  (if highlight-uses-mode
+      (setq highlight-uses-mode-point (point))
+    (when highlight-uses-mode-point
+      (goto-char highlight-uses-mode-point)))
   (remove-overlays (point-min) (point-max) 'highlight-uses-mode-highlight t))
+
+(defun highlight-uses-mode-stop-here ()
+  "Stop at this point."
+  (interactive)
+  (setq highlight-uses-mode-point (point))
+  (highlight-uses-mode -1))
 
 (defun highlight-uses-mode-next ()
   "Jump to next result."
