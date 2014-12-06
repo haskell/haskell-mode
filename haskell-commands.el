@@ -17,6 +17,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'haskell-process)
 (require 'haskell-font-lock)
 (require 'haskell-interactive-mode)

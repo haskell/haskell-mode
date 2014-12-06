@@ -17,6 +17,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'haskell-mode)
 (require 'haskell-process)
 (require 'haskell-debug)

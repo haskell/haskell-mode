@@ -23,6 +23,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'json)
 (require 'url-util)
 (require 'haskell-session)

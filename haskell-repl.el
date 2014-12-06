@@ -17,6 +17,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'haskell-interactive-mode)
 
 (defun haskell-interactive-handle-expr ()
