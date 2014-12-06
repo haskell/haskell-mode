@@ -73,7 +73,7 @@
   "Make a highlight overlay at the given span."
   (let ((o (make-overlay start end)))
     (overlay-put o 'priority 999)
-    (overlay-put o 'face 'isearch-lazy-highlight)
+    (overlay-put o 'face 'isearch)
     (overlay-put o 'highlight-uses-mode-highlight t)))
 
 (provide 'highlight-uses-mode)
