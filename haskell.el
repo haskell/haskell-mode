@@ -264,6 +264,7 @@
       (display-buffer buffer)
       (other-window 1))))
 
+;;;###autoload
 (defun haskell-process-load-file ()
   "Load the current buffer file."
   (interactive)
