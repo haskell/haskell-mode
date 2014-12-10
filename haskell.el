@@ -32,6 +32,38 @@
 (add-hook 'haskell-process-ended-hook 'haskell-process-prompt-restart)
 (add-hook 'kill-buffer-hook 'haskell-interactive-kill)
 
+(defvar interactive-haskell-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-l") 'haskell-process-load-or-reload)
+    (define-key map (kbd "C-c C-t") 'haskell-process-do-type)
+    (define-key map (kbd "C-c C-i") 'haskell-process-do-info)
+    (define-key map (kbd "M-.") 'haskell-mode-jump-to-def-or-tag)
+    (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
+    (define-key map (kbd "C-c C-c") 'haskell-process-cabal-build)
+    (define-key map (kbd "C-c C-x") 'haskell-process-cabal)
+    (define-key map [?\C-c ?\C-b] 'haskell-interactive-switch)
+    (define-key map [?\C-c ?\C-z] 'haskell-interactive-switch)
+    map)
+  "Keymap for using haskell-interactive-mode.")
+
+;;;###autoload
+(define-minor-mode interactive-haskell-mode
+  "Minor mode for enabling haskell-process interaction."
+  :lighter " Interactive"
+  :keymap interactive-haskell-mode-map
+  (add-hook 'completion-at-point-functions 'haskell-process-completions-at-point nil t))
+
+(defun haskell-process-completions-at-point ()
+  "A completion-at-point function using the current haskell process."
+  (let ((process (haskell-process))
+        (symbol (symbol-at-point)))
+    (when (and process symbol)
+      (cl-destructuring-bind (start . end) (bounds-of-thing-at-point 'symbol)
+        (let ((completions (haskell-process-get-repl-completions
+                            process
+                            (symbol-name symbol))))
+          (list start end completions))))))
+
 ;;;###autoload
 (defun haskell-interactive-mode-return ()
   "Handle the return key."
