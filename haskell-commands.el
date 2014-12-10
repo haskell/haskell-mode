@@ -616,11 +616,27 @@ command from GHCi."
 (defun haskell-mode-show-type-at (&optional insert-value)
   "Show the type of the thing at point."
   (interactive "P")
-  (let ((ty (haskell-mode-type-at)))
+  (let ((ty (haskell-mode-type-at))
+        (orig (point)))
     (if insert-value
-        (progn (goto-char (line-beginning-position))
-               (insert (haskell-fontify-as-mode ty 'haskell-mode)
-                       "\n"))
+        (let ((ident-pos (haskell-ident-pos-at-point)))
+          (cond
+           ((region-active-p)
+            (delete-region (region-beginning)
+                           (region-end))
+            (insert "(" ty ")")
+            (goto-char (1+ orig)))
+           ((= (line-beginning-position) (car ident-pos))
+            (goto-char (line-beginning-position))
+            (insert (haskell-fontify-as-mode ty 'haskell-mode)
+                    "\n"))
+           (t
+            (save-excursion
+              (let ((col (save-excursion (goto-char (car ident-pos))
+                                         (current-column))))
+                (save-excursion (insert "\n")
+                                (indent-to col))
+                (insert (haskell-fontify-as-mode ty 'haskell-mode)))))))
       (message "%s" (haskell-fontify-as-mode ty 'haskell-mode)))))
 
 (defun haskell-process-generate-tags (&optional and-then-find-this-tag)
