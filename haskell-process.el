@@ -275,6 +275,17 @@ This uses `accept-process-output' internally."
             (error "Lengths inconsistent in `:complete' reponse"))
           (cons h1 cs))))))
 
+(defun haskell-process-completions-at-point ()
+  "A completion-at-point function using the current haskell process."
+  (let ((process (haskell-process))
+        (symbol (symbol-at-point)))
+    (when (and process symbol)
+      (destructuring-bind (start . end) (bounds-of-thing-at-point 'symbol)
+        (let ((completions (haskell-process-get-repl-completions
+                            process
+                            (symbol-name symbol))))
+          (list start end completions))))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessing the process
 
@@ -471,7 +482,8 @@ function and remove this comment.
 (define-minor-mode interactive-haskell-mode
   "Minor mode for enabling haskell-process interaction."
   :lighter " Interactive"
-  :keymap interactive-haskell-mode-map)
+  :keymap interactive-haskell-mode-map
+  (add-hook 'completion-at-point-functions 'haskell-process-completions-at-point nil t))
 
 (provide 'haskell-process)
 
