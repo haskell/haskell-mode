@@ -344,6 +344,7 @@ actual Emacs buffer of the module being loaded."
     (when echo
       (haskell-interactive-mode-echo session msg))))
 
+;;;###autoload
 (defun haskell-process-reload-devel-main ()
   "Reload the module `DevelMain' and then run
 `DevelMain.update'. This is for doing live update of the code of

@@ -24,6 +24,7 @@
 (require 'haskell-session)
 (require 'highlight-uses-mode)
 
+;;;###autoload
 (defun haskell-process-restart ()
   "Restart the inferior Haskell process."
   (interactive)
@@ -157,12 +158,14 @@ If I break, you can:
       (error "No Haskell session/process associated with this
       buffer. Maybe run M-x haskell-session-change?")))
 
+;;;###autoload
 (defun haskell-process-clear ()
   "Clear the current process."
   (interactive)
   (haskell-process-reset (haskell-commands-process))
   (haskell-process-set (haskell-commands-process) 'command-queue nil))
 
+;;;###autoload
 (defun haskell-process-interrupt ()
   "Interrupt the process (SIGINT)."
   (interactive)
@@ -175,6 +178,7 @@ If I break, you can:
   (haskell-process-queue-without-filters process ":reload")
   (haskell-process-queue-without-filters process ":set -fobject-code"))
 
+;;;###autoload
 (defun haskell-process-touch-buffer (process buffer)
   "Updates mtime on the file for BUFFER by queing a touch on
 PROCESS."
@@ -253,6 +257,7 @@ from `module-buffer'."
              (car state)
              (format ":m + %s" (mapconcat 'identity (cdr state) " "))))))))
 
+;;;###autoload
 (defun haskell-describe (ident)
   "Describe the given identifier."
   (interactive (list (read-from-minibuffer "Describe identifier: "
@@ -289,6 +294,7 @@ from `module-buffer'."
                        do (insert "\n\n"))
             (insert "No results for " ident)))))))
 
+;;;###autoload
 (defun haskell-rgrep (&optional prompt)
   "Grep the effective project for the symbol at point. Very
 useful for codebase navigation. Prompts for an arbitrary regexp
@@ -445,6 +451,7 @@ Returns:
                         (list 'module
                               (match-string 1 defined))))))))))))))
 
+;;;###autoload
 (defun haskell-mode-jump-to-def (ident)
   "Jump to definition of identifier at point."
   (interactive (list (haskell-ident-at-point)))
@@ -529,6 +536,7 @@ command from GHCi."
                    (buffer-substring-no-properties (car pos)
                                                    (cdr pos))))))))))
 
+;;;###autoload
 (defun haskell-process-cd (&optional not-interactive)
   "Change directory."
   (interactive)
@@ -574,6 +582,7 @@ command from GHCi."
                                      (format "Changed directory: %s"
                                              (cl-caddr state)))))))
 
+;;;###autoload
 (defun haskell-process-cabal-macros ()
   "Send the cabal macros string."
   (interactive)
@@ -616,6 +625,7 @@ command from GHCi."
                               (string-match "^<interactive>" response))
                     (haskell-mode-message-line response)))))))
 
+;;;###autoload
 (defun haskell-mode-show-type-at (&optional insert-value)
   "Show the type of the thing at point."
   (interactive "P")
@@ -642,6 +652,7 @@ command from GHCi."
                 (insert (haskell-fontify-as-mode ty 'haskell-mode)))))))
       (message "%s" (haskell-fontify-as-mode ty 'haskell-mode)))))
 
+;;;###autoload
 (defun haskell-process-generate-tags (&optional and-then-find-this-tag)
   "Regenerate the TAGS table."
   (interactive)
@@ -686,6 +697,7 @@ to be loaded by ghci."
        (haskell-interactive-process)
        (format ":set -i%s" ghci-gen-dir)))))
 
+;;;###autoload
 (defun haskell-process-unignore ()
   "Unignore any files that were specified as being ignored by the
   inferior GHCi process."
@@ -711,6 +723,7 @@ to be loaded by ghci."
                  (y-or-n-p "Restart GHCi process now? "))
         (haskell-process-restart)))))
 
+;;;###autoload
 (defun haskell-session-change-target (target)
   "Set the build target for cabal repl"
   (interactive "sNew build target:")
@@ -722,6 +735,7 @@ to be loaded by ghci."
                  (y-or-n-p "Target changed, restart haskell process?"))
         (haskell-process-start session)))))
 
+;;;###autoload
 (defun haskell-mode-stylish-buffer ()
   "Apply stylish-haskell to the current buffer."
   (interactive)
@@ -777,6 +791,7 @@ remains unchanged."
     (delete-file tmp-file)
     (delete-file err-file)))
 
+;;;###autoload
 (defun haskell-mode-find-uses ()
   "Find uses of the identifier at point, highlight them all."
   (interactive)
