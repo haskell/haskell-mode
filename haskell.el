@@ -32,6 +32,7 @@
 (add-hook 'haskell-process-ended-hook 'haskell-process-prompt-restart)
 (add-hook 'kill-buffer-hook 'haskell-interactive-kill)
 
+;;;###autoload
 (defun haskell-interactive-mode-return ()
   "Handle the return key."
   (interactive)
@@ -41,6 +42,7 @@
    (t
     (haskell-interactive-handle-expr))))
 
+;;;###autoload
 (defun haskell-session-kill (&optional leave-interactive-buffer)
   "Kill the session process and buffer, delete the session.
 0. Prompt to kill all associated buffers.
@@ -70,6 +72,7 @@
                                    name))
                         haskell-sessions))))
 
+;;;###autoload
 (defun haskell-interactive-kill ()
   "Kill the buffer and (maybe) the session."
   (interactive)
@@ -163,6 +166,7 @@
   "Get the interactive buffer of the session."
   (haskell-session-interactive-buffer (haskell-session)))
 
+;;;###autoload
 (defun haskell-kill-session-process (&optional session)
   "Kill the process."
   (interactive)
@@ -173,6 +177,7 @@
       (haskell-process-set (haskell-session-process session) 'is-restarting t)
       (delete-process existing-process))))
 
+;;;###autoload
 (defun haskell-interactive-mode-visit-error ()
   "Visit the buffer of the current (or last) error message."
   (interactive)
@@ -185,6 +190,7 @@
              (haskell-interactive-mode-error-backward)
              (haskell-interactive-jump-to-error-line)))))
 
+;;;###autoload
 (defun haskell-mode-contextual-space ()
   "Contextually do clever stuff when hitting space."
   (interactive)
@@ -206,6 +212,7 @@
              (haskell-process-do-try-info ident)))
           (t (insert " ")))))
 
+;;;###autoload
 (defun haskell-mode-jump-to-tag (&optional next-p)
   "Jump to the tag of the given identifier."
   (interactive "P")
@@ -228,6 +235,7 @@
           (after-save-hook '()))
       (basic-save-buffer))))
 
+;;;###autoload
 (defun haskell-mode-tag-find (&optional next-p)
   "The tag find function, specific for the particular session."
   (interactive "P")
@@ -344,6 +352,7 @@ for various things, but is optional."
                      (cl-cadddr state)
                      (cl-cadddr (cdr state)))))))))
 
+;;;###autoload
 (defun haskell-process-minimal-imports ()
   "Dump minimal imports."
   (interactive)
