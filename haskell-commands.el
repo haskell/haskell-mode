@@ -307,9 +307,12 @@ given a prefix arg."
 If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
   (interactive "P")
   (haskell-process-do-simple-echo
-   (let ((ident (if prompt-value
-                    (read-from-minibuffer "Info: " (haskell-ident-at-point))
-                  (haskell-ident-at-point)))
+   (let ((ident (replace-regexp-in-string
+                 "^!\\([A-Z_a-z]\\)"
+                 "\\1"
+                 (if prompt-value
+                     (read-from-minibuffer "Info: " (haskell-ident-at-point))
+                   (haskell-ident-at-point))))
          (modname (unless prompt-value
                     (haskell-utils-parse-import-statement-at-point))))
      (if modname
