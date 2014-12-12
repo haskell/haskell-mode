@@ -49,13 +49,23 @@ Used for locating additional package data files.")
 
 (defcustom haskell-process-wrapper-function
   #'identity
-  "A default wrapper function to deal with an eventual haskell-process-wrapper.
+  "Wrap or transform haskell process commands using this function.
 
-If no wrapper is needed, then using 'identify function is sufficient.
-Otherwise, define a function which takes a list of arguments.
-For example:
+Can be set to a custom function which takes a list of arguments
+and returns a possibly-modified list.
+
+The following example function arranges for all haskell process
+commands to be started in the current nix-shell environment:
+
   (lambda (argv) (append (list \"nix-shell\" \"default.nix\" \"--command\" )
-                    (list (mapconcat 'identity argv \" \"))))")
+                    (list (mapconcat 'identity argv \" \"))))
+
+See Info Node `(emacs)Directory Variables' for a way to set this option on
+a per-project basis."
+  :group 'haskell-interactive
+  :type '(choice
+          (function-item :tag "None" :value identity)
+          (function :tag "Custom function")))
 
 (defcustom haskell-ask-also-kill-buffers
   t
