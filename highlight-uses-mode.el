@@ -17,6 +17,8 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
 (defvar highlight-uses-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "TAB") 'highlight-uses-mode-next)
@@ -50,24 +52,28 @@
 (defun highlight-uses-mode-next ()
   "Jump to next result."
   (interactive)
-  (let ((os (overlays-in (point) (point-max))))
-    (let ((last-point (point)))
-      (while (car os)
-        (goto-char (overlay-start (car os)))
-        (if (= (point) last-point)
-            (setq os (cdr os))
-          (setq os nil))))))
+  (let ((os (sort (cl-remove-if (lambda (o)
+                                  (or (<= (overlay-start o) (point))
+                                      (not (overlay-get o 'highlight-uses-mode-highlight))))
+                                (overlays-in (point) (point-max)))
+                  (lambda (a b)
+                    (< (overlay-start a)
+                       (overlay-start b))))))
+    (when os
+      (goto-char (overlay-start (car os))))))
 
 (defun highlight-uses-mode-prev ()
   "Jump to previous result."
   (interactive)
-  (let ((os (overlays-in (point-min) (point))))
-    (let ((last-point (point)))
-      (while (car os)
-        (goto-char (overlay-start (car os)))
-        (if (= (point) last-point)
-            (setq os (cdr os))
-          (setq os nil))))))
+  (let ((os (sort (cl-remove-if (lambda (o)
+                                  (or (>= (overlay-end o) (point))
+                                      (not (overlay-get o 'highlight-uses-mode-highlight))))
+                                (overlays-in (point-min) (point)))
+                  (lambda (a b)
+                    (> (overlay-start a)
+                       (overlay-start b))))))
+    (when os
+      (goto-char (overlay-start (car os))))))
 
 (defun highlight-uses-mode-highlight (start end)
   "Make a highlight overlay at the given span."
