@@ -256,6 +256,7 @@
              (find-tag ident next-p))
             (t (haskell-process-generate-tags ident))))))
 
+;;;###autoload
 (defun haskell-mode-after-save-handler ()
   "Function that will be called after buffer's saving."
   (when haskell-tags-on-save
