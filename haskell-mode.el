@@ -569,11 +569,16 @@ see documentation for that variable for more details."
   (set (make-local-variable 'mode-line-process)
        '("/" (:eval (symbol-name haskell-literate)))))
 
-;;;###autoload(add-to-list 'auto-mode-alist        '("\\.[gh]s\\'" . haskell-mode))
-;;;###autoload(add-to-list 'auto-mode-alist        '("\\.l[gh]s\\'" . literate-haskell-mode))
-;;;###autoload(add-to-list 'interpreter-mode-alist '("runghc" . haskell-mode))
-;;;###autoload(add-to-list 'interpreter-mode-alist '("runhaskell" . haskell-mode))
-;;;###autoload(add-to-list 'completion-ignored-extensions ".hi")
+;;;###autoload
+(add-to-list 'auto-mode-alist        '("\\.[gh]s\\'" . haskell-mode))
+;;;###autoload
+(add-to-list 'auto-mode-alist        '("\\.l[gh]s\\'" . literate-haskell-mode))
+;;;###autoload
+(add-to-list 'interpreter-mode-alist '("runghc" . haskell-mode))
+;;;###autoload
+(add-to-list 'interpreter-mode-alist '("runhaskell" . haskell-mode))
+;;;###autoload
+(add-to-list 'completion-ignored-extensions ".hi")
 
 (defcustom haskell-hoogle-command
   (if (executable-find "hoogle") "hoogle")
