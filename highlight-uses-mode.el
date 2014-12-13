@@ -43,6 +43,26 @@
       (goto-char highlight-uses-mode-point)))
   (remove-overlays (point-min) (point-max) 'highlight-uses-mode-highlight t))
 
+(defun highlight-uses-mode-replace ()
+  "Replace all highlighted instances in the buffer with something
+  else."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (let ((o (highlight-uses-mode-next)))
+      (when o
+        (let ((replacement (read-from-minibuffer (format "Replace uses %s with: "
+                                                         (buffer-substring
+                                                          (overlay-start o)
+                                                          (overlay-end o))))))
+
+          (while o
+            (goto-char (overlay-start o))
+            (delete-region (overlay-start o)
+                           (overlay-end o))
+            (insert replacement)
+            (setq o (highlight-uses-mode-next))))))))
+
 (defun highlight-uses-mode-stop-here ()
   "Stop at this point."
   (interactive)
@@ -60,7 +80,8 @@
                     (< (overlay-start a)
                        (overlay-start b))))))
     (when os
-      (goto-char (overlay-start (car os))))))
+      (goto-char (overlay-start (car os)))
+      (car os))))
 
 (defun highlight-uses-mode-prev ()
   "Jump to previous result."
@@ -73,7 +94,8 @@
                     (> (overlay-start a)
                        (overlay-start b))))))
     (when os
-      (goto-char (overlay-start (car os))))))
+      (goto-char (overlay-start (car os)))
+      (car os))))
 
 (defun highlight-uses-mode-highlight (start end)
   "Make a highlight overlay at the given span."
