@@ -380,6 +380,7 @@ command from GHCi."
 (defun haskell-mode-goto-span (span)
   "Jump to the span, whatever file and line and column it needs
 to to get there."
+  (ring-insert find-tag-marker-ring (point-marker))
   (find-file (expand-file-name (plist-get span :path)
                                (haskell-session-cabal-dir (haskell-interactive-session))))
   (goto-char (point-min))
