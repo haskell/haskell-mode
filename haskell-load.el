@@ -271,31 +271,35 @@ actual Emacs buffer of the module being loaded."
          (modules (split-string modules-string ", ")))
     (cons modules modules-string)))
 
-(defun haskell-process-errors-warnings (session process buffer)
-  "Trigger handling type errors or warnings."
+(defun haskell-process-errors-warnings (session process buffer &optional return-only)
+  "Trigger handling type errors or warnings. Either prints the
+messages in the interactive buffer or if CONT is specified,
+passes the error onto that."
   (cond
    ((haskell-process-consume
      process
      "\\(Module imports form a cycle:[ \n]+module [^ ]+ ([^)]+)[[:unibyte:][:nonascii:]]+?\\)\nFailed")
     (let ((err (match-string 1 buffer)))
-      (when (string-match "module [`'‘‛]\\([^ ]+\\)['’`] (\\([^)]+\\))" err)
-        (let* ((default-directory (haskell-session-current-dir session))
-               (module (match-string 1 err))
-               (file (match-string 2 err))
-               (relative-file-name (file-relative-name file)))
-          (haskell-interactive-show-load-message
-           session
-           'import-cycle
-           module
-           relative-file-name
-           nil
-           nil)
-          (haskell-interactive-mode-compile-error
-           session
-           (format "%s:1:0: %s"
-                   relative-file-name
-                   err)))))
-    t)
+      (if (string-match "module [`'‘‛]\\([^ ]+\\)['’`] (\\([^)]+\\))" err)
+          (let* ((default-directory (haskell-session-current-dir session))
+                 (module (match-string 1 err))
+                 (file (match-string 2 err))
+                 (relative-file-name (file-relative-name file)))
+            (unless return-only
+              (haskell-interactive-show-load-message
+               session
+               'import-cycle
+               module
+               relative-file-name
+               nil
+               nil)
+              (haskell-interactive-mode-compile-error
+               session
+               (format "%s:1:0: %s"
+                       relative-file-name
+                       err)))
+            (list :file file :line 1 :col 0 :msg err :type 'error))
+        t)))
    ((haskell-process-consume
      process
      (concat "[\r\n]\\([A-Z]?:?[^ \r\n:][^:\n\r]+\\):\\([0-9()-:]+\\):"
@@ -312,20 +316,26 @@ actual Emacs buffer of the module being loaded."
                               (haskell-session-strip-dir session file)
                               location
                               error-msg)))
-      (funcall (cond (warning
-                      'haskell-interactive-mode-compile-warning)
-                     (splice
-                      'haskell-interactive-mode-compile-splice)
-                     (t 'haskell-interactive-mode-compile-error))
-               session final-msg)
-      (unless warning
-        (haskell-mode-message-line final-msg))
-      (haskell-process-trigger-suggestions
-       session
-       error-msg
-       file
-       (plist-get (haskell-process-parse-error final-msg) :line)))
-    t)))
+      (if return-only
+          (let* ((location (haskell-process-parse-error (concat file ":" location ": x")))
+                 (file (plist-get location :file))
+                 (line (plist-get location :line))
+                 (col1 (plist-get location :col)))
+            (list :file file :line line :col col1 :msg error-msg :type (if warning 'warning 'error)))
+        (progn (funcall (cond (warning
+                               'haskell-interactive-mode-compile-warning)
+                              (splice
+                               'haskell-interactive-mode-compile-splice)
+                              (t 'haskell-interactive-mode-compile-error))
+                        session final-msg)
+               (unless warning
+                 (haskell-mode-message-line final-msg))
+               (haskell-process-trigger-suggestions
+                session
+                error-msg
+                file
+                (plist-get (haskell-process-parse-error final-msg) :line))
+               t))))))
 
 (defun haskell-interactive-show-load-message (session type module-name file-name echo th)
   "Show the '(Compiling|Loading) X' message."
