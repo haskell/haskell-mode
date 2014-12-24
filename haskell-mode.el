@@ -313,6 +313,18 @@ May return a qualified name."
       (unless (= (car reg) (cdr reg))
         (buffer-substring-no-properties (car reg) (cdr reg))))))
 
+(defun haskell-spanable-pos-at-point ()
+  "Same as haskell-ident-pos-at-point, but with the backticks around the span,
+if those exist."
+  (save-excursion
+    (let ((pos (haskell-ident-pos-at-point)))
+      (if pos
+          (destructuring-bind (start . end) pos
+            (if (and (eq ?` (char-before start))
+                     (eq ?` (char-after end)))
+                (cons (- start 1) (+ end 1))
+              (cons start end)))))))
+
 (defun haskell-ident-pos-at-point ()
   "Return the span of the identifier under point, or nil if none found.
 May return a qualified name."

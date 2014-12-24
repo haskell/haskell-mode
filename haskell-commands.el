@@ -477,7 +477,7 @@ GHCi."
   (let ((pos (or (when (region-active-p)
                    (cons (region-beginning)
                          (region-end)))
-                 (haskell-ident-pos-at-point)
+                 (haskell-spanable-pos-at-point)
                  (cons (point)
                        (point)))))
     (when pos
@@ -507,13 +507,14 @@ GHCi."
               (error (propertize reply 'face 'compilation-error)))
           (error (propertize "No reply. Is :loc-at supported?"
                              'face 'compilation-error)))))))
+
 (defun haskell-mode-type-at ()
   "Get the type of the thing at point. Requires the :type-at
 command from GHCi."
   (let ((pos (or (when (region-active-p)
                    (cons (region-beginning)
                          (region-end)))
-                 (haskell-ident-pos-at-point)
+                 (haskell-spanable-pos-at-point)
                  (cons (point)
                        (point)))))
     (when pos
