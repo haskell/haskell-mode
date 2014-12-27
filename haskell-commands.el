@@ -863,4 +863,12 @@ the :uses command from GHCi."
           (error (propertize "No reply. Is :uses supported?"
                              'face 'compilation-error)))))))
 
+(defun haskell-rgrep (regexp)
+  (interactive (list (grep-read-regexp)))
+  (if buffer-file-name
+      (let* ((cabal-file (haskell-cabal-find-file (file-name-directory buffer-file-name)))
+             (proj-dir (file-name-directory cabal-file)))
+        (rgrep regexp "*.hs" proj-dir))))
+
+
 (provide 'haskell-commands)
