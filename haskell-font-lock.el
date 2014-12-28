@@ -353,7 +353,7 @@ Returns keywords suitable for `font-lock-keywords'."
 
          ;; Top-level declarations
          (topdecl-var
-          (concat line-prefix "\\(" varid "\\)\\s-*"
+          (concat line-prefix "\\(" varid "\\(?:\\s-*,\\s-*" varid "\\)*" "\\)\\s-*"
                   ;; optionally allow for a single newline after identifier
                   ;; NOTE: not supported for bird-style .lhs files
                   (if (eq literate 'bird) nil "\\([\n]\\s-+\\)?")
