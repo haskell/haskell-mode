@@ -314,8 +314,7 @@ May return a qualified name."
         (buffer-substring-no-properties (car reg) (cdr reg))))))
 
 (defun haskell-spanable-pos-at-point ()
-  "Same as haskell-ident-pos-at-point, but with the backticks around the span,
-if those exist."
+  "Like `haskell-ident-pos-at-point', but includes any surrounding backticks."
   (save-excursion
     (let ((pos (haskell-ident-pos-at-point)))
       (if pos
