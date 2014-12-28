@@ -319,7 +319,7 @@ if those exist."
   (save-excursion
     (let ((pos (haskell-ident-pos-at-point)))
       (if pos
-          (destructuring-bind (start . end) pos
+          (cl-destructuring-bind (start . end) pos
             (if (and (eq ?` (char-before start))
                      (eq ?` (char-after end)))
                 (cons (- start 1) (+ end 1))
