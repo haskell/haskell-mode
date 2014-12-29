@@ -74,6 +74,38 @@ a per-project basis."
   :type 'boolean
   :group 'haskell-interactive)
 
+(defcustom haskell-session-ask-new-project
+  t
+  "Ask when starting a new project."
+  :type 'boolean
+  :safe 'booleanp
+  :group 'haskell-interactive)
+
+(defcustom haskell-cabal-use-directory
+  nil
+  "Use this cabal directory (the default if t, ask if nil)."
+  :type '(choice (const :tag "Ask" nil)
+                 (const :tag "Default" t)
+                 (string :tag "Directory path"))
+  :safe 'booleanp
+  :group 'haskell-interactive)
+
+(defcustom haskell-session-current-directory
+  nil
+  "Use this current directory (use buffer's directory if t, ask if nil)."
+  :type '(choice (const :tag "Ask" nil)
+                 (const :tag "Guess from buffer" t)
+                 (string :tag "Directory path"))
+  :safe 'booleanp
+  :group 'haskell-interactive)
+
+(defcustom haskell-session-use-default-target
+  nil
+  "Whether to use the default target without asking."
+  :type 'boolean
+  :safe 'booleanp
+  :group 'haskell-interactive)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configuration
 

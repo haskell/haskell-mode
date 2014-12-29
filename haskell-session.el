@@ -203,10 +203,14 @@ If DONTCREATE is non-nil don't create a new session."
 (defun haskell-session-target (s)
   "Get the session build target."
   (let* ((maybe-target (haskell-session-get s 'target))
-         (target (if maybe-target maybe-target
-                   (let ((new-target
-                          (read-string "build target (empty for default):")))
-                     (haskell-session-set-target s new-target)))))
+         (target
+          (if maybe-target
+              maybe-target
+            (let ((new-target
+                   (if haskell-session-use-default-target
+                       ""
+                     (read-string "build target (empty for default):"))))
+              (haskell-session-set-target s new-target)))))
     (if (not (string= target "")) target nil)))
 
 (defun haskell-session-set-target (s target)

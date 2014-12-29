@@ -22,6 +22,7 @@
 (require 'haskell-font-lock)
 (require 'haskell-interactive-mode)
 (require 'haskell-session)
+(require 'haskell-customize)
 (require 'highlight-uses-mode)
 
 ;;;###autoload
@@ -553,18 +554,28 @@ command from GHCi."
 
 (defun haskell-session-pwd (session &optional change)
   "Prompt for the current directory."
-  (or (unless change
-        (haskell-session-get session 'current-dir))
-      (progn (haskell-session-set-current-dir
-              session
-              (haskell-utils-read-directory-name
-               (if change "Change directory: " "Set current directory: ")
-               (or (haskell-session-get session 'current-dir)
-                   (haskell-session-get session 'cabal-dir)
-                   (if (buffer-file-name)
-                       (file-name-directory (buffer-file-name))
-                     "~/"))))
-             (haskell-session-get session 'current-dir))))
+  (or
+   (unless change
+     (haskell-session-get session 'current-dir))
+   (progn
+     (haskell-session-set-current-dir
+      session
+      (let ((guess (or (haskell-session-get session 'current-dir)
+                       (haskell-session-get session 'cabal-dir)
+                       (if (buffer-file-name)
+                           (file-name-directory (buffer-file-name))
+                         "~/"))))
+        (if change
+            (haskell-utils-read-directory-name "Change directory: " guess)
+          (cond
+           ((and guess (eq haskell-session-current-directory t))
+            guess)
+           ((stringp haskell-session-current-directory)
+            haskell-session-current-directory)
+           (t
+            (haskell-utils-read-directory-name
+             "Set current directory: " guess))))))
+     (haskell-session-get session 'current-dir))))
 
 (defun haskell-process-change-dir (session process dir)
   "Change the directory of the current process."
