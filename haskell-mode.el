@@ -289,7 +289,7 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
     (mapc (lambda (x)
             (modify-syntax-entry x "_" table))
           ;; Some of these are actually OK by default.
-          "!#$%&*+./:<=>?@^|~")
+          "!#$%&*+⧺./:<=>?@^|~")
     (unless (featurep 'mule)
       ;; Non-ASCII syntax should be OK, at least in Emacs.
       (mapc (lambda (x)
