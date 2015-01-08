@@ -45,7 +45,8 @@
   (or (get-buffer haskell-menu-buffer-name)
       (with-current-buffer (get-buffer-create haskell-menu-buffer-name)
         (haskell-menu-mode)))
-  (switch-to-buffer-other-window (get-buffer haskell-menu-buffer-name)))
+  (switch-to-buffer-other-window (get-buffer haskell-menu-buffer-name))
+  (haskell-menu-revert-function nil nil))
 
 (define-derived-mode haskell-menu-mode special-mode "Haskell Session Menu"
   "Major mode for managing Haskell sessions.
