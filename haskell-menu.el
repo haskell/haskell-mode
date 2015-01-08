@@ -58,14 +58,10 @@ Letters do not insert themselves; instead, they are commands."
   (setq truncate-lines t)
   (haskell-menu-revert-function nil t))
 
-(defvar haskell-menu-mode-map
-  (let ((map (make-keymap)))
-    (suppress-keymap map t)
-    (define-key map (kbd "n") 'next-line)
-    (define-key map (kbd "p") 'previous-line)
-    (define-key map (kbd "RET") 'haskell-menu-mode-ret)
-    map)
-  "Key map for haskell-menu-mode.")
+(suppress-keymap haskell-menu-mode-map t)
+(define-key haskell-menu-mode-map (kbd "n") 'next-line)
+(define-key haskell-menu-mode-map (kbd "p") 'previous-line)
+(define-key haskell-menu-mode-map (kbd "RET") 'haskell-menu-mode-ret)
 
 (defun haskell-menu-revert-function (arg1 arg2)
   "Function to refresh the display."
