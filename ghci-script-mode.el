@@ -19,6 +19,14 @@
 
 (require 'haskell)
 
+(defvar ghci-script-mode-keywords
+  ;; The comment syntax can't be described simply in syntax-table.
+  ;; We could use font-lock-syntactic-keywords, but is it worth it?
+  '(("^[ \t]*--.*" . font-lock-comment-face)
+    ("^ *\\([^ \t:]+\\):" (1 font-lock-keyword-face))
+    ("^:[a-z{]+ *\\+" . font-lock-keyword-face)
+    ("^:[a-z{]+ " . font-lock-keyword-face)))
+
 (define-derived-mode ghci-script-mode text-mode "GHCi-Script"
   "Major mode for working with .ghci files."
   (set (make-local-variable 'adaptive-fill-mode) nil)
@@ -29,14 +37,7 @@
   (set (make-local-variable 'comment-end-skip) "[ \t]*\\(-}\\|\\s>\\)")
   (set (make-local-variable 'indent-line-function) 'haskell-mode-suggest-indent-choice)
   (set (make-local-variable 'font-lock-defaults)
-       '(haskell-font-lock-choose-keywords
-         nil nil ((?\' . "w") (?_  . "w")) nil
-         (font-lock-syntactic-keywords
-          . haskell-font-lock-choose-syntactic-keywords)
-         (font-lock-syntactic-face-function
-          . haskell-syntactic-face-function)
-         ;; Get help from font-lock-syntactic-keywords.
-         (parse-sexp-lookup-properties . t)))
+       '(ghci-script-mode-keywords t t nil nil))
   (set (make-local-variable 'indent-tabs-mode) nil)
   (set (make-local-variable 'tab-width) 8)
   (when (boundp 'electric-indent-inhibit)
