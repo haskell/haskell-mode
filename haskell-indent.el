@@ -102,16 +102,19 @@
 (defcustom haskell-indent-offset 4
   "Indentation of Haskell statements with respect to containing block."
   :type 'integer
+  :safe #'natnump
   :group 'haskell-indent)
 
 (defcustom haskell-indent-literate-Bird-default-offset 1
   "Default number of blanks after > in a Bird style literate script."
   :type 'integer
+  :safe #'natnump
   :group 'haskell-indent)
 
 (defcustom haskell-indent-rhs-align-column 0
   "Column on which to align right-hand sides (use 0 for ad-hoc alignment)."
   :type 'integer
+  :safe #'natnump
   :group 'haskell-indent)
 
 (defun haskell-indent-point-to-col (apoint)
@@ -324,6 +327,7 @@ It deals with both Bird style and non Bird-style scripts."
 (defcustom haskell-indent-look-past-empty-line t
   "If nil, indentation engine will not look past an empty line for layout points."
   :group 'haskell-indent
+  :safe #'booleanp
   :type 'boolean)
 
 (defun haskell-indent-start-of-def ()
@@ -1020,6 +1024,7 @@ OPEN is the start position of the comment in which point is."
 This is necessary in the \"do\" layout under Haskell-98.
 See http://hackage.haskell.org/trac/haskell-prime/wiki/DoAndIfThenElse"
   :group 'haskell-indent
+  :safe #'booleanp
   :type 'integer)
 
 (defun haskell-indent-closing-keyword (start)
