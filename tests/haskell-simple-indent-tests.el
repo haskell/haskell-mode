@@ -14,8 +14,10 @@
       (reverse result))))
 
 
-(defun find-indent-and-backtab-positions (lines-above-content)
+(defun find-indent-and-backtab-positions (lines-above-content &optional prepare-buffer)
   (with-temp-buffer
+    (if prepare-buffer
+        (funcall prepare-buffer))
     (dolist (line lines-above-content)
       (insert line)
       (insert "\n"))
@@ -52,6 +54,16 @@
 					  "     long_streak")))))
 
 (ert-deftest find-indent-and-backtab-positions-1 ()
+  (should (equal '((2 4 5 8 16 24 32 40 48 56)
+		   (2 4 5 8 16 24 32 40 48 56))
+                 ;; Note: haskell-simple-indent-backtab is broken when
+                 ;; it encounters TABs in source file.
+		 (find-indent-and-backtab-positions '("a b c d e f g h"
+						      "     long_streak")
+                                                    (lambda ()
+                                                      (setq indent-tabs-mode nil))))))
+
+(ert-deftest find-indent-and-backtab-positions-1a ()
   :expected-result :failed
   (should (equal '((2 4 5 8 16 24 32 40 48 56)
 		   (2 4 5 8 16 24 32 40 48 56))
@@ -59,6 +71,13 @@
 						      "     long_streak")))))
 
 (ert-deftest find-indent-and-backtab-positions-2 ()
+  (should (equal '((8 10 13 20 24 27 32 35 37 45)
+		   (8 10 13 20 24 27 32 35 37 45))
+		 (find-indent-and-backtab-positions '("\tx <- return 123 {- This is a comment -}")
+                                                    (lambda ()
+                                                      (setq-local indent-tabs-mode nil))))))
+
+(ert-deftest find-indent-and-backtab-positions-2a ()
   :expected-result :failed
   (should (equal '((8 10 13 20 24 27 32 35 37 45)
 		   (8 10 13 20 24 27 32 35 37 45))
