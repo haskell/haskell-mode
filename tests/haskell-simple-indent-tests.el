@@ -53,6 +53,16 @@
 		 (find-indent-positions '("a b c d e f g h"
 					  "     long_streak")))))
 
+(ert-deftest find-indent-positions-5 ()
+  (should (equal '(2 4 6 13 15 17 19 24 32 40)
+		 (find-indent-positions '(" f g e  e iirelevant"
+                                          "a b c d"
+                                          "             h idden"
+                                          "                hidden"
+                                          ""
+			   	 	  "             e f g h"
+                                          "")))))
+
 (ert-deftest find-indent-and-backtab-positions-1 ()
   (should (equal '((2 4 5 8 16 24 32 40 48 56)
 		   (2 4 5 8 16 24 32 40 48 56))
@@ -82,3 +92,28 @@
   (should (equal '((8 10 13 20 24 27 32 35 37 45)
 		   (8 10 13 20 24 27 32 35 37 45))
 		 (find-indent-and-backtab-positions '("\tx <- return 123 {- This is a comment -}")))))
+
+(ert-deftest find-indent-and-backtab-positions-3 ()
+  (should (equal '((2 4 6 13 15 17 19 24 32 40)
+                   (2 4 6 13 15 17 19 24 32 40))
+		 (find-indent-and-backtab-positions '(" f g e  e iirelevant"
+                                                      "a b c d"
+                                                      "             h idden     x"
+                                                      "                hidden      4 5"
+                                                      ""
+                                                      "             e f g h"
+                                                      "")
+                                                    (lambda ()
+                                                      (setq-local indent-tabs-mode nil))))))
+
+(ert-deftest find-indent-and-backtab-positions-3a ()
+  :expected-result :failed
+  (should (equal '((2 4 6 13 15 17 19 24 32 40)
+                   (2 4 6 13 15 17 19 24 32 40))
+		 (find-indent-and-backtab-positions '(" f g e  e iirelevant"
+                                                      "a b c d"
+                                                      "             h idden     x"
+                                                      "                hidden      4 5"
+                                                      ""
+                                                      "             e f g h"
+                                                      "")))))
