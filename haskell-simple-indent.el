@@ -90,33 +90,41 @@ column, `tab-to-tab-stop' is done instead."
   (interactive)
   (let* ((start-column (current-column))
          (invisible-from nil)           ; `nil' means infinity here
-         (indent
-          (catch 'haskell-simple-indent-break
-            (save-excursion
-              (while (progn (beginning-of-line)
-                            (not (bobp)))
-                (forward-line -1)
-                (if (not (looking-at "[ \t]*\n"))
-                    (let ((this-indentation (current-indentation)))
-                      (if (or (not invisible-from)
-                              (< this-indentation invisible-from))
-                          (if (> this-indentation start-column)
-                              (setq invisible-from this-indentation)
-                            (let ((end (line-beginning-position 2)))
-                              (move-to-column start-column)
-                              ;; Is start-column inside a tab on this line?
-                              (if (> (current-column) start-column)
-                                  (backward-char 1))
-                              (or (looking-at "[ \t]")
-                                  (skip-chars-forward "^ \t" end))
-                              (skip-chars-forward " \t" end)
-                              (let ((col (current-column)))
-                                (throw 'haskell-simple-indent-break
-                                       (if (or (= (point) end)
-                                               (and invisible-from
-                                                    (> col invisible-from)))
-                                           invisible-from
-                                         col)))))))))))))
+         (indent))
+    (save-excursion
+      ;; Loop stops if there no more lines above this one or when has
+      ;; found a line starting at first column.
+      (while (and (or (not invisible-from)
+                      (not (zerop invisible-from)))
+                  (zerop (forward-line -1)))
+        ;; Ignore empty lines.
+        (if (not (looking-at "[ \t]*\n"))
+            (let ((this-indentation (current-indentation)))
+              ;; Is this line so indented that it cannot have
+              ;; influence on indentation points?
+              (if (or (not invisible-from)
+                      (< this-indentation invisible-from))
+                  (if (> this-indentation start-column)
+                      (setq invisible-from this-indentation)
+                    (let ((end (line-end-position)))
+                      (move-to-column start-column)
+                      ;; Is start-column inside a tab on this line?
+                      (if (> (current-column) start-column)
+                          (backward-char 1))
+                      ;; Skip to the end of non-whitespace.
+                      (skip-chars-forward "^ \t" end)
+                      ;; Skip over whitespace.
+                      (skip-chars-forward " \t" end)
+                      ;; Indentation point found if not at the end of
+                      ;; line and if not covered by any line below
+                      ;; this one. In that case use invisible-from.
+                      (setq indent (if (or (= (point) end)
+                                           (and invisible-from
+                                                (> (current-column) invisible-from)))
+                                       invisible-from
+                                     (current-column)))
+                      ;; Signal that solution is found.
+                      (setq invisible-from 0))))))))
     (if indent
         (let ((opoint (point-marker)))
           (indent-line-to indent)
