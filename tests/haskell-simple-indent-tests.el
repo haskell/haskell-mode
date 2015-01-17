@@ -33,19 +33,25 @@
       (setq result-backward (cons (current-column) result-backward))
       (list (reverse result-forward) result-backward))))
 
-(defun indent-last-line (lines &optional prepare-buffer)
+(defun indent-and-backtab-last-line (lines &optional prepare-buffer)
   (with-temp-buffer
-    (if prepare-buffer
-        (funcall prepare-buffer))
-    (dolist (line lines)
-      (insert line)
-      (insert "\n"))
-    (forward-line -1)
-    (skip-chars-forward "^|")
-    (delete-char 1)
-    (haskell-simple-indent)
-    (insert "|")
-    (buffer-substring (line-beginning-position) (line-end-position))))
+    (let (after-indent after-backtab)
+      (if prepare-buffer
+          (funcall prepare-buffer))
+      (dolist (line lines)
+        (insert line)
+        (insert "\n"))
+      (forward-line -1)
+      (skip-chars-forward "^|")
+      (delete-char 1)
+      (haskell-simple-indent)
+      (insert "|")
+      (setq after-indent (buffer-substring (line-beginning-position) (line-end-position)))
+      (delete-char -1)
+      (haskell-simple-indent-backtab)
+      (insert "|")
+      (setq after-backtab (buffer-substring (line-beginning-position) (line-end-position)))
+      (list after-indent after-backtab))))
 
 (ert-deftest find-indent-positions-1 ()
   (should (equal '(5 7 10 19 26 32 40 48 56 64)
@@ -130,34 +136,47 @@
                                                       "             e f g h"
                                                       "")))))
 
-(ert-deftest indent-last-line-1 ()
-  (should (equal "\t|"
-		 (indent-last-line '("|")))))
+(ert-deftest indent-and-backtab-last-line-1 ()
+  (should (equal '("\t|"
+                   "|")
+		 (indent-and-backtab-last-line '("|")))))
 
-(ert-deftest indent-last-line-2 ()
-  (should (equal "\t|x"
-		 (indent-last-line '("|x")))))
+(ert-deftest indent-and-backtab-last-line-2 ()
+  (should (equal '("\t|x"
+                   "|x")
+		 (indent-and-backtab-last-line '("|x")))))
 
-(ert-deftest indent-last-line-3 ()
-  (should (equal "\t|x"
-		 (indent-last-line '("|  x")))))
+(ert-deftest indent-and-backtab-last-line-3 ()
+  (should (equal '("\t|x"
+                   "|x")
+		 (indent-and-backtab-last-line '("|  x")))))
 
-(ert-deftest indent-last-line-4 ()
-  (should (equal "    |x"
-		 (indent-last-line '("a b c"
-                                     "|  x")))))
+(ert-deftest indent-and-backtab-last-line-4 ()
+  (should (equal '("    |x"
+                   "  |x")
+		 (indent-and-backtab-last-line '("a b c"
+                                                 "|  x")))))
 
-(ert-deftest indent-last-line-5 ()
-  (should (equal "\tx|y"
-		 (indent-last-line '("x|y")))))
+(ert-deftest indent-and-backtab-last-line-5 ()
+  (should (equal '("\tx|y"
+                   "x|y")
+		 (indent-and-backtab-last-line '("x|y")))))
 
-(ert-deftest indent-last-line-6 ()
-  (should (equal "\t\t\tx|y"
-		 (indent-last-line '("\t\t\tbase"
-                                     "x|y")))))
+(ert-deftest indent-and-backtab-last-line-6 ()
+  (should (equal '("\t\t\tx|y"
+                   "x|y")
+		 (indent-and-backtab-last-line '("\t\t\tbase"
+                                                 "x|y")))))
 
-(ert-deftest indent-last-line-7 ()
-  (should (equal "\txy    |"
-		 (indent-last-line '("    p   x"
-                                     "\t\t\tbase"
-                                     "      xy    |")))))
+(ert-deftest indent-and-backtab-last-line-7 ()
+  (should (equal '("\txy    |"
+                   "    xy    |")
+		 (indent-and-backtab-last-line '("    p   x"
+                                                 "\t\t\tbase"
+                                                 "      xy    |")))))
+
+(ert-deftest indent-and-backtab-last-line-8 ()
+  (should (equal '("\t\t this_is_|long"
+                   "\t       this_is_|long")
+		 (indent-and-backtab-last-line '(" a a a a a a a a this_is_long"
+                                                 "               this_is_|long")))))

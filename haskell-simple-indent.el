@@ -156,18 +156,28 @@ point beyond the current column, position given by
 (defun haskell-simple-indent-backtab ()
   "Indent backwards.  Dual to `haskell-simple-indent'."
   (interactive)
-  (back-to-indentation)
-  (let ((saved-column (current-column))
+  (let ((saved-column (or (save-excursion
+                             (back-to-indentation)
+                             (if (not (eolp))
+                                 (current-column)))
+                           (current-column)))
         (i 0)
         (x 0))
-    (delete-region (line-beginning-position) (point))
 
     (save-excursion
-      (while (< (current-column) saved-column)
-        (haskell-simple-indent)
-        (setq i (+ i 1))))
-    (back-to-indentation)
-    (delete-region (line-beginning-position) (point))
+      (back-to-indentation)
+      (delete-region (line-beginning-position) (point)))
+    (while (< (or (save-excursion
+                             (back-to-indentation)
+                             (if (not (eolp))
+                                 (current-column)))
+                  (current-column)) saved-column)
+      (haskell-simple-indent)
+      (setq i (+ i 1)))
+
+    (save-excursion
+      (back-to-indentation)
+      (delete-region (line-beginning-position) (point)))
     (while (< x (- i 1))
       (haskell-simple-indent)
       (setq x (+ x 1)))))
