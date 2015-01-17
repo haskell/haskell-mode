@@ -76,6 +76,8 @@ interference with prompts that look like haskell expressions."
     (define-key map (kbd "C-c C-z") 'haskell-interactive-switch-back)
     (define-key map (kbd "M-p") 'haskell-interactive-mode-history-previous)
     (define-key map (kbd "M-n") 'haskell-interactive-mode-history-next)
+    (define-key map (kbd "C-c C-p") 'haskell-interactive-mode-prompt-previous)
+    (define-key map (kbd "C-c C-n") 'haskell-interactive-mode-prompt-next)
     (define-key map (kbd "C-<up>") 'haskell-interactive-mode-history-previous)
     (define-key map (kbd "C-<down>") 'haskell-interactive-mode-history-next)
     (define-key map (kbd "TAB") 'haskell-interactive-mode-tab)
@@ -959,6 +961,21 @@ don't care when the thing completes as long as it's soonish."
         (haskell-interactive-mode-history-toggle (- arg))
       (setq haskell-interactive-mode-history-index 0)
       (haskell-interactive-mode-history-toggle -1))))
+
+(defun haskell-interactive-mode-prompt-previous ()
+  "Jump to the previous prompt."
+  (interactive)
+  (let ((prev-prompt-pos
+         (save-excursion
+           (beginning-of-line) ;; otherwise prompt at current line matches
+           (and (search-backward-regexp (haskell-interactive-prompt-regex) nil t)
+                (match-end 0)))))
+    (when prev-prompt-pos (goto-char prev-prompt-pos))))
+
+(defun haskell-interactive-mode-prompt-next ()
+  "Jump to the next prompt."
+  (interactive)
+  (search-forward-regexp (haskell-interactive-prompt-regex) nil t))
 
 (defun haskell-interactive-mode-clear ()
   "Clear the screen and put any current input into the history."
