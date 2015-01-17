@@ -667,17 +667,16 @@ command from GHCi."
             (if (eq system-type 'windows-nt)
                 (haskell-process-send-string
                  (car state)
-                 (format ":!powershell -Command \"& { cd %s ; hasktags -e -x (ls -fi *.hs -exclude \\\"#*#\\\" -name -r) ; exit }\""
+                 (format ":!powershell -Command \"& { cd %s ; hasktags -e -x (ls -fi *.hs *.lhs *.hsc -exclude \\\"#*#\\\" -name -r) ; exit }\""
                          (haskell-session-cabal-dir
                           (haskell-process-session (car state)))))
               (haskell-process-send-string
                (car state)
-               (format ":!cd %s && %s | %s | %s"
+               (format ":!cd %s && %s | %s"
                        (haskell-session-cabal-dir
                         (haskell-process-session (car state)))
-                       "find . -name '*.hs*'"
-                       "grep -v '#'" ; To avoid Emacs back-up files. Yeah.
-                       "xargs hasktags -e -x"))))
+                       "find . -name '*.hs' -or -name '*.lhs' -or -name '*.hsc' -print0"
+                       "xargs -0 hasktags -e -x"))))
       :complete (lambda (state response)
                   (when (cdr state)
                     (let ((tags-file-name
