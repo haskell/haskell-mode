@@ -128,14 +128,18 @@ column, `tab-to-tab-stop' is done instead."
 (defun haskell-simple-indent-backtab ()
   "Indent backwards.  Dual to `haskell-simple-indent'."
   (interactive)
-  (let ((current-point (point))
+  (back-to-indentation)
+  (let ((saved-column (current-column))
         (i 0)
         (x 0))
-    (goto-char (line-beginning-position))
+    (delete-region (line-beginning-position) (point))
+
     (save-excursion
-      (while (< (point) current-point)
+      (while (< (current-column) saved-column)
         (haskell-simple-indent)
         (setq i (+ i 1))))
+    (back-to-indentation)
+    (delete-region (line-beginning-position) (point))
     (while (< x (- i 1))
       (haskell-simple-indent)
       (setq x (+ x 1)))))
