@@ -674,8 +674,11 @@ currently using.
 Additional Haskell mode modules can be hooked in via `haskell-mode-hook';
 see documentation for that variable for more details."
   :group 'haskell
-  (set (make-local-variable 'paragraph-start) (concat "^$\\|" page-delimiter))
-  (set (make-local-variable 'paragraph-separate) paragraph-start)
+  ;; paragraph-{start,separate} should treat comments as paragraphs as well.
+  (set (make-local-variable 'paragraph-start)
+       (concat " *{-\\| *-- |\\|" page-delimiter))
+  (set (make-local-variable 'paragraph-separate)
+       (concat " *$\\| *-- |\\| *\\({-\\|-}\\) *$\\|" page-delimiter))
   (set (make-local-variable 'fill-paragraph-function) 'haskell-fill-paragraph)
   ;; (set (make-local-variable 'adaptive-fill-function) 'haskell-adaptive-fill)
   (set (make-local-variable 'adaptive-fill-mode) nil)
@@ -741,12 +744,22 @@ see documentation for that variable for more details."
         (let* ((comment-start-point (nth 8 syntax-values))
                (comment-end-point
                 (save-excursion
-                  (re-search-forward "-}" (point-max) t comment-num)
+                  (goto-char comment-start-point)
+                  (forward-sexp)
+                  ;; Find end of any comment even if forward-sexp
+                  ;; fails to find the right braces.
+                  (backward-char 2)
+                  (re-search-forward "-}" nil t)
                   (point)))
+               (fill-start (+ 2 comment-start-point))
+               (fill-end (- comment-end-point 2))
                (fill-paragraph-handle-comment nil))
           (save-restriction
-            (narrow-to-region (+ 2 comment-start-point) (- comment-end-point 2))
-            (fill-paragraph justify))))
+            (narrow-to-region fill-start fill-end)
+            (fill-paragraph justify)
+            ;; If no filling happens, whatever called us should not
+            ;; continue with standard text filling, so return t
+            t)))
        ((eolp)
         ;; do nothing outside of a comment
         t)
