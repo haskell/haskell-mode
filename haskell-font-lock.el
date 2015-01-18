@@ -364,6 +364,8 @@ Returns keywords suitable for `font-lock-keywords'."
                   "\\(" varid "\\|" conid "\\|::\\|∷\\|=\\||\\|\\s(\\|[0-9\"']\\)"))
          (topdecl-var2
           (concat line-prefix "\\(" varid "\\|" conid "\\)\\s-*`\\(" varid "\\)`"))
+         (topdecl-bangpat
+          (concat line-prefix "\\(" varid "\\)\\s-*!"))
          (topdecl-sym
           (concat line-prefix "\\(" varid "\\|" conid "\\)\\s-*\\(" sym "\\)"))
          (topdecl-sym2 (concat line-prefix "(\\(" sym "\\))"))
@@ -419,6 +421,7 @@ Returns keywords suitable for `font-lock-keywords'."
             ;; Place them *before* generic id-and-op highlighting.
             (,topdecl-var  (1 haskell-definition-face))
             (,topdecl-var2 (2 haskell-definition-face))
+            (,topdecl-bangpat  (1 haskell-definition-face))
             (,topdecl-sym  (2 haskell-definition-face))
             (,topdecl-sym2 (1 haskell-definition-face))
 
