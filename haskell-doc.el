@@ -1,4 +1,4 @@
-;;; haskell-doc.el --- show function types in echo area  -*- coding: utf-8 -*-
+;;; haskell-doc.el --- show function types in echo area  -*- coding: utf-8; lexical-binding: t -*-
 
 ;; Copyright (C) 2004, 2005, 2006, 2007, 2009  Free Software Foundation, Inc.
 ;; Copyright (C) 1997  Hans-Wolfgang Loidl
@@ -343,8 +343,11 @@
 ;;@subsection Emacs portability
 
 (require 'haskell-mode)
+(require 'haskell-process)
+(require 'haskell)
 (require 'inf-haskell)
 (require 'imenu)
+(require 'eldoc)
 
 (defgroup haskell-doc nil
   "Show Haskell function types in echo area."
@@ -1519,7 +1522,12 @@ This function is run by an idle timer to print the type
 (defun haskell-doc-current-info ()
   "Return the info about symbol at point.
 Meant for `eldoc-documentation-function'."
-  (haskell-doc-sym-doc (haskell-ident-at-point)))
+  ;; There are a number of possible documentation functions.
+  ;; Some of them are asynchronous.
+  (let ((msg (or
+              (haskell-doc-current-info--interaction)
+              (haskell-doc-sym-doc (haskell-ident-at-point)))))
+    (unless (symbolp msg) msg)))
 
 
 ;;@node Mouse interface, Print fctsym, Top level function, top
@@ -1583,6 +1591,65 @@ current buffer."
           (let ((message-log-max nil))
             (message "%s" doc)))))))
 
+(defvar haskell-doc-current-info--interaction-last nil
+  "If non-nil, a previous eldoc message from an async call, that
+  hasn't been displayed yet.")
+
+(defun haskell-doc-current-info--interaction ()
+  "Asynchronous call to `haskell-process-get-type', suitable for
+use in the eldoc function `haskell-doc-current-info'."
+  ;; Return nil if nothing is available, or 'async if something might
+  ;; be available, but asynchronously later. This will call
+  ;; `eldoc-print-current-symbol-info' later.
+  (let (sym prev-message)
+    (cond
+     ((setq prev-message haskell-doc-current-info--interaction-last)
+      (setq haskell-doc-current-info--interaction-last nil)
+      (cdr prev-message))
+     ((setq sym
+            (if (use-region-p)
+                (buffer-substring-no-properties
+                 (region-beginning) (region-end))
+              (thing-at-point 'symbol 'no-properties)))
+      (haskell-process-get-type
+       sym (lambda (response)
+             (setq haskell-doc-current-info--interaction-last
+                   (cons 'async response))
+             (eldoc-print-current-symbol-info)))
+      'async))))
+
+(defun haskell-process-get-type (expr-string &optional callback)
+  "Asynchronously get the type of a given string.
+
+EXPR-STRING should be an expression passed to :type in ghci.
+
+CALLBACK will be called with a formatted type string."
+  (let ((process (haskell-process))
+        ;; Avoid passing bad strings to ghci
+        (expr-okay (not (string-match-p "\n" expr-string)))
+        (ghci-command (concat ":type " expr-string)))
+    (when (and process expr-okay)
+      (haskell-process-queue-command
+       (haskell-process)
+       (make-haskell-command
+        :go (lambda (_) (haskell-process-send-string process ghci-command))
+        :complete
+        (lambda (_ response)
+          ;; Responses with empty first line are likely errors
+          (if (string-match-p (rx string-start line-end) response)
+              (setq response nil)
+            ;; Remove a newline at the end
+            (setq response (replace-regexp-in-string "\n\\'" "" response))
+            ;; Propertize for eldoc
+            (save-match-data
+              (when (string-match " :: " response)
+                ;; Highlight type
+                (let ((name (substring response 0 (match-end 0)))
+                      (type (propertize
+                             (substring response (match-end 0))
+                             'face 'eldoc-highlight-function-argument)))
+                  (setq response (concat name type))))))
+          (when callback (funcall callback response))))))))
 
 (defun haskell-doc-sym-doc (sym)
   "Show the type of the function near point.
