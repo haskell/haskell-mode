@@ -183,6 +183,21 @@ point beyond the current column, position given by
   (haskell-simple-indent-newline-same-col)
   (insert (make-string haskell-indent-spaces ? )))
 
+(defun haskell-simple-indent-comment-indent-function ()
+  "Haskell version of `comment-indent-function'."
+  ;; This is required when filladapt is turned off.  Without it, when
+  ;; filladapt is not used, comments which start in column zero
+  ;; cascade one character to the right
+  (save-excursion
+    (beginning-of-line)
+    (let ((eol (line-end-position)))
+      (and comment-start-skip
+           (re-search-forward comment-start-skip eol t)
+           (setq eol (match-beginning 0)))
+      (goto-char eol)
+      (skip-chars-backward " \t")
+      (max comment-column (+ (current-column) (if (bolp) 0 1))))))
+
 ;;;###autoload
 (define-minor-mode haskell-simple-indent-mode
   "Simple Haskell indentation mode that uses simple heuristic.
@@ -197,6 +212,7 @@ Runs `haskell-simple-indent-hook' on activation."
   :lighter " Ind"
   :group 'haskell-simple-indent
   :keymap '(([backtab] . haskell-simple-indent-backtab))
+  (set (make-local-variable 'comment-indent-function) #'haskell-simple-indent-comment-indent-function)
   (kill-local-variable 'indent-line-function)
   (when haskell-simple-indent-mode
     (set (make-local-variable 'indent-line-function) 'haskell-simple-indent)
