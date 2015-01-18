@@ -1578,7 +1578,8 @@ current buffer."
   (unless sym (setq sym (haskell-ident-at-point)))
   ;; if printed before do not print it again
   (unless (string= sym (car haskell-doc-last-data))
-    (let ((doc (haskell-doc-sym-doc sym)))
+    (let ((doc (or (haskell-doc-current-info--interaction t)
+                  (haskell-doc-sym-doc sym))))
       (when (and doc (haskell-doc-in-code-p))
         ;; In Emacs 19.29 and later, and XEmacs 19.13 and later, all
         ;; messages are recorded in a log.  Do not put haskell-doc messages
@@ -1595,9 +1596,13 @@ current buffer."
   "If non-nil, a previous eldoc message from an async call, that
   hasn't been displayed yet.")
 
-(defun haskell-doc-current-info--interaction ()
+(defun haskell-doc-current-info--interaction (&optional sync)
   "Asynchronous call to `haskell-process-get-type', suitable for
-use in the eldoc function `haskell-doc-current-info'."
+use in the eldoc function `haskell-doc-current-info'.
+
+If SYNC is non-nil, the call will be synchronous instead, and
+instead of calling `eldoc-print-current-symbol-info', the result
+will be returned directly."
   ;; Return nil if nothing is available, or 'async if something might
   ;; be available, but asynchronously later. This will call
   ;; `eldoc-print-current-symbol-info' later.
@@ -1611,49 +1616,57 @@ use in the eldoc function `haskell-doc-current-info'."
                 (buffer-substring-no-properties
                  (region-beginning) (region-end))
               (thing-at-point 'symbol 'no-properties)))
-      (haskell-process-get-type
-       sym (lambda (response)
-             (setq haskell-doc-current-info--interaction-last
-                   (cons 'async response))
-             (eldoc-print-current-symbol-info)))
-      'async))))
+      (if sync
+          (haskell-process-get-type sym #'identity t)
+        (haskell-process-get-type
+         sym (lambda (response)
+               (setq haskell-doc-current-info--interaction-last
+                     (cons 'async response))
+               (eldoc-print-current-symbol-info)))
+        'async)))))
 
-(defun haskell-process-get-type (expr-string &optional callback)
+(defun haskell-process-get-type (expr-string &optional callback sync)
   "Asynchronously get the type of a given string.
 
 EXPR-STRING should be an expression passed to :type in ghci.
 
-CALLBACK will be called with a formatted type string."
+CALLBACK will be called with a formatted type string.
+
+If SYNC is non-nil, make the call synchronously instead."
   (let ((process (haskell-process))
         ;; Avoid passing bad strings to ghci
         (expr-okay (not (string-match-p "\n" expr-string)))
-        (ghci-command (concat ":type " expr-string)))
+        (ghci-command (concat ":type " expr-string))
+        (complete-func
+         (lambda (_ response)
+           ;; Responses with empty first line are likely errors
+           (if (string-match-p (rx string-start line-end) response)
+               (setq response nil)
+             ;; Remove a newline at the end
+             (setq response (replace-regexp-in-string "\n\\'" "" response))
+             ;; Propertize for eldoc
+             (save-match-data
+               (when (string-match " :: " response)
+                 ;; Highlight type
+                 (let ((name (substring response 0 (match-end 0)))
+                       (type (propertize
+                              (substring response (match-end 0))
+                              'face 'eldoc-highlight-function-argument)))
+                   (setq response (concat name type)))))
+             (when haskell-doc-prettify-types
+               (dolist (re '(("::" . "∷") ("=>" . "⇒") ("->" . "→")))
+                 (setq response
+                       (replace-regexp-in-string (car re) (cdr re) response)))))
+           (when callback (funcall callback response)))))
     (when (and process expr-okay)
-      (haskell-process-queue-command
-       (haskell-process)
-       (make-haskell-command
-        :go (lambda (_) (haskell-process-send-string process ghci-command))
-        :complete
-        (lambda (_ response)
-          ;; Responses with empty first line are likely errors
-          (if (string-match-p (rx string-start line-end) response)
-              (setq response nil)
-            ;; Remove a newline at the end
-            (setq response (replace-regexp-in-string "\n\\'" "" response))
-            ;; Propertize for eldoc
-            (save-match-data
-              (when (string-match " :: " response)
-                ;; Highlight type
-                (let ((name (substring response 0 (match-end 0)))
-                      (type (propertize
-                             (substring response (match-end 0))
-                             'face 'eldoc-highlight-function-argument)))
-                  (setq response (concat name type)))))
-            (when haskell-doc-prettify-types
-              (dolist (re '(("::" . "∷") ("=>" . "⇒") ("->" . "→")))
-                (setq response
-                      (replace-regexp-in-string (car re) (cdr re) response)))))
-          (when callback (funcall callback response))))))))
+      (if sync
+          (let ((response (haskell-process-queue-sync-request process ghci-command)))
+            (funcall complete-func nil response))
+        (haskell-process-queue-command
+         process
+         (make-haskell-command
+          :go (lambda (_) (haskell-process-send-string process ghci-command))
+          :complete complete-func))))))
 
 (defun haskell-doc-sym-doc (sym)
   "Show the type of the function near point.
