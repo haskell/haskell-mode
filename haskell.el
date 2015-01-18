@@ -25,6 +25,7 @@
 (require 'haskell-repl)
 (require 'haskell-load)
 (require 'haskell-commands)
+(require 'haskell-customize)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic configuration hooks
@@ -128,8 +129,8 @@
   "Prompt to create a new project based on a guess from the nearest Cabal file."
   (let ((name (haskell-session-default-name)))
     (unless (haskell-session-lookup name)
-      (when (y-or-n-p (format "Start a new project named “%s”? "
-                              name))
+      (when (or (not haskell-session-ask-new-project)
+                (y-or-n-p (format "Start a new project named “%s”? " name)))
         (haskell-session-make name)))))
 
 ;;;###autoload

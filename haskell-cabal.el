@@ -50,6 +50,7 @@
 
 (require 'cl-lib)
 (require 'haskell-utils)
+(require 'haskell-customize)
 
 (defconst haskell-cabal-general-fields
   ;; Extracted with (haskell-cabal-extract-fields-from-doc "general-fields")
@@ -183,11 +184,15 @@
 (defun haskell-cabal-get-dir ()
   "Get the Cabal dir for a new project. Various ways of figuring this out,
    and indeed just prompting the user. Do them all."
-  (let* ((file (haskell-cabal-find-file))
-         (dir (when file (file-name-directory file))))
-    (haskell-utils-read-directory-name
-     (format "Cabal dir%s: " (if file (format " (guessed from %s)" (file-relative-name file)) ""))
-     dir)))
+  (let* ((file (or (haskell-cabal-find-file) (buffer-file-name)))
+         (dir (file-name-directory file)))
+    (cond
+     ((and dir (eq haskell-cabal-use-directory t)) dir)
+     ((stringp haskell-cabal-use-directory) haskell-cabal-use-directory)
+     (t
+      (haskell-utils-read-directory-name
+       (format "Cabal dir%s: " (if file (format " (guessed from %s)" (file-relative-name file)) ""))
+       dir)))))
 
 (defun haskell-cabal-compute-checksum (dir)
   "Compute MD5 checksum of package description file in DIR.
