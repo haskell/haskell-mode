@@ -146,9 +146,16 @@ point beyond the current column, position given by
       ;; or use tab-to-tab-stop. Try hard to keep cursor in the same
       ;; place or move it to the indentation if it was before it. And
       ;; keep content of the line intact.
-      (indent-line-to (or indent
-                          invisible-from
-                          (indent-next-tab-stop start-column)))
+      (setq indent (or indent
+		       invisible-from
+		       (if (fboundp 'indent-next-tab-stop)
+			   (indent-next-tab-stop start-column))
+		       (let ((tabs tab-stop-list))
+			 (while (and tabs (>= start-column (car tabs)))
+			   (setq tabs (cdr tabs)))
+			 (if tabs (car tabs)))
+		       (* (/ (+ start-column tab-width) tab-width) tab-width)))
+      (indent-line-to indent)
       (if (> opoint (point))
           (goto-char opoint))
       (set-marker opoint nil))))
