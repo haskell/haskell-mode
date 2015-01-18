@@ -82,11 +82,19 @@
 ;; Partly stolen from `indent-relative' in indent.el:
 (defun haskell-simple-indent ()
   "Space out to under next visible indent point.
-Indent points are positions of non-whitespace following whitespace in
-lines preceeding point.  A position is visible if it is to the left of
-the first non-whitespace of every nonblank line between the position and
-the current line.  If there is no visible indent point beyond the current
-column, `tab-to-tab-stop' is done instead."
+
+Indent points are positions of non-whitespace following
+whitespace in lines preceeding point. Example:
+
+func arg cx = when (isTrue) $ do
+                print 42
+^    ^   ^  ^ ^ ^     ^         ^       ^       ^
+
+A position is visible if it is to the left of the first
+non-whitespace (indentation) of every nonblank line between the
+position and the current line.  If there is no visible indent
+point beyond the current column, position given by
+`indent-next-tab-stop' is used instead."
   (interactive)
   (let* ((start-column (current-column))
          (invisible-from nil)           ; `nil' means infinity here
