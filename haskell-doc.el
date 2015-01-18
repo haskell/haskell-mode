@@ -1648,7 +1648,11 @@ CALLBACK will be called with a formatted type string."
                       (type (propertize
                              (substring response (match-end 0))
                              'face 'eldoc-highlight-function-argument)))
-                  (setq response (concat name type))))))
+                  (setq response (concat name type)))))
+            (when haskell-doc-prettify-types
+              (dolist (re '(("::" . "∷") ("=>" . "⇒") ("->" . "→")))
+                (setq response
+                      (replace-regexp-in-string (car re) (cdr re) response)))))
           (when callback (funcall callback response))))))))
 
 (defun haskell-doc-sym-doc (sym)

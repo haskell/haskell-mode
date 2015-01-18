@@ -77,6 +77,13 @@ a per-project basis."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configuration
 
+(defcustom haskell-doc-prettify-types t
+  "Replace some parts of types with Unicode characters like \"∷\"
+when showing type information about symbols."
+  :group 'haskell-doc
+  :type 'boolean
+  :safe 'booleanp)
+
 (defvar haskell-process-end-hook nil
   "Hook for when the haskell process ends.")
 
