@@ -3,6 +3,18 @@
 (require 'haskell-mode)
 
 
+(ert-deftest haskell-indent-in-comment-1 ()
+  "Document bad behavior. Should not assert."
+  :expected-result :failed
+  (should (with-temp-buffer
+	    (haskell-mode)
+	    (haskell-indent-mode)
+	    (insert (concat "module Test where\n"
+			    "-- {{{ A header\n"
+			    "--\n"))
+	    (indent-for-tab-command)
+	    t)))
+
 
 ;; haskell-indent-put-region-in-literate happens to be in haskell-indent
 ;; when the function is moved, move the tests also
