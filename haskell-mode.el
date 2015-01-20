@@ -748,11 +748,11 @@ see documentation for that variable for more details."
                   (forward-sexp)
                   ;; Find end of any comment even if forward-sexp
                   ;; fails to find the right braces.
-                  (backward-char 2)
-                  (re-search-forward "-}" nil t)
-                  (point)))
+                  (backward-char 3)
+                  (re-search-forward "[ \t]?-}" nil t)
+                  (match-beginning 0)))
                (fill-start (+ 2 comment-start-point))
-               (fill-end (- comment-end-point 2))
+               (fill-end comment-end-point)
                (fill-paragraph-handle-comment nil))
           (save-restriction
             (narrow-to-region fill-start fill-end)
