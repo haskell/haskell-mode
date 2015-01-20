@@ -327,6 +327,12 @@ when Data.Map is the candidate.
                        (string :tag "Import lines")))
   :group 'haskell-interactive)
 
+(defcustom haskell-language-extensions
+  "Language extensions in use. Should be in format: -XFoo, -XNoFoo etc."
+  '()
+  :group 'shm
+  :type '(repeat 'string))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessor functions
 
