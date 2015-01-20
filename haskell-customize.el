@@ -328,8 +328,8 @@ when Data.Map is the candidate.
   :group 'haskell-interactive)
 
 (defcustom haskell-language-extensions
-  "Language extensions in use. Should be in format: -XFoo, -XNoFoo etc."
   '()
+  "Language extensions in use. Should be in format: -XFoo, -XNoFoo etc."
   :group 'shm
   :type '(repeat 'string))
 
