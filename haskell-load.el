@@ -20,7 +20,9 @@
 (require 'cl-lib)
 (require 'haskell-process)
 (require 'haskell-interactive-mode)
+(require 'haskell-modules)
 (require 'haskell-commands)
+(require 'haskell-session)
 
 (defun haskell-process-look-config-changes (session)
   "Checks whether a cabal configuration file has
@@ -136,13 +138,7 @@ actual Emacs buffer of the module being loaded."
                               module)))))))
     (when module
       (haskell-process-find-file session file)
-      (save-excursion
-        (goto-char (point-max))
-        (haskell-navigate-imports)
-        (insert (read-from-minibuffer "Import line: " (concat "import " module))
-                "\n")
-        (haskell-sort-imports)
-        (haskell-align-imports)))))
+      (haskell-add-import module))))
 
 (defun haskell-process-trigger-suggestions (session msg file line)
   "Trigger prompting to add any extension suggestions."

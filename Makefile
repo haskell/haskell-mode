@@ -17,6 +17,8 @@ ELFILES = \
 	haskell-c.el \
 	haskell-checkers.el \
 	haskell-collapse.el \
+	haskell-modules.el \
+	haskell-sandbox.el \
 	haskell-commands.el \
 	haskell-compat.el \
 	haskell-compile.el \

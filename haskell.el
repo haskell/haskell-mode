@@ -25,6 +25,8 @@
 (require 'haskell-repl)
 (require 'haskell-load)
 (require 'haskell-commands)
+(require 'haskell-sandbox)
+(require 'haskell-modules)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic configuration hooks
@@ -236,7 +238,12 @@
            (let ((module (haskell-complete-module-read
                           "Module: "
                           (haskell-session-all-modules (haskell-session)))))
-             (insert module)
+             (let ((mapping (assoc module haskell-import-mapping)))
+               (if mapping
+                   (progn (delete-region (line-beginning-position)
+                                         (line-end-position))
+                          (insert (cdr mapping)))
+                 (insert module)))
              (haskell-mode-format-imports)))
           ((not (string= "" (save-excursion (forward-char -1) (haskell-ident-at-point))))
            (let ((ident (save-excursion (forward-char -1) (haskell-ident-at-point))))

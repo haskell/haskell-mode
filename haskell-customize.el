@@ -307,6 +307,26 @@ printing compilation messages."
   :type 'boolean
   :group 'haskell-interactive)
 
+(defcustom haskell-import-mapping
+  '()
+  "Support a mapping from module to import lines.
+
+E.g. '((\"Data.Map\" . \"import qualified Data.Map as M
+import Data.Map (Map)
+\"))
+
+This will import
+
+import qualified Data.Map as M
+import Data.Map (Map)
+
+when Data.Map is the candidate.
+
+"
+  :type '(repeat (cons (string :tag "Module name")
+                       (string :tag "Import lines")))
+  :group 'haskell-interactive)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessor functions
 
