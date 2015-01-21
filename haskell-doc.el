@@ -1,4 +1,4 @@
-;;; haskell-doc.el --- show function types in echo area  -*- coding: utf-8; lexical-binding: t -*-
+;;; haskell-doc.el --- show function types in echo area  -*- coding: utf-8 -*-
 
 ;; Copyright (C) 2004, 2005, 2006, 2007, 2009  Free Software Foundation, Inc.
 ;; Copyright (C) 1997  Hans-Wolfgang Loidl
@@ -341,6 +341,8 @@
 
 ;;@node Emacs portability, Maintenance stuff, Constants and Variables, Constants and Variables
 ;;@subsection Emacs portability
+
+(eval-when-compile (require 'cl))
 
 (require 'haskell-mode)
 (require 'haskell-process)
@@ -1632,13 +1634,14 @@ EXPR-STRING should be an expression passed to :type in ghci.
 CALLBACK will be called with a formatted type string.
 
 If SYNC is non-nil, make the call synchronously instead."
+  (unless callback (setq callback (lambda (response) (message "%s" response))))
   (let ((process (and (haskell-session-maybe)
                     (haskell-session-process (haskell-session-maybe))))
         ;; Avoid passing bad strings to ghci
         (expr-okay (not (string-match-p "\n" expr-string)))
         (ghci-command (concat ":type " expr-string))
-        (complete-func
-         (lambda (_ response)
+        (process-response
+         (lambda (response)
            ;; Responses with empty first line are likely errors
            (if (string-match-p (rx string-start line-end) response)
                (setq response nil)
@@ -1656,17 +1659,23 @@ If SYNC is non-nil, make the call synchronously instead."
              (when haskell-doc-prettify-types
                (dolist (re '(("::" . "∷") ("=>" . "⇒") ("->" . "→")))
                  (setq response
-                       (replace-regexp-in-string (car re) (cdr re) response)))))
-           (when callback (funcall callback response)))))
+                       (replace-regexp-in-string (car re) (cdr re) response))))
+             response))))
     (when (and process expr-okay)
       (if sync
           (let ((response (haskell-process-queue-sync-request process ghci-command)))
-            (funcall complete-func nil response))
-        (haskell-process-queue-command
-         process
-         (make-haskell-command
-          :go (lambda (_) (haskell-process-send-string process ghci-command))
-          :complete complete-func))
+            (funcall callback (funcall process-response response)))
+        (lexical-let ((process process)
+                      (callback callback)
+                      (ghci-command ghci-command)
+                      (process-response process-response))
+          (haskell-process-queue-command
+           process
+           (make-haskell-command
+            :go (lambda (_) (haskell-process-send-string process ghci-command))
+            :complete
+            (lambda (_ response)
+              (funcall callback (funcall process-response response))))))
         'async))))
 
 (defun haskell-doc-sym-doc (sym)
