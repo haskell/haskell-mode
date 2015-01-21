@@ -1622,8 +1622,7 @@ will be returned directly."
          sym (lambda (response)
                (setq haskell-doc-current-info--interaction-last
                      (cons 'async response))
-               (eldoc-print-current-symbol-info)))
-        'async)))))
+               (eldoc-print-current-symbol-info))))))))
 
 (defun haskell-process-get-type (expr-string &optional callback sync)
   "Asynchronously get the type of a given string.
@@ -1633,7 +1632,8 @@ EXPR-STRING should be an expression passed to :type in ghci.
 CALLBACK will be called with a formatted type string.
 
 If SYNC is non-nil, make the call synchronously instead."
-  (let ((process (haskell-process))
+  (let ((process (and (haskell-session-maybe)
+                    (haskell-session-process (haskell-session-maybe))))
         ;; Avoid passing bad strings to ghci
         (expr-okay (not (string-match-p "\n" expr-string)))
         (ghci-command (concat ":type " expr-string))
@@ -1666,7 +1666,8 @@ If SYNC is non-nil, make the call synchronously instead."
          process
          (make-haskell-command
           :go (lambda (_) (haskell-process-send-string process ghci-command))
-          :complete complete-func))))))
+          :complete complete-func))
+        'async))))
 
 (defun haskell-doc-sym-doc (sym)
   "Show the type of the function near point.
