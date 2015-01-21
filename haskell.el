@@ -57,9 +57,9 @@
 
 (defun haskell-process-completions-at-point ()
   "A completion-at-point function using the current haskell process."
-  (let ((process (haskell-process))
-        (symbol (symbol-at-point)))
-    (when (and process symbol)
+  (when (haskell-session-maybe)
+    (let ((process (haskell-process))
+          (symbol (symbol-at-point)))
       (cl-destructuring-bind (start . end) (bounds-of-thing-at-point 'symbol)
         (let ((completions (haskell-process-get-repl-completions
                             process
