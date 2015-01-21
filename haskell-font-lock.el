@@ -429,9 +429,12 @@ Returns keywords suitable for `font-lock-keywords'."
             ("(\\(,*\\|->\\))" 0 haskell-constructor-face)
             ("\\[\\]" 0 haskell-constructor-face)
             ;; Expensive.
+            (,(concat "`" varid "`") 0 haskell-operator-face)
+            (,(concat "`" conid "`") 0 haskell-operator-face)
+            (,(concat "`" qvarid "`") 0 haskell-operator-face)
+            (,(concat "`" qconid "`") 0 haskell-operator-face)
             (,qvarid 0 haskell-default-face)
             (,qconid 0 haskell-constructor-face)
-            (,(concat "\`" varid "\`") 0 haskell-operator-face)
             ;; Expensive.
             (,conid 0 haskell-constructor-face)
 
