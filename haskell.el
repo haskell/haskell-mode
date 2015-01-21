@@ -58,13 +58,25 @@
 (defun haskell-process-completions-at-point ()
   "A completion-at-point function using the current haskell process."
   (when (haskell-session-maybe)
-    (let ((process (haskell-process))
-          (symbol (symbol-at-point)))
-      (cl-destructuring-bind (start . end) (bounds-of-thing-at-point 'symbol)
-        (let ((completions (haskell-process-get-repl-completions
-                            process
-                            (symbol-name symbol))))
-          (list start end completions))))))
+    (let ((process (haskell-process)) symbol)
+      (cond
+       ;; ghci can complete module names, but it needs the "import "
+       ;; string at the beginning
+       ((looking-back (rx line-start
+                          "import" (1+ space)
+                          (? "qualified" (1+ space))
+                          (group (? (char upper) ; modid
+                                    (* (char alnum ?' ?.))))))
+        (let ((text (match-string-no-properties 0))
+              (start (match-beginning 1))
+              (end (match-end 1)))
+          (list start end
+                (haskell-process-get-repl-completions process text))))
+       ((setq symbol (symbol-at-point))
+        (cl-destructuring-bind (start . end) (bounds-of-thing-at-point 'symbol)
+          (let ((completions (haskell-process-get-repl-completions
+                              process (symbol-name symbol))))
+            (list start end completions))))))))
 
 ;;;###autoload
 (defun haskell-interactive-mode-return ()
