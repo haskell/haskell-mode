@@ -4,4 +4,4 @@
 # condition: (= (length "lang") (current-column))
 # contributor: Luke Hoersten <luke@hoersten.org>, John Wiegley
 # --
-{-# LANGUAGE `(progn (require 'haskell-yas) (haskell-yas-complete "Extension: " haskell-yas-ghc-language-pragmas))` #-}
+{-# LANGUAGE `(progn (require 'haskell-yas) (haskell-yas-complete "Extension: " haskell-ghc-supported-languages))` #-}

@@ -27,7 +27,6 @@
 (require 'haskell-commands)
 (require 'haskell-sandbox)
 (require 'haskell-modules)
-(require 'haskell-yas) ; import precomputed ghc options/pragmas
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic configuration hooks
@@ -80,7 +79,7 @@
                (and (search-backward "{-#" nil t)
                   (search-forward-regexp "\\_<OPTIONS\\(?:_GHC\\)?\\_>" p t))))
            (looking-back (rx symbol-start "-" (* (char alnum ?-)))))
-        (list (match-beginning 0) (match-end 0) haskell-yas-ghc-options))
+        (list (match-beginning 0) (match-end 0) haskell-ghc-supported-options))
        ;; Complete LANGUAGE :complete repl ":set -X..."
        ((and (nth 4 (syntax-ppss))
            (save-excursion
@@ -89,7 +88,7 @@
                   (search-forward-regexp "\\_<LANGUAGE\\_>" p t))))
            (setq symbol-bounds (bounds-of-thing-at-point 'symbol)))
         (list (car symbol-bounds) (cdr symbol-bounds)
-              haskell-yas-ghc-language-pragmas))
+              haskell-ghc-supported-languages))
        ((setq symbol-bounds (bounds-of-thing-at-point 'symbol))
         (cl-destructuring-bind (start . end) symbol-bounds
           (list start end
