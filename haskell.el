@@ -78,7 +78,7 @@
            (save-excursion
              (let ((p (point)))
                (and (search-backward "{-#" nil t)
-                  (search-forward-regexp "\\_<OPTIONS\\_>" p t))))
+                  (search-forward-regexp "\\_<OPTIONS\\(?:_GHC\\)?\\_>" p t))))
            (looking-back (rx symbol-start "-" (* (char alnum ?-)))))
         (list (match-beginning 0) (match-end 0) haskell-yas-ghc-options))
        ;; Complete LANGUAGE :complete repl ":set -X..."
