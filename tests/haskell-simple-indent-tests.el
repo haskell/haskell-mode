@@ -105,7 +105,7 @@
 		   (0 8 10 13 20 24 27 32 35 37))
 		 (find-indent-and-backtab-positions '("\tx <- return 123 {- This is a comment -}")
                                                     (lambda ()
-                                                      (setq-local indent-tabs-mode nil))))))
+                                                      (setq indent-tabs-mode nil))))))
 
 (ert-deftest find-indent-and-backtab-positions-2a ()
   (should (equal '((0 8 10 13 20 24 27 32 35 37)
@@ -123,7 +123,7 @@
                                                       "             e f g h"
                                                       "")
                                                     (lambda ()
-                                                      (setq-local indent-tabs-mode nil))))))
+                                                      (setq indent-tabs-mode nil))))))
 
 (ert-deftest find-indent-and-backtab-positions-3a ()
   (should (equal '((0 2 4 6 13 15 17 19 24 32)
