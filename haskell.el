@@ -27,6 +27,7 @@
 (require 'haskell-commands)
 (require 'haskell-sandbox)
 (require 'haskell-modules)
+(require 'haskell-yas) ; import precomputed ghc options/pragmas
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic configuration hooks
@@ -79,11 +80,7 @@
                (and (search-backward "{-#" nil t)
                   (search-forward-regexp "\\_<OPTIONS\\_>" p t))))
            (looking-back (rx symbol-start "-" (* (char alnum ?-)))))
-        (let ((text (concat ":set " (match-string-no-properties 0)))
-              (start (match-beginning 0))
-              (end (match-end 0)))
-          (list start end
-                (haskell-process-get-repl-completions process text))))
+        (list (match-beginning 0) (match-end 0) haskell-yas-ghc-options))
        ;; Complete LANGUAGE :complete repl ":set -X..."
        ((and (nth 4 (syntax-ppss))
            (save-excursion
@@ -91,14 +88,8 @@
                (and (search-backward "{-#" nil t)
                   (search-forward-regexp "\\_<LANGUAGE\\_>" p t))))
            (setq symbol-bounds (bounds-of-thing-at-point 'symbol)))
-        (let* ((start (car symbol-bounds))
-               (end (cdr symbol-bounds))
-               (text (buffer-substring-no-properties start end))
-               (cmd (concat ":set -X" text))
-               (completions (haskell-process-get-repl-completions process cmd))
-               (names (cdr completions)) ; first string is common prefix
-               (lang-options (mapcar (lambda (c) (substring c 2)) names)))
-          (list start end lang-options)))
+        (list (car symbol-bounds) (cdr symbol-bounds)
+              haskell-yas-ghc-language-pragmas))
        ((setq symbol-bounds (bounds-of-thing-at-point 'symbol))
         (cl-destructuring-bind (start . end) symbol-bounds
           (list start end

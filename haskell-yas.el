@@ -42,6 +42,12 @@
   :group 'haskell-yas
   :type '(repeat string))
 
+(defcustom haskell-yas-ghc-options
+  (split-string (shell-command-to-string "ghc --show-options"))
+  "List of options supported by the installed version of GHC."
+  :group 'haskell-yas
+  :type '(repeat string))
+
 (defcustom haskell-yas-completing-function 'ido-completing-read
   "Function to use for completing among alternatives."
   :group 'haskell-yas
