@@ -58,7 +58,7 @@
 (defun haskell-process-completions-at-point ()
   "A completion-at-point function using the current haskell process."
   (when (haskell-session-maybe)
-    (let ((process (haskell-process)) symbol)
+    (let ((process (haskell-process)) symbol symbol-bounds)
       (cond
        ;; ghci can complete module names, but it needs the "import "
        ;; string at the beginning
@@ -72,6 +72,33 @@
               (end (match-end 1)))
           (list start end
                 (haskell-process-get-repl-completions process text))))
+       ;; Complete OPTIONS using :complete repl ":set ..."
+       ((and (nth 4 (syntax-ppss))
+           (save-excursion
+             (let ((p (point)))
+               (and (search-backward "{-#" nil t)
+                  (search-forward-regexp "\\_<OPTIONS\\_>" p t))))
+           (looking-back (rx symbol-start "-" (* (char alnum ?-)))))
+        (let ((text (concat ":set " (match-string-no-properties 0)))
+              (start (match-beginning 0))
+              (end (match-end 0)))
+          (list start end
+                (haskell-process-get-repl-completions process text))))
+       ;; Complete LANGUAGE :complete repl ":set -X..."
+       ((and (nth 4 (syntax-ppss))
+           (save-excursion
+             (let ((p (point)))
+               (and (search-backward "{-#" nil t)
+                  (search-forward-regexp "\\_<LANGUAGE\\_>" p t))))
+           (setq symbol-bounds (bounds-of-thing-at-point 'symbol)))
+        (let* ((start (car symbol-bounds))
+               (end (cdr symbol-bounds))
+               (text (buffer-substring-no-properties start end))
+               (cmd (concat ":set -X" text))
+               (completions (haskell-process-get-repl-completions process cmd))
+               (names (cdr completions)) ; first string is common prefix
+               (lang-options (mapcar (lambda (c) (substring c 2)) names)))
+          (list start end lang-options)))
        ((setq symbol (symbol-at-point))
         (cl-destructuring-bind (start . end) (bounds-of-thing-at-point 'symbol)
           (let ((completions (haskell-process-get-repl-completions
