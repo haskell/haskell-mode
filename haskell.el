@@ -99,11 +99,11 @@
                (names (cdr completions)) ; first string is common prefix
                (lang-options (mapcar (lambda (c) (substring c 2)) names)))
           (list start end lang-options)))
-       ((setq symbol (symbol-at-point))
-        (cl-destructuring-bind (start . end) (bounds-of-thing-at-point 'symbol)
-          (let ((completions (haskell-process-get-repl-completions
-                              process (symbol-name symbol))))
-            (list start end completions))))))))
+       ((setq symbol-bounds (bounds-of-thing-at-point 'symbol))
+        (cl-destructuring-bind (start . end) symbol-bounds
+          (list start end
+                (haskell-process-get-repl-completions
+                 process (buffer-substring-no-properties start end)))))))))
 
 ;;;###autoload
 (defun haskell-interactive-mode-return ()
