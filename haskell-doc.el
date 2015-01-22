@@ -1638,7 +1638,9 @@ If SYNC is non-nil, make the call synchronously instead."
   (let ((process (and (haskell-session-maybe)
                     (haskell-session-process (haskell-session-maybe))))
         ;; Avoid passing bad strings to ghci
-        (expr-okay (not (string-match-p "\n" expr-string)))
+        (expr-okay
+         (and (not (string-match-p "\\`[[:space:]]*\\'" expr-string))
+            (not (string-match-p "\n" expr-string))))
         (ghci-command (concat ":type " expr-string))
         (process-response
          (lambda (response)
