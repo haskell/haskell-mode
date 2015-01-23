@@ -4,8 +4,9 @@ GIT_VERSION = $(shell git describe --tags --match 'v[0-9]*' --long --dirty | sed
 INSTALL_INFO = install-info
 EMACS = emacs
 EFLAGS = --eval "(if (< emacs-major-version 24)                                    \
-                      (add-to-list 'load-path (expand-file-name \"tests/compat\")) \
-                    (setq byte-compile-error-on-warn t))"
+                      (progn (add-to-list 'load-path (expand-file-name \"tests/compat\"))  \
+                             (setq byte-compile-warnings '(not cl-functions))))"       \
+         --eval '(setq byte-compile-error-on-warn t)'
 
 BATCH = $(EMACS) $(EFLAGS) --batch -Q -L .
 SUBST_ATAT = sed -e 's/@@GIT_VERSION@@/$(GIT_VERSION)/g;s/@GIT_VERSION@/$(GIT_VERSION)/g;s/@@VERSION@@/$(VERSION)/g;s/@VERSION@/$(VERSION)/g'
