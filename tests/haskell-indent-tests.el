@@ -15,6 +15,9 @@
 		   (buffer-substring-no-properties (point-min) (point-max))))))
 
 (ert-deftest haskell-indent-put-region-in-literate-2 ()
+  :expected-result (if (< emacs-major-version 24)
+		       :failed
+		     :passed)
   (should (equal "literate"
 		 (with-temp-buffer
 		   (insert "> literate")
