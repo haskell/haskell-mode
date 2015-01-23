@@ -61,7 +61,8 @@ ELCHECKS=$(addprefix check-, $(ELFILES:.el=))
 
 %.elc: %.el
 	@$(BATCH) \
-       -f batch-byte-compile $<
+	     --eval "(setq byte-compile-error-on-warn t)" \
+		 -f batch-byte-compile $*.el
 
 .PHONY: all compile info clean check $(ELCHECKS) elpa package
 
@@ -69,23 +70,14 @@ all: compile $(AUTOLOADS) info
 
 compile: $(ELCFILES)
 
-$(ELCHECKS): check-%: %.el
+$(ELCHECKS): check-%: %.el %.elc
 	@$(BATCH) --eval '(when (check-declare-file "$*.el") (error "check-declare failed"))'
-	@$(BATCH) \
-	     --eval "(setq byte-compile-error-on-warn t)" \
-		 -f batch-byte-compile $*.el
-	@$(RM) $*.elc
 	@if [ -f "$(<:%.el=tests/%-tests.el)" ]; then \
-	if $(BATCH) --eval "(require 'ert)" 2> /dev/null; then \
-		echo; \
 		$(BATCH) -l "$(<:%.el=tests/%-tests.el)" -f ert-run-tests-batch-and-exit; \
-	else \
-		echo "ERT not available, skipping unit tests"; \
-	fi; \
 	fi
 	@echo "--"
 
-check: clean $(ELCHECKS)
+check: $(ELCHECKS)
 	@echo "checks passed!"
 
 clean:
