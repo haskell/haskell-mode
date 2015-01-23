@@ -3,7 +3,10 @@ GIT_VERSION = $(shell git describe --tags --match 'v[0-9]*' --long --dirty | sed
 
 INSTALL_INFO = install-info
 EMACS = emacs
-EFLAGS =
+EFLAGS = --eval "(if (< emacs-major-version 24)                                    \
+                      (add-to-list 'load-path (expand-file-name \"tests/compat\")) \
+                    (setq byte-compile-error-on-warn t))"
+
 BATCH = $(EMACS) $(EFLAGS) --batch -Q -L .
 SUBST_ATAT = sed -e 's/@@GIT_VERSION@@/$(GIT_VERSION)/g;s/@GIT_VERSION@/$(GIT_VERSION)/g;s/@@VERSION@@/$(VERSION)/g;s/@VERSION@/$(VERSION)/g'
 
@@ -61,7 +64,6 @@ ELCHECKS=$(addprefix check-, $(ELFILES:.el=))
 
 %.elc: %.el
 	@$(BATCH) \
-	     --eval "(setq byte-compile-error-on-warn t)" \
 		 -f batch-byte-compile $*.el
 
 .PHONY: all compile info clean check $(ELCHECKS) elpa package
