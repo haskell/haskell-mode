@@ -441,35 +441,35 @@ Returns keywords suitable for `font-lock-keywords'."
                  ("^>" 0 haskell-default-face t))))
         ((latex tex)
          (setq keywords
-               `((haskell-fl-latex-comments 0 'font-lock-comment-face t)
+               `((haskell-font-lock-latex-comments 0 'font-lock-comment-face t)
                  ,@keywords)))))
     keywords))
 
-(defvar haskell-fl-latex-cache-pos nil
-  "Position of cache point used by `haskell-fl-latex-cache-in-comment'.
+(defvar haskell-font-lock-latex-cache-pos nil
+  "Position of cache point used by `haskell-font-lock-latex-cache-in-comment'.
 Should be at the start of a line.")
 
-(defvar haskell-fl-latex-cache-in-comment nil
-  "If `haskell-fl-latex-cache-pos' is outside a
+(defvar haskell-font-lock-latex-cache-in-comment nil
+  "If `haskell-font-lock-latex-cache-pos' is outside a
 \\begin{code}..\\end{code} block (and therefore inside a comment),
 this variable is set to t, otherwise nil.")
 
-(defun haskell-fl-latex-comments (end)
+(defun haskell-font-lock-latex-comments (end)
   "Sets `match-data' according to the region of the buffer before end
 that should be commented under LaTeX-style literate scripts."
   (let ((start (point)))
     (if (= start end)
         ;; We're at the end.  No more to fontify.
         nil
-      (if (not (eq start haskell-fl-latex-cache-pos))
+      (if (not (eq start haskell-font-lock-latex-cache-pos))
           ;; If the start position is not cached, calculate the state
           ;; of the start.
           (progn
-            (setq haskell-fl-latex-cache-pos start)
+            (setq haskell-font-lock-latex-cache-pos start)
             ;; If the previous \begin{code} or \end{code} is a
             ;; \begin{code}, then start is not in a comment, otherwise
             ;; it is in a comment.
-            (setq haskell-fl-latex-cache-in-comment
+            (setq haskell-font-lock-latex-cache-in-comment
                   (if (and
                        (re-search-backward
                         "^\\(\\(\\\\begin{code}\\)\\|\\(\\\\end{code}\\)\\)$"
@@ -478,7 +478,7 @@ that should be commented under LaTeX-style literate scripts."
                       nil t))
             ;; Restore position.
             (goto-char start)))
-      (if haskell-fl-latex-cache-in-comment
+      (if haskell-font-lock-latex-cache-in-comment
           (progn
             ;; If start is inside a comment, search for next \begin{code}.
             (re-search-forward "^\\\\begin{code}$" end 'move)
