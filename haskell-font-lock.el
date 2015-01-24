@@ -448,11 +448,13 @@ Returns keywords suitable for `font-lock-keywords'."
 (defvar haskell-font-lock-latex-cache-pos nil
   "Position of cache point used by `haskell-font-lock-latex-cache-in-comment'.
 Should be at the start of a line.")
+(make-variable-buffer-local 'haskell-font-lock-latex-cache-pos)
 
 (defvar haskell-font-lock-latex-cache-in-comment nil
   "If `haskell-font-lock-latex-cache-pos' is outside a
 \\begin{code}..\\end{code} block (and therefore inside a comment),
 this variable is set to t, otherwise nil.")
+(make-variable-buffer-local 'haskell-font-lock-latex-cache-in-comment)
 
 (defun haskell-font-lock-latex-comments (end)
   "Sets `match-data' according to the region of the buffer before end
