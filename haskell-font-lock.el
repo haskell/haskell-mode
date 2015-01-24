@@ -217,10 +217,6 @@ Inherit from `default' to avoid fontification of them."
 (defvar haskell-default-face 'haskell-default-face)
 (defvar haskell-literate-comment-face 'haskell-literate-comment-face)
 
-(defconst haskell-emacs21-features (string-match "[[:alpha:]]" "x")
-  "Non-nil if we have regexp char classes.
-Assume this means we have other useful features from Emacs 21.")
-
 (defun haskell-font-lock-compose-symbol (alist)
   "Compose a sequence of ascii chars into a symbol.
 Regexp match data 0 points to the chars."
@@ -379,15 +375,7 @@ Returns keywords suitable for `font-lock-keywords'."
             ("^=======" 0 'font-lock-warning-face t)
             ("^>>>>>>> .*$" 0 'font-lock-warning-face t)
             ("^#.*$" 0 'font-lock-preprocessor-face t)
-            ,@(unless haskell-emacs21-features ;Supports nested comments?
-                ;; Expensive.
-                `((,string-and-char 1 font-lock-string-face)))
 
-            ;; This was originally at the very end (and needs to be after
-            ;; all the comment/string/doc highlighting) but it seemed to
-            ;; trigger a bug in Emacs-21.3 which caused the compositions to
-            ;; be "randomly" dropped.  Moving it earlier seemed to reduce
-            ;; the occurrence of the bug.
             ,@(haskell-font-lock-symbols-keywords)
 
             (,reservedid 1 haskell-keyword-face)
@@ -456,8 +444,6 @@ Returns keywords suitable for `font-lock-keywords'."
                `((haskell-fl-latex-comments 0 'font-lock-comment-face t)
                  ,@keywords)))))
     keywords))
-
-;; The next three aren't used in Emacs 21.
 
 (defvar haskell-fl-latex-cache-pos nil
   "Position of cache point used by `haskell-fl-latex-cache-in-comment'.
