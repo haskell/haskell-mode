@@ -560,7 +560,10 @@ FILE-NAME only."
            (format "Add `%s' to %s?"
                    package-name
                    cabal-file))
-      (haskell-cabal-add-dependency package-name version nil t))))
+      (haskell-cabal-add-dependency package-name version nil t)
+      (when (y-or-n-p (format "Enable -package %s in the GHCi session?" package-name))
+        (haskell-process-queue-without-filters (haskell-session-process session)
+                                               (format ":set -package %s" package-name))))))
 
 (defun haskell-process-suggest-remove-import (session file import line)
   "Suggest removing or commenting out IMPORT on LINE."
