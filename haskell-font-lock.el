@@ -573,7 +573,7 @@ that should be commented under LaTeX-style literate scripts."
    ((and haskell-font-lock-haddock
          (save-excursion
            (goto-char (nth 8 state))
-           (or (looking-at "[{-]-[ \\t]*[|^*]")
+           (or (looking-at "[{-]-[ \\t][|^*]")
                (and haskell-font-lock-seen-haddock
                     (looking-at "--")
                     (let ((doc nil)
