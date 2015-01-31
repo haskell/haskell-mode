@@ -869,7 +869,9 @@ Source names from main-is and c-sources sections are left untouched
          (indent-line-to indent)
          (beginning-of-line)
          (when (looking-at "[ ]*\\([ ]\\{2\\},[ ]*\\)")
-           (replace-match ", " t t nil 1))))))
+           (replace-match ", " t t nil 1)))))
+    (empty
+     (indent-relative)))
   (haskell-cabal-forward-to-line-entry))
 
 (defun haskell-cabal-map-sections (fun)
