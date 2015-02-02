@@ -1057,14 +1057,31 @@ don't care when the thing completes as long as it's soonish."
                             'read-only t
                             'rear-nonsticky t))))))
 
+(defun haskell-interactive-mode-splices-buffer (session)
+  "Get the splices buffer for the current session."
+  (get-buffer-create (haskell-interactive-mode-splices-buffer-name session)))
+
+(defun haskell-interactive-mode-splices-buffer-name (session)
+  (format "*%s:splices*" (haskell-session-name session)))
+
 (defun haskell-interactive-mode-compile-splice (session message)
   "Echo a compiler splice."
-  (with-current-buffer (haskell-session-interactive-buffer session)
-    (setq next-error-last-buffer (current-buffer))
-    (save-excursion
-      (haskell-interactive-mode-goto-end-point)
-      (insert (haskell-fontify-as-mode message 'haskell-mode)
-              "\n"))))
+  (with-current-buffer (haskell-interactive-mode-splices-buffer session)
+    (unless (eq major-mode 'haskell-mode)
+      (haskell-mode))
+    (let* ((parts (split-string message "\n  ======>\n"))
+           (file-and-decl-lines (split-string (nth 0 parts) "\n"))
+           (file (nth 0 file-and-decl-lines))
+           (decl (mapconcat #'identity (cdr file-and-decl-lines) "\n"))
+           (output (nth 1 parts)))
+      (insert "-- " file "\n")
+      (let ((start (point)))
+        (insert decl "\n")
+        (indent-rigidly start (point) -4))
+      (insert "-- =>\n")
+      (let ((start (point)))
+        (insert output "\n")
+        (indent-rigidly start (point) -4)))))
 
 (defun haskell-interactive-mode-insert-garbage (session message)
   "Echo a read only piece of text before the prompt."

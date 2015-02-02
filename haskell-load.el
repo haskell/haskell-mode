@@ -82,6 +82,9 @@ changed. Restarts the process if that is the case."
   "Handle the complete loading response. BUFFER is the string of
 text being sent over the process pipe. MODULE-BUFFER is the
 actual Emacs buffer of the module being loaded."
+  (when (get-buffer (format "*%s:splices*" (haskell-session-name session)))
+    (with-current-buffer (haskell-interactive-mode-splices-buffer session)
+      (erase-buffer)))
   (cond ((haskell-process-consume process "Ok, modules loaded: \\(.+\\)\\.$")
          (let* ((modules (haskell-process-extract-modules buffer))
                 (cursor (haskell-process-response-cursor process)))
