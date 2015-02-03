@@ -47,58 +47,14 @@
     (haskell-process-set-session process session)
     (haskell-process-set-cmd process nil)
     (haskell-process-set (haskell-session-process session) 'is-restarting nil)
-    (let ((default-directory (haskell-session-cabal-dir session)))
+    (let ((default-directory (haskell-session-cabal-dir session))
+          (log-and-command (haskell-process-compute-process-log-and-command session (haskell-process-type))))
       (haskell-session-pwd session)
       (haskell-process-set-process
        process
-       (cl-ecase (haskell-process-type)
-         ('ghci
-          (haskell-process-log
-           (propertize (format "Starting inferior GHCi process %s ..."
-                               haskell-process-path-ghci)
-                       'face font-lock-comment-face))
-          (apply #'start-process
-                 (append (list (haskell-session-name session)
-                               nil
-                               haskell-process-path-ghci)
-                         haskell-process-args-ghci)))
-         ('cabal-repl
-          (haskell-process-log
-           (propertize
-            (format "Starting inferior `cabal repl' process using %s ..."
-                    haskell-process-path-cabal)
-            'face font-lock-comment-face))
-
-          (apply #'start-process
-                 (append (list (haskell-session-name session)
-                               nil
-                               haskell-process-path-cabal)
-                         '("repl") haskell-process-args-cabal-repl
-                         (let ((target (haskell-session-target session)))
-                           (if target (list target) nil)))))
-         ('cabal-ghci
-          (haskell-process-log
-           (propertize
-            (format "Starting inferior cabal-ghci process using %s ..."
-                    haskell-process-path-cabal-ghci)
-            'face font-lock-comment-face))
-          (start-process (haskell-session-name session)
-                         nil
-                         haskell-process-path-cabal-ghci))
-         ('cabal-dev
-          (let ((dir (concat (haskell-session-cabal-dir session)
-                             "/cabal-dev")))
-            (haskell-process-log
-             (propertize (format "Starting inferior cabal-dev process %s -s %s ..."
-                                 haskell-process-path-cabal-dev
-                                 dir)
-                         'face font-lock-comment-face))
-            (start-process (haskell-session-name session)
-                           nil
-                           haskell-process-path-cabal-dev
-                           "ghci"
-                           "-s"
-                           dir))))))
+       (progn
+         (haskell-process-log (propertize (car log-and-command)))
+         (apply #'start-process (cdr log-and-command)))))
     (progn (set-process-sentinel (haskell-process-process process) 'haskell-process-sentinel)
            (set-process-filter (haskell-process-process process) 'haskell-process-filter))
     (haskell-process-send-startup process)
