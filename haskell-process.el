@@ -79,28 +79,38 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
   (let ((session-name (haskell-session-name session)))
     (cl-ecase hptype
       ('ghci
-       (append (list (format "Starting inferior GHCi process %s ..." haskell-process-path-ghci)
+       (append (list (format "Starting inferior GHCi process %s ..."
+                             haskell-process-path-ghci)
                      session-name
                      nil)
-               (apply haskell-process-wrapper-function (list (cons haskell-process-path-ghci haskell-process-args-ghci)))))
+               (apply haskell-process-wrapper-function
+                      (list
+                       (cons haskell-process-path-ghci haskell-process-args-ghci)))))
       ('cabal-repl
-       (append (list (format "Starting inferior `cabal repl' process using %s ..." haskell-process-path-cabal)
+       (append (list (format "Starting inferior `cabal repl' process using %s ..."
+                             haskell-process-path-cabal)
                      session-name
                      nil)
-               (apply haskell-process-wrapper-function (list (cons haskell-process-path-cabal (cons "repl" haskell-process-args-cabal-repl))))
+               (apply haskell-process-wrapper-function
+                      (list
+                       (cons haskell-process-path-cabal (cons "repl" haskell-process-args-cabal-repl))))
                (let ((target (haskell-session-target session)))
                  (if target (list target) nil))))
       ('cabal-ghci
-       (append (list (format "Starting inferior cabal-ghci process using %s ..." haskell-process-path-cabal-ghci)
+       (append (list (format "Starting inferior cabal-ghci process using %s ..."
+                             haskell-process-path-cabal-ghci)
                      session-name
                      nil)
-               (apply haskell-process-wrapper-function (list (list haskell-process-path-cabal-ghci)))))
+               (apply haskell-process-wrapper-function
+                      (list (list haskell-process-path-cabal-ghci)))))
       ('cabal-dev
        (let ((dir (concat (haskell-session-cabal-dir session) "/cabal-dev")))
-         (append (list (format "Starting inferior cabal-dev process %s -s %s ..." haskell-process-path-cabal-dev dir)
+         (append (list (format "Starting inferior cabal-dev process %s -s %s ..."
+                               haskell-process-path-cabal-dev dir)
                        session-name
                        nil)
-                 (apply haskell-process-wrapper-function (list (cons haskell-process-path-cabal-dev (list "ghci" "-s" dir))))))))))
+                 (apply haskell-process-wrapper-function
+                        (list (cons haskell-process-path-cabal-dev (list "ghci" "-s" dir))))))))))
 
 (defun haskell-process-make (name)
   "Make an inferior Haskell process."
