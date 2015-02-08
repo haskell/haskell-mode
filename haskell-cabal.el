@@ -117,7 +117,7 @@
 (add-to-list 'auto-mode-alist '("\\.cabal\\'" . haskell-cabal-mode))
 
 (defvar haskell-cabal-mode-map (make-sparse-keymap))
-(define-key haskell-cabal-mode-map  (kbd "C-c s")
+(define-key haskell-cabal-mode-map  (kbd "C-c C-s")
   'haskell-cabal-subsection-arrange-lines)
 (define-key haskell-cabal-mode-map  (kbd "C-M-n") 'haskell-cabal-next-section)
 (define-key haskell-cabal-mode-map  (kbd "C-M-p")
@@ -129,7 +129,7 @@
   'haskell-cabal-next-subsection)
 (define-key haskell-cabal-mode-map  (kbd "C-<up>")
   'haskell-cabal-previous-subsection)
-(define-key haskell-cabal-mode-map  (kbd "C-c f")
+(define-key haskell-cabal-mode-map  (kbd "C-c C-f")
   'haskell-cabal-find-or-create-source-file)
 (define-key haskell-cabal-mode-map  (kbd "M-g l")
   'haskell-cabal-goto-library-section)
