@@ -32,6 +32,7 @@
 
 (require 'comint)
 (require 'shell)             ; For directory tracking.
+(require 'xref)
 (require 'compile)
 (require 'haskell-mode)
 (require 'haskell-decl-scan)
@@ -568,7 +569,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
             (setq file (expand-file-name file)))
           ;; Push current location marker on the ring used by `find-tag'
           (require 'etags)
-          (ring-insert find-tag-marker-ring (point-marker))
+          (xref-push-marker-stack)
           (pop-to-buffer (find-file-noselect file))
           (when line
             (goto-char (point-min))
