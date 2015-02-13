@@ -1033,27 +1033,19 @@ LOC = (list FILE LINE COL)"
                              collect (replace-regexp-in-string "\\.l?hs$" "" part))))
     (mapconcat 'identity (reverse components) ".")))
 
+(defvar haskell-auto-insert-module-format-string
+  "-- | \n\nmodule %s where\n\n"
+  "Template string that will be inserted in new haskell buffers via `haskell-auto-insert-module-template'.")
+
 (defun haskell-auto-insert-module-template ()
   "Insert a module template for the newly created buffer."
   (interactive)
   (when (and (= (point-min)
                 (point-max))
              (buffer-file-name))
-    (insert
-     "-- | "
-     "\n"
-     "\n"
-     "module "
-     )
-    (let ((name (haskell-guess-module-name)))
-      (if (string= name "")
-          (insert "")
-        (insert name)))
-    (insert " where"
-            "\n"
-            "\n")
+    (insert (format haskell-auto-insert-module-format-string (haskell-guess-module-name)))
     (goto-char (point-min))
-    (forward-char 4)))
+    (end-of-line)))
 
 
 ;; Provide ourselves:
