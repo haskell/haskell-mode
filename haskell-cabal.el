@@ -180,6 +180,20 @@
           val)))))
 
 ;;;###autoload
+(defun haskell-guess-setting (name)
+  "Guess the specified setting of this project.
+If there is no valid .cabal file to get the setting from (or
+there is no corresponding setting with that name in the .cabal
+file), then this function returns nil."
+  (interactive)
+  (when (and name buffer-file-name)
+    (let ((cabal-file (haskell-cabal-find-file (file-name-directory buffer-file-name))))
+      (when (and cabal-file (file-readable-p cabal-file))
+        (with-temp-buffer
+          (insert-file-contents cabal-file)
+          (haskell-cabal-get-setting name))))))
+
+;;;###autoload
 (defun haskell-cabal-get-dir ()
   "Get the Cabal dir for a new project. Various ways of figuring this out,
    and indeed just prompting the user. Do them all."
