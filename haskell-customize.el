@@ -57,7 +57,7 @@ and returns a possibly-modified list.
 The following example function arranges for all haskell process
 commands to be started in the current nix-shell environment:
 
-  (lambda (argv) (append (list \"nix-shell\" \"default.nix\" \"--command\" )
+  (lambda (argv) (append (list \"nix-shell\" \"-I\" \".\" \"--command\" )
                     (list (mapconcat 'identity argv \" \"))))
 
 See Info Node `(emacs)Directory Variables' for a way to set this option on
