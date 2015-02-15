@@ -631,7 +631,7 @@ command from GHCi."
                (format ":!cd %s && %s | %s"
                        (haskell-session-cabal-dir
                         (haskell-process-session (car state)))
-                       "find . -name '*.hs' -or -name '*.lhs' -or -name '*.hsc' -print0"
+                       "find . -name '*.hs' -print0 -or -name '*.lhs' -print0 -or -name '*.hsc' -print0"
                        "xargs -0 hasktags -e -x"))))
       :complete (lambda (state response)
                   (when (cdr state)
