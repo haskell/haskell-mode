@@ -459,7 +459,7 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
     (modify-syntax-entry ?\t " " table)
     (modify-syntax-entry ?\" "\"" table)
     (modify-syntax-entry ?\' "_" table)
-    (modify-syntax-entry ?_  "w" table)
+    (modify-syntax-entry ?_  "_" table)
     (modify-syntax-entry ?\( "()" table)
     (modify-syntax-entry ?\) ")(" table)
     (modify-syntax-entry ?\[  "(]" table)
@@ -467,36 +467,20 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
 
     (modify-syntax-entry ?\{  "(}1nb" table)
     (modify-syntax-entry ?\}  "){4nb" table)
-    (modify-syntax-entry ?-  "_ 123" table)
+    (modify-syntax-entry ?-  ". 123" table)
     (modify-syntax-entry ?\n ">" table)
-
-    (let (i lim)
-      (map-char-table
-       (lambda (k v)
-         (when (equal v '(1))
-           ;; The current Emacs 22 codebase can pass either a char
-           ;; or a char range.
-           (if (consp k)
-               (setq i (car k)
-                     lim (cdr k))
-             (setq i k
-                   lim k))
-           (while (<= i lim)
-             (when (> i 127)
-               (modify-syntax-entry i "_" table))
-             (setq i (1+ i)))))
-       (standard-syntax-table)))
 
     (modify-syntax-entry ?\` "$`" table)
     (modify-syntax-entry ?\\ "\\" table)
     (mapc (lambda (x)
-            (modify-syntax-entry x "_" table))
-          ;; Some of these are actually OK by default.
+            (modify-syntax-entry x "." table))
           "!#$%&*+./:<=>?@^|~")
 
-    ;; Precise syntax table entries for symbol characters
+    ;; Haskell symbol characters are treated as punctuation because
+    ;; they are not able to form identifiers with word constituent 'w'
+    ;; class characters.
     (dolist (charcodes haskell--char-syntax-symbols)
-      (modify-syntax-entry charcodes "_" table))
+      (modify-syntax-entry charcodes "." table))
     ;; ... and for identifier characters
     (dolist (charcodes haskell--char-syntax-identifiers)
       (modify-syntax-entry charcodes "w" table))
