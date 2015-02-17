@@ -464,20 +464,9 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
     (modify-syntax-entry ?\[  "(]" table)
     (modify-syntax-entry ?\]  ")[" table)
 
-    (cond ((featurep 'xemacs)
-           ;; I don't know whether this is equivalent to the below
-           ;; (modulo nesting).  -- fx
-           (modify-syntax-entry ?{  "(}5" table)
-           (modify-syntax-entry ?}  "){8" table)
-           (modify-syntax-entry ?-  "_ 1267" table))
-          (t
-           ;; In Emacs 21, the `n' indicates that they nest.
-           ;; The `b' annotation is actually ignored because it's only
-           ;; meaningful on the second char of a comment-starter, so
-           ;; on Emacs 20 and before we get wrong results.  --Stef
-           (modify-syntax-entry ?\{  "(}1nb" table)
-           (modify-syntax-entry ?\}  "){4nb" table)
-           (modify-syntax-entry ?-  "_ 123" table)))
+    (modify-syntax-entry ?\{  "(}1nb" table)
+    (modify-syntax-entry ?\}  "){4nb" table)
+    (modify-syntax-entry ?-  "_ 123" table)
     (modify-syntax-entry ?\n ">" table)
 
     (let (i lim)
