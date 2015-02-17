@@ -51,8 +51,6 @@ Note: The implementation currently only supports ASCII
   "Return (up to) N character length prefix of STRING."
   (substring string 0 (min (length string) n)))
 
-(defalias 'haskell-str-is-prefix-of-p 'string-prefix-p)
-
 (defun haskell-str-is-suffix-of-p (str1 str2 &optional ignore-case)
   "Return non-nil if STR1 is a suffix of STR2.
 If IGNORE-CASE is non-nil, the comparison is done without paying attention
