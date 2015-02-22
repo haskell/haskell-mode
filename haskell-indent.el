@@ -6,7 +6,6 @@
 ;; Author: 1997-1998 Guy Lapalme <lapalme@iro.umontreal.ca>
 
 ;; Keywords: indentation Haskell layout-rule
-;; Version: 1.2
 ;; URL: http://www.iro.umontreal.ca/~lapalme/layout/index.html
 
 ;; This file is not part of GNU Emacs.
