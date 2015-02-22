@@ -32,6 +32,7 @@
 
 (require 'comint)
 (require 'shell)             ; For directory tracking.
+(require 'haskell-compat)
 (require 'xref)
 (require 'compile)
 (require 'haskell-mode)

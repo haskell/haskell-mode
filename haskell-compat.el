@@ -31,6 +31,20 @@ A process is considered alive if its status is `run', `open',
     (memq (process-status process)
           '(run open listen connect stop))))
 
+;; Cross-referencing commands have been replaced since Emacs 25.1.
+;; These aliases are required to provide backward compatibility.
+(unless (require 'xref nil 'noerror)
+  (defalias 'xref-pop-marker-stack 'pop-tag-mark)
+
+  (defun xref-push-marker-stack ()
+    "Add point to the marker stack."
+    (require 'ring)
+    (defvar find-tag-marker-ring)
+
+    (ring-insert find-tag-marker-ring (point-marker)))
+
+  (provide 'xref))
+
 (provide 'haskell-compat)
 
 ;;; haskell-compat.el ends here

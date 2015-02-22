@@ -18,6 +18,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'haskell-compat)
 (require 'xref)
 (require 'haskell-process)
 (require 'haskell-font-lock)
