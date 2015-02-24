@@ -635,7 +635,7 @@ command from GHCi."
                        "xargs -0 hasktags -e -x"))))
       :complete (lambda (state response)
                   (when (cdr state)
-                    (let ((tags-file-name
+                    (let ((add-to-list 'tags-table-list
                            (haskell-session-tags-filename
                             (haskell-process-session (car state)))))
                       (find-tag (cdr state))))
