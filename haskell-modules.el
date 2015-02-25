@@ -71,11 +71,6 @@ If DONTCREATE is non-nil don't create a new session."
       (let ((modules (shell-command-to-string
                       (format "%s | %s | %s"
                               (cond
-                               ((eq 'cabal-dev (haskell-process-type))
-                                (if (or (not dontcreate) session)
-                                    (format "cabal-dev -s %s/cabal-dev ghc-pkg dump"
-                                            (haskell-session-cabal-dir session))
-                                  "echo ''"))
                                ((haskell-sandbox-exists-p session)
                                 (concat "ghc-pkg dump -f "
                                         (shell-quote-argument (haskell-sandbox-pkgdb session))))

@@ -102,15 +102,7 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
                      session-name
                      nil)
                (apply haskell-process-wrapper-function
-                      (list (list haskell-process-path-cabal-ghci)))))
-      ('cabal-dev
-       (let ((dir (concat (haskell-session-cabal-dir session) "/cabal-dev")))
-         (append (list (format "Starting inferior cabal-dev process %s -s %s ..."
-                               haskell-process-path-cabal-dev dir)
-                       session-name
-                       nil)
-                 (apply haskell-process-wrapper-function
-                        (list (cons haskell-process-path-cabal-dev (list "ghci" "-s" dir))))))))))
+                      (list (list haskell-process-path-cabal-ghci))))))))
 
 (defun haskell-process-make (name)
   "Make an inferior Haskell process."
