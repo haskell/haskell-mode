@@ -21,6 +21,8 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'xref nil 'noerror)
+(require 'ring)
 
 ;; Missing in Emacs23, stolen from Emacs24's `subr.el'
 (unless (fboundp 'process-live-p)
@@ -33,14 +35,12 @@ A process is considered alive if its status is `run', `open',
 
 ;; Cross-referencing commands have been replaced since Emacs 25.1.
 ;; These aliases are required to provide backward compatibility.
-(unless (require 'xref nil 'noerror)
+(unless (fboundp 'xref-push-marker-stack)
   (defalias 'xref-pop-marker-stack 'pop-tag-mark)
 
   (defun xref-push-marker-stack ()
     "Add point to the marker stack."
-    (require 'ring)
     (defvar find-tag-marker-ring)
-
     (ring-insert find-tag-marker-ring (point-marker)))
 
   (provide 'xref))
