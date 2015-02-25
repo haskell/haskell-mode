@@ -464,6 +464,7 @@ resultung buffer-content"
        (save-excursion
          (prog1
              (with-temp-buffer
+               (setq indent-tabs-mode nil)
                (indent-to ,start-col)
                (insert ,section-data)
                (goto-char (point-min))
