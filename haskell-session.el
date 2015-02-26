@@ -64,8 +64,8 @@
     (cl-reduce (lambda (acc a)
                  (let ((dir (haskell-session-cabal-dir a t)))
                    (if dir
-                       (if (haskell-is-prefix-of dir
-                                                 (file-name-directory (buffer-file-name)))
+                       (if (string-prefix-p dir
+					    (file-name-directory (buffer-file-name)))
                            (if acc
                                (if (and
                                     (> (length (haskell-session-cabal-dir a t))

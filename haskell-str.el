@@ -51,19 +51,6 @@ Note: The implementation currently only supports ASCII
   "Return (up to) N character length prefix of STRING."
   (substring string 0 (min (length string) n)))
 
-(defalias 'haskell-str-is-prefix-of-p 'string-prefix-p)
-
-(defun haskell-str-is-suffix-of-p (str1 str2 &optional ignore-case)
-  "Return non-nil if STR1 is a suffix of STR2.
-If IGNORE-CASE is non-nil, the comparison is done without paying attention
-to case differences.
-
-Dual to `haskell-str-is-prefix-of-p'"
-  (let ((pos (- (length str2) (length str1))))
-    (if (>= pos 0)
-        (eq t (compare-strings str1 nil nil
-                               str2 pos nil ignore-case)))))
-
 (defconst haskell-str-literal-encode-ascii-array
   [ "\\NUL" "\\SOH" "\\STX" "\\ETX" "\\EOT" "\\ENQ" "\\ACK" "\\a" "\\b" "\\t" "\\n" "\\v" "\\f" "\\r" "\\SO" "\\SI" "\\DLE" "\\DC1" "\\DC2" "\\DC3" "\\DC4" "\\NAK" "\\SYN" "\\ETB" "\\CAN" "\\EM" "\\SUB" "\\ESC" "\\FS" "\\GS" "\\RS" "\\US" " " "!" "\\\"" "#" "$" "%" "&" "'" "(" ")" "*" "+" "," "-" "." "/" "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" ":" ";" "<" "=" ">" "?" "@" "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z" "[" "\\\\" "]" "^" "_" "`" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" "{" "|" "}" "~" "\\DEL" ]
   "Array of encodings for 7-bit ASCII character points indexed by ASCII value.")
