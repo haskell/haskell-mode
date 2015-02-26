@@ -53,6 +53,12 @@ A process is considered alive if its status is `run', `open',
 (unless (fboundp 'outline-show-subtree)
   (defalias 'outline-show-subtree 'show-subtree))
 
+(unless (fboundp 'outline-hide-sublevels)
+  (defalias 'outline-hide-sublevels 'hide-sublevels))
+
+(unless (fboundp 'outline-show-subtree)
+  (defalias 'outline-show-subtree 'show-subtree))
+
 (provide 'haskell-compat)
 
 ;;; haskell-compat.el ends here
