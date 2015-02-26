@@ -418,8 +418,7 @@ Preserves indentation and removes extra whitespace"
       (delete-char n)
     (on-parse-error (delete-char n)
                     (cond
-                     ((and delete-selection-mode
-                           mark-active
+                     ((and mark-active
                            (not (= (point) (mark))))
                       (delete-region (mark) (point)))
                      ((and (eq haskell-literate 'bird)
