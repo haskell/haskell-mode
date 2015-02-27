@@ -67,12 +67,12 @@ modes (e.g. fill-column-indicator)."
 (defface haskell-indentation-show-normal-face
   '((t :underline t))
   "Default face for indentations overlay."
-  :group 'hl2)
+  :group 'haskell-indentation)
 
 (defface haskell-indentation-show-hl-line-face
   '((t :underline t :inherit hl-line))
   "Face used for indentations overlay after EOL if hl-line mode is enabled."
-  :group 'hl2)
+  :group 'haskell-indentation)
 
 
 (defcustom haskell-indentation-indent-leftmost 'both
@@ -444,7 +444,7 @@ the current buffer."
   "Disable showing of indentation points in the current buffer."
   (interactive)
   (setq haskell-indentation-dyn-show-indentations nil)
-  (remove-hook 'post-command-hook #'hl2-show-overlays t)
+  (remove-hook 'post-command-hook #'haskell-indentation-show-overlays t)
   (haskell-indentation-unshow-overlays)
   (remove-hook 'change-major-mode-hook #'haskell-indentation-unshow-overlays t)
   (remove-hook 'pre-command-hook #'haskell-indentation-unshow-overlays t))
