@@ -62,11 +62,11 @@ Note: doesn't detect if in {--}-style comment."
   (save-excursion
     (goto-char (line-beginning-position))
     (if (looking-at (concat "[\t ]*import[\t ]+"
-                            "\\(safe[\t ]+\\)?" ;; SafeHaskell
-                            "\\(qualified[\t ]+\\)?"
-                            "\\(\"[^\"]*\"[\t ]+\\)?" ;; PackageImports
-                            "\\([[:digit:][:upper:][:lower:].]+\\)"))
-        (match-string-no-properties 4))))
+                            "\\(?:safe[\t ]+\\)?" ;; SafeHaskell
+                            "\\(?:qualified[\t ]+\\)?"
+                            "\\(?:\"[^\"]*\"[\t ]+\\)?" ;; PackageImports
+                            "\\([[:digit:][:upper:][:lower:]_.]+\\)"))
+        (match-string-no-properties 1))))
 
 
 (provide 'haskell-utils)

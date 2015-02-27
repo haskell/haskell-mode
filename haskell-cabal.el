@@ -153,6 +153,7 @@
   (set (make-local-variable 'comment-end) "")
   (set (make-local-variable 'comment-end-skip) "[ \t]*\\(\\s>\\|\n\\)")
   (set (make-local-variable 'indent-line-function) 'haskell-cabal-indent-line)
+  (setq indent-tabs-mode nil)
   )
 
 (defun haskell-cabal-get-setting (name)
@@ -177,6 +178,20 @@
               (setq start (1+ (match-beginning 0)))
               (setq val (replace-match "" t t val))))
           val)))))
+
+;;;###autoload
+(defun haskell-guess-setting (name)
+  "Guess the specified setting of this project.
+If there is no valid .cabal file to get the setting from (or
+there is no corresponding setting with that name in the .cabal
+file), then this function returns nil."
+  (interactive)
+  (when (and name buffer-file-name)
+    (let ((cabal-file (haskell-cabal-find-file (file-name-directory buffer-file-name))))
+      (when (and cabal-file (file-readable-p cabal-file))
+        (with-temp-buffer
+          (insert-file-contents cabal-file)
+          (haskell-cabal-get-setting name))))))
 
 ;;;###autoload
 (defun haskell-cabal-get-dir ()
@@ -346,8 +361,8 @@ OTHER-WINDOW use `find-file-other-window'."
 )
 
 (defun haskell-cabal-section-end ()
-  (interactive)
   "Find the end of the current section"
+  (interactive)
   (save-excursion
     (if  (re-search-forward "\n\\([ \t]*\n\\)*[[:alnum:]]" nil t)
          (match-beginning 0)
@@ -449,6 +464,7 @@ resultung buffer-content"
        (save-excursion
          (prog1
              (with-temp-buffer
+               (setq indent-tabs-mode nil)
                (indent-to ,start-col)
                (insert ,section-data)
                (goto-char (point-min))

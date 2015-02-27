@@ -51,37 +51,49 @@
                      (t
                       (string< a b)))))))
     (while (not result)
-      (let ((key (read-event (concat (propertize prompt 'face 'minibuffer-prompt)
-                                     (propertize pattern 'face 'font-lock-type-face)
-                                     "{"
-                                     (mapconcat #'identity
-                                                (let* ((i 0))
-                                                  (cl-loop for candidate in candidates
-                                                           while (<= i haskell-complete-module-max-display)
-                                                           do (cl-incf i)
-                                                           collect (cond ((> i haskell-complete-module-max-display)
-                                                                          "...")
-                                                                         ((= i 1)
-                                                                          (propertize candidate 'face 'ido-first-match-face))
-                                                                         (t candidate))))
-                                                " | ")
-                                     "}"))))
-        (cl-case key
-          (7 (keyboard-quit))
-          (backspace
-           (unless (null stack)
-             (setq candidates (pop stack)))
-           (unless (string= "" pattern)
-             (setq pattern (substring pattern 0 -1))))
-          (return (setq result (car candidates)))
-          (left (setq candidates (append (last candidates) (butlast candidates))))
-          (right (setq candidates (append (cdr candidates) (list (car candidates)))))
-          (t (when (characterp key)
-               (let ((char (char-to-string key)))
-                 (when (string-match "[A-Za-z0-9_'.]+" char)
-                   (push candidates stack)
-                   (setq pattern (concat pattern char))
-                   (setq candidates (haskell-complete-module pattern candidates)))))))))
+      (let ((key
+             (key-description
+              (vector
+               (read-key
+                (concat (propertize prompt 'face 'minibuffer-prompt)
+                        (propertize pattern 'face 'font-lock-type-face)
+                        "{"
+                        (mapconcat #'identity
+                                   (let* ((i 0))
+                                     (cl-loop for candidate in candidates
+                                              while (<= i haskell-complete-module-max-display)
+                                              do (cl-incf i)
+                                              collect (cond ((> i haskell-complete-module-max-display)
+                                                             "...")
+                                                            ((= i 1)
+                                                             (propertize candidate 'face 'ido-first-match-face))
+                                                            (t candidate))))
+                                   " | ")
+                        "}"))))))
+        (cond
+         ((string= key "C-g")
+          (keyboard-quit))
+         ((string= key "DEL")
+          (unless (null stack)
+            (setq candidates (pop stack)))
+          (unless (string= "" pattern)
+            (setq pattern (substring pattern 0 -1))))
+         ((string= key "RET")
+          (setq result (or (car candidates)
+                           pattern)))
+         ((string= key "<left>")
+          (setq candidates
+                (append (last candidates)
+                        (butlast candidates))))
+         ((string= key "<right>")
+          (setq candidates
+                (append (cdr candidates)
+                        (list (car candidates)))))
+         (t
+          (when (string-match "[A-Za-z0-9_'.]+" key)
+            (push candidates stack)
+            (setq pattern (concat pattern key))
+            (setq candidates (haskell-complete-module pattern candidates)))))))
     result))
 
 (defun haskell-complete-module (pattern candidates)

@@ -3,42 +3,57 @@ GIT_VERSION = $(shell git describe --tags --match 'v[0-9]*' --long --dirty | sed
 
 INSTALL_INFO = install-info
 EMACS = emacs
-EFLAGS =
+EFLAGS = --eval "(when (< emacs-major-version 24) \
+                    (add-to-list 'load-path (expand-file-name \"tests/compat\")) \
+                    (setq byte-compile-warnings '(not cl-functions)))" \
+         --eval '(setq byte-compile-error-on-warn t)'
+
 BATCH = $(EMACS) $(EFLAGS) --batch -Q -L .
 SUBST_ATAT = sed -e 's/@@GIT_VERSION@@/$(GIT_VERSION)/g;s/@GIT_VERSION@/$(GIT_VERSION)/g;s/@@VERSION@@/$(VERSION)/g;s/@VERSION@/$(VERSION)/g'
 
 ELFILES = \
 	ghc-core.el \
+	ghci-script-mode.el \
+	highlight-uses-mode.el \
 	haskell-align-imports.el \
-	haskell-c.el \
+	haskell-bot.el \
 	haskell-cabal.el \
+	haskell-c.el \
 	haskell-checkers.el \
+	haskell-collapse.el \
+	haskell-modules.el \
+	haskell-sandbox.el \
+	haskell-commands.el \
 	haskell-compat.el \
 	haskell-compile.el \
+	haskell-complete-module.el \
+	haskell-customize.el \
+	haskell-debug.el \
 	haskell-decl-scan.el \
 	haskell-doc.el \
+	haskell.el \
 	haskell-font-lock.el \
-	haskell-indent.el \
 	haskell-indentation.el \
-	haskell-collapse.el \
+	haskell-indent.el \
 	haskell-interactive-mode.el \
+	haskell-load.el \
 	haskell-menu.el \
 	haskell-mode.el \
 	haskell-move-nested.el \
 	haskell-navigate-imports.el \
 	haskell-package.el \
-	haskell-complete-module.el \
+	haskell-presentation-mode.el \
 	haskell-process.el \
+	haskell-repl.el \
 	haskell-session.el \
 	haskell-show.el \
 	haskell-simple-indent.el \
 	haskell-sort-imports.el \
-	haskell-string.el \
 	haskell-str.el \
+	haskell-string.el \
 	haskell-unicode-input-method.el \
 	haskell-utils.el \
 	haskell-yas.el \
-	haskell-presentation-mode.el \
 	inf-haskell.el
 
 ELCFILES = $(ELFILES:.el=.elc)
@@ -50,7 +65,7 @@ ELCHECKS=$(addprefix check-, $(ELFILES:.el=))
 
 %.elc: %.el
 	@$(BATCH) \
-       -f batch-byte-compile $<
+		 -f batch-byte-compile $*.el
 
 .PHONY: all compile info clean check $(ELCHECKS) elpa package
 
@@ -58,23 +73,14 @@ all: compile $(AUTOLOADS) info
 
 compile: $(ELCFILES)
 
-$(ELCHECKS): check-%: %.el
+$(ELCHECKS): check-%: %.el %.elc
 	@$(BATCH) --eval '(when (check-declare-file "$*.el") (error "check-declare failed"))'
-	@$(BATCH) \
-	     --eval "(setq byte-compile-error-on-warn t)" \
-		 -f batch-byte-compile $*.el
-	@$(RM) $*.elc
 	@if [ -f "$(<:%.el=tests/%-tests.el)" ]; then \
-	if $(BATCH) --eval "(require 'ert)" 2> /dev/null; then \
-		echo; \
 		$(BATCH) -l "$(<:%.el=tests/%-tests.el)" -f ert-run-tests-batch-and-exit; \
-	else \
-		echo "ERT not available, skipping unit tests"; \
-	fi; \
 	fi
 	@echo "--"
 
-check: clean $(ELCHECKS)
+check: $(ELCHECKS)
 	@echo "checks passed!"
 
 clean:
@@ -86,6 +92,16 @@ dir: haskell-mode.info
 	$(INSTALL_INFO) --dir=$@ $<
 
 haskell-mode.tmp.texi: haskell-mode.texi
+	@sed -n -e '/@chapter/ s/@code{\(.*\)}/\1/' \
+                -e 's/@chapter \(.*\)$$/* \1::/p' \
+                -e 's/@unnumbered \(.*\)$$/* \1::/p' \
+               haskell-mode.texi > haskell-mode-menu-order.txt
+	@sed -e '1,/@menu/ d' \
+            -e '/end menu/,$$ d' \
+            haskell-mode.texi > haskell-mode-content-order.txt
+	diff -C 1 haskell-mode-menu-order.txt haskell-mode-content-order.txt
+	@rm haskell-mode-menu-order.txt haskell-mode-content-order.txt
+
 	$(SUBST_ATAT) < haskell-mode.texi > haskell-mode.tmp.texi
 
 haskell-mode.info: haskell-mode.tmp.texi

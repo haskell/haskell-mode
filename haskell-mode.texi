@@ -55,17 +55,16 @@ Haskell Mode is an Haskell development Environment for GNU Emacs version 23 or l
 * Getting Help and Reporting Bugs::
 * Getting Started::
 * Editing Haskell Code::
-* Unicode::
+* Unicode support::
 * Indentation::
-* Compilation::
 * haskell-decl-scan-mode::
+* Compilation::
 * inferior-haskell-mode::
 * haskell-interactive-mode::
 * haskell-cabal-mode::
 * Concept index::
 * Function index::
 * Variable index::
-
 @end menu
 
 @node Introduction
@@ -150,7 +149,7 @@ The major mode @code{literate-haskell-mode} (which is derived from @code{haskell
 
 @code{haskell-mode} supports @dfn{syntax highlighting} via Emacs' Font Lock minor mode which should be enabled by default in current Emacsen. @xref{Font Lock,,,emacs}, for more information on how to control @code{font-lock-mode}.
 
-@node Unicode
+@node Unicode support
 @chapter Unicode support
 
 @cindex Unicode

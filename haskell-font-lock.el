@@ -217,10 +217,6 @@ Inherit from `default' to avoid fontification of them."
 (defvar haskell-default-face 'haskell-default-face)
 (defvar haskell-literate-comment-face 'haskell-literate-comment-face)
 
-(defconst haskell-emacs21-features (string-match "[[:alpha:]]" "x")
-  "Non-nil if we have regexp char classes.
-Assume this means we have other useful features from Emacs 21.")
-
 (defun haskell-font-lock-compose-symbol (alist)
   "Compose a sequence of ascii chars into a symbol.
 Regexp match data 0 points to the chars."
@@ -353,7 +349,7 @@ Returns keywords suitable for `font-lock-keywords'."
 
          ;; Top-level declarations
          (topdecl-var
-          (concat line-prefix "\\(" varid "\\)\\s-*"
+          (concat line-prefix "\\(" varid "\\(?:\\s-*,\\s-*" varid "\\)*" "\\)\\s-*"
                   ;; optionally allow for a single newline after identifier
                   ;; NOTE: not supported for bird-style .lhs files
                   (if (eq literate 'bird) nil "\\([\n]\\s-+\\)?")
@@ -364,6 +360,8 @@ Returns keywords suitable for `font-lock-keywords'."
                   "\\(" varid "\\|" conid "\\|::\\|∷\\|=\\||\\|\\s(\\|[0-9\"']\\)"))
          (topdecl-var2
           (concat line-prefix "\\(" varid "\\|" conid "\\)\\s-*`\\(" varid "\\)`"))
+         (topdecl-bangpat
+          (concat line-prefix "\\(" varid "\\)\\s-*!"))
          (topdecl-sym
           (concat line-prefix "\\(" varid "\\|" conid "\\)\\s-*\\(" sym "\\)"))
          (topdecl-sym2 (concat line-prefix "(\\(" sym "\\))"))
@@ -377,22 +375,14 @@ Returns keywords suitable for `font-lock-keywords'."
             ("^=======" 0 'font-lock-warning-face t)
             ("^>>>>>>> .*$" 0 'font-lock-warning-face t)
             ("^#.*$" 0 'font-lock-preprocessor-face t)
-            ,@(unless haskell-emacs21-features ;Supports nested comments?
-                ;; Expensive.
-                `((,string-and-char 1 font-lock-string-face)))
 
-            ;; This was originally at the very end (and needs to be after
-            ;; all the comment/string/doc highlighting) but it seemed to
-            ;; trigger a bug in Emacs-21.3 which caused the compositions to
-            ;; be "randomly" dropped.  Moving it earlier seemed to reduce
-            ;; the occurrence of the bug.
             ,@(haskell-font-lock-symbols-keywords)
 
             (,reservedid 1 haskell-keyword-face)
             (,reservedsym 1 haskell-operator-face)
             ;; Special case for `as', `hiding', `safe' and `qualified', which are
             ;; keywords in import statements but are not otherwise reserved.
-            ("\\<import[ \t]+\\(?:\\(safe\\>\\)[ \t]*\\)?\\(?:\\(qualified\\>\\)[ \t]*\\)?[^ \t\n()]+[ \t]*\\(?:\\(\\<as\\>\\)[ \t]*[^ \t\n()]+[ \t]*\\)?\\(\\<hiding\\>\\)?"
+            ("\\<import[ \t]+\\(?:\\(safe\\>\\)[ \t]*\\)?\\(?:\\(qualified\\>\\)[ \t]*\\)?\\(?:\"[^\"]*\"[\t ]*\\)?[^ \t\n()]+[ \t]*\\(?:\\(\\<as\\>\\)[ \t]*[^ \t\n()]+[ \t]*\\)?\\(\\<hiding\\>\\)?"
              (1 haskell-keyword-face nil lax)
              (2 haskell-keyword-face nil lax)
              (3 haskell-keyword-face nil lax)
@@ -419,6 +409,7 @@ Returns keywords suitable for `font-lock-keywords'."
             ;; Place them *before* generic id-and-op highlighting.
             (,topdecl-var  (1 haskell-definition-face))
             (,topdecl-var2 (2 haskell-definition-face))
+            (,topdecl-bangpat  (1 haskell-definition-face))
             (,topdecl-sym  (2 haskell-definition-face))
             (,topdecl-sym2 (1 haskell-definition-face))
 
@@ -426,9 +417,12 @@ Returns keywords suitable for `font-lock-keywords'."
             ("(\\(,*\\|->\\))" 0 haskell-constructor-face)
             ("\\[\\]" 0 haskell-constructor-face)
             ;; Expensive.
+            (,(concat "`" varid "`") 0 haskell-operator-face)
+            (,(concat "`" conid "`") 0 haskell-operator-face)
+            (,(concat "`" qvarid "`") 0 haskell-operator-face)
+            (,(concat "`" qconid "`") 0 haskell-operator-face)
             (,qvarid 0 haskell-default-face)
             (,qconid 0 haskell-constructor-face)
-            (,(concat "\`" varid "\`") 0 haskell-operator-face)
             ;; Expensive.
             (,conid 0 haskell-constructor-face)
 
@@ -447,37 +441,37 @@ Returns keywords suitable for `font-lock-keywords'."
                  ("^>" 0 haskell-default-face t))))
         ((latex tex)
          (setq keywords
-               `((haskell-fl-latex-comments 0 'font-lock-comment-face t)
+               `((haskell-font-lock-latex-comments 0 'font-lock-comment-face t)
                  ,@keywords)))))
     keywords))
 
-;; The next three aren't used in Emacs 21.
-
-(defvar haskell-fl-latex-cache-pos nil
-  "Position of cache point used by `haskell-fl-latex-cache-in-comment'.
+(defvar haskell-font-lock-latex-cache-pos nil
+  "Position of cache point used by `haskell-font-lock-latex-cache-in-comment'.
 Should be at the start of a line.")
+(make-variable-buffer-local 'haskell-font-lock-latex-cache-pos)
 
-(defvar haskell-fl-latex-cache-in-comment nil
-  "If `haskell-fl-latex-cache-pos' is outside a
+(defvar haskell-font-lock-latex-cache-in-comment nil
+  "If `haskell-font-lock-latex-cache-pos' is outside a
 \\begin{code}..\\end{code} block (and therefore inside a comment),
 this variable is set to t, otherwise nil.")
+(make-variable-buffer-local 'haskell-font-lock-latex-cache-in-comment)
 
-(defun haskell-fl-latex-comments (end)
+(defun haskell-font-lock-latex-comments (end)
   "Sets `match-data' according to the region of the buffer before end
 that should be commented under LaTeX-style literate scripts."
   (let ((start (point)))
     (if (= start end)
         ;; We're at the end.  No more to fontify.
         nil
-      (if (not (eq start haskell-fl-latex-cache-pos))
+      (if (not (eq start haskell-font-lock-latex-cache-pos))
           ;; If the start position is not cached, calculate the state
           ;; of the start.
           (progn
-            (setq haskell-fl-latex-cache-pos start)
+            (setq haskell-font-lock-latex-cache-pos start)
             ;; If the previous \begin{code} or \end{code} is a
             ;; \begin{code}, then start is not in a comment, otherwise
             ;; it is in a comment.
-            (setq haskell-fl-latex-cache-in-comment
+            (setq haskell-font-lock-latex-cache-in-comment
                   (if (and
                        (re-search-backward
                         "^\\(\\(\\\\begin{code}\\)\\|\\(\\\\end{code}\\)\\)$"
@@ -486,7 +480,7 @@ that should be commented under LaTeX-style literate scripts."
                       nil t))
             ;; Restore position.
             (goto-char start)))
-      (if haskell-fl-latex-cache-in-comment
+      (if haskell-font-lock-latex-cache-in-comment
           (progn
             ;; If start is inside a comment, search for next \begin{code}.
             (re-search-forward "^\\\\begin{code}$" end 'move)
@@ -692,6 +686,16 @@ Invokes `haskell-font-lock-hook' if not nil."
 (defun turn-off-haskell-font-lock ()
   "Turns off font locking in current buffer."
   (font-lock-mode -1))
+
+(defun haskell-fontify-as-mode (text mode)
+  "Fontify TEXT as MODE, returning the fontified text."
+  (with-temp-buffer
+    (funcall mode)
+    (insert text)
+    (if (fboundp 'font-lock-ensure)
+        (font-lock-ensure)
+      (with-no-warnings (font-lock-fontify-buffer)))
+    (buffer-substring (point-min) (point-max))))
 
 ;; Provide ourselves:
 

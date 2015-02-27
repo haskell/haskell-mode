@@ -81,7 +81,7 @@
 
 (ert-deftest haskell-str-literal-decode-encode ()
   "Test whether decode+encode is the identity function."
-  (random t)
+  (random "c7430a4")
   ;; some edge cases
   (dolist (s0 (list "\x0e\x48" ;; '\SO' 'H'
 		    "\x01"     ;; '\SOH'
