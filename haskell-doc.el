@@ -35,15 +35,10 @@
 
 ;; Installation:
 
-;; One useful way to enable this minor mode is to put the following in your
-;; .emacs:
+;; Depending on the major mode you use for your Haskell programs add
+;; one of the following to your .emacs:
 ;;
-;;      (autoload 'turn-on-haskell-doc-mode "haskell-doc" nil t)
-
-;;   and depending on the major mode you use for your Haskell programs:
-;;      (add-hook 'hugs-mode-hook 'turn-on-haskell-doc-mode)    ; hugs-mode
-;;     or
-;;      (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode) ; haskell-mode
+;;   (add-hook 'haskell-mode-hook 'haskell-doc-mode)
 
 ;; Customisation:
 
@@ -76,7 +71,7 @@
 
 ;; `haskell-doc-mode' is implemented as a minor-mode.  So, you can combine it
 ;; with any other mode.  To enable it just type
-;;   M-x turn-on-haskell-doc-mode
+;;   M-x haskell-doc-mode
 
 ;; These are the names of the functions that can be called directly by the
 ;; user (with keybindings in `haskell-mode'):
