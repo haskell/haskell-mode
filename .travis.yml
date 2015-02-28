@@ -1,35 +1,31 @@
 language: emacs-lisp
 
 env:
+  global:
+    - PATH=$HOME/.cask/bin:$HOME/.evm/bin:$PATH
   matrix:
-    - EMACS=emacs23
-    - EMACS=emacs24
-    - EMACS=emacs-snapshot
+    #   # Cask does not support emacs < 24
+    # - EVM_EMACS=emacs-23.4-bin
+    #   # dependencies break in ghc-core.el about cl-lib
+    # - EVM_EMACS=emacs-24.1-bin
+    #   # dependencies break in ghc-core.el about cl-lib
+    # - EVM_EMACS=emacs-24.2-bin
+    - EVM_EMACS=emacs-24.3-bin
+    - EVM_EMACS=emacs-24.4-bin
+  # allow_failures:
+  #   - EVM_EMACS=emacs-23.4-bin
+  #   - EVM_EMACS=emacs-24.1-bin
+  #   - EVM_EMACS=emacs-24.2-bin
 
-matrix:
-  allow_failures:
-    - env:
-        - EMACS=emacs-snapshot
-
-install:
-  - if [ "$EMACS" = "emacs23" ]; then
-        sudo apt-get update -qq &&
-        sudo apt-get install -qq emacs23-gtk emacs23-el;
-    fi
-  - if [ "$EMACS" = "emacs24" ]; then
-        sudo add-apt-repository -y ppa:cassou/emacs &&
-        sudo apt-get update -qq &&
-        sudo apt-get install -qq emacs24 emacs24-el;
-    fi
-  - if [ "$EMACS" = "emacs-snapshot" ]; then
-        sudo add-apt-repository -y ppa:cassou/emacs &&
-        sudo apt-get update -qq &&
-        sudo apt-get install -qq emacs-snapshot &&
-        sudo apt-get install -qq emacs-snapshot-el emacs-snapshot-gtk;
-    fi
+before_install:
+  - curl -fsSkL https://gist.github.com/rejeep/7736123/raw > travis.sh && source ./travis.sh
+  # install the matrix's emacs version
+  - evm install $EVM_EMACS --use --skip
+  # install deps for cask
+  - cask
 
 script:
-  lsb_release -a && $EMACS --version && make EMACS=$EMACS check
+  lsb_release -a && emacs --version && make check
 
 notifications:
   email: false
