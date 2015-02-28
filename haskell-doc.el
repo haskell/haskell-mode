@@ -31,14 +31,6 @@
 ;; checking the word under the cursor and matching it against a list of
 ;; prelude, library, local and global functions.
 
-;; To show types of global functions, i.e. functions defined in a module
-;; imported by the current module, call the function
-;; `turn-on-haskell-doc-global-types'.  This automatically loads all modules
-;; and builds `imenu' tables to get the types of all functions.
-;; Note: The modules are loaded recursively, so you might pull in
-;;       many modules by just turning on global function support.
-;; This features is currently not very well supported.
-
 ;; This program was inspired by the `eldoc.el' package by Noah Friedman.
 
 ;; Installation:
