@@ -1458,15 +1458,19 @@ See variable docstring."
 
 ;;;###autoload
 (defalias 'turn-on-haskell-doc-mode 'haskell-doc-mode)
+(make-obsolete 'turn-on-haskell-doc-mode 'haskell-doc-mode nil)
 
 ;;;###autoload
 (defalias 'turn-on-haskell-doc 'haskell-doc-mode)
+(make-obsolete 'turn-on-haskell-doc 'haskell-doc-mode nil)
 
 ;;@cindex  turn-off-haskell-doc-mode
 (defalias 'turn-off-haskell-doc-mode 'turn-off-haskell-doc)
+(make-obsolete 'turn-off-haskell-doc-mode 'haskell-doc-mode nil)
 
 (defun turn-off-haskell-doc ()
   "Unequivocally turn off `haskell-doc-mode' (which see)."
+  (declare (obsolete 'haskell-doc-mode nil))
   (haskell-doc-mode 0))
 
 ;;@node Check, Top level function, Switch it on or off, top
