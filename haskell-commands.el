@@ -18,6 +18,8 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'etags)
+(require 'haskell-compat)
 (require 'haskell-process)
 (require 'haskell-font-lock)
 (require 'haskell-interactive-mode)
@@ -310,10 +312,9 @@ jump to the tag.
 Remember: If GHCi is busy doing something, this will delay, but
 it will always be accurate, in contrast to tags, which always
 work but are not always accurate.
-
-If the definition or tag is found, the location from which you
-jumped will be pushed onto `find-tag-marker-ring', so you can
-return to that position with `pop-tag-mark'."
+If the definition or tag is found, the location from which you jumped
+will be pushed onto `xref--marker-ring', so you can return to that
+position with `xref-pop-marker-stack'."
   (interactive "P")
   (let ((initial-loc (point-marker))
         (loc (haskell-mode-find-def (haskell-ident-at-point))))
@@ -321,8 +322,11 @@ return to that position with `pop-tag-mark'."
         (haskell-mode-handle-generic-loc loc)
       (call-interactively 'haskell-mode-tag-find))
     (unless (equal initial-loc (point-marker))
-      ;; Store position for return with `pop-tag-mark'
-      (ring-insert find-tag-marker-ring initial-loc))))
+      (save-excursion
+        (goto-char initial-loc)
+        (set-mark-command nil)
+        ;; Store position for return with `xref-pop-marker-stack'
+        (xref-push-marker-stack)))))
 
 ;;;###autoload
 (defun haskell-mode-goto-loc ()
@@ -336,7 +340,7 @@ command from GHCi."
 (defun haskell-mode-goto-span (span)
   "Jump to the span, whatever file and line and column it needs
 to to get there."
-  (ring-insert find-tag-marker-ring (point-marker))
+  (xref-push-marker-stack)
   (find-file (expand-file-name (plist-get span :path)
                                (haskell-session-cabal-dir (haskell-interactive-session))))
   (goto-char (point-min))

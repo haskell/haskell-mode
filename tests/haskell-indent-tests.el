@@ -6,6 +6,9 @@
 (ert-deftest haskell-indent-in-comment-1 ()
   "Document bad behavior. Should not assert."
   :expected-result :failed
+  ;; Emacs 25 (snapshot) starts debugger on cl-assert
+  ;; even in batch mode. So we do not run this test.
+  (skip-unless (< emacs-major-version 25))
   (should (with-temp-buffer
 	    (haskell-mode)
 	    (haskell-indent-mode)

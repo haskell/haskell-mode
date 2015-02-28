@@ -171,9 +171,9 @@ When MESSAGE is non-nil, display a message with the version."
   (interactive)
   (with-current-buffer (find-file-read-only (expand-file-name "NEWS" haskell-mode-pkg-base-dir))
     (goto-char (point-min))
-    (hide-sublevels 1)
+    (outline-hide-sublevels 1)
     (outline-next-visible-heading 1)
-    (show-subtree)))
+    (outline-show-subtree)))
 
 ;; Are we looking at a literate script?
 (defvar haskell-literate nil
