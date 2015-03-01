@@ -55,7 +55,7 @@
       (haskell-process-set-process
        process
        (progn
-         (haskell-process-log (propertize (car log-and-command)))
+         (haskell-process-log (propertize (format "%S" log-and-command)))
          (apply #'start-process (cdr log-and-command)))))
     (progn (set-process-sentinel (haskell-process-process process) 'haskell-process-sentinel)
            (set-process-filter (haskell-process-process process) 'haskell-process-filter))
