@@ -319,11 +319,11 @@ Returns keywords suitable for `font-lock-keywords'."
 
          ;; Reserved operations
          (reservedsym
-          (concat "\\S_"
+          (concat "\\S."
                   ;; (regexp-opt '(".." "::" "=" "\\" "|" "<-" "->"
                   ;;            "@" "~" "=>") t)
                   "\\(->\\|→\\|\\.\\.\\|::\\|∷\\|<-\\|←\\|=>\\|[=@\\|~]\\)"
-                  "\\S_"))
+                  "\\S."))
          ;; Reserved identifiers
          (reservedid
           (concat "\\<"
