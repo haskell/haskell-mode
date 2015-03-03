@@ -11,6 +11,7 @@
 ;; Keywords: faces files Haskell
 ;; Version: 13.10
 ;; URL: https://github.com/haskell/haskell-mode
+;; Version: 13.07
 
 ;; This file is not part of GNU Emacs.
 
