@@ -3,24 +3,9 @@
 ;;; Code:
 
 (require 'ert)
-(require 'haskell-process)
-
-(eval-when-compile (require 'cl)) ;; for tests with mock to pass...
-
-(progn ;; HACK install package.el including for emacs-23.3, then install external el-mock dependency
-  (when (version< emacs-version "24")
-    (with-current-buffer (url-retrieve-synchronously "http://git.savannah.gnu.org/gitweb/?p=emacs.git;a=blob_plain;hb=ba08b24186711eaeb3748f3d1f23e2c2d9ed0d09;f=lisp/emacs-lisp/package.el")
-      (save-excursion
-        (goto-char (point-min))
-        (kill-line 8)
-        (eval-buffer))))
-  (require 'package)
-  (package-initialize)
-  (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
-  (package-refresh-contents)
-  (package-install 'el-mock))
-
 (require 'el-mock)
+
+(require 'haskell-process)
 
 (ert-deftest haskell-process-wrapper-command-function-identity ()
   "No wrapper, return directly the command."
