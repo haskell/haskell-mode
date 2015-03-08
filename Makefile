@@ -3,8 +3,8 @@ GIT_VERSION = $(shell git describe --tags --match 'v[0-9]*' --long --dirty | sed
 
 INSTALL_INFO = install-info
 EMACS = emacs
-EFLAGS = --eval "(when (< emacs-major-version 24) \
-                    (add-to-list 'load-path (expand-file-name \"tests/compat\")) \
+EFLAGS = --eval "(add-to-list 'load-path (expand-file-name \"tests/compat\") 'append)" \
+         --eval "(when (< emacs-major-version 24) \
                     (setq byte-compile-warnings '(not cl-functions)))" \
          --eval '(setq byte-compile-error-on-warn t)'
 
