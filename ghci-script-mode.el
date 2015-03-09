@@ -27,6 +27,7 @@
     ("^:[a-z{]+ *\\+" . font-lock-keyword-face)
     ("^:[a-z{]+ " . font-lock-keyword-face)))
 
+;;;###autoload
 (define-derived-mode ghci-script-mode text-mode "GHCi-Script"
   "Major mode for working with .ghci files."
   (set (make-local-variable 'adaptive-fill-mode) nil)
@@ -48,7 +49,9 @@
   (set (make-local-variable 'dabbrev-abbrev-char-regexp) "\\sw\\|[.]")
   (setq haskell-literate nil))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.ghci\\'" . ghci-script-mode))
+
 (define-key ghci-script-mode-map (kbd "C-c C-l") 'ghci-script-mode-load)
 
 (defun ghci-script-mode-load ()
