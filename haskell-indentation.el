@@ -1163,8 +1163,8 @@ the current buffer."
     (if (or (looking-at "'\\([^\\']\\|\\\\.\\)*'")
             (looking-at "\"\\([^\\\"]\\|\\\\.\\)*\"")
             (looking-at         ; Hierarchical names always start with uppercase
-             "[[:upper:]]\\(\\sw\\|'\\)*\\(\\.\\(\\sw\\|'\\)+\\)*")
-            (looking-at "\\sw\\(\\sw\\|'\\)*") ; Only unqualified vars can start with lowercase
+             "[[:upper:]]\\(\\s_\\|\\sw\\|'\\)*\\(\\.\\(\\s_\\|\\sw\\|'\\)+\\)*")
+            (looking-at "\\(\\s_\\|\\sw\\)\\(\\s_\\|\\sw\\|'\\)*") ; Only unqualified vars can start with lowercase
             (looking-at "[0-9][0-9oOxXeE+-]*")
             (looking-at "[-:!#$%&*+./<=>?@\\\\^|~]+")
             (looking-at "[](){}[,;]")
