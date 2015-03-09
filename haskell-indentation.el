@@ -849,7 +849,7 @@ the current buffer."
     (haskell-indentation-implicit-layout-list parser)))
 
 (defun haskell-indentation-expression-token (token)
-  (member token '("if" "let" "do" "case" "\\" "(" "[" "::"
+  (member token '("if" "let" "do" "case" "\\" "(" "{" "[" "::"
                   value operator no-following-token)))
 
 ;; parse an expression until an unknown token is encountered.
