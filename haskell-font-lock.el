@@ -315,7 +315,7 @@ Returns keywords suitable for `font-lock-keywords'."
           ;; (concat "[" symbol ":]+")
           ;; Add backslash to the symbol-syntax chars.  This seems to
           ;; be thrown for some reason by backslash's escape syntax.
-          "\\(\\s_\\|\\\\\\)+")
+          "\\(\\s.\\|\\\\\\)+")
 
          ;; Reserved operations
          (reservedsym
