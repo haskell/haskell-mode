@@ -44,7 +44,7 @@ Used for locating additional package data files.")
 (defcustom haskell-process-type
   'auto
   "The inferior Haskell process type to use."
-  :type '(choice (const auto) (const ghci) (const cabal-repl) (const cabal-dev) (const cabal-ghci))
+  :type '(choice (const auto) (const ghci) (const cabal-repl) (const cabal-ghci))
   :group 'haskell-interactive)
 
 (defcustom haskell-process-wrapper-function
@@ -100,12 +100,6 @@ a per-project basis."
 (defcustom haskell-process-path-cabal-ghci
   "cabal-ghci"
   "The path for starting cabal-ghci."
-  :group 'haskell-interactive
-  :type '(choice string (repeat string)))
-
-(defcustom haskell-process-path-cabal-dev
-  "cabal-dev"
-  "The path for starting cabal-dev."
   :group 'haskell-interactive
   :type '(choice string (repeat string)))
 
