@@ -18,7 +18,6 @@ ELFILES = \
 	haskell-align-imports.el \
 	haskell-bot.el \
 	haskell-cabal.el \
-	haskell-c.el \
 	haskell-checkers.el \
 	haskell-collapse.el \
 	haskell-modules.el \
