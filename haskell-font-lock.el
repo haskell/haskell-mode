@@ -673,6 +673,7 @@ Invokes `haskell-font-lock-hook' if not nil."
 (provide 'haskell-font-lock)
 
 ;; Local Variables:
+;; coding: utf-8-unix
 ;; tab-width: 8
 ;; End:
 
