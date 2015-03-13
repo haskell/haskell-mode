@@ -117,7 +117,11 @@ $ apt-get install haskell-mode
 
 ### Installation from Git
 
-*This installation method requires more work and recommended for haskell-mode developers/contributors only as it allows to load haskell-mode directly from the checked out Git working copy. If you just want to use bleeding edge versions of haskell-mode please use the MELPA installation method described above.*
+*This installation method requires more work and recommended for
+ haskell-mode developers/contributors only as it allows to load
+ haskell-mode directly from the checked out Git working copy. If you
+ just want to use bleeding edge versions of haskell-mode please use
+ the MELPA installation method described above.*
 
 -   `git clone https://github.com/haskell/haskell-mode.git` into a
     suitable directory, e.g. `~/lib/emacs/haskell-mode/` where `~`
