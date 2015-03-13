@@ -1110,7 +1110,7 @@ haskell-present, depending on configuration."
                   ;; `haskell-process-use-presentation-mode' is t.
                   (haskell-interactive-mode-echo
                    (haskell-process-session (car state))
-                   response
+                   (replace-regexp-in-string "\n\\'" "" response)
                    (cl-caddr state))
                   (if haskell-process-use-presentation-mode
                       (progn (haskell-present (cadr state)

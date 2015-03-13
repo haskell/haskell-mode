@@ -294,15 +294,24 @@ If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
   (interactive "P")
   (if insert-value
       (haskell-process-insert-type)
-    (haskell-process-do-simple-echo
-     (let ((ident (haskell-ident-at-point)))
-       ;; TODO: Generalize all these `string-match' of ident calls into
-       ;; one function.
-       (format (if (string-match "^[_[:lower:][:upper:]]" ident)
-                   ":type %s"
-                 ":type (%s)")
-               ident))
-     'haskell-mode)))
+    (let* ((expr
+            (if (use-region-p)
+                (buffer-substring-no-properties (region-beginning) (region-end))
+              (haskell-ident-at-point)))
+           (expr-okay (and expr
+                         (not (string-match-p "\\`[[:space:]]*\\'" expr))
+                         (not (string-match-p "\n" expr)))))
+      ;; No newlines in expressions, and surround with parens if it
+      ;; might be a slice expression
+      (when expr-okay
+        (haskell-process-do-simple-echo
+         (format
+          (if (or (string-match-p "\\`(" expr)
+                 (string-match-p "\\`[_[:alpha:]]" expr))
+              ":type %s"
+            ":type (%s)")
+          expr)
+         'haskell-mode)))))
 
 ;;;###autoload
 (defun haskell-mode-jump-to-def-or-tag (&optional next-p)
