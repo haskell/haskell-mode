@@ -416,7 +416,7 @@ SESSION, otherwise operate on the current buffer.
       (message "%s"
                (concat (car lines)
                        (if (and (cdr lines) (stringp (cadr lines)))
-                           (format " [ %s .. ]" (haskell-string-take (haskell-trim (cadr lines)) 10))
+                           (format " [ %s .. ]" (haskell-string-take (haskell-string-trim (cadr lines)) 10))
                          ""))))))
 
 (defun haskell-interactive-mode-tab ()

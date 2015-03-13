@@ -51,7 +51,7 @@
 (defun haskell-show-parse-and-insert (given)
   "Parse a `string' containing a Show instance value and insert
   it pretty printed into the current buffer."
-  (when (not (string= "" (haskell-trim given)))
+  (when (not (string= "" (haskell-string-trim given)))
     (let ((current-column (- (point)
                              (line-beginning-position)))
           (result (haskell-show-parse given)))
