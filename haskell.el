@@ -27,6 +27,7 @@
 (require 'haskell-commands)
 (require 'haskell-sandbox)
 (require 'haskell-modules)
+(require 'haskell-string)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic configuration hooks
@@ -270,7 +271,7 @@
   (let ((ident (haskell-ident-at-point))
         (tags-file-name (haskell-session-tags-filename (haskell-session)))
         (tags-revert-without-query t))
-    (when (not (string= "" (haskell-trim ident)))
+    (when (not (string= "" (haskell-string-trim ident)))
       (cond ((file-exists-p tags-file-name)
              (find-tag ident next-p))
             (t (haskell-process-generate-tags ident))))))

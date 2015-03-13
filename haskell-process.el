@@ -29,7 +29,7 @@
 (require 'haskell-compat)
 (require 'haskell-session)
 (require 'haskell-customize)
-(require 'haskell-str)
+(require 'haskell-string)
 
 (defconst haskell-process-prompt-regex "\4"
   "Used for delimiting command replies. 4 is End of Transmission.")
@@ -264,17 +264,17 @@ This uses `accept-process-output' internally."
 (defun haskell-process-get-repl-completions (process inputstr)
   "Perform `:complete repl ...' query for INPUTSTR using PROCESS."
   (let* ((reqstr (concat ":complete repl "
-                         (haskell-str-literal-encode inputstr)))
+                         (haskell-string-literal-encode inputstr)))
          (rawstr (haskell-process-queue-sync-request process reqstr)))
     (if (string-prefix-p "unknown command " rawstr)
         (error "GHCi lacks `:complete' support")
       (let* ((s1 (split-string rawstr "\r?\n" t))
-             (cs (mapcar #'haskell-str-literal-decode (cdr s1)))
+             (cs (mapcar #'haskell-string-literal-decode (cdr s1)))
              (h0 (car s1))) ;; "<cnt1> <cnt2> <quoted-str>"
         (unless (string-match "\\`\\([0-9]+\\) \\([0-9]+\\) \\(\".*\"\\)\\'" h0)
           (error "Invalid `:complete' response"))
         (let ((cnt1 (match-string 1 h0))
-              (h1 (haskell-str-literal-decode (match-string 3 h0))))
+              (h1 (haskell-string-literal-decode (match-string 3 h0))))
           (unless (= (string-to-number cnt1) (length cs))
             (error "Lengths inconsistent in `:complete' reponse"))
           (cons h1 cs))))))

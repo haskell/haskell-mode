@@ -49,7 +49,6 @@ ELFILES = \
 	haskell-show.el \
 	haskell-simple-indent.el \
 	haskell-sort-imports.el \
-	haskell-str.el \
 	haskell-string.el \
 	haskell-unicode-input-method.el \
 	haskell-utils.el \

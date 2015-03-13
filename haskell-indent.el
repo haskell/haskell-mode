@@ -658,8 +658,8 @@ Returns the location of the start of the comment, nil otherwise."
           (string-match "where[ \t]*" haskell-indent-current-line-first-ident))
          (diff-first                 ; not a function def with the same name
           (or (null valname-string)
-              (not (string= (haskell-trim valname-string)
-                            (haskell-trim haskell-indent-current-line-first-ident)))))
+              (not (string= (haskell-string-trim valname-string)
+                            (haskell-string-trim haskell-indent-current-line-first-ident)))))
 
          ;; (is-type-def
          ;;  (and rhs-sign (eq (char-after rhs-sign) ?\:)))
