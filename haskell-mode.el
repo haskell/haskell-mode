@@ -781,6 +781,8 @@ see documentation for that variable for more details."
 ;;;###autoload
 (add-to-list 'auto-mode-alist        '("\\.l[gh]s\\'" . literate-haskell-mode))
 ;;;###autoload
+(add-to-list 'auto-mode-alist        '("\\.hsc\\'" . haskell-mode))
+;;;###autoload
 (add-to-list 'interpreter-mode-alist '("runghc" . haskell-mode))
 ;;;###autoload
 (add-to-list 'interpreter-mode-alist '("runhaskell" . haskell-mode))
