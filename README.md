@@ -154,7 +154,8 @@ For setup instructions, please consult the new integrated haskell-mode
 manual which can be accessed after installation via
 `M-x info-display-manual [RET] haskell-mode`.
 Alternatively, you can also direct your browser to the
-[latest online HTML version](http://haskell.github.io/haskell-mode/manual/latest/).
+[the online haskell-mode manual](https://github.com/haskell/haskell-mode/wiki)
+for setup and use guide.
 
 Support
 -------
