@@ -499,11 +499,6 @@ that should be commented under LaTeX-style literate scripts."
      ("^\\(\\\\\\)end{code}$" 1 "!"))
    haskell-basic-syntactic-keywords))
 
-(defcustom haskell-font-lock-haddock (boundp 'font-lock-doc-face)
-  "If non-nil try to highlight Haddock comments specially."
-  :type 'boolean
-  :group 'haskell)
-
 (defun haskell-syntactic-face-function (state)
   "`font-lock-syntactic-face-function' for Haskell."
   (cond
@@ -532,20 +527,19 @@ that should be commented under LaTeX-style literate scripts."
    ;; And then there are also haddock section headers that start with
    ;; any number of stars:
    ;;   -- * ...
-   ((and haskell-font-lock-haddock
-         (save-excursion
-           (goto-char (nth 8 state))
-           (or (looking-at "\\(?:{- ?\\|-- \\)[|^*$]")
-               (and (looking-at "--")
-                    (let ((doc nil)
-                          pos)
-                      (while (and (not doc)
-                                  (setq pos (line-beginning-position))
-                                  (forward-comment -1)
-                                  (eq (line-beginning-position 2) pos)
-                                  (looking-at "--\\([ \\t]*[|^*]\\)?"))
-                        (setq doc (match-beginning 1)))
-                      doc)))))
+   ((save-excursion
+      (goto-char (nth 8 state))
+      (or (looking-at "\\(?:{- ?\\|-- \\)[|^*$]")
+	  (and (looking-at "--")
+	       (let ((doc nil)
+		     pos)
+		 (while (and (not doc)
+			     (setq pos (line-beginning-position))
+			     (forward-comment -1)
+			     (eq (line-beginning-position 2) pos)
+			     (looking-at "--\\([ \\t]*[|^*]\\)?"))
+		   (setq doc (match-beginning 1)))
+		 doc))))
     font-lock-doc-face)
    (t font-lock-comment-face)))
 
