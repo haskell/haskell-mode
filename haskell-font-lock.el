@@ -236,26 +236,6 @@ Regexp match data 0 points to the chars."
 	  ;; no face.  So force evaluation by using `keep'.
 	  keep)))))
 
-(defun haskell-font-lock-find-pragma (end)
-  (catch 'haskell-font-lock-find-pragma
-    (while (search-forward "{-#" end t)
-      (let* ((begin (match-beginning 0))
-             (ppss (save-excursion (syntax-ppss begin))))
-        ;; We're interested only when it's not in a string or a comment.
-        (unless (or (nth 3 ppss)
-                    (nth 4 ppss))
-          ;; Find the end of the pragma.
-          (let ((end (scan-lists begin 1 0)))
-            ;; Match data contains only the opening {-#, update it to cover the
-            ;; whole pragma.
-            (set-match-data (list begin end))
-            ;; Move to the end so we don't start the next scan from inside the
-            ;; pragma we just found.
-            (goto-char end)
-            (throw 'haskell-font-lock-find-pragma t)))))
-    ;; Found no pragma.
-    nil))
-
 ;; The font lock regular expressions.
 (defun haskell-font-lock-keywords-create (literate)
   "Create fontification definitions for Haskell scripts.
@@ -400,9 +380,7 @@ Returns keywords suitable for `font-lock-keywords'."
             ;; Very expensive.
             (,sym 0 (if (eq (char-after (match-beginning 0)) ?:)
                         haskell-constructor-face
-                      haskell-operator-face))
-
-            (haskell-font-lock-find-pragma 0 haskell-pragma-face t)))
+                      haskell-operator-face))))
     (unless (boundp 'font-lock-syntactic-keywords)
       (cl-case literate
         (bird
@@ -508,6 +486,15 @@ that should be commented under LaTeX-style literate scripts."
         (and (eq haskell-literate 'bird)
              (memq (char-before (nth 8 state)) '(nil ?\n))))
     haskell-literate-comment-face)
+   ;; Detect pragmas. A pragma is enclosed in special comment
+   ;; delimeters {-# .. #-}.
+   ((save-excursion
+      (goto-char (nth 8 state))
+      (and (looking-at "{-#")
+           (forward-comment 1)
+           (goto-char (- (point) 3))
+           (looking-at "#-}")))
+    haskell-pragma-face)
    ;; Haddock comment start with either "-- [|^*$]" or "{- ?[|^*$]"
    ;; (note space optional for nested comments and mandatory for
    ;; double dash comments).
