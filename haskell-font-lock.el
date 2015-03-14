@@ -173,7 +173,7 @@ This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
   :group 'haskell)
 
 (defface haskell-pragma-face
-  '((t :inherit font-lock-comment-face))
+  '((t :inherit font-lock-preprocessor-face))
   "Face used to highlight Haskell pragmas."
   :group 'haskell)
 
