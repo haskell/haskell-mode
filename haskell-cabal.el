@@ -173,7 +173,7 @@
           val)))))
 
 ;;;###autoload
-(defun haskell-guess-setting (name)
+(defun haskell-cabal-guess-setting (name)
   "Guess the specified setting of this project.
 If there is no valid .cabal file to get the setting from (or
 there is no corresponding setting with that name in the .cabal
