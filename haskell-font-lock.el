@@ -504,9 +504,6 @@ that should be commented under LaTeX-style literate scripts."
   :type 'boolean
   :group 'haskell)
 
-(defvar haskell-font-lock-seen-haddock nil)
-(make-variable-buffer-local 'haskell-font-lock-seen-haddock)
-
 (defun haskell-syntactic-face-function (state)
   "`font-lock-syntactic-face-function' for Haskell."
   (cond
@@ -539,8 +536,7 @@ that should be commented under LaTeX-style literate scripts."
          (save-excursion
            (goto-char (nth 8 state))
            (or (looking-at "\\(?:{- ?\\|-- \\)[|^*$]")
-               (and haskell-font-lock-seen-haddock
-                    (looking-at "--")
+               (and (looking-at "--")
                     (let ((doc nil)
                           pos)
                       (while (and (not doc)
@@ -550,7 +546,6 @@ that should be commented under LaTeX-style literate scripts."
                                   (looking-at "--\\([ \\t]*[|^*]\\)?"))
                         (setq doc (match-beginning 1)))
                       doc)))))
-    (setq haskell-font-lock-seen-haddock t)
     font-lock-doc-face)
    (t font-lock-comment-face)))
 
