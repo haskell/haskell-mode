@@ -508,38 +508,28 @@ that should be commented under LaTeX-style literate scripts."
         (and (eq haskell-literate 'bird)
              (memq (char-before (nth 8 state)) '(nil ?\n))))
     haskell-literate-comment-face)
-   ;; Try and recognize Haddock comments.  From what I gather from its
-   ;; documentation, its comments can take the following forms:
-   ;; a) {-| ... -}
-   ;; b) {-^ ... -}
-   ;; c) -- | ...
-   ;; d) -- ^ ...
-   ;; e) -- ...
-   ;; Where `e' is the tricky one: it is only a Haddock comment if it
-   ;; follows immediately another Haddock comment.  Even an empty line
-   ;; breaks such a sequence of Haddock comments.  It is not clear if `e'
-   ;; can follow any other case, so I interpreted it as following only cases
-   ;; c,d,e (not a or b).  In any case, this `e' is expensive since it
-   ;; requires extra work for each and every non-Haddock comment, so I only
-   ;; go through the more expensive check if we've already seen a Haddock
-   ;; comment in the buffer.
+   ;; Haddock comment start with either "-- [|^*$]" or "{- ?[|^*$]"
+   ;; (note space optional for nested comments and mandatory for
+   ;; double dash comments).
    ;;
-   ;; And then there are also haddock section headers that start with
-   ;; any number of stars:
-   ;;   -- * ...
+   ;; Haddock comment will also continue on next line, provided:
+   ;; - current line is a double dash haddock comment
+   ;; - next line is also double dash comment
+   ;; - there is only whitespace between
+   ;;
+   ;; We recognize double dash haddock comments by property
+   ;; 'font-lock-doc-face attached to newline. In case of bounded
+   ;; comments newline is outside of comment.
    ((save-excursion
       (goto-char (nth 8 state))
       (or (looking-at "\\(?:{- ?\\|-- \\)[|^*$]")
-	  (and (looking-at "--")
-	       (let ((doc nil)
-		     pos)
-		 (while (and (not doc)
-			     (setq pos (line-beginning-position))
-			     (forward-comment -1)
-			     (eq (line-beginning-position 2) pos)
-			     (looking-at "--\\([ \\t]*[|^*]\\)?"))
-		   (setq doc (match-beginning 1)))
-		 doc))))
+	  (and (looking-at "--")              ; are we at double dash comment
+	       (forward-line -1)              ; this is nil on first line
+	       (eq (get-text-property (line-end-position) 'face)
+		   font-lock-doc-face) 	      ; is a doc face
+	       (forward-line)
+	       (skip-syntax-forward "-")      ; see if there is only whitespace
+	       (eq (point) (nth 8 state)))))  ; we are back in position
     font-lock-doc-face)
    (t font-lock-comment-face)))
 
