@@ -51,7 +51,7 @@
                      (haskell-process-compute-process-log-and-command "dummy-session2" 'cabal-repl))))))
 
 (ert-deftest test-haskell-process--with-wrapper-compute-process-log-and-command-cabal-repl ()
-  (should (equal '("Starting inferior `cabal repl' process using cabal ..." "dumses2" nil "nix-shell" "default.nix" "--command" "cabal\\ repl\\ --ghc-option\\=-ferror-spans" "dumdum-session")
+  (should (equal '("Starting inferior `cabal repl' process using cabal ..." "dumses2" nil "nix-shell" "default.nix" "--command" "cabal\\ repl\\ --ghc-option\\=-ferror-spans\\ dumdum-session")
                  (let ((haskell-process-path-cabal      "cabal")
                        (haskell-process-args-cabal-repl '("--ghc-option=-ferror-spans")))
                    (custom-set-variables '(haskell-process-wrapper-function
