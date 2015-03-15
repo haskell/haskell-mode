@@ -211,21 +211,23 @@ Return nil if no Cabal description file could be located via
 If DIR is nil, `default-directory' is used as starting point for
 directory traversal.  Upward traversal is aborted if file owner
 changes.  Uses`haskell-cabal-find-pkg-desc' internally."
-  (catch 'found
-    (let ((user (nth 2 (file-attributes (or dir default-directory))))
-          ;; Abbreviate, so as to stop when we cross ~/.
-          (root (abbreviate-file-name (or dir default-directory))))
-      ;; traverse current dir up to root as long as file owner doesn't change
-      (while (and root (equal user (nth 2 (file-attributes root))))
-        (let ((cabal-file (haskell-cabal-find-pkg-desc root)))
-          (when cabal-file
-            (throw 'found cabal-file)))
+  (let ((use-dir (or dir default-directory)))
+    (when (file-directory-p use-dir)
+      (catch 'found
+        (let ((user (nth 2 (file-attributes use-dir)))
+              ;; Abbreviate, so as to stop when we cross ~/.
+              (root (abbreviate-file-name use-dir)))
+          ;; traverse current dir up to root as long as file owner doesn't change
+          (while (and root (equal user (nth 2 (file-attributes root))))
+            (let ((cabal-file (haskell-cabal-find-pkg-desc root)))
+              (when cabal-file
+                (throw 'found cabal-file)))
 
-        (let ((proot (file-name-directory (directory-file-name root))))
-          (if (equal proot root) ;; fix-point reached?
-              (throw 'found nil)
-            (setq root proot))))
-      nil)))
+            (let ((proot (file-name-directory (directory-file-name root))))
+              (if (equal proot root) ;; fix-point reached?
+                  (throw 'found nil)
+                (setq root proot))))
+          nil)))))
 
 (defun haskell-cabal-find-pkg-desc (dir &optional allow-multiple)
   "Find a package description file in the directory DIR.
