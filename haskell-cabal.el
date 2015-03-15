@@ -180,7 +180,8 @@ there is no corresponding setting with that name in the .cabal
 file), then this function returns nil."
   (interactive)
   (when (and name buffer-file-name)
-    (let ((cabal-file (haskell-cabal-find-file (file-name-directory buffer-file-name))))
+    (let* ((dir (file-name-directory buffer-file-name))
+           (cabal-file (when (file-directory-p dir) (haskell-cabal-find-file dir))))
       (when (and cabal-file (file-readable-p cabal-file))
         (with-temp-buffer
           (insert-file-contents cabal-file)
