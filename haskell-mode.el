@@ -876,6 +876,14 @@ is asked to show extra info for the items matching QUERY.."
           (hoogle-start-server)
         (error "hoogle is not installed")))))
 
+(defcustom haskell-hayoo-url "http://hayoo.fh-wedel.de/?query=%s"
+  "Default value for hayoo web site.
+"
+  :group 'haskell
+  :type '(choice
+          (const :tag "fh-wedel.de" "http://hayoo.fh-wedel.de/?query=%s")
+          string))
+
 ;;;###autoload
 (defun haskell-hayoo (query)
   "Do a Hayoo search for QUERY."
@@ -886,7 +894,7 @@ is asked to show extra info for the items matching QUERY.."
                             (format "Hayoo query (default %s): " def)
                           "Hayoo query: ")
                         nil nil def))))
-  (browse-url (format "http://holumbus.fh-wedel.de/hayoo/hayoo.html?query=%s" query)))
+  (browse-url (format haskell-hayoo-url (url-hexify-string query))))
 
 ;;;###autoload
 (defalias 'hayoo 'haskell-hayoo)
