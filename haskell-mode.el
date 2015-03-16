@@ -797,6 +797,15 @@ If nil, use the Hoogle web-site."
   :type '(choice (const :tag "Use Web-site" nil)
                  string))
 
+(defcustom haskell-hoogle-url "http://haskell.org/hoogle/?q=%s"
+  "Default value for hoogle web site.
+"
+  :group 'haskell
+  :type '(choice
+          (const :tag "haskell-org" "http://haskell.org/hoogle/?q=%s")
+          (const :tag "fp-complete" "https://www.fpcomplete.com/hoogle?q=%s")
+          string))
+
 ;;;###autoload
 (defun haskell-hoogle (query &optional info)
   "Do a Hoogle search for QUERY.
@@ -814,7 +823,7 @@ is asked to show extra info for the items matching QUERY.."
                         nil nil def)
            current-prefix-arg)))
   (if (null haskell-hoogle-command)
-      (browse-url (format "http://haskell.org/hoogle/?q=%s" query))
+      (browse-url (format haskell-hoogle-url (url-hexify-string query)))
     (let ((hoogle-args (append (when info '("-i"))
                                (list "--color" (shell-quote-argument query)))))
       (with-help-window "*hoogle*"
