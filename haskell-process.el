@@ -269,7 +269,7 @@ This uses `accept-process-output' internally."
                          (haskell-string-literal-encode inputstr)))
          (rawstr (haskell-process-queue-sync-request process reqstr)))
     (if (string-prefix-p "unknown command " rawstr)
-        (error "GHCi lacks `:complete' support")
+        (error "GHCi lacks `:complete' support (try installing 7.8 or ghci-ng)")
       (let* ((s1 (split-string rawstr "\r?\n" t))
              (cs (mapcar #'haskell-string-literal-decode (cdr s1)))
              (h0 (car s1))) ;; "<cnt1> <cnt2> <quoted-str>"
