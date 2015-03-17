@@ -212,7 +212,9 @@ If DIR is nil, `default-directory' is used as starting point for
 directory traversal.  Upward traversal is aborted if file owner
 changes.  Uses`haskell-cabal-find-pkg-desc' internally."
   (let ((use-dir (or dir default-directory)))
-    (when (file-directory-p use-dir)
+    (while (and use-dir (not (file-directory-p use-dir)))
+      (setq use-dir (file-name-directory (directory-file-name use-dir))))
+    (when use-dir
       (catch 'found
         (let ((user (nth 2 (file-attributes use-dir)))
               ;; Abbreviate, so as to stop when we cross ~/.
