@@ -360,7 +360,7 @@ indentation points to the right, we switch going to the left."
         (haskell-indentation-reindent-to pi cursor-in-whitespace))))))
 
 ;;---------------------------------------- haskell-indentation show indentations UI starts here
-(defvar haskell-indentation-dyn-show-indentations
+(defvar haskell-indentation-dyn-show-indentations nil
   "Whether showing of indentation points is enabled in this buffer.")
 (make-variable-buffer-local 'haskell-indentation-dyn-show-indentations)
 (defvar haskell-indentation-dyn-overlays nil
