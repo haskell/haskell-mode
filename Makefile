@@ -1,5 +1,18 @@
-VERSION = $(shell git describe --tags --match 'v[0-9]*' --abbrev=0 | sed 's/^v//;s/\.0*/./g')
-GIT_VERSION = $(shell git describe --tags --match 'v[0-9]*' --long --dirty | sed 's/^v//')
+
+#
+# Note: Due to MELPA distributing directly from github source version
+# needs to be embedded in files as is without proprocessing.
+#
+# Version string is present in:
+# - Makefile
+# - haskell-mode.el
+# - haskell-mode.texi
+# - haskell-mode-pkg.el (used for marmelade)
+#
+# We should have a script that changes it everywhere it is needed and
+# syncs it with current git tag.
+#
+VERSION = 13.12
 
 INSTALL_INFO = install-info
 EMACS = emacs
@@ -9,7 +22,6 @@ EFLAGS = --eval "(add-to-list 'load-path (expand-file-name \"tests/compat\") 'ap
          --eval '(setq byte-compile-error-on-warn t)'
 
 BATCH = $(EMACS) $(EFLAGS) --batch -Q -L .
-SUBST_ATAT = sed -e 's/@@GIT_VERSION@@/$(GIT_VERSION)/g;s/@GIT_VERSION@/$(GIT_VERSION)/g;s/@@VERSION@@/$(VERSION)/g;s/@VERSION@/$(VERSION)/g'
 
 ELFILES = \
 	ghc-core.el \
@@ -82,14 +94,15 @@ check: $(ELCHECKS)
 	@echo "checks passed!"
 
 clean:
-	$(RM) $(ELCFILES) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) $(PKG_TAR) haskell-mode.tmp.texi haskell-mode.info dir
+	$(RM) $(ELCFILES) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) $(PKG_TAR) haskell-mode.info dir
 
 info: haskell-mode.info dir
 
 dir: haskell-mode.info
 	$(INSTALL_INFO) --dir=$@ $<
 
-haskell-mode.tmp.texi: haskell-mode.texi
+haskell-mode.info: haskell-mode.texi
+	# Check if chapter order is same as node order
 	@sed -n -e '/@chapter/ s/@code{\(.*\)}/\1/' \
                 -e 's/@chapter \(.*\)$$/* \1::/p' \
                 -e 's/@unnumbered \(.*\)$$/* \1::/p' \
@@ -100,39 +113,28 @@ haskell-mode.tmp.texi: haskell-mode.texi
 	diff -C 1 haskell-mode-menu-order.txt haskell-mode-content-order.txt
 	@rm haskell-mode-menu-order.txt haskell-mode-content-order.txt
 
-	$(SUBST_ATAT) < haskell-mode.texi > haskell-mode.tmp.texi
-
-haskell-mode.info: haskell-mode.tmp.texi
+	# Processing proper
 	$(MAKEINFO) $(MAKEINFO_FLAGS) -o $@ $<
 
-haskell-mode.html: haskell-mode.tmp.texi
+haskell-mode.html: haskell-mode.texi
 	$(MAKEINFO) $(MAKEINFO_FLAGS) --html --no-split -o $@ $<
 
 # Generate ELPA-compatible package
 package: $(PKG_TAR)
 elpa: $(PKG_TAR)
 
-$(PKG_TAR): $(PKG_DIST_FILES) haskell-mode-pkg.el.in
+$(PKG_TAR): $(PKG_DIST_FILES) haskell-mode-pkg.el
 	rm -rf haskell-mode-$(VERSION)
 	mkdir haskell-mode-$(VERSION)
 	cp $(PKG_DIST_FILES) haskell-mode-$(VERSION)/
-	$(SUBST_ATAT) < haskell-mode-pkg.el.in > haskell-mode-$(VERSION)/haskell-mode-pkg.el
-	$(SUBST_ATAT) < haskell-mode.el > haskell-mode-$(VERSION)/haskell-mode.el
-	(sed -n -e '/^;;; Commentary/,/^;;;/p' | egrep '^;;( |$$)' | cut -c4-) < haskell-mode.el > haskell-mode-$(VERSION)/README
+
 	tar cvf $@ haskell-mode-$(VERSION)
 	rm -rf haskell-mode-$(VERSION)
 	@echo
-	@echo "Created ELPA compatible distribution package '$@' from $(GIT_VERSION)"
+	@echo "Created ELPA compatible distribution package '$@' from $(VERSION)"
 
 $(AUTOLOADS): $(ELFILES) haskell-mode.elc
 	$(BATCH) \
 		--eval '(setq make-backup-files nil)' \
 		--eval '(setq generated-autoload-file "$(CURDIR)/$@")' \
 		-f batch-update-autoloads "."
-
-# HACK: embed version number into .elc file
-haskell-mode.elc: haskell-mode.el
-	$(SUBST_ATAT) < haskell-mode.el > haskell-mode.tmp.el
-	@$(BATCH) -f batch-byte-compile haskell-mode.tmp.el
-	mv haskell-mode.tmp.elc haskell-mode.elc
-	$(RM) haskell-mode.tmp.el

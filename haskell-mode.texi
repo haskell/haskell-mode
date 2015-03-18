@@ -2,7 +2,7 @@
 @c %**start of header
 @setfilename haskell-mode.info
 @documentencoding UTF-8
-@settitle Haskell Mode @@VERSION@@
+@settitle Haskell Mode 13.12
 @c %**end of header
 
 @dircategory Emacs
@@ -11,7 +11,7 @@
 @end direntry
 
 @copying
-This manual is for Haskell mode, version @@GIT_VERSION@@
+This manual is for Haskell mode, version 13.12
 
 Copyright @copyright{} 2013 Haskell Mode contributors.
 
