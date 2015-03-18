@@ -379,6 +379,27 @@ indentation points to the right, we switch going to the left."
   "Unshows all the overlays."
   (mapc #'delete-overlay haskell-indentation-dyn-overlays))
 
+(defvar haskell-indentation-pending-delay-show-overlays nil
+  "Indicates that there are pending overlays to be shown.
+
+Holds time object value as received from `run-at-time'.
+
+Used to debounce `haskell-indentation-delay-show-overlays'.")
+(make-local-variable 'haskell-indentation-pending-delay-show-overlays)
+
+(defun haskell-indentation-delay-show-overlays ()
+  "Show overlays after a little while so that it does not get in
+the way of normal cursor movement.
+
+If there is a running show overlays timer cancel it first."
+  (when haskell-indentation-pending-delay-show-overlays
+    (cancel-timer haskell-indentation-pending-delay-show-overlays))
+  (setq haskell-indentation-pending-delay-show-overlays
+        (run-at-time "0.1 sec" nil
+                     (lambda ()
+                       (setq haskell-indentation-pending-delay-show-overlays nil)
+                       (haskell-indentation-show-overlays)))))
+
 (defun haskell-indentation-show-overlays ()
   "Put an underscore overlay at all the indentations points in
 the current buffer."
@@ -436,15 +457,16 @@ the current buffer."
   "Enable showing of indentation points in the current buffer."
   (interactive)
   (setq haskell-indentation-dyn-show-indentations t)
+  (setq haskell-indentation-pending-delay-show-overlays nil)
   (add-hook 'change-major-mode-hook #'haskell-indentation-unshow-overlays nil t)
   (add-hook 'pre-command-hook #'haskell-indentation-unshow-overlays nil t)
-  (add-hook 'post-command-hook #'haskell-indentation-show-overlays nil t))
+  (add-hook 'post-command-hook #'haskell-indentation-delay-show-overlays nil t))
 
 (defun haskell-indentation-disable-show-indentations ()
   "Disable showing of indentation points in the current buffer."
   (interactive)
   (setq haskell-indentation-dyn-show-indentations nil)
-  (remove-hook 'post-command-hook #'haskell-indentation-show-overlays t)
+  (remove-hook 'post-command-hook #'haskell-indentation-delay-show-overlays t)
   (haskell-indentation-unshow-overlays)
   (remove-hook 'change-major-mode-hook #'haskell-indentation-unshow-overlays t)
   (remove-hook 'pre-command-hook #'haskell-indentation-unshow-overlays t))
