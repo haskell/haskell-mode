@@ -184,9 +184,8 @@ When you adapt Emacs Lisp Mock to a testing framework, wrap test method around t
 ;;;; message hack
 (defun mock-suppress-redefinition-message (func)
   "Erase \"ad-handle-definition: `%s' got redefined\" message."
-  (prog1
-      (funcall func)
-    (message "")))
+  (funcall func))
+
 (put 'mock-syntax-error 'error-conditions '(mock-syntax-error error))
 (put 'mock-syntax-error 'error-message "Mock syntax error")
 
