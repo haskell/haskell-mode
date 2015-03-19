@@ -131,7 +131,6 @@
     (define-key map (kbd "M-g b") 'haskell-cabal-goto-benchmark-section)
     (define-key map (kbd "M-g t") 'haskell-cabal-goto-test-suite-section)
     map))
-(defvar haskell-cabal-mode-map (make-sparse-keymap))
 
 ;;;###autoload
 (define-derived-mode haskell-cabal-mode fundamental-mode "Haskell-Cabal"
