@@ -459,19 +459,19 @@ that should be commented under LaTeX-style literate scripts."
                               nil)
                              (t ".")))) ; other symbol sequence
 
-    ;; If we find a backslash inside a string that is considered to be
-    ;; escape we need to go back a little (over whitespace) and see if
-    ;; there is another backslash that is escape. In such situation
-    ;; the second one should have escape bit removed. This implements
-    ;; 'gap' rule from Haskell Report.  Backslashes outside of strings
-    ;; have their powers removed.  (Note about this strange (> 0
-    ;; (skip-syntax-backward "\\")): this skips over *escaping*
+    ;; If we find a backslash inside a string that is not preceeded by
+    ;; escaping backslash then it itself gets escape bit set. There
+    ;; can be whitespace between those two. This implements 'gap' rule
+    ;; from Haskell Report.  Backslashes outside of strings have their
+    ;; powers removed.  (Note about this strange (> 0
+    ;; (skip-syntax-backward ".")): this skips over *escaping*
     ;; backslash and leaves non-escaping onse alone.
-    ("\\s\\" (0 (when (or (not (nth 3 (syntax-ppss)))
-                          (save-excursion (and (goto-char (match-beginning 0))
-                                               (skip-syntax-backward "->")
-                                               (> 0 (skip-syntax-backward "\\")))))
-                  ".")))
+    ("\\\\" (0 (when (save-excursion (and (nth 3 (syntax-ppss))
+                                          (goto-char (match-beginning 0))
+                                          (skip-syntax-backward "->")
+                                          (or (not (eq ?\\ (char-before)))
+                                              (> 0 (skip-syntax-backward ".")))))
+                  "\\")))
     ))
 
 (defconst haskell-bird-syntactic-keywords

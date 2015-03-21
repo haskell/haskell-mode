@@ -473,7 +473,7 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
     ;; defined separately.
     (mapc (lambda (x)
             (modify-syntax-entry x "." table))
-          "!#$%&*+./:<=>?@^|~")
+          "!#$%&*+./:<=>?@^|~\\")
     (modify-syntax-entry ?-  ". 123" table)
 
     (modify-syntax-entry ?\  " " table)
@@ -491,7 +491,6 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
     (modify-syntax-entry ?\n ">" table)
 
     (modify-syntax-entry ?\` "$`" table)
-    (modify-syntax-entry ?\\ "\\" table)
 
     ;; Haskell symbol characters are treated as punctuation because
     ;; they are not able to form identifiers with word constituent 'w'
