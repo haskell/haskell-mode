@@ -321,10 +321,6 @@ Returns keywords suitable for `font-lock-keywords'."
     (setq keywords
           `(;; NOTICE the ordering below is significant
             ;;
-            ("^<<<<<<< .*$" 0 'font-lock-warning-face t)
-            ("^|||||||$" 0 'font-lock-warning-face t) ; "diff3" style
-            ("^=======$" 0 'font-lock-warning-face t)
-            ("^>>>>>>> .*$" 0 'font-lock-warning-face t)
             ("^#.*$" 0 'font-lock-preprocessor-face t)
 
             ,@(haskell-font-lock-symbols-keywords)
