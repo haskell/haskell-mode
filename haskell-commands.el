@@ -616,8 +616,8 @@ command from GHCi."
                     "\n"))
            (t
             (save-excursion
-              (let ((col (save-excursion (goto-char (car ident-pos))
-                                         (current-column))))
+	      (goto-char (car ident-pos))
+              (let ((col (current-column)))
                 (save-excursion (insert "\n")
                                 (indent-to col))
                 (insert (haskell-fontify-as-mode ty 'haskell-mode)))))))
