@@ -457,8 +457,8 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
     (modify-syntax-entry ?\  " " table)
     (modify-syntax-entry ?\t " " table)
     (modify-syntax-entry ?\" "\"" table)
-    (modify-syntax-entry ?\' "_" table)
-    (modify-syntax-entry ?_  "_" table)
+    (modify-syntax-entry ?\' "w" table)
+    (modify-syntax-entry ?_  "w" table)
     (modify-syntax-entry ?\( "()" table)
     (modify-syntax-entry ?\) ")(" table)
     (modify-syntax-entry ?\[  "(]" table)
@@ -671,7 +671,7 @@ see documentation for that variable for more details."
   ;; Set things up for font-lock.
   (set (make-local-variable 'font-lock-defaults)
        '(haskell-font-lock-choose-keywords
-         nil nil ((?\' . "w") (?_  . "w")) nil
+         nil nil nil nil
          (font-lock-syntactic-keywords
           . haskell-font-lock-choose-syntactic-keywords)
          (font-lock-syntactic-face-function
