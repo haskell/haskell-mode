@@ -189,65 +189,73 @@ actual Emacs buffer of the module being loaded."
 (defun haskell-process-do-cabal (command)
   "Run a Cabal command."
   (let ((process (haskell-interactive-process)))
-    (haskell-process-queue-command
-     process
-     (make-haskell-command
-      :state (list (haskell-interactive-session) process command 0)
+    (cond
+     ((let ((child (haskell-process-process process)))
+        (not (equal 'run (process-status child))))
+      (message "Process is not running, so running directly.")
+      (shell-command (concat "cabal " command)
+                     (get-buffer-create "*haskell-process-log*")
+                     (get-buffer-create "*haskell-process-log*"))
+      (switch-to-buffer-other-window (get-buffer "*haskell-process-log*")))
+     (t (haskell-process-queue-command
+         process
+         (make-haskell-command
+          :state (list (haskell-interactive-session) process command 0)
 
-      :go
-      (lambda (state)
-        (haskell-process-send-string
-         (cadr state)
-         (format haskell-process-do-cabal-format-string
-                 (haskell-session-cabal-dir (car state))
-                 (format "%s %s"
-                         (cl-ecase (haskell-process-type)
-                           ('ghci haskell-process-path-cabal)
-                           ('cabal-repl haskell-process-path-cabal)
-                           ('cabal-ghci haskell-process-path-cabal))
-                         (cl-caddr state)))))
+          :go
+          (lambda (state)
+            (haskell-process-send-string
+             (cadr state)
+             (format haskell-process-do-cabal-format-string
+                     (haskell-session-cabal-dir (car state))
+                     (format "%s %s"
+                             (cl-ecase (haskell-process-type)
+                               ('ghci haskell-process-path-cabal)
+                               ('cabal-repl haskell-process-path-cabal)
+                               ('cabal-ghci haskell-process-path-cabal))
+                             (cl-caddr state)))))
 
-      :live
-      (lambda (state buffer)
-        (let ((cmd (replace-regexp-in-string "^\\([a-z]+\\).*"
-                                             "\\1"
-                                             (cl-caddr state))))
-          (cond ((or (string= cmd "build")
-                     (string= cmd "install"))
-                 (haskell-process-live-build (cadr state) buffer t))
-                (t
-                 (haskell-process-cabal-live state buffer)))))
+          :live
+          (lambda (state buffer)
+            (let ((cmd (replace-regexp-in-string "^\\([a-z]+\\).*"
+                                                 "\\1"
+                                                 (cl-caddr state))))
+              (cond ((or (string= cmd "build")
+                         (string= cmd "install"))
+                     (haskell-process-live-build (cadr state) buffer t))
+                    (t
+                     (haskell-process-cabal-live state buffer)))))
 
-      :complete
-      (lambda (state response)
-        (let* ((process (cadr state))
-               (session (haskell-process-session process))
-               (message-count 0)
-               (cursor (haskell-process-response-cursor process)))
-          (haskell-process-set-response-cursor process 0)
-          (while (haskell-process-errors-warnings session process response)
-            (setq message-count (1+ message-count)))
-          (haskell-process-set-response-cursor process cursor)
-          (let ((msg (format "Complete: cabal %s (%s compiler messages)"
-                             (cl-caddr state)
-                             message-count)))
-            (haskell-interactive-mode-echo session msg)
-            (when (= message-count 0)
-              (haskell-interactive-mode-echo
-               session
-               "No compiler messages, dumping complete output:")
-              (haskell-interactive-mode-echo session response))
-            (haskell-mode-message-line msg)
-            (when (and haskell-notify-p
-                       (fboundp 'notifications-notify))
-              (notifications-notify
-               :title (format "*%s*" (haskell-session-name (car state)))
-               :body msg
-               :app-name (cl-ecase (haskell-process-type)
-                           ('ghci haskell-process-path-cabal)
-                           ('cabal-repl haskell-process-path-cabal)
-                           ('cabal-ghci haskell-process-path-cabal))
-               :app-icon haskell-process-logo)))))))))
+          :complete
+          (lambda (state response)
+            (let* ((process (cadr state))
+                   (session (haskell-process-session process))
+                   (message-count 0)
+                   (cursor (haskell-process-response-cursor process)))
+              (haskell-process-set-response-cursor process 0)
+              (while (haskell-process-errors-warnings session process response)
+                (setq message-count (1+ message-count)))
+              (haskell-process-set-response-cursor process cursor)
+              (let ((msg (format "Complete: cabal %s (%s compiler messages)"
+                                 (cl-caddr state)
+                                 message-count)))
+                (haskell-interactive-mode-echo session msg)
+                (when (= message-count 0)
+                  (haskell-interactive-mode-echo
+                   session
+                   "No compiler messages, dumping complete output:")
+                  (haskell-interactive-mode-echo session response))
+                (haskell-mode-message-line msg)
+                (when (and haskell-notify-p
+                           (fboundp 'notifications-notify))
+                  (notifications-notify
+                   :title (format "*%s*" (haskell-session-name (car state)))
+                   :body msg
+                   :app-name (cl-ecase (haskell-process-type)
+                               ('ghci haskell-process-path-cabal)
+                               ('cabal-repl haskell-process-path-cabal)
+                               ('cabal-ghci haskell-process-path-cabal))
+                   :app-icon haskell-process-logo)))))))))))
 
 (defun haskell-process-echo-load-message (process buffer echo-in-repl th)
   "Echo a load message."
