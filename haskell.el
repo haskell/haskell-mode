@@ -190,18 +190,39 @@
   "Prompt to restart the died process."
   (let ((process-name (haskell-process-name process)))
     (if haskell-process-suggest-restart
-        (cl-case (read-event
-                  (propertize (format "The Haskell process `%s' has died. Restart? (y, n, l: show process log)"
-                                      process-name)
-                              'face 'minibuffer-prompt))
-          (?y (haskell-process-start (haskell-process-session process)))
-          (?l (let* ((response (haskell-process-response process))
-                     (buffer (get-buffer "*haskell-process-log*")))
-                (if buffer
-                    (switch-to-buffer buffer)
-                  (progn (switch-to-buffer (get-buffer-create "*haskell-process-log*"))
-                         (insert response)))))
-          (?n))
+        (cond
+         ((string-match "You need to re-run the 'configure' command."
+                        (haskell-process-response process))
+          (cl-case (read-event
+                    (concat "The Haskell process ended. Cabal wants you to run "
+                            (propertize "cabal configure" 'face 'font-lock-keyword-face)
+                            " because there is a version mismatch. Re-configure (y, n, l: view log)?"
+                            "\n\n"
+                            "Cabal said:\n\n"
+                            (propertize (haskell-process-response process)
+                                        'face 'font-lock-comment-face)))
+            (?y (let ((default-directory (haskell-session-cabal-dir (haskell-process-session process))))
+                  (message "%s" (shell-command-to-string "cabal configure"))))
+            (?l (let* ((response (haskell-process-response process))
+                       (buffer (get-buffer "*haskell-process-log*")))
+                  (if buffer
+                      (switch-to-buffer buffer)
+                    (progn (switch-to-buffer (get-buffer-create "*haskell-process-log*"))
+                           (insert response)))))
+            (?n)))
+         (t
+          (cl-case (read-event
+                    (propertize (format "The Haskell process `%s' has died. Restart? (y, n, l: show process log)"
+                                        process-name)
+                                'face 'minibuffer-prompt))
+            (?y (haskell-process-start (haskell-process-session process)))
+            (?l (let* ((response (haskell-process-response process))
+                       (buffer (get-buffer "*haskell-process-log*")))
+                  (if buffer
+                      (switch-to-buffer buffer)
+                    (progn (switch-to-buffer (get-buffer-create "*haskell-process-log*"))
+                           (insert response)))))
+            (?n))))
       (message (format "The Haskell process `%s' is dearly departed."
                        process-name)))))
 
