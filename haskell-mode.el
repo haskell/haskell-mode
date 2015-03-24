@@ -454,6 +454,28 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
 ;; Syntax table.
 (defvar haskell-mode-syntax-table
   (let ((table (make-syntax-table)))
+
+    ;; Remove default punctuation class because because we try to use
+    ;; punctuation for a purpose of matching Haskell symbol
+    ;; characters. Previous punctuation should get an 'illegal' class,
+    ;; but Emacs does not have one. Lets treat them as whitespace as
+    ;; the next best categorization.
+    (with-syntax-table table
+      (dotimes (x 256)
+        (when (eq (char-syntax x) ?.)
+          (modify-syntax-entry x "-" table))))
+
+    ;; Now add punctuation class to characters defined by Haskell
+    ;; report as 'symbol'.  Note that ':' is also here as it is also a
+    ;; symbol although not listed among symbols. Ugh, just read
+    ;; Haskell report extra carefuly and you will understand.  Notably
+    ;; '-' is not here as it is also a comment character so has to be
+    ;; defined separately.
+    (mapc (lambda (x)
+            (modify-syntax-entry x "." table))
+          "!#$%&*+./:<=>?@^|~")
+    (modify-syntax-entry ?-  ". 123" table)
+
     (modify-syntax-entry ?\  " " table)
     (modify-syntax-entry ?\t " " table)
     (modify-syntax-entry ?\" "\"" table)
@@ -461,19 +483,15 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
     (modify-syntax-entry ?_  "_" table)
     (modify-syntax-entry ?\( "()" table)
     (modify-syntax-entry ?\) ")(" table)
-    (modify-syntax-entry ?\[  "(]" table)
-    (modify-syntax-entry ?\]  ")[" table)
+    (modify-syntax-entry ?\[ "(]" table)
+    (modify-syntax-entry ?\] ")[" table)
 
-    (modify-syntax-entry ?\{  "(}1nb" table)
-    (modify-syntax-entry ?\}  "){4nb" table)
-    (modify-syntax-entry ?-  ". 123" table)
+    (modify-syntax-entry ?\{ "(}1nb" table)
+    (modify-syntax-entry ?\} "){4nb" table)
     (modify-syntax-entry ?\n ">" table)
 
     (modify-syntax-entry ?\` "$`" table)
     (modify-syntax-entry ?\\ "\\" table)
-    (mapc (lambda (x)
-            (modify-syntax-entry x "." table))
-          "!#$%&*+./:<=>?@^|~")
 
     ;; Haskell symbol characters are treated as punctuation because
     ;; they are not able to form identifiers with word constituent 'w'
