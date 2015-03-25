@@ -142,24 +142,18 @@
 ;; All functions/variables start with `(literate-)haskell-'.
 
 ;; Version of mode.
-(defconst haskell-version "@VERSION@"
+(defconst haskell-version "13.12"
   "The release version of `haskell-mode'.")
-
-(defconst haskell-git-version "@GIT_VERSION@"
-  "The Git version of `haskell-mode'.")
 
 ;;;###autoload
 (defun haskell-version (&optional here)
   "Show the `haskell-mode` version in the echo area.
-With prefix argument HERE, insert it at point.
-When FULL is non-nil, use a verbose version string.
-When MESSAGE is non-nil, display a message with the version."
+With prefix argument HERE, insert it at point."
   (interactive "P")
   (let* ((haskell-mode-dir (ignore-errors
                              (file-name-directory (or (locate-library "haskell-mode") ""))))
-         (_version (format "haskell-mode version %s (%s @ %s)"
+         (_version (format "haskell-mode version %s (%s)"
                            haskell-version
-                           haskell-git-version
                            haskell-mode-dir)))
     (if here
         (insert _version)
