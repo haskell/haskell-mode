@@ -449,11 +449,6 @@ that should be commented under LaTeX-style literate scripts."
     ;; might be inside a comment or a string.
     ;; This still gets fooled with "'"'"'"'"'"', but ... oh well.
     ("\\Sw\\('\\)\\([^\\'\n]\\|\\\\.[^\\'\n \"}]*\\)\\('\\)" (1 "|") (3 "|"))
-    ;; The \ is not escaping in \(x,y) -> x + y.
-    ("\\(\\\\\\)(" (1 "."))
-    ;; The second \ in a gap does not quote the subsequent char.
-    ;; It's probably not worth the trouble, tho.
-    ;; ("^[ \t]*\\(\\\\\\)" (1 "."))
     ;; Deal with instances of `--' which don't form a comment
     ("\\s.\\{3,\\}" (0 (cond ((numberp (nth 4 (syntax-ppss)))
                               ;; There are no such instances inside nestable comments
@@ -463,6 +458,22 @@ that should be commented under LaTeX-style literate scripts."
                               ;; case of things like `{---'.
                               nil)
                              (t ".")))) ; other symbol sequence
+
+    ;; Implement Haskell Report 'escape' and 'gap' rules. Backslash
+    ;; inside of a string is escaping unless it is preceeded by
+    ;; another escaping backslash. There can be whitespace between
+    ;; those two.
+    ;;
+    ;; Backslashes outside of string never escape.
+    ;;
+    ;; Note that (> 0 (skip-syntax-backward ".")) this skips over *escaping*
+    ;; backslashes only.
+    ("\\\\" (0 (when (save-excursion (and (nth 3 (syntax-ppss))
+                                          (goto-char (match-beginning 0))
+                                          (skip-syntax-backward "->")
+                                          (or (not (eq ?\\ (char-before)))
+                                              (> 0 (skip-syntax-backward ".")))))
+                  "\\")))
     ))
 
 (defconst haskell-bird-syntactic-keywords
