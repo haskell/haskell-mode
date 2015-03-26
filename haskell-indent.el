@@ -1538,6 +1538,7 @@ One indentation cycle is used."
 (defun turn-off-haskell-indent ()
   "Turn off ``intelligent'' Haskell indentation mode."
   (kill-local-variable 'indent-line-function)
+  (kill-local-variable 'indent-region-function)
   ;; Remove haskell-indent-map from the local map.
   (let ((map (current-local-map)))
     (while map

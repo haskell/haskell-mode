@@ -241,9 +241,10 @@ Runs `haskell-simple-indent-hook' on activation."
   :lighter " Ind"
   :group 'haskell-simple-indent
   :keymap '(([backtab] . haskell-simple-indent-backtab))
-  (set (make-local-variable 'comment-indent-function) #'haskell-simple-indent-comment-indent-function)
+  (kill-local-variable 'comment-indent-function)
   (kill-local-variable 'indent-line-function)
   (when haskell-simple-indent-mode
+    (set (make-local-variable 'comment-indent-function) #'haskell-simple-indent-comment-indent-function)
     (set (make-local-variable 'indent-line-function) 'haskell-simple-indent)
     (run-hooks 'haskell-simple-indent-hook)))
 
