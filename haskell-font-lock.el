@@ -450,7 +450,7 @@ that should be commented under LaTeX-style literate scripts."
     ;; This still gets fooled with "'"'"'"'"'"', but ... oh well.
     ("\\Sw\\('\\)\\([^\\'\n]\\|\\\\.[^\\'\n \"}]*\\)\\('\\)" (1 "|") (3 "|"))
     ;; Deal with instances of `--' which don't form a comment
-    ("\\s.\\{3,\\}" (0 (cond ((numberp (nth 4 (syntax-ppss)))
+    ("[!#$%&*+./:<=>?@^|~\\-]\\{3,\\}" (0 (cond ((numberp (nth 4 (syntax-ppss)))
                               ;; There are no such instances inside nestable comments
                               nil)
                              ((string-match "\\`-*\\'" (match-string 0))
