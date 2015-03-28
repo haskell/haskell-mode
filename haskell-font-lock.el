@@ -23,67 +23,6 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;;; Commentary:
-
-;; Purpose:
-;;
-;; To support fontification of standard Haskell keywords, symbols,
-;; functions, etc.  Supports full Haskell 1.4 as well as LaTeX- and
-;; Bird-style literate scripts.
-;;
-;; Installation:
-;;
-;; To turn font locking on for all Haskell buffers under the Haskell
-;; mode of Moss&Thorn, add this to .emacs:
-;;
-;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-font-lock)
-;;
-;; Otherwise, call `turn-on-haskell-font-lock'.
-;;
-;;
-;; Customisation:
-;;
-;; The colours and level of font locking may be customised.  See the
-;; documentation on `turn-on-haskell-font-lock' for more details.
-;;
-;; Present Limitations/Future Work (contributions are most welcome!):
-;;
-;; . Debatable whether `()' `[]' `(->)' `(,)' `(,,)' etc.  should be
-;;   highlighted as constructors or not.  Should the `->' in
-;;   `id :: a -> a' be considered a constructor or a keyword?  If so,
-;;   how do we distinguish this from `\x -> x'?  What about the `\'?
-;;
-;; . XEmacs can support both `--' comments and `{- -}' comments
-;;   simultaneously.  If XEmacs is detected, this should be used.
-;;
-;; . Support for GreenCard?
-;;
-;;
-;; All functions/variables start with
-;; `(turn-(on/off)-)haskell-font-lock' or `haskell-fl-'.
-
-;;; Change Log:
-
-;; Version 1.3:
-;;   From Dave Love:
-;;   Support for proper behaviour (including with Unicode identifiers)
-;;   in Emacs 21 only hacked in messily to avoid disturbing the old
-;;   stuff.  Needs integrating more cleanly.  Allow literate comment
-;;   face to be customized.  Some support for fontifying definitions.
-;;   (I'm not convinced the faces should be customizable -- fontlock
-;;   faces are normally expected to be consistent.)
-;;
-;; Version 1.2:
-;;   Added support for LaTeX-style literate scripts.  Allow whitespace
-;;   after backslash to end a line for string continuations.
-;;
-;; Version 1.1:
-;;   Use own syntax table.  Use backquote (neater).  Stop ''' being
-;;   highlighted as quoted character.  Fixed `\"' fontification bug
-;;   in comments.
-;;
-;; Version 1.0:
-;;   Brought over from Haskell mode v1.1.
 
 ;;; Code:
 
