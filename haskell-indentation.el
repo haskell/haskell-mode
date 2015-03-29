@@ -266,12 +266,12 @@ NOFAIL is non-nil."
         (when nofail (car rev)))))
 
 (defun haskell-indentation-indent-line ()
-  (interactive)
   "Auto indentation on TAB.
 Do nothing inside multiline comments and multiline strings.
 Start enumerating the indentation points to the right.  The user
 can continue by repeatedly pressing TAB.  When there is no more
 indentation points to the right, we switch going to the left."
+  (interactive)
   ;; try to repeat
   (when (not (haskell-indentation-indent-line-repeat))
     (setq haskell-indentation-dyn-last-direction nil)
