@@ -385,8 +385,8 @@ that should be commented under LaTeX-style literate scripts."
     ;; This still gets fooled with "'"'"'"'"'"', but ... oh well.
     ("\\Sw\\('\\)\\([^\\'\n]\\|\\\\.[^\\'\n \"}]*\\)\\('\\)" (1 "|") (3 "|"))
     ;; Deal with instances of `--' which don't form a comment
-    ("[!#$%&*+./:<=>?@^|~\\-]\\{3,\\}" (0 (cond ((numberp (nth 4 (syntax-ppss)))
-                              ;; There are no such instances inside nestable comments
+    ("[!#$%&*+./:<=>?@^|~\\-]\\{3,\\}" (0 (cond ((or (nth 3 (syntax-ppss)) (numberp (nth 4 (syntax-ppss))))
+                              ;; There are no such instances inside nestable comments or strings
                               nil)
                              ((string-match "\\`-*\\'" (match-string 0))
                               ;; Sequence of hyphens.  Do nothing in
