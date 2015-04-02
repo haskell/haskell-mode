@@ -71,26 +71,36 @@ AUTOLOADS = haskell-mode-autoloads.el
 
 PKG_DIST_FILES = $(ELFILES) logo.svg NEWS haskell-mode.info dir
 PKG_TAR = haskell-mode-$(VERSION).tar
-ELCHECKS=$(addprefix check-, $(ELFILES:.el=))
+ELCHECKS=$(patsubst %.el,check-%, $(ELFILES))
 
 %.elc: %.el
-	@$(BATCH) \
-		 -f batch-byte-compile $*.el
+	@$(BATCH) -f batch-byte-compile $*.el
 
 .PHONY: all compile info clean check $(ELCHECKS) elpa package
 
 all: compile $(AUTOLOADS) info
 
-compile: $(ELCFILES)
+compile: .make/compile
+
+.make :
+	@mkdir .make
+
+.make/compile: $(ELFILES) | .make
+	@$(RM) $(patsubst %.el,%.elc,$?)
+	$(BATCH) -f batch-byte-compile $?
+	@touch $@
 
 $(ELCHECKS): check-%: %.el %.elc
-	@$(BATCH) --eval '(when (check-declare-file "$*.el") (error "check-declare failed"))'
 	@if [ -f "$(<:%.el=tests/%-tests.el)" ]; then \
 		$(BATCH) -l "$(<:%.el=tests/%-tests.el)" -f ert-run-tests-batch-and-exit; \
 	fi
 	@echo "--"
 
-check: $(ELCHECKS)
+check: .make/check
+
+.make/check: $(wildcard tests/*-tests.el) | compile .make
+	$(BATCH) $(patsubst %,-l %,$?) -f ert-run-tests-batch-and-exit
+	@touch $@
 	@echo "checks passed!"
 
 clean:
