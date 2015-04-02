@@ -33,9 +33,9 @@
 ;; To bind TAB to the indentation command for all Haskell buffers, add
 ;; this to .emacs:
 ;;
-;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
+;;    (add-hook 'haskell-mode-hook 'haskell-simple-indent)
 ;;
-;; Otherwise, call `turn-on-haskell-simple-indent'.
+;; Otherwise, call `haskell-simple-indent'.
 ;;
 ;;
 ;; Customisation:
@@ -253,11 +253,13 @@ Runs `haskell-simple-indent-hook' on activation."
 (defun turn-on-haskell-simple-indent ()
   "Turn on function `haskell-simple-indent-mode'."
   (interactive)
+  (declare (obsolete 'haskell-simple-indent-mode nil))
   (haskell-simple-indent-mode))
 
 (defun turn-off-haskell-simple-indent ()
   "Turn off function `haskell-simple-indent-mode'."
   (interactive)
+  (declare (obsolete 'haskell-simple-indent-mode nil))
   (haskell-simple-indent-mode 0))
 
 ;; Provide ourselves:

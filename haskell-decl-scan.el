@@ -36,9 +36,9 @@
 ;; To turn declaration scanning on for all Haskell buffers under the
 ;; Haskell mode of Moss&Thorn, add this to .emacs:
 ;;
-;;    (add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
+;;    (add-hook 'haskell-mode-hook 'haskell-decl-scan-mode)
 ;;
-;; Otherwise, call `turn-on-haskell-decl-scan'.
+;; Otherwise, call `haskell-decl-scan-mode'.
 ;;
 ;;
 ;; Customisation:
@@ -541,6 +541,7 @@ datatypes) in a Haskell file for the `imenu' package."
 (defun turn-on-haskell-decl-scan ()
   "Unconditionally activate `haskell-decl-scan-mode'."
   (interactive)
+  (declare (obsolete 'haskell-decl-scan-mode))
   (haskell-decl-scan-mode))
 
 ;;;###autoload
