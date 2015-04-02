@@ -138,6 +138,7 @@
 (require 'haskell-align-imports)
 (require 'haskell-sort-imports)
 (require 'haskell-string)
+(require 'haskell-indentation)
 
 ;; All functions/variables start with `(literate-)haskell-'.
 
@@ -611,9 +612,6 @@ details."
              turn-on-eldoc-mode
              turn-on-haskell-decl-scan
              turn-on-haskell-doc
-             turn-on-haskell-indent
-             turn-on-haskell-indentation
-             turn-on-haskell-simple-indent
              turn-on-haskell-unicode-input-method))
 
 (defvar eldoc-print-current-symbol-info-function)
@@ -660,7 +658,7 @@ Minor modes that work well with `haskell-mode':
   (set (make-local-variable 'comment-end) "")
   (set (make-local-variable 'comment-end-skip) "[ \t]*\\(-}\\|\\s>\\)")
   (set (make-local-variable 'parse-sexp-ignore-comments) nil)
-  (set (make-local-variable 'indent-line-function) 'haskell-mode-suggest-indent-choice)
+
   ;; Set things up for eldoc-mode.
   (set (make-local-variable 'eldoc-documentation-function)
        'haskell-doc-current-info)
@@ -696,7 +694,7 @@ Minor modes that work well with `haskell-mode':
   (setq haskell-literate nil)
   (add-hook 'before-save-hook 'haskell-mode-before-save-handler nil t)
   (add-hook 'after-save-hook 'haskell-mode-after-save-handler nil t)
-  )
+  (haskell-indentation-mode))
 
 (defun haskell-fill-paragraph (justify)
   (save-excursion
@@ -948,14 +946,6 @@ To be added to `flymake-init-create-temp-buffer-copy'."
                          'flymake-create-temp-inplace))))))
 
 (add-to-list 'flymake-allowed-file-name-masks '("\\.l?hs\\'" haskell-flymake-init))
-
-(defun haskell-mode-suggest-indent-choice ()
-  "Ran when the user tries to indent in the buffer but no indentation mode has been selected.
-Explains what has happened and suggests reading docs for `haskell-mode-hook'."
-  (interactive)
-  (error "You tried to do an indentation command, but an indentation mode has not been enabled yet.
-
-Run M-x describe-variable haskell-mode-hook for a list of such modes."))
 
 (defun haskell-mode-format-imports ()
   "Format the imports by aligning and sorting them."

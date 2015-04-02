@@ -89,6 +89,7 @@
 
 (require 'cl-lib)
 (require 'haskell-string)
+(require 'haskell-indentation)
 
 (defvar haskell-literate)
 
@@ -1513,6 +1514,8 @@ One indentation cycle is used."
 ;;;###autoload
 (defun turn-on-haskell-indent ()
   "Turn on ``intelligent'' Haskell indentation mode."
+  (when haskell-indentation-mode
+    (haskell-indentation-mode 0))
   (set (make-local-variable 'indent-line-function) 'haskell-indent-cycle)
   (set (make-local-variable 'indent-region-function) 'haskell-indent-region)
   (setq haskell-indent-mode t)

@@ -63,6 +63,7 @@
 ;; `(turn-(on/off)-)haskell-simple-indent'.
 
 (require 'haskell-mode)
+(require 'haskell-indentation)
 
 (defgroup haskell-simple-indent nil
   "Simple Haskell indentation."
@@ -244,6 +245,8 @@ Runs `haskell-simple-indent-hook' on activation."
   (kill-local-variable 'comment-indent-function)
   (kill-local-variable 'indent-line-function)
   (when haskell-simple-indent-mode
+    (when haskell-indentation-mode
+      (haskell-indentation-mode 0))
     (set (make-local-variable 'comment-indent-function) #'haskell-simple-indent-comment-indent-function)
     (set (make-local-variable 'indent-line-function) 'haskell-simple-indent)
     (run-hooks 'haskell-simple-indent-hook)))
