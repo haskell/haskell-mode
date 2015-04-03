@@ -552,70 +552,6 @@ May return a qualified name."
   :type 'boolean
   :group 'haskell-interactive)
 
-(defcustom haskell-mode-hook nil
-  "Hook run after entering `haskell-mode'.
-
-You may be looking at this documentation because you haven't
-configured indentation or process interaction.
-
-Indentation modes:
-
-   `haskell-indentation-mode', Kristof Bastiaensen
-     Intelligent semi-automatic indentation Mk2
-
-   `haskell-indent-mode', Guy Lapalme
-     Intelligent semi-automatic indentation.
-
-   `haskell-simple-indent-mode', Graeme E Moss and Heribert Schuetz
-     Simple indentation.
-
-Interaction modes:
-
-   `interactive-haskell-mode'
-     Interact with per-project GHCi processes through a REPL and
-     directory-aware sessions.
-
-   `inf-haskell-mode'
-     Interact with a GHCi process using comint-mode. Deprecated.
-
-Other modes:
-
-   `haskell-decl-scan-mode', Graeme E Moss
-     Scans top-level declarations, and places them in a menu.
-
-   `haskell-doc-mode', Hans-Wolfgang Loidl
-     Echoes types of functions or syntax of keywords when the cursor is idle.
-
-To activate a minor-mode, simply run the interactive command. For
-example, `M-x haskell-doc-mode'. Run it again to disable it.
-
-To enable a mode for every haskell-mode buffer, add a hook in
-your Emacs configuration. For example, to enable
-haskell-indent-mode and interactive-haskell-mode, use the
-following:
-
-(add-hook 'haskell-mode-hook 'haskell-indent-mode)
-(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
-
-See Info node `(haskell-mode)haskell-mode-hook' for more details.
-
-Warning: do not enable more than one of the three indentation
-modes. See Info node `(haskell-mode)indentation' for more
-details."
-  :type 'hook
-  :group 'haskell
-  :link '(info-link "(haskell-mode)haskell-mode-hook")
-  :link '(function-link haskell-mode)
-  :options `(capitalized-words-mode
-             imenu-add-menubar-index
-             turn-on-eldoc-mode
-             turn-on-haskell-decl-scan
-             turn-on-haskell-doc
-             turn-on-haskell-indent
-             turn-on-haskell-indentation
-             turn-on-haskell-simple-indent
-             turn-on-haskell-unicode-input-method))
-
 (defvar eldoc-print-current-symbol-info-function)
 
 ;; For compatibility with Emacs < 24, derive conditionally
@@ -627,19 +563,64 @@ details."
 (define-derived-mode haskell-mode haskell-parent-mode "Haskell"
   "Major mode for editing Haskell programs.
 
-See also Info node `(haskell-mode)Getting Started' for more
-information about this mode.
+For more information aee also Info node `(haskell-mode)Getting Started'.
 
 \\<haskell-mode-map>
-Literate scripts are supported via `literate-haskell-mode'.
+
+Literate Haskell scripts are supported via `literate-haskell-mode'.
 The variable `haskell-literate' indicates the style of the script in the
 current buffer.  See the documentation on this variable for more details.
 
 Use `haskell-version' to find out what version of Haskell mode you are
 currently using.
 
-Additional Haskell mode modules can be hooked in via `haskell-mode-hook';
-see documentation for that variable for more details.
+Additional Haskell mode modules can be hooked in via `haskell-mode-hook'.
+
+Indentation modes:
+
+    `haskell-indentation-mode', Kristof Bastiaensen, Gergely Risko
+      Intelligent semi-automatic indentation Mk2
+
+    `haskell-indent-mode', Guy Lapalme
+      Intelligent semi-automatic indentation.
+
+    `haskell-simple-indent-mode', Graeme E Moss and Heribert Schuetz
+      Simple indentation.
+
+Interaction modes:
+
+    `interactive-haskell-mode'
+      Interact with per-project GHCi processes through a REPL and
+      directory-aware sessions.
+
+    `inf-haskell-mode'
+      Interact with a GHCi process using comint-mode. Deprecated.
+
+Other modes:
+
+    `haskell-decl-scan-mode', Graeme E Moss
+      Scans top-level declarations, and places them in a menu.
+
+    `haskell-doc-mode', Hans-Wolfgang Loidl
+      Echoes types of functions or syntax of keywords when the cursor is idle.
+
+To activate a minor-mode, simply run the interactive command. For
+example, `M-x haskell-doc-mode'. Run it again to disable it.
+
+To enable a mode for every haskell-mode buffer, add a hook in
+your Emacs configuration. To do that you can customize
+`haskell-mode-hook' or add lines to your .emacs file. For
+example, to enable `haskell-indent-mode' and
+`interactive-haskell-mode', use the following:
+
+    (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
+    (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+
+For more details see Info node `(haskell-mode)haskell-mode-hook'.
+
+Warning: do not enable more than one of the above indentation
+modes. See Info node `(haskell-mode)indentation' for more
+details.
 
 Minor modes that work well with `haskell-mode':
 
