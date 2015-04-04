@@ -1102,10 +1102,11 @@ the current buffer."
    (+ left-indent haskell-indentation-left-offset)))
 
 (defun haskell-indentation-push-indentation (indent)
-  (when (or (null possible-indentations)
-            (< indent (car possible-indentations)))
-    (setq possible-indentations
-          (cons indent possible-indentations))))
+  (loop for ind in (list (+ indent tab-width) indent) do
+        (when (or (null possible-indentations)
+              (< ind (car possible-indentations)))
+          (setq possible-indentations
+                (cons ind possible-indentations)))))
 
 (defun haskell-indentation-token-test ()
   (let ((current-token nil)
