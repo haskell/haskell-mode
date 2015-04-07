@@ -198,9 +198,18 @@ PROCESS."
 
 (defun haskell-process-haskell-docs-ident (ident)
   "Search with haskell-docs for IDENT, returns a list of modules."
-  (cl-remove-if-not (lambda (a) (string-match "^[A-Z][A-Za-b0-9_'.]+$" a))
-                    (split-string (shell-command-to-string (concat "haskell-docs --modules " ident))
-                                  "\n")))
+  (cl-remove-if-not
+   (lambda (a) (string-match "^[[:upper:]][[:alnum:]_'.]+$" a))
+   (split-string
+      (with-output-to-string
+        (with-current-buffer
+            standard-output
+          (call-process "haskell-docs"
+                        nil             ; no infile
+                        t               ; output to current buffer (that is string)
+                        nil             ; do not redisplay
+                        "--modules" ident)))
+      "\n")))
 
 (defun haskell-process-import-modules (process modules)
   "Import `modules' with :m +, and send any import statements
