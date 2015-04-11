@@ -428,7 +428,4 @@ TODO/WRITEME
 @bye
 
 @c Local Variables:
-@c eval: (visual-line-mode t)
-@c eval: (linum-mode t)
-@c eval: (hl-line-mode t)
 @c End:
