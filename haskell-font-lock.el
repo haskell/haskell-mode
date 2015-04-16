@@ -227,15 +227,6 @@ Returns keywords suitable for `font-lock-keywords'."
                   "\\(_\\|c\\(ase\\|lass\\)\\|d\\(ata\\|e\\(fault\\|riving\\)\\|o\\)\\|else\\|i\\(mport\\|n\\(fix[lr]?\\|stance\\)\\|[fn]\\)\\|let\\|module\\|mdo\\|newtype\\|of\\|rec\\|proc\\|t\\(hen\\|ype\\)\\|where\\)"
                   "\\>"))
 
-         ;; This unreadable regexp matches strings and character
-         ;; constants.  We need to do this with one regexp to handle
-         ;; stuff like '"':"'".  The regexp is the composition of
-         ;; "([^"\\]|\\.)*" for strings and '([^\\]|\\.[^']*)' for
-         ;; characters, allowing for string continuations.
-         ;; Could probably be improved...
-         (string-and-char
-          (concat "\\(\\(\"\\|" line-prefix "[ \t]*\\\\\\)\\([^\"\\\\\n]\\|\\\\.\\)*\\(\"\\|\\\\[ \t]*$\\)\\|'\\([^'\\\\\n]\\|\\\\.[^'\n]*\\)'\\)"))
-
          ;; Top-level declarations
          (topdecl-var
           (concat line-prefix "\\(" varid "\\(?:\\s-*,\\s-*" varid "\\)*" "\\)\\s-*"
