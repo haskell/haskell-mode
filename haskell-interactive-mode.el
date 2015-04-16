@@ -485,7 +485,7 @@ FILE-NAME only."
                (let ((msg-file-name (match-string-no-properties 1))
                      (msg-startpos (line-beginning-position)))
                  ;; skip over hanging continuation message lines
-                 (while (progn (forward-line) (looking-at "^[ ]+")))
+                 (while (progn (forward-line) (looking-at-p "^[ ]+")))
 
                  (when (or (not file-name) (string= file-name msg-file-name))
                    (let ((inhibit-read-only t))
@@ -656,7 +656,7 @@ FILE-NAME only."
         (haskell-interactive-mode-error-forward))
 
       (setq reset-locus t)
-      (unless (looking-at haskell-interactive-mode-error-regexp)
+      (unless (looking-at-p haskell-interactive-mode-error-regexp)
         (error "no errors found")))
 
     ;; move point if needed

@@ -436,10 +436,10 @@ that should be commented under LaTeX-style literate scripts."
    ;; delimeters {-# .. #-}.
    ((save-excursion
       (goto-char (nth 8 state))
-      (and (looking-at "{-#")
+      (and (looking-at-p "{-#")
            (forward-comment 1)
            (goto-char (- (point) 3))
-           (looking-at "#-}")))
+           (looking-at-p "#-}")))
     haskell-pragma-face)
    ;; Haddock comment start with either "-- [|^*$]" or "{- ?[|^*$]"
    ;; (note space optional for nested comments and mandatory for
@@ -455,8 +455,8 @@ that should be commented under LaTeX-style literate scripts."
    ;; comments newline is outside of comment.
    ((save-excursion
       (goto-char (nth 8 state))
-      (or (looking-at "\\(?:{- ?\\|-- \\)[|^*$]")
-	  (and (looking-at "--")              ; are we at double dash comment
+      (or (looking-at-p "\\(?:{- ?\\|-- \\)[|^*$]")
+	  (and (looking-at-p "--")            ; are we at double dash comment
 	       (forward-line -1)              ; this is nil on first line
 	       (eq (get-text-property (line-end-position) 'face)
 		   font-lock-doc-face) 	      ; is a doc face
