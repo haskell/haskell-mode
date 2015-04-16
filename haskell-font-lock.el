@@ -206,13 +206,6 @@ Returns keywords suitable for `font-lock-keywords'."
           ;; be thrown for some reason by backslash's escape syntax.
           "\\(\\s.\\|\\\\\\)+")
 
-         ;; Reserved operations
-         (reservedsym
-          (concat "\\S."
-                  ;; (regexp-opt '(".." "::" "=" "\\" "|" "<-" "->"
-                  ;;            "@" "~" "=>") t)
-                  "\\(->\\|→\\|\\.\\.\\|::\\|∷\\|<-\\|←\\|=>\\|[=@\\|~]\\)"
-                  "\\S."))
          ;; Reserved identifiers
          (reservedid
           (concat "\\<"
@@ -256,7 +249,7 @@ Returns keywords suitable for `font-lock-keywords'."
             ,@(haskell-font-lock-symbols-keywords)
 
             (,reservedid 1 haskell-keyword-face)
-            (,reservedsym 1 haskell-operator-face)
+
             ;; Special case for `as', `hiding', `safe' and `qualified', which are
             ;; keywords in import statements but are not otherwise reserved.
             ("\\<import[ \t]+\\(?:\\(safe\\>\\)[ \t]*\\)?\\(?:\\(qualified\\>\\)[ \t]*\\)?\\(?:\"[^\"]*\"[\t ]*\\)?[^ \t\n()]+[ \t]*\\(?:\\(\\<as\\>\\)[ \t]*[^ \t\n()]+[ \t]*\\)?\\(\\<hiding\\>\\)?"
@@ -265,7 +258,6 @@ Returns keywords suitable for `font-lock-keywords'."
              (3 haskell-keyword-face nil lax)
              (4 haskell-keyword-face nil lax))
 
-            (,reservedsym 1 haskell-operator-face)
             ;; Special case for `foreign import'
             ;; keywords in foreign import statements but are not otherwise reserved.
             ("\\<\\(foreign\\)[ \t]+\\(import\\)[ \t]+\\(?:\\(ccall\\|stdcall\\|cplusplus\\|jvm\\|dotnet\\)[ \t]+\\)?\\(?:\\(safe\\|unsafe\\|interruptible\\)[ \t]+\\)?"
@@ -274,7 +266,6 @@ Returns keywords suitable for `font-lock-keywords'."
              (3 haskell-keyword-face nil lax)
              (4 haskell-keyword-face nil lax))
 
-            (,reservedsym 1 haskell-operator-face)
             ;; Special case for `foreign export'
             ;; keywords in foreign export statements but are not otherwise reserved.
             ("\\<\\(foreign\\)[ \t]+\\(export\\)[ \t]+\\(?:\\(ccall\\|stdcall\\|cplusplus\\|jvm\\|dotnet\\)[ \t]+\\)?"
