@@ -183,15 +183,6 @@ Returns keywords suitable for `font-lock-keywords'."
          ;; "^>", otherwise a line of code starts with "^".
          (line-prefix (if (eq literate 'bird) "^> ?" "^"))
 
-         ;; Most names are borrowed from the lexical syntax of the Haskell
-         ;; report.
-         ;; Some of these definitions have been superseded by using the
-         ;; syntax table instead.
-
-         ;; (ASCsymbol "-!#$%&*+./<=>?@\\\\^|~")
-         ;; Put the minus first to make it work in ranges.
-
-         ;; We allow _ as the first char to fit GHC
          (varid "\\b[[:lower:]_][[:alnum:]'_]*\\b")
          ;; We allow ' preceding conids because of DataKinds/PolyKinds
          (conid "\\b'?[[:upper:]][[:alnum:]'_]*\\b")
@@ -278,17 +269,16 @@ Returns keywords suitable for `font-lock-keywords'."
             ;; These four are debatable...
             ("(\\(,*\\|->\\))" 0 haskell-constructor-face)
             ("\\[\\]" 0 haskell-constructor-face)
-            ;; Expensive.
+
             (,(concat "`" varid "`") 0 haskell-operator-face)
             (,(concat "`" conid "`") 0 haskell-operator-face)
             (,(concat "`" qvarid "`") 0 haskell-operator-face)
             (,(concat "`" qconid "`") 0 haskell-operator-face)
             (,qvarid 0 haskell-default-face)
             (,qconid 0 haskell-constructor-face)
-            ;; Expensive.
+
             (,conid 0 haskell-constructor-face)
 
-            ;; Very expensive.
             (,sym 0 (if (eq (char-after (match-beginning 0)) ?:)
                         haskell-constructor-face
                       haskell-operator-face))))
