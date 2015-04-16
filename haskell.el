@@ -67,7 +67,8 @@
                           "import" (1+ space)
                           (? "qualified" (1+ space))
                           (group (? (char upper) ; modid
-                                    (* (char alnum ?' ?.))))))
+                                    (* (char alnum ?' ?.)))))
+                      (line-beginning-position))
         (let ((text (match-string-no-properties 0))
               (start (match-beginning 1))
               (end (match-end 1)))
