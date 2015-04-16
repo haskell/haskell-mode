@@ -198,13 +198,7 @@ Returns keywords suitable for `font-lock-keywords'."
          (modid (concat "\\b" conid "\\(\\." conid "\\)*\\b"))
          (qvarid (concat modid "\\." varid))
          (qconid (concat modid "\\." conid))
-         (sym
-          ;; We used to use the below for non-Emacs21, but I think the
-          ;; regexp based on syntax works for other emacsen as well.  -- Stef
-          ;; (concat "[" symbol ":]+")
-          ;; Add backslash to the symbol-syntax chars.  This seems to
-          ;; be thrown for some reason by backslash's escape syntax.
-          "\\(\\s.\\|\\\\\\)+")
+         (sym "\\s.+")
 
          ;; Reserved identifiers
          (reservedid
