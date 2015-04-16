@@ -282,17 +282,6 @@ Returns keywords suitable for `font-lock-keywords'."
             (,sym 0 (if (eq (char-after (match-beginning 0)) ?:)
                         haskell-constructor-face
                       haskell-operator-face))))
-    (unless (boundp 'font-lock-syntactic-keywords)
-      (cl-case literate
-        (bird
-         (setq keywords
-               `(("^[^>\n].*$" 0 haskell-comment-face t)
-                 ,@keywords
-                 ("^>" 0 haskell-default-face t))))
-        ((latex tex)
-         (setq keywords
-               `((haskell-font-lock-latex-comments 0 'font-lock-comment-face t)
-                 ,@keywords)))))
     keywords))
 
 (defvar haskell-font-lock-latex-cache-pos nil
