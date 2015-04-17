@@ -112,7 +112,7 @@ point beyond the current column, position given by
                       (not (zerop invisible-from)))
                   (zerop (forward-line -1)))
         ;; Ignore empty lines.
-        (if (not (looking-at "[ \t]*\n"))
+        (if (not (looking-at-p "[ \t]*\n"))
             (let ((this-indentation (current-indentation)))
               ;; Is this line so indented that it cannot have
               ;; influence on indentation points?

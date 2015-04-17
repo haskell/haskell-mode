@@ -517,7 +517,7 @@ the current buffer."
               (goto-char ps)
               (beginning-of-line)))
           (when (and (>= 2 (haskell-indentation-current-indentation))
-                     (not (looking-at ">\\s-*$")))
+                     (not (looking-at-p ">\\s-*$")))
             (forward-char 2)
             (throw 'return nil))
           (when (bobp)
@@ -656,7 +656,7 @@ the current buffer."
 (defun haskell-indentation-declaration-layout ()
   (haskell-indentation-layout #'haskell-indentation-declaration))
 
-;; a layout list with case expressions 
+;; a layout list with case expressions
 (defun haskell-indentation-case-layout ()
   (haskell-indentation-layout #'haskell-indentation-case))
 
@@ -905,7 +905,7 @@ the current buffer."
                 (throw 'parse-end nil))
 
 	      ;; after an 'open' expression such as 'if', exit
-              (unless (member (car parser) '("(" "[" "{" "do" "case")) 
+              (unless (member (car parser) '("(" "[" "{" "do" "case"))
                 (throw 'return nil)))))))))
 
 (defun haskell-indentation-test-indentations ()
@@ -961,7 +961,7 @@ the current buffer."
 ;; and current-indent after the separator
 ;; For example:
 ;; l = [  1
-;;      , 2  
+;;      , 2
 ;;      ,    -- start now here
 
 (defun haskell-indentation-at-separator ()
@@ -1174,7 +1174,7 @@ the current buffer."
         ((looking-at "\\(→\\|←\\|∷\\)\\([^-:!#$%&*+./<=>?@\\\\^|~]\\|$\\)")
          (let ((tok (match-string-no-properties 1)))
            (or (cdr (assoc tok haskell-indentation-unicode-tokens)) tok)))
-        ((looking-at"[-:!#$%&*+./<=>?@\\\\^|~`]" )
+        ((looking-at-p "[-:!#$%&*+./<=>?@\\\\^|~`]")
          'operator)
         (t 'value)))
 

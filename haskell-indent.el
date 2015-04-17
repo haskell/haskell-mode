@@ -192,7 +192,7 @@ followed by an OFFSET (if present use its value otherwise use
     (if (and (eq haskell-literate 'bird)
              (eq (following-char) ?\>))
         (forward-char 1))
-    (looking-at "[ \t]*$")))
+    (looking-at-p "[ \t]*$")))
 
 (defun haskell-indent-back-to-indentation ()
   "`back-to-indentation' function but dealing with Bird-style literate scripts."
@@ -311,7 +311,7 @@ It deals with both Bird style and non Bird-style scripts."
               (delete-region (point) (line-beginning-position 2)))
           (goto-char beg)               ; Remove end.
           (beginning-of-line)
-          (if (looking-at "\\\\begin{code}")
+          (if (looking-at-p "\\\\begin{code}")
               (kill-line 1)))
       (save-excursion                   ; Add the literate indication.
         (goto-char end)
@@ -396,10 +396,10 @@ Returns the location of the start of the comment, nil otherwise."
   (cond
    ((haskell-indent-empty-line-p) 'empty)
    ((haskell-indent-in-comment (point-min) (point)) 'comment)
-   ((looking-at "\\(\\([[:alpha:]]\\(\\sw\\|'\\)*\\)\\|_\\)[ \t\n]*")
+   ((looking-at-p "\\(\\([[:alpha:]]\\(\\sw\\|'\\)*\\)\\|_\\)[ \t\n]*")
     'ident)
-   ((looking-at "\\(|[^|]\\)[ \t\n]*") 'guard)
-   ((looking-at "\\(=[^>=]\\|::\\|∷\\|→\\|←\\|->\\|<-\\)[ \t\n]*") 'rhs)
+   ((looking-at-p "\\(|[^|]\\)[ \t\n]*") 'guard)
+   ((looking-at-p "\\(=[^>=]\\|::\\|∷\\|→\\|←\\|->\\|<-\\)[ \t\n]*") 'rhs)
    (t 'other)))
 
 (defvar haskell-indent-current-line-first-ident ""
@@ -488,7 +488,7 @@ Returns the location of the start of the comment, nil otherwise."
   "Check if there is no otherwise at GUARD."
   (save-excursion
     (goto-char guard)
-    (not (looking-at "|[ \t]*otherwise\\>"))))
+    (not (looking-at-p "|[ \t]*otherwise\\>"))))
 
 
 (defun haskell-indent-guard (start end end-visible indent-info)
@@ -937,12 +937,12 @@ and find indentation info for each part."
   "Return non-nil if point is in front of a `let' that has no `in'.
 START is the position of the presumed `in'."
   ;; We're looking at either `in' or `let'.
-  (when (looking-at "let")
+  (when (looking-at-p "let")
     (ignore-errors
       (save-excursion
         (forward-word 1)
         (forward-comment (point-max))
-        (if (looking-at "{")
+        (if (looking-at-p "{")
             (progn
               (forward-sexp 1)
               (forward-comment (point-max))
@@ -1001,7 +1001,7 @@ OPEN is the start position of the comment in which point is."
              indent-info)))
 
       ;; We really are inside a comment.
-      (if (looking-at "-}")
+      (if (looking-at-p "-}")
           (progn
             (forward-char 2)
             (forward-comment -1)
@@ -1131,7 +1131,7 @@ is at the end of an otherwise-non-empty line."
 
 (defun haskell-indent-inside-paren (open)
   ;; there is an open structure to complete
-  (if (looking-at "\\s)\\|[;,]")
+  (if (looking-at-p "\\s)\\|[;,]")
       ;; A close-paren or a , or ; can only correspond syntactically to
       ;; the open-paren at `open'.  So there is no ambiguity.
       (progn
@@ -1150,7 +1150,7 @@ is at the end of an otherwise-non-empty line."
     (let* ((end (point))
            (basic-indent-info
             ;; Anything else than a ) is subject to layout.
-            (if (looking-at "\\s.\\|\\$ ")
+            (if (looking-at-p "\\s.\\|\\$ ")
                 (haskell-indent-point-to-col open) ; align a punct with (
               (let ((follow (save-excursion
                               (goto-char (1+ open))
@@ -1216,14 +1216,14 @@ START if non-nil is a presumed start pos of the current definition."
      ;; in string?
      ((setq open (haskell-indent-in-string start (point)))
       (list (list (+ (haskell-indent-point-to-col open)
-                     (if (looking-at "\\\\") 0 1)))))
+                     (if (looking-at-p "\\\\") 0 1)))))
 
      ;; in comment ?
      ((setq open (haskell-indent-in-comment start (point)))
       (haskell-indent-comment open start))
 
      ;; Closing the declaration part of a `let' or the test exp part of a case.
-     ((looking-at "\\(?:in\\|of\\|then\\|else\\)\\>")
+     ((looking-at-p "\\(?:in\\|of\\|then\\|else\\)\\>")
       (haskell-indent-closing-keyword start))
 
      ;; Right after a special keyword.
@@ -1378,7 +1378,7 @@ TYPE is either 'guard or 'rhs."
                 (if (<= (haskell-indent-current-indentation) defcol)
                     (progn
                       (move-to-column defcol)
-                      (if (and (looking-at defname) ; start of equation
+                      (if (and (looking-at-p defname) ; start of equation
                                (not (haskell-indent-open-structure start-block (point))))
                           (push (cons (point) 'eqn) eqns-start)
                         ;; found a less indented point not starting an equation
