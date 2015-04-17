@@ -183,36 +183,14 @@ Returns keywords suitable for `font-lock-keywords'."
          ;; "^>", otherwise a line of code starts with "^".
          (line-prefix (if (eq literate 'bird) "^> ?" "^"))
 
-         ;; Most names are borrowed from the lexical syntax of the Haskell
-         ;; report.
-         ;; Some of these definitions have been superseded by using the
-         ;; syntax table instead.
-
-         ;; (ASCsymbol "-!#$%&*+./<=>?@\\\\^|~")
-         ;; Put the minus first to make it work in ranges.
-
-         ;; We allow _ as the first char to fit GHC
          (varid "\\b[[:lower:]_][[:alnum:]'_]*\\b")
          ;; We allow ' preceding conids because of DataKinds/PolyKinds
          (conid "\\b'?[[:upper:]][[:alnum:]'_]*\\b")
          (modid (concat "\\b" conid "\\(\\." conid "\\)*\\b"))
          (qvarid (concat modid "\\." varid))
          (qconid (concat modid "\\." conid))
-         (sym
-          ;; We used to use the below for non-Emacs21, but I think the
-          ;; regexp based on syntax works for other emacsen as well.  -- Stef
-          ;; (concat "[" symbol ":]+")
-          ;; Add backslash to the symbol-syntax chars.  This seems to
-          ;; be thrown for some reason by backslash's escape syntax.
-          "\\(\\s.\\|\\\\\\)+")
+         (sym "\\s.+")
 
-         ;; Reserved operations
-         (reservedsym
-          (concat "\\S."
-                  ;; (regexp-opt '(".." "::" "=" "\\" "|" "<-" "->"
-                  ;;            "@" "~" "=>") t)
-                  "\\(->\\|→\\|\\.\\.\\|::\\|∷\\|<-\\|←\\|=>\\|[=@\\|~]\\)"
-                  "\\S."))
          ;; Reserved identifiers
          (reservedid
           (concat "\\<"
@@ -226,15 +204,6 @@ Returns keywords suitable for `font-lock-keywords'."
                   ;;    "then" "type" "where" "_") t)
                   "\\(_\\|c\\(ase\\|lass\\)\\|d\\(ata\\|e\\(fault\\|riving\\)\\|o\\)\\|else\\|i\\(mport\\|n\\(fix[lr]?\\|stance\\)\\|[fn]\\)\\|let\\|module\\|mdo\\|newtype\\|of\\|rec\\|proc\\|t\\(hen\\|ype\\)\\|where\\)"
                   "\\>"))
-
-         ;; This unreadable regexp matches strings and character
-         ;; constants.  We need to do this with one regexp to handle
-         ;; stuff like '"':"'".  The regexp is the composition of
-         ;; "([^"\\]|\\.)*" for strings and '([^\\]|\\.[^']*)' for
-         ;; characters, allowing for string continuations.
-         ;; Could probably be improved...
-         (string-and-char
-          (concat "\\(\\(\"\\|" line-prefix "[ \t]*\\\\\\)\\([^\"\\\\\n]\\|\\\\.\\)*\\(\"\\|\\\\[ \t]*$\\)\\|'\\([^'\\\\\n]\\|\\\\.[^'\n]*\\)'\\)"))
 
          ;; Top-level declarations
          (topdecl-var
@@ -265,7 +234,7 @@ Returns keywords suitable for `font-lock-keywords'."
             ,@(haskell-font-lock-symbols-keywords)
 
             (,reservedid 1 haskell-keyword-face)
-            (,reservedsym 1 haskell-operator-face)
+
             ;; Special case for `as', `hiding', `safe' and `qualified', which are
             ;; keywords in import statements but are not otherwise reserved.
             ("\\<import[ \t]+\\(?:\\(safe\\>\\)[ \t]*\\)?\\(?:\\(qualified\\>\\)[ \t]*\\)?\\(?:\"[^\"]*\"[\t ]*\\)?[^ \t\n()]+[ \t]*\\(?:\\(\\<as\\>\\)[ \t]*[^ \t\n()]+[ \t]*\\)?\\(\\<hiding\\>\\)?"
@@ -274,7 +243,6 @@ Returns keywords suitable for `font-lock-keywords'."
              (3 haskell-keyword-face nil lax)
              (4 haskell-keyword-face nil lax))
 
-            (,reservedsym 1 haskell-operator-face)
             ;; Special case for `foreign import'
             ;; keywords in foreign import statements but are not otherwise reserved.
             ("\\<\\(foreign\\)[ \t]+\\(import\\)[ \t]+\\(?:\\(ccall\\|stdcall\\|cplusplus\\|jvm\\|dotnet\\)[ \t]+\\)?\\(?:\\(safe\\|unsafe\\|interruptible\\)[ \t]+\\)?"
@@ -283,7 +251,6 @@ Returns keywords suitable for `font-lock-keywords'."
              (3 haskell-keyword-face nil lax)
              (4 haskell-keyword-face nil lax))
 
-            (,reservedsym 1 haskell-operator-face)
             ;; Special case for `foreign export'
             ;; keywords in foreign export statements but are not otherwise reserved.
             ("\\<\\(foreign\\)[ \t]+\\(export\\)[ \t]+\\(?:\\(ccall\\|stdcall\\|cplusplus\\|jvm\\|dotnet\\)[ \t]+\\)?"
@@ -302,31 +269,19 @@ Returns keywords suitable for `font-lock-keywords'."
             ;; These four are debatable...
             ("(\\(,*\\|->\\))" 0 haskell-constructor-face)
             ("\\[\\]" 0 haskell-constructor-face)
-            ;; Expensive.
+
             (,(concat "`" varid "`") 0 haskell-operator-face)
             (,(concat "`" conid "`") 0 haskell-operator-face)
             (,(concat "`" qvarid "`") 0 haskell-operator-face)
             (,(concat "`" qconid "`") 0 haskell-operator-face)
             (,qvarid 0 haskell-default-face)
             (,qconid 0 haskell-constructor-face)
-            ;; Expensive.
+
             (,conid 0 haskell-constructor-face)
 
-            ;; Very expensive.
             (,sym 0 (if (eq (char-after (match-beginning 0)) ?:)
                         haskell-constructor-face
                       haskell-operator-face))))
-    (unless (boundp 'font-lock-syntactic-keywords)
-      (cl-case literate
-        (bird
-         (setq keywords
-               `(("^[^>\n].*$" 0 haskell-comment-face t)
-                 ,@keywords
-                 ("^>" 0 haskell-default-face t))))
-        ((latex tex)
-         (setq keywords
-               `((haskell-font-lock-latex-comments 0 'font-lock-comment-face t)
-                 ,@keywords)))))
     keywords))
 
 (defvar haskell-font-lock-latex-cache-pos nil
