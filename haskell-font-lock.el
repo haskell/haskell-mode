@@ -144,6 +144,7 @@ Regexp match data 0 points to the chars."
          (end (match-end 0))
          (syntaxes (cond
                     ((eq (char-syntax (char-after start)) ?w) '(?w))
+                    ((eq (char-syntax (char-after start)) ?.) '(?.))
                     ;; Special case for the . used for qualified names.
                     ((and (eq (char-after start) ?\.) (= end (1+ start)))
                      '(?_ ?\\ ?w))
