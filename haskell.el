@@ -252,7 +252,7 @@
   (interactive)
   (with-current-buffer (haskell-session-interactive-buffer (haskell-session))
     (if (progn (goto-char (line-beginning-position))
-               (looking-at-p haskell-interactive-mode-error-regexp))
+               (looking-at haskell-interactive-mode-error-regexp))
         (progn (forward-line -1)
                (haskell-interactive-jump-to-error-line))
       (progn (goto-char (point-max))
@@ -268,7 +268,7 @@
       (self-insert-command 1)
     (cond ((and haskell-mode-contextual-import-completion
                 (save-excursion (forward-word -1)
-                                (looking-at-p "^import$")))
+                                (looking-at "^import$")))
            (insert " ")
            (let ((module (haskell-complete-module-read
                           "Module: "

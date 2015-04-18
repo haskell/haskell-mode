@@ -75,7 +75,7 @@ within that region."
 
 (defun haskell-sort-imports-collect-imports ()
   (let ((imports (list)))
-    (while (looking-at-p "import")
+    (while (looking-at "import")
       (let* ((points (haskell-sort-imports-decl-points))
              (string (buffer-substring-no-properties (car points)
                                                      (cdr points))))
@@ -96,7 +96,7 @@ within that region."
   "Are we at an import?"
   (save-excursion
     (haskell-sort-imports-goto-import-start)
-    (looking-at-p "import")))
+    (looking-at "import")))
 
 (defun haskell-sort-imports-goto-import-start ()
   "Go to the start of the import."
@@ -107,8 +107,8 @@ within that region."
   (save-excursion
     (let ((start (or (progn (goto-char (line-end-position))
                             (search-backward-regexp "^[^ \n]" nil t 1)
-                            (unless (or (looking-at-p "^-}$")
-                                        (looking-at-p "^{-$"))
+                            (unless (or (looking-at "^-}$")
+                                        (looking-at "^{-$"))
                               (point)))
                      0))
           (end (progn (goto-char (1+ (point)))

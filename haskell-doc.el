@@ -1830,7 +1830,7 @@ ToDo: Check for matching parenthesis!."
           (let ((here (point)))
             (goto-char here)
             (skip-chars-forward " \t")
-            (if (looking-at-p "--")  ; it is a comment line
+            (if (looking-at "--")  ; it is a comment line
                 (progn
                   (forward-line 1)
                   (end-of-line)

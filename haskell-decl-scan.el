@@ -152,12 +152,12 @@ Point is not changed."
     (with-syntax-table haskell-ds-syntax-table
       (if (looking-at prefix) (goto-char (match-end 0)))
       ;; Keyword.
-      (if (looking-at-p haskell-ds-start-keywords-re)
+      (if (looking-at haskell-ds-start-keywords-re)
           nil
         (or ;; Parenthesized symbolic variable.
          (and (looking-at "(\\(\\s_+\\))") (match-string-no-properties 1))
          ;; General case.
-         (if (looking-at-p
+         (if (looking-at
               (if (eq ?\( (char-after))
                   ;; Skip paranthesised expression.
                   (progn
@@ -187,7 +187,7 @@ current line that starts with REGEXP and is not in `font-lock-comment-face'."
   ;; no effect on efficiency.  It is probably not called enough to do
   ;; so.
   (while (and (= (forward-line inc) 0)
-              (or (not (looking-at-p regexp))
+              (or (not (looking-at regexp))
                   (eq (get-text-property (point) 'face)
                       'font-lock-comment-face)))))
 
@@ -257,7 +257,7 @@ then point does not move if already at the start of a declaration."
                      ;; Checking the face to ensure a declaration starts
                      ;; here seems to be the only addition to make this
                      ;; module support LaTeX-style literate scripts.
-                     (if (and (looking-at-p start-decl-re)
+                     (if (and (looking-at start-decl-re)
                               (not (elt (syntax-ppss) 4)))
                          (match-beginning 1)))))
         (if (and start
@@ -310,7 +310,7 @@ then point does not move if already at the start of a declaration."
           ;; start with a declaration, move forward to start of next
           ;; declaration (which must exist).  Otherwise, we are done.
           (if (and (not direction)
-                   (or (and (looking-at-p start-decl-re)
+                   (or (and (looking-at start-decl-re)
                             (not (string= name
                                           ;; Note we must not use
                                           ;; newname here as this may
@@ -319,12 +319,12 @@ then point does not move if already at the start of a declaration."
                                           ;; of the buffer.
                                           (haskell-ds-get-variable
                                            line-prefix))))
-                       (and (not (looking-at-p start-decl-re))
+                       (and (not (looking-at start-decl-re))
                             (bobp))))
               (haskell-ds-move-to-start-regexp-skipping-comments 1 start-decl-re)))
         ;; Store whether we are at the start of a declaration or not.
         ;; Used to calculate final result.
-        (let ((at-start-decl (looking-at-p start-decl-re)))
+        (let ((at-start-decl (looking-at start-decl-re)))
           ;; If we are at the beginning of a line, move over
           ;; line-prefix, if present at point.
           (if (bolp)

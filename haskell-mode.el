@@ -518,12 +518,12 @@ May return a qualified name."
         ;; If we're looking at a module ID that qualifies further IDs, add
         ;; those IDs.
         (goto-char start)
-        (while (and (looking-at-p "[[:upper:]]") (eq (char-after end) ?.)
+        (while (and (looking-at "[[:upper:]]") (eq (char-after end) ?.)
                     ;; It's a module ID that qualifies further IDs.
                     (goto-char (1+ end))
                     (save-excursion
                       (when (not (zerop (skip-syntax-forward
-                                         (if (looking-at-p "\\s_") "_" "w'"))))
+                                         (if (looking-at "\\s_") "_" "w'"))))
                         (setq end (point))))))
         ;; If we're looking at an ID that's itself qualified by previous
         ;; module IDs, add those too.
@@ -533,7 +533,7 @@ May return a qualified name."
                     (progn (forward-char -1)
                            (not (zerop (skip-syntax-backward "w'"))))
                     (skip-syntax-forward "'")
-                    (looking-at-p "[[:upper:]]"))
+                    (looking-at "[[:upper:]]"))
           (setq start (point)))
         ;; This is it.
         (cons start end)))))
@@ -965,14 +965,14 @@ LOC = (list FILE LINE COL)"
 (defun haskell-mode-insert-scc-at-point ()
   "Insert an SCC annotation at point."
   (interactive)
-  (if (or (looking-at-p "\\b\\|[ \t]\\|$") (and (not (bolp))
-                                                (save-excursion
-                                                  (forward-char -1)
-                                                  (looking-at-p "\\b\\|[ \t]"))))
-      (let ((space-at-point (looking-at-p "[ \t]")))
+  (if (or (looking-at "\\b\\|[ \t]\\|$") (and (not (bolp))
+                                              (save-excursion
+                                                (forward-char -1)
+                                                (looking-at "\\b\\|[ \t]"))))
+      (let ((space-at-point (looking-at "[ \t]")))
         (unless (and (not (bolp)) (save-excursion
                                     (forward-char -1)
-                                    (looking-at-p "[ \t]")))
+                                    (looking-at "[ \t]")))
           (insert " "))
         (insert "{-# SCC \"\" #-}")
         (unless space-at-point
