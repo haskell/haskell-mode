@@ -86,12 +86,12 @@ This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
                         (line-beginning-position) t)))
 
 (defface haskell-keyword-face
-  '((t :inherit font-lock-keyword-face))
+  '((t :inherit 'font-lock-keyword-face))
   "Face used to highlight Haskell keywords."
   :group 'haskell)
 
 (defface haskell-constructor-face
-  '((t :inherit font-lock-type-face))
+  '((t :inherit 'font-lock-type-face))
   "Face used to highlight Haskell constructors."
   :group 'haskell)
 
@@ -99,7 +99,7 @@ This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
 ;; a highlighting that's consistent with other modes (it's mostly used
 ;; for function defintions).
 (defface haskell-definition-face
-  '((t :inherit font-lock-function-name-face))
+  '((t :inherit 'font-lock-function-name-face))
   "Face used to highlight Haskell definitions."
   :group 'haskell)
 
@@ -107,34 +107,25 @@ This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
 ;; `font-lock-function-name-face' with a result that was not consistent with
 ;; other major modes, so I just exchanged with `haskell-definition-face'.
 (defface haskell-operator-face
-  '((t :inherit font-lock-variable-name-face))
+  '((t :inherit 'font-lock-variable-name-face))
   "Face used to highlight Haskell operators."
   :group 'haskell)
 
 (defface haskell-pragma-face
-  '((t :inherit font-lock-preprocessor-face))
+  '((t :inherit 'font-lock-preprocessor-face))
   "Face used to highlight Haskell pragmas."
   :group 'haskell)
 
 (defface haskell-default-face
-  '((t :inherit default))
+  '((t :inherit 'default))
   "Face used to highlight ordinary Haskell code."
   :group 'haskell)
 
 (defface haskell-literate-comment-face
-  '((t :inherit font-lock-doc-face))
+  '((t :inherit 'font-lock-doc-face))
   "Face with which to fontify literate comments.
 Inherit from `default' to avoid fontification of them."
   :group 'haskell)
-
-;; These variables exist only for backward compatibility.
-(defvar haskell-keyword-face 'haskell-keyword-face)
-(defvar haskell-constructor-face 'haskell-constructor-face)
-(defvar haskell-definition-face 'haskell-definition-face)
-(defvar haskell-operator-face 'haskell-operator-face)
-(defvar haskell-pragma-face 'haskell-pragma-face)
-(defvar haskell-default-face 'haskell-default-face)
-(defvar haskell-literate-comment-face 'haskell-literate-comment-face)
 
 (defun haskell-font-lock-compose-symbol (alist)
   "Compose a sequence of ascii chars into a symbol.
@@ -234,55 +225,55 @@ Returns keywords suitable for `font-lock-keywords'."
 
             ,@(haskell-font-lock-symbols-keywords)
 
-            (,reservedid 1 haskell-keyword-face)
+            (,reservedid 1 'haskell-keyword-face)
 
             ;; Special case for `as', `hiding', `safe' and `qualified', which are
             ;; keywords in import statements but are not otherwise reserved.
             ("\\<import[ \t]+\\(?:\\(safe\\>\\)[ \t]*\\)?\\(?:\\(qualified\\>\\)[ \t]*\\)?\\(?:\"[^\"]*\"[\t ]*\\)?[^ \t\n()]+[ \t]*\\(?:\\(\\<as\\>\\)[ \t]*[^ \t\n()]+[ \t]*\\)?\\(\\<hiding\\>\\)?"
-             (1 haskell-keyword-face nil lax)
-             (2 haskell-keyword-face nil lax)
-             (3 haskell-keyword-face nil lax)
-             (4 haskell-keyword-face nil lax))
+             (1 'haskell-keyword-face nil lax)
+             (2 'haskell-keyword-face nil lax)
+             (3 'haskell-keyword-face nil lax)
+             (4 'haskell-keyword-face nil lax))
 
             ;; Special case for `foreign import'
             ;; keywords in foreign import statements but are not otherwise reserved.
             ("\\<\\(foreign\\)[ \t]+\\(import\\)[ \t]+\\(?:\\(ccall\\|stdcall\\|cplusplus\\|jvm\\|dotnet\\)[ \t]+\\)?\\(?:\\(safe\\|unsafe\\|interruptible\\)[ \t]+\\)?"
-             (1 haskell-keyword-face nil lax)
-             (2 haskell-keyword-face nil lax)
-             (3 haskell-keyword-face nil lax)
-             (4 haskell-keyword-face nil lax))
+             (1 'haskell-keyword-face nil lax)
+             (2 'haskell-keyword-face nil lax)
+             (3 'haskell-keyword-face nil lax)
+             (4 'haskell-keyword-face nil lax))
 
             ;; Special case for `foreign export'
             ;; keywords in foreign export statements but are not otherwise reserved.
             ("\\<\\(foreign\\)[ \t]+\\(export\\)[ \t]+\\(?:\\(ccall\\|stdcall\\|cplusplus\\|jvm\\|dotnet\\)[ \t]+\\)?"
-             (1 haskell-keyword-face nil lax)
-             (2 haskell-keyword-face nil lax)
-             (3 haskell-keyword-face nil lax))
+             (1 'haskell-keyword-face nil lax)
+             (2 'haskell-keyword-face nil lax)
+             (3 'haskell-keyword-face nil lax))
 
             ;; Toplevel Declarations.
             ;; Place them *before* generic id-and-op highlighting.
-            (,topdecl-var  (1 haskell-definition-face))
-            (,topdecl-var2 (2 haskell-definition-face))
-            (,topdecl-bangpat  (1 haskell-definition-face))
-            (,topdecl-sym  (2 haskell-definition-face))
-            (,topdecl-sym2 (1 haskell-definition-face))
+            (,topdecl-var  (1 'haskell-definition-face))
+            (,topdecl-var2 (2 'haskell-definition-face))
+            (,topdecl-bangpat  (1 'haskell-definition-face))
+            (,topdecl-sym  (2 'haskell-definition-face))
+            (,topdecl-sym2 (1 'haskell-definition-face))
 
             ;; These four are debatable...
-            ("(\\(,*\\|->\\))" 0 haskell-constructor-face)
-            ("\\[\\]" 0 haskell-constructor-face)
+            ("(\\(,*\\|->\\))" 0 'haskell-constructor-face)
+            ("\\[\\]" 0 'haskell-constructor-face)
 
-            (,(concat "`" varid "`") 0 haskell-operator-face)
-            (,(concat "`" conid "`") 0 haskell-operator-face)
-            (,(concat "`" qvarid "`") 0 haskell-operator-face)
-            (,(concat "`" qconid "`") 0 haskell-operator-face)
-            (,qvarid 0 haskell-default-face)
-            (,qconid 0 haskell-constructor-face)
+            (,(concat "`" varid "`") 0 'haskell-operator-face)
+            (,(concat "`" conid "`") 0 'haskell-operator-face)
+            (,(concat "`" qvarid "`") 0 'haskell-operator-face)
+            (,(concat "`" qconid "`") 0 'haskell-operator-face)
+            (,qvarid 0 'haskell-default-face)
+            (,qconid 0 'haskell-constructor-face)
 
-            (,conid 0 haskell-constructor-face)
+            (,conid 0 'haskell-constructor-face)
 
             (,sym 0 (if (eq (char-after (match-beginning 0)) ?:)
-                        haskell-constructor-face
-                      haskell-operator-face))))
+                        'haskell-constructor-face
+                      'haskell-operator-face))))
     keywords))
 
 (defvar haskell-font-lock-latex-cache-pos nil
@@ -382,12 +373,12 @@ that should be commented under LaTeX-style literate scripts."
 (defun haskell-syntactic-face-function (state)
   "`font-lock-syntactic-face-function' for Haskell."
   (cond
-   ((nth 3 state) font-lock-string-face) ; as normal
+   ((nth 3 state) 'font-lock-string-face) ; as normal
    ;; Else comment.  If it's from syntax table, use default face.
    ((or (eq 'syntax-table (nth 7 state))
         (and (eq haskell-literate 'bird)
              (memq (char-before (nth 8 state)) '(nil ?\n))))
-    haskell-literate-comment-face)
+    'haskell-literate-comment-face)
    ;; Detect pragmas. A pragma is enclosed in special comment
    ;; delimeters {-# .. #-}.
    ((save-excursion
@@ -396,7 +387,7 @@ that should be commented under LaTeX-style literate scripts."
            (forward-comment 1)
            (goto-char (- (point) 3))
            (looking-at-p "#-}")))
-    haskell-pragma-face)
+    'haskell-pragma-face)
    ;; Haddock comment start with either "-- [|^*$]" or "{- ?[|^*$]"
    ;; (note space optional for nested comments and mandatory for
    ;; double dash comments).
@@ -415,12 +406,12 @@ that should be commented under LaTeX-style literate scripts."
 	  (and (looking-at-p "--")            ; are we at double dash comment
 	       (forward-line -1)              ; this is nil on first line
 	       (eq (get-text-property (line-end-position) 'face)
-		   font-lock-doc-face) 	      ; is a doc face
+		   'font-lock-doc-face)	      ; is a doc face
 	       (forward-line)
 	       (skip-syntax-forward "-")      ; see if there is only whitespace
 	       (eq (point) (nth 8 state)))))  ; we are back in position
-    font-lock-doc-face)
-   (t font-lock-comment-face)))
+    'font-lock-doc-face)
+   (t 'font-lock-comment-face)))
 
 (defconst haskell-font-lock-keywords
   (haskell-font-lock-keywords-create nil)
