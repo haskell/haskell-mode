@@ -594,7 +594,7 @@ used to visit the @file{.cabal} file.  If you wish, you can bind
 
 @lisp
 (eval-after-load "haskell-mode"
-  (define-key haskell-mode-map (kbd "C-c v c") 'haskell-cabal-visit-file))
+  '(define-key haskell-mode-map (kbd "C-c v c") 'haskell-cabal-visit-file))
 @end lisp
 
 TODO/WRITEME
