@@ -298,7 +298,8 @@ OTHER-WINDOW use `find-file-other-window'."
     "hscolour"
     "register"
     "test"
-    "help"))
+    "help"
+    "run"))
 
 
 (defgroup haskell-cabal nil
