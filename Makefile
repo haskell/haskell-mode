@@ -63,7 +63,6 @@ ELFILES = \
 	haskell-string.el \
 	haskell-unicode-input-method.el \
 	haskell-utils.el \
-	haskell-yas.el \
 	inf-haskell.el
 
 ELCFILES = $(ELFILES:.el=.elc)
