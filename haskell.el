@@ -59,7 +59,7 @@
 (defun haskell-process-completions-at-point ()
   "A completion-at-point function using the current haskell process."
   (when (haskell-session-maybe)
-    (let ((process (haskell-process)) symbol)
+    (let ((process (haskell-process)) symbol symbol-bounds)
       (cond
        ;; ghci can complete module names, but it needs the "import "
        ;; string at the beginning
@@ -74,11 +74,28 @@
               (end (match-end 1)))
           (list start end
                 (haskell-process-get-repl-completions process text))))
-       ((setq symbol (symbol-at-point))
-        (cl-destructuring-bind (start . end) (bounds-of-thing-at-point 'symbol)
-          (let ((completions (haskell-process-get-repl-completions
-                              process (symbol-name symbol))))
-            (list start end completions))))))))
+       ;; Complete OPTIONS using :complete repl ":set ..."
+       ((and (nth 4 (syntax-ppss))
+           (save-excursion
+             (let ((p (point)))
+               (and (search-backward "{-#" nil t)
+                  (search-forward-regexp "\\_<OPTIONS\\(?:_GHC\\)?\\_>" p t))))
+           (looking-back (rx symbol-start "-" (* (char alnum ?-)))))
+        (list (match-beginning 0) (match-end 0) haskell-ghc-supported-options))
+       ;; Complete LANGUAGE :complete repl ":set -X..."
+       ((and (nth 4 (syntax-ppss))
+           (save-excursion
+             (let ((p (point)))
+               (and (search-backward "{-#" nil t)
+                  (search-forward-regexp "\\_<LANGUAGE\\_>" p t))))
+           (setq symbol-bounds (bounds-of-thing-at-point 'symbol)))
+        (list (car symbol-bounds) (cdr symbol-bounds)
+              haskell-ghc-supported-languages))
+       ((setq symbol-bounds (bounds-of-thing-at-point 'symbol))
+        (cl-destructuring-bind (start . end) symbol-bounds
+          (list start end
+                (haskell-process-get-repl-completions
+                 process (buffer-substring-no-properties start end)))))))))
 
 ;;;###autoload
 (defun haskell-interactive-mode-return ()

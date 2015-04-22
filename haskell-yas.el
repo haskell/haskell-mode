@@ -36,12 +36,6 @@
   :group 'haskell
   :prefix "haskell-yas-")
 
-(defcustom haskell-yas-ghc-language-pragmas
-  (split-string (shell-command-to-string "ghc --supported-extensions"))
-  "List of language pragmas supported by the installed version of GHC."
-  :group 'haskell-yas
-  :type '(repeat string))
-
 (defcustom haskell-yas-completing-function 'ido-completing-read
   "Function to use for completing among alternatives."
   :group 'haskell-yas
