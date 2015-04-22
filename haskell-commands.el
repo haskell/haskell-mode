@@ -665,7 +665,7 @@ command from GHCi."
                         (add-to-list
                          'tags-table-list
                          'session-tags)
-                        (setq 'tags-file-name nil)))
+                        (setq tags-file-name nil)))
                     (find-tag (cdr state)))
                   (haskell-mode-message-line "Tags generated."))))))
 
