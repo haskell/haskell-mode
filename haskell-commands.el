@@ -658,10 +658,12 @@ command from GHCi."
                        "xargs -0 hasktags -e -x"))))
       :complete (lambda (state response)
                   (when (cdr state)
-                    (let ((tags-file-name
-                           (haskell-session-tags-filename
-                            (haskell-process-session (car state)))))
-                      (find-tag (cdr state))))
+                    (let ((session-tags
+                          (haskell-session-tags-filename
+                           (haskell-process-session (car state)))))
+                      (add-to-list 'tags-table-list session-tags)
+                      (setq tags-file-name nil))
+                    (find-tag (cdr state)))
                   (haskell-mode-message-line "Tags generated."))))))
 
 (defun haskell-process-add-cabal-autogen ()
