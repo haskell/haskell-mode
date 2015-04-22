@@ -82,9 +82,11 @@ be disabled at that position.")
 This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
   (save-excursion
     (goto-char start)
-    (not (or
-      (string= " " (string (char-after start)))
-      (string= " " (string (char-before start)))))))
+    (or (re-search-backward "\\<forall\\>[^.\"]*\\="
+                            (line-beginning-position) t)
+        (not (or
+              (string= " " (string (char-after start)))
+              (string= " " (string (char-before start))))))))
 
 (defface haskell-keyword-face
   '((t :inherit 'font-lock-keyword-face))
