@@ -15,7 +15,18 @@
 VERSION = 13.12
 
 INSTALL_INFO = install-info
-EMACS = emacs
+
+# Use $EMACS environment variable if present, so that all of these are
+# equivalent:
+#
+# 1.  export EMACS=/path/to/emacs && make
+# 2.  EMACS=/path/to/emacs make
+# 3.  make EMACS=/path/to/emacs
+#
+# This is particularly useful when EMACS is set in ~/.bash_profile
+#
+EMACS := $(shell echo "$${EMACS:-emacs}")
+
 EFLAGS = --eval "(add-to-list 'load-path (expand-file-name \"tests/compat\") 'append)" \
          --eval "(when (< emacs-major-version 24) \
                     (setq byte-compile-warnings '(not cl-functions)))" \
