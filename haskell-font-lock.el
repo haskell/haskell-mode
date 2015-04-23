@@ -89,12 +89,12 @@ This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
               (string= " " (string (char-before start))))))))
 
 (defface haskell-keyword-face
-  '((t :inherit 'font-lock-keyword-face))
+  '((t :inherit font-lock-keyword-face))
   "Face used to highlight Haskell keywords."
   :group 'haskell)
 
 (defface haskell-constructor-face
-  '((t :inherit 'font-lock-type-face))
+  '((t :inherit font-lock-type-face))
   "Face used to highlight Haskell constructors."
   :group 'haskell)
 
@@ -102,7 +102,7 @@ This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
 ;; a highlighting that's consistent with other modes (it's mostly used
 ;; for function defintions).
 (defface haskell-definition-face
-  '((t :inherit 'font-lock-function-name-face))
+  '((t :inherit font-lock-function-name-face))
   "Face used to highlight Haskell definitions."
   :group 'haskell)
 
@@ -110,22 +110,22 @@ This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
 ;; `font-lock-function-name-face' with a result that was not consistent with
 ;; other major modes, so I just exchanged with `haskell-definition-face'.
 (defface haskell-operator-face
-  '((t :inherit 'font-lock-variable-name-face))
+  '((t :inherit font-lock-variable-name-face))
   "Face used to highlight Haskell operators."
   :group 'haskell)
 
 (defface haskell-pragma-face
-  '((t :inherit 'font-lock-preprocessor-face))
+  '((t :inherit font-lock-preprocessor-face))
   "Face used to highlight Haskell pragmas."
   :group 'haskell)
 
 (defface haskell-default-face
-  '((t :inherit 'default))
+  '((t :inherit default))
   "Face used to highlight ordinary Haskell code."
   :group 'haskell)
 
 (defface haskell-literate-comment-face
-  '((t :inherit 'font-lock-doc-face))
+  '((t :inherit font-lock-doc-face))
   "Face with which to fontify literate comments.
 Inherit from `default' to avoid fontification of them."
   :group 'haskell)
