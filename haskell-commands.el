@@ -572,21 +572,22 @@ command from GHCi."
 
 (defun haskell-process-do-try-info (sym)
   "Get info of `sym' and echo in the minibuffer."
-  (let ((process (haskell-interactive-process)))
-    (haskell-process-queue-command
-     process
-     (make-haskell-command
-      :state (cons process sym)
-      :go (lambda (state)
-            (haskell-process-send-string
-             (car state)
-             (if (string-match "^[A-Za-z_]" (cdr state))
-                 (format ":info %s" (cdr state))
-               (format ":info (%s)" (cdr state)))))
-      :complete (lambda (state response)
-                  (unless (or (string-match "^Top level" response)
-                              (string-match "^<interactive>" response))
-                    (haskell-mode-message-line response)))))))
+  (when (stringp sym)
+    (let ((process (haskell-interactive-process)))
+             (haskell-process-queue-command
+              process
+              (make-haskell-command
+               :state (cons process sym)
+               :go (lambda (state)
+                     (haskell-process-send-string
+                      (car state)
+                      (if (string-match "^[A-Za-z_]" (cdr state))
+                          (format ":info %s" (cdr state))
+                        (format ":info (%s)" (cdr state)))))
+               :complete (lambda (state response)
+                           (unless (or (string-match "^Top level" response)
+                                       (string-match "^<interactive>" response))
+                             (haskell-mode-message-line response))))))))
 
 (defun haskell-process-do-try-type (sym)
   "Get type of `sym' and echo in the minibuffer."
