@@ -621,26 +621,29 @@ command from GHCi."
   (interactive "P")
   (let ((ty (haskell-mode-type-at))
         (orig (point)))
-    (if insert-value
-        (let ((ident-pos (haskell-ident-pos-at-point)))
-          (cond
-           ((region-active-p)
-            (delete-region (region-beginning)
-                           (region-end))
-            (insert "(" ty ")")
-            (goto-char (1+ orig)))
-           ((= (line-beginning-position) (car ident-pos))
-            (goto-char (line-beginning-position))
-            (insert (haskell-fontify-as-mode ty 'haskell-mode)
-                    "\n"))
-           (t
-            (save-excursion
-	      (goto-char (car ident-pos))
-              (let ((col (current-column)))
-                (save-excursion (insert "\n")
-                                (indent-to col))
-                (insert (haskell-fontify-as-mode ty 'haskell-mode)))))))
-      (message "%s" (haskell-fontify-as-mode ty 'haskell-mode)))))
+    (unless (= (aref ty 0) ?\n)
+      ;; That seems to be what happens when `haskell-mode-type-at` fails
+      (if insert-value
+          (let ((ident-pos (or (haskell-ident-pos-at-point)
+                               (cons (point) (point)))))
+            (cond
+             ((region-active-p)
+              (delete-region (region-beginning)
+                             (region-end))
+              (insert "(" ty ")")
+              (goto-char (1+ orig)))
+             ((= (line-beginning-position) (car ident-pos))
+              (goto-char (line-beginning-position))
+              (insert (haskell-fontify-as-mode ty 'haskell-mode)
+                      "\n"))
+             (t
+              (save-excursion
+                (goto-char (car ident-pos))
+                (let ((col (current-column)))
+                  (save-excursion (insert "\n")
+                                  (indent-to col))
+                  (insert (haskell-fontify-as-mode ty 'haskell-mode)))))))
+        (message "%s" (haskell-fontify-as-mode ty 'haskell-mode))))))
 
 ;;;###autoload
 (defun haskell-process-generate-tags (&optional and-then-find-this-tag)
