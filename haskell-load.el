@@ -169,7 +169,7 @@ actual Emacs buffer of the module being loaded."
            (haskell-process-suggest-pragma session "LANGUAGE" "OverloadedStrings" file)))
         ((string-match "^Not in scope: .*[‘`‛]\\(.+\\)['’]$" msg)
          (let* ((match1 (match-string 1 msg))
-                (ident (if (string-match "^[A-Za-z0-9_'.]+\\.\\(.+\\)$" match1)
+                (ident (if (string-match "^[[:alnum:]_'.]+\\.\\(.+\\)$" match1)
                            ;; Skip qualification.
                            (match-string 1 match1)
                          match1)))

@@ -282,7 +282,7 @@ If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
   (let ((at-point (haskell-ident-at-point)))
     (when (or prompt-value at-point)
       (let* ((ident (replace-regexp-in-string
-                     "^!\\([A-Z_a-z]\\)"
+                     "^!\\([[:alpha:]_]\\)"
                      "\\1"
                      (if prompt-value
                          (read-from-minibuffer "Info: " at-point)
@@ -294,7 +294,7 @@ If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
                         (format ":browse! %s" modname))
                        ((string= ident "") ; For the minibuffer input case
                         nil)
-                       (t (format (if (string-match "^[a-zA-Z_]" ident)
+                       (t (format (if (string-match "^[[:alpha:]_]" ident)
                                       ":info %s"
                                     ":info (%s)")
                                   (or ident
@@ -377,7 +377,7 @@ possible, using GHCi's :type."
   (let ((ident (haskell-ident-at-point)))
     (when ident
       (let ((process (haskell-interactive-process))
-            (query (format (if (string-match "^[_[:lower:][:upper:]]" ident)
+            (query (format (if (string-match "^[[:alpha:]_]" ident)
                                ":type %s"
                              ":type (%s)")
                            ident)))
@@ -414,7 +414,7 @@ Returns:
   (when (stringp ident)
     (let ((reply (haskell-process-queue-sync-request
                   (haskell-interactive-process)
-                  (format (if (string-match "^[a-zA-Z_]" ident)
+                  (format (if (string-match "^[[:alpha:]_]" ident)
                               ":info %s"
                             ":info (%s)")
                           ident))))
@@ -589,7 +589,7 @@ command from GHCi."
       :go (lambda (state)
             (haskell-process-send-string
              (car state)
-             (if (string-match "^[A-Za-z_]" (cdr state))
+             (if (string-match "^[[:alpha:]_]" (cdr state))
                  (format ":info %s" (cdr state))
                (format ":info (%s)" (cdr state)))))
       :complete (lambda (state response)
@@ -607,7 +607,7 @@ command from GHCi."
       :go (lambda (state)
             (haskell-process-send-string
              (car state)
-             (if (string-match "^[A-Za-z_]" (cdr state))
+             (if (string-match "^[[:alpha:]_]" (cdr state))
                  (format ":type %s" (cdr state))
                (format ":type (%s)" (cdr state)))))
       :complete (lambda (state response)

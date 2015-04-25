@@ -128,11 +128,11 @@
   (let* ((lines (split-string text "\n    ")))
     (mapcar
      (lambda (line)
-       (string-match "^{?\\([a-zA-Z0-9-_]+\\)-\\([0-9.]+\\)}?$" line)
+       (string-match "^{?\\([[:alnum:]-_]+\\)-\\([0-9.]+\\)}?$" line)
        (cons (match-string 1 line) (match-string 2 line)))
      (cl-delete-if
       (lambda (line)
-        (not (string-match "^{?[a-zA-Z0-9-_]+-[0-9.]+}?$" line)))
+        (not (string-match "^{?[[:alnum:]-_]+-[0-9.]+}?$" line)))
       lines))))
 
 (provide 'haskell-package)

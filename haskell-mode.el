@@ -1001,7 +1001,7 @@ LOC = (list FILE LINE COL)"
   (let ((components (cl-loop for part
                              in (reverse (split-string (buffer-file-name) "/"))
                              while (let ((case-fold-search nil))
-                                     (string-match "^[A-Z]+" part))
+                                     (string-match "^[[:upper:]]+" part))
                              collect (replace-regexp-in-string "\\.l?hs$" "" part))))
     (mapconcat 'identity (reverse components) ".")))
 

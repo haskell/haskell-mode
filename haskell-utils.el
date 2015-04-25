@@ -65,7 +65,7 @@ Note: doesn't detect if in {--}-style comment."
                             "\\(?:safe[\t ]+\\)?" ;; SafeHaskell
                             "\\(?:qualified[\t ]+\\)?"
                             "\\(?:\"[^\"]*\"[\t ]+\\)?" ;; PackageImports
-                            "\\([[:digit:][:upper:][:lower:]_.]+\\)"))
+                            "\\([[:alnum:]_.]+\\)"))
         (match-string-no-properties 1))))
 
 

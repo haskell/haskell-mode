@@ -693,7 +693,7 @@ variances in source span notation."
 
 (defun haskell-debug-parse-history-entry (string)
   "Parse a history entry."
-  (if (string-match "^\\([-0-9]+\\)[ ]+:[ ]+\\([A-Za-z0-9_':]+\\)[ ]+(\\([^:]+\\):\\(.+?\\))$"
+  (if (string-match "^\\([-0-9]+\\)[ ]+:[ ]+\\([[:alnum:]_':]+\\)[ ]+(\\([^:]+\\):\\(.+?\\))$"
                     string)
       (list :index (string-to-number (match-string 1 string))
             :name (match-string 2 string)

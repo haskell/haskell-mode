@@ -90,7 +90,7 @@
                 (append (cdr candidates)
                         (list (car candidates)))))
          (t
-          (when (string-match "[A-Za-z0-9_'.]+" key)
+          (when (string-match "[[:alnum:]_'.]+" key)
             (push candidates stack)
             (setq pattern (concat pattern key))
             (setq candidates (haskell-complete-module pattern candidates)))))))
