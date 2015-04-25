@@ -299,11 +299,11 @@
                           (insert (cdr mapping)))
                  (insert module)))
              (haskell-mode-format-imports)))
-          ((not (string= "" (save-excursion (forward-char -1) (haskell-ident-at-point))))
+          (t
            (let ((ident (save-excursion (forward-char -1) (haskell-ident-at-point))))
              (insert " ")
-             (haskell-process-do-try-info ident)))
-          (t (insert " ")))))
+             (when ident
+               (haskell-process-do-try-info ident)))))))
 
 ;;;###autoload
 (defun haskell-mode-jump-to-tag (&optional next-p)
@@ -312,7 +312,7 @@
   (let ((ident (haskell-ident-at-point))
         (tags-file-name (haskell-session-tags-filename (haskell-session)))
         (tags-revert-without-query t))
-    (when (not (string= "" (haskell-string-trim ident)))
+    (when (and ident (not (string= "" (haskell-string-trim ident))))
       (cond ((file-exists-p tags-file-name)
              (find-tag ident next-p))
             (t (haskell-process-generate-tags ident))))))

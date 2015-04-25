@@ -486,19 +486,18 @@ Run M-x describe-variable haskell-mode-hook for a list of such modes."))
 May return a qualified name."
   (let ((reg (haskell-ident-pos-at-point)))
     (when reg
-      (unless (= (car reg) (cdr reg))
-        (buffer-substring-no-properties (car reg) (cdr reg))))))
+      (buffer-substring-no-properties (car reg) (cdr reg)))))
 
 (defun haskell-spanable-pos-at-point ()
   "Like `haskell-ident-pos-at-point', but includes any surrounding backticks."
   (save-excursion
     (let ((pos (haskell-ident-pos-at-point)))
-      (if pos
-          (cl-destructuring-bind (start . end) pos
-            (if (and (eq ?` (char-before start))
-                     (eq ?` (char-after end)))
-                (cons (- start 1) (+ end 1))
-              (cons start end)))))))
+      (when pos
+        (cl-destructuring-bind (start . end) pos
+          (if (and (eq ?` (char-before start))
+                   (eq ?` (char-after end)))
+              (cons (- start 1) (+ end 1))
+            (cons start end)))))))
 
 (defun haskell-ident-pos-at-point ()
   "Return the span of the identifier under point, or nil if none found.
@@ -536,7 +535,8 @@ May return a qualified name."
                     (looking-at "[[:upper:]]"))
           (setq start (point)))
         ;; This is it.
-        (cons start end)))))
+        (unless (= start end)
+          (cons start end))))))
 
 (defun haskell-delete-indentation (&optional arg)
   "Like `delete-indentation' but ignoring Bird-style \">\"."

@@ -25,6 +25,49 @@
             (haskell-mode)
             (eq nil (haskell-ident-at-point)))))
 
+(ert-deftest empty-pos ()
+  (should (with-temp-buffer
+            (haskell-mode)
+            (eq nil (haskell-ident-pos-at-point)))))
+
+(ert-deftest empty-spanable ()
+  (should (with-temp-buffer
+            (haskell-mode)
+            (eq nil (haskell-spanable-pos-at-point)))))
+
+(ert-deftest aftercolons ()
+  (should (with-temp-buffer
+            (haskell-mode)
+            (insert "foo ::")
+            (eq nil (haskell-ident-at-point)))))
+
+(ert-deftest aftercolons-pos ()
+  (should (with-temp-buffer
+            (haskell-mode)
+            (insert "foo ::")
+            (eq nil (haskell-ident-pos-at-point)))))
+
+(ert-deftest beforetype ()
+  (should (with-temp-buffer
+            (haskell-mode)
+            (insert "foo ::")
+            (save-excursion (insert " bar -> baz"))
+            (eq nil (haskell-ident-at-point)))))
+
+(ert-deftest beforetype-pos ()
+  (should (with-temp-buffer
+            (haskell-mode)
+            (insert "foo ::")
+            (save-excursion (insert " bar -> baz"))
+            (eq nil (haskell-ident-pos-at-point)))))
+
+(ert-deftest beforetype-spanable ()
+  (should (with-temp-buffer
+            (haskell-mode)
+            (insert "foo ::")
+            (save-excursion (insert " bar -> baz"))
+            (eq nil (haskell-spanable-pos-at-point)))))
+
 (ert-deftest single ()
   (should (with-temp-buffer
             (haskell-mode)
@@ -127,7 +170,55 @@
   (should (with-temp-buffer
             (haskell-mode)
             (insert "Äöèąċōïá")
-            (string= "Äöèąċōïá" (haskell-ident-at-point)))))
+            (string= "Äöèąċōïá" (haskell-ident-at-point)))))            
+
+(ert-deftest unicode-pos ()
+  (should (with-temp-buffer
+            (haskell-mode)
+            (insert "åöèą5ċōïá")
+            (equal (cons (point-min) (point-max)) (haskell-ident-pos-at-point)))))
+
+(ert-deftest unicode2-pos ()
+  (should (with-temp-buffer
+            (haskell-mode)
+            (insert "Äöèąċōïá")
+            (equal (cons (point-min) (point-max)) (haskell-ident-pos-at-point)))))
+
+(ert-deftest unicode-spanable ()
+  (should (with-temp-buffer
+            (haskell-mode)
+            (insert "åöèą5ċōïá")
+            (equal (cons (point-min) (point-max)) (haskell-spanable-pos-at-point)))))
+
+(ert-deftest unicode2-spanable ()
+  (should (with-temp-buffer
+            (haskell-mode)
+            (insert "Äöèąċōïá")
+            (equal (cons (point-min) (point-max)) (haskell-spanable-pos-at-point)))))
+
+(ert-deftest ident-in-backticks ()
+  (should (with-temp-buffer
+            (haskell-mode)
+            (insert "`foo`")
+            (backward-char 2)
+            (string= "foo" (haskell-ident-at-point)))))
+
+(ert-deftest ident-pos-in-backticks ()
+  (should (with-temp-buffer
+            (haskell-mode)
+            (insert "`foo`")
+            (backward-char 2)
+            (equal (cons (1+ (point-min)) (1- (point-max)))
+                   (haskell-ident-pos-at-point)))))
+
+(ert-deftest spanable-pos-in-backticks ()
+  (should (with-temp-buffer
+            (haskell-mode)
+            (insert "`foo`")
+            (backward-char 2)
+            (equal (cons (point-min) (point-max))
+                   (haskell-spanable-pos-at-point)))))
+
 
 (defun check-fill (expected initial)
   "Check using ERT if `fill-paragraph' over `initial' gives

@@ -1677,7 +1677,7 @@ If `haskell-doc-use-inf-haskell' is non-nil, this function will consult
 the inferior Haskell process for type/kind information, rather than using
 the haskell-doc database."
   (if haskell-doc-use-inf-haskell
-      (unless (string= "" sym)
+      (unless (or (null sym) (string= "" sym))
         (let* ((message-log-max nil)
                (result (ignore-errors
                          (unwind-protect
