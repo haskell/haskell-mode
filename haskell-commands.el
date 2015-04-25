@@ -279,23 +279,28 @@ given a prefix arg."
   "Print info on the identifier at point.
 If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
   (interactive "P")
-  (haskell-process-do-simple-echo
-   (let ((ident (replace-regexp-in-string
-                 "^!\\([A-Z_a-z]\\)"
-                 "\\1"
-                 (if prompt-value
-                     (read-from-minibuffer "Info: " (haskell-ident-at-point))
-                   (haskell-ident-at-point))))
-         (modname (unless prompt-value
-                    (haskell-utils-parse-import-statement-at-point))))
-     (if modname
-         (format ":browse! %s" modname)
-       (format (if (string-match "^[a-zA-Z_]" ident)
-                   ":info %s"
-                 ":info (%s)")
-               (or ident
-                   (haskell-ident-at-point)))))
-   'haskell-mode))
+  (let ((at-point (haskell-ident-at-point)))
+    (when (or prompt-value at-point)
+      (let* ((ident (replace-regexp-in-string
+                     "^!\\([A-Z_a-z]\\)"
+                     "\\1"
+                     (if prompt-value
+                         (read-from-minibuffer "Info: " at-point)
+                       at-point)))
+             (modname (unless prompt-value
+                        (haskell-utils-parse-import-statement-at-point)))
+             (command (cond
+                       (modname
+                        (format ":browse! %s" modname))
+                       ((string= ident "") ; For the minibuffer input case
+                        nil)
+                       (t (format (if (string-match "^[a-zA-Z_]" ident)
+                                      ":info %s"
+                                    ":info (%s)")
+                                  (or ident
+                                      at-point))))))
+        (when command
+          (haskell-process-do-simple-echo command 'haskell-mode))))))
 
 ;;;###autoload
 (defun haskell-process-do-type (&optional insert-value)
@@ -369,67 +374,71 @@ to to get there."
 (defun haskell-process-insert-type ()
   "Get the identifer at the point and insert its type, if
 possible, using GHCi's :type."
-  (let ((process (haskell-interactive-process))
-        (query (let ((ident (haskell-ident-at-point)))
-                 (format (if (string-match "^[_[:lower:][:upper:]]" ident)
-                             ":type %s"
-                           ":type (%s)")
-                         ident))))
-    (haskell-process-queue-command
-     process
-     (make-haskell-command
-      :state (list process query (current-buffer))
-      :go (lambda (state)
-            (haskell-process-send-string (nth 0 state)
-                                         (nth 1 state)))
-      :complete (lambda (state response)
-                  (cond
-                   ;; TODO: Generalize this into a function.
-                   ((or (string-match "^Top level" response)
-                        (string-match "^<interactive>" response))
-                    (message response))
-                   (t
-                    (with-current-buffer (nth 2 state)
-                      (goto-char (line-beginning-position))
-                      (insert (format "%s\n" (replace-regexp-in-string "\n$" "" response)))))))))))
+  (let ((ident (haskell-ident-at-point)))
+    (when ident
+      (let ((process (haskell-interactive-process))
+            (query (format (if (string-match "^[_[:lower:][:upper:]]" ident)
+                               ":type %s"
+                             ":type (%s)")
+                           ident)))
+        (haskell-process-queue-command
+         process
+         (make-haskell-command
+          :state (list process query (current-buffer))
+          :go (lambda (state)
+                (haskell-process-send-string (nth 0 state)
+                                             (nth 1 state)))
+          :complete (lambda (state response)
+                      (cond
+                       ;; TODO: Generalize this into a function.
+                       ((or (string-match "^Top level" response)
+                            (string-match "^<interactive>" response))
+                        (message response))
+                       (t
+                        (with-current-buffer (nth 2 state)
+                          (goto-char (line-beginning-position))
+                          (insert (format "%s\n" (replace-regexp-in-string "\n$" "" response)))))))))))))
 
 (defun haskell-mode-find-def (ident)
   "Find definition location of identifier. Uses the GHCi process
-to find the location.
+to find the location.  Returns `nil' if it can't find the
+identifier or the identifier isn't a string.
 
 Returns:
 
     (library <package> <module>)
     (file <path> <line> <col>)
     (module <name>)
+    nil
 "
-  (let ((reply (haskell-process-queue-sync-request
-                (haskell-interactive-process)
-                (format (if (string-match "^[a-zA-Z_]" ident)
-                            ":info %s"
-                          ":info (%s)")
-                        ident))))
-    (let ((match (string-match "-- Defined \\(at\\|in\\) \\(.+\\)$" reply)))
-      (when match
-        (let ((defined (match-string 2 reply)))
-          (let ((match (string-match "\\(.+?\\):\\([0-9]+\\):\\([0-9]+\\)$" defined)))
-            (cond
-             (match
-              (list 'file
-                    (expand-file-name (match-string 1 defined)
-                                      (haskell-session-current-dir (haskell-interactive-session)))
-                    (string-to-number (match-string 2 defined))
-                    (string-to-number (match-string 3 defined))))
-             (t
-              (let ((match (string-match "`\\(.+?\\):\\(.+?\\)'$" defined)))
-                (if match
-                    (list 'library
-                          (match-string 1 defined)
-                          (match-string 2 defined))
-                  (let ((match (string-match "`\\(.+?\\)'$" defined)))
-                    (if match
-                        (list 'module
-                              (match-string 1 defined))))))))))))))
+  (when (stringp ident)
+    (let ((reply (haskell-process-queue-sync-request
+                  (haskell-interactive-process)
+                  (format (if (string-match "^[a-zA-Z_]" ident)
+                              ":info %s"
+                            ":info (%s)")
+                          ident))))
+      (let ((match (string-match "-- Defined \\(at\\|in\\) \\(.+\\)$" reply)))
+        (when match
+          (let ((defined (match-string 2 reply)))
+            (let ((match (string-match "\\(.+?\\):\\([0-9]+\\):\\([0-9]+\\)$" defined)))
+              (cond
+               (match
+                (list 'file
+                      (expand-file-name (match-string 1 defined)
+                                        (haskell-session-current-dir (haskell-interactive-session)))
+                      (string-to-number (match-string 2 defined))
+                      (string-to-number (match-string 3 defined))))
+               (t
+                (let ((match (string-match "`\\(.+?\\):\\(.+?\\)'$" defined)))
+                  (if match
+                      (list 'library
+                            (match-string 1 defined)
+                            (match-string 2 defined))
+                    (let ((match (string-match "`\\(.+?\\)'$" defined)))
+                      (if match
+                          (list 'module
+                                (match-string 1 defined)))))))))))))))
 
 ;;;###autoload
 (defun haskell-mode-jump-to-def (ident)

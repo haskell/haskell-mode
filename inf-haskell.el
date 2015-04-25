@@ -490,7 +490,7 @@ in the buffer.  This can be done interactively with the \\[universal-argument] p
 The returned info is cached for reuse by `haskell-doc-mode'."
   (interactive
    (let ((sym (haskell-ident-at-point)))
-     (list (read-string (if (> (length sym) 0)
+     (list (read-string (if sym
                             (format "Show type of (default %s): " sym)
                           "Show type of: ")
                         nil nil sym)
@@ -526,7 +526,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
   "Query the haskell process for the kind of the given expression."
   (interactive
    (let ((type (haskell-ident-at-point)))
-     (list (read-string (if (> (length type) 0)
+     (list (read-string (if type
                             (format "Show kind of (default %s): " type)
                           "Show kind of: ")
                         nil nil type))))
@@ -539,7 +539,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
   "Query the haskell process for the info of the given expression."
   (interactive
    (let ((sym (haskell-ident-at-point)))
-     (list (read-string (if (> (length sym) 0)
+     (list (read-string (if sym
                             (format "Show info of (default %s): " sym)
                           "Show info of: ")
                         nil nil sym))))
@@ -552,7 +552,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
   "Attempt to locate and jump to the definition of the given expression."
   (interactive
    (let ((sym (haskell-ident-at-point)))
-     (list (read-string (if (> (length sym) 0)
+     (list (read-string (if sym
                             (format "Find definition of (default %s): " sym)
                           "Find definition of: ")
                         nil nil sym))))
@@ -771,7 +771,7 @@ see if this is newer than `haskell-package-conf-file' every time
 we load it."
   (interactive
    (let ((sym (haskell-ident-at-point)))
-     (list (read-string (if (> (length sym) 0)
+     (list (read-string (if sym
                             (format "Find documentation of (default %s): " sym)
                           "Find documentation of: ")
                         nil nil sym))))
