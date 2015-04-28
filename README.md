@@ -67,7 +67,7 @@ the tests/compat directory.  Copy cl-lib.el to your emacs
 directory, e.g. ~/.emacs.d directory and put
 
 ```el
-(add-to-list 'load-path "~/.emacs.d/"
+(add-to-list 'load-path "~/.emacs.d/")
 (require 'cl-lib)
 ```
 
