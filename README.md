@@ -66,8 +66,10 @@ Emacs23 requires an the use of "cl-lib".  cl-lib.el can be found in
 the tests/compat directory.  Copy cl-lib.el to your emacs
 directory, e.g. ~/.emacs.d directory and put
 
-(add-to-list 'load-path "~/.emacs.d/")
+```el
+(add-to-list 'load-path "~/.emacs.d/"
 (require 'cl-lib)
+```
 
 in your .emacs file.
 
