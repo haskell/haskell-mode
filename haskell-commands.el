@@ -658,9 +658,9 @@ command from GHCi."
             (if (eq system-type 'windows-nt)
                 (haskell-process-send-string
                  (car state)
-                 (format ":!powershell -Command \"& { cd %s ; hasktags -e -x (ls -fi *.hs *.lhs *.hsc -exclude \\\"#*#\\\" -name -r) ; exit }\""
-                         (haskell-session-cabal-dir
-                          (haskell-process-session (car state)))))
+                 (format ":!hasktags --output=\"%s\\TAGS\" -x -e \"%s\""
+                            (haskell-session-cabal-dir (haskell-process-session (car state)))
+                            (haskell-session-cabal-dir (haskell-process-session (car state)))))
               (haskell-process-send-string
                (car state)
                (format ":!cd %s && %s | %s"
