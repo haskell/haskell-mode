@@ -71,6 +71,17 @@ Other means of obtaining `haskell-mode` include
 [el-get](https://github.com/dimitri/el-get),
 [Emacs Prelude](https://github.com/bbatsov/prelude) and [Debian package](https://packages.debian.org/search?keywords=haskell-mode).
 
+Emacs23 requires an the use of "cl-lib".  cl-lib.el can be found in
+the tests/compat directory.  Copy cl-lib.el to your emacs
+directory, e.g. ~/.emacs.d directory and put
+
+```el
+(add-to-list 'load-path "~/.emacs.d/")
+(require 'cl-lib)
+```
+
+in your .emacs file.
+
 
 ## Installation from git repository
 
