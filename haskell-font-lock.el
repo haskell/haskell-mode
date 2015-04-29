@@ -119,11 +119,6 @@ This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
   "Face used to highlight Haskell pragmas."
   :group 'haskell)
 
-(defface haskell-default-face
-  '((t :inherit default))
-  "Face used to highlight ordinary Haskell code."
-  :group 'haskell)
-
 (defface haskell-literate-comment-face
   '((t :inherit font-lock-doc-face))
   "Face with which to fontify literate comments.
@@ -269,7 +264,7 @@ Returns keywords suitable for `font-lock-keywords'."
             (,(concat "`" conid "`") 0 'haskell-operator-face)
             (,(concat "`" qvarid "`") 0 'haskell-operator-face)
             (,(concat "`" qconid "`") 0 'haskell-operator-face)
-            (,qvarid 0 'haskell-default-face)
+
             (,qconid 0 'haskell-constructor-face)
 
             (,conid 0 'haskell-constructor-face)
