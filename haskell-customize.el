@@ -274,12 +274,6 @@ ambiguous class constraint."
   :type 'boolean
   :group 'haskell-interactive)
 
-(defcustom haskell-interactive-mode-eval-pretty
-  nil
-  "Print eval results that can be parsed as Show instances prettily. Requires sexp-show (on Hackage)."
-  :type 'boolean
-  :group 'haskell-interactive)
-
 (defvar haskell-interactive-prompt "λ> "
   "The prompt to use.")
 
