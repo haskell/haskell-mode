@@ -300,7 +300,7 @@ If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
                                   (or ident
                                       at-point))))))
         (when command
-          (haskell-process-do-simple-echo command 'haskell-mode))))))
+          (haskell-process-show-repl-response command))))))
 
 ;;;###autoload
 (defun haskell-process-do-type (&optional insert-value)
@@ -318,14 +318,13 @@ If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
       ;; No newlines in expressions, and surround with parens if it
       ;; might be a slice expression
       (when expr-okay
-        (haskell-process-do-simple-echo
+        (haskell-process-show-repl-response
          (format
           (if (or (string-match-p "\\`(" expr)
-                 (string-match-p "\\`[_[:alpha:]]" expr))
+                  (string-match-p "\\`[_[:alpha:]]" expr))
               ":type %s"
             ":type (%s)")
-          expr)
-         'haskell-mode)))))
+          expr))))))
 
 ;;;###autoload
 (defun haskell-mode-jump-to-def-or-tag (&optional next-p)

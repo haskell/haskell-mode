@@ -26,6 +26,7 @@
 ;;; Code:
 
 (require 'haskell-mode)
+(require 'haskell-session)
 
 (define-derived-mode haskell-presentation-mode
   haskell-mode "Presentation"
@@ -36,23 +37,25 @@
 (define-key haskell-presentation-mode-map (kbd "q") 'quit-window)
 
 (defun haskell-present (name session code)
-  "Present CODE in a popup buffer suffixed with NAME and set
-SESSION as the current haskell-session."
-  (let* ((name (format "*Haskell Presentation%s*" name))
-         (buffer (get-buffer-create name)))
+  "Present given code in a popup buffer.
+Creates temporal buffer with given NAME and assigns it to given
+haskell SESSION; presented CODE will be fontified as haskell code."
+  (let ((buffer (get-buffer-create name)))
     (with-current-buffer buffer
       (haskell-presentation-mode)
-      (if (boundp 'shm-display-quarantine)
-          (set (make-local-variable 'shm-display-quarantine) nil))
-      (let ((buffer-read-only nil))
+
+      (when (boundp 'shm-display-quarantine)
+        (set (make-local-variable 'shm-display-quarantine) nil))
+
+      (let ((buffer-read-only nil)
+            (hint "-- Hit `q' to close this window.\n\n"))
+        (haskell-session-assign session)
         (erase-buffer)
-        (insert (propertize "-- Hit `q' to close this window.\n\n"
-                            'face
-                            'font-lock-comment-face))
-        (let ((point (point)))
-          (insert code "\n\n")
-          (font-lock-fontify-region point (point))
-          (goto-char point))))
+        (insert hint)
+        (save-excursion
+          (insert code "\n\n")))
+      (setq buffer-read-only t))
+
     (if (eq major-mode 'haskell-presentation-mode)
         (switch-to-buffer buffer)
       (pop-to-buffer buffer))))
