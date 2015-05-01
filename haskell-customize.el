@@ -363,7 +363,7 @@ sure all haskell customize definitions have been loaded."
   (interactive)
   ;; make sure all modules with (defcustom ...)s are loaded
   (mapc 'require
-        '(haskell-checkers haskell-compile haskell-doc haskell-font-lock haskell-indentation haskell-indent haskell-interactive-mode haskell-menu haskell-process haskell-yas inf-haskell))
+        '(haskell-checkers haskell-compile haskell-doc haskell-font-lock haskell-indentation haskell-indent haskell-interactive-mode haskell-menu haskell-process inf-haskell))
   (customize-browse 'haskell))
 
 (provide 'haskell-customize)

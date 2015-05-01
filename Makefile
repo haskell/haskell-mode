@@ -1,4 +1,3 @@
-
 #
 # Note: Due to MELPA distributing directly from github source version
 # needs to be embedded in files as is without proprocessing.
@@ -28,9 +27,9 @@ INSTALL_INFO = install-info
 EMACS := $(shell echo "$${EMACS:-emacs}")
 
 EFLAGS = --eval "(add-to-list 'load-path (expand-file-name \"tests/compat\") 'append)" \
-         --eval "(when (< emacs-major-version 24) \
-                    (setq byte-compile-warnings '(not cl-functions)))" \
-         --eval '(setq byte-compile-error-on-warn t)'
+	 --eval "(when (< emacs-major-version 24) \
+		    (setq byte-compile-warnings '(not cl-functions)))" \
+	 --eval '(setq byte-compile-error-on-warn t)'
 
 BATCH = $(EMACS) $(EFLAGS) --batch -Q -L .
 
@@ -73,7 +72,6 @@ ELFILES = \
 	haskell-string.el \
 	haskell-unicode-input-method.el \
 	haskell-utils.el \
-	haskell-yas.el \
 	inf-haskell.el
 
 ELCFILES = $(ELFILES:.el=.elc)
@@ -114,12 +112,12 @@ dir: haskell-mode.info
 haskell-mode.info: haskell-mode.texi
 	# Check if chapter order is same as node order
 	@sed -n -e '/@chapter/ s/@code{\(.*\)}/\1/' \
-                -e 's/@chapter \(.*\)$$/* \1::/p' \
-                -e 's/@unnumbered \(.*\)$$/* \1::/p' \
-               haskell-mode.texi > haskell-mode-menu-order.txt
+		-e 's/@chapter \(.*\)$$/* \1::/p' \
+		-e 's/@unnumbered \(.*\)$$/* \1::/p' \
+	       haskell-mode.texi > haskell-mode-menu-order.txt
 	@sed -e '1,/@menu/ d' \
-            -e '/end menu/,$$ d' \
-            haskell-mode.texi > haskell-mode-content-order.txt
+	    -e '/end menu/,$$ d' \
+	    haskell-mode.texi > haskell-mode-content-order.txt
 	diff -C 1 haskell-mode-menu-order.txt haskell-mode-content-order.txt
 	@rm haskell-mode-menu-order.txt haskell-mode-content-order.txt
 
