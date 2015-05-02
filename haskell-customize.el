@@ -328,9 +328,9 @@ when Data.Map is the candidate.
   :group 'shm
   :type '(repeat 'string))
 
-(defcustom haskell-ghc-supported-languages
+(defcustom haskell-ghc-supported-extensions
   (split-string (shell-command-to-string "ghc --supported-extensions"))
-  "List of language pragmas supported by the installed version of GHC."
+  "List of language extensions supported by the installed version of GHC."
   :group 'haskell
   :type '(repeat string))
 
