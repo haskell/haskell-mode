@@ -85,9 +85,20 @@ ELCHECKS=$(addprefix check-, $(ELFILES:.el=))
 	@$(BATCH) \
 		 -f batch-byte-compile $*.el
 
-.PHONY: all compile info clean check $(ELCHECKS) elpa package
+.PHONY: all compile info clean check $(ELCHECKS) elpa package check-emacs-version
 
-all: compile $(AUTOLOADS) info
+all: check-emacs-version compile $(AUTOLOADS) info
+
+check-emacs-version :
+	@$(BATCH) --eval "(when (< emacs-major-version 24)					\
+                            (message \"Error: haskell-mode requires Emacs 23 or later\")	\
+                            (message \"Your version of Emacs is %s\" emacs-version)		\
+                            (message \"Found as '$(EMACS)'\")					\
+                            (message \"Use one of:\")						\
+                            (message \"   1.  export EMACS=/path/to/emacs && make\")		\
+                            (message \"   2.  EMACS=/path/to/emacs make\")			\
+                            (message \"   3.  make EMACS=/path/to/emacs\")			\
+                            (kill-emacs 2))"
 
 compile: $(ELCFILES)
 
