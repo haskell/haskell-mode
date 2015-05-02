@@ -92,7 +92,7 @@
                   (search-forward-regexp "\\_<LANGUAGE\\_>" p t))))
            (setq symbol-bounds (bounds-of-thing-at-point 'symbol)))
         (list (car symbol-bounds) (cdr symbol-bounds)
-              haskell-ghc-supported-languages))
+              haskell-ghc-supported-extensions))
        ((setq symbol-bounds (bounds-of-thing-at-point 'symbol))
         (cl-destructuring-bind (start . end) symbol-bounds
           (list start end
