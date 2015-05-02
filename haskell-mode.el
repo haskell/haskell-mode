@@ -205,9 +205,7 @@ be set to the preferred literate style."
 (defun haskell-mode-enable-process-minor-mode ()
   "Tell the user to choose a minor mode for process interaction."
   (interactive)
-  (error "You tried to do an interaction command, but an interaction mode has not been enabled yet.
-
-Run M-x describe-variable haskell-mode-hook for a list of such modes."))
+  (error "Run `C-h f haskell-mode` for instruction how to setup a Haskell interaction mode."))
 
 (easy-menu-define haskell-mode-menu haskell-mode-map
   "Menu for the Haskell major mode."
