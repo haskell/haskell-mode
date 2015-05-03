@@ -1,11 +1,13 @@
+![Haskell Mode Logo](images/haskell-mode-128x128.png)
+
 Haskell Mode for Emacs
 ======================
+
+This is an Emacs mode for editing, debugging and developing Haskell programs.
 
 [![Build Status](https://travis-ci.org/haskell/haskell-mode.svg?branch=master)](https://travis-ci.org/haskell/haskell-mode)
 [![Melpa Status](http://melpa.org/packages/haskell-mode-badge.svg)](http://melpa.org/#/haskell-mode)
 [![Melpa Stable Status](http://stable.melpa.org/packages/haskell-mode-badge.svg)](http://stable.melpa.org/#/haskell-mode)
-
-This is an Emacs mode for editing, debugging, and developing Haskell programs.
 
 ## Installation
 
