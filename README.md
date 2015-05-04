@@ -69,7 +69,6 @@ for setup and user guide.
 
 Other means of obtaining `haskell-mode` include
 [el-get](https://github.com/dimitri/el-get),
-[Marmalade](http://marmalade-repo.org/packages/haskell-mode),
 [Emacs Prelude](https://github.com/bbatsov/prelude) and [Debian package](https://packages.debian.org/search?keywords=haskell-mode).
 
 

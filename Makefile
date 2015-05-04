@@ -6,7 +6,6 @@
 # - Makefile
 # - haskell-mode.el
 # - haskell-mode.texi
-# - haskell-mode-pkg.el (used for marmelade)
 #
 # We should have a script that changes it everywhere it is needed and
 # syncs it with current git tag.
@@ -78,7 +77,6 @@ ELCFILES = $(ELFILES:.el=.elc)
 AUTOLOADS = haskell-mode-autoloads.el
 
 PKG_DIST_FILES = $(ELFILES) logo.svg NEWS haskell-mode.info dir
-PKG_TAR = haskell-mode-$(VERSION).tar
 ELCHECKS=$(addprefix check-, $(ELFILES:.el=))
 
 %.elc: %.el
@@ -113,7 +111,7 @@ check: $(ELCHECKS)
 	@echo "checks passed!"
 
 clean:
-	$(RM) $(ELCFILES) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) $(PKG_TAR) haskell-mode.info dir
+	$(RM) $(ELCFILES) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) haskell-mode.info dir
 
 info: haskell-mode.info dir
 
@@ -137,20 +135,6 @@ haskell-mode.info: haskell-mode.texi
 
 haskell-mode.html: haskell-mode.texi
 	$(MAKEINFO) $(MAKEINFO_FLAGS) --html --no-split -o $@ $<
-
-# Generate ELPA-compatible package
-package: $(PKG_TAR)
-elpa: $(PKG_TAR)
-
-$(PKG_TAR): $(PKG_DIST_FILES) haskell-mode-pkg.el
-	rm -rf haskell-mode-$(VERSION)
-	mkdir haskell-mode-$(VERSION)
-	cp $(PKG_DIST_FILES) haskell-mode-$(VERSION)/
-
-	tar cvf $@ haskell-mode-$(VERSION)
-	rm -rf haskell-mode-$(VERSION)
-	@echo
-	@echo "Created ELPA compatible distribution package '$@' from $(VERSION)"
 
 $(AUTOLOADS): $(ELFILES) haskell-mode.elc
 	$(BATCH) \

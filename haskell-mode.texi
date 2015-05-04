@@ -130,10 +130,7 @@ Requests}.
 @chapter Getting Started
 
 If you are reading this, you have most likely already managed to install
-Haskell Mode in one way or another. However, just for the record, the
-officially recommended way is to install Haskell Mode via the
-@uref{http://marmalade-repo.org/packages/haskell-mode,Marmalade package
-archive} which contains the latest stable release of Haskell Mode.
+Haskell Mode in one way or another.
 
 @findex haskell-customize
 Most of Haskell Mode's settings are configurable via customizable
