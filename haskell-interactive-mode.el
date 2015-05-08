@@ -444,7 +444,7 @@ SESSION, otherwise operate on the current buffer.
                                 (not visibility)))))))
 
 (defconst haskell-interactive-mode-error-regexp
-  "^\\([A-Z]?:?[^\r\n:]+\\):\\([0-9()-:]+\\):?")
+  "^\\(\\(?:[A-Z]:\\)?[^ \r\n:][^\r\n:]*\\):\\([0-9()-:]+\\):?")
 
 (defun haskell-interactive-at-compile-message ()
   "Am I on a compile message?"
