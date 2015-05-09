@@ -1,5 +1,11 @@
 ;;; haskell-commands.el --- Commands that can be run on the process
 
+;;; Commentary:
+
+;;; This module provides varoius `haskell-mode' and `haskell-interactive-mode'
+;;; specific commands such as show type signature, show info, haskell process
+;;; commands and etc.
+
 ;; Copyright (c) 2014 Chris Done. All rights reserved.
 
 ;; This file is free software; you can redistribute it and/or modify
@@ -965,3 +971,4 @@ execusion."
      'post-command-hook #'hs-utils/async-update-post-command-flag t)))
 
 (provide 'haskell-commands)
+;;; haskell-commands.el ends here
