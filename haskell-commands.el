@@ -495,36 +495,6 @@ GHCi."
           (error (propertize "No reply. Is :loc-at supported?"
                              'face 'compilation-error)))))))
 
-(defun haskell-mode-type-at ()
-  "Get the type of the thing at point. Requires the :type-at
-command from GHCi."
-  (let ((pos (or (when (region-active-p)
-                   (cons (region-beginning)
-                         (region-end)))
-                 (haskell-spanable-pos-at-point)
-                 (cons (point)
-                       (point)))))
-    (when pos
-      (replace-regexp-in-string
-       "\n$"
-       ""
-       (save-excursion
-         (haskell-process-queue-sync-request
-          (haskell-interactive-process)
-          (replace-regexp-in-string
-           "\n"
-           " "
-           (format ":type-at %s %d %d %d %d %s"
-                   (buffer-file-name)
-                   (progn (goto-char (car pos))
-                          (line-number-at-pos))
-                   (1+ (current-column))
-                   (progn (goto-char (cdr pos))
-                          (line-number-at-pos))
-                   (1+ (current-column))
-                   (buffer-substring-no-properties (car pos)
-                                                   (cdr pos))))))))))
-
 ;;;###autoload
 (defun haskell-process-cd (&optional not-interactive)
   "Change directory."
@@ -620,33 +590,71 @@ command from GHCi."
 
 ;;;###autoload
 (defun haskell-mode-show-type-at (&optional insert-value)
-  "Show the type of the thing at point."
+  "Show type of the thing at point or within active region asynchronously.
+Optional argument INSERT-VALUE indicates that recieved type signature should be
+inserted (but only if nothing happened since function invocation).
+This function requires GHCi-ng (see
+https://github.com/chrisdone/ghci-ng#using-with-haskell-mode for instructions)."
   (interactive "P")
-  (let ((ty (haskell-mode-type-at))
-        (orig (point)))
-    (unless (= (aref ty 0) ?\n)
-      ;; That seems to be what happens when `haskell-mode-type-at` fails
-      (if insert-value
-          (let ((ident-pos (or (haskell-ident-pos-at-point)
-                               (cons (point) (point)))))
-            (cond
-             ((region-active-p)
-              (delete-region (region-beginning)
-                             (region-end))
-              (insert "(" ty ")")
-              (goto-char (1+ orig)))
-             ((= (line-beginning-position) (car ident-pos))
-              (goto-char (line-beginning-position))
-              (insert (haskell-fontify-as-mode ty 'haskell-mode)
-                      "\n"))
-             (t
-              (save-excursion
-                (goto-char (car ident-pos))
-                (let ((col (current-column)))
-                  (save-excursion (insert "\n")
-                                  (indent-to col))
-                  (insert (haskell-fontify-as-mode ty 'haskell-mode)))))))
-        (message "%s" (haskell-fontify-as-mode ty 'haskell-mode))))))
+  (let* ((pos (hs-utils/capture-expr-bounds))
+         (req (hs-utils/compose-type-at-command pos))
+         (process (haskell-interactive-process))
+         (buf (current-buffer))
+         (pos-reg (cons pos (region-active-p))))
+    (haskell-process-queue-command
+     process
+     (make-haskell-command
+      :state (list process req buf insert-value pos-reg)
+      :go
+      (lambda (state)
+        (let* ((prc (car state))
+               (req (nth 1 state)))
+          (hs-utils/async-watch-changes)
+          (haskell-process-send-string prc req)))
+      :complete
+      (lambda (state response)
+        (let* ((init-buffer (nth 2 state))
+               (insert-value (nth 3 state))
+               (pos-reg (nth 4 state))
+               (wrap (cdr pos-reg))
+               (min-pos (caar pos-reg))
+               (max-pos (cdar pos-reg))
+               (sig (hs-utils/reduce-string response))
+               (split (split-string sig "\\W::\\W" t))
+               (is-error (not (= (length split) 2))))
+
+          (if is-error
+              ;; neither popup presentation buffer
+              ;; nor insert response in error case
+              (message "Wrong REPL response: %s" sig)
+            (if insert-value
+                ;; Only insert type signature and do not present it
+                (if (= (length hs-utils/async-post-command-flag) 1)
+                    (if wrap
+                        ;; Handle region case
+                        (progn
+                          (deactivate-mark)
+                          (save-excursion
+                            (delete-region min-pos max-pos)
+                            (goto-char min-pos)
+                            (insert (concat "(" sig ")"))))
+                      ;; Non-region cases
+                      (hs-utils/insert-type-signature sig))
+                  ;; Some commands registered, prevent insertion
+                  (let* ((rev (reverse hs-utils/async-post-command-flag))
+                         (cs (format "%s" (cdr rev))))
+                    (message
+                     (concat
+                      "Type signature insertion was prevented. "
+                      "These commands were registered:"
+                      cs))))
+              ;; Present the result only when response is valid and not asked to
+              ;; insert result
+              (let* ((expr (car split))
+                     (buf-name (concat ":type " expr)))
+                (hs-utils/echo-or-present response buf-name))))
+
+          (hs-utils/async-stop-watching-changes init-buffer)))))))
 
 ;;;###autoload
 (defun haskell-process-generate-tags (&optional and-then-find-this-tag)
