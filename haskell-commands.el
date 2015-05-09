@@ -856,4 +856,69 @@ the :uses command from GHCi."
           (error (propertize "No reply. Is :uses supported?"
                              'face 'compilation-error)))))))
 
+(defun hs-utils/capture-expr-bounds ()
+  "Capture position bounds of expression at point.
+If there is an active region then it returns region
+bounds.  Otherwise it uses `haskell-spanable-pos-at-point` to
+capture identifier bounds.  If latter function returns NIL this function
+will return cons cell where min and max positions both are equal
+to point."
+  (or (when (region-active-p)
+        (cons (region-beginning)
+              (region-end)))
+      (haskell-spanable-pos-at-point)
+      (cons (point) (point))))
+
+(defun hs-utils/compose-type-at-command (pos)
+  "Prepare :type-at command to be send to haskell process.
+POS is a cons cell containing min and max positions, i.e. target
+expression bounds."
+  (replace-regexp-in-string
+   "\n$"
+   ""
+   (format ":type-at %s %d %d %d %d %s"
+           (buffer-file-name)
+           (progn (goto-char (car pos))
+                  (line-number-at-pos))
+           (1+ (current-column))
+           (progn (goto-char (cdr pos))
+                  (line-number-at-pos))
+           (1+ (current-column))
+           (buffer-substring-no-properties (car pos)
+                                           (cdr pos)))))
+
+(defun hs-utils/reduce-string (s)
+  "Remove newlines ans extra whitespace from S.
+Removes all extra whitespace at the beginning of each line leaving
+only single one.  Then removes all newlines."
+  (let ((s_ (replace-regexp-in-string "^\s+" " " s)))
+    (replace-regexp-in-string "\n" "" s_)))
+
+(defun hs-utils/insert-type-signature (signature)
+  "Insert type signature.
+In case of active region is present, wrap it by parentheses and
+append SIGNATURE to original expression.  Otherwise tries to
+carefully insert SIGNATURE above identifier at point.  Removes
+newlines and extra whitespace in signature before insertion."
+  (let* ((ident-pos (or (haskell-ident-pos-at-point)
+                        (cons (point) (point))))
+         (min-pos (car ident-pos))
+         (sig (hs-utils/reduce-string signature)))
+    (save-excursion
+      (goto-char min-pos)
+      (let ((col (current-column)))
+        (insert sig "\n")
+        (indent-to col)))))
+
+(defun hs-utils/echo-or-present (msg &optional name)
+  "Present message in some manner depending on configuration.
+If variable `haskell-process-use-presentation-mode' is NIL it will output
+modified message MSG to echo area.
+Optinal NAME will be used as presentation mode buffer name."
+  (if haskell-process-use-presentation-mode
+      (let ((bufname (or name "*Haskell Presentation*"))
+            (session (haskell-process-session (haskell-interactive-process))))
+        (haskell-present bufname session msg))
+    (let (m (hs-utils/reduce-string msg))
+      (message m))))
 (provide 'haskell-commands)
