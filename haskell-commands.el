@@ -614,6 +614,10 @@ command from GHCi."
                               (string-match "^<interactive>" response))
                     (haskell-mode-message-line response)))))))
 
+(defvar hs-utils/async-post-command-flag nil
+  "Non-nil means some commands were triggered during async function execution.")
+(make-variable-buffer-local 'hs-utils/async-post-command-flag)
+
 ;;;###autoload
 (defun haskell-mode-show-type-at (&optional insert-value)
   "Show the type of the thing at point."
@@ -921,4 +925,35 @@ Optinal NAME will be used as presentation mode buffer name."
         (haskell-present bufname session msg))
     (let (m (hs-utils/reduce-string msg))
       (message m))))
+
+(defun hs-utils/async-update-post-command-flag ()
+  "A special hook which collects triggered commands during async execution.
+This hook pushes value of variable `this-command' to flag variable
+`hs-utils/async-post-command-flag'."
+  (let* ((cmd this-command)
+         (updated-flag (cons cmd hs-utils/async-post-command-flag)))
+    (setq hs-utils/async-post-command-flag updated-flag)))
+
+(defun hs-utils/async-watch-changes ()
+  "Watch for triggered commands during async operation execution.
+Resets flag variable
+`hs-utils/async-update-post-command-flag' to NIL.  By chanhges it is
+assumed that nothing happened, e.g. nothing was inserted in
+buffer, point was not moved, etc.  To collect data `post-command-hook' is used."
+  (setq hs-utils/async-post-command-flag nil)
+  (add-hook
+   'post-command-hook #'hs-utils/async-update-post-command-flag nil t))
+
+(defun hs-utils/async-stop-watching-changes (buffer)
+  "Clean up after async operation finished.
+This function takes care about cleaning up things made by
+`hs-utils/async-watch-changes'.  The BUFFER argument is a buffer where
+`post-command-hook' should be disabled.  This is neccessary, because
+it is possible that user will change buffer during async function
+execusion."
+  (with-current-buffer buffer
+    (setq hs-utils/async-post-command-flag nil)
+    (remove-hook
+     'post-command-hook #'hs-utils/async-update-post-command-flag t)))
+
 (provide 'haskell-commands)
