@@ -970,5 +970,28 @@ execusion."
     (remove-hook
      'post-command-hook #'hs-utils/async-update-post-command-flag t)))
 
+(defun hs-utils/parse-repl-response (r)
+  "Parse response R from REPL and return special kind of result.
+The result is response string itself with speacial property
+response-type added.
+
+This property could be of the following:
+
++ unknown-command
++ option-missing
++ interactive-error
++ success"
+  (let ((first-line (car (split-string r "\n"))))
+    (cond
+     ((string-match-p "^unknown command" first-line) 'unknown-command)
+     ((string-match-p "^Couldn't guess that module name. Does it exist?"
+                      first-line)
+      'option-missing)
+     ((string-match-p "^<interactive>:" first-line) 'interactive-error)
+     (t 'success))))
+
+
+
+
 (provide 'haskell-commands)
 ;;; haskell-commands.el ends here
