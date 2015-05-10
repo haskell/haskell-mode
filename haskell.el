@@ -93,7 +93,7 @@
            (setq symbol-bounds (bounds-of-thing-at-point 'symbol)))
         (list (car symbol-bounds) (cdr symbol-bounds)
               haskell-ghc-supported-extensions))
-       ((setq symbol-bounds (bounds-of-thing-at-point 'symbol))
+       ((setq symbol-bounds (haskell-ident-pos-at-point))
         (cl-destructuring-bind (start . end) symbol-bounds
           (list start end
                 (haskell-process-get-repl-completions
