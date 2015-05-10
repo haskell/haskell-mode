@@ -597,10 +597,18 @@ GHCi."
 ;;;###autoload
 (defun haskell-mode-show-type-at (&optional insert-value)
   "Show type of the thing at point or within active region asynchronously.
-Optional argument INSERT-VALUE indicates that recieved type signature should be
-inserted (but only if nothing happened since function invocation).
-This function requires GHCi-ng (see
-https://github.com/chrisdone/ghci-ng#using-with-haskell-mode for instructions)."
+This function requires GHCi-ng and `:set +c` option enabled by
+default (please follow GHCi-ng README available at URL
+`https://github.com/chrisdone/ghci-ng').
+
+\\<haskell-interactive-mode-map>
+To make this function works sometimes you need to load the file in REPL
+first using command `haskell-process-load-or-reload' bound to
+\\[haskell-process-load-or-reload].
+
+Optional argument INSERT-VALUE indicates that
+recieved type signature should be inserted (but only if nothing
+happened since function invocation)."
   (interactive "P")
   (let* ((pos (hs-utils/capture-expr-bounds))
          (req (hs-utils/compose-type-at-command pos))
@@ -626,41 +634,53 @@ https://github.com/chrisdone/ghci-ng#using-with-haskell-mode for instructions)."
                (min-pos (caar pos-reg))
                (max-pos (cdar pos-reg))
                (sig (hs-utils/reduce-string response))
-               (split (split-string sig "\\W::\\W" t))
-               (is-error (not (= (length split) 2))))
+               (res-type (hs-utils/parse-repl-response sig)))
 
-          (if is-error
-              ;; neither popup presentation buffer
-              ;; nor insert response in error case
-              (message "Wrong REPL response: %s" sig)
-            (if insert-value
-                ;; Only insert type signature and do not present it
-                (if (= (length hs-utils/async-post-command-flag) 1)
-                    (if wrap
-                        ;; Handle region case
-                        (progn
-                          (deactivate-mark)
-                          (save-excursion
-                            (delete-region min-pos max-pos)
-                            (goto-char min-pos)
-                            (insert (concat "(" sig ")"))))
-                      ;; Non-region cases
-                      (hs-utils/insert-type-signature sig))
-                  ;; Some commands registered, prevent insertion
-                  (let* ((rev (reverse hs-utils/async-post-command-flag))
-                         (cs (format "%s" (cdr rev))))
-                    (message
-                     (concat
-                      "Type signature insertion was prevented. "
-                      "These commands were registered:"
-                      cs))))
-              ;; Present the result only when response is valid and not asked to
-              ;; insert result
-              (let* ((expr (car split))
-                     (buf-name (concat ":type " expr)))
-                (hs-utils/echo-or-present response buf-name))))
+          (cl-case res-type
+            ;; neither popup presentation buffer
+            ;; nor insert response in error case
+            ('unknown-command
+             (message
+              (concat
+               "This command requires GHCi-ng. "
+               "Please read command description for details.")))
+            ('option-missing
+             (message
+              (concat
+               "Could not infer type signature. "
+               "You need to load file first. "
+               "Also :set +c is required. "
+               "Please read command description for details.")))
+            ('interactive-error (message "Wrong REPL response: %s" sig))
+            (otherwise
+             (if insert-value
+                 ;; Only insert type signature and do not present it
+                 (if (= (length hs-utils/async-post-command-flag) 1)
+                     (if wrap
+                         ;; Handle region case
+                         (progn
+                           (deactivate-mark)
+                           (save-excursion
+                             (delete-region min-pos max-pos)
+                             (goto-char min-pos)
+                             (insert (concat "(" sig ")"))))
+                       ;; Non-region cases
+                       (hs-utils/insert-type-signature sig))
+                   ;; Some commands registered, prevent insertion
+                   (let* ((rev (reverse hs-utils/async-post-command-flag))
+                          (cs (format "%s" (cdr rev))))
+                     (message
+                      (concat
+                       "Type signature insertion was prevented. "
+                       "These commands were registered:"
+                       cs))))
+               ;; Present the result only when response is valid and not asked to
+               ;; insert result
+               (let* ((expr (car (split-string sig "\\W::\\W" t)))
+                      (buf-name (concat ":type " expr)))
+                 (hs-utils/echo-or-present response buf-name))))
 
-          (hs-utils/async-stop-watching-changes init-buffer)))))))
+            (hs-utils/async-stop-watching-changes init-buffer))))))))
 
 ;;;###autoload
 (defun haskell-process-generate-tags (&optional and-then-find-this-tag)
