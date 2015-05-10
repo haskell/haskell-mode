@@ -1604,7 +1604,7 @@ will be returned directly."
             (if (use-region-p)
                 (buffer-substring-no-properties
                  (region-beginning) (region-end))
-              (thing-at-point 'symbol 'no-properties)))
+              (haskell-ident-at-point)))
       (if sync
           (haskell-process-get-type sym #'identity t)
         (haskell-process-get-type
