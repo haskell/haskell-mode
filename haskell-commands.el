@@ -1,5 +1,11 @@
 ;;; haskell-commands.el --- Commands that can be run on the process
 
+;;; Commentary:
+
+;;; This module provides varoius `haskell-mode' and `haskell-interactive-mode'
+;;; specific commands such as show type signature, show info, haskell process
+;;; commands and etc.
+
 ;; Copyright (c) 2014 Chris Done. All rights reserved.
 
 ;; This file is free software; you can redistribute it and/or modify
@@ -495,36 +501,6 @@ GHCi."
           (error (propertize "No reply. Is :loc-at supported?"
                              'face 'compilation-error)))))))
 
-(defun haskell-mode-type-at ()
-  "Get the type of the thing at point. Requires the :type-at
-command from GHCi."
-  (let ((pos (or (when (region-active-p)
-                   (cons (region-beginning)
-                         (region-end)))
-                 (haskell-spanable-pos-at-point)
-                 (cons (point)
-                       (point)))))
-    (when pos
-      (replace-regexp-in-string
-       "\n$"
-       ""
-       (save-excursion
-         (haskell-process-queue-sync-request
-          (haskell-interactive-process)
-          (replace-regexp-in-string
-           "\n"
-           " "
-           (format ":type-at %s %d %d %d %d %s"
-                   (buffer-file-name)
-                   (progn (goto-char (car pos))
-                          (line-number-at-pos))
-                   (1+ (current-column))
-                   (progn (goto-char (cdr pos))
-                          (line-number-at-pos))
-                   (1+ (current-column))
-                   (buffer-substring-no-properties (car pos)
-                                                   (cdr pos))))))))))
-
 ;;;###autoload
 (defun haskell-process-cd (&optional not-interactive)
   "Change directory."
@@ -614,35 +590,77 @@ command from GHCi."
                               (string-match "^<interactive>" response))
                     (haskell-mode-message-line response)))))))
 
+(defvar hs-utils/async-post-command-flag nil
+  "Non-nil means some commands were triggered during async function execution.")
+(make-variable-buffer-local 'hs-utils/async-post-command-flag)
+
 ;;;###autoload
 (defun haskell-mode-show-type-at (&optional insert-value)
-  "Show the type of the thing at point."
+  "Show type of the thing at point or within active region asynchronously.
+Optional argument INSERT-VALUE indicates that recieved type signature should be
+inserted (but only if nothing happened since function invocation).
+This function requires GHCi-ng (see
+https://github.com/chrisdone/ghci-ng#using-with-haskell-mode for instructions)."
   (interactive "P")
-  (let ((ty (haskell-mode-type-at))
-        (orig (point)))
-    (unless (= (aref ty 0) ?\n)
-      ;; That seems to be what happens when `haskell-mode-type-at` fails
-      (if insert-value
-          (let ((ident-pos (or (haskell-ident-pos-at-point)
-                               (cons (point) (point)))))
-            (cond
-             ((region-active-p)
-              (delete-region (region-beginning)
-                             (region-end))
-              (insert "(" ty ")")
-              (goto-char (1+ orig)))
-             ((= (line-beginning-position) (car ident-pos))
-              (goto-char (line-beginning-position))
-              (insert (haskell-fontify-as-mode ty 'haskell-mode)
-                      "\n"))
-             (t
-              (save-excursion
-                (goto-char (car ident-pos))
-                (let ((col (current-column)))
-                  (save-excursion (insert "\n")
-                                  (indent-to col))
-                  (insert (haskell-fontify-as-mode ty 'haskell-mode)))))))
-        (message "%s" (haskell-fontify-as-mode ty 'haskell-mode))))))
+  (let* ((pos (hs-utils/capture-expr-bounds))
+         (req (hs-utils/compose-type-at-command pos))
+         (process (haskell-interactive-process))
+         (buf (current-buffer))
+         (pos-reg (cons pos (region-active-p))))
+    (haskell-process-queue-command
+     process
+     (make-haskell-command
+      :state (list process req buf insert-value pos-reg)
+      :go
+      (lambda (state)
+        (let* ((prc (car state))
+               (req (nth 1 state)))
+          (hs-utils/async-watch-changes)
+          (haskell-process-send-string prc req)))
+      :complete
+      (lambda (state response)
+        (let* ((init-buffer (nth 2 state))
+               (insert-value (nth 3 state))
+               (pos-reg (nth 4 state))
+               (wrap (cdr pos-reg))
+               (min-pos (caar pos-reg))
+               (max-pos (cdar pos-reg))
+               (sig (hs-utils/reduce-string response))
+               (split (split-string sig "\\W::\\W" t))
+               (is-error (not (= (length split) 2))))
+
+          (if is-error
+              ;; neither popup presentation buffer
+              ;; nor insert response in error case
+              (message "Wrong REPL response: %s" sig)
+            (if insert-value
+                ;; Only insert type signature and do not present it
+                (if (= (length hs-utils/async-post-command-flag) 1)
+                    (if wrap
+                        ;; Handle region case
+                        (progn
+                          (deactivate-mark)
+                          (save-excursion
+                            (delete-region min-pos max-pos)
+                            (goto-char min-pos)
+                            (insert (concat "(" sig ")"))))
+                      ;; Non-region cases
+                      (hs-utils/insert-type-signature sig))
+                  ;; Some commands registered, prevent insertion
+                  (let* ((rev (reverse hs-utils/async-post-command-flag))
+                         (cs (format "%s" (cdr rev))))
+                    (message
+                     (concat
+                      "Type signature insertion was prevented. "
+                      "These commands were registered:"
+                      cs))))
+              ;; Present the result only when response is valid and not asked to
+              ;; insert result
+              (let* ((expr (car split))
+                     (buf-name (concat ":type " expr)))
+                (hs-utils/echo-or-present response buf-name))))
+
+          (hs-utils/async-stop-watching-changes init-buffer)))))))
 
 ;;;###autoload
 (defun haskell-process-generate-tags (&optional and-then-find-this-tag)
@@ -856,4 +874,101 @@ the :uses command from GHCi."
           (error (propertize "No reply. Is :uses supported?"
                              'face 'compilation-error)))))))
 
+(defun hs-utils/capture-expr-bounds ()
+  "Capture position bounds of expression at point.
+If there is an active region then it returns region
+bounds.  Otherwise it uses `haskell-spanable-pos-at-point` to
+capture identifier bounds.  If latter function returns NIL this function
+will return cons cell where min and max positions both are equal
+to point."
+  (or (when (region-active-p)
+        (cons (region-beginning)
+              (region-end)))
+      (haskell-spanable-pos-at-point)
+      (cons (point) (point))))
+
+(defun hs-utils/compose-type-at-command (pos)
+  "Prepare :type-at command to be send to haskell process.
+POS is a cons cell containing min and max positions, i.e. target
+expression bounds."
+  (replace-regexp-in-string
+   "\n$"
+   ""
+   (format ":type-at %s %d %d %d %d %s"
+           (buffer-file-name)
+           (progn (goto-char (car pos))
+                  (line-number-at-pos))
+           (1+ (current-column))
+           (progn (goto-char (cdr pos))
+                  (line-number-at-pos))
+           (1+ (current-column))
+           (buffer-substring-no-properties (car pos)
+                                           (cdr pos)))))
+
+(defun hs-utils/reduce-string (s)
+  "Remove newlines ans extra whitespace from S.
+Removes all extra whitespace at the beginning of each line leaving
+only single one.  Then removes all newlines."
+  (let ((s_ (replace-regexp-in-string "^\s+" " " s)))
+    (replace-regexp-in-string "\n" "" s_)))
+
+(defun hs-utils/insert-type-signature (signature)
+  "Insert type signature.
+In case of active region is present, wrap it by parentheses and
+append SIGNATURE to original expression.  Otherwise tries to
+carefully insert SIGNATURE above identifier at point.  Removes
+newlines and extra whitespace in signature before insertion."
+  (let* ((ident-pos (or (haskell-ident-pos-at-point)
+                        (cons (point) (point))))
+         (min-pos (car ident-pos))
+         (sig (hs-utils/reduce-string signature)))
+    (save-excursion
+      (goto-char min-pos)
+      (let ((col (current-column)))
+        (insert sig "\n")
+        (indent-to col)))))
+
+(defun hs-utils/echo-or-present (msg &optional name)
+  "Present message in some manner depending on configuration.
+If variable `haskell-process-use-presentation-mode' is NIL it will output
+modified message MSG to echo area.
+Optinal NAME will be used as presentation mode buffer name."
+  (if haskell-process-use-presentation-mode
+      (let ((bufname (or name "*Haskell Presentation*"))
+            (session (haskell-process-session (haskell-interactive-process))))
+        (haskell-present bufname session msg))
+    (let (m (hs-utils/reduce-string msg))
+      (message m))))
+
+(defun hs-utils/async-update-post-command-flag ()
+  "A special hook which collects triggered commands during async execution.
+This hook pushes value of variable `this-command' to flag variable
+`hs-utils/async-post-command-flag'."
+  (let* ((cmd this-command)
+         (updated-flag (cons cmd hs-utils/async-post-command-flag)))
+    (setq hs-utils/async-post-command-flag updated-flag)))
+
+(defun hs-utils/async-watch-changes ()
+  "Watch for triggered commands during async operation execution.
+Resets flag variable
+`hs-utils/async-update-post-command-flag' to NIL.  By chanhges it is
+assumed that nothing happened, e.g. nothing was inserted in
+buffer, point was not moved, etc.  To collect data `post-command-hook' is used."
+  (setq hs-utils/async-post-command-flag nil)
+  (add-hook
+   'post-command-hook #'hs-utils/async-update-post-command-flag nil t))
+
+(defun hs-utils/async-stop-watching-changes (buffer)
+  "Clean up after async operation finished.
+This function takes care about cleaning up things made by
+`hs-utils/async-watch-changes'.  The BUFFER argument is a buffer where
+`post-command-hook' should be disabled.  This is neccessary, because
+it is possible that user will change buffer during async function
+execusion."
+  (with-current-buffer buffer
+    (setq hs-utils/async-post-command-flag nil)
+    (remove-hook
+     'post-command-hook #'hs-utils/async-update-post-command-flag t)))
+
 (provide 'haskell-commands)
+;;; haskell-commands.el ends here
