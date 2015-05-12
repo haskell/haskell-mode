@@ -41,7 +41,8 @@
   (haskell-process-start (haskell-interactive-session)))
 
 (defun haskell-process-start (session)
-  "Start the inferior Haskell process."
+  "Start the inferior Haskell process with a given SESSION.
+You can create new session using function `haskell-session-make'."
   (let ((existing-process (get-process (haskell-session-name (haskell-interactive-session)))))
     (when (processp existing-process)
       (haskell-interactive-mode-echo session "Restarting process ...")
@@ -77,7 +78,7 @@
     process))
 
 (defun haskell-process-send-startup (process)
-  "Send the necessary start messages."
+  "Send the necessary start messages to haskell PROCESS."
   (haskell-process-queue-command
    process
    (make-haskell-command
@@ -136,7 +137,9 @@ If I break, you can:
   (interrupt-process (haskell-process-process (haskell-commands-process))))
 
 (defun haskell-process-reload-with-fbytecode (process module-buffer)
-  "Reload FILE-NAME with -fbyte-code set, and then restore -fobject-code."
+  "Query a PROCESS to reload MODULE-BUFFER with -fbyte-code set.
+Restores -fobject-code after reload finished.
+MODULE-BUFFER is the actual Emacs buffer of the module being loaded."
   (haskell-process-queue-without-filters process ":set -fbyte-code")
   (haskell-process-touch-buffer process module-buffer)
   (haskell-process-queue-without-filters process ":reload")
@@ -144,8 +147,8 @@ If I break, you can:
 
 ;;;###autoload
 (defun haskell-process-touch-buffer (process buffer)
-  "Updates mtime on the file for BUFFER by queing a touch on
-PROCESS."
+  "Query PROCESS to `:!touch` BUFFER's file.
+Use to update mtime on BUFFER's file."
   (interactive)
   (haskell-process-queue-command
    process
@@ -166,7 +169,8 @@ PROCESS."
 (defvar url-http-end-of-headers)
 
 (defun haskell-process-hayoo-ident (ident)
-  "Hayoo for IDENT, returns a list of modules asyncronously through CALLBACK."
+  ;; FIXME Obsolete doc string, CALLBACK is not used.
+  "Hayoo for IDENT, return a list of modules asyncronously through CALLBACK."
   ;; We need a real/simulated closure, because otherwise these
   ;; variables will be unbound when the url-retrieve callback is
   ;; called.
@@ -189,7 +193,7 @@ PROCESS."
         (warn "HTTP error %s fetching %s" url-http-response-status url)))))
 
 (defun haskell-process-hoogle-ident (ident)
-  "Hoogle for IDENT, returns a list of modules."
+  "Hoogle for IDENT, return a list of modules."
   (with-temp-buffer
     (let ((hoogle-error (call-process "hoogle" nil t nil "search" "--exact" ident)))
       (goto-char (point-min))
@@ -203,7 +207,7 @@ PROCESS."
                                     "\n"))))))
 
 (defun haskell-process-haskell-docs-ident (ident)
-  "Search with haskell-docs for IDENT, returns a list of modules."
+  "Search with haskell-docs for IDENT, return a list of modules."
   (cl-remove-if-not
    (lambda (a) (string-match "^[[:upper:]][[:alnum:]_'.]+$" a))
    (split-string
@@ -218,8 +222,7 @@ PROCESS."
       "\n")))
 
 (defun haskell-process-import-modules (process modules)
-  "Import `modules' with :m +, and send any import statements
-from `module-buffer'."
+  "Query PROCESS `:m +' command to import MODULES."
   (when haskell-process-auto-import-loaded-modules
     (haskell-process-queue-command
      process
@@ -232,14 +235,14 @@ from `module-buffer'."
 
 ;;;###autoload
 (defun haskell-describe (ident)
-  "Describe the given identifier."
+  "Describe the given identifier IDENT."
   (interactive (list (read-from-minibuffer "Describe identifier: "
                                            (haskell-ident-at-point))))
   (let ((results (read (shell-command-to-string
                         (concat "haskell-docs --sexp "
                                 ident)))))
     (help-setup-xref (list #'haskell-describe ident)
-		     (called-interactively-p 'interactive))
+                     (called-interactively-p 'interactive))
     (save-excursion
       (with-help-window (help-buffer)
         (with-current-buffer (help-buffer)
@@ -269,9 +272,10 @@ from `module-buffer'."
 
 ;;;###autoload
 (defun haskell-rgrep (&optional prompt)
-  "Grep the effective project for the symbol at point. Very
-useful for codebase navigation. Prompts for an arbitrary regexp
-given a prefix arg."
+  "Grep the effective project for the symbol at point.
+Very useful for codebase navigation.
+
+Prompts for an arbitrary regexp given a prefix arg PROMPT."
   (interactive "P")
   (let ((sym (if prompt
                  (read-from-minibuffer "Look for: ")
@@ -310,7 +314,11 @@ If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
 
 ;;;###autoload
 (defun haskell-process-do-type (&optional insert-value)
-  "Print the type of the given expression."
+  ;; FIXME insert value functionallity seems to be missing.
+  "Print the type of the given expression.
+
+Given INSERT-VALUE prefix indicates that result type signature
+should be inserted."
   (interactive "P")
   (if insert-value
       (haskell-process-insert-type)
@@ -334,8 +342,10 @@ If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
 
 ;;;###autoload
 (defun haskell-mode-jump-to-def-or-tag (&optional next-p)
-  "Jump to the definition (by consulting GHCi), or (fallback)
-jump to the tag.
+  ;; FIXME NEXT-P arg is not used
+  "Jump to the definition.
+Jump to definition of identifier at point by consulting GHCi, or
+tag table as fallback.
 
 Remember: If GHCi is busy doing something, this will delay, but
 it will always be accurate, in contrast to tags, which always
@@ -359,16 +369,15 @@ position with `xref-pop-marker-stack'."
 
 ;;;###autoload
 (defun haskell-mode-goto-loc ()
-  "Go to the location of the thing at point. Requires the :loc-at
-command from GHCi."
+  "Go to the location of the thing at point.
+Requires the :loc-at command from GHCi."
   (interactive)
   (let ((loc (haskell-mode-loc-at)))
     (when loc
       (haskell-mode-goto-span loc))))
 
 (defun haskell-mode-goto-span (span)
-  "Jump to the span, whatever file and line and column it needs
-to to get there."
+  "Jump to the SPAN, whatever file and line and column it needs to get there."
   (xref-push-marker-stack)
   (find-file (expand-file-name (plist-get span :path)
                                (haskell-session-cabal-dir (haskell-interactive-session))))
@@ -377,8 +386,8 @@ to to get there."
   (forward-char (plist-get span :start-col)))
 
 (defun haskell-process-insert-type ()
-  "Get the identifer at the point and insert its type, if
-possible, using GHCi's :type."
+  "Get the identifer at the point and insert its type.
+Use GHCi's :type if it's possible."
   (let ((ident (haskell-ident-at-point)))
     (when ident
       (let ((process (haskell-interactive-process))
@@ -405,17 +414,17 @@ possible, using GHCi's :type."
                           (insert (format "%s\n" (replace-regexp-in-string "\n$" "" response)))))))))))))
 
 (defun haskell-mode-find-def (ident)
-  "Find definition location of identifier. Uses the GHCi process
-to find the location.  Returns `nil' if it can't find the
-identifier or the identifier isn't a string.
+  ;; TODO Check if it possible to exploit `haskell-process-do-info'
+  "Find definition location of identifier IDENT.
+Uses the GHCi process to find the location.  Returns nil if it
+can't find the identifier or the identifier isn't a string.
 
 Returns:
 
     (library <package> <module>)
     (file <path> <line> <col>)
     (module <name>)
-    nil
-"
+    nil"
   (when (stringp ident)
     (let ((reply (haskell-process-queue-sync-request
                   (haskell-interactive-process)
@@ -447,15 +456,15 @@ Returns:
 
 ;;;###autoload
 (defun haskell-mode-jump-to-def (ident)
-  "Jump to definition of identifier at point."
+  "Jump to definition of identifier IDENT at point."
   (interactive (list (haskell-ident-at-point)))
   (let ((loc (haskell-mode-find-def ident)))
     (when loc
       (haskell-mode-handle-generic-loc loc))))
 
 (defun haskell-mode-handle-generic-loc (loc)
-  "Either jump to or display a generic location. Either a file or
-a library."
+  "Either jump to or echo a generic location LOC.
+Either a file or a library."
   (cl-case (car loc)
     (file (haskell-mode-jump-to-loc (cdr loc)))
     (library (message "Defined in `%s' (%s)."
@@ -465,8 +474,8 @@ a library."
                      (elt loc 1)))))
 
 (defun haskell-mode-loc-at ()
-  "Get the location at point. Requires the :loc-at command from
-GHCi."
+  "Get the location at point.
+Requires the :loc-at command from GHCi."
   (let ((pos (or (when (region-active-p)
                    (cons (region-beginning)
                          (region-end)))
@@ -503,6 +512,7 @@ GHCi."
 
 ;;;###autoload
 (defun haskell-process-cd (&optional not-interactive)
+  ;; FIXME optional arg is not used
   "Change directory."
   (interactive)
   (let* ((session (haskell-interactive-session))
@@ -515,7 +525,10 @@ GHCi."
                                 dir)))
 
 (defun haskell-session-pwd (session &optional change)
-  "Prompt for the current directory."
+  "Prompt for the current directory.
+Return current working directory for SESSION.
+Optional CHANGE argument makes user to choose new working directory for SESSION.
+In this case new working directory path will be returned."
   (or (unless change
         (haskell-session-get session 'current-dir))
       (progn (haskell-session-set-current-dir
@@ -530,7 +543,8 @@ GHCi."
              (haskell-session-get session 'current-dir))))
 
 (defun haskell-process-change-dir (session process dir)
-  "Change the directory of the current process."
+  "Change SESSION's current directory.
+Query PROCESS to `:cd` to directory DIR."
   (haskell-process-queue-command
    process
    (make-haskell-command
@@ -555,7 +569,7 @@ GHCi."
                                          ":set -optP-include -optPdist/build/autogen/cabal_macros.h"))
 
 (defun haskell-process-do-try-info (sym)
-  "Get info of `sym' and echo in the minibuffer."
+  "Get info of SYM and echo in the minibuffer."
   (let ((process (haskell-interactive-process)))
     (haskell-process-queue-command
      process
@@ -573,7 +587,7 @@ GHCi."
                     (haskell-mode-message-line response)))))))
 
 (defun haskell-process-do-try-type (sym)
-  "Get type of `sym' and echo in the minibuffer."
+  "Get type of SYM and echo in the minibuffer."
   (let ((process (haskell-interactive-process)))
     (haskell-process-queue-command
      process
@@ -684,7 +698,9 @@ happened since function invocation)."
 
 ;;;###autoload
 (defun haskell-process-generate-tags (&optional and-then-find-this-tag)
-  "Regenerate the TAGS table."
+  "Regenerate the TAGS table.
+If optional AND-THEN-FIND-THIS-TAG argument is present it is used with
+function `find-tag' after new table was generated."
   (interactive)
   (let ((process (haskell-interactive-process)))
     (haskell-process-queue-command
@@ -716,9 +732,10 @@ happened since function invocation)."
                   (haskell-mode-message-line "Tags generated."))))))
 
 (defun haskell-process-add-cabal-autogen ()
-  "Add <cabal-project-dir>/dist/build/autogen/ to the ghci search
-path. This allows modules such as 'Path_...', generated by cabal,
-to be loaded by ghci."
+  "Add cabal's autogen dir to the GHCi search path.
+Add <cabal-project-dir>/dist/build/autogen/ to GHCi seatch path.
+This allows modules such as 'Path_...', generated by cabal, to be
+loaded by GHCi."
   (unless (eq 'cabal-repl (haskell-process-type)) ;; redundant with "cabal repl"
     (let*
         ((session       (haskell-interactive-session))
@@ -730,8 +747,9 @@ to be loaded by ghci."
 
 ;;;###autoload
 (defun haskell-process-unignore ()
-  "Unignore any files that were specified as being ignored by the
-  inferior GHCi process."
+  "Unignore any ignored files.
+Do not ignore files that were specified as being ignored by the
+inferior GHCi process."
   (interactive)
   (let ((session (haskell-interactive-session))
         (changed nil))
@@ -756,7 +774,7 @@ to be loaded by ghci."
 
 ;;;###autoload
 (defun haskell-session-change-target (target)
-  "Set the build target for cabal repl"
+  "Set the build TARGET for cabal REPL."
   (interactive "sNew build target:")
   (let* ((session haskell-session)
          (old-target (haskell-session-get session 'target)))
@@ -778,9 +796,9 @@ to be loaded by ghci."
     (goto-char (+ column (point)))))
 
 (defun haskell-mode-buffer-apply-command (cmd)
-  "Execute shell command CMD with current buffer as input and
-replace the whole buffer with the output. If CMD fails the buffer
-remains unchanged."
+  "Execute shell command CMD with current buffer as input and output.
+Use buffer as input and replace the whole buffer with the
+output.  If CMD fails the buffer remains unchanged."
   (set-buffer-modified-p t)
   (let* ((chomp (lambda (str)
                   (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'" str)
@@ -826,7 +844,7 @@ remains unchanged."
 
 ;;;###autoload
 (defun haskell-mode-find-uses ()
-  "Find uses of the identifier at point, highlight them all."
+  "Find use cases of the identifier at point and highlight them all."
   (interactive)
   (let ((spans (haskell-mode-uses-at)))
     (unless (null spans)
@@ -835,7 +853,7 @@ remains unchanged."
                do (haskell-mode-make-use-highlight span)))))
 
 (defun haskell-mode-make-use-highlight (span)
-  "Make a highlight overlay at the given span."
+  "Make a highlight overlay at the given SPAN."
   (save-window-excursion
     (save-excursion
       (haskell-mode-goto-span span)
@@ -853,8 +871,8 @@ remains unchanged."
            (point)))))))
 
 (defun haskell-mode-uses-at ()
-  "Get the locations of uses for the ident at point. Requires
-the :uses command from GHCi."
+  "Get the locations of use cases for the ident at point.
+Requires the :uses command from GHCi."
   (let ((pos (or (when (region-active-p)
                    (cons (region-beginning)
                          (region-end)))
