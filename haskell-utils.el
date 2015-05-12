@@ -50,7 +50,6 @@ DEFAULT."
     (concat (replace-regexp-in-string "/$" "" filename)
             "/")))
 
-
 (defun haskell-utils-parse-import-statement-at-point ()
   "Return imported module name if on import statement or nil otherwise.
 This currently assumes that the \"import\" keyword and the module
@@ -68,7 +67,5 @@ Note: doesn't detect if in {--}-style comment."
                             "\\([[:digit:][:upper:][:lower:]_.]+\\)"))
         (match-string-no-properties 1))))
 
-
 (provide 'haskell-utils)
-
 ;;; haskell-utils.el ends here
