@@ -147,11 +147,30 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
          (replace-regexp-in-string "\4" "" response))))))
 
 (defun haskell-process-log (msg)
-  "Write MSG to the process log (if enabled)."
+  "Effective append MSG to the process log (if enabled)."
   (when haskell-process-log
-    (with-current-buffer (get-buffer-create "*haskell-process-log*")
-      (goto-char (point-max))
-      (insert msg "\n"))))
+    (let* ((append-to (get-buffer-create "*haskell-process-log*"))
+           (windows (get-buffer-window-list append-to t t))
+           move-point-in-windows)
+      (with-current-buffer append-to
+        (setq buffer-read-only nil)
+        ;; record in which windows we should keep point at eob.
+        (dolist (window windows)
+          (when (= (window-point window) (point-max))
+            (push window move-point-in-windows)))
+        (let (return-to-position)
+          ;; decide whether we should reset point to return-to-position
+          ;; or leave it at eob.
+          (unless (= (point) (point-max))
+            (setq return-to-position (point))
+            (goto-char (point-max)))
+          (insert "\n" msg "\n")
+          (when return-to-position
+          (goto-char return-to-position)))
+        ;; advance to point-max in windows where it is needed
+        (dolist (window move-point-in-windows)
+          (set-window-point window (point-max)))
+        (setq buffer-read-only t)))))
 
 (defun haskell-process-project-by-proc (proc)
   "Find project by process."
