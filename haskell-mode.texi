@@ -37,15 +37,6 @@ Front-Cover Texts and no Back-Cover Texts.
 @contents
 @end iftex
 
-@ifhtml
-@titlepage
-@title Haskell Mode
-@subtitle Haskell Development Environment for Emacs
-
-@end titlepage
-@insertcopying
-@end ifhtml
-
 @ifnottex
 @node Top
 @top Haskell Mode
@@ -73,6 +64,11 @@ interpreter (e.g. GHCi).
 * Function index::
 * Variable index::
 @end menu
+
+@ifhtml
+@insertcopying
+@end ifhtml
+
 
 @node Introduction
 @chapter Introduction
