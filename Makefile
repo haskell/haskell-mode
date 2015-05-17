@@ -133,8 +133,26 @@ haskell-mode.info: haskell-mode.texi
 	# Processing proper
 	LANG=en_US.UTF-8 $(MAKEINFO) $(MAKEINFO_FLAGS) -o $@ $<
 
-haskell-mode.html: haskell-mode.texi
-	LANG=en_US.UTF-8 $(MAKEINFO) $(MAKEINFO_FLAGS) --html --no-split -o $@ $<
+haskell-mode.html: haskell-mode.texi haskell-mode.css
+	LANG=en_US.UTF-8 $(MAKEINFO) $(MAKEINFO_FLAGS) --html --css-include=haskell-mode.css --no-split -o $@ $<
+
+html/index.html : haskell-mode.texi
+	if [ -e html ]; then rm -r html; fi
+	LANG=en_US.UTF-8 $(MAKEINFO) $(MAKEINFO_FLAGS) --html		\
+	    --css-ref=haskell-mode.css					\
+	    -c AFTER_BODY_OPEN="<div class='background'> </div>"	\
+	    -c SHOW_TITLE=0						\
+	    -o html $<
+
+html/haskell-mode.css : haskell-mode.css html/index.html
+	cp $< $@
+
+html/images/haskell-mode.svg : images/haskell-mode.svg html/index.html
+	mkdir -p html/images
+	cp $< $@
+
+html : html/index.html html/haskell-mode.css html/images/haskell-mode.svg
+
 
 $(AUTOLOADS): $(ELFILES) haskell-mode.elc
 	$(BATCH) \
