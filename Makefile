@@ -131,10 +131,10 @@ haskell-mode.info: haskell-mode.texi
 	@rm haskell-mode-menu-order.txt haskell-mode-content-order.txt
 
 	# Processing proper
-	$(MAKEINFO) $(MAKEINFO_FLAGS) -o $@ $<
+	LANG=en_US.UTF-8 $(MAKEINFO) $(MAKEINFO_FLAGS) -o $@ $<
 
 haskell-mode.html: haskell-mode.texi
-	$(MAKEINFO) $(MAKEINFO_FLAGS) --html --no-split -o $@ $<
+	LANG=en_US.UTF-8 $(MAKEINFO) $(MAKEINFO_FLAGS) --html --no-split -o $@ $<
 
 $(AUTOLOADS): $(ELFILES) haskell-mode.elc
 	$(BATCH) \
