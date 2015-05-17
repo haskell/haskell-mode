@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual is for Haskell mode, version 13.12
+
+Copyright (C) 2013 Haskell Mode contributors.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the http://www.gnu.org/licenses/fdl.html (GNU
+Free Documentation License), Version 1.3 or any later version published
+by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts and no Back-Cover Texts. -->
+<!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>Haskell Mode 13.12: Compilation</title>
+
+<meta name="description" content="Haskell Mode 13.12: Compilation">
+<meta name="keywords" content="Haskell Mode 13.12: Compilation">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="index.html#Top" rel="start" title="Top">
+<link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
+<link href="index.html#Top" rel="up" title="Top">
+<link href="inferior_002dhaskell_002dmode.html#inferior_002dhaskell_002dmode" rel="next" title="inferior-haskell-mode">
+<link href="haskell_002ddecl_002dscan_002dmode.html#haskell_002ddecl_002dscan_002dmode" rel="prev" title="haskell-decl-scan-mode">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.indentedblock {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smallindentedblock {margin-left: 3.2em; font-size: smaller}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style:oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nocodebreak {white-space:nowrap}
+span.nolinebreak {white-space:nowrap}
+span.roman {font-family:serif; font-weight:normal}
+span.sansserif {font-family:sans-serif; font-weight:normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="haskell-mode.css">
+
+
+</head>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+<div class='background'> </div><a name="Compilation"></a>
+<div class="header">
+<p>
+Next: <a href="inferior_002dhaskell_002dmode.html#inferior_002dhaskell_002dmode" accesskey="n" rel="next">inferior-haskell-mode</a>, Previous: <a href="haskell_002ddecl_002dscan_002dmode.html#haskell_002ddecl_002dscan_002dmode" accesskey="p" rel="prev">haskell-decl-scan-mode</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<a name="Compilation-1"></a>
+<h2 class="chapter">8 Compilation</h2>
+
+<a name="index-haskell_002dcompile"></a>
+
+<p>Haskell mode comes equipped with a specialized <em>Compilation mode</em>
+tailored to GHC&rsquo;s compiler messages with optional support for Cabal
+projects. See <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Compilation-Mode.html#Compilation-Mode">(emacs)Compilation Mode</a>, for more information about
+the basic commands provided by the Compilation mode which are available
+in the Haskell compilation sub-mode as well. The additional features
+provided compared to Emacs&rsquo; basic Compilation mode are:
+</p>
+<ul>
+<li> DWIM-style auto-detection of compile command (including support for
+CABAL projects)
+</li><li> Support for GHC&rsquo;s compile messages and recognizing error, warning and
+info source locations (including <samp>-ferror-spans</samp> syntax)
+</li><li> Support for filtering out GHC&rsquo;s uninteresting &lsquo;<samp>Loading package...</samp>&rsquo;
+linker messages
+</li></ul>
+
+<p>In order to use it, invoke the <code>haskell-compile</code> command instead of
+<code>compile</code> as you would for the ordinary Compilation mode. It&rsquo;s
+recommended to bind <code>haskell-compile</code> to a convenient key
+binding. For instance, you can add the following to your Emacs
+initialization to bind <code>haskell-compile</code> to <kbd>C-c C-c</kbd>.
+</p>
+<div class="lisp">
+<pre class="lisp">(eval-after-load &quot;haskell-mode&quot;
+    '(define-key haskell-mode-map (kbd &quot;C-c C-c&quot;) 'haskell-compile))
+
+(eval-after-load &quot;haskell-cabal&quot;
+    '(define-key haskell-cabal-mode-map (kbd &quot;C-c C-c&quot;) 'haskell-compile))
+</pre></div>
+
+<p>The following description assumes that <code>haskell-compile</code> has been
+bound to <kbd>C-c C-c</kbd>.
+</p>
+<a name="index-haskell_002dcompile_002dcabal_002dbuild_002dcommand"></a>
+<a name="index-haskell_002dcompile_002dcabal_002dbuild_002dcommand_002dalt"></a>
+<a name="index-haskell_002dcompile_002dcommand"></a>
+
+<p>When invoked, <code>haskell-compile</code> tries to guess how to compile the
+Haskell program your currently visited buffer belongs to, by searching
+for a <samp>.cabal</samp> file in the current of enclosing parent folders. If
+a <samp>.cabal</samp> file was found, the command defined in the
+<code>haskell-compile-cabal-build-command</code> option is used. Moreover,
+when requesting to compile a <samp>.cabal</samp>-file is detected and a
+negative prefix argument (e.g. <kbd>C-- C-c C-c</kbd>) was given, the
+alternative <code>haskell-compile-cabal-build-command-alt</code> is
+invoked. By default, <code>haskell-compile-cabal-build-command-alt</code>
+contains a &lsquo;<samp>cabal clean -s</samp>&rsquo; command in order to force a full
+rebuild.
+</p>
+<p>Otherwise if no <samp>.cabal</samp> could be found, a single-module
+compilation is assumed and <code>haskell-compile-command</code> is used
+(<em>if</em> the currently visited buffer contains Haskell source code).
+</p>
+<p>You can also inspect and modify the compile command to be invoked
+temporarily by invoking <code>haskell-compile</code> with a prefix argument
+(e.g. <kbd>C-u C-c C-c</kbd>). If later-on you want to recompile using the
+same customized compile command, invoke <code>recompile</code> (bound to
+<kbd>g</kbd>) inside the &lsquo;<samp>*haskell-compilation*</samp>&rsquo; buffer.
+</p>
+<hr>
+<div class="header">
+<p>
+Next: <a href="inferior_002dhaskell_002dmode.html#inferior_002dhaskell_002dmode" accesskey="n" rel="next">inferior-haskell-mode</a>, Previous: <a href="haskell_002ddecl_002dscan_002dmode.html#haskell_002ddecl_002dscan_002dmode" accesskey="p" rel="prev">haskell-decl-scan-mode</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>
