@@ -702,7 +702,7 @@ happened since function invocation)."
 (defun haskell-process-generate-tags (&optional and-then-find-this-tag)
   "Regenerate the TAGS table.
 If optional AND-THEN-FIND-THIS-TAG argument is present it is used with
-function `find-tag' after new table was generated."
+function `xref-find-definitions' after new table was generated."
   (interactive)
   (let ((process (haskell-interactive-process)))
     (haskell-process-queue-command
@@ -730,7 +730,7 @@ function `find-tag' after new table was generated."
                            (haskell-process-session (car state)))))
                       (add-to-list 'tags-table-list session-tags)
                       (setq tags-file-name nil))
-                    (find-tag (cdr state)))
+                    (xref-find-definitions (cdr state)))
                   (haskell-mode-message-line "Tags generated."))))))
 
 (defun haskell-process-add-cabal-autogen ()
