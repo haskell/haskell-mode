@@ -314,7 +314,8 @@
         (tags-revert-without-query t))
     (when (and ident (not (string= "" (haskell-string-trim ident))))
       (cond ((file-exists-p tags-file-name)
-             (find-tag ident next-p))
+             (let ((xref-prompt-for-identifier next-p))
+               (xref-find-definitions ident)))
             (t (haskell-process-generate-tags ident))))))
 
 ;;;###autoload

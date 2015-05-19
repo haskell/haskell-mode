@@ -59,6 +59,12 @@ A process is considered alive if its status is `run', `open',
 (unless (fboundp 'outline-show-subtree)
   (defalias 'outline-show-subtree 'show-subtree))
 
+(unless (fboundp 'xref-find-definitions)
+  (defun xref-find-definitions (ident)
+    (let ((next-p (and (boundp 'xref-prompt-for-identifier)
+                       xref-prompt-for-identifier)))
+      (find-tag ident next-p))))
+
 (provide 'haskell-compat)
 
 ;;; haskell-compat.el ends here
