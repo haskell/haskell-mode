@@ -354,6 +354,40 @@ that should be commented under LaTeX-style literate scripts."
                                           (or (not (eq ?\\ (char-before)))
                                               (> 0 (skip-syntax-backward ".")))))
                   "\\")))
+
+    ;; QuasiQuotes syntax: [quoter| string |], quoter is unqualified
+    ;; name, no spaces, string is arbitrary (including newlines),
+    ;; finishes at the first occurence of |], no escaping is provided.
+    ;;
+    ;; The quoter cannot be "e", "t", "d", or "p", since those overlap
+    ;; with Template Haskell quotations.
+    ;;
+    ;; QuasiQuotes opens only when outside of a string or a comment
+    ;; and closes only when inside a quasiquote.
+    ;;
+    ;; (syntax-ppss) returns list with two imteresting elements:
+    ;; nth 3. non-nil if inside a string. (it is the character that will
+    ;;        terminate the string, or t if the string should be terminated
+    ;;        by a generic string delimiter.)
+    ;; nth 4. nil if outside a comment, t if inside a non-nestable comment,
+    ;;        else an integer (the current comment nesting).
+    ;;
+    ;; Note also that we need to do in in a single pass, hence a regex
+    ;; that covers both the opening and the ending of a quasiquote.
+
+    ("\\(\\[[[:alnum:]]+\\)?\\(|\\)\\(?:]\\)?"
+     (2 (save-excursion
+          (goto-char (match-beginning 0))
+          (if (eq ?\[ (char-after))
+              ;; opening case
+              (unless (or (nth 3 (syntax-ppss))
+                          (nth 4 (syntax-ppss))
+                          (member (match-string 1)
+                                  '("[e" "[t" "[d" "[p")))
+                "|")
+            ;; closing case
+            (when (eq t (nth 3 (syntax-ppss)))
+              "|")))))
     ))
 
 (defconst haskell-bird-syntactic-keywords
