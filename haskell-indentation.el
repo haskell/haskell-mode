@@ -49,15 +49,16 @@
   :group 'haskell
   :prefix "haskell-indentation-")
 
-(defcustom haskell-indentation-show-indentations t
+(defcustom haskell-indentation-show-indentations nil
   "If t the current line's indentation points will be showed as
 underscore overlays in new haskell-mode buffers.  Use
-`haskell-indentation-enable-show-indentations' and `haskell-indentation-disable-show-indentations'
-to switch the behavior for already existing buffers."
+`haskell-indentation-enable-show-indentations' and
+`haskell-indentation-disable-show-indentations' to switch the
+behavior for already existing buffers."
   :type 'boolean
   :group 'haskell-indentation)
 
-(defcustom haskell-indentation-show-indentations-after-eol t
+(defcustom haskell-indentation-show-indentations-after-eol nil
   "If t, try to show indentation points after the end of line.
 This requires strange overlay hacks and can collide with other
 modes (e.g. fill-column-indicator)."
@@ -121,7 +122,14 @@ modes (e.g. fill-column-indicator)."
   "Haskell indentation mode that deals with the layout rule.
 It rebinds RET, DEL and BACKSPACE, so that indentations can be
 set and deleted as if they were real tabs.  It supports
-autofill-mode."
+autofill-mode.
+
+It is possible to render indent stops for current line as
+overlays.  Please read documentation for option
+`haskell-indentation-enable-show-indentations' and option
+`haskell-indentation-show-indentations-after-eol'.  These options
+were disabled by default because in most cases occurs overlay
+clashing with other modes."
   :lighter " Ind"
   :keymap haskell-indentation-mode-map
   (kill-local-variable 'indent-line-function)
@@ -656,7 +664,7 @@ the current buffer."
 (defun haskell-indentation-declaration-layout ()
   (haskell-indentation-layout #'haskell-indentation-declaration))
 
-;; a layout list with case expressions 
+;; a layout list with case expressions
 (defun haskell-indentation-case-layout ()
   (haskell-indentation-layout #'haskell-indentation-case))
 
@@ -905,7 +913,7 @@ the current buffer."
                 (throw 'parse-end nil))
 
 	      ;; after an 'open' expression such as 'if', exit
-              (unless (member (car parser) '("(" "[" "{" "do" "case")) 
+              (unless (member (car parser) '("(" "[" "{" "do" "case"))
                 (throw 'return nil)))))))))
 
 (defun haskell-indentation-test-indentations ()
@@ -961,7 +969,7 @@ the current buffer."
 ;; and current-indent after the separator
 ;; For example:
 ;; l = [  1
-;;      , 2  
+;;      , 2
 ;;      ,    -- start now here
 
 (defun haskell-indentation-at-separator ()
