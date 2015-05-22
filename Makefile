@@ -118,41 +118,42 @@ info: haskell-mode.info dir
 dir: haskell-mode.info
 	$(INSTALL_INFO) --dir=$@ $<
 
-haskell-mode.info: haskell-mode.texi
+haskell-mode.info: doc/haskell-mode.texi
 	# Check if chapter order is same as node order
 	@sed -n -e '/@chapter/ s/@code{\(.*\)}/\1/' \
 		-e 's/@chapter \(.*\)$$/* \1::/p' \
 		-e 's/@unnumbered \(.*\)$$/* \1::/p' \
-	       haskell-mode.texi > haskell-mode-menu-order.txt
+	       $< > haskell-mode-menu-order.txt
 	@sed -e '1,/@menu/ d' \
 	    -e '/end menu/,$$ d' \
-	    haskell-mode.texi > haskell-mode-content-order.txt
+	    $< > haskell-mode-content-order.txt
 	diff -C 1 haskell-mode-menu-order.txt haskell-mode-content-order.txt
 	@rm haskell-mode-menu-order.txt haskell-mode-content-order.txt
 
 	# Processing proper
 	LANG=en_US.UTF-8 $(MAKEINFO) $(MAKEINFO_FLAGS) -o $@ $<
 
-haskell-mode.html: haskell-mode.texi haskell-mode.css
-	LANG=en_US.UTF-8 $(MAKEINFO) $(MAKEINFO_FLAGS) --html --css-include=haskell-mode.css --no-split -o $@ $<
+doc/haskell-mode.html: doc/haskell-mode.texi doc/haskell-mode.css
+	LANG=en_US.UTF-8 $(MAKEINFO) $(MAKEINFO_FLAGS) --html --css-include=doc/haskell-mode.css --no-split -o $@ $<
 
-html/index.html : haskell-mode.texi
-	if [ -e html ]; then rm -r html; fi
+doc/html/index.html : doc/haskell-mode.texi
+	if [ -e doc/html ]; then rm -r doc/html; fi
 	LANG=en_US.UTF-8 $(MAKEINFO) $(MAKEINFO_FLAGS) --html		\
 	    --css-ref=haskell-mode.css					\
 	    -c AFTER_BODY_OPEN="<div class='background'> </div>"	\
 	    -c SHOW_TITLE=0						\
-	    -o html $<
+	    -o doc/html $<
 
-html/haskell-mode.css : haskell-mode.css html/index.html
+doc/html/haskell-mode.css : doc/haskell-mode.css doc/html/index.html
 	cp $< $@
 
-html/images/haskell-mode.svg : images/haskell-mode.svg html/index.html
-	mkdir -p html/images
+doc/html/haskell-mode.svg : images/haskell-mode.svg doc/html/index.html
 	cp $< $@
 
-html : html/index.html html/haskell-mode.css html/images/haskell-mode.svg
+doc/html : doc/html/index.html doc/html/haskell-mode.css doc/html/haskell-mode.svg
 
+deploy-manual : doc/html
+	cd doc && ./deploy-manual.sh
 
 $(AUTOLOADS): $(ELFILES) haskell-mode.elc
 	$(BATCH) \

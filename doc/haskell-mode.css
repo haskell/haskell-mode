@@ -27,7 +27,7 @@ div.background {
     width: 256px;
     height: 256px;
     opacity: 0.3;
-    background-image: url("images/haskell-mode.svg");
+    background-image: url("haskell-mode.svg");
     background-repeat: no-repeat;
     background-size: 256px 256px;
 }
