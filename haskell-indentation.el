@@ -52,8 +52,9 @@
 (defcustom haskell-indentation-show-indentations nil
   "If t the current line's indentation points will be showed as
 underscore overlays in new haskell-mode buffers.  Use
-`haskell-indentation-enable-show-indentations' and `haskell-indentation-disable-show-indentations'
-to switch the behavior for already existing buffers."
+`haskell-indentation-enable-show-indentations' and
+`haskell-indentation-disable-show-indentations' to switch the
+behavior for already existing buffers."
   :type 'boolean
   :group 'haskell-indentation)
 
@@ -663,7 +664,7 @@ the current buffer."
 (defun haskell-indentation-declaration-layout ()
   (haskell-indentation-layout #'haskell-indentation-declaration))
 
-;; a layout list with case expressions 
+;; a layout list with case expressions
 (defun haskell-indentation-case-layout ()
   (haskell-indentation-layout #'haskell-indentation-case))
 
@@ -912,7 +913,7 @@ the current buffer."
                 (throw 'parse-end nil))
 
 	      ;; after an 'open' expression such as 'if', exit
-              (unless (member (car parser) '("(" "[" "{" "do" "case")) 
+              (unless (member (car parser) '("(" "[" "{" "do" "case"))
                 (throw 'return nil)))))))))
 
 (defun haskell-indentation-test-indentations ()
@@ -968,7 +969,7 @@ the current buffer."
 ;; and current-indent after the separator
 ;; For example:
 ;; l = [  1
-;;      , 2  
+;;      , 2
 ;;      ,    -- start now here
 
 (defun haskell-indentation-at-separator ()
