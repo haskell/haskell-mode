@@ -2,9 +2,12 @@ language: emacs-lisp
 
 env:
   matrix:
-    - EMACS=emacs23
-    - EMACS=emacs24
-    - EMACS=emacs-snapshot
+    - EMACS=emacs23           TARGET=check
+    - EMACS=emacs24           TARGET=check
+    - EMACS=emacs-snapshot    TARGET=check
+    - EMACS=emacs24           TARGET=deploy-manual
+  global:
+    - secure: "ejv1+ub/v+Hm/23fhp4zLAHT3HiCG+YdDHai57LDe4LfEZCeGz4i/6LazbPbwm58v2YuKvMcdNshebc1s4A293ARJryPyFfW/8kEe+3hQ+cDxunNdHfqcS8SyhcDG0mrv7dqiVAtMJqB8qZb0c161KeEM8nyhC0wyQ+EZ5qJnzM="
 
 matrix:
   allow_failures:
@@ -27,9 +30,18 @@ install:
         sudo apt-get install -qq emacs-snapshot &&
         sudo apt-get install -qq emacs-snapshot-el;
     fi
+  - if [ "$TARGET" = "deploy-manual" ]; then
+        curl -O http://ftp.gnu.org/gnu/texinfo/texinfo-5.2.tar.xz;
+        tar -xf texinfo-5.2.tar.xz;
+        cd texinfo-5.2;
+        ./configure;
+        make;
+        sudo make install;
+        cd ..;
+    fi
 
 script:
-  lsb_release -a && $EMACS --version && make EMACS=$EMACS check
+  lsb_release -a && $EMACS --version && make EMACS=$EMACS $TARGET
 
 notifications:
   email: false
