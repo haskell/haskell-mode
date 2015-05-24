@@ -1107,7 +1107,6 @@ haskell-present, depending on variable `haskell-process-use-presentation-mode'."
       :complete (lambda (state response)
                   (if haskell-process-use-presentation-mode
                       (haskell-present
-                       (cdr state)
                        (haskell-process-session (car state))
                        response)
                     (haskell-mode-message-line response)))))))
