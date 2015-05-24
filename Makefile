@@ -138,10 +138,11 @@ doc/haskell-mode.html: doc/haskell-mode.texi doc/haskell-mode.css
 
 doc/html/index.html : doc/haskell-mode.texi
 	if [ -e doc/html ]; then rm -r doc/html; fi
-	LANG=en_US.UTF-8 $(MAKEINFO) $(MAKEINFO_FLAGS) --html		\
-	    --css-ref=haskell-mode.css					\
-	    -c AFTER_BODY_OPEN="<div class='background'> </div>"	\
-	    -c SHOW_TITLE=0						\
+	LANG=en_US.UTF-8 $(MAKEINFO) $(MAKEINFO_FLAGS) --html				\
+	    --css-ref=haskell-mode.css							\
+	    -c AFTER_BODY_OPEN='<div class="background"> </div>'			\
+	    -c EXTRA_HEAD='<link rel="shortcut icon" href="haskell-mode-32x32.png">'	\
+	    -c SHOW_TITLE=0								\
 	    -o doc/html $<
 
 doc/html/haskell-mode.css : doc/haskell-mode.css doc/html/index.html
@@ -150,7 +151,10 @@ doc/html/haskell-mode.css : doc/haskell-mode.css doc/html/index.html
 doc/html/haskell-mode.svg : images/haskell-mode.svg doc/html/index.html
 	cp $< $@
 
-doc/html : doc/html/index.html doc/html/haskell-mode.css doc/html/haskell-mode.svg
+doc/html/haskell-mode-32x32.png : images/haskell-mode-32x32.png doc/html/index.html
+	cp $< $@
+
+doc/html : doc/html/index.html doc/html/haskell-mode.css doc/html/haskell-mode.svg doc/html/haskell-mode-32x32.png
 
 deploy-manual : doc/html
 	cd doc && ./deploy-manual.sh
