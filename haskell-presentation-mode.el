@@ -34,7 +34,15 @@
           \\{hypertext-mode-map}"
   (setq case-fold-search nil))
 
-(define-key haskell-presentation-mode-map (kbd "q") 'quit-window)
+(defconst haskell-present-buffer-name
+  "*Haskell Presentation*"
+  "Haskell Presentation buffer name.")
+
+(defconst haskell-present-hint-message
+  "-- Hit `q' to close this window; `c' to clear.\n\n"
+  "Hint message appered in Haskell Presentation buffer.")
+
+(define-key haskell-presentation-mode-map (kbd "q") #'quit-window)
 
 (defun haskell-present (name session code)
   "Present given code in a popup buffer.
