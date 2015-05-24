@@ -42,8 +42,11 @@
   "-- Hit `q' to close this window; `c' to clear.\n\n"
   "Hint message appered in Haskell Presentation buffer.")
 
-(define-key haskell-presentation-mode-map (kbd "q") #'quit-window)
-(define-key haskell-presentation-mode-map (kbd "c") #'haskell-present-clear)
+(easy-mmode-defmap
+ haskell-presentation-mode-map
+ `(("q" . #'quit-window)
+   ("c" . #'haskell-present-clear))
+ "The base key map for `haskell-presentation-mode'.")
 
 (defun haskell-present-clear ()
   "Clear Haskell Presentation buffer."
