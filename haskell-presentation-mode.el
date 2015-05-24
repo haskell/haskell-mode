@@ -43,6 +43,17 @@
   "Hint message appered in Haskell Presentation buffer.")
 
 (define-key haskell-presentation-mode-map (kbd "q") #'quit-window)
+(define-key haskell-presentation-mode-map (kbd "c") #'haskell-present-clear)
+
+(defun haskell-present-clear ()
+  "Clear Haskell Presentation buffer."
+  (interactive)
+  (let ((hp-buf (get-buffer haskell-present-buffer-name)))
+    (when hp-buf
+      (with-current-buffer hp-buf
+        (let ((buffer-read-only nil))
+          (erase-buffer)
+          (insert haskell-present-hint-message))))))
 
 (defun haskell-present (name session code)
   "Present given code in a popup buffer.
