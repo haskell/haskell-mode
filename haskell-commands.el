@@ -30,6 +30,7 @@
 (require 'haskell-font-lock)
 (require 'haskell-interactive-mode)
 (require 'haskell-session)
+(require 'haskell-presentation-mode)
 (require 'highlight-uses-mode)
 
 
@@ -690,11 +691,9 @@ happened since function invocation)."
                        "Type signature insertion was prevented. "
                        "These commands were registered:"
                        cs))))
-               ;; Present the result only when response is valid and not asked to
-               ;; insert result
-               (let* ((expr (car (split-string sig "\\W::\\W" t)))
-                      (buf-name (concat ":type " expr)))
-                 (haskell-utils-echo-or-present response buf-name))))
+               ;; Present the result only when response is valid and not asked
+               ;; to insert result
+               (haskell-utils-echo-or-present response)))
 
             (haskell-utils-async-stop-watching-changes init-buffer))))))))
 
@@ -961,15 +960,13 @@ newlines and extra whitespace in signature before insertion."
         (insert sig "\n")
         (indent-to col)))))
 
-(defun haskell-utils-echo-or-present (msg &optional name)
+(defun haskell-utils-echo-or-present (msg)
   "Present message in some manner depending on configuration.
 If variable `haskell-process-use-presentation-mode' is NIL it will output
-modified message MSG to echo area.
-Optinal NAME will be used as presentation mode buffer name."
+modified message MSG to echo area."
   (if haskell-process-use-presentation-mode
-      (let ((bufname (or name "*Haskell Presentation*"))
-            (session (haskell-process-session (haskell-interactive-process))))
-        (haskell-present bufname session msg))
+      (let ((session (haskell-process-session (haskell-interactive-process))))
+        (haskell-present session msg))
     (let (m (haskell-utils-reduce-string msg))
       (message m))))
 

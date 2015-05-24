@@ -34,31 +34,54 @@
           \\{hypertext-mode-map}"
   (setq case-fold-search nil))
 
-(define-key haskell-presentation-mode-map (kbd "q") 'quit-window)
+(defconst haskell-present-buffer-name
+  "*Haskell Presentation*"
+  "Haskell Presentation buffer name.")
 
-(defun haskell-present (name session code)
+(defconst haskell-present-hint-message
+  "-- Hit `q' to close this window; `c' to clear.\n\n"
+  "Hint message appered in Haskell Presentation buffer.")
+
+(easy-mmode-defmap
+ haskell-presentation-mode-map
+ `(("q" . #'quit-window)
+   ("c" . #'haskell-present-clear))
+ "The base key map for `haskell-presentation-mode'.")
+
+(defun haskell-present-clear ()
+  "Clear Haskell Presentation buffer."
+  (interactive)
+  (let ((hp-buf (get-buffer haskell-present-buffer-name)))
+    (when hp-buf
+      (with-current-buffer hp-buf
+        (let ((buffer-read-only nil))
+          (erase-buffer)
+          (insert haskell-present-hint-message))))))
+
+(defun haskell-present (session code &optional clear)
   "Present given code in a popup buffer.
-Creates temporal buffer with given NAME and assigns it to given
-haskell SESSION; presented CODE will be fontified as haskell code."
-  (let ((buffer (get-buffer-create name)))
+Creates temporal Haskell Presentation buffer and assigns it to
+given haskell SESSION; presented CODE will be fontified as
+haskell code.  Give an optional non-nil CLEAR arg to clear the
+buffer before presenting message."
+  (let ((buffer (get-buffer-create haskell-present-buffer-name)))
     (with-current-buffer buffer
       (haskell-presentation-mode)
 
       (when (boundp 'shm-display-quarantine)
         (set (make-local-variable 'shm-display-quarantine) nil))
 
-      (let ((buffer-read-only nil)
-            (hint "-- Hit `q' to close this window.\n\n"))
-        (haskell-session-assign session)
-        (erase-buffer)
-        (insert hint)
-        (save-excursion
+      (when clear (haskell-present-clear))
+      (haskell-session-assign session)
+      (save-excursion
+        (let ((buffer-read-only nil))
+          (goto-char (point-min))
+          (forward-line 2)
           (insert code "\n\n")))
-      (setq buffer-read-only t))
 
-    (if (eq major-mode 'haskell-presentation-mode)
-        (switch-to-buffer buffer)
-      (pop-to-buffer buffer))))
+      (if (eq major-mode 'haskell-presentation-mode)
+          (switch-to-buffer buffer)
+        (pop-to-buffer buffer)))))
 
 (provide 'haskell-presentation-mode)
 
