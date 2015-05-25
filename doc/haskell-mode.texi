@@ -265,13 +265,13 @@ trade-offs:
 
 @ftable @code
 
-@item turn-on-haskell-simple-indent
+@item haskell-simple-indent-mode
 
 A very simple indentation scheme; In this scheme, @key{TAB} will now
 move the cursor to the next indent point in the previous non-blank line.
 An indent point is a non-whitespace character following whitespace.
 
-@item turn-on-haskell-indent
+@item haskell-indent-mode
 
 Intelligent semi-automatic indentation for Haskell's layout rule.  The
 basic idea is to have @key{TAB} cycle through possibilities indentation
@@ -282,28 +282,28 @@ detail in the article @cite{Dynamic tabbing for automatic indentation
 with the layout rule} published in the Journal of Functional Programming
 8.5 (1998).
 
-@item turn-on-haskell-indentation
+@item haskell-indentation-mode
 
-Improved variation of @code{turn-on-haskell-indent} indentation
+Improved variation of @code{haskell-indent-mode} indentation
 mode. Rebinds @key{RET} and @key{DEL}, so that indentations can be set
 and deleted as if they were real tabs.
 
 @end ftable
 
 To enable one of these three mutually exclusive indentation schemes, you
-just need call one (and only one!) of the @code{turn-on-*} commands
+just need call one (and only one!) of the @code{*-mode} commands
 while in the buffer you want the indentation scheme to be activated for.
 
-The recommended way is to add one of @code{turn-on-*} commands to
+The recommended way is to add one of @code{*-mode} commands to
 @code{haskell-mode-hook}. This can be done either by using @kbd{M-x
 customize-variable @key{RET} haskell-mode-hook} which provides a
 convenient user interface or by adding @emph{one} of the following three
 lines to your @file{.emacs} file:
 
 @lisp
-(add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+(add-hook 'haskell-mode-hook 'haskell-simple-indent-mode)
+(add-hook 'haskell-mode-hook 'haskell-indent-mode)
+(add-hook 'haskell-mode-hook 'haskell-indentation-mode)
 @end lisp
 
 @section Interactive Block Indentation
@@ -351,7 +351,6 @@ selection mode (without redefining @kbd{C-x},@kbd{C-c},@kbd{C-v}, and
 @node Declaration scanning
 @chapter Declaration scannning
 
-@findex turn-on-haskell-decl-scan
 @findex haskell-decl-scan-mode
 @vindex haskell-decl-scan-mode-hook
 
@@ -391,11 +390,11 @@ Lock,,,emacs}) as @code{haskell-decl-scan-mode} ignores text highlighted
 with @code{font-lock-comment-face}.
 
 As usual, in order to activate @code{haskell-decl-scan-mode}
-automatically for Haskell buffers, add @code{turn-on-haskell-decl-scan}
+automatically for Haskell buffers, add @code{haskell-decl-scan-mode}
 to @code{haskell-mode-hook}:
 
 @lisp
-(add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
+(add-hook 'haskell-mode-hook 'haskell-decl-scan-mode)
 @end lisp
 
 @code{haskell-decl-scan-mode} enables the use of features that build
