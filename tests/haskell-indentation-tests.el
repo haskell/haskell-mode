@@ -77,7 +77,6 @@ Example of lines:
 
 (ert-deftest haskell-indentation-check-4 ()
   "Import statememnt symbol list 2"
-  :expected-result :failed
   (haskell-indentation-check
    "import Control.Concurrent"
    "  ( forkIO"

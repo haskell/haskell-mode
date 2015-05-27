@@ -940,20 +940,22 @@ the current buffer."
 ;;     ,
 (defun haskell-indentation-separated (parser separator &optional stmt-separator)
   (catch 'return
+    (unless (listp separator)
+      (setq separator (list separator)))
+    (unless (listp stmt-separator)
+      (setq stmt-separator (list stmt-separator)))
     (while t
       (funcall parser)
-      (cond ((if (listp separator)
-		 (member current-token separator)
-	       (equal current-token separator))
+      (cond ((member current-token separator)
              (haskell-indentation-at-separator))
 
-            ((equal current-token stmt-separator)
+            ((member current-token stmt-separator)
              (setq starter-indent (current-column))
              (haskell-indentation-at-separator))
 
             ((eq current-token 'end-tokens)
-             (cond ((or (equal following-token separator)
-                        (equal following-token stmt-separator))
+             (cond ((or (member following-token separator)
+                        (member following-token stmt-separator))
 		    ;; set an indentation before a separator,
 		    ;; for example:
 		    ;;  [ 1   or   [ 1 | a
