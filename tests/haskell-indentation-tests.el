@@ -60,12 +60,11 @@ Example of lines:
 
 (ert-deftest haskell-indentation-check-2a ()
   "Handle apostrophe in identifiers"
-  :expected-result :failed
   (haskell-indentation-check
    "function = do"
    "  (_'x') <- return ()"
    " z"
-   "^ ^       ^"))
+   "^ ^         ^"))
 
 
 (ert-deftest haskell-indentation-check-3 ()
