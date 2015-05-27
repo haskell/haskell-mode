@@ -195,3 +195,32 @@ Example of lines:
   (haskell-indentation-check
    "fun = \x ->"
    "  ^"))
+
+(ert-deftest haskell-indentation-check-17a ()
+  "A type for a function"
+  (haskell-indentation-check
+   "fun :: Int"
+   "    -> Int"
+   "    ^"))
+
+(ert-deftest haskell-indentation-check-17b ()
+  "A type for a function with context"
+  (haskell-indentation-check
+   "fun :: Monad m"
+   "    => Int"
+   "    ^"))
+
+(ert-deftest haskell-indentation-check-17c ()
+  "A type for a function with complicated context"
+  (haskell-indentation-check
+   "fun :: (Monad m, MonadBaseControl IO m, MyMonad (A v) m)"
+   "    => MyMonad (A v) m"
+   "    ^"))
+
+(ert-deftest haskell-indentation-check-17d ()
+  "A type for a function with param and a complicated context"
+  (haskell-indentation-check
+   "fun :: (Monad m, MonadBaseControl IO m, MyMonad (A v) m)"
+   "    => MyMonad (A v) m"
+   "    -> m (Maybe a)"
+   "    ^"))
