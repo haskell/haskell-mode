@@ -10,7 +10,7 @@
 # We should have a script that changes it everywhere it is needed and
 # syncs it with current git tag.
 #
-VERSION = 13.12
+VERSION = 13.14
 
 INSTALL_INFO = install-info
 
