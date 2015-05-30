@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual is for Haskell mode, version 13.14
+
+Copyright (C) 2013 Haskell Mode contributors.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the http://www.gnu.org/licenses/fdl.html (GNU
+Free Documentation License), Version 1.3 or any later version published
+by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts and no Back-Cover Texts. -->
+<!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>Haskell Mode 13.14: Unicode support</title>
+
+<meta name="description" content="Haskell Mode 13.14: Unicode support">
+<meta name="keywords" content="Haskell Mode 13.14: Unicode support">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="index.html#Top" rel="start" title="Top">
+<link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
+<link href="index.html#Top" rel="up" title="Top">
+<link href="Indentation.html#Indentation" rel="next" title="Indentation">
+<link href="Editing-Haskell-Code.html#Editing-Haskell-Code" rel="prev" title="Editing Haskell Code">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.indentedblock {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smallindentedblock {margin-left: 3.2em; font-size: smaller}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style:oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nocodebreak {white-space:nowrap}
+span.nolinebreak {white-space:nowrap}
+span.roman {font-family:serif; font-weight:normal}
+span.sansserif {font-family:sans-serif; font-weight:normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="haskell-mode.css">
+
+<link rel="shortcut icon" href="haskell-mode-32x32.png">
+</head>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+<div class="background"> </div><a name="Unicode-support"></a>
+<div class="header">
+<p>
+Next: <a href="Indentation.html#Indentation" accesskey="n" rel="next">Indentation</a>, Previous: <a href="Editing-Haskell-Code.html#Editing-Haskell-Code" accesskey="p" rel="prev">Editing Haskell Code</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<a name="Unicode-support-1"></a>
+<h2 class="chapter">5 Unicode support</h2>
+
+<a name="index-Unicode"></a>
+
+<p>See the Haskell Wiki&rsquo;s entry on
+<a href="http://www.haskell.org/haskellwiki/Unicode-symbols">Unicode
+Symbols</a> for general information about Unicode support in Haskell.
+</p>
+<p>As Emacs supports editing files containing Unicode out of the box, so
+does Haskell Mode. As an add-on, Haskell Mode includes the
+<code>haskell-unicode</code> input method which allows you to easily type a
+number of Unicode symbols that are useful when writing Haskell code;
+See <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Input-Methods.html#Input-Methods">(emacs)Input Methods</a>, for more details.
+</p>
+<p>To automatically enable the <code>haskell-unicode</code> input method in
+haskell-mode buffers use <kbd>M-x customize-variable <span class="key">RET</span>
+haskell-mode-hook</kbd> or put the following code in your <samp>.emacs</samp> file:
+</p>
+<div class="lisp">
+<pre class="lisp">(add-hook 'haskell-mode-hook 'turn-on-haskell-unicode-input-method)
+</pre></div>
+
+<p>To temporarily enable this input method for a single buffer you can use
+<kbd>M-x turn-on-haskell-unicode-input-method</kbd>.
+</p>
+<p>When the <code>haskell-unicode</code> input method is active, you can simply
+type &lsquo;<samp>-&gt;</samp>&rsquo; and it is immediately replaced with &lsquo;<samp>→</samp>&rsquo;. Use
+<kbd>C-\</kbd> to toggle the input method. To see a table of all key
+sequences use <kbd>M-x describe-input-method <span class="key">RET</span>
+haskell-unicode</kbd>. A sequence like &lsquo;<samp>&lt;=</samp>&rsquo; is ambiguous and can mean
+either &lsquo;<samp>⇐</samp>&rsquo; or &lsquo;<samp>≤</samp>&rsquo;. Typing it presents you with a choice. Type
+<kbd>1</kbd> or <kbd>2</kbd> to select an option or keep typing to use the default
+option.
+</p>
+<p>If you don&rsquo;t like the highlighting of partially matching tokens you can
+turn it off by setting <code>input-method-highlight-flag</code> to <code>nil</code>
+via <kbd>M-x customize-variable</kbd>.
+</p>
+
+
+
+</body>
+</html>
