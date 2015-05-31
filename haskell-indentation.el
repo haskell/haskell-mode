@@ -111,11 +111,10 @@ modes (e.g. fill-column-indicator)."
   :type 'integer
   :group 'haskell-indentation)
 
-(defconst haskell-indentation-mode-map
-  (let ((keymap (make-sparse-keymap)))
-    (define-key keymap (kbd "RET") 'haskell-indentation-newline-and-indent)
-    (define-key keymap (kbd "<backtab>") 'haskell-indentation-indent-backwards)
-    keymap))
+(easy-mmode-defmap haskell-indentation-mode-map
+  `(("RET" . haskell-indentation-newline-and-indent)
+    ("<backtab>" . haskell-indentation-indent-backwards))
+  "Keymap for haskell-indentation-mode-map")
 
 ;;;###autoload
 (define-minor-mode haskell-indentation-mode
