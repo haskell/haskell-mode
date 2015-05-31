@@ -188,19 +188,16 @@ be set to the preferred literate style."
   :group 'haskell
   :type '(choice (const bird) (const tex) (const nil)))
 
-(defvar haskell-mode-map
-  (let ((map (make-sparse-keymap)))
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;; Editing-specific commands
-    (define-key map (kbd "C-c C-.") 'haskell-mode-format-imports)
-    (define-key map [remap delete-indentation] 'haskell-delete-indentation)
-    (define-key map (kbd "C-c C-l") 'haskell-mode-enable-process-minor-mode)
-    (define-key map (kbd "C-c C-b") 'haskell-mode-enable-process-minor-mode)
-    (define-key map (kbd "C-c C-v") 'haskell-mode-enable-process-minor-mode)
-    (define-key map (kbd "C-c C-t") 'haskell-mode-enable-process-minor-mode)
-    (define-key map (kbd "C-c C-i") 'haskell-mode-enable-process-minor-mode)
-    map)
-  "Keymap used in Haskell mode.")
+(easy-mmode-defmap haskell-mode-map
+  ;; editing specific
+  `(("C-c C-." . haskell-mode-format-imports)
+    ([remap delete-indentation] . haskell-delete-indentation)
+    ("C-c C-l" . haskell-mode-enable-process-minor-mode)
+    ("C-c C-b" . haskell-mode-enable-process-minor-mode)
+    ("C-c C-v" . haskell-mode-enable-process-minor-mode)
+    ("C-c C-t" . haskell-mode-enable-process-minor-mode)
+    ("C-c C-i" . haskell-mode-enable-process-minor-mode))
+  "Keymap used in Haskell mode")
 
 (defun haskell-mode-enable-process-minor-mode ()
   "Tell the user to choose a minor mode for process interaction."
