@@ -148,20 +148,10 @@ clashing with other modes."
   (interactive)
   (haskell-indentation-mode t))
 
-(put 'parse-error
-     'error-conditions
-     '(error parse-error))
-(put 'parse-error 'error-message "Parse error")
-
-(defun parse-error (&rest args)
-  (signal 'parse-error (apply 'format args)))
-
-(defmacro on-parse-error (except &rest body)
-  `(condition-case parse-error-string
-       (progn ,@body)
-     (parse-error
-      ,except
-      (message "%s" (cdr parse-error-string)))))
+(defun haskell-indentation-parse-error (&rest args)
+  (let ((msg (apply 'format args)))
+    (message "%s" msg)
+    (throw 'parse-error msg)))
 
 (defvar haskell-literate)
 (defun haskell-indentation-birdp ()
@@ -244,15 +234,11 @@ Handles bird style literate haskell too."
   (if (haskell-indentation-bird-outside-codep)
       (haskell-indentation-delete-horizontal-space-and-newline)
     ;; - just jump to the next line if parse-error
-    (on-parse-error
+    (catch 'parse-error
      (haskell-indentation-delete-horizontal-space-and-newline)
      (let* ((cc (current-column))
             (ci (haskell-indentation-current-indentation))
             (indentations (haskell-indentation-find-indentations-safe)))
-       ;; - jump to the next line and reindent to at the least same level
-       ;;   if parsing was OK
-       (skip-syntax-forward "-")
-       (haskell-indentation-delete-horizontal-space-and-newline)
        (when (haskell-indentation-birdp) (insert "> "))
        (haskell-indentation-reindent-to
         (haskell-indentation-next-indentation (- ci 1) indentations 'nofail)
@@ -414,52 +400,51 @@ the current buffer."
   (if (and (memq major-mode '(haskell-mode literate-haskell-mode))
            (memq 'haskell-indentation-mode minor-mode-list)
            haskell-indentation-dyn-show-indentations)
-      (save-excursion
-        (let* ((columns (progn
-                          (end-of-line)
-                          (current-column)))
-               (ci (haskell-indentation-current-indentation))
-               (allinds (save-excursion
-                          (move-to-column ci); XXX: remove when haskell-indentation-find-indentations is fixed
-                          ;; don't freak out on parse-error
-                          (condition-case e
-                              (haskell-indentation-find-indentations-safe)
-                            (parse-error nil))))
-               ;; indentations that are easy to show
-               (inds (cl-remove-if (lambda (i) (>= i columns)) allinds))
-               ;; tricky indentations, that are after the current EOL
-               (overinds (cl-member-if (lambda (i) (>= i columns)) allinds))
-               ;; +1: leave space for an extra overlay to show overinds
-               (overlays (haskell-indentation-init-overlays (+ 1 (length inds)))))
-          (while inds
-            (move-to-column (car inds))
-            (overlay-put (car overlays) 'face 'haskell-indentation-show-normal-face)
-            (overlay-put (car overlays) 'after-string nil)
-            (move-overlay (car overlays) (point) (+ 1 (point)))
-            (setq inds (cdr inds))
-            (setq overlays (cdr overlays)))
-          (when (and overinds
-                     haskell-indentation-show-indentations-after-eol)
-            (let ((o (car overlays))
-                  (s (make-string (+ 1 (- (car (last overinds)) columns)) ? )))
-              ;; needed for the cursor to be in the good position, see:
-              ;;   http://lists.gnu.org/archive/html/bug-gnu-emacs/2013-03/msg00079.html
-              (put-text-property 0 1 'cursor t s)
-              ;; color the whole line ending overlay with hl-line face if needed
-              (when (or hl-line-mode global-hl-line-mode)
-                (put-text-property 0 (length s) 'face 'hl-line s))
-              ;; put in the underlines at the correct positions
-              (dolist (i overinds)
-                (put-text-property
-                 (- i columns) (+ 1 (- i columns))
-                 'face (if (or hl-line-mode global-hl-line-mode)
-                           'haskell-indentation-show-hl-line-face
-                         'haskell-indentation-show-normal-face)
-                 s))
-              (overlay-put o 'face nil)
-              (overlay-put o 'after-string s)
-              (end-of-line)
-              (move-overlay o (point) (point))))))))
+      (catch 'parse-error
+        (save-excursion
+          (let* ((columns (progn
+                            (end-of-line)
+                            (current-column)))
+                 (ci (haskell-indentation-current-indentation))
+                 (allinds (save-excursion
+                            (move-to-column ci); XXX: remove when haskell-indentation-find-indentations is fixed
+                            ;; don't freak out on parse-error
+                            (haskell-indentation-find-indentations-safe)))
+                 ;; indentations that are easy to show
+                 (inds (cl-remove-if (lambda (i) (>= i columns)) allinds))
+                 ;; tricky indentations, that are after the current EOL
+                 (overinds (cl-member-if (lambda (i) (>= i columns)) allinds))
+                 ;; +1: leave space for an extra overlay to show overinds
+                 (overlays (haskell-indentation-init-overlays (+ 1 (length inds)))))
+            (while inds
+              (move-to-column (car inds))
+              (overlay-put (car overlays) 'face 'haskell-indentation-show-normal-face)
+              (overlay-put (car overlays) 'after-string nil)
+              (move-overlay (car overlays) (point) (+ 1 (point)))
+              (setq inds (cdr inds))
+              (setq overlays (cdr overlays)))
+            (when (and overinds
+                       haskell-indentation-show-indentations-after-eol)
+              (let ((o (car overlays))
+                    (s (make-string (+ 1 (- (car (last overinds)) columns)) ? )))
+                ;; needed for the cursor to be in the good position, see:
+                ;;   http://lists.gnu.org/archive/html/bug-gnu-emacs/2013-03/msg00079.html
+                (put-text-property 0 1 'cursor t s)
+                ;; color the whole line ending overlay with hl-line face if needed
+                (when (or hl-line-mode global-hl-line-mode)
+                  (put-text-property 0 (length s) 'face 'hl-line s))
+                ;; put in the underlines at the correct positions
+                (dolist (i overinds)
+                  (put-text-property
+                   (- i columns) (+ 1 (- i columns))
+                   'face (if (or hl-line-mode global-hl-line-mode)
+                             'haskell-indentation-show-hl-line-face
+                           'haskell-indentation-show-normal-face)
+                   s))
+                (overlay-put o 'face nil)
+                (overlay-put o 'after-string s)
+                (end-of-line)
+                (move-overlay o (point) (point)))))))))
 
 (defun haskell-indentation-enable-show-indentations ()
   "Enable showing of indentation points in the current buffer."
@@ -566,7 +551,7 @@ the current buffer."
         (catch 'parse-end
           (haskell-indentation-toplevel)
           (unless (eq current-token 'end-tokens)
-            (parse-error "Illegal token: %s" current-token)))
+            (haskell-indentation-parse-error "Illegal token: %s" current-token)))
         possible-indentations))))
 
 (defun haskell-indentation-first-indentation ()
@@ -815,7 +800,7 @@ the current buffer."
              (when end (throw 'parse-end nil))) ;; add no more indentations if we expect a closing keyword
             ((equal current-token end)
              (haskell-indentation-read-next-token)) ;; continue
-            (end (parse-error "Illegal token: %s" current-token))))))
+            (end (haskell-indentation-parse-error "Illegal token: %s" current-token))))))
 
 (defun haskell-indentation-case-alternative ()
   (setq left-indent (current-column))
@@ -1083,7 +1068,7 @@ the current buffer."
         (haskell-indentation-phrase-rest (cddr phrase))))
 
      ((string= (cadr phrase) "in")) ;; fallthrough
-     (t (parse-error "Expecting %s" (cadr phrase))))))
+     (t (haskell-indentation-parse-error "Expecting %s" (cadr phrase))))))
 
 (defun haskell-indentation-add-indentation (indent)
   (haskell-indentation-push-indentation
