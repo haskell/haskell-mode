@@ -333,13 +333,17 @@ that should be commented under LaTeX-style literate scripts."
     ;; This still gets fooled with "'"'"'"'"'"', but ... oh well.
     ("\\Sw\\('\\)\\([^\\'\n]\\|\\\\.[^\\'\n \"}]*\\)\\('\\)" (1 "\"") (3 "\""))
     ;; Deal with instances of `--' which don't form a comment
-    ("[!#$%&*+./:<=>?@^|~\\-]\\{3,\\}" (0 (cond ((or (nth 3 (syntax-ppss)) (numberp (nth 4 (syntax-ppss))))
-                              ;; There are no such instances inside nestable comments or strings
+    ("[!#$%&*+./:<=>?@^|~\\]*--[!#$%&*+./:<=>?@^|~\\-]*" (0 (cond ((or (nth 3 (syntax-ppss)) (numberp (nth 4 (syntax-ppss))))
+                              ;; There are no such instances inside
+                              ;; nestable comments or strings
                               nil)
                              ((string-match "\\`-*\\'" (match-string 0))
-                              ;; Sequence of hyphens.  Do nothing in
+                              ;; Sequence of hyphens. Do nothing in
                               ;; case of things like `{---'.
                               nil)
+                             ((string-match "\\`[^-]+--.*" (match-string 0))
+                              ;; Extra characters before comment starts
+                              ".")
                              (t ".")))) ; other symbol sequence
 
     ;; Implement Haskell Report 'escape' and 'gap' rules. Backslash
