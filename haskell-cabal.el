@@ -116,21 +116,20 @@
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.cabal\\'" . haskell-cabal-mode))
 
-(defvar haskell-cabal-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c C-s") 'haskell-cabal-subsection-arrange-lines)
-    (define-key map (kbd "C-M-n") 'haskell-cabal-next-section)
-    (define-key map (kbd "C-M-p") 'haskell-cabal-previous-section)
-    (define-key map (kbd "M-n") 'haskell-cabal-next-subsection)
-    (define-key map (kbd "M-p") 'haskell-cabal-previous-subsection)
-    (define-key map (kbd "C-<down>") 'haskell-cabal-next-subsection)
-    (define-key map (kbd "C-<up>") 'haskell-cabal-previous-subsection)
-    (define-key map (kbd "C-c C-f") 'haskell-cabal-find-or-create-source-file)
-    (define-key map (kbd "M-g l") 'haskell-cabal-goto-library-section)
-    (define-key map (kbd "M-g e") 'haskell-cabal-goto-executable-section)
-    (define-key map (kbd "M-g b") 'haskell-cabal-goto-benchmark-section)
-    (define-key map (kbd "M-g t") 'haskell-cabal-goto-test-suite-section)
-    map))
+(easy-mmode-defmap haskell-cabal-mode-map
+  `(("C-c C-s"  . #'haskell-cabal-subsection-arrange-lines)
+    ("C-M-n"    . #'haskell-cabal-next-section)
+    ("C-M-p"    . #'haskell-cabal-previous-section)
+    ("M-n"      . #'haskell-cabal-next-subsection)
+    ("M-p"      . #'haskell-cabal-previous-subsection)
+    ("C-<down>" . #'haskell-cabal-next-subsection)
+    ("C-<up>"   . #'haskell-cabal-previous-subsection)
+    ("C-c C-f"  . #'haskell-cabal-find-or-create-source-file)
+    ("M-g l"    . #'haskell-cabal-goto-library-section)
+    ("M-g e"    . #'haskell-cabal-goto-executable-section)
+    ("M-g b"    . #'haskell-cabal-goto-benchmark-section)
+    ("M-g t"    . #'haskell-cabal-goto-test-suite-section))
+  "Keymap for haskell-cabal-mode")
 
 ;;;###autoload
 (define-derived-mode haskell-cabal-mode fundamental-mode "Haskell-Cabal"

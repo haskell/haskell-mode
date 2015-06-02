@@ -19,15 +19,13 @@
 
 (require 'cl-lib)
 
-(defvar highlight-uses-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "TAB") 'highlight-uses-mode-next)
-    (define-key map (kbd "S-TAB") 'highlight-uses-mode-prev)
-    (define-key map (kbd "<backtab>") 'highlight-uses-mode-prev)
-    (define-key map (kbd "RET") 'highlight-uses-mode-stop-here)
-    (define-key map (kbd "C-g") 'highlight-uses-mode)
-    map)
-  "Keymap for using haskell-interactive-mode.")
+(easy-mmode-defmap highlight-uses-mode-map
+  `(("TAB"       . #'highlight-uses-mode-next)
+    ("S-TAB"     . #'highlight-uses-mode-prev)
+    ("<backtab>" . #'highlight-uses-mode-prev)
+    ("RET"       . #'highlight-uses-mode-stop-here)
+    ("C-g"       . #'highlight-uses-mode))
+  "Keymap for using haskell-interactive-mode")
 
 (defvar highlight-uses-mode-point nil)
 (make-variable-buffer-local 'highlight-uses-mode-point)
