@@ -59,9 +59,12 @@ Letters do not insert themselves; instead, they are commands."
   (haskell-menu-revert-function nil t))
 
 (suppress-keymap haskell-menu-mode-map t)
-(define-key haskell-menu-mode-map (kbd "n") 'next-line)
-(define-key haskell-menu-mode-map (kbd "p") 'previous-line)
-(define-key haskell-menu-mode-map (kbd "RET") 'haskell-menu-mode-ret)
+
+(easy-mmode-defmap haskell-menu-mode-map
+  `(("n"   . next-line)
+    ("p"   . previous-line)
+    ("RET" . haskell-menu-mode-ret))
+  "Keymap for haskell-menu-mode")
 
 (defun haskell-menu-revert-function (arg1 arg2)
   "Function to refresh the display."

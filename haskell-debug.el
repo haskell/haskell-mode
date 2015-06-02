@@ -68,16 +68,18 @@
   text-mode "Debug"
   "Major mode for debugging Haskell via GHCi.")
 
-(define-key haskell-debug-mode-map (kbd "g") 'haskell-debug/refresh)
-(define-key haskell-debug-mode-map (kbd "s") 'haskell-debug/step)
-(define-key haskell-debug-mode-map (kbd "t") 'haskell-debug/trace)
-(define-key haskell-debug-mode-map (kbd "d") 'haskell-debug/delete)
-(define-key haskell-debug-mode-map (kbd "b") 'haskell-debug/break-on-function)
-(define-key haskell-debug-mode-map (kbd "a") 'haskell-debug/abandon)
-(define-key haskell-debug-mode-map (kbd "c") 'haskell-debug/continue)
-(define-key haskell-debug-mode-map (kbd "p") 'haskell-debug/previous)
-(define-key haskell-debug-mode-map (kbd "n") 'haskell-debug/next)
-(define-key haskell-debug-mode-map (kbd "RET") 'haskell-debug/select)
+(easy-mmode-defmap haskell-debug-mode-map
+  `(("g"   . haskell-debug/refresh)
+    ("s"   . haskell-debug/step)
+    ("t"   . haskell-debug/trace)
+    ("d"   . haskell-debug/delete)
+    ("b"   . haskell-debug/break-on-function)
+    ("a"   . haskell-debug/abandon)
+    ("c"   . haskell-debug/continue)
+    ("p"   . haskell-debug/previous)
+    ("n"   . haskell-debug/next)
+    ("RET" . haskell-debug/select))
+  "The base keymap for haskell-debug-mode")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Globals

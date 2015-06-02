@@ -35,18 +35,16 @@
 (add-hook 'haskell-process-ended-hook 'haskell-process-prompt-restart)
 (add-hook 'kill-buffer-hook 'haskell-interactive-kill)
 
-(defvar interactive-haskell-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c C-l") 'haskell-process-load-or-reload)
-    (define-key map (kbd "C-c C-t") 'haskell-process-do-type)
-    (define-key map (kbd "C-c C-i") 'haskell-process-do-info)
-    (define-key map (kbd "M-.") 'haskell-mode-jump-to-def-or-tag)
-    (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
-    (define-key map (kbd "C-c C-c") 'haskell-process-cabal-build)
-    (define-key map (kbd "C-c C-x") 'haskell-process-cabal)
-    (define-key map [?\C-c ?\C-b] 'haskell-interactive-switch)
-    (define-key map [?\C-c ?\C-z] 'haskell-interactive-switch)
-    map)
+(easy-mmode-defmap interactive-haskell-mode-map
+  `(("C-c C-l" . haskell-process-load-or-reload)
+    ("C-c C-t" . haskell-process-do-type)
+    ("C-c C-i" . haskell-process-do-info)
+    ("M-."     . haskell-mode-jump-to-def-or-tag)
+    ("C-c C-k" . haskell-interactive-mode-clear)
+    ("C-c C-c" . haskell-process-cabal-build)
+    ("C-c C-x" . haskell-process-cabal)
+    ("C-c C-b" . haskell-interactive-switch)
+    ("C-c C-z" . haskell-interactive-switch))
   "Keymap for using haskell-interactive-mode.")
 
 ;;;###autoload
