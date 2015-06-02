@@ -807,20 +807,6 @@ we load it."
     ("C-c C-d" . inferior-haskell-find-haddock))
   "Keymap for inf-haskell-mode-map")
 
-(defvar inf-haskell-mode-map
-  (let ((map (make-sparse-keymap)))
-    ;; (define-key map [?\M-C-x]     'inferior-haskell-send-defun)
-    ;; (define-key map [?\C-x ?\C-e] 'inferior-haskell-send-last-sexp)
-    ;; (define-key map [?\C-c ?\C-r] 'inferior-haskell-send-region)
-    ;; I think it makes sense to bind inferior-haskell-load-and-run to C-c
-    ;; C-r, but since it used to be bound to `reload' until June 2007, I'm
-    ;; going to leave it out for now.
-    ;; (define-key map [?\C-c ?\C-r] 'inferior-haskell-load-and-run)
-    ;; (define-key map [?\C-c ?\C-s] 'inferior-haskell-start-process)
-    ;; That's what M-; is for.
-    map)
-  "Keymap for using inf-haskell.")
-
 ;;;###autoload
 (define-minor-mode inf-haskell-mode
   "Minor mode for enabling inf-haskell process interaction."
