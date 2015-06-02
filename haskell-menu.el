@@ -61,9 +61,9 @@ Letters do not insert themselves; instead, they are commands."
 (suppress-keymap haskell-menu-mode-map t)
 
 (easy-mmode-defmap haskell-menu-mode-map
-  `(("n"   . next-line)
-    ("p"   . previous-line)
-    ("RET" . haskell-menu-mode-ret))
+  `(("n"   . #'next-line)
+    ("p"   . #'previous-line)
+    ("RET" . #'haskell-menu-mode-ret))
   "Keymap for haskell-menu-mode")
 
 (defun haskell-menu-revert-function (arg1 arg2)

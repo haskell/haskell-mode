@@ -796,15 +796,15 @@ we load it."
     (if url (browse-url url) (error "Local file doesn't exist"))))
 
 (easy-mmode-defmap inf-haskell-mode-map
-  `(("C-x C-d" . inferior-haskell-send-decl)
-    ("C-c C-z" . switch-to-haskell)
-    ("C-c C-l" . inferior-haskell-load-file)
-    ("C-c C-b" . switch-to-haskell)
-    ("C-c C-v" . haskell-check)
-    ("C-c C-t" . inferior-haskell-type)
-    ("C-c C-i" . inferior-haskell-info)
-    ("C-c M-." . inferior-haskell-find-definition)
-    ("C-c C-d" . inferior-haskell-find-haddock))
+  `(("C-x C-d" . #'inferior-haskell-send-decl)
+    ("C-c C-z" . #'switch-to-haskell)
+    ("C-c C-l" . #'inferior-haskell-load-file)
+    ("C-c C-b" . #'switch-to-haskell)
+    ("C-c C-v" . #'haskell-check)
+    ("C-c C-t" . #'inferior-haskell-type)
+    ("C-c C-i" . #'inferior-haskell-info)
+    ("C-c M-." . #'inferior-haskell-find-definition)
+    ("C-c C-d" . #'inferior-haskell-find-haddock))
   "Keymap for inf-haskell-mode-map")
 
 ;;;###autoload

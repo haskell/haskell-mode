@@ -69,16 +69,16 @@
   "Major mode for debugging Haskell via GHCi.")
 
 (easy-mmode-defmap haskell-debug-mode-map
-  `(("g"   . haskell-debug/refresh)
-    ("s"   . haskell-debug/step)
-    ("t"   . haskell-debug/trace)
-    ("d"   . haskell-debug/delete)
-    ("b"   . haskell-debug/break-on-function)
-    ("a"   . haskell-debug/abandon)
-    ("c"   . haskell-debug/continue)
-    ("p"   . haskell-debug/previous)
-    ("n"   . haskell-debug/next)
-    ("RET" . haskell-debug/select))
+  `(("g"   . #'haskell-debug/refresh)
+    ("s"   . #'haskell-debug/step)
+    ("t"   . #'haskell-debug/trace)
+    ("d"   . #'haskell-debug/delete)
+    ("b"   . #'haskell-debug/break-on-function)
+    ("a"   . #'haskell-debug/abandon)
+    ("c"   . #'haskell-debug/continue)
+    ("p"   . #'haskell-debug/previous)
+    ("n"   . #'haskell-debug/next)
+    ("RET" . #'haskell-debug/select))
   "The base keymap for haskell-debug-mode")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

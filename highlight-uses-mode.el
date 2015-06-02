@@ -20,11 +20,11 @@
 (require 'cl-lib)
 
 (easy-mmode-defmap highlight-uses-mode-map
-  `(("TAB" . highlight-uses-mode-next)
-    ("S-TAB" . highlight-uses-mode-prev)
-    ("<backtab>" . highlight-uses-mode-prev)
-    ("RET" . highlight-uses-mode-stop-here)
-    ("C-g" . highlight-uses-mode))
+  `(("TAB"       . #'highlight-uses-mode-next)
+    ("S-TAB"     . #'highlight-uses-mode-prev)
+    ("<backtab>" . #'highlight-uses-mode-prev)
+    ("RET"       . #'highlight-uses-mode-stop-here)
+    ("C-g"       . #'highlight-uses-mode))
   "Keymap for using haskell-interactive-mode")
 
 (defvar highlight-uses-mode-point nil)

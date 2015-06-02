@@ -36,15 +36,15 @@
 (add-hook 'kill-buffer-hook 'haskell-interactive-kill)
 
 (easy-mmode-defmap interactive-haskell-mode-map
-  `(("C-c C-l" . haskell-process-load-or-reload)
-    ("C-c C-t" . haskell-process-do-type)
-    ("C-c C-i" . haskell-process-do-info)
-    ("M-."     . haskell-mode-jump-to-def-or-tag)
-    ("C-c C-k" . haskell-interactive-mode-clear)
-    ("C-c C-c" . haskell-process-cabal-build)
-    ("C-c C-x" . haskell-process-cabal)
-    ("C-c C-b" . haskell-interactive-switch)
-    ("C-c C-z" . haskell-interactive-switch))
+  `(("C-c C-l" . #'haskell-process-load-or-reload)
+    ("C-c C-t" . #'haskell-process-do-type)
+    ("C-c C-i" . #'haskell-process-do-info)
+    ("M-."     . #'haskell-mode-jump-to-def-or-tag)
+    ("C-c C-k" . #'haskell-interactive-mode-clear)
+    ("C-c C-c" . #'haskell-process-cabal-build)
+    ("C-c C-x" . #'haskell-process-cabal)
+    ("C-c C-b" . #'haskell-interactive-switch)
+    ("C-c C-z" . #'haskell-interactive-switch))
   "Keymap for using haskell-interactive-mode.")
 
 ;;;###autoload

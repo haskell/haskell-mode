@@ -190,13 +190,13 @@ be set to the preferred literate style."
 
 (easy-mmode-defmap haskell-mode-map
   ;; editing specific
-  `(("C-c C-." . haskell-mode-format-imports)
-    ([remap delete-indentation] . haskell-delete-indentation)
-    ("C-c C-l" . haskell-mode-enable-process-minor-mode)
-    ("C-c C-b" . haskell-mode-enable-process-minor-mode)
-    ("C-c C-v" . haskell-mode-enable-process-minor-mode)
-    ("C-c C-t" . haskell-mode-enable-process-minor-mode)
-    ("C-c C-i" . haskell-mode-enable-process-minor-mode))
+  `(("C-c C-." . #'haskell-mode-format-imports)
+    ("C-c C-l" . #'haskell-mode-enable-process-minor-mode)
+    ("C-c C-b" . #'haskell-mode-enable-process-minor-mode)
+    ("C-c C-v" . #'haskell-mode-enable-process-minor-mode)
+    ("C-c C-t" . #'haskell-mode-enable-process-minor-mode)
+    ("C-c C-i" . #'haskell-mode-enable-process-minor-mode)
+    ([remap delete-indentation] . #'haskell-delete-indentation))
   "Keymap used in Haskell mode")
 
 (defun haskell-mode-enable-process-minor-mode ()

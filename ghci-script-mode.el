@@ -53,7 +53,7 @@
 (add-to-list 'auto-mode-alist '("\\.ghci\\'" . ghci-script-mode))
 
 (easy-mmode-defmap ghci-script-mode-map
-  `("C-c C-l" . ghci-script-mode-load)
+  `("C-c C-l" . #'ghci-script-mode-load)
   "Keymap for ghci-script-mode")
 
 (defun ghci-script-mode-load ()
