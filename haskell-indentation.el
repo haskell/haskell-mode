@@ -76,7 +76,7 @@ modes (e.g. fill-column-indicator)."
   :group 'haskell-indentation)
 
 
-(defcustom haskell-indentation-indent-leftmost 'both
+(defcustom haskell-indentation-indent-leftmost t
   "Indent to the left margin after certain keywords (for example after let .. in, case .. of).  If set to t it will only indent to the left.  If nil only relative to the containing expression.  If set to the keyword 'both then both positions are allowed."
   :type 'symbol
   :group 'haskell-indentation)
@@ -86,7 +86,7 @@ modes (e.g. fill-column-indicator)."
   :type 'integer
   :group 'haskell-indentation)
 
-(defcustom haskell-indentation-starter-offset 1
+(defcustom haskell-indentation-starter-offset 2
   "Extra indentation after an opening keyword (e.g. let)."
   :type 'integer
   :group 'haskell-indentation)
