@@ -47,7 +47,7 @@ cd gh-pages-deploy
 git rm -qr manual/latest
 cp -r ../html manual/latest
 git add manual/latest
-(git commit -m "Update manual from haskell/haskell-mode@${HEAD_COMMIT}" && git push) || true
+(git commit -m "Update manual from haskell/haskell-mode@${HEAD_COMMIT}" && git push origin gh-pages) || true
 cd ..
 rm -fr gh-pages-deploy
 
