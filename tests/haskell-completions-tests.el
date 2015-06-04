@@ -27,5 +27,48 @@
 
 ;;; Code:
 
+(require 'ert)
+(require 'haskell-mode)
+(require 'haskell-completions)
+
+
+(ert-deftest haskell-completions-can-grab-prefix-test ()
+  "Tests the function `haskell-completions-can-grab-prefix'."
+  (with-temp-buffer
+    (haskell-mode)
+    (should (eql nil (haskell-completions-can-grab-prefix)))
+    (insert " ")
+    (should (eql nil (haskell-completions-can-grab-prefix)))
+    (insert "a")
+    (should (eql t (haskell-completions-can-grab-prefix)))
+    (save-excursion
+      (insert " ")
+      (should (eql nil (haskell-completions-can-grab-prefix)))
+      (insert "bc-")
+      (should (eql t (haskell-completions-can-grab-prefix)))
+      (insert "\n")
+      (should (eql nil (haskell-completions-can-grab-prefix)))
+      (insert "def:#!")
+      (should (eql t (haskell-completions-can-grab-prefix))))
+    (should (eql t (haskell-completions-can-grab-prefix)))
+    ;; punctuation tests
+    (save-excursion (insert ")"))
+    (should (eql t (haskell-completions-can-grab-prefix)))
+    (save-excursion (insert ","))
+    (should (eql t (haskell-completions-can-grab-prefix)))
+    (save-excursion (insert "'"))
+    (should (eql t (haskell-completions-can-grab-prefix)))
+    ;; should return nil in the middle of word
+    (save-excursion (insert "bcd"))
+    (should (eql nil (haskell-completions-can-grab-prefix)))
+    ;; region case
+    (let ((p (point)))
+      (goto-char (point-min))
+      (push-mark)
+      (goto-char p)
+      (activate-mark)
+      (should (eql nil (haskell-completions-can-grab-prefix))))))
+
+
 (provide 'haskell-completions-tests)
 ;;; haskell-completions-tests.el ends here

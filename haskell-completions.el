@@ -28,5 +28,19 @@
 
 ;;; Code:
 
+(defun haskell-completions-can-grab-prefix ()
+  "Check if the case is appropriate for grabbing completion prefix.
+Returns t if point is either at whitespace character, or at
+punctuation, or at line end and preceeding character is not a
+whitespace or new line, otherwise returns nil.
+
+  Returns nil in presense of active region."
+  (when (not (region-active-p))
+    (when (looking-at (rx (| space line-end punct)))
+      (when (not (bobp))
+        (save-excursion
+          (backward-char)
+          (not (looking-at (rx (| space line-end)))))))))
+
 (provide 'haskell-completions)
 ;;; haskell-completions.el ends here
