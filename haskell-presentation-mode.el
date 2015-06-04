@@ -80,9 +80,8 @@ Creates temporal Haskell Presentation buffer and assigns it to
 given haskell SESSION; presented CODE will be fontified as
 haskell code.  Give an optional non-nil CLEAR arg to clear the
 buffer before presenting message."
-  (let ((buffer (get-buffer-create haskell-presentation-buffer-name)))
+  (let ((buffer (haskell-presentation-buffer)))
     (with-current-buffer buffer
-      (haskell-presentation-mode)
 
       (when (boundp 'shm-display-quarantine)
         (set (make-local-variable 'shm-display-quarantine) nil))
