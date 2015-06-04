@@ -47,6 +47,7 @@ ELFILES = \
 	haskell-compat.el \
 	haskell-compile.el \
 	haskell-complete-module.el \
+	haskell-completions.el \
 	haskell-customize.el \
 	haskell-debug.el \
 	haskell-decl-scan.el \
