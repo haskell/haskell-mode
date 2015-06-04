@@ -83,8 +83,8 @@ includes three different indentation minor modes with different
 trade-offs:
 </p>
 <dl compact="compact">
-<dt><code>turn-on-haskell-simple-indent</code>
-<a name="index-turn_002don_002dhaskell_002dsimple_002dindent"></a>
+<dt><code>haskell-simple-indent-mode</code>
+<a name="index-haskell_002dsimple_002dindent_002dmode"></a>
 </dt>
 <dd>
 <p>A very simple indentation scheme; In this scheme, <tt class="key">TAB</tt> will now
@@ -92,8 +92,8 @@ move the cursor to the next indent point in the previous non-blank line.
 An indent point is a non-whitespace character following whitespace.
 </p>
 </dd>
-<dt><code>turn-on-haskell-indent</code>
-<a name="index-turn_002don_002dhaskell_002dindent"></a>
+<dt><code>haskell-indent-mode</code>
+<a name="index-haskell_002dindent_002dmode"></a>
 </dt>
 <dd>
 <p>Intelligent semi-automatic indentation for Haskell&rsquo;s layout rule.  The
@@ -106,11 +106,11 @@ with the layout rule</cite> published in the Journal of Functional Programming
 8.5 (1998).
 </p>
 </dd>
-<dt><code>turn-on-haskell-indentation</code>
-<a name="index-turn_002don_002dhaskell_002dindentation"></a>
+<dt><code>haskell-indentation-mode</code>
+<a name="index-haskell_002dindentation_002dmode"></a>
 </dt>
 <dd>
-<p>Improved variation of <code>turn-on-haskell-indent</code> indentation
+<p>Improved variation of <code>haskell-indent-mode</code> indentation
 mode. Rebinds <tt class="key">RET</tt> and <tt class="key">DEL</tt>, so that indentations can be set
 and deleted as if they were real tabs.
 </p>
@@ -118,19 +118,19 @@ and deleted as if they were real tabs.
 </dl>
 
 <p>To enable one of these three mutually exclusive indentation schemes, you
-just need call one (and only one!) of the <code>turn-on-*</code> commands
+just need call one (and only one!) of the <code>*-mode</code> commands
 while in the buffer you want the indentation scheme to be activated for.
 </p>
-<p>The recommended way is to add one of <code>turn-on-*</code> commands to
+<p>The recommended way is to add one of <code>*-mode</code> commands to
 <code>haskell-mode-hook</code>. This can be done either by using <kbd>M-x
 customize-variable <span class="key">RET</span> haskell-mode-hook</kbd> which provides a
 convenient user interface or by adding <em>one</em> of the following three
 lines to your <samp>.emacs</samp> file:
 </p>
 <div class="lisp">
-<pre class="lisp">(add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+<pre class="lisp">(add-hook 'haskell-mode-hook 'haskell-simple-indent-mode)
+(add-hook 'haskell-mode-hook 'haskell-indent-mode)
+(add-hook 'haskell-mode-hook 'haskell-indentation-mode)
 </pre></div>
 
 <a name="Interactive-Block-Indentation"></a>

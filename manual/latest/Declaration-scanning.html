@@ -67,7 +67,6 @@ Next: <a href="Compilation.html#Compilation" accesskey="n" rel="next">Compilatio
 <a name="Declaration-scannning"></a>
 <h2 class="chapter">7 Declaration scannning</h2>
 
-<a name="index-turn_002don_002dhaskell_002ddecl_002dscan"></a>
 <a name="index-haskell_002ddecl_002dscan_002dmode"></a>
 <a name="index-haskell_002ddecl_002dscan_002dmode_002dhook"></a>
 
@@ -110,11 +109,11 @@ Lock</a>) as <code>haskell-decl-scan-mode</code> ignores text highlighted
 with <code>font-lock-comment-face</code>.
 </p>
 <p>As usual, in order to activate <code>haskell-decl-scan-mode</code>
-automatically for Haskell buffers, add <code>turn-on-haskell-decl-scan</code>
+automatically for Haskell buffers, add <code>haskell-decl-scan-mode</code>
 to <code>haskell-mode-hook</code>:
 </p>
 <div class="lisp">
-<pre class="lisp">(add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
+<pre class="lisp">(add-hook 'haskell-mode-hook 'haskell-decl-scan-mode)
 </pre></div>
 
 <p><code>haskell-decl-scan-mode</code> enables the use of features that build
