@@ -527,7 +527,7 @@ Returns keywords suitable for `font-lock-keywords'."
   "Locally set `font-lock-defaults' for Haskell."
   (set (make-local-variable 'font-lock-defaults)
        '(haskell-font-lock-choose-keywords
-         nil nil ((?\' . "w") (?_  . "w")) nil
+         nil nil nil nil
          (font-lock-syntactic-keywords
           . haskell-font-lock-choose-syntactic-keywords)
          (font-lock-syntactic-face-function
