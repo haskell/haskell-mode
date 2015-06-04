@@ -48,6 +48,22 @@
    ("c" . haskell-presentation-clear))
  "The base key map for `haskell-presentation-mode'.")
 
+(defun haskell-presentation-buffer ()
+  "Return Haskell Presentaion buffer.
+Return current presenation buffer or create new one if absent.
+Never returns nil."
+  ;; TODO Provide interactive calling options: when called interactively make
+  ;; the presentation buffer current.
+  (let ((may-buffer (get-buffer haskell-presentation-buffer-name)))
+    (if may-buffer
+        may-buffer
+      (let ((buffer (generate-new-buffer haskell-presentation-buffer-name)))
+        (with-current-buffer buffer
+          (insert haskell-presentation-hint-message)
+          (haskell-presentation-mode)
+          (setq buffer-read-only t))
+          buffer))))
+
 (defun haskell-presentation-clear ()
   "Clear Haskell Presentation buffer."
   (interactive)
