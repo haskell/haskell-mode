@@ -966,7 +966,7 @@ If variable `haskell-process-use-presentation-mode' is NIL it will output
 modified message MSG to echo area."
   (if haskell-process-use-presentation-mode
       (let ((session (haskell-process-session (haskell-interactive-process))))
-        (haskell-present session msg))
+        (haskell-presentation-present session msg))
     (let ((m (haskell-utils-reduce-string msg)))
       (message m))))
 
