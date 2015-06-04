@@ -44,8 +44,8 @@
 
 (easy-mmode-defmap
  haskell-presentation-mode-map
- `(("q" . #'quit-window)
-   ("c" . #'haskell-presentation-clear))
+ `(("q" . quit-window)
+   ("c" . haskell-presentation-clear))
  "The base key map for `haskell-presentation-mode'.")
 
 (defun haskell-presentation-clear ()
