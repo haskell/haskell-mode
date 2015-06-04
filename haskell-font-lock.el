@@ -372,7 +372,7 @@ that should be commented under LaTeX-style literate scripts."
     ;; QuasiQuotes opens only when outside of a string or a comment
     ;; and closes only when inside a quasiquote.
     ;;
-    ;; (syntax-ppss) returns list with two imteresting elements:
+    ;; (syntax-ppss) returns list with two interesting elements:
     ;; nth 3. non-nil if inside a string. (it is the character that will
     ;;        terminate the string, or t if the string should be terminated
     ;;        by a generic string delimiter.)
@@ -382,7 +382,7 @@ that should be commented under LaTeX-style literate scripts."
     ;; Note also that we need to do in in a single pass, hence a regex
     ;; that covers both the opening and the ending of a quasiquote.
 
-    ("\\(\\[[[:alnum:]]+\\)?\\(|\\)\\(?:]\\)?"
+    ("\\(\\[[[:alnum:]]+\\)?\\(|\\)\\(]\\)?"
      (2 (save-excursion
           (goto-char (match-beginning 0))
           (if (eq ?\[ (char-after))
@@ -391,10 +391,12 @@ that should be commented under LaTeX-style literate scripts."
                           (nth 4 (syntax-ppss))
                           (member (match-string 1)
                                   '("[e" "[t" "[d" "[p")))
-                "|")
+                "\"")
             ;; closing case
-            (when (eq t (nth 3 (syntax-ppss)))
-              "|")))))
+            (when (and (eq ?| (nth 3 (syntax-ppss)))
+                       (equal "]" (match-string 3))
+                       )
+              "\"")))))
     ))
 
 (defconst haskell-bird-syntactic-keywords
