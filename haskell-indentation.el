@@ -28,7 +28,7 @@
 ;; To turn indentation on for all Haskell buffers under Haskell mode
 ;; <http://www.haskell.org/haskell-mode/> add this to .emacs:
 ;;
-;;    (add-hook haskell-mode-hook 'turn-on-haskell-indentation)
+;;    (add-hook haskell-mode-hook 'haskell-indentation-mode)
 ;;
 ;; Otherwise, call `haskell-indentation-mode'.
 
@@ -147,6 +147,9 @@ clashing with other modes."
   "Turn on the haskell-indentation minor mode."
   (interactive)
   (haskell-indentation-mode t))
+(make-obsolete 'turn-on-haskell-indentation
+               'haskell-indentation-mode
+               "2015-05-25")
 
 (defun haskell-indentation-parse-error (&rest args)
   (let ((msg (apply 'format args)))
