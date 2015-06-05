@@ -967,7 +967,7 @@ modified message MSG to echo area."
   (if haskell-process-use-presentation-mode
       (let ((session (haskell-process-session (haskell-interactive-process))))
         (haskell-present session msg))
-    (let (m (haskell-utils-reduce-string msg))
+    (let ((m (haskell-utils-reduce-string msg)))
       (message m))))
 
 (defun haskell-utils-async-update-post-command-flag ()
