@@ -487,6 +487,71 @@ that should be commented under LaTeX-style literate scripts."
          ;; Get help from font-lock-syntactic-keywords.
          (parse-sexp-lookup-properties . t))))
 
+;; The main functions.
+(defun turn-on-haskell-font-lock ()
+  "Turns on font locking in current buffer for Haskell 1.4 scripts.
+
+Changes the current buffer's `font-lock-defaults', and adds the
+following variables:
+
+   `haskell-keyword-face'      for reserved keywords and syntax,
+   `haskell-constructor-face'  for data- and type-constructors, class names,
+                               and module names,
+   `haskell-operator-face'     for symbolic and alphanumeric operators,
+   `haskell-default-face'      for ordinary code.
+
+The variables are initialised to the following font lock default faces:
+
+   `haskell-keyword-face'      `font-lock-keyword-face'
+   `haskell-constructor-face'  `font-lock-type-face'
+   `haskell-operator-face'     `font-lock-function-name-face'
+   `haskell-default-face'      <default face>
+
+Two levels of fontification are defined: level one (the default)
+and level two (more colour).  The former does not colour operators.
+Use the variable `font-lock-maximum-decoration' to choose
+non-default levels of fontification.  For example, adding this to
+.emacs:
+
+  (setq font-lock-maximum-decoration '((haskell-mode . 2) (t . 0)))
+
+uses level two fontification for `haskell-mode' and default level for
+all other modes.  See documentation on this variable for further
+details.
+
+To alter an attribute of a face, add a hook.  For example, to change
+the foreground colour of comments to brown, add the following line to
+.emacs:
+
+  (add-hook 'haskell-font-lock-hook
+      (lambda ()
+          (set-face-foreground 'haskell-comment-face \"brown\")))
+
+Note that the colours available vary from system to system.  To see
+what colours are available on your system, call
+`list-colors-display' from emacs.
+
+To turn font locking on for all Haskell buffers, add this to .emacs:
+
+  (add-hook 'haskell-mode-hook 'turn-on-haskell-font-lock)
+
+To turn font locking on for the current buffer, call
+`turn-on-haskell-font-lock'.  To turn font locking off in the current
+buffer, call `turn-off-haskell-font-lock'.
+
+Bird-style literate Haskell scripts are supported: If the value of
+`haskell-literate-bird-style' (automatically set by the Haskell mode
+of Moss&Thorn) is non-nil, a Bird-style literate script is assumed.
+
+Invokes `haskell-font-lock-hook' if not nil."
+  (haskell-font-lock-defaults-create)
+  (run-hooks 'haskell-font-lock-hook)
+  (turn-on-font-lock))
+
+(defun turn-off-haskell-font-lock ()
+  "Turns off font locking in current buffer."
+  (font-lock-mode -1))
+
 (defun haskell-fontify-as-mode (text mode)
   "Fontify TEXT as MODE, returning the fontified text."
   (with-temp-buffer
