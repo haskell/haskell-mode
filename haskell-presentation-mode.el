@@ -34,44 +34,59 @@
           \\{hypertext-mode-map}"
   (setq case-fold-search nil))
 
-(defconst haskell-present-buffer-name
+(defconst haskell-presentation-buffer-name
   "*Haskell Presentation*"
   "Haskell Presentation buffer name.")
 
-(defconst haskell-present-hint-message
+(defconst haskell-presentation-hint-message
   "-- Hit `q' to close this window; `c' to clear.\n\n"
   "Hint message appered in Haskell Presentation buffer.")
 
 (easy-mmode-defmap
  haskell-presentation-mode-map
- `(("q" . #'quit-window)
-   ("c" . #'haskell-present-clear))
+ `(("q" . quit-window)
+   ("c" . haskell-presentation-clear))
  "The base key map for `haskell-presentation-mode'.")
 
-(defun haskell-present-clear ()
+(defun haskell-presentation-buffer ()
+  "Return Haskell Presentaion buffer.
+Return current presenation buffer or create new one if absent.
+Never returns nil."
+  ;; TODO Provide interactive calling options: when called interactively make
+  ;; the presentation buffer current.
+  (let ((may-buffer (get-buffer haskell-presentation-buffer-name)))
+    (if may-buffer
+        may-buffer
+      (let ((buffer (generate-new-buffer haskell-presentation-buffer-name)))
+        (with-current-buffer buffer
+          (insert haskell-presentation-hint-message)
+          (haskell-presentation-mode)
+          (setq buffer-read-only t))
+          buffer))))
+
+(defun haskell-presentation-clear ()
   "Clear Haskell Presentation buffer."
   (interactive)
-  (let ((hp-buf (get-buffer haskell-present-buffer-name)))
+  (let ((hp-buf (get-buffer haskell-presentation-buffer-name)))
     (when hp-buf
       (with-current-buffer hp-buf
         (let ((buffer-read-only nil))
           (erase-buffer)
-          (insert haskell-present-hint-message))))))
+          (insert haskell-presentation-hint-message))))))
 
-(defun haskell-present (session code &optional clear)
+(defun haskell-presentation-present (session code &optional clear)
   "Present given code in a popup buffer.
 Creates temporal Haskell Presentation buffer and assigns it to
 given haskell SESSION; presented CODE will be fontified as
 haskell code.  Give an optional non-nil CLEAR arg to clear the
 buffer before presenting message."
-  (let ((buffer (get-buffer-create haskell-present-buffer-name)))
+  (let ((buffer (haskell-presentation-buffer)))
     (with-current-buffer buffer
-      (haskell-presentation-mode)
 
       (when (boundp 'shm-display-quarantine)
         (set (make-local-variable 'shm-display-quarantine) nil))
 
-      (when clear (haskell-present-clear))
+      (when clear (haskell-presentation-clear))
       (haskell-session-assign session)
       (save-excursion
         (let ((buffer-read-only nil))

@@ -1096,7 +1096,8 @@ don't care when the thing completes as long as it's soonish."
 (defun haskell-process-show-repl-response (line)
   "Send LINE to the GHCi process and echo the result in some fashion.
 Result will be printed in the minibuffer or presented using
-haskell-present, depending on variable `haskell-process-use-presentation-mode'."
+function `haskell-presentation-present', depending on variable
+`haskell-process-use-presentation-mode'."
   (let ((process (haskell-interactive-process)))
     (haskell-process-queue-command
      process
@@ -1106,7 +1107,7 @@ haskell-present, depending on variable `haskell-process-use-presentation-mode'."
             (haskell-process-send-string (car state) (cdr state)))
       :complete (lambda (state response)
                   (if haskell-process-use-presentation-mode
-                      (haskell-present
+                      (haskell-presentation-present
                        (haskell-process-session (car state))
                        response)
                     (haskell-mode-message-line response)))))))
