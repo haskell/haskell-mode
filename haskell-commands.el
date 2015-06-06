@@ -945,6 +945,11 @@ expression bounds."
       (setq end-l (line-number-at-pos))
       (setq end-c (1+ (current-column)))
       (setq value (buffer-substring-no-properties start-p end-p))
+      ;; supress multiline expressions
+      (let ((lines (split-string value "\n" t)))
+        (when (and (cdr lines)
+                   (stringp (car lines)))
+          (setq value (format "[ %s … ]" (car lines)))))
       (replace-regexp-in-string
        "\n$"
        ""
