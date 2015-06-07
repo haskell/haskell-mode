@@ -930,19 +930,37 @@ to point."
   "Prepare :type-at command to be send to haskell process.
 POS is a cons cell containing min and max positions, i.e. target
 expression bounds."
-  (replace-regexp-in-string
-   "\n$"
-   ""
-   (format ":type-at %s %d %d %d %d %s"
-           (buffer-file-name)
-           (progn (goto-char (car pos))
-                  (line-number-at-pos))
-           (1+ (current-column))
-           (progn (goto-char (cdr pos))
-                  (line-number-at-pos))
-           (1+ (current-column))
-           (buffer-substring-no-properties (car pos)
-                                           (cdr pos)))))
+  (save-excursion
+    (let ((start-p (car pos))
+          (end-p (cdr pos))
+          start-l
+          start-c
+          end-l
+          end-c
+          value)
+      (goto-char start-p)
+      (setq start-l (line-number-at-pos))
+      (setq start-c (1+ (current-column)))
+      (goto-char end-p)
+      (setq end-l (line-number-at-pos))
+      (setq end-c (1+ (current-column)))
+      (setq value (buffer-substring-no-properties start-p end-p))
+      ;; supress multiline expressions
+      (let ((lines (split-string value "\n" t)))
+        (when (and (cdr lines)
+                   (stringp (car lines)))
+          (setq value (format "[ %s … ]" (car lines)))))
+      (replace-regexp-in-string
+       "\n$"
+       ""
+       (format ":type-at %s %d %d %d %d %s"
+               (buffer-file-name)
+               start-l
+               start-c
+               end-l
+               end-c
+               value)))))
+
 
 (defun haskell-utils-insert-type-signature (signature)
   "Insert type signature.
