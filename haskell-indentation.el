@@ -606,7 +606,7 @@ the current buffer."
 ;; tokens in type declarations
 (defconst haskell-indentation-type-list
   '(("::"    . (lambda () (haskell-indentation-with-starter
-                           (lambda () (haskell-indentation-separated #'haskell-indentation-type '("->" "=>"))))))
+                           (lambda () (haskell-indentation-separated #'haskell-indentation-type "->")))))
     ("("     . (lambda () (haskell-indentation-list #'haskell-indentation-type ")" ",")))
     ("["     . (lambda () (haskell-indentation-list #'haskell-indentation-type "]" ",")))
     ("{"     . (lambda () (haskell-indentation-list #'haskell-indentation-type "}" ",")))))
@@ -637,7 +637,7 @@ the current buffer."
     ("where" . (lambda () (haskell-indentation-with-starter
                            #'haskell-indentation-declaration-layout nil t)))
     ("::"    . (lambda () (haskell-indentation-with-starter
-                           (lambda () (haskell-indentation-separated #'haskell-indentation-type '("->" "=>"))))))
+                           (lambda () (haskell-indentation-separated #'haskell-indentation-type "->")))))
     ("="     . (lambda () (haskell-indentation-statement-right #'haskell-indentation-expression)))
     ("<-"    . (lambda () (haskell-indentation-statement-right #'haskell-indentation-expression)))
     ("("     . (lambda () (haskell-indentation-list #'haskell-indentation-expression ")" '(list "," "->"))))
@@ -702,7 +702,7 @@ the current buffer."
          ((eq current-token 'end-tokens)
           (when (member following-token
                         '(value operator no-following-token
-                                "(" "[" "{" "::"))
+                                "->" "(" "[" "{" "::"))
             (haskell-indentation-add-indentation current-indent))
           (throw 'return nil))
          (t (let ((parser (assoc current-token haskell-indentation-type-list)))
@@ -1167,7 +1167,7 @@ the current buffer."
          (match-string-no-properties 1))
         ((looking-at "[][(){}[,;]")
          (match-string-no-properties 0))
-        ((looking-at "\\(\\\\\\|->\\|=>\\|→\\|<-\\|←\\|::\\|∷\\|=\\||\\)\\([^-:!#$%&*+./<=>?@\\\\^|~]\\|$\\)")
+        ((looking-at "\\(\\\\\\|->\\|→\\|<-\\|←\\|::\\|∷\\|=\\||\\)\\([^-:!#$%&*+./<=>?@\\\\^|~]\\|$\\)")
          (match-string-no-properties 1))
         ((looking-at "\\(→\\|←\\|∷\\)\\([^-:!#$%&*+./<=>?@\\\\^|~]\\|$\\)")
          (let ((tok (match-string-no-properties 1)))

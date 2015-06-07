@@ -198,6 +198,7 @@ Example of lines:
 
 (ert-deftest haskell-indentation-check-17a ()
   "A type for a function"
+  :expected-result :failed
   (haskell-indentation-check
    "fun :: Int"
    "    -> Int"
@@ -205,6 +206,7 @@ Example of lines:
 
 (ert-deftest haskell-indentation-check-17b ()
   "A type for a function with context"
+  :expected-result :failed
   (haskell-indentation-check
    "fun :: Monad m"
    "    => Int"
@@ -212,6 +214,7 @@ Example of lines:
 
 (ert-deftest haskell-indentation-check-17c ()
   "A type for a function with complicated context"
+  :expected-result :failed
   (haskell-indentation-check
    "fun :: (Monad m, MonadBaseControl IO m, MyMonad (A v) m)"
    "    => MyMonad (A v) m"
@@ -219,8 +222,101 @@ Example of lines:
 
 (ert-deftest haskell-indentation-check-17d ()
   "A type for a function with param and a complicated context"
+  :expected-result :failed
   (haskell-indentation-check
    "fun :: (Monad m, MonadBaseControl IO m, MyMonad (A v) m)"
    "    => MyMonad (A v) m"
    "    -> m (Maybe a)"
    "    ^"))
+
+(ert-deftest haskell-indentation-check-18a ()
+  "if then else indentation: then"
+  (haskell-indentation-check
+   "x = if flag"
+   "    then 1"
+   "    ^"))
+
+(ert-deftest haskell-indentation-check-18b ()
+  "if then else indentation: else"
+  (haskell-indentation-check
+   "x = if flag"
+   "    then 1"
+   "    else 0"
+   "    ^"))
+
+(ert-deftest haskell-indentation-check-18c ()
+  "do and if then else indentation: then"
+  (haskell-indentation-check
+   "x = do"
+   "  if flag"
+   "    then 1"
+   "    ^"))
+
+(ert-deftest haskell-indentation-check-18d ()
+  "do and if then else indentation: else"
+  (haskell-indentation-check
+   "x = do"
+   "  if flag"
+   "    then 1"
+   "    else 0"
+   "    ^"))
+
+(ert-deftest haskell-indentation-check-18e ()
+  "do and if then else indentation: else"
+  :expected-result :failed
+  (haskell-indentation-check
+   "x = do"
+   "  if flag"
+   "    then do"
+   "      return ()"
+   "      ^"))
+
+(ert-deftest haskell-indentation-check-18f ()
+  "do and if then else indentation: else"
+  :expected-result :failed
+  (haskell-indentation-check
+   "x = do"
+   "  if flag"
+   "    then do"
+   "      return ()"
+   "    else do"
+   "      return ()"
+   "      ^"))
+
+(ert-deftest haskell-indentation-check-19a ()
+  "let and in"
+  (haskell-indentation-check
+   "x = let"
+   "  y"
+   "  ^"))
+
+(ert-deftest haskell-indentation-check-19b ()
+  "let and in"
+  (haskell-indentation-check
+   "x = let y"
+   "    in "
+   "      z "
+   "      ^"))
+
+(ert-deftest haskell-indentation-check-19c ()
+  "let in a do"
+  (haskell-indentation-check
+   "x = do"
+   "  thing"
+   "  let "
+   "    z = 5"
+   "    ^"))
+
+(ert-deftest haskell-indentation-check-instance-20a ()
+  "instance declaration"
+  (haskell-indentation-check
+   "instance C a where"
+   "  c = undefined"
+   "  ^"))
+
+(ert-deftest haskell-indentation-check-instance-20b ()
+  "instance declaration"
+  (haskell-indentation-check
+   "instance (Monad m) => C m a where"
+   "  c = undefined"
+   "  ^"))
