@@ -320,3 +320,13 @@ Example of lines:
    "instance (Monad m) => C m a where"
    "  c = undefined"
    "  ^"))
+
+(ert-deftest haskell-indentation-check-instance-21a ()
+  "layout versus comma in braces"
+  (haskell-indentation-check
+   "main :: IO ()"
+   "main = do"
+   "let foo = Foo {"
+   "      bar = 0"
+   "      , baz = 0"
+   "      ^"))
