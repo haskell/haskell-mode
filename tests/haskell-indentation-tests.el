@@ -58,6 +58,14 @@ Example of lines:
    " z"
    "^ ^       ^"))
 
+(ert-deftest haskell-indentation-check-2-unicode ()
+  "Handle underscore in identifiers (unicode)"
+  (haskell-indentation-check
+   "function = do"
+   "  (_x) ← return ()"
+   " z"
+   "^ ^       ^"))
+
 (ert-deftest haskell-indentation-check-2a ()
   "Handle apostrophe in identifiers"
   (haskell-indentation-check
@@ -66,6 +74,13 @@ Example of lines:
    " z"
    "^ ^         ^"))
 
+(ert-deftest haskell-indentation-check-2a-unicode ()
+  "Handle apostrophe in identifiers (unicode)"
+  (haskell-indentation-check
+   "function = do"
+   "  (_'x') ← return ()"
+   " z"
+   "^ ^         ^"))
 
 (ert-deftest haskell-indentation-check-3 ()
   "Import statememnt symbol list 1"
@@ -108,6 +123,16 @@ Example of lines:
    "          , f <- fx x y c ]"
    "          ^"))
 
+(ert-deftest haskell-indentation-check-6-unicode ()
+  "let in list comprehension (unicode)"
+  :expected-result :failed
+  (haskell-indentation-check
+   "fun = [ f | x ← xs"
+   "          , y ← ys"
+   "          , let c = 123"
+   "          , f ← fx x y c ]"
+   "          ^"))
+
 (ert-deftest haskell-indentation-check-7 ()
   "import after import"
   :expected-result :failed
@@ -145,6 +170,14 @@ Example of lines:
    "clunky env var1 var2"
    "  | Just val1 <- lookup env var1"
    "  , Just val2 <- lookup env var2"
+   "  ^"))
+
+(ert-deftest haskell-indentation-check-11-unicode ()
+  "Guards with commas (unicode)"
+  (haskell-indentation-check
+   "clunky env var1 var2"
+   "  | Just val1 ← lookup env var1"
+   "  , Just val2 ← lookup env var2"
    "  ^"))
 
 (ert-deftest haskell-indentation-check-12 ()
@@ -189,11 +222,25 @@ Example of lines:
    "fun = \x -> do"
    "  ^"))
 
+(ert-deftest haskell-indentation-check-16-unicode ()
+  "Lambda and a do block (unicode)"
+  :expected-result :failed
+  (haskell-indentation-check
+   "fun = \x → do"
+   "  ^"))
+
 (ert-deftest haskell-indentation-check-16a ()
   "A lambda"
   :expected-result :failed
   (haskell-indentation-check
    "fun = \x ->"
+   "  ^"))
+
+(ert-deftest haskell-indentation-check-16a-unicode ()
+  "A lambda (unicode)"
+  :expected-result :failed
+  (haskell-indentation-check
+   "fun = \x →"
    "  ^"))
 
 (ert-deftest haskell-indentation-check-17a ()
@@ -212,12 +259,28 @@ Example of lines:
    "    => Int"
    "    ^"))
 
+(ert-deftest haskell-indentation-check-17b-unicode ()
+  "A type for a function with context (unicode)"
+  :expected-result :failed
+  (haskell-indentation-check
+   "fun ∷ Monad m"
+   "    ⇒ Int"
+   "    ^"))
+
 (ert-deftest haskell-indentation-check-17c ()
   "A type for a function with complicated context"
   :expected-result :failed
   (haskell-indentation-check
    "fun :: (Monad m, MonadBaseControl IO m, MyMonad (A v) m)"
    "    => MyMonad (A v) m"
+   "    ^"))
+
+(ert-deftest haskell-indentation-check-17c-unicode ()
+  "A type for a function with complicated context (unicode)"
+  :expected-result :failed
+  (haskell-indentation-check
+   "fun ∷ (Monad m, MonadBaseControl IO m, MyMonad (A v) m)"
+   "    ⇒ MyMonad (A v) m"
    "    ^"))
 
 (ert-deftest haskell-indentation-check-17d ()
@@ -227,6 +290,15 @@ Example of lines:
    "fun :: (Monad m, MonadBaseControl IO m, MyMonad (A v) m)"
    "    => MyMonad (A v) m"
    "    -> m (Maybe a)"
+   "    ^"))
+
+(ert-deftest haskell-indentation-check-17d-unicode ()
+  "A type for a function with param and a complicated context (unicode)"
+  :expected-result :failed
+  (haskell-indentation-check
+   "fun ∷ (Monad m, MonadBaseControl IO m, MyMonad (A v) m)"
+   "    ⇒ MyMonad (A v) m"
+   "    → m (Maybe a)"
    "    ^"))
 
 (ert-deftest haskell-indentation-check-18a ()
@@ -321,10 +393,27 @@ Example of lines:
    "  c = undefined"
    "  ^"))
 
+(ert-deftest haskell-indentation-check-instance-20b-unicode ()
+  "instance declaration (unicode)"
+  (haskell-indentation-check
+   "instance (Monad m) ⇒ C m a where"
+   "  c = undefined"
+   "  ^"))
+
 (ert-deftest haskell-indentation-check-instance-21a ()
   "layout versus comma in braces"
   (haskell-indentation-check
    "main :: IO ()"
+   "main = do"
+   "let foo = Foo {"
+   "      bar = 0"
+   "      , baz = 0"
+   "      ^"))
+
+(ert-deftest haskell-indentation-check-instance-21a-unicode ()
+  "layout versus comma in braces (unicode)"
+  (haskell-indentation-check
+   "main ∷ IO ()"
    "main = do"
    "let foo = Foo {"
    "      bar = 0"
