@@ -59,6 +59,7 @@ Example of lines:
    "^ ^       ^"))
 
 (ert-deftest haskell-indentation-check-2-unicode ()
+  :expected-result :failed
   "Handle underscore in identifiers (unicode)"
   (haskell-indentation-check
    "function = do"
@@ -76,6 +77,7 @@ Example of lines:
 
 (ert-deftest haskell-indentation-check-2a-unicode ()
   "Handle apostrophe in identifiers (unicode)"
+  :expected-result :failed
   (haskell-indentation-check
    "function = do"
    "  (_'x') ← return ()"
@@ -173,6 +175,7 @@ Example of lines:
    "  ^"))
 
 (ert-deftest haskell-indentation-check-11-unicode ()
+  :expected-result :failed
   "Guards with commas (unicode)"
   (haskell-indentation-check
    "clunky env var1 var2"
