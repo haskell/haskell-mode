@@ -587,8 +587,8 @@ the current buffer."
     ("←" . "<-")     ;; #x2190 LEFTWARDS ARROW
     ("⇒" . "=>")     ;; #x21D2 RIGHTWARDS DOUBLE ARROW
     ("∀" . "forall") ;; #x2200 FOR ALL
-    ("↢" . "-<")     ;; #x2919 LEFTWARDS ARROW-TAIL
-    ("↣" . ">-")     ;; #x291A RIGHTWARDS ARROW-TAIL
+    ("⤙" . "-<")     ;; #x2919 LEFTWARDS ARROW-TAIL
+    ("⤚" . ">-")     ;; #x291A RIGHTWARDS ARROW-TAIL
     ("⤛" . "-<<")    ;; #x291B LEFTWARDS DOUBLE ARROW-TAIL
     ("⤜" . ">>-")    ;; #x291C RIGHTWARDS DOUBLE ARROW-TAIL
     ("★" . "*"))     ;; #x2605 BLACK STAR
