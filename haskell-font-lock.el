@@ -38,7 +38,7 @@ alignment and can thus lead to nasty surprises w.r.t layout."
   :group 'haskell
   :type 'boolean)
 
-(defconst haskell-font-lock-symbols-alist
+(defcustom haskell-font-lock-symbols-alist
   '(("\\" . "λ")
     ("not" . "¬")
     ("->" . "→")
@@ -75,7 +75,9 @@ COMPONENTS is a representation specification suitable as an argument to
 `compose-region'.
 PREDICATE if present is a function of one argument (the start position
 of the symbol) which should return non-nil if this mapping should
-be disabled at that position.")
+be disabled at that position."
+  :type '(alist string string)
+  :group 'haskell)
 
 (defun haskell-font-lock-dot-is-not-composition (start)
   "Return non-nil if the \".\" at START is not a composition operator.
