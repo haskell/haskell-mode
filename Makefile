@@ -89,7 +89,7 @@ ELCHECKS=$(addprefix check-, $(ELFILES:.el=))
 all: check-emacs-version compile $(AUTOLOADS) info
 
 check-emacs-version :
-	@$(BATCH) --eval "(when (< emacs-major-version 24)					\
+	@$(BATCH) --eval "(when (< emacs-major-version 23)					\
                             (message \"Error: haskell-mode requires Emacs 23 or later\")	\
                             (message \"Your version of Emacs is %s\" emacs-version)		\
                             (message \"Found as '$(EMACS)'\")					\
