@@ -28,6 +28,9 @@
 
 ;;; Code:
 
+(require 'haskell-mode)
+
+
 (defun haskell-completions-can-grab-prefix ()
   "Check if the case is appropriate for grabbing completion prefix.
 Returns t if point is either at whitespace character, or at
@@ -111,6 +114,57 @@ pragma is supported also."
                                )))))))))))))
       (when prefix-value
         (list prefix-start prefix-end prefix-value prefix-type)))))
+
+(defun haskell-completions-grab-identifier-prefix ()
+  "Grab completion prefix for identifier at point.
+Returns a list of form '(prefix-start-position
+prefix-end-position prefix-value prefix-type) for haskell
+identifier at point depending on result of function
+`haskell-ident-pos-at-point'."
+  (let ((pos-at-point (haskell-ident-pos-at-point))
+        (p (point)))
+    (when pos-at-point
+      (let* ((start (car pos-at-point))
+             (end (cdr pos-at-point))
+             (type 'haskell-completions-identifier-prefix)
+             (case-fold-search nil)
+             value)
+        ;; we need end position of result, becase of
+        ;; `haskell-ident-pos-at-point' ignores trailing whitespace, e.g. the
+        ;; result will be same for `map|` and `map  |` invocations.
+        (when (<= p end)
+          (setq end p)
+          (setq value (buffer-substring-no-properties start end))
+          (when (string-match-p (rx bos upper) value)
+            ;; we need to check if found identifier is a module name
+            (save-excursion
+              (goto-char (line-beginning-position))
+              (when (re-search-forward
+                     (rx "import"
+                         (? (1+ space) "qualified")
+                         (1+ space)
+                         upper
+                         (1+ (| alnum ".")))
+                     p    ;; bound
+                     t)   ;; no-error
+                (if (equal p (point))
+                    (setq type 'haskell-completions-module-name-prefix)
+                  (when (re-search-forward
+                         (rx (| " as " "("))
+                         start
+                         t)
+                    ;; but uppercase ident could occur after `as` keyword, or in
+                    ;; module imports after opening parenthesis, in this case
+                    ;; restore identifier type again, it's neccessary to
+                    ;; distinguish the means of completions retrieval
+                    (setq type 'haskell-completions-identifier-prefix))))))
+          (when (nth 8 (syntax-ppss))
+            ;; eighth element of syntax-ppss result is string or comment start,
+            ;; so when it's not nil word at point is inside string or comment,
+            ;; return special literal prefix type
+            (setq type 'haskell-completions-general-prefix))
+          ;; finally take in account minlen if given and return the result
+          (when value (list start end value type)))))))
 
 
 (provide 'haskell-completions)
