@@ -98,31 +98,39 @@ within empty pragma comment {-# #-} and outside of it."
     (should (eql nil (haskell-completions-grab-pragma-prefix)))))
 
 (ert-deftest haskell-completions-grab-pragma-name-prefix-test ()
-  "Tests the function `haskell-completions-grab-pragma-prefix'
-for pragma names completions such as WARNING, LANGUAGE,
-DEPRECATED and etc."
+  "Tests both `haskell-completions-grab-pragma-prefix' and
+`haskell-completions-grab-prefix' functions for pragma names
+completions such as WARNING, LANGUAGE, DEPRECATED and etc."
   (let ((expected (list 5 8 "LAN" 'haskell-completions-pragma-name-prefix)))
     (with-temp-buffer
       (haskell-mode)
       (goto-char (point-min))
       (insert "{-# LAN")
       (should (equal expected (haskell-completions-grab-pragma-prefix)))
+      ;; minimal prefix length
+      (should (equal expected (haskell-completions-grab-prefix 3)))
+      (should (eql nil (haskell-completions-grab-prefix 4)))
       (save-excursion (insert " #-}"))
       ;; should work in case of closed comment, e.g. {-# LAN| #-}
       (should (equal expected (haskell-completions-grab-pragma-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       ;; pragma function should work in the middle of word
       (backward-char)
-      (should (not (equal expected (haskell-completions-grab-pragma-prefix)))))
+      (should (not (equal expected (haskell-completions-grab-pragma-prefix))))
+      ;; but general function should not
+      (should (eql nil (haskell-completions-grab-prefix))))
     (with-temp-buffer
       (haskell-mode)
       (goto-char (point-min))
       (insert "{-#\nLAN")
       ;; should work for multiline case
-      (should (equal expected (haskell-completions-grab-pragma-prefix))))))
+      (should (equal expected (haskell-completions-grab-pragma-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix))))))
 
 (ert-deftest haskell-completions-grab-ghc-options-prefix-test-01 ()
-  "Tests the function `haskell-completions-grab-pragma-prefix'
-for GHC options prefixes."
+  "Tests both `haskell-completions-grab-pragma-prefix' and
+`haskell-completions-grab-prefix' functions for GHC options
+prefixes."
   (let (expected)
     (with-temp-buffer
       (haskell-mode)
@@ -131,14 +139,17 @@ for GHC options prefixes."
             (list 5 16 "OPTIONS_GHC" 'haskell-completions-pragma-name-prefix))
       (insert "{-# OPTIONS_GHC")
       (should (equal expected (haskell-completions-grab-pragma-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (insert " --opt1")
       (setq expected
             (list 17 23 "--opt1" 'haskell-completions-ghc-option-prefix))
       (should (equal expected (haskell-completions-grab-pragma-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (insert "    -XOpt-2")
       (setq expected
             (list 27 34 "-XOpt-2" 'haskell-completions-ghc-option-prefix))
       (should (equal expected (haskell-completions-grab-pragma-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (save-excursion
         (insert "\n")
         (insert "\"new-line\"")
@@ -147,21 +158,32 @@ for GHC options prefixes."
          expected
          (list 35 45 "\"new-line\"" 'haskell-completions-ghc-option-prefix))
         (should (equal expected (haskell-completions-grab-pragma-prefix)))
-        (insert " test    ")
+        (should (equal expected (haskell-completions-grab-prefix)))
+        (insert " test")
+        (setq expected
+              (list 46 50 "test" 'haskell-completions-ghc-option-prefix))
+        ;; minimal prefix length
+        (should (equal expected (haskell-completions-grab-prefix 4)))
+        (should (eql nil (haskell-completions-grab-prefix 5)))
+        (insert "    ")
         (should (eql nil (haskell-completions-grab-pragma-prefix)))
+        (should (eql nil (haskell-completions-grab-prefix)))
         (insert "#-}"))
       ;; should work in case of closed comment, e.g. {-# OPTIONS_GHC xyz| #-}
       (setq expected
             (list 27 34 "-XOpt-2" 'haskell-completions-ghc-option-prefix))
       (should (equal expected (haskell-completions-grab-pragma-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (backward-char)
       ;; pragma function should work in the middle of word
-      (should (not (eql nil (haskell-completions-grab-pragma-prefix)))))))
+      (should (not (eql nil (haskell-completions-grab-pragma-prefix))))
+      ;; but general function should not
+      (should (eql nil (haskell-completions-grab-prefix))))))
 
 (ert-deftest haskell-completions-grab-ghc-options-prefix-test-02 ()
-  "Tests the function `haskell-completions-grab-pragma-prefix'
-for GHC options prefixes.  Same tests as above for obsolete
-OPTIONS pragma."
+  "Tests both `haskell-completions-grab-pragma-prefix' and
+`haskell-completions-grab-prefix' functions  for GHC options prefixes.  Same
+tests as above for obsolete OPTIONS pragma."
   (let (expected)
     (with-temp-buffer
       (haskell-mode)
@@ -170,14 +192,17 @@ OPTIONS pragma."
       (setq expected
             (list 5 12 "OPTIONS" 'haskell-completions-pragma-name-prefix))
       (should (equal expected (haskell-completions-grab-pragma-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (insert " --opt1")
       (setq expected
             (list 13 19 "--opt1" 'haskell-completions-ghc-option-prefix))
       (should (equal expected (haskell-completions-grab-pragma-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (insert "    -XOpt-2")
       (setq expected
             (list 23 30 "-XOpt-2" 'haskell-completions-ghc-option-prefix))
       (should (equal expected (haskell-completions-grab-pragma-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (save-excursion
         (insert "\n")
         (insert "\"new-line\"")
@@ -186,20 +211,31 @@ OPTIONS pragma."
          expected
          (list 31 41 "\"new-line\"" 'haskell-completions-ghc-option-prefix))
         (should (equal expected (haskell-completions-grab-pragma-prefix)))
-        (insert " test    ")
+        (should (equal expected (haskell-completions-grab-prefix)))
+        (insert " test")
+        ;; minimal prefix length
+        (setq expected
+              (list 42 46 "test" 'haskell-completions-ghc-option-prefix))
+        (should (equal expected (haskell-completions-grab-prefix 4)))
+        (should (eql nil (haskell-completions-grab-prefix 5)))
+        (insert "    ")
         (should (eql nil (haskell-completions-grab-pragma-prefix)))
+        (should (eql nil (haskell-completions-grab-prefix)))
         (insert "#-}"))
       ;; should work in case of closed comment
       (setq expected
             (list 23 30 "-XOpt-2" 'haskell-completions-ghc-option-prefix))
       (should (equal expected (haskell-completions-grab-pragma-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (backward-char)
       ;; pragma function should work in the middle of word
-      (should (not (eql nil (haskell-completions-grab-pragma-prefix)))))))
+      (should (not (eql nil (haskell-completions-grab-pragma-prefix))))
+      ;; but general function should not
+      (should (eql nil (haskell-completions-grab-prefix))))))
 
 (ert-deftest haskell-completions-grab-language-extenstion-prefix-test ()
-  "Tests both function `haskell-completions-grab-pragma-prefix'
-and function `haskell-completions-grab-prefix' for language
+  "Tests both `haskell-completions-grab-pragma-prefix' and
+`haskell-completions-grab-prefix' functions for language
 extension prefixes."
   (let (expected)
     (with-temp-buffer
@@ -209,15 +245,18 @@ extension prefixes."
       (setq expected
             (list 5 13 "LANGUAGE" 'haskell-completions-pragma-name-prefix))
       (should (equal expected (haskell-completions-grab-pragma-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (insert " Rec")
       (setq expected
             (list 14 17 "Rec" 'haskell-completions-language-extension-prefix))
       (should (equal expected (haskell-completions-grab-pragma-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (insert ",    -XOpt-2")
       (setq
        expected
        (list 22 29 "-XOpt-2" 'haskell-completions-language-extension-prefix))
       (should (equal expected (haskell-completions-grab-pragma-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (insert ",\n")
       (insert "\"new-line\"")
       ;; should handle multiline case
@@ -227,54 +266,78 @@ extension prefixes."
                   "\"new-line\""
                   'haskell-completions-language-extension-prefix))
       (should (equal expected (haskell-completions-grab-pragma-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (insert " -test")
+      ;; minimal prefix length
+      (setq expected
+            (list 42 47 "-test" 'haskell-completions-language-extension-prefix))
+      (should (equal expected (haskell-completions-grab-prefix 5)))
+      (should (eql nil (haskell-completions-grab-prefix 6)))
       (save-excursion (insert "     #-}"))
       ;; should work in case of closed comment
       (setq expected
             (list 42 47 "-test" 'haskell-completions-language-extension-prefix))
       (should (equal expected (haskell-completions-grab-pragma-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (backward-char)
       ;; pragma function should work in the middle of the word
-      (should (not (eql nil (haskell-completions-grab-pragma-prefix)))))))
+      (should (not (eql nil (haskell-completions-grab-pragma-prefix))))
+      ;; but general function does not
+      (should (eql nil (haskell-completions-grab-prefix))))))
+
+
 (ert-deftest haskell-completions-grab-identifier-prefix-test ()
-  "Tests the function
-`haskell-completions-grab-identifier-prefix' for arbitrary
-haskell identifiers and module identifiers."
+  "Tests both `haskell-completions-grab-identifier-prefix' and
+`haskell-completions-grab-prefix' functions for arbitrary haskell
+identifiers and module identifiers."
   (let (expected)
     (with-temp-buffer
       (haskell-mode)
       (should (eql nil (haskell-completions-grab-identifier-prefix)))
+      (should (eql nil (haskell-completions-grab-prefix)))
       (insert "import")
       (setq expected (list 1 7 "import" 'haskell-completions-identifier-prefix))
       (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (insert " Da")
       (setq expected (list 8 10 "Da" 'haskell-completions-module-name-prefix))
       (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
+      ;; minimal length test
+      (should (equal expected (haskell-completions-grab-prefix 2)))
+      (should (eql nil (haskell-completions-grab-prefix 3)))
       (insert "ta.")
       (setq expected
             (list 8 13 "Data." 'haskell-completions-module-name-prefix))
       (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (insert "Text (pack")
       (setq expected (list 19 23 "pack" 'haskell-completions-identifier-prefix))
       (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (insert ")")
       ;; should work when point is at punctuation
       (backward-char)
       (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (forward-char)
       ;; but should not work after punctuation
       (should (eql nil (haskell-completions-grab-identifier-prefix)))
+      (should (eql nil (haskell-completions-grab-prefix)))
       (insert "\n")
       (insert "import qualified Data.Text as T")
       (insert "\n\n")
       ;; should not work at the beginning of a line
       (should (eql nil (haskell-completions-grab-identifier-prefix)))
+      (should (eql nil (haskell-completions-grab-prefix)))
       (insert "main")
       (setq expected (list 58 62 "main" 'haskell-completions-identifier-prefix))
       (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (insert " :: IO")
       (setq expected (list 66 68 "IO" 'haskell-completions-identifier-prefix))
       (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (insert " ()\n")
       (insert "main")
       (save-excursion
@@ -282,31 +345,39 @@ haskell identifiers and module identifiers."
         (setq expected
               (list 79 87 "putStrLn" 'haskell-completions-identifier-prefix))
         (should (equal expected (haskell-completions-grab-identifier-prefix)))
+        (should (equal expected (haskell-completions-grab-prefix)))
         (insert " (T.")
         (setq expected (list 89 91 "T." 'haskell-completions-identifier-prefix))
         (should (equal expected (haskell-completions-grab-identifier-prefix)))
+        (should (equal expected (haskell-completions-grab-prefix)))
         (insert "unpack")
         (setq expected
               (list 89 97 "T.unpack" 'haskell-completions-identifier-prefix))
         (should (equal expected (haskell-completions-grab-identifier-prefix)))
+        (should (equal expected (haskell-completions-grab-prefix)))
         (insert " (T.pack (\"Hello")
         (setq expected
               (list 108 113 "Hello" 'haskell-completions-general-prefix))
         (should (equal expected (haskell-completions-grab-identifier-prefix)))
+        (should (equal expected (haskell-completions-grab-prefix)))
         (insert " World!\" :: String")
         (setq expected
               (list 125 131 "String" 'haskell-completions-identifier-prefix))
         (should (equal expected (haskell-completions-grab-identifier-prefix)))
+        (should (equal expected (haskell-completions-grab-prefix)))
         (insert " -- Comment")
         (setq expected
               (list 135 142 "Comment" 'haskell-completions-general-prefix))
-        (should (equal expected (haskell-completions-grab-identifier-prefix))))
+        (should (equal expected (haskell-completions-grab-identifier-prefix)))
+        (should (equal expected (haskell-completions-grab-prefix))))
       ;; test in the middle of line
       (setq expected (list 72 76 "main" 'haskell-completions-identifier-prefix))
       (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (backward-char)
       (setq expected (list 72 75 "mai" 'haskell-completions-identifier-prefix))
-      (should (equal expected (haskell-completions-grab-identifier-prefix))))
+      (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (should (equal nil (haskell-completions-grab-prefix))))
     ;; qualified imports and "as indentifier" tests
     (with-temp-buffer
       (haskell-mode)
@@ -314,9 +385,11 @@ haskell identifiers and module identifiers."
       (setq expected
             (list 18 27 "Data.Text" 'haskell-completions-module-name-prefix))
       (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix)))
       (insert " as T")
       (setq expected (list 31 32 "T" 'haskell-completions-identifier-prefix))
-      (should (equal expected (haskell-completions-grab-identifier-prefix))))))
+      (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (should (equal expected (haskell-completions-grab-prefix))))))
 
 
 (provide 'haskell-completions-tests)
