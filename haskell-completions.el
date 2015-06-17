@@ -42,5 +42,76 @@ whitespace or new line, otherwise returns nil.
           (backward-char)
           (not (looking-at (rx (| space line-end)))))))))
 
+(defun haskell-completions-grab-pragma-prefix ()
+  "Grab completion prefix for pragma completions.
+Returns a list of form '(prefix-start-position
+prefix-end-position prefix-value prefix-type) for pramga names
+such as WARNING, DEPRECATED, LANGUAGE and etc.  Also returns
+completion prefixes for options in case OPTIONS_GHC pragma, or
+language extensions in case of LANGUAGE pragma.  Obsolete OPTIONS
+pragma is supported also."
+  (when (nth 4 (syntax-ppss))
+    ;; We're inside comment
+    (let ((p (point))
+          (comment-start (nth 8 (syntax-ppss)))
+          (case-fold-search nil)
+          prefix-start
+          prefix-end
+          prefix-type
+          prefix-value)
+      (save-excursion
+        (goto-char comment-start)
+        (when (looking-at (rx "{-#" (1+ (| space "\n"))))
+          (let ((pragma-start (match-end 0)))
+            (when (> p pragma-start)
+              ;; point stands after `{-#`
+              (goto-char pragma-start)
+              (when (looking-at (rx (1+ (| upper "_"))))
+                ;; found suitable sequence for pragma name
+                (let ((pragma-end (match-end 0))
+                      (pragma-value (match-string-no-properties 0)))
+                  (if (eq p pragma-end)
+                      ;; point is at the end of (in)complete pragma name
+                      ;; prepare resulting values
+                      (progn
+                        (setq prefix-start pragma-start)
+                        (setq prefix-end pragma-end)
+                        (setq prefix-value pragma-value)
+                        (setq prefix-type
+                              'haskell-completions-pragma-name-prefix))
+                    (when (and (> p pragma-end)
+                               (or (equal "OPTIONS_GHC" pragma-value)
+                                   (equal "OPTIONS" pragma-value)
+                                   (equal "LANGUAGE" pragma-value)))
+                      ;; point is after pragma name, so we need to check
+                      ;; special cases of `OPTIONS_GHC` and `LANGUAGE` pragmas
+                      ;; and provide a completion prefix for possible ghc
+                      ;; option or language extension.
+                      (goto-char pragma-end)
+                      (when (re-search-forward
+                             (rx (* anything)
+                                 (1+ (regexp "\\S-")))
+                             p
+                             t)
+                        (let* ((str (match-string-no-properties 0))
+                               (split (split-string str (rx (| space "\n")) t))
+                               (val (car (last split)))
+                               (end (point)))
+                          (when (and (equal p end)
+                                     (not (string-match-p "#" val)))
+                            (setq prefix-value val)
+                            (backward-char (length val))
+                            (setq prefix-start (point))
+                            (setq prefix-end end)
+                            (setq
+                             prefix-type
+                             (if (not (equal "LANGUAGE" pragma-value))
+                                 'haskell-completions-ghc-option-prefix
+                               'haskell-completions-language-extension-prefix
+                               )))))))))))))
+      (when prefix-value
+        (list prefix-start prefix-end prefix-value prefix-type)))))
+
+
 (provide 'haskell-completions)
 ;;; haskell-completions.el ends here
