@@ -236,6 +236,87 @@ extension prefixes."
       (backward-char)
       ;; pragma function should work in the middle of the word
       (should (not (eql nil (haskell-completions-grab-pragma-prefix)))))))
+(ert-deftest haskell-completions-grab-identifier-prefix-test ()
+  "Tests the function
+`haskell-completions-grab-identifier-prefix' for arbitrary
+haskell identifiers and module identifiers."
+  (let (expected)
+    (with-temp-buffer
+      (haskell-mode)
+      (should (eql nil (haskell-completions-grab-identifier-prefix)))
+      (insert "import")
+      (setq expected (list 1 7 "import" 'haskell-completions-identifier-prefix))
+      (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (insert " Da")
+      (setq expected (list 8 10 "Da" 'haskell-completions-module-name-prefix))
+      (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (insert "ta.")
+      (setq expected
+            (list 8 13 "Data." 'haskell-completions-module-name-prefix))
+      (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (insert "Text (pack")
+      (setq expected (list 19 23 "pack" 'haskell-completions-identifier-prefix))
+      (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (insert ")")
+      ;; should work when point is at punctuation
+      (backward-char)
+      (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (forward-char)
+      ;; but should not work after punctuation
+      (should (eql nil (haskell-completions-grab-identifier-prefix)))
+      (insert "\n")
+      (insert "import qualified Data.Text as T")
+      (insert "\n\n")
+      ;; should not work at the beginning of a line
+      (should (eql nil (haskell-completions-grab-identifier-prefix)))
+      (insert "main")
+      (setq expected (list 58 62 "main" 'haskell-completions-identifier-prefix))
+      (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (insert " :: IO")
+      (setq expected (list 66 68 "IO" 'haskell-completions-identifier-prefix))
+      (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (insert " ()\n")
+      (insert "main")
+      (save-excursion
+        (insert " = putStrLn")
+        (setq expected
+              (list 79 87 "putStrLn" 'haskell-completions-identifier-prefix))
+        (should (equal expected (haskell-completions-grab-identifier-prefix)))
+        (insert " (T.")
+        (setq expected (list 89 91 "T." 'haskell-completions-identifier-prefix))
+        (should (equal expected (haskell-completions-grab-identifier-prefix)))
+        (insert "unpack")
+        (setq expected
+              (list 89 97 "T.unpack" 'haskell-completions-identifier-prefix))
+        (should (equal expected (haskell-completions-grab-identifier-prefix)))
+        (insert " (T.pack (\"Hello")
+        (setq expected
+              (list 108 113 "Hello" 'haskell-completions-general-prefix))
+        (should (equal expected (haskell-completions-grab-identifier-prefix)))
+        (insert " World!\" :: String")
+        (setq expected
+              (list 125 131 "String" 'haskell-completions-identifier-prefix))
+        (should (equal expected (haskell-completions-grab-identifier-prefix)))
+        (insert " -- Comment")
+        (setq expected
+              (list 135 142 "Comment" 'haskell-completions-general-prefix))
+        (should (equal expected (haskell-completions-grab-identifier-prefix))))
+      ;; test in the middle of line
+      (setq expected (list 72 76 "main" 'haskell-completions-identifier-prefix))
+      (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (backward-char)
+      (setq expected (list 72 75 "mai" 'haskell-completions-identifier-prefix))
+      (should (equal expected (haskell-completions-grab-identifier-prefix))))
+    ;; qualified imports and "as indentifier" tests
+    (with-temp-buffer
+      (haskell-mode)
+      (insert "import qualified Data.Text")
+      (setq expected
+            (list 18 27 "Data.Text" 'haskell-completions-module-name-prefix))
+      (should (equal expected (haskell-completions-grab-identifier-prefix)))
+      (insert " as T")
+      (setq expected (list 31 32 "T" 'haskell-completions-identifier-prefix))
+      (should (equal expected (haskell-completions-grab-identifier-prefix))))))
 
 
 (provide 'haskell-completions-tests)
