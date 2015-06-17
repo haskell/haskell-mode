@@ -26,6 +26,14 @@
 ;; This package provides completions related functionality for
 ;; Haskell Mode such grab completion prefix at point, and etc..
 
+;; Some description
+;; ================
+;;
+;; For major use function `haskell-completions-grab-prefix' is supposed, and
+;; other prefix grabbing functions are used internally by it.  So, only this
+;; funciton have prefix minimal length functionality and invokes predicate
+;; function `haskell-completions-can-grab-prefix'.
+
 ;;; Code:
 
 (require 'haskell-mode)
@@ -165,6 +173,25 @@ identifier at point depending on result of function
             (setq type 'haskell-completions-general-prefix))
           ;; finally take in account minlen if given and return the result
           (when value (list start end value type)))))))
+
+(defun haskell-completions-grab-prefix (&optional minlen)
+   "Grab prefix at point for possible completion.
+Returns a list of form '(prefix-start-position
+prefix-end-position prefix-value prefix-type) depending on
+situation, e.g. is it needed to complete pragma, module name,
+arbitrary identifier, and etc.  Rerurns nil in case it is
+impossible to grab prefix.
+
+If provided optional MINLEN parameter this function will return
+result only if prefix length is not less than MINLEN."
+   (when (haskell-completions-can-grab-prefix)
+     (let ((prefix (cond
+                    ((haskell-completions-grab-pragma-prefix))
+                    ((haskell-completions-grab-identifier-prefix)))))
+       (cond ((and minlen prefix)
+              (when (>= (length (nth 2 prefix)) minlen)
+                prefix))
+             (prefix prefix)))))
 
 
 (provide 'haskell-completions)
