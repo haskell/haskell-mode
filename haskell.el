@@ -74,7 +74,8 @@
               (end (match-end 1)))
           (list start end
                 (haskell-process-get-repl-completions process text))))
-       ;; Complete OPTIONS using :complete repl ":set ..."
+       ;; Complete OPTIONS, a completion list comes from variable
+       ;; `haskell-ghc-supported-options'
        ((and (nth 4 (syntax-ppss))
            (save-excursion
              (let ((p (point)))
@@ -84,7 +85,8 @@
             (rx symbol-start "-" (* (char alnum ?-)))
             (line-beginning-position)))
         (list (match-beginning 0) (match-end 0) haskell-ghc-supported-options))
-       ;; Complete LANGUAGE :complete repl ":set -X..."
+       ;; Complete LANGUAGE, a list of completions comes from variable
+       ;; `haskell-ghc-supported-options'
        ((and (nth 4 (syntax-ppss))
            (save-excursion
              (let ((p (point)))

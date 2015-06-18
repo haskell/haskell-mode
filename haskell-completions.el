@@ -26,7 +26,18 @@
 ;; This package provides completions related functionality for
 ;; Haskell Mode such grab completion prefix at point, and etc..
 
+;; Some description
+;; ================
+;;
+;; For major use function `haskell-completions-grab-prefix' is supposed, and
+;; other prefix grabbing functions are used internally by it.  So, only this
+;; funciton have prefix minimal length functionality and invokes predicate
+;; function `haskell-completions-can-grab-prefix'.
+
 ;;; Code:
+
+(require 'haskell-mode)
+
 
 (defun haskell-completions-can-grab-prefix ()
   "Check if the case is appropriate for grabbing completion prefix.
@@ -41,6 +52,147 @@ whitespace or new line, otherwise returns nil.
         (save-excursion
           (backward-char)
           (not (looking-at (rx (| space line-end)))))))))
+
+(defun haskell-completions-grab-pragma-prefix ()
+  "Grab completion prefix for pragma completions.
+Returns a list of form '(prefix-start-position
+prefix-end-position prefix-value prefix-type) for pramga names
+such as WARNING, DEPRECATED, LANGUAGE and etc.  Also returns
+completion prefixes for options in case OPTIONS_GHC pragma, or
+language extensions in case of LANGUAGE pragma.  Obsolete OPTIONS
+pragma is supported also."
+  (when (nth 4 (syntax-ppss))
+    ;; We're inside comment
+    (let ((p (point))
+          (comment-start (nth 8 (syntax-ppss)))
+          (case-fold-search nil)
+          prefix-start
+          prefix-end
+          prefix-type
+          prefix-value)
+      (save-excursion
+        (goto-char comment-start)
+        (when (looking-at (rx "{-#" (1+ (| space "\n"))))
+          (let ((pragma-start (match-end 0)))
+            (when (> p pragma-start)
+              ;; point stands after `{-#`
+              (goto-char pragma-start)
+              (when (looking-at (rx (1+ (| upper "_"))))
+                ;; found suitable sequence for pragma name
+                (let ((pragma-end (match-end 0))
+                      (pragma-value (match-string-no-properties 0)))
+                  (if (eq p pragma-end)
+                      ;; point is at the end of (in)complete pragma name
+                      ;; prepare resulting values
+                      (progn
+                        (setq prefix-start pragma-start)
+                        (setq prefix-end pragma-end)
+                        (setq prefix-value pragma-value)
+                        (setq prefix-type
+                              'haskell-completions-pragma-name-prefix))
+                    (when (and (> p pragma-end)
+                               (or (equal "OPTIONS_GHC" pragma-value)
+                                   (equal "OPTIONS" pragma-value)
+                                   (equal "LANGUAGE" pragma-value)))
+                      ;; point is after pragma name, so we need to check
+                      ;; special cases of `OPTIONS_GHC` and `LANGUAGE` pragmas
+                      ;; and provide a completion prefix for possible ghc
+                      ;; option or language extension.
+                      (goto-char pragma-end)
+                      (when (re-search-forward
+                             (rx (* anything)
+                                 (1+ (regexp "\\S-")))
+                             p
+                             t)
+                        (let* ((str (match-string-no-properties 0))
+                               (split (split-string str (rx (| space "\n")) t))
+                               (val (car (last split)))
+                               (end (point)))
+                          (when (and (equal p end)
+                                     (not (string-match-p "#" val)))
+                            (setq prefix-value val)
+                            (backward-char (length val))
+                            (setq prefix-start (point))
+                            (setq prefix-end end)
+                            (setq
+                             prefix-type
+                             (if (not (equal "LANGUAGE" pragma-value))
+                                 'haskell-completions-ghc-option-prefix
+                               'haskell-completions-language-extension-prefix
+                               )))))))))))))
+      (when prefix-value
+        (list prefix-start prefix-end prefix-value prefix-type)))))
+
+(defun haskell-completions-grab-identifier-prefix ()
+  "Grab completion prefix for identifier at point.
+Returns a list of form '(prefix-start-position
+prefix-end-position prefix-value prefix-type) for haskell
+identifier at point depending on result of function
+`haskell-ident-pos-at-point'."
+  (let ((pos-at-point (haskell-ident-pos-at-point))
+        (p (point)))
+    (when pos-at-point
+      (let* ((start (car pos-at-point))
+             (end (cdr pos-at-point))
+             (type 'haskell-completions-identifier-prefix)
+             (case-fold-search nil)
+             value)
+        ;; we need end position of result, becase of
+        ;; `haskell-ident-pos-at-point' ignores trailing whitespace, e.g. the
+        ;; result will be same for `map|` and `map  |` invocations.
+        (when (<= p end)
+          (setq end p)
+          (setq value (buffer-substring-no-properties start end))
+          (when (string-match-p (rx bos upper) value)
+            ;; we need to check if found identifier is a module name
+            (save-excursion
+              (goto-char (line-beginning-position))
+              (when (re-search-forward
+                     (rx "import"
+                         (? (1+ space) "qualified")
+                         (1+ space)
+                         upper
+                         (1+ (| alnum ".")))
+                     p    ;; bound
+                     t)   ;; no-error
+                (if (equal p (point))
+                    (setq type 'haskell-completions-module-name-prefix)
+                  (when (re-search-forward
+                         (rx (| " as " "("))
+                         start
+                         t)
+                    ;; but uppercase ident could occur after `as` keyword, or in
+                    ;; module imports after opening parenthesis, in this case
+                    ;; restore identifier type again, it's neccessary to
+                    ;; distinguish the means of completions retrieval
+                    (setq type 'haskell-completions-identifier-prefix))))))
+          (when (nth 8 (syntax-ppss))
+            ;; eighth element of syntax-ppss result is string or comment start,
+            ;; so when it's not nil word at point is inside string or comment,
+            ;; return special literal prefix type
+            (setq type 'haskell-completions-general-prefix))
+          ;; finally take in account minlen if given and return the result
+          (when value (list start end value type)))))))
+
+(defun haskell-completions-grab-prefix (&optional minlen)
+   "Grab prefix at point for possible completion.
+Returns a list of form '(prefix-start-position
+prefix-end-position prefix-value prefix-type) depending on
+situation, e.g. is it needed to complete pragma, module name,
+arbitrary identifier, and etc.  Rerurns nil in case it is
+impossible to grab prefix.
+
+If provided optional MINLEN parameter this function will return
+result only if prefix length is not less than MINLEN."
+   (when (haskell-completions-can-grab-prefix)
+     (let ((prefix (cond
+                    ((haskell-completions-grab-pragma-prefix))
+                    ((haskell-completions-grab-identifier-prefix)))))
+       (cond ((and minlen prefix)
+              (when (>= (length (nth 2 prefix)) minlen)
+                prefix))
+             (prefix prefix)))))
+
 
 (provide 'haskell-completions)
 ;;; haskell-completions.el ends here
