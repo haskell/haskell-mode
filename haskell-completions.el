@@ -220,6 +220,41 @@ result only if prefix length is not less than MINLEN."
                 prefix))
              (prefix prefix)))))
 
+
+(defun haskell-completions-sync-completions-at-point ()
+  "A `completion-at-point' function using the current haskell process.
+Returns nil if no completions available."
+  (let ((prefix-data (haskell-completions-grab-prefix)))
+    (when prefix-data
+      (cl-destructuring-bind (beg end pfx typ) prefix-data
+        (let ((imp (eql typ 'haskell-completions-module-name-prefix))
+              lst)
+          (setq lst
+                (cl-case typ
+                  ;; non-interactive completions first
+                  ('haskell-completions-pragma-name-prefix
+                   haskell-completions-pragma-names)
+                  ('haskell-completions-ghc-option-prefix
+                   haskell-ghc-supported-options)
+                  ('haskell-completions-language-extension-prefix
+                   haskell-ghc-supported-extensions)
+                  (otherwise
+                   (when (and
+                          (not (eql typ 'haskell-completions-general-prefix))
+                          (haskell-session-maybe)
+                          (not
+                           (haskell-process-cmd (haskell-interactive-process))))
+                     ;; if REPL is available and not busy try to query it
+                     ;; for completions list in case of module name or
+                     ;; identifier prefixes
+                     (haskell-completions-sync-complete-repl pfx imp)))))
+          (when (or (equal '("") lst)
+                    (eql nil lst))
+            ;; complete things using dabbrev
+            (setq lst (haskell-completions-dabbrev-completions pfx)))
+          (when lst
+            (list beg end lst)))))))
+
 (defun haskell-completions-sync-complete-repl (prefix &optional import)
   "Return completion list for given PREFIX quering REPL synchronously.
 When optional IMPORT argument is non-nil complete PREFIX
