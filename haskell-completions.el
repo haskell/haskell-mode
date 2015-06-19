@@ -37,6 +37,8 @@
 ;;; Code:
 
 (require 'haskell-mode)
+(require 'haskell-process)
+(require 'haskell-interactive-mode)
 
 (defvar haskell-completions-pragma-names
   (list "DEPRECATED"
@@ -218,6 +220,22 @@ result only if prefix length is not less than MINLEN."
                 prefix))
              (prefix prefix)))))
 
+(defun haskell-completions-sync-complete-repl (prefix &optional import)
+  "Return completion list for given PREFIX quering REPL synchronously.
+When optional IMPORT argument is non-nil complete PREFIX
+prepending \"import \" keyword (useful for module names).  This
+function is supposed for internal use."
+  (haskell-process-get-repl-completions
+   (haskell-interactive-process)
+   (if import
+       (concat "import " prefix)
+     prefix)))
+
+(defun haskell-completions-dabbrev-completions (prefix)
+  "Return completion list for PREFIX using dabbrev facility.
+This function is supposed for internal use."
+  (dabbrev--reset-global-variables)
+  (dabbrev--find-all-expansions prefix nil))
 
 (provide 'haskell-completions)
 ;;; haskell-completions.el ends here
