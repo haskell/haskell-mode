@@ -324,8 +324,16 @@ when Data.Map is the candidate.
 
 (defcustom haskell-language-extensions
   '()
-  "Language extensions in use. Should be in format: -XFoo, -XNoFoo etc."
-  :group 'shm
+  "Language extensions in use. Should be in format: -XFoo,
+-XNoFoo etc. The idea is that various tools written with HSE (or
+any haskell-mode code that needs to be aware of syntactical
+properties; such as an indentation mode) that don't know what
+extensions to use can use this variable. Examples: hlint,
+hindent, structured-haskell-mode, tool-de-jour, etc.
+
+You can set this per-project with a .dir-locals.el file, in the
+same vein as `haskell-indent-spaces'."
+  :group 'haskell
   :type '(repeat 'string))
 
 (defcustom haskell-ghc-supported-extensions
