@@ -38,6 +38,31 @@
 
 (require 'haskell-mode)
 
+(defvar haskell-completions-pragma-names
+  (list "DEPRECATED"
+        "INCLUDE"
+        "INCOHERENT"
+        "INLINABLE"
+        "INLINE"
+        "LANGUAGE"
+        "LINE"
+        "MINIMAL"
+        "NOINLINE"
+        "NOUNPACK"
+        "OPTIONS"
+        "OPTIONS_GHC"
+        "OVERLAPPABLE"
+        "OVERLAPPING"
+        "OVERLAPS"
+        "RULES"
+        "SOURCE"
+        "SPECIALIZE"
+        "UNPACK"
+        "WARNING")
+  "A list of supported pragmas.
+This list comes from GHC documentation (URL
+`https://downloads.haskell.org/~ghc/7.10.1/docs/html/users_guide/pragmas.html'.
+")
 
 (defun haskell-completions-can-grab-prefix ()
   "Check if the case is appropriate for grabbing completion prefix.
