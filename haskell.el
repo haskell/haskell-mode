@@ -28,6 +28,7 @@
 (require 'haskell-sandbox)
 (require 'haskell-modules)
 (require 'haskell-string)
+(require 'haskell-completions)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic configuration hooks
@@ -54,8 +55,14 @@
   "Minor mode for enabling haskell-process interaction."
   :lighter " Interactive"
   :keymap interactive-haskell-mode-map
-  (add-hook 'completion-at-point-functions 'haskell-process-completions-at-point nil t))
+  (add-hook 'completion-at-point-functions
+            #'haskell-completions-sync-completions-at-point
+            nil
+            t))
 
+(make-obsolete #'haskell-process-completions-at-point
+               #'haskell-completions-sync-completions-at-point
+               "June 19, 2015")
 (defun haskell-process-completions-at-point ()
   "A completion-at-point function using the current haskell process."
   (when (haskell-session-maybe)
