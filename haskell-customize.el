@@ -336,17 +336,6 @@ same vein as `haskell-indent-spaces'."
   :group 'haskell
   :type '(repeat 'string))
 
-(defcustom haskell-ghc-supported-extensions
-  (split-string (shell-command-to-string "ghc --supported-extensions"))
-  "List of language extensions supported by the installed version of GHC."
-  :group 'haskell
-  :type '(repeat string))
-
-(defcustom haskell-ghc-supported-options
-  (split-string (shell-command-to-string "ghc --show-options"))
-  "List of options supported by the installed version of GHC."
-  :group 'haskell
-  :type '(repeat string))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessor functions

@@ -202,6 +202,20 @@ be set to the preferred literate style."
     map)
   "Keymap used in Haskell mode.")
 
+
+(defvar haskell-ghc-supported-extensions
+  (split-string (shell-command-to-string "ghc --supported-extensions"))
+  "List of language extensions supported by the installed version of GHC.
+This list comes from default system's GHC, i.e. first `ghc`
+executable found in PATH.")
+
+(defvar haskell-ghc-supported-options
+  (split-string (shell-command-to-string "ghc --show-options"))
+  "List of options supported by the installed version of GHC.
+This list comes from default system's GHC, i.e. first `ghc`
+executable found in PATH.")
+
+
 (defun haskell-mode-enable-process-minor-mode ()
   "Tell the user to choose a minor mode for process interaction."
   (interactive)
