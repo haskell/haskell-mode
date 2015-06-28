@@ -992,7 +992,8 @@ don't care when the thing completes as long as it's soonish."
       (haskell-session-set session 'next-error-region nil)
       (haskell-session-set session 'next-error-locus nil))
     (with-current-buffer (get-buffer-create "*haskell-process-log*")
-      (delete-region (point-min) (point-max))
+      (let ((inhibit-read-only t))
+        (delete-region (point-min) (point-max)))
       (remove-overlays))))
 
 (defun haskell-interactive-mode-completion-at-point-function ()
