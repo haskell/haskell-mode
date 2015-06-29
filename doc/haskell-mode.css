@@ -22,6 +22,7 @@ code, kbd, samp, pre { font-family: "Source Code Pro", Menlo, Inconsolata, monos
 kbd {font-style:normal}
 div.background {
     position: fixed;
+    z-index: -1;
     right: 30px;
     bottom: 0px;
     width: 256px;
