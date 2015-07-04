@@ -104,7 +104,18 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
                      session-name
                      nil)
                (apply haskell-process-wrapper-function
-                      (list (list haskell-process-path-cabal-ghci))))))))
+                      (list (list haskell-process-path-cabal-ghci)))))
+      ('stack-ghci
+       (append (list (format "Starting inferior stack GHCi process using %s" haskell-process-path-stack)
+                     session-name
+                     nil)
+               (apply haskell-process-wrapper-function
+                      (list
+                       (append
+                        (list haskell-process-path-stack "ghci")
+                        (let ((target (haskell-session-target session)))
+                          (if target (list target) nil))
+                        haskell-process-args-stack-ghci))))))))
 
 (defun haskell-process-make (name)
   "Make an inferior Haskell process."

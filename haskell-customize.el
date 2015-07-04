@@ -44,7 +44,7 @@ Used for locating additional package data files.")
 (defcustom haskell-process-type
   'auto
   "The inferior Haskell process type to use."
-  :type '(choice (const auto) (const ghci) (const cabal-repl) (const cabal-ghci))
+  :type '(choice (const auto) (const ghci) (const cabal-repl) (const cabal-ghci) (const stack-ghci))
   :group 'haskell-interactive)
 
 (defcustom haskell-process-wrapper-function
@@ -110,6 +110,12 @@ when showing type information about symbols."
   :group 'haskell-interactive
   :type '(choice string (repeat string)))
 
+(defcustom haskell-process-path-stack
+  "stack"
+  "The path for starting stack."
+  :group 'haskell-interactive
+  :type '(choice string (repeat string)))
+
 (defcustom haskell-process-args-ghci
   '("-ferror-spans")
   "Any arguments for starting ghci."
@@ -118,13 +124,19 @@ when showing type information about symbols."
 
 (defcustom haskell-process-args-cabal-repl
   '("--ghc-option=-ferror-spans")
-  "Additional arguments to for `cabal repl' invocation.
+  "Additional arguments for `cabal repl' invocation.
 Note: The settings in `haskell-process-path-ghci' and
 `haskell-process-args-ghci' are not automatically reused as `cabal repl'
 currently invokes `ghc --interactive'. Use
 `--with-ghc=<path-to-executable>' if you want to use a different
 interactive GHC frontend; use `--ghc-option=<ghc-argument>' to
 pass additional flags to `ghc'."
+  :group 'haskell-interactive
+  :type '(repeat (string :tag "Argument")))
+
+(defcustom haskell-process-args-stack-ghci
+  '("--ghc-options=-ferror-spans")
+  "Additional arguments for `stack ghci' invocation."
   :group 'haskell-interactive
   :type '(repeat (string :tag "Argument")))
 
