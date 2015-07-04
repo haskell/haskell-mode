@@ -369,12 +369,7 @@
   (interactive)
   (let* ((session (haskell-session))
          (buffer (haskell-session-interactive-buffer session)))
-    (unless (and (cl-find-if (lambda (window) (equal (window-buffer window) buffer))
-                             (window-list))
-                 (= 2 (length (window-list))))
-      (delete-other-windows)
-      (display-buffer buffer)
-      (other-window 1))))
+    (pop-to-buffer buffer)))
 
 ;;;###autoload
 (defun haskell-process-load-file ()
