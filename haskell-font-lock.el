@@ -250,6 +250,12 @@ Returns keywords suitable for `font-lock-keywords'."
              (2 'haskell-keyword-face nil lax)
              (3 'haskell-keyword-face nil lax))
 
+            ;; Special case for `type family' and `data family'.
+            ;; `family' is only reserved in these contexts.
+            ("\\<\\(type\\|data\\)[ \t]+\\(family\\>\\)"
+             (1 'haskell-keyword-face nil lax)
+             (2 'haskell-keyword-face nil lax))
+
             ;; Toplevel Declarations.
             ;; Place them *before* generic id-and-op highlighting.
             (,topdecl-var  (1 'haskell-definition-face))
