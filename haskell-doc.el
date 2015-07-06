@@ -479,7 +479,8 @@ It is probably best to manipulate this data structure with the commands
     ("where" . "exp where { decl; ...; decl [;] }") ; check that ; see also class, instance, module
     ("as" . "import [qualified] modid [as modid] [impspec]")
     ("qualified" . "import [qualified] modid [as modid] [impspec]")
-    ("hiding" . "hiding ( import1 , ... , importn [ , ] )"))
+    ("hiding" . "hiding ( import1 , ... , importn [ , ] )")
+    ("family" . "(type family type [kind] [= type_fam_equations]) | (data family type [kind])")) 
   "An alist of reserved identifiers.
 Each element is of the form (ID . DOC) where both ID and DOC are strings.
 DOC should be a concise single-line string describing the construct in which
