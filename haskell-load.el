@@ -182,7 +182,7 @@ actual Emacs buffer of the module being loaded."
            (when haskell-process-suggest-hayoo-imports
              (let ((modules (haskell-process-hayoo-ident ident)))
                (haskell-process-suggest-imports session file modules ident)))))
-        ((string-match "^[ ]+It is a member of the hidden package [‘`‛]\\(.+\\)['’].$" msg)
+        ((string-match "^[ ]+It is a member of the hidden package [‘`‛]\\([^@\r\n]+\\).*['’].$" msg)
          (when haskell-process-suggest-add-package
            (haskell-process-suggest-add-package session msg)))))
 
