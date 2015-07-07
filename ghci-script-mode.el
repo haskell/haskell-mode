@@ -55,8 +55,8 @@
 (define-key ghci-script-mode-map (kbd "C-c C-l") 'ghci-script-mode-load)
 
 (defun ghci-script-mode-load ()
-  (interactive)
   "Load the current script file into the GHCi session."
+  (interactive)
   (let ((buffer (haskell-session-interactive-buffer (haskell-session)))
         (filename (buffer-file-name)))
     (save-buffer)
