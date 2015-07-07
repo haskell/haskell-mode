@@ -34,7 +34,7 @@
   (concat "^import[ ]+"
           "\\(qualified \\)?"
           "[ ]*\\(\"[^\"]*\" \\)?"
-          "[ ]*\\([A-Za-z0-9_.']*.*\\)"))
+          "[ ]*\\([[:alnum:]_.']*.*\\)"))
 
 ;;;###autoload
 (defun haskell-sort-imports ()
