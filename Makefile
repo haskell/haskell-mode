@@ -28,7 +28,8 @@ EMACS := $(shell echo "$${EMACS:-emacs}")
 EFLAGS = --eval "(add-to-list 'load-path (expand-file-name \"tests/compat\") 'append)" \
 	 --eval "(when (< emacs-major-version 24) \
 		    (setq byte-compile-warnings '(not cl-functions)))" \
-	 --eval '(setq byte-compile-error-on-warn t)'
+	 --eval '(setq byte-compile-error-on-warn t)' \
+	 --eval '(when (not (version< emacs-version "24.4")) (setq load-prefer-newer t))'
 
 BATCH = $(EMACS) $(EFLAGS) --batch -Q -L .
 
