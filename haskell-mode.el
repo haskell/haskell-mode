@@ -136,6 +136,7 @@
 (require 'haskell-complete-module)
 (require 'haskell-compat)
 (require 'haskell-align-imports)
+(require 'haskell-lexeme)
 (require 'haskell-sort-imports)
 (require 'haskell-string)
 
@@ -652,6 +653,7 @@ Minor modes that work well with `haskell-mode':
   (set (make-local-variable 'comment-start-skip) "[-{]-[ \t]*")
   (set (make-local-variable 'comment-end) "")
   (set (make-local-variable 'comment-end-skip) "[ \t]*\\(-}\\|\\s>\\)")
+  (set (make-local-variable 'forward-sexp-function) #'haskell-forward-sexp)
   (set (make-local-variable 'parse-sexp-ignore-comments) nil)
   (set (make-local-variable 'indent-line-function) 'haskell-mode-suggest-indent-choice)
   ;; Set things up for eldoc-mode.
@@ -746,6 +748,31 @@ Minor modes that work well with `haskell-mode':
 ;;         (let ();(prefix-start (point)))
 ;;           (skip-syntax-forward "^w")
 ;;           (make-string (- (point) line-start) ?\s))))))
+
+;;;###autoload
+(defun haskell-forward-sexp (&optional arg)
+  "Haskell specific version of `forward-sexp'.
+
+Move forward across one balanced expression (sexp).  With ARG, do
+it that many times.  Negative arg -N means move backward across N
+balanced expressions.  This command assumes point is not in a
+string or comment.
+
+Note that negative arguments do not work so well."
+  (interactive "^p")
+  (or arg (setq arg 1))
+  (if (< arg 0)
+      ;; Fall back to native Emacs method for negative arguments.
+      ;; Haskell has maximum munch rule that does not work well
+      ;; backwards.
+      (progn
+        (goto-char (or (scan-sexps (point) arg) (buffer-end arg)))
+        (backward-prefix-chars))
+    (save-match-data
+      (if (haskell-lexeme-looking-at-token)
+          (if (member (match-string 0) (list "(" "[" "{"))
+              (goto-char (or (scan-sexps (point) arg) (buffer-end arg)))
+            (goto-char (match-end 0)))))))
 
 
 
