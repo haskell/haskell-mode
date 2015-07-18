@@ -317,9 +317,19 @@ actual Emacs buffer of the module being loaded."
   (let ((ovls (cl-remove-if-not test (overlays-in beg end))))
     (cl-first (sort (cl-copy-list ovls) 'overlay-start>))))
 
+(defun haskell-error-overlay-briefly (ovl)
+  (let ((text (overlay-get ovl 'haskell-msg))
+	(type (overlay-get ovl 'haskell-msg-type)))
+    (cond ((not (eq type 'warning))
+	   text)
+	  ((string-prefix-p "Warning:\n    " text)
+	   (cl-subseq text 13))
+	  (t (error "Invariant failed: a warning message from GHC has unexpected form: %s." text)))))
+
 (defun haskell-goto-error-overlay (ovl)
   (cond (ovl
-	 (goto-char (overlay-start ovl)))
+	 (goto-char (overlay-start ovl))
+	 (haskell-mode-message-line (haskell-error-overlay-briefly ovl)))
 	(t
 	 (message "No further notes from Haskell compiler."))))
 
@@ -362,6 +372,7 @@ actual Emacs buffer of the module being loaded."
 	(overlay-put ovl 'haskell-check t)
 	(overlay-put ovl 'haskell-file file)
 	(overlay-put ovl 'haskell-msg msg)
+	(overlay-put ovl 'haskell-msg-type type)
 	(overlay-put ovl 'help-echo msg)
 	(overlay-put ovl 'haskell-hole hole)
 	(cl-destructuring-bind (face fringe) (cl-case type
