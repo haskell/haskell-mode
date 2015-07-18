@@ -102,6 +102,11 @@ when showing type information about symbols."
   :group 'haskell-interactive
   :type 'boolean)
 
+(defcustom haskell-load-on-visit nil
+  "Whether to load the buffer on visit."
+  :group 'haskell-interactive
+  :type 'boolean)
+
 (defcustom haskell-process-path-ghci
   "ghci"
   "The path for starting ghci."
