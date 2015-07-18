@@ -92,7 +92,7 @@ actual Emacs buffer of the module being loaded."
 	 (cursor (haskell-process-response-cursor process))
 	 (warning-count 0))
     (haskell-process-set-response-cursor process 0)
-    (while (haskell-process-errors-warnings session process buffer)
+    (while (haskell-process-errors-warnings module-buffer session process buffer)
       (setq warning-count (1+ warning-count)))
     (haskell-process-set-response-cursor process cursor)
     (if (and (not reload)
@@ -220,8 +220,9 @@ actual Emacs buffer of the module being loaded."
                    (session (haskell-process-session process))
                    (message-count 0)
                    (cursor (haskell-process-response-cursor process)))
+	      ;; XXX: what the hell about the rampant code duplication?
               (haskell-process-set-response-cursor process 0)
-              (while (haskell-process-errors-warnings session process response)
+              (while (haskell-process-errors-warnings nil session process response)
                 (setq message-count (1+ message-count)))
               (haskell-process-set-response-cursor process cursor)
               (let ((msg (format "Complete: cabal %s (%s compiler messages)"
@@ -264,7 +265,7 @@ actual Emacs buffer of the module being loaded."
          (modules (split-string modules-string ", ")))
     (cons modules modules-string)))
 
-(defun haskell-process-errors-warnings (session process buffer &optional return-only)
+(defun haskell-process-errors-warnings (module-buffer session process buffer &optional return-only)
   "Trigger handling type errors or warnings. Either prints the
 messages in the interactive buffer or if CONT is specified,
 passes the error onto that."
