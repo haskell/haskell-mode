@@ -293,10 +293,43 @@ actual Emacs buffer of the module being loaded."
 (defvar haskell-check-warning-fringe (propertize "?" 'display '(left-fringe question-mark)))
 (defvar haskell-check-hole-fringe    (propertize "_" 'display '(left-fringe horizontal-bar)))
 
+(defun haskell-check-paint-overlay (buffer error-from-this-file-p line msg file err hole coln)
+  (with-current-buffer buffer
+    (let (beg end)
+      (goto-char (point-min))
+      ;; XXX: we can avoid excess buffer walking by relying on the maybe-fact that
+      ;;      GHC sorts error messages by line number, maybe.
+      (cond
+	(error-from-this-file-p
+	 (forward-line (1- line))
+	 (forward-char (1- coln))
+	 (setq beg (point))
+	 (if hole
+	     (forward-char (length hole))
+	     (skip-chars-forward "^[:space:]" (line-end-position)))
+	 (setq end (point)))
+	(t
+	 (setq beg (point))
+	 (forward-line)
+	 (setq end (point))))
+      (let ((ovl (make-overlay beg end)))
+	(overlay-put ovl 'haskell-check t)
+	(overlay-put ovl 'haskell-file file)
+	(overlay-put ovl 'haskell-msg msg)
+	(overlay-put ovl 'help-echo msg)
+	(overlay-put ovl 'haskell-hole hole)
+	(cl-destructuring-bind (face fringe) (cond (err  (list 'haskell-error-face   haskell-check-error-fringe))
+						   (hole (list 'haskell-hole-face    haskell-check-hole-fringe))
+						   (t    (list 'haskell-warning-face haskell-check-warning-fringe)))
+	  (overlay-put ovl 'before-string fringe)
+	  (overlay-put ovl 'face face))))))
+
 (defun haskell-process-errors-warnings (module-buffer session process buffer &optional return-only)
   "Trigger handling type errors or warnings. Either prints the
 messages in the interactive buffer or if CONT is specified,
-passes the error onto that."
+passes the error onto that.
+
+When MODULE-BUFFER is non-NIL, paint error overlays."
   (cond
    ((haskell-process-consume
      process
