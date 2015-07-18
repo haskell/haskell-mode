@@ -339,7 +339,7 @@ actual Emacs buffer of the module being loaded."
 			      (if ovl-at (overlay-end ovl-at) (point)) (point-max))
 	 ovl-at))))
 
-(defun haskell-check-paint-overlay (buffer error-from-this-file-p line msg file err hole coln)
+(defun haskell-check-paint-overlay (buffer error-from-this-file-p line msg file type hole coln)
   (with-current-buffer buffer
     (let (beg end)
       (goto-char (point-min))
@@ -350,7 +350,7 @@ actual Emacs buffer of the module being loaded."
 	 (forward-line (1- line))
 	 (forward-char (1- coln))
 	 (setq beg (point))
-	 (if hole
+	 (if (eq type 'hole)
 	     (forward-char (length hole))
 	     (skip-chars-forward "^[:space:]" (line-end-position)))
 	 (setq end (point)))
@@ -364,9 +364,10 @@ actual Emacs buffer of the module being loaded."
 	(overlay-put ovl 'haskell-msg msg)
 	(overlay-put ovl 'help-echo msg)
 	(overlay-put ovl 'haskell-hole hole)
-	(cl-destructuring-bind (face fringe) (cond (err  (list 'haskell-error-face   haskell-check-error-fringe))
-						   (hole (list 'haskell-hole-face    haskell-check-hole-fringe))
-						   (t    (list 'haskell-warning-face haskell-check-warning-fringe)))
+	(cl-destructuring-bind (face fringe) (cl-case type
+					       (warning (list 'haskell-warning-face haskell-check-warning-fringe))
+					       (hole    (list 'haskell-hole-face    haskell-check-hole-fringe))
+					       (error   (list 'haskell-error-face   haskell-check-error-fringe)))
 	  (overlay-put ovl 'before-string fringe)
 	  (overlay-put ovl 'face face))))))
 
@@ -411,9 +412,10 @@ When MODULE-BUFFER is non-NIL, paint error overlays."
            (file (match-string 1 buffer))
            (location-raw (match-string 2 buffer))
            (error-msg (match-string 3 buffer))
-           (warning (string-match "^Warning:" error-msg))
-           (splice (string-match "^Splicing " error-msg))
-	   (errorp (not warning))
+	   (type (cond ((string-match "^Warning:" error-msg)  'warning)
+		       ((string-match "^Splicing " error-msg) 'splice)
+		       (t                                     'error)))
+	   (critical (not (eq type 'warning)))
 	   ;; XXX: extract hole information, pass down to `haskell-check-paint-overlay'
            (final-msg (format "%s:%s: %s"
                               (haskell-session-strip-dir session file)
@@ -424,16 +426,15 @@ When MODULE-BUFFER is non-NIL, paint error overlays."
 	   (col1 (plist-get location :col)))
       (when module-buffer
 	(haskell-check-paint-overlay module-buffer (string= (file-truename (buffer-file-name module-buffer)) (file-truename file))
-				     line error-msg file errorp nil col1))
+				     line error-msg file type nil col1))
       (if return-only
-          (list :file file :line line :col col1 :msg error-msg :type (if warning 'warning 'error))
-        (progn (funcall (cond (warning
-                               'haskell-interactive-mode-compile-warning)
-                              (splice
-                               'haskell-interactive-mode-compile-splice)
-                              (t 'haskell-interactive-mode-compile-error))
+          (list :file file :line line :col col1 :msg error-msg :type type)
+	  (progn (funcall (cl-case type
+			    (warning  'haskell-interactive-mode-compile-warning)
+			    (splice   'haskell-interactive-mode-compile-splice)
+			    (error    'haskell-interactive-mode-compile-error))
                         session final-msg)
-               (unless warning
+               (when critical
                  (haskell-mode-message-line final-msg))
                (haskell-process-trigger-suggestions
                 session
