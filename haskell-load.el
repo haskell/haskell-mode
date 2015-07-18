@@ -294,9 +294,50 @@ actual Emacs buffer of the module being loaded."
 (defvar haskell-check-warning-fringe (propertize "?" 'display '(left-fringe question-mark)))
 (defvar haskell-check-hole-fringe    (propertize "_" 'display '(left-fringe horizontal-bar)))
 
+(defun haskell-check-overlay-p (ovl)
+  (overlay-get ovl 'haskell-check))
+
+(defun haskell-check-filter-overlays (xs)
+  (cl-remove-if-not 'haskell-check-overlay-p xs))
+
 (defun haskell-check-remove-overlays (buffer)
   (with-current-buffer buffer
     (remove-overlays (point-min) (point-max) 'haskell-check t)))
+
+(defun overlay-start> (o1 o2)
+  (> (overlay-start o1) (overlay-start o2)))
+(defun overlay-start< (o1 o2)
+  (< (overlay-start o1) (overlay-start o2)))
+
+(defun first-overlay-in-if (test beg end)
+  (let ((ovls (cl-remove-if-not test (overlays-in beg end))))
+    (cl-first (sort (cl-copy-list ovls) 'overlay-start<))))
+
+(defun last-overlay-in-if (test beg end)
+  (let ((ovls (cl-remove-if-not test (overlays-in beg end))))
+    (cl-first (sort (cl-copy-list ovls) 'overlay-start>))))
+
+(defun haskell-goto-error-overlay (ovl)
+  (cond (ovl
+	 (goto-char (overlay-start ovl)))
+	(t
+	 (message "No further notes from Haskell compiler."))))
+
+(defun haskell-goto-prev-error ()
+  (interactive)
+  (haskell-goto-error-overlay
+   (let ((ovl-at (cl-first (haskell-check-filter-overlays (overlays-at (point))))))
+     (or (last-overlay-in-if 'haskell-check-overlay-p
+			     (point-min) (if ovl-at (overlay-start ovl-at) (point)))
+	 ovl-at))))
+
+(defun haskell-goto-next-error ()
+  (interactive)
+  (haskell-goto-error-overlay
+   (let ((ovl-at (cl-first (haskell-check-filter-overlays (overlays-at (point))))))
+     (or (first-overlay-in-if 'haskell-check-overlay-p
+			      (if ovl-at (overlay-end ovl-at) (point)) (point-max))
+	 ovl-at))))
 
 (defun haskell-check-paint-overlay (buffer error-from-this-file-p line msg file err hole coln)
   (with-current-buffer buffer
