@@ -265,6 +265,34 @@ actual Emacs buffer of the module being loaded."
          (modules (split-string modules-string ", ")))
     (cons modules modules-string)))
 
+(defface haskell-error-face
+  '((((supports :underline (:style wave)))
+     :underline (:style wave :color "#dc322f"))
+    (t
+     :inherit error))
+  "Face used for marking error lines."
+  :group 'haskell-mode)
+
+(defface haskell-warning-face
+  '((((supports :underline (:style wave)))
+     :underline (:style wave :color "#b58900"))
+    (t
+     :inherit warning))
+  "Face used for marking warning lines."
+  :group 'haskell-mode)
+
+(defface haskell-hole-face
+  '((((supports :underline (:style wave)))
+     :underline (:style wave :color "#6c71c4"))
+    (t
+     :inherit warning))
+  "Face used for marking hole lines."
+  :group 'haskell-mode)
+
+(defvar haskell-check-error-fringe   (propertize "!" 'display '(left-fringe exclamation-mark)))
+(defvar haskell-check-warning-fringe (propertize "?" 'display '(left-fringe question-mark)))
+(defvar haskell-check-hole-fringe    (propertize "_" 'display '(left-fringe horizontal-bar)))
+
 (defun haskell-process-errors-warnings (module-buffer session process buffer &optional return-only)
   "Trigger handling type errors or warnings. Either prints the
 messages in the interactive buffer or if CONT is specified,
