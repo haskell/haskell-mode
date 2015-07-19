@@ -342,7 +342,9 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
     (ignore-errors (haskell-mode-stylish-buffer))
     (let ((before-save-hook '())
           (after-save-hook '()))
-      (basic-save-buffer))))
+      (basic-save-buffer)))
+  (when haskell-load-on-save
+    (haskell-process-load-or-reload)))
 
 ;;;###autoload
 (defun haskell-mode-tag-find (&optional next-p)
