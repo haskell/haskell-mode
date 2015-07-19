@@ -85,40 +85,28 @@ actual Emacs buffer of the module being loaded."
   (when (get-buffer (format "*%s:splices*" (haskell-session-name session)))
     (with-current-buffer (haskell-interactive-mode-splices-buffer session)
       (erase-buffer)))
-  (cond ((haskell-process-consume process "Ok, modules loaded: \\(.+\\)\\.$")
-         (let* ((modules (haskell-process-extract-modules buffer))
-                (cursor (haskell-process-response-cursor process)))
-           (haskell-process-set-response-cursor process 0)
-           (let ((warning-count 0))
-             (while (haskell-process-errors-warnings session process buffer)
-               (setq warning-count (1+ warning-count)))
-             (haskell-process-set-response-cursor process cursor)
-             (if (and (not reload)
-                      haskell-process-reload-with-fbytecode)
-                 (haskell-process-reload-with-fbytecode process module-buffer)
-               (haskell-process-import-modules process (car modules)))
-             (haskell-mode-message-line
-              (if reload "Reloaded OK." "OK."))
-             (when cont
-               (condition-case e
-                   (funcall cont t)
-                 (error (message "%S" e))
-                 (quit nil))))))
-        ((haskell-process-consume process "Failed, modules loaded: \\(.+\\)\\.$")
-         (let* ((modules (haskell-process-extract-modules buffer))
-                (cursor (haskell-process-response-cursor process)))
-           (haskell-process-set-response-cursor process 0)
-           (while (haskell-process-errors-warnings session process buffer))
-           (haskell-process-set-response-cursor process cursor)
-           (if (and (not reload) haskell-process-reload-with-fbytecode)
-               (haskell-process-reload-with-fbytecode process module-buffer)
-             (haskell-process-import-modules process (car modules)))
-           (haskell-interactive-mode-compile-error session "Compilation failed.")
-           (when cont
-             (condition-case e
-                 (funcall cont nil)
-               (error (message "%S" e))
-               (quit nil)))))))
+  (let* ((ok (cond ((haskell-process-consume process "Ok, modules loaded: \\(.+\\)\\.$")       t)
+		   ((haskell-process-consume process "Failed, modules loaded: \\(.+\\)\\.$") nil)
+		   (t (error (message "Unexpected response from haskell process.")))))
+	 (modules (haskell-process-extract-modules buffer))
+	 (cursor (haskell-process-response-cursor process))
+	 (warning-count 0))
+    (haskell-process-set-response-cursor process 0)
+    (while (haskell-process-errors-warnings module-buffer session process buffer)
+      (setq warning-count (1+ warning-count)))
+    (haskell-process-set-response-cursor process cursor)
+    (if (and (not reload)
+	     haskell-process-reload-with-fbytecode)
+	(haskell-process-reload-with-fbytecode process module-buffer)
+	(haskell-process-import-modules process (car modules)))
+    (if ok
+	(haskell-mode-message-line (if reload "Reloaded OK." "OK."))
+	(haskell-interactive-mode-compile-error session "Compilation failed."))
+    (when cont
+      (condition-case e
+	  (funcall cont ok)
+	(error (message "%S" e))
+	(quit nil)))))
 
 (defun haskell-process-suggest-imports (session file modules ident)
   "Given a list of MODULES, suggest adding them to the import section."
@@ -232,8 +220,9 @@ actual Emacs buffer of the module being loaded."
                    (session (haskell-process-session process))
                    (message-count 0)
                    (cursor (haskell-process-response-cursor process)))
+	      ;; XXX: what the hell about the rampant code duplication?
               (haskell-process-set-response-cursor process 0)
-              (while (haskell-process-errors-warnings session process response)
+              (while (haskell-process-errors-warnings nil session process response)
                 (setq message-count (1+ message-count)))
               (haskell-process-set-response-cursor process cursor)
               (let ((msg (format "Complete: cabal %s (%s compiler messages)"
@@ -276,7 +265,7 @@ actual Emacs buffer of the module being loaded."
          (modules (split-string modules-string ", ")))
     (cons modules modules-string)))
 
-(defun haskell-process-errors-warnings (session process buffer &optional return-only)
+(defun haskell-process-errors-warnings (module-buffer session process buffer &optional return-only)
   "Trigger handling type errors or warnings. Either prints the
 messages in the interactive buffer or if CONT is specified,
 passes the error onto that."
