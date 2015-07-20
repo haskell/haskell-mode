@@ -98,13 +98,6 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
                         haskell-process-args-cabal-repl
                         (let ((target (haskell-session-target session)))
                           (if target (list target) nil)))))))
-      ('cabal-ghci
-       (append (list (format "Starting inferior cabal-ghci process using %s ..."
-                             haskell-process-path-cabal-ghci)
-                     session-name
-                     nil)
-               (apply haskell-process-wrapper-function
-                      (list (list haskell-process-path-cabal-ghci)))))
       ('stack-ghci
        (append (list (format "Starting inferior stack GHCi process using %s" haskell-process-path-stack)
                      session-name
