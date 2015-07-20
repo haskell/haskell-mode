@@ -58,6 +58,7 @@ ELFILES = \
 	haskell-indentation.el \
 	haskell-indent.el \
 	haskell-interactive-mode.el \
+	haskell-lexeme.el \
 	haskell-load.el \
 	haskell-menu.el \
 	haskell-mode.el \
