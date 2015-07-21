@@ -150,11 +150,14 @@ with all relevant buffers)."
   (haskell-session-get s 'name))
 
 (defun haskell-session-target (s)
-  "Get the session build target."
+  "Get the session build target.
+If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
   (let* ((maybe-target (haskell-session-get s 'target))
          (target (if maybe-target maybe-target
                    (let ((new-target
-                          (read-string "build target (empty for default):")))
+			  (if haskell-process-load-or-reload-prompt
+			      (read-string "build target (empty for default):")
+			    "")))
                      (haskell-session-set-target s new-target)))))
     (if (not (string= target "")) target nil)))
 

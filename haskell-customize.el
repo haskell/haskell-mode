@@ -22,6 +22,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Customization variables
 
+(defcustom haskell-process-load-or-reload-prompt nil
+  "Nil means there will be no prompts on starting REPL. Defaults will be accepted."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defgroup haskell nil
   "Major mode for editing Haskell programs."
   :link '(custom-manual "(haskell-mode)")

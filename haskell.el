@@ -29,6 +29,8 @@
 (require 'haskell-modules)
 (require 'haskell-string)
 (require 'haskell-completions)
+(require 'haskell-utils)
+(require 'haskell-customize)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic configuration hooks
@@ -169,12 +171,13 @@
     session))
 
 (defun haskell-session-new-assume-from-cabal ()
-  "Prompt to create a new project based on a guess from the nearest Cabal file."
+  "Prompt to create a new project based on a guess from the nearest Cabal file.
+If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
   (let ((name (haskell-session-default-name)))
     (unless (haskell-session-lookup name)
-      (when (y-or-n-p (format "Start a new project named “%s”? "
-                              name))
-        (haskell-session-make name)))))
+      (if (or (not haskell-process-load-or-reload-prompt)
+	      (y-or-n-p (format "Start a new project named “%s”? " name)))
+	    (haskell-session-make name)))))
 
 ;;;###autoload
 (defun haskell-session ()

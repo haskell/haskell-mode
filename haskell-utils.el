@@ -38,6 +38,8 @@
 ;;       require/depend-on any other haskell-mode modules in order to
 ;;       stay at the bottom of the module dependency graph.
 
+(require 'haskell-customize)
+
 (defvar haskell-utils-async-post-command-flag nil
   "Non-nil means some commands were triggered during async function execution.")
 (make-variable-buffer-local 'haskell-utils-async-post-command-flag)
@@ -45,13 +47,14 @@
 (defun haskell-utils-read-directory-name (prompt default)
   "Read directory name and normalize to true absolute path.
 Refer to `read-directory-name' for the meaning of PROMPT and
-DEFAULT."
+DEFAULT. If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
   (let ((filename (file-truename
-                   (read-directory-name prompt
-                                        default
-                                        default))))
-    (concat (replace-regexp-in-string "/$" "" filename)
-            "/")))
+		   (if haskell-process-load-or-reload-prompt
+		       (read-directory-name prompt
+					    default
+					    default)
+		     default))))
+    (concat (replace-regexp-in-string "/$" "" filename) "/")))
 
 (defun haskell-utils-parse-import-statement-at-point ()
   "Return imported module name if on import statement or nil otherwise.
