@@ -383,7 +383,7 @@ actual Emacs buffer of the module being loaded."
 	  (overlay-put ovl 'face face))))))
 
 (defun haskell-process-errors-warnings (module-buffer session process buffer &optional return-only)
-  "Trigger handling type errors or warnings. Either prints the
+  "Trigger handling type errors or warnings.  Either prints the
 messages in the interactive buffer or if CONT is specified,
 passes the error onto that.
 
