@@ -261,17 +261,41 @@ Returns nil if no completions available."
 When optional IMPORT argument is non-nil complete PREFIX
 prepending \"import \" keyword (useful for module names).  This
 function is supposed for internal use."
-  (haskell-process-get-repl-completions
-   (haskell-interactive-process)
-   (if import
-       (concat "import " prefix)
-     prefix)))
+  (let ((ccs (haskell-process-get-repl-completions
+              (haskell-interactive-process)
+              (if import
+                  (concat "import " prefix)
+                prefix)
+              (haskell-completions-get-candidates-limit))))
+    ;; `haskell-process-get-repl-completions' returns unused part of line as
+    ;; first item in completions list, e.g. for "map co" prefix first element
+    ;; will be "map " followed by completions for "co" part of input.  It is
+    ;; currently unused.
+    (when ccs (cdr ccs))))
 
 (defun haskell-completions-dabbrev-completions (prefix)
   "Return completion list for PREFIX using dabbrev facility.
 This function is supposed for internal use."
-  (dabbrev--reset-global-variables)
-  (dabbrev--find-all-expansions prefix nil))
+  (let ((limit (haskell-completions-get-candidates-limit)))
+    (dabbrev--reset-global-variables)
+    (if limit
+        (haskell-completions-dabbrev-find-limit-expansions prefix limit)
+      (dabbrev--find-all-expansions prefix nil))))
+
+(defun haskell-completions-dabbrev-find-limit-expansions (prefix limit)
+  "Search list of dabbrev expansions for PREFIX limited by LIMIT."
+  ;; The idea stolen from http://emacswiki.org/emacs/ac-dabbrev.el
+  (let ((i 0)
+        (all-expansions nil)
+        expansion)
+    (while (and (< i limit)
+                (setq expansion (dabbrev--find-expansion prefix -1 nil)))
+      (setq all-expansions (cons expansion all-expansions))
+      ;; Note: sometimes dabbrev expansions return such list:
+      ;; m ma map mapC ... mapConcat
+      ;; this is the best place to introduce workaround for this stuff.
+      (setq i (+ i 1)))
+    all-expansions))
 
 (defun haskell-completions-get-candidates-limit ()
   "Return valid completion candidates limit."
