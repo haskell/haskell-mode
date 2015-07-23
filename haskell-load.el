@@ -326,13 +326,12 @@ correspondingly-named overlay properties of OVL."
     (cl-first (sort (cl-copy-list ovls) 'overlay-start>))))
 
 (defun haskell-error-overlay-briefly (ovl)
-  (let ((text (overlay-get ovl 'haskell-msg))
-	(type (overlay-get ovl 'haskell-msg-type)))
-    (cond ((not (eq type 'warning))
-	   text)
-	  ((string-prefix-p "Warning:\n    " text)
-	   (cl-subseq text 13))
-	  (t (error "Invariant failed: a warning message from GHC has unexpected form: %s." text)))))
+  (with-overlay-properties (haskell-msg haskell-msg-type) ovl
+    (cond ((not (eq haskell-msg-type 'warning))
+	   haskell-msg)
+	  ((string-prefix-p "Warning:\n    " haskell-msg)
+	   (cl-subseq haskell-msg 13))
+	  (t (error "Invariant failed: a warning message from GHC has unexpected form: %s." haskell-msg)))))
 
 (defun haskell-goto-error-overlay (ovl)
   (cond (ovl
