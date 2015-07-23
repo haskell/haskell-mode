@@ -92,6 +92,7 @@ actual Emacs buffer of the module being loaded."
 	 (cursor (haskell-process-response-cursor process))
 	 (warning-count 0))
     (haskell-process-set-response-cursor process 0)
+    (haskell-check-remove-overlays module-buffer)
     (while (haskell-process-errors-warnings module-buffer session process buffer)
       (setq warning-count (1+ warning-count)))
     (haskell-process-set-response-cursor process cursor)
@@ -293,6 +294,10 @@ actual Emacs buffer of the module being loaded."
 (defvar haskell-check-warning-fringe (propertize "?" 'display '(left-fringe question-mark)))
 (defvar haskell-check-hole-fringe    (propertize "_" 'display '(left-fringe horizontal-bar)))
 
+(defun haskell-check-remove-overlays (buffer)
+  (with-current-buffer buffer
+    (remove-overlays (point-min) (point-max) 'haskell-check t)))
+
 (defun haskell-check-paint-overlay (buffer error-from-this-file-p line msg file err hole coln)
   (with-current-buffer buffer
     (let (beg end)
@@ -363,20 +368,24 @@ When MODULE-BUFFER is non-NIL, paint error overlays."
                                          (- (haskell-process-response-cursor process) 1))
     (let* ((buffer (haskell-process-response process))
            (file (match-string 1 buffer))
-           (location (match-string 2 buffer))
+           (location-raw (match-string 2 buffer))
            (error-msg (match-string 3 buffer))
            (warning (string-match "^Warning:" error-msg))
            (splice (string-match "^Splicing " error-msg))
+	   (errorp (not warning))
+	   ;; XXX: extract hole information, pass down to `haskell-check-paint-overlay'
            (final-msg (format "%s:%s: %s"
                               (haskell-session-strip-dir session file)
-                              location
-                              error-msg)))
+                              location-raw
+                              error-msg))
+	   (location (haskell-process-parse-error (concat file ":" location-raw ": x")))
+	   (line (plist-get location :line))
+	   (col1 (plist-get location :col)))
+      (when module-buffer
+	(haskell-check-paint-overlay module-buffer (string= (file-truename (buffer-file-name module-buffer)) (file-truename file))
+				     line error-msg file errorp nil col1))
       (if return-only
-          (let* ((location (haskell-process-parse-error (concat file ":" location ": x")))
-                 (file (plist-get location :file))
-                 (line (plist-get location :line))
-                 (col1 (plist-get location :col)))
-            (list :file file :line line :col col1 :msg error-msg :type (if warning 'warning 'error)))
+          (list :file file :line line :col col1 :msg error-msg :type (if warning 'warning 'error))
         (progn (funcall (cond (warning
                                'haskell-interactive-mode-compile-warning)
                               (splice
