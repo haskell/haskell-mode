@@ -498,6 +498,7 @@ the current buffer."
 (defvar parse-line-number) ;; the number of lines parsed
 (defvar possible-indentations) ;; the return value of the indentations
 (defvar indentation-point) ;; where to stop parsing
+(defvar implicit-layout-active) ;; is 'off-side' rule active?
 
 (defun haskell-indentation-goto-least-indentation ()
   (beginning-of-line)
@@ -770,11 +771,12 @@ the current buffer."
 ;; items parsed by parser, separated by sep or stmt-sep, and ending in
 ;; end.
 (defun haskell-indentation-list (parser end sep &optional stmt-sep)
-  (haskell-indentation-with-starter
-   `(lambda () (haskell-indentation-separated #',parser
-                                              ,sep
-                                              ,stmt-sep))
-   end))
+  (let ((implicit-layout-active nil))
+    (haskell-indentation-with-starter
+     `(lambda () (haskell-indentation-separated #',parser
+                                                ,sep
+                                                ,stmt-sep))
+     end)))
 
 ;; An expression starting with a keyword or paren.  Skip the keyword
 ;; or paren.
@@ -979,7 +981,8 @@ the current buffer."
 (defun haskell-indentation-implicit-layout-list (parser)
   (let* ((layout-indent (current-column))
          (current-indent (current-column))
-         (left-indent (current-column)))
+         (left-indent (current-column))
+         (implicit-layout-active t))
     (catch 'return
       (while t
         (let ((left-indent left-indent))
@@ -1123,23 +1126,30 @@ the current buffer."
 ;; 'end-tokens:  back at point where we started, following-token
 ;;               will be set to the next token.
 ;;
+;; Pseudo tokens are used only when implicit-layout-active is t. That
+;; is the case only after keywords 'do', 'where', 'let' and 'of'.
+;;
 ;; if we are at a new line, parse-line is increased, and
 ;; current-indent and left-indent are set to the indentation
 ;; of the line.
 
 (defun haskell-indentation-read-next-token ()
-  (cond ((eq current-token 'end-tokens)
+  (cond ((and implicit-layout-active
+              (eq current-token 'end-tokens))
          'end-tokens)
-        ((eq current-token 'layout-end)
+        ((and implicit-layout-active
+              (eq current-token 'layout-end))
          (cond ((> layout-indent (current-column))
                 'layout-end)
                ((= layout-indent (current-column))
                 (setq current-token 'layout-item))
                ((< layout-indent (current-column))
                 (setq current-token (haskell-indentation-peek-token)))))
-        ((eq current-token 'layout-item)
+        ((and implicit-layout-active
+              (eq current-token 'layout-item))
          (setq current-token (haskell-indentation-peek-token)))
-        ((> layout-indent (current-column))
+        ((and implicit-layout-active
+              (> layout-indent (current-column)))
          (setq current-token 'layout-end))
         (t
          (haskell-indentation-skip-token)
@@ -1155,9 +1165,11 @@ the current buffer."
              (setq current-indent (current-column))
              (setq left-indent (current-column))
              (setq parse-line-number (+ parse-line-number 1)))
-           (cond ((> layout-indent (current-column))
+           (cond ((and implicit-layout-active
+                       (> layout-indent (current-column)))
                   (setq current-token 'layout-end))
-                 ((= layout-indent (current-column))
+                 ((and implicit-layout-active
+                       (= layout-indent (current-column)))
                   (setq current-token 'layout-item))
                  (t (setq current-token (haskell-indentation-peek-token))))))))
 
