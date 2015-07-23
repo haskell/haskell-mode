@@ -304,6 +304,14 @@ actual Emacs buffer of the module being loaded."
   (with-current-buffer buffer
     (remove-overlays (point-min) (point-max) 'haskell-check t)))
 
+(defmacro with-overlay-properties (proplist ovl &rest body)
+  "Evaluate BODY with names in PROPLIST bound to the values of
+correspondingly-named overlay properties of OVL."
+  (let ((ovlvar (cl-gensym "OVL-")))
+    `(let* ((,ovlvar ,ovl)
+	    ,@(mapcar (lambda (p) `(,p (overlay-get ,ovlvar ',p))) proplist))
+       ,@body)))
+
 (defun overlay-start> (o1 o2)
   (> (overlay-start o1) (overlay-start o2)))
 (defun overlay-start< (o1 o2)
