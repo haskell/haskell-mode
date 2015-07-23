@@ -39,6 +39,7 @@
 (require 'haskell-mode)
 (require 'haskell-process)
 (require 'haskell-interactive-mode)
+(require 'haskell-customize)
 
 (defvar haskell-completions-pragma-names
   (list "DEPRECATED"
@@ -271,6 +272,14 @@ function is supposed for internal use."
 This function is supposed for internal use."
   (dabbrev--reset-global-variables)
   (dabbrev--find-all-expansions prefix nil))
+
+(defun haskell-completions-get-candidates-limit ()
+  "Return valid completion candidates limit."
+  (if (and haskell-completion-candidates-limit
+           (< haskell-completion-candidates-limit 1))
+      nil
+    haskell-completion-candidates-limit))
+
 
 (provide 'haskell-completions)
 ;;; haskell-completions.el ends here
