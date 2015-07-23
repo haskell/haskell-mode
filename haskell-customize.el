@@ -347,6 +347,15 @@ same vein as `haskell-indent-spaces'."
   :group 'haskell
   :type '(repeat 'string))
 
+(defcustom haskell-completion-candidates-limit
+  100
+  "Maximum number of completion candidates.  Value must be
+positive integer to take effect.  In othercase completion
+candidates count supposed to be unlimited.  Some predifed
+completions sources (e.g. pragma completions) currently ignore
+this option."
+  :group 'haskell
+  :type '(integer))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessor functions
