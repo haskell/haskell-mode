@@ -30,6 +30,8 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
 (defvar haskell-sort-imports-regexp
   (concat "^import[ ]+"
           "\\(qualified \\)?"
@@ -55,7 +57,7 @@ within that region."
         (haskell-sort-imports-goto-group-start))
       (let* ((start (point))
 	     (imports (haskell-sort-imports-collect-imports))
-	     (sorted (sort (copy-list imports)
+	     (sorted (sort (cl-copy-list imports)
 			   (lambda (a b)
 			     (string< (haskell-sort-imports-normalize a)
 				      (haskell-sort-imports-normalize b))))))
