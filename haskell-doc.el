@@ -105,6 +105,11 @@
 ;;; Changelog:
 
 ;;  $Log: haskell-doc.el,v $
+;;  Revision 1.31 2015/07/23 10:34:20  ankhers
+;;  (turn-on-haskell-doc-mode): marked obsolete
+;;  (turn-on-haskell-doc): marked obsolete
+;;  other packages have been moving away from (turn-on-haskell-*)
+;;
 ;;  Revision 1.30  2009/02/02 21:00:33  monnier
 ;;  (haskell-doc-imported-list): Don't add current buffer
 ;;  to the imported file list if it is not (yet?) visiting a file.
@@ -1380,9 +1385,15 @@ See variable docstring."
 
 ;;;###autoload
 (defalias 'turn-on-haskell-doc-mode 'haskell-doc-mode)
+(make-obsolete 'turn-on-haskell-doc-mode
+               'haskell-doc-mode
+               "2015-07-23")
 
 ;;;###autoload
 (defalias 'turn-on-haskell-doc 'haskell-doc-mode)
+(make-obsolete 'turn-on-haskell-doc
+               'haskell-doc-mode
+               "2015-07-23")
 
 (defalias 'turn-off-haskell-doc-mode 'turn-off-haskell-doc)
 

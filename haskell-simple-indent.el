@@ -254,6 +254,9 @@ Runs `haskell-simple-indent-hook' on activation."
   "Turn on function `haskell-simple-indent-mode'."
   (interactive)
   (haskell-simple-indent-mode))
+(make-obsolete 'turn-on-haskell-simple-indent
+               'haskell-simple-indent-mode
+               "2015-07-23")
 
 (defun turn-off-haskell-simple-indent ()
   "Turn off function `haskell-simple-indent-mode'."
