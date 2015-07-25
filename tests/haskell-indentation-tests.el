@@ -422,3 +422,17 @@ Example of lines:
    "      bar = 0"
    "      , baz = 0"
    "      ^"))
+
+(ert-deftest haskell-indentation-check-22a ()
+  "names starting with quotes"
+  (haskell-indentation-check
+   "f = a (a 'A)"
+   "    (a 'A)"
+   "^   ^"))
+
+(ert-deftest haskell-indentation-check-22b ()
+  "character literal (escape sequence)"
+  (haskell-indentation-check
+   "f = '\\\\'"
+   ""
+   "^   ^"))
