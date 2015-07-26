@@ -318,20 +318,6 @@ Returns newly set VALUE."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Session teardown
 
-;; depends-on:
-;;  - haskell-interactive-mode.el:haskell-interactive-mode-echo
-;;  - haskell-process.el:haskell-process-set
-;;;###autoload
-(defun haskell-kill-session-process (&optional session)
-  "Kill the process."
-  (interactive)
-  (let* ((session (or session (haskell-session)))
-         (existing-process (get-process (haskell-session-name session))))
-    (when (processp existing-process)
-      (haskell-interactive-mode-echo session "Killing process ...")
-      (haskell-process-set (haskell-session-process session) 'is-restarting t)
-      (delete-process existing-process))))
-
 ;; This one is called from `haskell-session-kill' -- can you believe this?
 (defun haskell-session-interactive-buffer (s)
   "Get the session interactive buffer."
@@ -346,6 +332,9 @@ Returns newly set VALUE."
         (switch-to-buffer-other-window buffer)
         buffer))))
 
+;; depends-on:
+;;  - haskell-interactive-mode.el:haskell-interactive-mode-echo
+;;  - haskell-process.el:haskell-process-set
 ;;;###autoload
 (defun haskell-session-kill (&optional leave-interactive-buffer)
   "Kill the session process and buffer, delete the session.
@@ -359,8 +348,12 @@ Returns newly set VALUE."
          (name (haskell-session-name session))
          (also-kill-buffers
           (and haskell-ask-also-kill-buffers
-               (y-or-n-p (format "Killing `%s'. Also kill all associated buffers?" name)))))
-    (haskell-kill-session-process session)
+               (y-or-n-p (format "Killing `%s'. Also kill all associated buffers?" name))))
+	 (existing-process (get-process (haskell-session-name session))))
+    (when (processp existing-process)
+      (haskell-interactive-mode-echo session "Killing process ...")
+      (haskell-process-set (haskell-session-process session) 'is-restarting t)
+      (delete-process existing-process))
     (unless leave-interactive-buffer
       (kill-buffer (haskell-session-interactive-buffer session)))
     (cl-loop for buffer in (buffer-list)
