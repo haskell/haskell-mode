@@ -103,13 +103,4 @@ If DONTCREATE is non-nil don't create a new session."
                        "egrep '^module[\t\r ]+[^(\t\r ]+' . -r -I --include='*.*hs' --include='*.hsc' -s -o -h | sed 's/^module[\t\r ]*//' | sort | uniq"))))
         (split-string modules))))
 
-(defun haskell-modules-session ()
-  "Get the `haskell-session', throw an error if it's not
-  available."
-  (or (haskell-session-maybe)
-      (haskell-session-assign
-       (or (haskell-session-from-buffer)
-           (haskell-session-choose)
-           (error "No session associated with this buffer. Try M-x haskell-session-change or report this as a bug.")))))
-
 (provide 'haskell-modules)
