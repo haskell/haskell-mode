@@ -97,6 +97,16 @@ when showing type information about symbols."
   :link '(custom-manual "(haskell-mode)haskell-interactive-mode")
   :group 'haskell)
 
+(defcustom haskell-load-on-save nil
+  "Whether to load the buffer after saving."
+  :group 'haskell-interactive
+  :type 'boolean)
+
+(defcustom haskell-load-on-visit nil
+  "Whether to load the buffer on visit."
+  :group 'haskell-interactive
+  :type 'boolean)
+
 (defcustom haskell-process-path-ghci
   "ghci"
   "The path for starting ghci."

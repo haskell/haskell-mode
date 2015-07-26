@@ -137,6 +137,7 @@
 (require 'haskell-compat)
 (require 'haskell-align-imports)
 (require 'haskell-lexeme)
+(require 'haskell-process)
 (require 'haskell-sort-imports)
 (require 'haskell-string)
 
@@ -691,7 +692,8 @@ Minor modes that work well with `haskell-mode':
   (setq haskell-literate nil)
   (add-hook 'before-save-hook 'haskell-mode-before-save-handler nil t)
   (add-hook 'after-save-hook 'haskell-mode-after-save-handler nil t)
-  )
+  (when haskell-load-on-visit
+    (haskell-process-load-file)))
 
 (defun haskell-fill-paragraph (justify)
   (save-excursion
