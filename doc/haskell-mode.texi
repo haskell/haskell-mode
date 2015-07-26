@@ -536,6 +536,8 @@ Separate sessions per Cabal project @file{haskell-session.el}.
 A new inferior Haskell process handling code @file{haskell-process.el}.
 @item
 New REPL implementation similiar to SLIME/IELM
+@item
+Navigatable error overlays
 @file{haskell-interactive-mode.el}.
 @end itemize
 

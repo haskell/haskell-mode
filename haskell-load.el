@@ -92,6 +92,7 @@ actual Emacs buffer of the module being loaded."
 	 (cursor (haskell-process-response-cursor process))
 	 (warning-count 0))
     (haskell-process-set-response-cursor process 0)
+    (haskell-check-remove-overlays module-buffer)
     (while (haskell-process-errors-warnings module-buffer session process buffer)
       (setq warning-count (1+ warning-count)))
     (haskell-process-set-response-cursor process cursor)
@@ -265,10 +266,135 @@ actual Emacs buffer of the module being loaded."
          (modules (split-string modules-string ", ")))
     (cons modules modules-string)))
 
+(defface haskell-error-face
+  '((((supports :underline (:style wave)))
+     :underline (:style wave :color "#dc322f"))
+    (t
+     :inherit error))
+  "Face used for marking error lines."
+  :group 'haskell-mode)
+
+(defface haskell-warning-face
+  '((((supports :underline (:style wave)))
+     :underline (:style wave :color "#b58900"))
+    (t
+     :inherit warning))
+  "Face used for marking warning lines."
+  :group 'haskell-mode)
+
+(defface haskell-hole-face
+  '((((supports :underline (:style wave)))
+     :underline (:style wave :color "#6c71c4"))
+    (t
+     :inherit warning))
+  "Face used for marking hole lines."
+  :group 'haskell-mode)
+
+(defvar haskell-check-error-fringe   (propertize "!" 'display '(left-fringe exclamation-mark)))
+(defvar haskell-check-warning-fringe (propertize "?" 'display '(left-fringe question-mark)))
+(defvar haskell-check-hole-fringe    (propertize "_" 'display '(left-fringe horizontal-bar)))
+
+(defun haskell-check-overlay-p (ovl)
+  (overlay-get ovl 'haskell-check))
+
+(defun haskell-check-filter-overlays (xs)
+  (cl-remove-if-not 'haskell-check-overlay-p xs))
+
+(defun haskell-check-remove-overlays (buffer)
+  (with-current-buffer buffer
+    (remove-overlays (point-min) (point-max) 'haskell-check t)))
+
+(defmacro with-overlay-properties (proplist ovl &rest body)
+  "Evaluate BODY with names in PROPLIST bound to the values of
+correspondingly-named overlay properties of OVL."
+  (let ((ovlvar (cl-gensym "OVL-")))
+    `(let* ((,ovlvar ,ovl)
+	    ,@(mapcar (lambda (p) `(,p (overlay-get ,ovlvar ',p))) proplist))
+       ,@body)))
+
+(defun overlay-start> (o1 o2)
+  (> (overlay-start o1) (overlay-start o2)))
+(defun overlay-start< (o1 o2)
+  (< (overlay-start o1) (overlay-start o2)))
+
+(defun first-overlay-in-if (test beg end)
+  (let ((ovls (cl-remove-if-not test (overlays-in beg end))))
+    (cl-first (sort (cl-copy-list ovls) 'overlay-start<))))
+
+(defun last-overlay-in-if (test beg end)
+  (let ((ovls (cl-remove-if-not test (overlays-in beg end))))
+    (cl-first (sort (cl-copy-list ovls) 'overlay-start>))))
+
+(defun haskell-error-overlay-briefly (ovl)
+  (with-overlay-properties (haskell-msg haskell-msg-type) ovl
+    (cond ((not (eq haskell-msg-type 'warning))
+	   haskell-msg)
+	  ((string-prefix-p "Warning:\n    " haskell-msg)
+	   (cl-subseq haskell-msg 13))
+	  (t (error "Invariant failed: a warning message from GHC has unexpected form: %s." haskell-msg)))))
+
+(defun haskell-goto-error-overlay (ovl)
+  (cond (ovl
+	 (goto-char (overlay-start ovl))
+	 (haskell-mode-message-line (haskell-error-overlay-briefly ovl)))
+	(t
+	 (message "No further notes from Haskell compiler."))))
+
+(defun haskell-goto-prev-error ()
+  (interactive)
+  (haskell-goto-error-overlay
+   (let ((ovl-at (cl-first (haskell-check-filter-overlays (overlays-at (point))))))
+     (or (last-overlay-in-if 'haskell-check-overlay-p
+			     (point-min) (if ovl-at (overlay-start ovl-at) (point)))
+	 ovl-at))))
+
+(defun haskell-goto-next-error ()
+  (interactive)
+  (haskell-goto-error-overlay
+   (let ((ovl-at (cl-first (haskell-check-filter-overlays (overlays-at (point))))))
+     (or (first-overlay-in-if 'haskell-check-overlay-p
+			      (if ovl-at (overlay-end ovl-at) (point)) (point-max))
+	 ovl-at))))
+
+(defun haskell-check-paint-overlay (buffer error-from-this-file-p line msg file type hole coln)
+  (with-current-buffer buffer
+    (let (beg end)
+      (goto-char (point-min))
+      ;; XXX: we can avoid excess buffer walking by relying on the maybe-fact that
+      ;;      GHC sorts error messages by line number, maybe.
+      (cond
+	(error-from-this-file-p
+	 (forward-line (1- line))
+	 (forward-char (1- coln))
+	 (setq beg (point))
+	 (if (eq type 'hole)
+	     (forward-char (length hole))
+	     (skip-chars-forward "^[:space:]" (line-end-position)))
+	 (setq end (point)))
+	(t
+	 (setq beg (point))
+	 (forward-line)
+	 (setq end (point))))
+      (let ((ovl (make-overlay beg end)))
+	(overlay-put ovl 'haskell-check t)
+	(overlay-put ovl 'haskell-file file)
+	(overlay-put ovl 'haskell-msg msg)
+	(overlay-put ovl 'haskell-msg-type type)
+	(overlay-put ovl 'help-echo msg)
+	(overlay-put ovl 'haskell-hole hole)
+	(cl-destructuring-bind (face fringe) (cl-case type
+					       (warning (list 'haskell-warning-face haskell-check-warning-fringe))
+					       (hole    (list 'haskell-hole-face    haskell-check-hole-fringe))
+					       (error   (list 'haskell-error-face   haskell-check-error-fringe)))
+	  (overlay-put ovl 'before-string fringe)
+	  (overlay-put ovl 'face face))))))
+
 (defun haskell-process-errors-warnings (module-buffer session process buffer &optional return-only)
-  "Trigger handling type errors or warnings. Either prints the
+  "Trigger handling type errors or warnings.  Either prints the
 messages in the interactive buffer or if CONT is specified,
-passes the error onto that."
+passes the error onto that.
+
+When MODULE-BUFFER is non-NIL, paint error overlays."
   (cond
    ((haskell-process-consume
      process
@@ -302,27 +428,31 @@ passes the error onto that."
                                          (- (haskell-process-response-cursor process) 1))
     (let* ((buffer (haskell-process-response process))
            (file (match-string 1 buffer))
-           (location (match-string 2 buffer))
+           (location-raw (match-string 2 buffer))
            (error-msg (match-string 3 buffer))
-           (warning (string-match "^Warning:" error-msg))
-           (splice (string-match "^Splicing " error-msg))
+	   (type (cond ((string-match "^Warning:" error-msg)  'warning)
+		       ((string-match "^Splicing " error-msg) 'splice)
+		       (t                                     'error)))
+	   (critical (not (eq type 'warning)))
+	   ;; XXX: extract hole information, pass down to `haskell-check-paint-overlay'
            (final-msg (format "%s:%s: %s"
                               (haskell-session-strip-dir session file)
-                              location
-                              error-msg)))
+                              location-raw
+                              error-msg))
+	   (location (haskell-process-parse-error (concat file ":" location-raw ": x")))
+	   (line (plist-get location :line))
+	   (col1 (plist-get location :col)))
+      (when module-buffer
+	(haskell-check-paint-overlay module-buffer (string= (file-truename (buffer-file-name module-buffer)) (file-truename file))
+				     line error-msg file type nil col1))
       (if return-only
-          (let* ((location (haskell-process-parse-error (concat file ":" location ": x")))
-                 (file (plist-get location :file))
-                 (line (plist-get location :line))
-                 (col1 (plist-get location :col)))
-            (list :file file :line line :col col1 :msg error-msg :type (if warning 'warning 'error)))
-        (progn (funcall (cond (warning
-                               'haskell-interactive-mode-compile-warning)
-                              (splice
-                               'haskell-interactive-mode-compile-splice)
-                              (t 'haskell-interactive-mode-compile-error))
+          (list :file file :line line :col col1 :msg error-msg :type type)
+	  (progn (funcall (cl-case type
+			    (warning  'haskell-interactive-mode-compile-warning)
+			    (splice   'haskell-interactive-mode-compile-splice)
+			    (error    'haskell-interactive-mode-compile-error))
                         session final-msg)
-               (unless warning
+               (when critical
                  (haskell-mode-message-line final-msg))
                (haskell-process-trigger-suggestions
                 session
