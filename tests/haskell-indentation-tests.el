@@ -404,21 +404,26 @@ Example of lines:
    "  ^"))
 
 (ert-deftest haskell-indentation-check-instance-21a ()
-  "layout versus comma in braces"
   (haskell-indentation-check
    "main :: IO ()"
    "main = do"
    "let foo = Foo {"
    "      bar = 0"
-   "      , baz = 0"
+   "    , baz = 0"
    "      ^"))
 
-(ert-deftest haskell-indentation-check-instance-21a-unicode ()
-  "layout versus comma in braces (unicode)"
+(ert-deftest haskell-indentation-check-instance-21b ()
+  (haskell-indentation-check
+   "data Foo = Foo {"
+   "  bar :: Int"
+   ", baz :: Int"
+   "  ^"))
+
+(ert-deftest haskell-indentation-check-instance-21c ()
   (haskell-indentation-check
    "main ∷ IO ()"
    "main = do"
    "let foo = Foo {"
-   "      bar = 0"
-   "      , baz = 0"
-   "      ^"))
+   "            bar = 0"
+   "            , baz = 0"
+   "            ^"))
