@@ -286,23 +286,30 @@ This uses `accept-process-output' internally."
     (haskell-process-queue-flush process)
     (car-safe (haskell-command-state cmd))))
 
-(defun haskell-process-get-repl-completions (process inputstr)
-  "Perform `:complete repl ...' query for INPUTSTR using PROCESS."
-  (let* ((reqstr (concat ":complete repl "
+(defun haskell-process-get-repl-completions (process inputstr &optional limit)
+  "Perform `:complete repl ...' query for INPUTSTR using PROCESS.
+Give optional LIMIT arg to limit completion candidates count,
+zero, negative values, and nil means all possible completions.
+Returns NIL when no completions found."
+  (let* ((mlimit (if (and limit (> limit 0))
+                     (concat " " (number-to-string limit) " ")
+                   " "))
+         (reqstr (concat ":complete repl"
+                         mlimit
                          (haskell-string-literal-encode inputstr)))
          (rawstr (haskell-process-queue-sync-request process reqstr)))
+    ;; TODO use haskell-utils-parse-repl-response
     (if (string-prefix-p "unknown command " rawstr)
         (error "GHCi lacks `:complete' support (try installing 7.8 or ghci-ng)")
       (let* ((s1 (split-string rawstr "\r?\n" t))
              (cs (mapcar #'haskell-string-literal-decode (cdr s1)))
-             (h0 (car s1))) ;; "<cnt1> <cnt2> <quoted-str>"
+             (h0 (car s1))) ;; "<limit count> <all count> <unused string>"
         (unless (string-match "\\`\\([0-9]+\\) \\([0-9]+\\) \\(\".*\"\\)\\'" h0)
           (error "Invalid `:complete' response"))
-        (let ((cnt1 (match-string 1 h0))
-              (h1 (haskell-string-literal-decode (match-string 3 h0))))
+        (let ((cnt1 (match-string 1 h0)))
           (unless (= (string-to-number cnt1) (length cs))
             (error "Lengths inconsistent in `:complete' reponse"))
-          (cons h1 cs))))))
+          cs)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessing the process
