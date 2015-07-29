@@ -190,7 +190,7 @@ file), then this function returns nil."
   "Get the Cabal dir for a new project. Various ways of figuring this out,
    and indeed just prompting the user. Do them all."
   (let* ((file (haskell-cabal-find-file))
-         (dir (when file (file-name-directory file))))
+         (dir (if file (file-name-directory file) default-directory)))
     (haskell-utils-read-directory-name
      (format "Cabal dir%s: " (if file (format " (guessed from %s)" (file-relative-name file)) ""))
      dir)))
