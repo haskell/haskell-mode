@@ -201,7 +201,8 @@ actual Emacs buffer of the module being loaded."
                              (cl-ecase (haskell-process-type)
                                ('ghci haskell-process-path-cabal)
                                ('cabal-repl haskell-process-path-cabal)
-                               ('cabal-ghci haskell-process-path-cabal))
+                               ('cabal-ghci haskell-process-path-cabal)
+                               ('stack-ghci haskell-process-path-stack))
                              (cl-caddr state)))))
 
           :live
@@ -244,7 +245,8 @@ actual Emacs buffer of the module being loaded."
                    :app-name (cl-ecase (haskell-process-type)
                                ('ghci haskell-process-path-cabal)
                                ('cabal-repl haskell-process-path-cabal)
-                               ('cabal-ghci haskell-process-path-cabal))
+                               ('cabal-ghci haskell-process-path-cabal)
+                               ('stack-ghci haskell-process-path-stack))
                    :app-icon haskell-process-logo)))))))))))
 
 (defun haskell-process-echo-load-message (process buffer echo-in-repl th)
