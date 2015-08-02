@@ -25,6 +25,12 @@ INSTALL_INFO = install-info
 #
 EMACS := $(shell echo "$${EMACS:-emacs}")
 
+# Emacs itself sets the $EMACS environment variable to t if it is not
+# present, so we should ignore the variable if this is its value.
+ifeq ($(EMACS),t)
+EMACS := emacs
+endif
+
 EFLAGS = --eval "(add-to-list 'load-path (expand-file-name \"tests/compat\") 'append)" \
 	 --eval "(when (< emacs-major-version 24) \
 		    (setq byte-compile-warnings '(not cl-functions)))" \
