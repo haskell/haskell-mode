@@ -36,6 +36,7 @@
   "Face for quarantines."
   :group 'shm)
 
+;;;###autoload
 (defcustom haskell-w3m-haddock-dirs
   '("~/.cabal/share/doc/")
   "The path to your cabal documentation dir. It should contain

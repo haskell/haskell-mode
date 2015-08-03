@@ -354,6 +354,7 @@ The function `haskell-doc-make-global-fct-index' rebuilds this variables
 This variable is buffer-local.")
 (make-variable-buffer-local 'haskell-doc-index)
 
+;;;###autoload
 (defcustom haskell-doc-show-global-types nil
   "If non-nil, search for the types of global functions by loading the files.
 This variable is buffer-local."
@@ -361,6 +362,7 @@ This variable is buffer-local."
   :type 'boolean)
 (make-variable-buffer-local 'haskell-doc-show-global-types)
 
+;;;###autoload
 (defcustom haskell-doc-show-reserved t
   "If non-nil, show a documentation string for reserved ids.
 This variable is buffer-local."
@@ -368,6 +370,7 @@ This variable is buffer-local."
   :type 'boolean)
 (make-variable-buffer-local 'haskell-doc-show-reserved)
 
+;;;###autoload
 (defcustom haskell-doc-show-prelude t
   "If non-nil, show a documentation string for prelude functions.
 This variable is buffer-local."
@@ -375,6 +378,7 @@ This variable is buffer-local."
   :type 'boolean)
 (make-variable-buffer-local 'haskell-doc-show-prelude)
 
+;;;###autoload
 (defcustom haskell-doc-show-strategy t
   "If non-nil, show a documentation string for strategies.
 This variable is buffer-local."
@@ -382,6 +386,7 @@ This variable is buffer-local."
   :type 'boolean)
 (make-variable-buffer-local 'haskell-doc-show-strategy)
 
+;;;###autoload
 (defcustom haskell-doc-show-user-defined t
   "If non-nil, show a documentation string for user defined ids.
 This variable is buffer-local."
@@ -389,11 +394,13 @@ This variable is buffer-local."
   :type 'boolean)
 (make-variable-buffer-local 'haskell-doc-show-user-defined)
 
+;;;###autoload
 (defcustom haskell-doc-chop-off-context t
   "If non-nil eliminate the context part in a Haskell type."
   :group 'haskell-doc
   :type 'boolean)
 
+;;;###autoload
 (defcustom haskell-doc-chop-off-fctname nil
   "If non-nil omit the function name and show only the type."
   :group 'haskell-doc

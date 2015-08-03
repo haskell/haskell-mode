@@ -90,11 +90,13 @@
 (defvar haskell-bot-process-buffer nil
   "*Buffer used for communication with Bot subprocess for current buffer.")
 
+;;;###autoload
 (defcustom haskell-bot-program-name "lambdabot"
   "*The name of the Bot interpreter program."
   :type 'string
   :group 'haskell-bot)
 
+;;;###autoload
 (defcustom haskell-bot-program-args nil
   "*A list of string args to pass when starting the Bot interpreter."
   :type '(repeat string)

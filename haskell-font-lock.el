@@ -30,6 +30,7 @@
 (require 'haskell-mode)
 (require 'font-lock)
 
+;;;###autoload
 (defcustom haskell-font-lock-symbols nil
   "Display \\ and -> and such using symbols in fonts.
 
@@ -38,6 +39,7 @@ alignment and can thus lead to nasty surprises w.r.t layout."
   :group 'haskell
   :type 'boolean)
 
+;;;###autoload
 (defcustom haskell-font-lock-symbols-alist
   '(("\\" . "λ")
     ("not" . "¬")

@@ -33,6 +33,7 @@
 (require 'haskell-process)
 (require 'haskell-interactive-mode)
 
+;;;###autoload
 (defcustom haskell-menu-buffer-name "*haskell-menu*"
   "The name of the Haskell session menu buffer"
   :group 'haskell-interactive
