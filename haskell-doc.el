@@ -308,6 +308,7 @@
 (require 'imenu)
 (require 'eldoc)
 
+;;;###autoload
 (defgroup haskell-doc nil
   "Show Haskell function types in echo area."
   :group 'haskell

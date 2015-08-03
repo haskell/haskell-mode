@@ -27,6 +27,7 @@
 
 (require 'compile)
 
+;;;###autoload
 (defgroup haskell-checkers nil
   "Run HLint as inferior of Emacs, parse error messages."
   :group 'haskell)

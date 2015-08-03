@@ -29,6 +29,7 @@
 (require 'compile)
 (require 'haskell-cabal)
 
+;;;###autoload
 (defgroup haskell-compile nil
   "Settings for Haskell compilation mode"
   :link '(custom-manual "(haskell-mode)compilation")

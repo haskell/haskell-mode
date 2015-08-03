@@ -42,6 +42,7 @@
 ;; Dynamically scoped variables.
 (defvar find-tag-marker-ring)
 
+;;;###autoload
 (defgroup inferior-haskell nil
   "Settings for REPL interaction via `inferior-haskell-mode'"
   :link '(custom-manual "(haskell-mode)inferior-haskell-mode")

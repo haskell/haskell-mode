@@ -26,6 +26,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configuration
 
+;;;###autoload
 (defgroup haskell-debug nil
   "Settings for debugging support."
   :link '(custom-manual "(haskell-mode)haskell-debug")

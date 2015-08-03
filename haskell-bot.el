@@ -72,6 +72,7 @@
 
 (require 'comint)
 
+;;;###autoload
 (defgroup haskell-bot nil
   "Major mode for interacting with an inferior Bot session."
   :group 'haskell

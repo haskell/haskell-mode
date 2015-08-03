@@ -28,6 +28,7 @@
   :type 'boolean
   :group 'haskell-interactive)
 
+;;;###autoload
 (defgroup haskell nil
   "Major mode for editing Haskell programs."
   :link '(custom-manual "(haskell-mode)")
@@ -98,6 +99,7 @@ when showing type information about symbols."
 (defvar haskell-process-end-hook nil
   "Hook for when the haskell process ends.")
 
+;;;###autoload
 (defgroup haskell-interactive nil
   "Settings for REPL interaction via `haskell-interactive-mode'"
   :link '(custom-manual "(haskell-mode)haskell-interactive-mode")

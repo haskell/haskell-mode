@@ -64,6 +64,7 @@
 
 (require 'haskell-mode)
 
+;;;###autoload
 (defgroup haskell-simple-indent nil
   "Simple Haskell indentation."
   :link '(custom-manual "(haskell-mode)Indentation")

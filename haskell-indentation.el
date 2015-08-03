@@ -42,7 +42,7 @@
 (defvar haskell-indentation-dyn-last-direction)
 (defvar haskell-indentation-dyn-last-indentations)
 
-
+;;;###autoload
 (defgroup haskell-indentation nil
   "Haskell indentation."
   :link '(custom-manual "(haskell-mode)Indentation")
