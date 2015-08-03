@@ -130,26 +130,31 @@ be nil.")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Faces
 
+;;;###autoload
 (defface haskell-interactive-face-prompt
   '((t :inherit font-lock-function-name-face))
   "Face for the prompt."
   :group 'haskell-interactive)
 
+;;;###autoload
 (defface haskell-interactive-face-compile-error
   '((t :inherit compilation-error))
   "Face for compile errors."
   :group 'haskell-interactive)
 
+;;;###autoload
 (defface haskell-interactive-face-compile-warning
   '((t :inherit compilation-warning))
   "Face for compiler warnings."
   :group 'haskell-interactive)
 
+;;;###autoload
 (defface haskell-interactive-face-result
   '((t :inherit font-lock-string-face))
   "Face for the result."
   :group 'haskell-interactive)
 
+;;;###autoload
 (defface haskell-interactive-face-garbage
   '((t :inherit font-lock-string-face))
   "Face for trailing garbage after a command has completed."

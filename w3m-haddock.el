@@ -31,6 +31,7 @@
 
 (add-hook 'w3m-display-hook 'w3m-haddock-display)
 
+;;;###autoload
 (defface w3m-haddock-heading-face
   '((((class color)) :inherit magit-item-highlight))
   "Face for quarantines."

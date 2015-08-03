@@ -67,11 +67,13 @@ modes (e.g. fill-column-indicator)."
   :type 'boolean
   :group 'haskell-indentation)
 
+;;;###autoload
 (defface haskell-indentation-show-normal-face
   '((t :underline t))
   "Default face for indentations overlay."
   :group 'haskell-indentation)
 
+;;;###autoload
 (defface haskell-indentation-show-hl-line-face
   '((t :underline t :inherit hl-line))
   "Face used for indentations overlay after EOL if hl-line mode is enabled."
