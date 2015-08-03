@@ -301,12 +301,13 @@ OTHER-WINDOW use `find-file-other-window'."
     "help"
     "run"))
 
-
+;;;###autoload
 (defgroup haskell-cabal nil
   "Haskell cabal files"
   :group 'haskell
 )
 
+;;;###autoload
 (defcustom haskell-cabal-list-comma-position
   'before
   "Where to put the comma in lists"

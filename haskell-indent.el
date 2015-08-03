@@ -92,24 +92,28 @@
 
 (defvar haskell-literate)
 
+;;;###autoload
 (defgroup haskell-indent nil
   "Haskell indentation."
   :group 'haskell
   :link '(custom-manual "(haskell-mode)Indentation")
   :prefix "haskell-indent-")
 
+;;;###autoload
 (defcustom haskell-indent-offset 4
   "Indentation of Haskell statements with respect to containing block."
   :type 'integer
   :safe #'natnump
   :group 'haskell-indent)
 
+;;;###autoload
 (defcustom haskell-indent-literate-Bird-default-offset 1
   "Default number of blanks after > in a Bird style literate script."
   :type 'integer
   :safe #'natnump
   :group 'haskell-indent)
 
+;;;###autoload
 (defcustom haskell-indent-rhs-align-column 0
   "Column on which to align right-hand sides (use 0 for ad-hoc alignment)."
   :type 'integer
@@ -322,7 +326,7 @@ It deals with both Bird style and non Bird-style scripts."
         (insert "\\begin{code}\n")))))
 
 ;;; Start of indentation code
-
+;;;###autoload
 (defcustom haskell-indent-look-past-empty-line t
   "If nil, indentation engine will not look past an empty line for layout points."
   :group 'haskell-indent
@@ -1018,6 +1022,7 @@ OPEN is the start position of the comment in which point is."
                             (haskell-indent-point-to-col (match-end 0)))
                         (haskell-indent-point-to-col (point))))))))))
 
+;;;###autoload
 (defcustom haskell-indent-thenelse 0
   "If non-nil, \"then\" and \"else\" are indented.
 This is necessary in the \"do\" layout under Haskell-98.
@@ -1049,6 +1054,7 @@ See http://hackage.haskell.org/trac/haskell-prime/wiki/DoAndIfThenElse"
     (list (list (+ (if (memq (char-after) '(?t ?e)) haskell-indent-thenelse 0)
                    (haskell-indent-point-to-col open))))))
 
+;;;###autoload
 (defcustom haskell-indent-after-keywords
   '(("where" 2 0)
     ("of" 2)
@@ -1097,6 +1103,7 @@ is at the end of an otherwise-non-empty line."
     (or (assoc id haskell-indent-after-keywords)
         (car (member id haskell-indent-after-keywords)))))
 
+;;;###autoload
 (defcustom haskell-indent-dont-hang '("(")
   "Lexemes that should never be considered as hanging."
   :group 'haskell-indent

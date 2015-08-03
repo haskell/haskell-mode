@@ -108,6 +108,7 @@
           "\\( -- .*\\)?[ ]*$")
   "Regex used for matching components of an import.")
 
+;;;###autoload
 (defcustom haskell-align-imports-pad-after-name
   nil
   "Pad layout after the module name also."

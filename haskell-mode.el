@@ -182,6 +182,7 @@ of `haskell-literate-default' is used.")
 (make-variable-buffer-local 'haskell-literate)
 (put 'haskell-literate 'safe-local-variable 'symbolp)
 ;; Default literate style for ambiguous literate buffers.
+;;;###autoload
 (defcustom haskell-literate-default 'bird
   "Default value for `haskell-literate'.
 Used if the style of a literate buffer is ambiguous.  This variable should
@@ -558,7 +559,7 @@ May return a qualified name."
     (delete-indentation arg)))
 
 ;; Various mode variables.
-
+;;;###autoload
 (defcustom haskell-mode-contextual-import-completion
   t
   "Enable import completion on haskell-mode-contextual-space."
@@ -807,6 +808,7 @@ Note that negative arguments do not work so well."
 ;;;###autoload
 (add-to-list 'completion-ignored-extensions ".hi")
 
+;;;###autoload
 (defcustom haskell-hoogle-command
   (if (executable-find "hoogle") "hoogle")
   "Name of the command to use to query Hoogle.
@@ -815,6 +817,7 @@ If nil, use the Hoogle web-site."
   :type '(choice (const :tag "Use Web-site" nil)
                  string))
 
+;;;###autoload
 (defcustom haskell-hoogle-url "http://haskell.org/hoogle/?q=%s"
   "Default value for hoogle web site.
 "
@@ -894,6 +897,7 @@ is asked to show extra info for the items matching QUERY.."
           (hoogle-start-server)
         (error "hoogle is not installed")))))
 
+;;;###autoload
 (defcustom haskell-hayoo-url "http://hayoo.fh-wedel.de/?query=%s"
   "Default value for hayoo web site.
 "
@@ -917,6 +921,7 @@ is asked to show extra info for the items matching QUERY.."
 ;;;###autoload
 (defalias 'hayoo 'haskell-hayoo)
 
+;;;###autoload
 (defcustom haskell-check-command "hlint"
   "*Command used to check a Haskell file."
   :group 'haskell
@@ -924,11 +929,13 @@ is asked to show extra info for the items matching QUERY.."
                  (const "ghc -fno-code")
                  (string :tag "Other command")))
 
+;;;###autoload
 (defcustom haskell-stylish-on-save nil
   "Whether to run stylish-haskell on the buffer before saving."
   :group 'haskell
   :type 'boolean)
 
+;;;###autoload
 (defcustom haskell-tags-on-save nil
   "Generate tags via hasktags after saving."
   :group 'haskell
@@ -937,6 +944,7 @@ is asked to show extra info for the items matching QUERY.."
 (defvar haskell-saved-check-command nil
   "Internal use.")
 
+;;;###autoload
 (defcustom haskell-indent-spaces 2
   "Number of spaces to indent inwards."
   :group 'haskell)

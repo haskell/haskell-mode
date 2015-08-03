@@ -30,6 +30,7 @@
 (require 'haskell-mode)
 (require 'font-lock)
 
+;;;###autoload
 (defcustom haskell-font-lock-symbols nil
   "Display \\ and -> and such using symbols in fonts.
 
@@ -38,6 +39,7 @@ alignment and can thus lead to nasty surprises w.r.t layout."
   :group 'haskell
   :type 'boolean)
 
+;;;###autoload
 (defcustom haskell-font-lock-symbols-alist
   '(("\\" . "λ")
     ("not" . "¬")
@@ -90,11 +92,13 @@ This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
               (string= " " (string (char-after start)))
               (string= " " (string (char-before start))))))))
 
+;;;###autoload
 (defface haskell-keyword-face
   '((t :inherit font-lock-keyword-face))
   "Face used to highlight Haskell keywords."
   :group 'haskell)
 
+;;;###autoload
 (defface haskell-constructor-face
   '((t :inherit font-lock-type-face))
   "Face used to highlight Haskell constructors."
@@ -111,16 +115,19 @@ This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
 ;; This is probably just wrong, but it used to use
 ;; `font-lock-function-name-face' with a result that was not consistent with
 ;; other major modes, so I just exchanged with `haskell-definition-face'.
+;;;###autoload
 (defface haskell-operator-face
   '((t :inherit font-lock-variable-name-face))
   "Face used to highlight Haskell operators."
   :group 'haskell)
 
+;;;###autoload
 (defface haskell-pragma-face
   '((t :inherit font-lock-preprocessor-face))
   "Face used to highlight Haskell pragmas."
   :group 'haskell)
 
+;;;###autoload
 (defface haskell-literate-comment-face
   '((t :inherit font-lock-doc-face))
   "Face with which to fontify literate comments.

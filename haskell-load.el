@@ -268,6 +268,7 @@ actual Emacs buffer of the module being loaded."
          (modules (split-string modules-string ", ")))
     (cons modules modules-string)))
 
+;;;###autoload
 (defface haskell-error-face
   '((((supports :underline (:style wave)))
      :underline (:style wave :color "#dc322f"))
@@ -276,6 +277,7 @@ actual Emacs buffer of the module being loaded."
   "Face used for marking error lines."
   :group 'haskell-mode)
 
+;;;###autoload
 (defface haskell-warning-face
   '((((supports :underline (:style wave)))
      :underline (:style wave :color "#b58900"))
@@ -284,6 +286,7 @@ actual Emacs buffer of the module being loaded."
   "Face used for marking warning lines."
   :group 'haskell-mode)
 
+;;;###autoload
 (defface haskell-hole-face
   '((((supports :underline (:style wave)))
      :underline (:style wave :color "#6c71c4"))

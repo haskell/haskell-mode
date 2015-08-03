@@ -31,11 +31,13 @@
 
 (add-hook 'w3m-display-hook 'w3m-haddock-display)
 
+;;;###autoload
 (defface w3m-haddock-heading-face
   '((((class color)) :inherit magit-item-highlight))
   "Face for quarantines."
   :group 'shm)
 
+;;;###autoload
 (defcustom haskell-w3m-haddock-dirs
   '("~/.cabal/share/doc/")
   "The path to your cabal documentation dir. It should contain

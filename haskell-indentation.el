@@ -42,13 +42,14 @@
 (defvar haskell-indentation-dyn-last-direction)
 (defvar haskell-indentation-dyn-last-indentations)
 
-
+;;;###autoload
 (defgroup haskell-indentation nil
   "Haskell indentation."
   :link '(custom-manual "(haskell-mode)Indentation")
   :group 'haskell
   :prefix "haskell-indentation-")
 
+;;;###autoload
 (defcustom haskell-indentation-show-indentations nil
   "If t the current line's indentation points will be showed as
 underscore overlays in new haskell-mode buffers.  Use
@@ -58,6 +59,7 @@ behavior for already existing buffers."
   :type 'boolean
   :group 'haskell-indentation)
 
+;;;###autoload
 (defcustom haskell-indentation-show-indentations-after-eol nil
   "If t, try to show indentation points after the end of line.
 This requires strange overlay hacks and can collide with other
@@ -65,47 +67,55 @@ modes (e.g. fill-column-indicator)."
   :type 'boolean
   :group 'haskell-indentation)
 
+;;;###autoload
 (defface haskell-indentation-show-normal-face
   '((t :underline t))
   "Default face for indentations overlay."
   :group 'haskell-indentation)
 
+;;;###autoload
 (defface haskell-indentation-show-hl-line-face
   '((t :underline t :inherit hl-line))
   "Face used for indentations overlay after EOL if hl-line mode is enabled."
   :group 'haskell-indentation)
 
-
+;;;###autoload
 (defcustom haskell-indentation-indent-leftmost t
   "Indent to the left margin after certain keywords (for example after let .. in, case .. of).  If set to t it will only indent to the left.  If nil only relative to the containing expression.  If set to the keyword 'both then both positions are allowed."
   :type 'symbol
   :group 'haskell-indentation)
 
+;;;###autoload
 (defcustom haskell-indentation-layout-offset 2
   "Extra indentation to add before expressions in a haskell layout list."
   :type 'integer
   :group 'haskell-indentation)
 
+;;;###autoload
 (defcustom haskell-indentation-starter-offset 2
   "Extra indentation after an opening keyword (e.g. let)."
   :type 'integer
   :group 'haskell-indentation)
 
+;;;###autoload
 (defcustom haskell-indentation-left-offset 2
   "Extra indentation after an indentation to the left (e.g. after do)."
   :type 'integer
   :group 'haskell-indentation)
 
+;;;###autoload
 (defcustom  haskell-indentation-ifte-offset 2
   "Extra indentation after the keywords `if' `then' or `else'."
   :type 'integer
   :group 'haskell-indentation)
 
+;;;###autoload
 (defcustom haskell-indentation-where-pre-offset 2
   "Extra indentation before the keyword `where'."
   :type 'integer
   :group 'haskell-indentation)
 
+;;;###autoload
 (defcustom haskell-indentation-where-post-offset 2
   "Extra indentation after the keyword `where'."
   :type 'integer

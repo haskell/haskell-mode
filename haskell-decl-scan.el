@@ -105,17 +105,20 @@
 (require 'syntax)
 (require 'imenu)
 
+;;;###autoload
 (defgroup haskell-decl-scan nil
   "Haskell declaration scanning (`imenu' support)."
   :link '(custom-manual "(haskell-mode)haskell-decl-scan-mode")
   :group 'haskell
   :prefix "haskell-decl-scan-")
 
+;;;###autoload
 (defcustom haskell-decl-scan-bindings-as-variables nil
   "Whether to put top-level value bindings into a \"Variables\" category."
   :group 'haskell-decl-scan
   :type 'boolean)
 
+;;;###autoload
 (defcustom haskell-decl-scan-add-to-menubar t
   "Whether to add a \"Declarations\" menu entry to menu bar."
   :group 'haskell-decl-scan
