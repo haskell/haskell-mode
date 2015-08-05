@@ -197,7 +197,7 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
 (defun haskell-session-cabal-dir (s)
   "Get the session cabal-dir."
   (or (haskell-session-get s 'cabal-dir)
-      (let ((set-dir (haskell-cabal-get-dir)))
+      (let ((set-dir (haskell-cabal-get-dir (not haskell-process-load-or-reload-prompt))))
 	(if set-dir
 	    (progn (haskell-session-set-cabal-dir s set-dir)
 		   set-dir)
