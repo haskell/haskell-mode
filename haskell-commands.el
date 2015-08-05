@@ -526,6 +526,15 @@ Requires the :loc-at command from GHCi."
                                 (haskell-interactive-process)
                                 dir)))
 
+(defun haskell-session-buffer-default-dir (session &optional buffer)
+  "Try to deduce a sensible default directory for SESSION and BUFFER,
+of which the latter defaults to the current buffer."
+  (or (haskell-session-get session 'current-dir)
+      (haskell-session-get session 'cabal-dir)
+      (if (buffer-file-name buffer)
+	  (file-name-directory (buffer-file-name buffer))
+	  "~/")))
+
 (defun haskell-session-pwd (session &optional change)
   "Prompt for the current directory.
 Return current working directory for SESSION.
@@ -533,16 +542,12 @@ Optional CHANGE argument makes user to choose new working directory for SESSION.
 In this case new working directory path will be returned."
   (or (unless change
         (haskell-session-get session 'current-dir))
-      (progn (haskell-session-set-current-dir
-              session
-              (haskell-utils-read-directory-name
-               (if change "Change directory: " "Set current directory: ")
-               (or (haskell-session-get session 'current-dir)
-                   (haskell-session-get session 'cabal-dir)
-                   (if (buffer-file-name)
-                       (file-name-directory (buffer-file-name))
-                     "~/"))))
-             (haskell-session-get session 'current-dir))))
+      (progn
+	(haskell-session-set-current-dir
+	 session
+	 (haskell-utils-read-directory-name (if change "Change directory: " "Set current directory: ")
+					    (haskell-session-buffer-default-dir session)))
+	(haskell-session-get session 'current-dir))))
 
 (defun haskell-process-change-dir (session process dir)
   "Change SESSION's current directory.
