@@ -60,7 +60,7 @@ You can create new session using function `haskell-session-make'."
     (haskell-process-set (haskell-session-process session) 'is-restarting nil)
     (let ((default-directory (haskell-session-cabal-dir session))
           (log-and-command (haskell-process-compute-process-log-and-command session (haskell-process-type))))
-      (haskell-session-pwd session)
+      (haskell-session-prompt-set-current-dir session)
       (haskell-process-set-process
        process
        (progn
@@ -518,7 +518,7 @@ Requires the :loc-at command from GHCi."
   "Change directory."
   (interactive)
   (let* ((session (haskell-interactive-session))
-         (dir (haskell-session-pwd session)))
+         (dir (haskell-session-prompt-set-current-dir session)))
     (haskell-process-log
      (propertize (format "Changing directory to %s ...\n" dir)
                  'face font-lock-comment-face))
@@ -535,7 +535,7 @@ of which the latter defaults to the current buffer."
 	  (file-name-directory (buffer-file-name buffer))
 	  "~/")))
 
-(defun haskell-session-pwd (session)
+(defun haskell-session-prompt-set-current-dir (session)
   "Prompt for the current directory.
 Return current working directory for SESSION.
 Optional CHANGE argument makes user to choose new working directory for SESSION.
