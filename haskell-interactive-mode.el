@@ -512,7 +512,7 @@ FILE-NAME only."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc
 
-(defun haskell-session-interactive-buffer (s)
+(defun haskell-session-interactive-buffer (s &optional no-window-popup)
   "Get the session interactive buffer."
   (let ((buffer (haskell-session-get s 'interactive-buffer)))
     (if (and buffer (buffer-live-p buffer))
@@ -522,7 +522,8 @@ FILE-NAME only."
         (with-current-buffer buffer
           (haskell-interactive-mode)
           (haskell-session-assign s))
-        (switch-to-buffer-other-window buffer)
+	(unless no-window-popup
+	  (switch-to-buffer-other-window buffer))
         buffer))))
 
 (defun haskell-process-cabal-live (state buffer)
