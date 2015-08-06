@@ -499,10 +499,10 @@ FILE-NAME only."
                t)))))
 
 ;;;###autoload
-(defun haskell-interactive-mode-reset-error (session)
+(defun haskell-interactive-mode-reset-error (session &optional no-window-popup)
   "Reset the error cursor position."
   (interactive)
-  (with-current-buffer (haskell-session-interactive-buffer session)
+  (with-current-buffer (haskell-session-interactive-buffer session no-window-popup)
     (haskell-interactive-mode-goto-end-point)
     (let ((mrk (point-marker)))
       (haskell-session-set session 'next-error-locus nil)
