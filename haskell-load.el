@@ -400,71 +400,72 @@ messages in the interactive buffer or if CONT is specified,
 passes the error onto that.
 
 When MODULE-BUFFER is non-NIL, paint error overlays."
-  (cond
-   ((haskell-process-consume
-     process
-     "\\(Module imports form a cycle:[ \n]+module [^ ]+ ([^)]+)[[:unibyte:][:nonascii:]]+?\\)\nFailed")
-    (let ((err (match-string 1 buffer)))
-      (if (string-match "module [`'‘‛]\\([^ ]+\\)['’`] (\\([^)]+\\))" err)
-          (let* ((default-directory (haskell-session-current-dir session))
-                 (module (match-string 1 err))
-                 (file (match-string 2 err))
-                 (relative-file-name (file-relative-name file)))
-            (unless return-only
-              (haskell-interactive-show-load-message
-               session
-               'import-cycle
-               module
-               relative-file-name
-               nil
-               nil)
-              (haskell-interactive-mode-compile-error
-               session
-               (format "%s:1:0: %s"
-                       relative-file-name
-                       err)))
-            (list :file file :line 1 :col 0 :msg err :type 'error))
-        t)))
-   ((haskell-process-consume
-     process
-     (concat "[\r\n]\\([A-Z]?:?[^ \r\n:][^:\n\r]+\\):\\([0-9()-:]+\\):"
-             "[ \n\r]+\\([[:unibyte:][:nonascii:]]+?\\)\n[^ ]"))
-    (haskell-process-set-response-cursor process
-                                         (- (haskell-process-response-cursor process) 1))
-    (let* ((buffer (haskell-process-response process))
-           (file (match-string 1 buffer))
-           (location-raw (match-string 2 buffer))
-           (error-msg (match-string 3 buffer))
-	   (type (cond ((string-match "^Warning:" error-msg)  'warning)
-		       ((string-match "^Splicing " error-msg) 'splice)
-		       (t                                     'error)))
-	   (critical (not (eq type 'warning)))
-	   ;; XXX: extract hole information, pass down to `haskell-check-paint-overlay'
-           (final-msg (format "%s:%s: %s"
-                              (haskell-session-strip-dir session file)
-                              location-raw
-                              error-msg))
-	   (location (haskell-process-parse-error (concat file ":" location-raw ": x")))
-	   (line (plist-get location :line))
-	   (col1 (plist-get location :col)))
-      (when module-buffer
-	(haskell-check-paint-overlay module-buffer (string= (file-truename (buffer-file-name module-buffer)) (file-truename file))
-				     line error-msg file type nil col1))
-      (if return-only
-          (list :file file :line line :col col1 :msg error-msg :type type)
-	  (progn (funcall (cl-case type
-			    (warning  'haskell-interactive-mode-compile-warning)
-			    (splice   'haskell-interactive-mode-compile-splice)
-			    (error    'haskell-interactive-mode-compile-error))
-                        session final-msg)
-               (when critical
-                 (haskell-mode-message-line final-msg))
-               (haskell-process-trigger-suggestions
-                session
-                error-msg
-                file
-                (plist-get (haskell-process-parse-error final-msg) :line))
-               t))))))
+  (save-excursion
+    (cond
+      ((haskell-process-consume
+	process
+	"\\(Module imports form a cycle:[ \n]+module [^ ]+ ([^)]+)[[:unibyte:][:nonascii:]]+?\\)\nFailed")
+       (let ((err (match-string 1 buffer)))
+	 (if (string-match "module [`'‘‛]\\([^ ]+\\)['’`] (\\([^)]+\\))" err)
+	     (let* ((default-directory (haskell-session-current-dir session))
+		    (module (match-string 1 err))
+		    (file (match-string 2 err))
+		    (relative-file-name (file-relative-name file)))
+	       (unless return-only
+		 (haskell-interactive-show-load-message
+		  session
+		  'import-cycle
+		  module
+		  relative-file-name
+		  nil
+		  nil)
+		 (haskell-interactive-mode-compile-error
+		  session
+		  (format "%s:1:0: %s"
+			  relative-file-name
+			  err)))
+	       (list :file file :line 1 :col 0 :msg err :type 'error))
+	     t)))
+      ((haskell-process-consume
+	process
+	(concat "[\r\n]\\([A-Z]?:?[^ \r\n:][^:\n\r]+\\):\\([0-9()-:]+\\):"
+		"[ \n\r]+\\([[:unibyte:][:nonascii:]]+?\\)\n[^ ]"))
+       (haskell-process-set-response-cursor process
+					    (- (haskell-process-response-cursor process) 1))
+       (let* ((buffer (haskell-process-response process))
+	      (file (match-string 1 buffer))
+	      (location-raw (match-string 2 buffer))
+	      (error-msg (match-string 3 buffer))
+	      (type (cond ((string-match "^Warning:" error-msg)  'warning)
+			  ((string-match "^Splicing " error-msg) 'splice)
+			  (t                                     'error)))
+	      (critical (not (eq type 'warning)))
+	      ;; XXX: extract hole information, pass down to `haskell-check-paint-overlay'
+	      (final-msg (format "%s:%s: %s"
+				 (haskell-session-strip-dir session file)
+				 location-raw
+				 error-msg))
+	      (location (haskell-process-parse-error (concat file ":" location-raw ": x")))
+	      (line (plist-get location :line))
+	      (col1 (plist-get location :col)))
+	 (when module-buffer
+	   (haskell-check-paint-overlay module-buffer (string= (file-truename (buffer-file-name module-buffer)) (file-truename file))
+					line error-msg file type nil col1))
+	 (if return-only
+	     (list :file file :line line :col col1 :msg error-msg :type type)
+	     (progn (funcall (cl-case type
+			       (warning  'haskell-interactive-mode-compile-warning)
+			       (splice   'haskell-interactive-mode-compile-splice)
+			       (error    'haskell-interactive-mode-compile-error))
+			     session final-msg)
+		    (when critical
+		      (haskell-mode-message-line final-msg))
+		    (haskell-process-trigger-suggestions
+		     session
+		     error-msg
+		     file
+		     (plist-get (haskell-process-parse-error final-msg) :line))
+		    t)))))))
 
 (defun haskell-interactive-show-load-message (session type module-name file-name echo th)
   "Show the '(Compiling|Loading) X' message."
