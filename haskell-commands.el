@@ -121,9 +121,9 @@ If I break, you can:
   3. General config:    M-x customize-mode
   4. Hide these tips:   C-h v haskell-session-show-debug-tips")))))))
 
-(defun haskell-commands-process ()
+(defun haskell-commands-session ()
   "Get the Haskell session, throws an error if not available."
-  (or (haskell-session-process (haskell-session-maybe))
+  (or (haskell-session-maybe)
       (error "No Haskell session/process associated with this
       buffer. Maybe run M-x haskell-session-change?")))
 
@@ -131,14 +131,14 @@ If I break, you can:
 (defun haskell-session-clear ()
   "Clear the current process."
   (interactive)
-  (haskell-session-reset (haskell-commands-process))
-  (haskell-session-set (haskell-commands-process) 'command-queue nil))
+  (haskell-session-reset (haskell-commands-session))
+  (haskell-session-set (haskell-commands-session) 'command-queue nil))
 
 ;;;###autoload
 (defun haskell-session-interrupt ()
   "Interrupt the process (SIGINT)."
   (interactive)
-  (interrupt-process (haskell-session-process (haskell-commands-process))))
+  (interrupt-process (haskell-session-process (haskell-commands-session))))
 
 (defun haskell-session-reload-with-fbytecode (process module-buffer)
   "Query a PROCESS to reload MODULE-BUFFER with -fbyte-code set.
