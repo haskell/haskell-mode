@@ -110,10 +110,6 @@ with all relevant buffers)."
                                 haskell-sessions)))
       session)))
 
-(defun haskell-session-clear ()
-  "Clear the buffer of any Haskell session choice."
-  (set (make-local-variable 'haskell-session) nil))
-
 (defun haskell-session-lookup (name)
   "Get the session by name."
   (cl-remove-if-not (lambda (s)
