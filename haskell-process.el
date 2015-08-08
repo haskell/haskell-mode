@@ -312,26 +312,6 @@ Returns NIL when no completions found."
             (error "Lengths inconsistent in `:complete' reponse"))
           (cons h1 cs))))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Accessing the process
-
-(defun haskell-session-get (process key)
-  "Get the PROCESS's KEY value.
-Returns nil if KEY not set."
-  (cdr (assq key process)))
-
-(defun haskell-session-set (process key value)
-  "Set the PROCESS's KEY to VALUE.
-Returns newly set VALUE."
-  (if process
-      (let ((cell (assq key process)))
-        (if cell
-            (setcdr cell value)         ; modify cell in-place
-          (setcdr process (cons (cons key value) (cdr process))) ; new cell
-          value))
-    (display-warning 'haskell-interactive
-                     "`haskell-session-set' called with nil process")))
-
 ;; Wrappers using haskell-session-{get,set}
 
 (defun haskell-session-set-sent-stdin (p v)

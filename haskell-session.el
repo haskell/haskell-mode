@@ -215,11 +215,14 @@ Returns nil if KEY not set."
 (defun haskell-session-set (session key value)
   "Set the SESSION's KEY to VALUE.
 Returns newly set VALUE."
-  (let ((cell (assq key session)))
-    (if cell
-        (setcdr cell value) ; modify cell in-place
-      (setcdr session (cons (cons key value) (cdr session))) ; new cell
-      value)))
+  (if session
+      (let ((cell (assq key session)))
+	(if cell
+	    (setcdr cell value)		; modify cell in-place
+	    (setcdr session (cons (cons key value) (cdr session))) ; new cell
+	    value))
+      (display-warning 'haskell-interactive
+		       "`haskell-session-set' called with nil session")))
 
 (provide 'haskell-session)
 
