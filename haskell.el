@@ -236,7 +236,7 @@ If `haskell-session-load-or-reload-prompt' is nil, accept `default'."
                             "Cabal said:\n\n"
                             (propertize (haskell-session-response process)
                                         'face 'font-lock-comment-face)))
-            (?y (let ((default-directory (haskell-session-cabal-dir (haskell-session-session process))))
+            (?y (let ((default-directory (haskell-session-cabal-dir process)))
                   (message "%s" (shell-command-to-string "cabal configure"))))
             (?l (let* ((response (haskell-session-response process))
                        (buffer (get-buffer "*haskell-session-log*")))
@@ -250,7 +250,7 @@ If `haskell-session-load-or-reload-prompt' is nil, accept `default'."
                     (propertize (format "The Haskell process `%s' has died. Restart? (y, n, l: show process log)"
                                         process-name)
                                 'face 'minibuffer-prompt))
-            (?y (haskell-session-start (haskell-session-session process)))
+            (?y (haskell-session-start process))
             (?l (let* ((response (haskell-session-response process))
                        (buffer (get-buffer "*haskell-session-log*")))
                   (if buffer

@@ -358,17 +358,9 @@ Return nil if no current command."
   "Get the process's current response."
   (haskell-session-get p 'current-response))
 
-(defun haskell-session-session (p)
-  "Get the process's current session."
-  (haskell-session-get p 'session))
-
 (defun haskell-session-set-response (p v)
   "Set the process's current response."
   (haskell-session-set p 'current-response v))
-
-(defun haskell-session-set-session (p v)
-  "Set the process's current session."
-  (haskell-session-set p 'session v))
 
 (defun haskell-session-response-cursor (p)
   "Get the process's current response cursor."

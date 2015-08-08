@@ -64,17 +64,17 @@ changed. Restarts the process if that is the case."
           "^Preprocessing executables for \\(.+?\\)\\.\\.\\.")
          (let ((msg (format "Preprocessing: %s" (match-string 1 buffer))))
            (haskell-interactive-mode-echo
-            (haskell-session-session process)
+            process
             msg)
            (haskell-mode-message-line msg)))
         ((haskell-session-consume process "Linking \\(.+?\\) \\.\\.\\.")
          (let ((msg (format "Linking: %s" (match-string 1 buffer))))
-           (haskell-interactive-mode-echo (haskell-session-session process) msg)
+           (haskell-interactive-mode-echo process msg)
            (haskell-mode-message-line msg)))
         ((haskell-session-consume process "\nBuilding \\(.+?\\)\\.\\.\\.")
          (let ((msg (format "Building: %s" (match-string 1 buffer))))
            (haskell-interactive-mode-echo
-            (haskell-session-session process)
+            process
             msg)
            (haskell-mode-message-line msg)))))
 
@@ -218,7 +218,7 @@ actual Emacs buffer of the module being loaded."
           :complete
           (lambda (state response)
             (let* ((process (cadr state))
-                   (session (haskell-session-session process))
+                   (session process)
                    (message-count 0)
                    (cursor (haskell-session-response-cursor process)))
 	      ;; XXX: what the hell about the rampant code duplication?
@@ -250,7 +250,7 @@ actual Emacs buffer of the module being loaded."
 
 (defun haskell-session-echo-load-message (process buffer echo-in-repl th)
   "Echo a load message."
-  (let ((session (haskell-session-session process))
+  (let ((session process)
         (module-name (match-string 3 buffer))
         (file-name (match-string 4 buffer)))
     (haskell-interactive-show-load-message

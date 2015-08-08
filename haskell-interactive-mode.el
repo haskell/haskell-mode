@@ -525,7 +525,7 @@ FILE-NAME only."
 (defun haskell-session-cabal-live (state buffer)
   "Do live updates for Cabal processes."
   (haskell-interactive-mode-insert
-   (haskell-session-session (cadr state))
+   (cadr state)
    (replace-regexp-in-string
     haskell-session-prompt-regex
     ""
@@ -1102,7 +1102,7 @@ function `haskell-presentation-present', depending on variable
       :complete (lambda (state response)
                   (if haskell-session-use-presentation-mode
                       (haskell-presentation-present
-                       (haskell-session-session (car state))
+                       (car state)
                        response)
                     (haskell-mode-message-line response)))))))
 

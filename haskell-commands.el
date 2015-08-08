@@ -94,18 +94,18 @@ You can create new session using function `haskell-session-make'."
                    "^\*\*\* WARNING: \\(.+\\) is writable by someone else, IGNORING!$")
               (let ((path (match-string 1 buffer)))
                 (haskell-session-modify
-                 (haskell-session-session process)
+                 process
                  'ignored-files
                  (lambda (files)
                    (cl-remove-duplicates (cons path files) :test 'string=)))
                 (haskell-interactive-mode-compile-warning
-                 (haskell-session-session process)
+                 process
                  (format "GHCi is ignoring: %s (run M-x haskell-session-unignore)"
                          path)))))
 
     :complete (lambda (process _)
                 (haskell-interactive-mode-echo
-                 (haskell-session-session process)
+                 process
                  (concat (nth (random (length haskell-session-greetings))
                               haskell-session-greetings)
                          (when haskell-session-show-debug-tips
@@ -692,8 +692,8 @@ function `xref-find-definitions' after new table was generated."
                 (haskell-session-send-string
                  (car state)
                  (format ":!hasktags --output=\"%s\\TAGS\" -x -e \"%s\""
-                            (haskell-session-cabal-dir (haskell-session-session (car state)))
-                            (haskell-session-cabal-dir (haskell-session-session (car state)))))
+                            (haskell-session-cabal-dir (car state))
+                            (haskell-session-cabal-dir (car state))))
               (haskell-session-send-string
                (car state)
                (format ":!cd %s && %s | %s"
@@ -705,7 +705,7 @@ function `xref-find-definitions' after new table was generated."
                   (when (cdr state)
                     (let ((session-tags
                           (haskell-session-tags-filename
-                           (haskell-session-session (car state)))))
+                           (car state))))
                       (add-to-list 'tags-table-list session-tags)
                       (setq tags-file-name nil))
                     (xref-find-definitions (cdr state)))
@@ -900,7 +900,7 @@ Requires the :uses command from GHCi."
 If variable `haskell-session-use-presentation-mode' is NIL it will output
 modified message MSG to echo area."
   (if haskell-session-use-presentation-mode
-      (let ((session (haskell-session-session (haskell-interactive-session))))
+      (let ((session (haskell-interactive-session)))
         (haskell-presentation-present session msg))
     (let ((m (haskell-utils-reduce-string msg)))
       (message m))))
