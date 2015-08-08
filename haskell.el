@@ -261,10 +261,6 @@ If `haskell-session-load-or-reload-prompt' is nil, accept `default'."
       (message (format "The Haskell process `%s' is dearly departed."
                        process-name)))))
 
-(defun haskell-session ()
-  "Get the current process from the current session."
-  (haskell-session-process (haskell-session)))
-
 (defun haskell-interactive-buffer ()
   "Get the interactive buffer of the session."
   (haskell-session-interactive-buffer (haskell-session)))
