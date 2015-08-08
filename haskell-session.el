@@ -165,15 +165,6 @@ If `haskell-session-load-or-reload-prompt' is nil, accept `default'."
   "Set the session interactive buffer."
   (haskell-session-set s 'interactive-buffer v))
 
-(defun haskell-session-set-process (s v)
-  "Set the session process."
-  (haskell-session-set s 'process v))
-
-;;;###autoload
-(defun haskell-session-process (s)
-  "Get the session process."
-  (haskell-session-get s 'process))
-
 (defun haskell-session-set-cabal-dir (s v)
   "Set the session cabal-dir."
   (let ((true-path (file-truename v)))
