@@ -512,19 +512,6 @@ FILE-NAME only."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc
 
-(defun haskell-session-interactive-buffer (s)
-  "Get the session interactive buffer."
-  (let ((buffer (haskell-session-get s 'interactive-buffer)))
-    (if (and buffer (buffer-live-p buffer))
-        buffer
-      (let ((buffer (get-buffer-create (format "*%s*" (haskell-session-name s)))))
-        (haskell-session-set-interactive-buffer s buffer)
-        (with-current-buffer buffer
-          (haskell-interactive-mode)
-          (haskell-session-assign s))
-        (switch-to-buffer-other-window buffer)
-        buffer))))
-
 (defun haskell-process-cabal-live (state buffer)
   "Do live updates for Cabal processes."
   (haskell-interactive-mode-insert
@@ -704,15 +691,6 @@ FILE-NAME only."
                 ;; ...finally select&hilight error locus
                 (compilation-goto-locus msgmrk m1 (and (marker-position m2) m2)))
             (error "don't know where to find %S" file)))))))
-
-(defun haskell-interactive-session ()
-  "Get the `haskell-session', throw an error if it's not
-  available."
-  (or (haskell-session-maybe)
-      (haskell-session-assign
-       (or (haskell-session-from-buffer)
-           (haskell-session-choose)
-           (error "No session associated with this buffer. Try M-x haskell-session-change or report this as a bug.")))))
 
 (defun haskell-interactive-process ()
   "Get the Haskell session."

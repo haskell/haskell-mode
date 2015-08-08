@@ -1,0 +1,26 @@
+#+startup: hidestars odd
+
+* Session creation
+  - [*] :: called elsewhere, not global entry points
+  - haskell-session, haskell-session-change, haskell-modules-session [*], haskell-interactive-session [*]
+    - haskell-session-new, haskell-session-new-assume-from-cabal
+      - haskell-session-make
+	- haskell-process-start
+	  - haskell-interactive-session
+	  - haskell-process-make
+	  - haskell-session-set-process, haskell-process-set-session
+	  - start-process
+	  - set-process-sentinel, set-process-filter
+	  - haskell-process-send-startup
+
+* Session teardown
+  - haskell-interactive-kill
+    - haskell-session-kill
+      - haskell-session, haskell-session-name, get-process
+      - haskell-interactive-mode-echo
+      - haskell-process-set, delete-process
+      - haskell-session-interactive-buffer
+	- get-buffer-create
+	- haskell-interactive-mode
+	- switch-to-buffer-other-window
+      - kill-buffer
