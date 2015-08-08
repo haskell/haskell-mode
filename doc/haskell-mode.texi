@@ -128,11 +128,12 @@ Requests}.
 If you are reading this, you have most likely already managed to install
 Haskell Mode in one way or another.
 
-@findex haskell-customize
+@cindex customizing
 Most of Haskell Mode's settings are configurable via customizable
 variables (@pxref{Easy Customization,,,emacs}, for details). You can use
-@kbd{M-x haskell-customize} to browse the @code{haskell} customization
-sub-tree.
+
+@kbd{M-x customize-group @key{RET} haskell} to browse the @code{haskell}
+customization sub-tree.
 
 @vindex haskell-mode-hook
 One of the important setting you should customize is the
