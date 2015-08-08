@@ -110,10 +110,6 @@ HPTYPE is the result of calling `'haskell-session-type`' function."
                           (if target (list target) nil))
                         haskell-session-args-stack-ghci))))))))
 
-(defun haskell-session-make (name)
-  "Make an inferior Haskell process."
-  (list (cons 'name name)))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Process communication
 
