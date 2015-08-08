@@ -106,6 +106,12 @@ when showing type information about symbols."
   :group 'haskell)
 
 ;;;###autoload
+(defcustom haskell-load-on-save nil
+  "Whether to load the buffer after saving."
+  :group 'haskell-interactive
+  :type 'boolean)
+
+;;;###autoload
 (defcustom haskell-process-path-ghci
   "ghci"
   "The path for starting ghci."
