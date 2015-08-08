@@ -35,18 +35,18 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic configuration hooks
 
-(add-hook 'haskell-process-ended-hook 'haskell-process-prompt-restart)
+(add-hook 'haskell-session-ended-hook 'haskell-session-prompt-restart)
 (add-hook 'kill-buffer-hook 'haskell-interactive-kill)
 
 (defvar interactive-haskell-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c C-l") 'haskell-process-load-or-reload)
-    (define-key map (kbd "C-c C-t") 'haskell-process-do-type)
-    (define-key map (kbd "C-c C-i") 'haskell-process-do-info)
+    (define-key map (kbd "C-c C-l") 'haskell-session-load-or-reload)
+    (define-key map (kbd "C-c C-t") 'haskell-session-do-type)
+    (define-key map (kbd "C-c C-i") 'haskell-session-do-info)
     (define-key map (kbd "M-.") 'haskell-mode-jump-to-def-or-tag)
     (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
-    (define-key map (kbd "C-c C-c") 'haskell-process-cabal-build)
-    (define-key map (kbd "C-c C-x") 'haskell-process-cabal)
+    (define-key map (kbd "C-c C-c") 'haskell-session-cabal-build)
+    (define-key map (kbd "C-c C-x") 'haskell-session-cabal)
     (define-key map [?\C-c ?\C-b] 'haskell-interactive-switch)
     (define-key map [?\C-c ?\C-z] 'haskell-interactive-switch)
     (define-key map (kbd "M-n") 'haskell-goto-next-error)
@@ -56,7 +56,7 @@
 
 ;;;###autoload
 (define-minor-mode interactive-haskell-mode
-  "Minor mode for enabling haskell-process interaction."
+  "Minor mode for enabling haskell-session interaction."
   :lighter " Interactive"
   :keymap interactive-haskell-mode-map
   (add-hook 'completion-at-point-functions
@@ -64,13 +64,13 @@
             nil
             t))
 
-(make-obsolete 'haskell-process-completions-at-point
+(make-obsolete 'haskell-session-completions-at-point
                'haskell-completions-sync-completions-at-point
                "June 19, 2015")
-(defun haskell-process-completions-at-point ()
+(defun haskell-session-completions-at-point ()
   "A completion-at-point function using the current haskell process."
   (when (haskell-session-maybe)
-    (let ((process (haskell-process))
+    (let ((process (haskell-session))
 	  symbol-bounds)
       (cond
        ;; ghci can complete module names, but it needs the "import "
@@ -85,7 +85,7 @@
               (start (match-beginning 1))
               (end (match-end 1)))
           (list start end
-                (haskell-process-get-repl-completions process text))))
+                (haskell-session-get-repl-completions process text))))
        ;; Complete OPTIONS, a completion list comes from variable
        ;; `haskell-ghc-supported-options'
        ((and (nth 4 (syntax-ppss))
@@ -110,7 +110,7 @@
        ((setq symbol-bounds (haskell-ident-pos-at-point))
         (cl-destructuring-bind (start . end) symbol-bounds
           (list start end
-                (haskell-process-get-repl-completions
+                (haskell-session-get-repl-completions
                  process (buffer-substring-no-properties start end)))))))))
 
 ;;;###autoload
@@ -170,15 +170,15 @@
   (let ((session (setq haskell-session
                        (list (cons 'name name)))))
     (add-to-list 'haskell-sessions session)
-    (haskell-process-start session)
+    (haskell-session-start session)
     session))
 
 (defun haskell-session-new-assume-from-cabal ()
   "Prompt to create a new project based on a guess from the nearest Cabal file.
-If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
+If `haskell-session-load-or-reload-prompt' is nil, accept `default'."
   (let ((name (haskell-session-default-name)))
     (unless (haskell-session-lookup name)
-      (if (or (not haskell-process-load-or-reload-prompt)
+      (if (or (not haskell-session-load-or-reload-prompt)
 	      (y-or-n-p (format "Start a new project named “%s”? " name)))
 	    (haskell-session-make name)))))
 
@@ -221,28 +221,28 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
                               (haskell-session-choose)
                               (haskell-session-new))))
 
-(defun haskell-process-prompt-restart (process)
+(defun haskell-session-prompt-restart (process)
   "Prompt to restart the died process."
-  (let ((process-name (haskell-process-name process)))
-    (if haskell-process-suggest-restart
+  (let ((process-name (haskell-session-name process)))
+    (if haskell-session-suggest-restart
         (cond
          ((string-match "You need to re-run the 'configure' command."
-                        (haskell-process-response process))
+                        (haskell-session-response process))
           (cl-case (read-event
                     (concat "The Haskell process ended. Cabal wants you to run "
                             (propertize "cabal configure" 'face 'font-lock-keyword-face)
                             " because there is a version mismatch. Re-configure (y, n, l: view log)?"
                             "\n\n"
                             "Cabal said:\n\n"
-                            (propertize (haskell-process-response process)
+                            (propertize (haskell-session-response process)
                                         'face 'font-lock-comment-face)))
-            (?y (let ((default-directory (haskell-session-cabal-dir (haskell-process-session process))))
+            (?y (let ((default-directory (haskell-session-cabal-dir (haskell-session-session process))))
                   (message "%s" (shell-command-to-string "cabal configure"))))
-            (?l (let* ((response (haskell-process-response process))
-                       (buffer (get-buffer "*haskell-process-log*")))
+            (?l (let* ((response (haskell-session-response process))
+                       (buffer (get-buffer "*haskell-session-log*")))
                   (if buffer
                       (switch-to-buffer buffer)
-                    (progn (switch-to-buffer (get-buffer-create "*haskell-process-log*"))
+                    (progn (switch-to-buffer (get-buffer-create "*haskell-session-log*"))
                            (insert response)))))
             (?n)))
          (t
@@ -250,18 +250,18 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
                     (propertize (format "The Haskell process `%s' has died. Restart? (y, n, l: show process log)"
                                         process-name)
                                 'face 'minibuffer-prompt))
-            (?y (haskell-process-start (haskell-process-session process)))
-            (?l (let* ((response (haskell-process-response process))
-                       (buffer (get-buffer "*haskell-process-log*")))
+            (?y (haskell-session-start (haskell-session-session process)))
+            (?l (let* ((response (haskell-session-response process))
+                       (buffer (get-buffer "*haskell-session-log*")))
                   (if buffer
                       (switch-to-buffer buffer)
-                    (progn (switch-to-buffer (get-buffer-create "*haskell-process-log*"))
+                    (progn (switch-to-buffer (get-buffer-create "*haskell-session-log*"))
                            (insert response)))))
             (?n))))
       (message (format "The Haskell process `%s' is dearly departed."
                        process-name)))))
 
-(defun haskell-process ()
+(defun haskell-session ()
   "Get the current process from the current session."
   (haskell-session-process (haskell-session)))
 
@@ -277,7 +277,7 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
          (existing-process (get-process (haskell-session-name session))))
     (when (processp existing-process)
       (haskell-interactive-mode-echo session "Killing process ...")
-      (haskell-process-set (haskell-session-process session) 'is-restarting t)
+      (haskell-session-set (haskell-session-process session) 'is-restarting t)
       (delete-process existing-process))))
 
 ;;;###autoload
@@ -318,7 +318,7 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
            (let ((ident (save-excursion (forward-char -1) (haskell-ident-at-point))))
              (insert " ")
              (when ident
-               (haskell-process-do-try-info ident)))))))
+               (haskell-session-do-try-info ident)))))))
 
 (defvar xref-prompt-for-identifier nil)
 
@@ -333,14 +333,14 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
       (cond ((file-exists-p tags-file-name)
              (let ((xref-prompt-for-identifier next-p))
                (xref-find-definitions ident)))
-            (t (haskell-process-generate-tags ident))))))
+            (t (haskell-session-generate-tags ident))))))
 
 ;;;###autoload
 (defun haskell-mode-after-save-handler ()
   "Function that will be called after buffer's saving."
   (when haskell-tags-on-save
     (ignore-errors (when (and (boundp 'haskell-session) haskell-session)
-                     (haskell-process-generate-tags))))
+                     (haskell-session-generate-tags))))
   (when haskell-stylish-on-save
     (ignore-errors (haskell-mode-stylish-buffer))
     (let ((before-save-hook '())
@@ -380,12 +380,12 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
     (pop-to-buffer buffer)))
 
 ;;;###autoload
-(defun haskell-process-load-file ()
+(defun haskell-session-load-file ()
   "Load the current buffer file."
   (interactive)
   (save-buffer)
   (haskell-interactive-mode-reset-error (haskell-session))
-  (haskell-process-file-loadish (format "load \"%s\"" (replace-regexp-in-string
+  (haskell-session-file-loadish (format "load \"%s\"" (replace-regexp-in-string
                                                        "\""
                                                        "\\\\\""
                                                        (buffer-file-name)))
@@ -393,15 +393,15 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
                                 (current-buffer)))
 
 ;;;###autoload
-(defun haskell-process-reload-file ()
+(defun haskell-session-reload-file ()
   "Re-load the current buffer file."
   (interactive)
   (save-buffer)
   (haskell-interactive-mode-reset-error (haskell-session))
-  (haskell-process-file-loadish "reload" t nil))
+  (haskell-session-file-loadish "reload" t nil))
 
 ;;;###autoload
-(defun haskell-process-load-or-reload (&optional toggle)
+(defun haskell-session-load-or-reload (&optional toggle)
   "Load or reload. Universal argument toggles which."
   (interactive "P")
   (if toggle
@@ -410,49 +410,49 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
                       (if haskell-reload-p
                           "Now running :reload."
                         "Now running :load <buffer-filename>.")))
-    (if haskell-reload-p (haskell-process-reload-file) (haskell-process-load-file))))
+    (if haskell-reload-p (haskell-session-reload-file) (haskell-session-load-file))))
 
 ;;;###autoload
-(defun haskell-process-cabal-build ()
+(defun haskell-session-cabal-build ()
   "Build the Cabal project."
   (interactive)
-  (haskell-process-do-cabal "build")
-  (haskell-process-add-cabal-autogen))
+  (haskell-session-do-cabal "build")
+  (haskell-session-add-cabal-autogen))
 
 ;;;###autoload
-(defun haskell-process-cabal (p)
+(defun haskell-session-cabal (p)
   "Prompts for a Cabal command to run."
   (interactive "P")
   (if p
-      (haskell-process-do-cabal
+      (haskell-session-do-cabal
        (read-from-minibuffer "Cabal command (e.g. install): "))
-    (haskell-process-do-cabal
+    (haskell-session-do-cabal
      (funcall haskell-completing-read-function "Cabal command: "
               (append haskell-cabal-commands
                       (list "build --ghc-options=-fforce-recomp"))))))
 
-(defun haskell-process-file-loadish (command reload-p module-buffer)
+(defun haskell-session-file-loadish (command reload-p module-buffer)
   "Run a loading-ish COMMAND that wants to pick up type errors
 and things like that. RELOAD-P indicates whether the notification
 should say 'reloaded' or 'loaded'. MODULE-BUFFER may be used
 for various things, but is optional."
   (let ((session (haskell-session)))
     (haskell-session-current-dir session)
-    (when haskell-process-check-cabal-config-on-load
-      (haskell-process-look-config-changes session))
-    (let ((process (haskell-process)))
-      (haskell-process-queue-command
+    (when haskell-session-check-cabal-config-on-load
+      (haskell-session-look-config-changes session))
+    (let ((process (haskell-session)))
+      (haskell-session-queue-command
        process
        (make-haskell-command
         :state (list session process command reload-p module-buffer)
         :go (lambda (state)
-              (haskell-process-send-string
+              (haskell-session-send-string
                (cadr state) (format ":%s" (cl-caddr state))))
         :live (lambda (state buffer)
-                (haskell-process-live-build
+                (haskell-session-live-build
                  (cadr state) buffer nil))
         :complete (lambda (state response)
-                    (haskell-process-load-complete
+                    (haskell-session-load-complete
                      (car state)
                      (cadr state)
                      response
@@ -460,7 +460,7 @@ for various things, but is optional."
                      (cl-cadddr (cdr state)))))))))
 
 ;;;###autoload
-(defun haskell-process-minimal-imports ()
+(defun haskell-session-minimal-imports ()
   "Dump minimal imports."
   (interactive)
   (unless (> (save-excursion
@@ -470,9 +470,9 @@ for various things, but is optional."
              (point))
     (goto-char (point-min))
     (haskell-navigate-imports-go))
-  (haskell-process-queue-sync-request (haskell-process)
+  (haskell-session-queue-sync-request (haskell-session)
                                       ":set -ddump-minimal-imports")
-  (haskell-process-load-file)
+  (haskell-session-load-file)
   (insert-file-contents-literally
    (concat (haskell-session-current-dir (haskell-session))
            "/"

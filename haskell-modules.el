@@ -64,7 +64,7 @@
   ;;
   ;; Ugliness aside, if it saves us time to type it's a winner.
   ;;
-  ;; FIXME/TODO: add support for (eq 'cabal-repl (haskell-process-type))
+  ;; FIXME/TODO: add support for (eq 'cabal-repl (haskell-session-type))
   (let ((session (haskell-session-maybe)))
     (when session
       (let ((modules (shell-command-to-string

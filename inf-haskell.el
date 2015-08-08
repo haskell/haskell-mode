@@ -189,14 +189,14 @@ setting up the inferior-haskell buffer."
     (inferior-haskell-mode)
     (run-hooks 'inferior-haskell-hook)))
 
-(defun inferior-haskell-process (&optional arg)
+(defun inferior-haskell-session (&optional arg)
   (or (if (buffer-live-p inferior-haskell-buffer)
           (get-buffer-process inferior-haskell-buffer))
       (progn
         (let ((current-prefix-arg arg))
           (call-interactively 'inferior-haskell-start-process))
         ;; Try again.
-        (inferior-haskell-process arg))))
+        (inferior-haskell-session arg))))
 
 ;;;###autoload
 (defalias 'run-haskell 'switch-to-haskell)
@@ -204,7 +204,7 @@ setting up the inferior-haskell buffer."
 (defun switch-to-haskell (&optional arg)
   "Show the inferior-haskell buffer.  Start the process if needed."
   (interactive "P")
-  (let ((proc (inferior-haskell-process arg)))
+  (let ((proc (inferior-haskell-session arg)))
     (pop-to-buffer (process-buffer proc))))
 
 ;;;###autoload
@@ -328,7 +328,7 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
   (save-buffer)
   (let ((buf (current-buffer))
         (file buffer-file-name)
-        (proc (inferior-haskell-process)))
+        (proc (inferior-haskell-session)))
     (if file
         (with-current-buffer (process-buffer proc)
           (compilation-forget-errors)
@@ -389,7 +389,7 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
           (inferior-haskell-load-file))
       (remove-hook 'next-error-hook neh))
     (unless inferior-haskell-errors
-      (inferior-haskell-send-command (inferior-haskell-process) command)
+      (inferior-haskell-send-command (inferior-haskell-session) command)
       (switch-to-haskell))))
 
 (defun inferior-haskell-send-command (proc str)
@@ -447,7 +447,7 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
   (interactive)
   (save-excursion
     (goto-char (1+ (point)))
-    (let* ((proc (inferior-haskell-process))
+    (let* ((proc (inferior-haskell-session))
            (start (or (haskell-ds-backward-decl) (point-min)))
            (end (or (haskell-ds-forward-decl) (point-max)))
            (raw-decl (buffer-substring start end)))
@@ -470,7 +470,7 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
 
 (defun inferior-haskell-get-result (inf-expr)
   "Submit the expression `inf-expr' to ghci and read the result."
-  (let ((proc (inferior-haskell-process)))
+  (let ((proc (inferior-haskell-session)))
     (with-current-buffer (process-buffer proc)
       (let ((parsing-end                ; Remember previous spot.
              (marker-position (process-mark proc))))
@@ -569,7 +569,7 @@ The returned info is cached for reuse by `haskell-doc-mode'."
             (col (string-to-number
                   (match-string-no-properties 3 info))))
         (when file
-          (with-current-buffer (process-buffer (inferior-haskell-process))
+          (with-current-buffer (process-buffer (inferior-haskell-session))
             ;; The file name is relative to the process's cwd.
             (setq file (expand-file-name file)))
           ;; Push current location marker on the ring used by `find-tag'

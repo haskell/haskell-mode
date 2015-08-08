@@ -151,11 +151,11 @@ with all relevant buffers)."
 
 (defun haskell-session-target (s)
   "Get the session build target.
-If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
+If `haskell-session-load-or-reload-prompt' is nil, accept `default'."
   (let* ((maybe-target (haskell-session-get s 'target))
          (target (if maybe-target maybe-target
                    (let ((new-target
-			  (if haskell-process-load-or-reload-prompt
+			  (if haskell-session-load-or-reload-prompt
 			      (read-string "build target (empty for default):")
 			    "")))
                      (haskell-session-set-target s new-target)))))
@@ -197,7 +197,7 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
 (defun haskell-session-cabal-dir (s)
   "Get the session cabal-dir."
   (or (haskell-session-get s 'cabal-dir)
-      (let ((set-dir (haskell-cabal-get-dir (not haskell-process-load-or-reload-prompt))))
+      (let ((set-dir (haskell-cabal-get-dir (not haskell-session-load-or-reload-prompt))))
 	(if set-dir
 	    (progn (haskell-session-set-cabal-dir s set-dir)
 		   set-dir)

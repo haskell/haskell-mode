@@ -129,7 +129,7 @@
   "Abandon the current computation."
   (interactive)
   (haskell-debug-with-breakpoints
-   (haskell-process-queue-sync-request (haskell-debug-process) ":abandon")
+   (haskell-session-queue-sync-request (haskell-debug-process) ":abandon")
    (message "Computation abandoned.")
    (setq haskell-debug-history-cache nil)
    (setq haskell-debug-bindings-cache nil)
@@ -139,7 +139,7 @@
   "Continue the current computation."
   (interactive)
   (haskell-debug-with-breakpoints
-   (haskell-process-queue-sync-request (haskell-debug-process) ":continue")
+   (haskell-session-queue-sync-request (haskell-debug-process) ":continue")
    (message "Computation continued.")
    (setq haskell-debug-history-cache nil)
    (setq haskell-debug-bindings-cache nil)
@@ -151,7 +151,7 @@
   (haskell-debug-with-modules
    (let ((ident (read-from-minibuffer "Function: "
                                       (haskell-ident-at-point))))
-     (haskell-process-queue-sync-request
+     (haskell-session-queue-sync-request
       (haskell-debug-process)
       (concat ":break "
               ident))
@@ -225,7 +225,7 @@
     (let ((break (get-text-property (point) 'break)))
       (when (y-or-n-p (format "Delete breakpoint #%d?"
                               (plist-get break :number)))
-        (haskell-process-queue-sync-request
+        (haskell-session-queue-sync-request
          (haskell-debug-process)
          (format ":delete %d"
                  (plist-get break :number)))
@@ -238,7 +238,7 @@
    (haskell-debug-with-breakpoints
     (let ((expr (read-from-minibuffer "Expression to trace: "
                                       (haskell-ident-at-point))))
-      (haskell-process-queue-sync-request
+      (haskell-session-queue-sync-request
        (haskell-debug-process)
        (concat ":trace " expr))
       (message "Tracing expression: %s" expr)
@@ -251,7 +251,7 @@
    (let* ((breakpoints (haskell-debug-get-breakpoints))
           (context (haskell-debug-get-context))
           (string
-           (haskell-process-queue-sync-request
+           (haskell-session-queue-sync-request
             (haskell-debug-process)
             (if expr
                 (concat ":step " expr)
@@ -276,7 +276,7 @@
                  (message "Reloading and resetting breakpoints...")
                  (haskell-interactive-mode-reset-error (haskell-debug-session))
                  (cl-loop for break in breakpoints
-                          do (haskell-process-queue-sync-request
+                          do (haskell-session-queue-sync-request
                               (haskell-debug-process)
                               (concat ":load " (plist-get break :path))))
                  (cl-loop for break in breakpoints
@@ -306,7 +306,7 @@
 
 (defun haskell-debug-get-breakpoints ()
   "Get the list of breakpoints currently set."
-  (let ((string (haskell-process-queue-sync-request
+  (let ((string (haskell-session-queue-sync-request
                  (haskell-debug-process)
                  ":show breaks")))
     (if (string= string "No active breakpoints.\n")
@@ -316,7 +316,7 @@
 
 (defun haskell-debug-get-modules ()
   "Get the list of modules currently set."
-  (let ((string (haskell-process-queue-sync-request
+  (let ((string (haskell-session-queue-sync-request
                  (haskell-debug-process)
                  ":show modules")))
     (if (string= string "")
@@ -326,7 +326,7 @@
 
 (defun haskell-debug-get-context ()
   "Get the current context."
-  (let ((string (haskell-process-queue-sync-request
+  (let ((string (haskell-session-queue-sync-request
                  (haskell-debug-process)
                  ":show context")))
     (if (string= string "")
@@ -335,7 +335,7 @@
 
 (defun haskell-debug-get-history ()
   "Get the step history."
-  (let ((string (haskell-process-queue-sync-request
+  (let ((string (haskell-session-queue-sync-request
                  (haskell-debug-process)
                  ":history")))
     (if (or (string= string "")
@@ -642,7 +642,7 @@ variances in source span notation."
 
 (defun haskell-debug-break (break)
   "Set BREAK breakpoint in module at line/col."
-  (haskell-process-queue-without-filters
+  (haskell-session-queue-without-filters
    (haskell-debug-process)
    (format ":break %s %s %d"
            (plist-get break :module)
@@ -651,7 +651,7 @@ variances in source span notation."
 
 (defun haskell-debug-navigate (direction)
   "Navigate in DIRECTION \"back\" or \"forward\"."
-  (let ((string (haskell-process-queue-sync-request
+  (let ((string (haskell-session-queue-sync-request
                  (haskell-debug-process)
                  (concat ":" direction))))
     (let ((bindings (haskell-debug-parse-logged string)))

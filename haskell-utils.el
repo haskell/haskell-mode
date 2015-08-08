@@ -47,7 +47,7 @@
 (defun haskell-utils-read-directory-name (prompt default)
   "Read directory name and normalize to true absolute path.
 Refer to `read-directory-name' for the meaning of PROMPT and
-DEFAULT. If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
+DEFAULT. If `haskell-session-load-or-reload-prompt' is nil, accept `default'."
   (let ((filename (file-truename (read-directory-name prompt default default))))
     (concat (replace-regexp-in-string "/$" "" filename) "/")))
 

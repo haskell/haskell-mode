@@ -35,53 +35,53 @@
 (require 'highlight-uses-mode)
 
 ;;;###autoload
-(defun haskell-process-restart ()
+(defun haskell-session-restart ()
   "Restart the inferior Haskell process."
   (interactive)
-  (haskell-process-reset (haskell-interactive-process))
-  (haskell-process-set (haskell-interactive-process) 'command-queue nil)
-  (haskell-process-start (haskell-interactive-session)))
+  (haskell-session-reset (haskell-interactive-process))
+  (haskell-session-set (haskell-interactive-process) 'command-queue nil)
+  (haskell-session-start (haskell-interactive-session)))
 
-(defun haskell-process-start (session)
+(defun haskell-session-start (session)
   "Start the inferior Haskell process with a given SESSION.
 You can create new session using function `haskell-session-make'."
   (let ((existing-process (get-process (haskell-session-name (haskell-interactive-session)))))
     (when (processp existing-process)
       (haskell-interactive-mode-echo session "Restarting process ...")
-      (haskell-process-set (haskell-session-process session) 'is-restarting t)
+      (haskell-session-set (haskell-session-process session) 'is-restarting t)
       (delete-process existing-process)))
   (let ((process (or (haskell-session-process session)
-                     (haskell-process-make (haskell-session-name session))))
-        (old-queue (haskell-process-get (haskell-session-process session)
+                     (haskell-session-make (haskell-session-name session))))
+        (old-queue (haskell-session-get (haskell-session-process session)
                                         'command-queue)))
     (haskell-session-set-process session process)
-    (haskell-process-set-session process session)
-    (haskell-process-set-cmd process nil)
-    (haskell-process-set (haskell-session-process session) 'is-restarting nil)
+    (haskell-session-set-session process session)
+    (haskell-session-set-cmd process nil)
+    (haskell-session-set (haskell-session-process session) 'is-restarting nil)
     (let ((default-directory (haskell-session-cabal-dir session))
-          (log-and-command (haskell-process-compute-process-log-and-command session (haskell-process-type))))
-      (haskell-session-prompt-set-current-dir session (not haskell-process-load-or-reload-prompt))
-      (haskell-process-set-process
+          (log-and-command (haskell-session-compute-process-log-and-command session (haskell-session-type))))
+      (haskell-session-prompt-set-current-dir session (not haskell-session-load-or-reload-prompt))
+      (haskell-session-set-process
        process
        (progn
-         (haskell-process-log (propertize (format "%S" log-and-command)))
+         (haskell-session-log (propertize (format "%S" log-and-command)))
          (apply #'start-process (cdr log-and-command)))))
-    (progn (set-process-sentinel (haskell-process-process process) 'haskell-process-sentinel)
-           (set-process-filter (haskell-process-process process) 'haskell-process-filter))
-    (haskell-process-send-startup process)
-    (unless (eq 'cabal-repl (haskell-process-type)) ;; "cabal repl" sets the proper CWD
-      (haskell-process-change-dir session
+    (progn (set-process-sentinel (haskell-session-process process) 'haskell-session-sentinel)
+           (set-process-filter (haskell-session-process process) 'haskell-session-filter))
+    (haskell-session-send-startup process)
+    (unless (eq 'cabal-repl (haskell-session-type)) ;; "cabal repl" sets the proper CWD
+      (haskell-session-change-dir session
                                   process
                                   (haskell-session-current-dir session)))
-    (haskell-process-set process 'command-queue
-                         (append (haskell-process-get (haskell-session-process session)
+    (haskell-session-set process 'command-queue
+                         (append (haskell-session-get (haskell-session-process session)
                                                       'command-queue)
                                  old-queue))
     process))
 
-(defun haskell-process-send-startup (process)
+(defun haskell-session-send-startup (process)
   "Send the necessary start messages to haskell PROCESS."
-  (haskell-process-queue-command
+  (haskell-session-queue-command
    process
    (make-haskell-command
     :state process
@@ -89,37 +89,37 @@ You can create new session using function `haskell-session-make'."
     :go (lambda (process)
           ;; We must set the prompt last, so that this command as a
           ;; whole produces only one prompt marker as a response.
-          (haskell-process-send-string process "Prelude.putStrLn \"\"")
-          (haskell-process-send-string process ":set -v1")
-          (haskell-process-send-string process ":set prompt \"\\4\""))
+          (haskell-session-send-string process "Prelude.putStrLn \"\"")
+          (haskell-session-send-string process ":set -v1")
+          (haskell-session-send-string process ":set prompt \"\\4\""))
 
     :live (lambda (process buffer)
-            (when (haskell-process-consume
+            (when (haskell-session-consume
                    process
                    "^\*\*\* WARNING: \\(.+\\) is writable by someone else, IGNORING!$")
               (let ((path (match-string 1 buffer)))
                 (haskell-session-modify
-                 (haskell-process-session process)
+                 (haskell-session-session process)
                  'ignored-files
                  (lambda (files)
                    (cl-remove-duplicates (cons path files) :test 'string=)))
                 (haskell-interactive-mode-compile-warning
-                 (haskell-process-session process)
-                 (format "GHCi is ignoring: %s (run M-x haskell-process-unignore)"
+                 (haskell-session-session process)
+                 (format "GHCi is ignoring: %s (run M-x haskell-session-unignore)"
                          path)))))
 
     :complete (lambda (process _)
                 (haskell-interactive-mode-echo
-                 (haskell-process-session process)
-                 (concat (nth (random (length haskell-process-greetings))
-                              haskell-process-greetings)
-                         (when haskell-process-show-debug-tips
+                 (haskell-session-session process)
+                 (concat (nth (random (length haskell-session-greetings))
+                              haskell-session-greetings)
+                         (when haskell-session-show-debug-tips
                            "
 If I break, you can:
-  1. Restart:           M-x haskell-process-restart
-  2. Configure logging: C-h v haskell-process-log (useful for debugging)
+  1. Restart:           M-x haskell-session-restart
+  2. Configure logging: C-h v haskell-session-log (useful for debugging)
   3. General config:    M-x customize-mode
-  4. Hide these tips:   C-h v haskell-process-show-debug-tips")))))))
+  4. Hide these tips:   C-h v haskell-session-show-debug-tips")))))))
 
 (defun haskell-commands-process ()
   "Get the Haskell session, throws an error if not available."
@@ -128,41 +128,41 @@ If I break, you can:
       buffer. Maybe run M-x haskell-session-change?")))
 
 ;;;###autoload
-(defun haskell-process-clear ()
+(defun haskell-session-clear ()
   "Clear the current process."
   (interactive)
-  (haskell-process-reset (haskell-commands-process))
-  (haskell-process-set (haskell-commands-process) 'command-queue nil))
+  (haskell-session-reset (haskell-commands-process))
+  (haskell-session-set (haskell-commands-process) 'command-queue nil))
 
 ;;;###autoload
-(defun haskell-process-interrupt ()
+(defun haskell-session-interrupt ()
   "Interrupt the process (SIGINT)."
   (interactive)
-  (interrupt-process (haskell-process-process (haskell-commands-process))))
+  (interrupt-process (haskell-session-process (haskell-commands-process))))
 
-(defun haskell-process-reload-with-fbytecode (process module-buffer)
+(defun haskell-session-reload-with-fbytecode (process module-buffer)
   "Query a PROCESS to reload MODULE-BUFFER with -fbyte-code set.
 Restores -fobject-code after reload finished.
 MODULE-BUFFER is the actual Emacs buffer of the module being loaded."
-  (haskell-process-queue-without-filters process ":set -fbyte-code")
+  (haskell-session-queue-without-filters process ":set -fbyte-code")
   ;; We prefix the module's filename with a "*", which asks ghci to
   ;; ignore any existing object file and interpret the module.
   ;; Dependencies will still use their object files as usual.
-  (haskell-process-queue-without-filters
+  (haskell-session-queue-without-filters
    process
    (format ":load \"*%s\""
            (replace-regexp-in-string
             "\""
             "\\\\\""
             (buffer-file-name module-buffer))))
-  (haskell-process-queue-without-filters process ":set -fobject-code"))
+  (haskell-session-queue-without-filters process ":set -fobject-code"))
 
 (defvar url-http-response-status)
 (defvar url-http-end-of-headers)
 (defvar haskell-cabal-targets-history nil
   "History list for session targets.")
 
-(defun haskell-process-hayoo-ident (ident)
+(defun haskell-session-hayoo-ident (ident)
   ;; FIXME Obsolete doc string, CALLBACK is not used.
   "Hayoo for IDENT, return a list of modules asyncronously through CALLBACK."
   ;; We need a real/simulated closure, because otherwise these
@@ -170,7 +170,7 @@ MODULE-BUFFER is the actual Emacs buffer of the module being loaded."
   ;; called.
   ;; TODO: Remove when this code is converted to lexical bindings by
   ;; default (Emacs 24.1+)
-  (let ((url (format haskell-process-hayoo-query-url (url-hexify-string ident))))
+  (let ((url (format haskell-session-hayoo-query-url (url-hexify-string ident))))
     (with-current-buffer (url-retrieve-synchronously url)
       (if (= 200 url-http-response-status)
           (progn
@@ -186,7 +186,7 @@ MODULE-BUFFER is the actual Emacs buffer of the module being loaded."
                          results)))
         (warn "HTTP error %s fetching %s" url-http-response-status url)))))
 
-(defun haskell-process-hoogle-ident (ident)
+(defun haskell-session-hoogle-ident (ident)
   "Hoogle for IDENT, return a list of modules."
   (with-temp-buffer
     (let ((hoogle-error (call-process "hoogle" nil t nil "search" "--exact" ident)))
@@ -200,7 +200,7 @@ MODULE-BUFFER is the actual Emacs buffer of the module being loaded."
                       (split-string (buffer-string)
                                     "\n"))))))
 
-(defun haskell-process-haskell-docs-ident (ident)
+(defun haskell-session-haskell-docs-ident (ident)
   "Search with haskell-docs for IDENT, return a list of modules."
   (cl-remove-if-not
    (lambda (a) (string-match "^[[:upper:]][[:alnum:]_'.]+$" a))
@@ -215,15 +215,15 @@ MODULE-BUFFER is the actual Emacs buffer of the module being loaded."
                         "--modules" ident)))
       "\n")))
 
-(defun haskell-process-import-modules (process modules)
+(defun haskell-session-import-modules (process modules)
   "Query PROCESS `:m +' command to import MODULES."
-  (when haskell-process-auto-import-loaded-modules
-    (haskell-process-queue-command
+  (when haskell-session-auto-import-loaded-modules
+    (haskell-session-queue-command
      process
      (make-haskell-command
       :state (cons process modules)
       :go (lambda (state)
-            (haskell-process-send-string
+            (haskell-session-send-string
              (car state)
              (format ":m + %s" (mapconcat 'identity (cdr state) " "))))))))
 
@@ -279,7 +279,7 @@ Prompts for an arbitrary regexp given a prefix arg PROMPT."
            (haskell-session-current-dir (haskell-interactive-session)))))
 
 ;;;###autoload
-(defun haskell-process-do-info (&optional prompt-value)
+(defun haskell-session-do-info (&optional prompt-value)
   "Print info on the identifier at point.
 If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
   (interactive "P")
@@ -304,10 +304,10 @@ If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
                                   (or ident
                                       at-point))))))
         (when command
-          (haskell-process-show-repl-response command))))))
+          (haskell-session-show-repl-response command))))))
 
 ;;;###autoload
-(defun haskell-process-do-type (&optional insert-value)
+(defun haskell-session-do-type (&optional insert-value)
   ;; FIXME insert value functionallity seems to be missing.
   "Print the type of the given expression.
 
@@ -315,7 +315,7 @@ Given INSERT-VALUE prefix indicates that result type signature
 should be inserted."
   (interactive "P")
   (if insert-value
-      (haskell-process-insert-type)
+      (haskell-session-insert-type)
     (let* ((expr
             (if (use-region-p)
                 (buffer-substring-no-properties (region-beginning) (region-end))
@@ -326,7 +326,7 @@ should be inserted."
       ;; No newlines in expressions, and surround with parens if it
       ;; might be a slice expression
       (when expr-okay
-        (haskell-process-show-repl-response
+        (haskell-session-show-repl-response
          (format
           (if (or (string-match-p "\\`(" expr)
                   (string-match-p "\\`[_[:alpha:]]" expr))
@@ -374,7 +374,7 @@ Requires the :loc-at command from GHCi."
   (forward-line (1- (plist-get span :start-line)))
   (forward-char (plist-get span :start-col)))
 
-(defun haskell-process-insert-type ()
+(defun haskell-session-insert-type ()
   "Get the identifer at the point and insert its type.
 Use GHCi's :type if it's possible."
   (let ((ident (haskell-ident-at-point)))
@@ -384,12 +384,12 @@ Use GHCi's :type if it's possible."
                                ":type %s"
                              ":type (%s)")
                            ident)))
-        (haskell-process-queue-command
+        (haskell-session-queue-command
          process
          (make-haskell-command
           :state (list process query (current-buffer))
           :go (lambda (state)
-                (haskell-process-send-string (nth 0 state)
+                (haskell-session-send-string (nth 0 state)
                                              (nth 1 state)))
           :complete (lambda (state response)
                       (cond
@@ -403,7 +403,7 @@ Use GHCi's :type if it's possible."
                           (insert (format "%s\n" (replace-regexp-in-string "\n$" "" response)))))))))))))
 
 (defun haskell-mode-find-def (ident)
-  ;; TODO Check if it possible to exploit `haskell-process-do-info'
+  ;; TODO Check if it possible to exploit `haskell-session-do-info'
   "Find definition location of identifier IDENT.
 Uses the GHCi process to find the location.  Returns nil if it
 can't find the identifier or the identifier isn't a string.
@@ -415,7 +415,7 @@ Returns:
     (module <name>)
     nil"
   (when (stringp ident)
-    (let ((reply (haskell-process-queue-sync-request
+    (let ((reply (haskell-session-queue-sync-request
                   (haskell-interactive-process)
                   (format (if (string-match "^[a-zA-Z_]" ident)
                               ":info %s"
@@ -472,7 +472,7 @@ Requires the :loc-at command from GHCi."
                  (cons (point)
                        (point)))))
     (when pos
-      (let ((reply (haskell-process-queue-sync-request
+      (let ((reply (haskell-session-queue-sync-request
                     (haskell-interactive-process)
                     (save-excursion
                       (format ":loc-at %s %d %d %d %d %s"
@@ -500,16 +500,16 @@ Requires the :loc-at command from GHCi."
                              'face 'compilation-error)))))))
 
 ;;;###autoload
-(defun haskell-process-cd (&optional _not-interactive)
+(defun haskell-session-cd (&optional _not-interactive)
   ;; FIXME optional arg is not used
   "Change directory."
   (interactive)
   (let* ((session (haskell-interactive-session))
          (dir (haskell-session-prompt-set-current-dir session)))
-    (haskell-process-log
+    (haskell-session-log
      (propertize (format "Changing directory to %s ...\n" dir)
                  'face font-lock-comment-face))
-    (haskell-process-change-dir session
+    (haskell-session-change-dir session
                                 (haskell-interactive-process)
                                 dir)))
 
@@ -533,16 +533,16 @@ Return current working directory for SESSION."
 	 (haskell-utils-read-directory-name "Set current directory: " default))))
   (haskell-session-get session 'current-dir))
 
-(defun haskell-process-change-dir (session process dir)
+(defun haskell-session-change-dir (session process dir)
   "Change SESSION's current directory.
 Query PROCESS to `:cd` to directory DIR."
-  (haskell-process-queue-command
+  (haskell-session-queue-command
    process
    (make-haskell-command
     :state (list session process dir)
     :go
     (lambda (state)
-      (haskell-process-send-string
+      (haskell-session-send-string
        (cadr state) (format ":cd %s" (cl-caddr state))))
 
     :complete
@@ -553,21 +553,21 @@ Query PROCESS to `:cd` to directory DIR."
                                              (cl-caddr state)))))))
 
 ;;;###autoload
-(defun haskell-process-cabal-macros ()
+(defun haskell-session-cabal-macros ()
   "Send the cabal macros string."
   (interactive)
-  (haskell-process-queue-without-filters (haskell-interactive-process)
+  (haskell-session-queue-without-filters (haskell-interactive-process)
                                          ":set -optP-include -optPdist/build/autogen/cabal_macros.h"))
 
-(defun haskell-process-do-try-info (sym)
+(defun haskell-session-do-try-info (sym)
   "Get info of SYM and echo in the minibuffer."
   (let ((process (haskell-interactive-process)))
-    (haskell-process-queue-command
+    (haskell-session-queue-command
      process
      (make-haskell-command
       :state (cons process sym)
       :go (lambda (state)
-            (haskell-process-send-string
+            (haskell-session-send-string
              (car state)
              (if (string-match "^[A-Za-z_]" (cdr state))
                  (format ":info %s" (cdr state))
@@ -577,15 +577,15 @@ Query PROCESS to `:cd` to directory DIR."
                               (string-match "^<interactive>" response))
                     (haskell-mode-message-line response)))))))
 
-(defun haskell-process-do-try-type (sym)
+(defun haskell-session-do-try-type (sym)
   "Get type of SYM and echo in the minibuffer."
   (let ((process (haskell-interactive-process)))
-    (haskell-process-queue-command
+    (haskell-session-queue-command
      process
      (make-haskell-command
       :state (cons process sym)
       :go (lambda (state)
-            (haskell-process-send-string
+            (haskell-session-send-string
              (car state)
              (if (string-match "^[A-Za-z_]" (cdr state))
                  (format ":type %s" (cdr state))
@@ -604,8 +604,8 @@ default (please follow GHCi-ng README available at URL
 
 \\<haskell-interactive-mode-map>
 To make this function works sometimes you need to load the file in REPL
-first using command `haskell-process-load-or-reload' bound to
-\\[haskell-process-load-or-reload].
+first using command `haskell-session-load-or-reload' bound to
+\\[haskell-session-load-or-reload].
 
 Optional argument INSERT-VALUE indicates that
 recieved type signature should be inserted (but only if nothing
@@ -616,7 +616,7 @@ happened since function invocation)."
          (process (haskell-interactive-process))
          (buf (current-buffer))
          (pos-reg (cons pos (region-active-p))))
-    (haskell-process-queue-command
+    (haskell-session-queue-command
      process
      (make-haskell-command
       :state (list process req buf insert-value pos-reg)
@@ -625,7 +625,7 @@ happened since function invocation)."
         (let* ((prc (car state))
                (req (nth 1 state)))
           (haskell-utils-async-watch-changes)
-          (haskell-process-send-string prc req)))
+          (haskell-session-send-string prc req)))
       :complete
       (lambda (state response)
         (let* ((init-buffer (nth 2 state))
@@ -682,56 +682,56 @@ happened since function invocation)."
             (haskell-utils-async-stop-watching-changes init-buffer))))))))
 
 ;;;###autoload
-(defun haskell-process-generate-tags (&optional and-then-find-this-tag)
+(defun haskell-session-generate-tags (&optional and-then-find-this-tag)
   "Regenerate the TAGS table.
 If optional AND-THEN-FIND-THIS-TAG argument is present it is used with
 function `xref-find-definitions' after new table was generated."
   (interactive)
   (let ((process (haskell-interactive-process)))
-    (haskell-process-queue-command
+    (haskell-session-queue-command
      process
      (make-haskell-command
       :state (cons process and-then-find-this-tag)
       :go (lambda (state)
             (if (eq system-type 'windows-nt)
-                (haskell-process-send-string
+                (haskell-session-send-string
                  (car state)
                  (format ":!hasktags --output=\"%s\\TAGS\" -x -e \"%s\""
-                            (haskell-session-cabal-dir (haskell-process-session (car state)))
-                            (haskell-session-cabal-dir (haskell-process-session (car state)))))
-              (haskell-process-send-string
+                            (haskell-session-cabal-dir (haskell-session-session (car state)))
+                            (haskell-session-cabal-dir (haskell-session-session (car state)))))
+              (haskell-session-send-string
                (car state)
                (format ":!cd %s && %s | %s"
                        (haskell-session-cabal-dir
-                        (haskell-process-session (car state)))
+                        (haskell-session-session (car state)))
                        "find . -type f \\( -name '*.hs' -or -name '*.lhs' -or -name '*.hsc' \\) -not \\( -name '#*' -or -name '.*' \\) -print0"
                        "xargs -0 hasktags -e -x"))))
       :complete (lambda (state _response)
                   (when (cdr state)
                     (let ((session-tags
                           (haskell-session-tags-filename
-                           (haskell-process-session (car state)))))
+                           (haskell-session-session (car state)))))
                       (add-to-list 'tags-table-list session-tags)
                       (setq tags-file-name nil))
                     (xref-find-definitions (cdr state)))
                   (haskell-mode-message-line "Tags generated."))))))
 
-(defun haskell-process-add-cabal-autogen ()
+(defun haskell-session-add-cabal-autogen ()
   "Add cabal's autogen dir to the GHCi search path.
 Add <cabal-project-dir>/dist/build/autogen/ to GHCi seatch path.
 This allows modules such as 'Path_...', generated by cabal, to be
 loaded by GHCi."
-  (unless (eq 'cabal-repl (haskell-process-type)) ;; redundant with "cabal repl"
+  (unless (eq 'cabal-repl (haskell-session-type)) ;; redundant with "cabal repl"
     (let*
         ((session       (haskell-interactive-session))
          (cabal-dir     (haskell-session-cabal-dir session))
          (ghci-gen-dir  (format "%sdist/build/autogen/" cabal-dir)))
-      (haskell-process-queue-without-filters
+      (haskell-session-queue-without-filters
        (haskell-interactive-process)
        (format ":set -i%s" ghci-gen-dir)))))
 
 ;;;###autoload
-(defun haskell-process-unignore ()
+(defun haskell-session-unignore ()
   "Unignore any ignored files.
 Do not ignore files that were specified as being ignored by the
 inferior GHCi process."
@@ -748,14 +748,14 @@ inferior GHCi process."
                                                 file)
                                         'face 'minibuffer-prompt))
                     (?y
-                     (haskell-process-unignore-file session file)
+                     (haskell-session-unignore-file session file)
                      (setq changed t))
                     (?v
                      (find-file file)
                      (cl-return))))
       (when (and changed
                  (y-or-n-p "Restart GHCi process now? "))
-        (haskell-process-restart)))))
+        (haskell-session-restart)))))
 
 ;;;###autoload
 (defun haskell-session-change-target (target)
@@ -770,7 +770,7 @@ inferior GHCi process."
       (haskell-session-set-target session target)
       (when (and (not (string= old-target target))
                  (y-or-n-p "Target changed, restart haskell process?"))
-        (haskell-process-start session)))))
+        (haskell-session-start session)))))
 
 ;;;###autoload
 (defun haskell-mode-stylish-buffer ()
@@ -868,7 +868,7 @@ Requires the :uses command from GHCi."
                  (cons (point)
                        (point)))))
     (when pos
-      (let ((reply (haskell-process-queue-sync-request
+      (let ((reply (haskell-session-queue-sync-request
                     (haskell-interactive-process)
                     (save-excursion
                       (format ":uses %s %d %d %d %d %s"
@@ -902,10 +902,10 @@ Requires the :uses command from GHCi."
 
 (defun haskell-command-echo-or-present (msg)
   "Present message in some manner depending on configuration.
-If variable `haskell-process-use-presentation-mode' is NIL it will output
+If variable `haskell-session-use-presentation-mode' is NIL it will output
 modified message MSG to echo area."
-  (if haskell-process-use-presentation-mode
-      (let ((session (haskell-process-session (haskell-interactive-process))))
+  (if haskell-session-use-presentation-mode
+      (let ((session (haskell-session-session (haskell-interactive-process))))
         (haskell-presentation-present session msg))
     (let ((m (haskell-utils-reduce-string msg)))
       (message m))))

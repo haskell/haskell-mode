@@ -84,7 +84,7 @@ Letters do not insert themselves; instead, they are commands."
     (haskell-menu-tabulate
      (list "Name" "PID" "Time" "RSS" "Cabal directory" "Working directory" "Command")
      (mapcar (lambda (session)
-               (let ((process (haskell-process-process (haskell-session-process session))))
+               (let ((process (haskell-session-process (haskell-session-process session))))
                  (cond
                   (process
                    (let ((id (process-id process)))
