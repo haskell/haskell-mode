@@ -123,36 +123,6 @@
     (haskell-interactive-handle-expr))))
 
 ;;;###autoload
-(defun haskell-session-kill (&optional leave-interactive-buffer)
-  "Kill the session process and buffer, delete the session.
-0. Prompt to kill all associated buffers.
-1. Kill the process.
-2. Kill the interactive buffer.
-3. Walk through all the related buffers and set their haskell-session to nil.
-4. Remove the session from the sessions list."
-  (interactive)
-  (let* ((session (haskell-session))
-         (name (haskell-session-name session))
-         (also-kill-buffers
-          (and haskell-ask-also-kill-buffers
-               (y-or-n-p (format "Killing `%s'. Also kill all associated buffers?" name)))))
-    (haskell-kill-session-process session)
-    (unless leave-interactive-buffer
-      (kill-buffer (haskell-session-interactive-buffer session)))
-    (cl-loop for buffer in (buffer-list)
-             do (with-current-buffer buffer
-                  (when (and (boundp 'haskell-session)
-                             (string= (haskell-session-name haskell-session) name))
-                    (setq haskell-session nil)
-                    (when also-kill-buffers
-                      (kill-buffer)))))
-    (setq haskell-sessions
-          (cl-remove-if (lambda (session)
-                          (string= (haskell-session-name session)
-                                   name))
-                        haskell-sessions))))
-
-;;;###autoload
 (defun haskell-interactive-kill ()
   "Kill the buffer and (maybe) the session."
   (interactive)
@@ -161,35 +131,6 @@
                haskell-session
                (y-or-n-p "Kill the whole session?"))
       (haskell-session-kill t))))
-
-(defun haskell-session-make (name)
-  "Make a Haskell session."
-  (when (haskell-session-lookup name)
-    (error "Session of name %s already exists!" name))
-  (let ((session (setq haskell-session
-                       (list (cons 'name name)))))
-    (add-to-list 'haskell-sessions session)
-    (haskell-process-start session)
-    session))
-
-(defun haskell-session-new-assume-from-cabal ()
-  "Prompt to create a new project based on a guess from the nearest Cabal file.
-If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
-  (let ((name (haskell-session-default-name)))
-    (unless (haskell-session-lookup name)
-      (if (or (not haskell-process-load-or-reload-prompt)
-	      (y-or-n-p (format "Start a new project named “%s”? " name)))
-	    (haskell-session-make name)))))
-
-;;;###autoload
-(defun haskell-session ()
-  "Get the Haskell session, prompt if there isn't one or fail."
-  (or (haskell-session-maybe)
-      (haskell-session-assign
-       (or (haskell-session-from-buffer)
-           (haskell-session-new-assume-from-cabal)
-           (haskell-session-choose)
-           (haskell-session-new)))))
 
 ;;;###autoload
 (defun haskell-interactive-switch ()
@@ -201,24 +142,6 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
       (setq haskell-interactive-previous-buffer initial-buffer))
     (unless (eq buffer (window-buffer))
       (switch-to-buffer-other-window buffer))))
-
-(defun haskell-session-new ()
-  "Make a new session."
-  (let ((name (read-from-minibuffer "Project name: " (haskell-session-default-name))))
-    (when (not (string= name ""))
-      (let ((session (haskell-session-lookup name)))
-        (if session
-            (when (y-or-n-p (format "Session %s already exists. Use it?" name))
-              session)
-          (haskell-session-make name))))))
-
-;;;###autoload
-(defun haskell-session-change ()
-  "Change the session for the current buffer."
-  (interactive)
-  (haskell-session-assign (or (haskell-session-new-assume-from-cabal)
-                              (haskell-session-choose)
-                              (haskell-session-new))))
 
 (defun haskell-process-prompt-restart (process)
   "Prompt to restart the died process."
@@ -267,17 +190,6 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
 (defun haskell-interactive-buffer ()
   "Get the interactive buffer of the session."
   (haskell-session-interactive-buffer (haskell-session)))
-
-;;;###autoload
-(defun haskell-kill-session-process (&optional session)
-  "Kill the process."
-  (interactive)
-  (let* ((session (or session (haskell-session)))
-         (existing-process (get-process (haskell-session-name session))))
-    (when (processp existing-process)
-      (haskell-interactive-mode-echo session "Killing process ...")
-      (haskell-process-set (haskell-session-process session) 'is-restarting t)
-      (delete-process existing-process))))
 
 ;;;###autoload
 (defun haskell-interactive-mode-visit-error ()
