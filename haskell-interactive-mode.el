@@ -710,12 +710,6 @@ FILE-NAME only."
            (haskell-session-choose)
            (error "No session associated with this buffer. Try M-x haskell-session-change or report this as a bug.")))))
 
-(defun haskell-interactive-session ()
-  "Get the Haskell session."
-  (or (haskell-session-process (haskell-interactive-session))
-      (error "No Haskell session/process associated with this
-      buffer. Maybe run M-x haskell-session-restart?")))
-
 (defun haskell-interactive-mode-do-presentation (expr)
   "Present the given expression. Requires the `present` package
   to be installed. Will automatically import it qualified as Present."
