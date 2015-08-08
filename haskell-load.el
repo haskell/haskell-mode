@@ -177,7 +177,7 @@ actual Emacs buffer of the module being loaded."
 
 (defun haskell-session-do-cabal (command)
   "Run a Cabal command."
-  (let ((process (haskell-interactive-process)))
+  (let ((process (haskell-interactive-session)))
     (cond
      ((let ((child (haskell-session-process process)))
         (not (equal 'run (process-status child))))
@@ -498,7 +498,7 @@ access the running context across :load/:reloads in GHCi."
                                (ido-find-file)
                              (error "No DevelMain.hs buffer.")))
     (let ((session (haskell-interactive-session)))
-      (let ((process (haskell-interactive-process)))
+      (let ((process (haskell-interactive-session)))
         (haskell-session-queue-command
          process
          (make-haskell-command
@@ -522,7 +522,7 @@ access the running context across :load/:reloads in GHCi."
                        (lambda (ok)
                          (when ok
                            (haskell-session-queue-without-filters
-                            (haskell-interactive-process)
+                            (haskell-interactive-session)
                             "DevelMain.update")
                            (message "DevelMain updated.")))))))))))
 

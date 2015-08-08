@@ -29,10 +29,10 @@
          ;; If already evaluating, then the user is trying to send
          ;; input to the REPL during evaluation. Most likely in
          ;; response to a getLine-like function.
-         ((and (haskell-session-evaluating-p (haskell-interactive-process))
+         ((and (haskell-session-evaluating-p (haskell-interactive-session))
                (= (line-end-position) (point-max)))
           (goto-char (point-max))
-          (let ((process (haskell-interactive-process))
+          (let ((process (haskell-interactive-session))
                 (string (buffer-substring-no-properties
                          haskell-interactive-mode-result-end
                          (point))))
@@ -62,7 +62,7 @@
 (defun haskell-interactive-mode-run-expr (expr)
   "Run the given expression."
   (let ((session (haskell-interactive-session))
-        (process (haskell-interactive-process)))
+        (process (haskell-interactive-session)))
     (haskell-session-queue-command
      process
      (make-haskell-command

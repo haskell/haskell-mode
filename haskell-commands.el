@@ -38,8 +38,8 @@
 (defun haskell-session-restart ()
   "Restart the inferior Haskell process."
   (interactive)
-  (haskell-session-reset (haskell-interactive-process))
-  (haskell-session-set (haskell-interactive-process) 'command-queue nil)
+  (haskell-session-reset (haskell-interactive-session))
+  (haskell-session-set (haskell-interactive-session) 'command-queue nil)
   (haskell-session-start (haskell-interactive-session)))
 
 (defun haskell-session-start (session)
@@ -379,7 +379,7 @@ Requires the :loc-at command from GHCi."
 Use GHCi's :type if it's possible."
   (let ((ident (haskell-ident-at-point)))
     (when ident
-      (let ((process (haskell-interactive-process))
+      (let ((process (haskell-interactive-session))
             (query (format (if (string-match "^[_[:lower:][:upper:]]" ident)
                                ":type %s"
                              ":type (%s)")
@@ -416,7 +416,7 @@ Returns:
     nil"
   (when (stringp ident)
     (let ((reply (haskell-session-queue-sync-request
-                  (haskell-interactive-process)
+                  (haskell-interactive-session)
                   (format (if (string-match "^[a-zA-Z_]" ident)
                               ":info %s"
                             ":info (%s)")
@@ -473,7 +473,7 @@ Requires the :loc-at command from GHCi."
                        (point)))))
     (when pos
       (let ((reply (haskell-session-queue-sync-request
-                    (haskell-interactive-process)
+                    (haskell-interactive-session)
                     (save-excursion
                       (format ":loc-at %s %d %d %d %d %s"
                               (buffer-file-name)
@@ -510,7 +510,7 @@ Requires the :loc-at command from GHCi."
      (propertize (format "Changing directory to %s ...\n" dir)
                  'face font-lock-comment-face))
     (haskell-session-change-dir session
-                                (haskell-interactive-process)
+                                (haskell-interactive-session)
                                 dir)))
 
 (defun haskell-session-buffer-default-dir (session &optional buffer)
@@ -556,12 +556,12 @@ Query PROCESS to `:cd` to directory DIR."
 (defun haskell-session-cabal-macros ()
   "Send the cabal macros string."
   (interactive)
-  (haskell-session-queue-without-filters (haskell-interactive-process)
+  (haskell-session-queue-without-filters (haskell-interactive-session)
                                          ":set -optP-include -optPdist/build/autogen/cabal_macros.h"))
 
 (defun haskell-session-do-try-info (sym)
   "Get info of SYM and echo in the minibuffer."
-  (let ((process (haskell-interactive-process)))
+  (let ((process (haskell-interactive-session)))
     (haskell-session-queue-command
      process
      (make-haskell-command
@@ -579,7 +579,7 @@ Query PROCESS to `:cd` to directory DIR."
 
 (defun haskell-session-do-try-type (sym)
   "Get type of SYM and echo in the minibuffer."
-  (let ((process (haskell-interactive-process)))
+  (let ((process (haskell-interactive-session)))
     (haskell-session-queue-command
      process
      (make-haskell-command
@@ -613,7 +613,7 @@ happened since function invocation)."
   (interactive "P")
   (let* ((pos (haskell-command-capture-expr-bounds))
          (req (haskell-utils-compose-type-at-command pos))
-         (process (haskell-interactive-process))
+         (process (haskell-interactive-session))
          (buf (current-buffer))
          (pos-reg (cons pos (region-active-p))))
     (haskell-session-queue-command
@@ -687,7 +687,7 @@ happened since function invocation)."
 If optional AND-THEN-FIND-THIS-TAG argument is present it is used with
 function `xref-find-definitions' after new table was generated."
   (interactive)
-  (let ((process (haskell-interactive-process)))
+  (let ((process (haskell-interactive-session)))
     (haskell-session-queue-command
      process
      (make-haskell-command
@@ -727,7 +727,7 @@ loaded by GHCi."
          (cabal-dir     (haskell-session-cabal-dir session))
          (ghci-gen-dir  (format "%sdist/build/autogen/" cabal-dir)))
       (haskell-session-queue-without-filters
-       (haskell-interactive-process)
+       (haskell-interactive-session)
        (format ":set -i%s" ghci-gen-dir)))))
 
 ;;;###autoload
@@ -869,7 +869,7 @@ Requires the :uses command from GHCi."
                        (point)))))
     (when pos
       (let ((reply (haskell-session-queue-sync-request
-                    (haskell-interactive-process)
+                    (haskell-interactive-session)
                     (save-excursion
                       (format ":uses %s %d %d %d %d %s"
                               (buffer-file-name)
@@ -905,7 +905,7 @@ Requires the :uses command from GHCi."
 If variable `haskell-session-use-presentation-mode' is NIL it will output
 modified message MSG to echo area."
   (if haskell-session-use-presentation-mode
-      (let ((session (haskell-session-session (haskell-interactive-process))))
+      (let ((session (haskell-session-session (haskell-interactive-session))))
         (haskell-presentation-present session msg))
     (let ((m (haskell-utils-reduce-string msg)))
       (message m))))

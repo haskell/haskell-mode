@@ -243,7 +243,7 @@ Returns nil if no completions available."
                           (not (eql typ 'haskell-completions-general-prefix))
                           (haskell-session-maybe)
                           (not
-                           (haskell-session-cmd (haskell-interactive-process))))
+                           (haskell-session-cmd (haskell-interactive-session))))
                      ;; if REPL is available and not busy try to query it
                      ;; for completions list in case of module name or
                      ;; identifier prefixes
@@ -257,7 +257,7 @@ When optional IMPORT argument is non-nil complete PREFIX
 prepending \"import \" keyword (useful for module names).  This
 function is supposed for internal use."
   (haskell-session-get-repl-completions
-   (haskell-interactive-process)
+   (haskell-interactive-session)
    (if import
        (concat "import " prefix)
      prefix)))

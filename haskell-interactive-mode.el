@@ -710,7 +710,7 @@ FILE-NAME only."
            (haskell-session-choose)
            (error "No session associated with this buffer. Try M-x haskell-session-change or report this as a bug.")))))
 
-(defun haskell-interactive-process ()
+(defun haskell-interactive-session ()
   "Get the Haskell session."
   (or (haskell-session-process (haskell-interactive-session))
       (error "No Haskell session/process associated with this
@@ -719,7 +719,7 @@ FILE-NAME only."
 (defun haskell-interactive-mode-do-presentation (expr)
   "Present the given expression. Requires the `present` package
   to be installed. Will automatically import it qualified as Present."
-  (let ((p (haskell-interactive-process)))
+  (let ((p (haskell-interactive-session)))
     ;; If Present.code isn't available, we probably need to run the
     ;; setup.
     (unless (string-match "^Present" (haskell-session-queue-sync-request p ":t Present.encode"))
@@ -744,7 +744,7 @@ FILE-NAME only."
 (defun haskell-interactive-mode-present-id (hash id)
   "Generate a presentation for the current expression at ID."
   ;; See below for commentary of this statement.
-  (let ((p (haskell-interactive-process)))
+  (let ((p (haskell-interactive-session)))
     (haskell-session-queue-without-filters
      p "let _it = it")
     (let* ((text (haskell-session-queue-sync-request
@@ -999,7 +999,7 @@ don't care when the thing completes as long as it's soonish."
 (defun haskell-interactive-mode-completion-at-point-function ()
   "Offer completions for partial expression between prompt and point"
   (when (haskell-interactive-at-prompt)
-    (let* ((process (haskell-interactive-process))
+    (let* ((process (haskell-interactive-session))
            (inp (haskell-interactive-mode-input-partial)))
       (if (string= inp (car-safe haskell-interactive-mode-completion-cache))
           (cdr haskell-interactive-mode-completion-cache)
@@ -1027,9 +1027,9 @@ don't care when the thing completes as long as it's soonish."
      ((and (not (haskell-interactive-mode-line-is-query (elt state 2)))
            (or (string-match "No instance for (?Show[ \n]" response)
                (string-match "Ambiguous type variable " response)))
-      (haskell-session-reset (haskell-interactive-process))
+      (haskell-session-reset (haskell-interactive-session))
       (let ((resp (haskell-session-queue-sync-request
-                   (haskell-interactive-process)
+                   (haskell-interactive-session)
                    (concat ":t "
                            (buffer-substring-no-properties
                             haskell-interactive-mode-prompt-start
@@ -1098,7 +1098,7 @@ don't care when the thing completes as long as it's soonish."
 Result will be printed in the minibuffer or presented using
 function `haskell-presentation-present', depending on variable
 `haskell-session-use-presentation-mode'."
-  (let ((process (haskell-interactive-process)))
+  (let ((process (haskell-interactive-session)))
     (haskell-session-queue-command
      process
      (make-haskell-command
