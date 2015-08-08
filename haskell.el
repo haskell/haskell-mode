@@ -377,11 +377,12 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
     (pop-to-buffer buffer)))
 
 ;;;###autoload
-(defun haskell-process-load-file ()
+(defun haskell-process-load-file (&optional no-window-popup)
   "Load the current buffer file."
   (interactive)
   (save-buffer)
-  (haskell-interactive-mode-reset-error (haskell-session))
+  (haskell-interactive-mode-reset-error (haskell-session) (or no-window-popup
+							      (not haskell-load-opens-repl)))
   (haskell-process-file-loadish (format "load \"%s\"" (replace-regexp-in-string
                                                        "\""
                                                        "\\\\\""
@@ -407,7 +408,8 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
                       (if haskell-reload-p
                           "Now running :reload."
                         "Now running :load <buffer-filename>.")))
-    (if haskell-reload-p (haskell-process-reload-file) (haskell-process-load-file))))
+      (if haskell-reload-p (haskell-process-reload-file) (haskell-process-load-file
+							  (not haskell-load-opens-repl)))))
 
 ;;;###autoload
 (defun haskell-process-cabal-build ()

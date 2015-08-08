@@ -106,6 +106,12 @@ when showing type information about symbols."
   :group 'haskell)
 
 ;;;###autoload
+(defcustom haskell-load-opens-repl t
+  "Whether `haskell-process-load-file' should open the REPL."
+  :group 'haskell-interactive
+  :type 'boolean)
+
+;;;###autoload
 (defcustom haskell-process-path-ghci
   "ghci"
   "The path for starting ghci."
