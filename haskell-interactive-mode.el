@@ -563,7 +563,7 @@ FILE-NAME only."
                    cabal-file))
       (haskell-cabal-add-dependency package-name version nil t)
       (when (y-or-n-p (format "Enable -package %s in the GHCi session?" package-name))
-        (haskell-session-queue-without-filters (haskell-session-process session)
+        (haskell-session-queue-without-filters session
                                                (format ":set -package %s" package-name))))))
 
 (defun haskell-session-suggest-remove-import (session file import line)

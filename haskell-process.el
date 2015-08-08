@@ -117,15 +117,14 @@ HPTYPE is the result of calling `'haskell-session-type`' function."
   "The sentinel for the process pipe."
   (let ((session (haskell-session-project-by-proc proc)))
     (when session
-      (let* ((process (haskell-session-process session)))
-        (unless (haskell-session-restarting process)
-          (haskell-session-log
-           (propertize (format "Event: %S\n" event)
-                       'face '((:weight bold))))
-          (haskell-session-log
-           (propertize "Process reset.\n"
-                       'face font-lock-comment-face))
-          (run-hook-with-args 'haskell-session-ended-hook process))))))
+      (unless (haskell-session-restarting session)
+	(haskell-session-log
+	 (propertize (format "Event: %S\n" event)
+		     'face '((:weight bold))))
+	(haskell-session-log
+	 (propertize "Process reset.\n"
+		     'face font-lock-comment-face))
+	(run-hook-with-args 'haskell-session-ended-hook session)))))
 
 (defun haskell-session-filter (proc response)
   "The filter for the process pipe."
@@ -139,10 +138,10 @@ HPTYPE is the result of calling `'haskell-session-type`' function."
              do (setq i (1+ i))))
   (let ((session (haskell-session-project-by-proc proc)))
     (when session
-      (if (haskell-session-cmd (haskell-session-process session))
+      (if (haskell-session-cmd session)
           (haskell-session-collect session
                                    response
-                                   (haskell-session-process session))
+                                   session)
         (haskell-session-log
          (replace-regexp-in-string "\4" "" response))))))
 

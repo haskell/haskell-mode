@@ -295,7 +295,7 @@
 
 (defun haskell-debug-process ()
   "Get the Haskell session."
-  (or (haskell-session-process (haskell-session-maybe))
+  (or (haskell-session-maybe)
       (error "No Haskell session associated with this debug
       buffer. Please just close the buffer and start again.")))
 

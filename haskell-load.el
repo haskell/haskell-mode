@@ -114,8 +114,7 @@ actual Emacs buffer of the module being loaded."
   (cl-assert session)
   (cl-assert file)
   (cl-assert ident)
-  (let* ((process (haskell-session-process session))
-         (suggested-already (haskell-session-suggested-imports process))
+  (let* ((suggested-already (haskell-session-suggested-imports session))
          (module (cond ((> (length modules) 1)
                         (when (y-or-n-p (format "Identifier `%s' not in scope, choose module to import?"
                                                 ident))
@@ -123,7 +122,7 @@ actual Emacs buffer of the module being loaded."
                        ((= (length modules) 1)
                         (let ((module (car modules)))
                           (unless (member module suggested-already)
-                            (haskell-session-set-suggested-imports process (cons module suggested-already))
+                            (haskell-session-set-suggested-imports session (cons module suggested-already))
                             (when (y-or-n-p (format "Identifier `%s' not in scope, import `%s'?"
                                                     ident
                                                     module))

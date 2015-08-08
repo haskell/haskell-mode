@@ -1543,8 +1543,7 @@ CALLBACK will be called with a formatted type string.
 
 If SYNC is non-nil, make the call synchronously instead."
   (unless callback (setq callback (lambda (response) (message "%s" response))))
-  (let ((process (and (haskell-session-maybe)
-                    (haskell-session-process (haskell-session-maybe))))
+  (let ((process (haskell-session-maybe))
         ;; Avoid passing bad strings to ghci
         (expr-okay
          (and (not (string-match-p "\\`[[:space:]]*\\'" expr-string))

@@ -48,36 +48,31 @@ You can create new session using function `haskell-session-make'."
   (let ((existing-process (get-process (haskell-session-name (haskell-interactive-session)))))
     (when (processp existing-process)
       (haskell-interactive-mode-echo session "Restarting process ...")
-      (haskell-session-set (haskell-session-process session) 'is-restarting t)
+      (haskell-session-set session 'is-restarting t)
       (delete-process existing-process)))
-  (let ((process (or (haskell-session-process session)
-                     (haskell-session-make (haskell-session-name session))))
-        (old-queue (haskell-session-get (haskell-session-process session)
+  (let ((old-queue (haskell-session-get session
                                         'command-queue)))
-    (haskell-session-set-process session process)
-    (haskell-session-set-session process session)
-    (haskell-session-set-cmd process nil)
-    (haskell-session-set (haskell-session-process session) 'is-restarting nil)
+    (haskell-session-set-cmd session nil)
+    (haskell-session-set session 'is-restarting nil)
     (let ((default-directory (haskell-session-cabal-dir session))
           (log-and-command (haskell-session-compute-process-log-and-command session (haskell-session-type))))
       (haskell-session-prompt-set-current-dir session (not haskell-session-load-or-reload-prompt))
       (haskell-session-set-process
-       process
+       session
        (progn
          (haskell-session-log (propertize (format "%S" log-and-command)))
          (apply #'start-process (cdr log-and-command)))))
-    (progn (set-process-sentinel (haskell-session-process process) 'haskell-session-sentinel)
-           (set-process-filter (haskell-session-process process) 'haskell-session-filter))
-    (haskell-session-send-startup process)
+    (progn (set-process-sentinel (haskell-session-process session) 'haskell-session-sentinel)
+           (set-process-filter (haskell-session-process session) 'haskell-session-filter))
+    (haskell-session-send-startup session)
     (unless (eq 'cabal-repl (haskell-session-type)) ;; "cabal repl" sets the proper CWD
       (haskell-session-change-dir session
-                                  process
+                                  session
                                   (haskell-session-current-dir session)))
-    (haskell-session-set process 'command-queue
-                         (append (haskell-session-get (haskell-session-process session)
-                                                      'command-queue)
+    (haskell-session-set session 'command-queue
+                         (append (haskell-session-get session 'command-queue)
                                  old-queue))
-    process))
+    session))
 
 (defun haskell-session-send-startup (process)
   "Send the necessary start messages to haskell PROCESS."

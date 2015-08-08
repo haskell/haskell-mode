@@ -273,7 +273,7 @@ If `haskell-session-load-or-reload-prompt' is nil, accept `default'."
          (existing-process (get-process (haskell-session-name session))))
     (when (processp existing-process)
       (haskell-interactive-mode-echo session "Killing process ...")
-      (haskell-session-set (haskell-session-process session) 'is-restarting t)
+      (haskell-session-set session 'is-restarting t)
       (delete-process existing-process))))
 
 ;;;###autoload
