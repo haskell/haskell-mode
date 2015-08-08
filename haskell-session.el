@@ -62,14 +62,14 @@
   (when (and (buffer-file-name)
              (consp haskell-sessions))
     (cl-reduce (lambda (acc a)
-                 (let ((dir (haskell-session-cabal-dir a t)))
+                 (let ((dir (haskell-session-get a 'cabal-dir)))
                    (if dir
                        (if (string-prefix-p dir
 					    (file-name-directory (buffer-file-name)))
                            (if acc
                                (if (and
-                                    (> (length (haskell-session-cabal-dir a t))
-                                       (length (haskell-session-cabal-dir acc t))))
+                                    (> (length (haskell-session-get a 'cabal-dir))
+                                       (length (haskell-session-get acc 'cabal-dir))))
                                    a
                                  acc)
                              a)
@@ -194,17 +194,14 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
   (haskell-session-set s 'cabal-checksum
                        (haskell-cabal-compute-checksum cabal-dir)))
 
-(defun haskell-session-cabal-dir (s &optional no-prompt)
+(defun haskell-session-cabal-dir (s)
   "Get the session cabal-dir."
-  (let ((dir (haskell-session-get s 'cabal-dir)))
-    (if dir
-        dir
-      (unless no-prompt
-        (let ((set-dir (haskell-cabal-get-dir)))
-          (if set-dir
-              (progn (haskell-session-set-cabal-dir s set-dir)
-                     set-dir)
-            (haskell-session-cabal-dir s)))))))
+  (or (haskell-session-get s 'cabal-dir)
+      (let ((set-dir (haskell-cabal-get-dir (not haskell-process-load-or-reload-prompt))))
+	(if set-dir
+	    (progn (haskell-session-set-cabal-dir s set-dir)
+		   set-dir)
+	    (haskell-session-cabal-dir s)))))
 
 (defun haskell-session-modify (session key update)
   "Update the value at KEY in SESSION with UPDATE."

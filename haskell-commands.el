@@ -60,7 +60,7 @@ You can create new session using function `haskell-session-make'."
     (haskell-process-set (haskell-session-process session) 'is-restarting nil)
     (let ((default-directory (haskell-session-cabal-dir session))
           (log-and-command (haskell-process-compute-process-log-and-command session (haskell-process-type))))
-      (haskell-session-pwd session)
+      (haskell-session-prompt-set-current-dir session (not haskell-process-load-or-reload-prompt))
       (haskell-process-set-process
        process
        (progn
@@ -518,7 +518,7 @@ Requires the :loc-at command from GHCi."
   "Change directory."
   (interactive)
   (let* ((session (haskell-interactive-session))
-         (dir (haskell-session-pwd session t)))
+         (dir (haskell-session-prompt-set-current-dir session)))
     (haskell-process-log
      (propertize (format "Changing directory to %s ...\n" dir)
                  'face font-lock-comment-face))
@@ -526,23 +526,25 @@ Requires the :loc-at command from GHCi."
                                 (haskell-interactive-process)
                                 dir)))
 
-(defun haskell-session-pwd (session &optional change)
+(defun haskell-session-buffer-default-dir (session &optional buffer)
+  "Try to deduce a sensible default directory for SESSION and BUFFER,
+of which the latter defaults to the current buffer."
+  (or (haskell-session-get session 'current-dir)
+      (haskell-session-get session 'cabal-dir)
+      (if (buffer-file-name buffer)
+	  (file-name-directory (buffer-file-name buffer))
+	  "~/")))
+
+(defun haskell-session-prompt-set-current-dir (session &optional use-default)
   "Prompt for the current directory.
-Return current working directory for SESSION.
-Optional CHANGE argument makes user to choose new working directory for SESSION.
-In this case new working directory path will be returned."
-  (or (unless change
-        (haskell-session-get session 'current-dir))
-      (progn (haskell-session-set-current-dir
-              session
-              (haskell-utils-read-directory-name
-               (if change "Change directory: " "Set current directory: ")
-               (or (haskell-session-get session 'current-dir)
-                   (haskell-session-get session 'cabal-dir)
-                   (if (buffer-file-name)
-                       (file-name-directory (buffer-file-name))
-                     "~/"))))
-             (haskell-session-get session 'current-dir))))
+Return current working directory for SESSION."
+  (let ((default (haskell-session-buffer-default-dir session)))
+    (haskell-session-set-current-dir
+     session
+     (if use-default
+	 default
+	 (haskell-utils-read-directory-name "Set current directory: " default))))
+  (haskell-session-get session 'current-dir))
 
 (defun haskell-process-change-dir (session process dir)
   "Change SESSION's current directory.

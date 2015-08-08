@@ -186,14 +186,16 @@ file), then this function returns nil."
           (haskell-cabal-get-setting name))))))
 
 ;;;###autoload
-(defun haskell-cabal-get-dir ()
+(defun haskell-cabal-get-dir (&optional use-defaults)
   "Get the Cabal dir for a new project. Various ways of figuring this out,
    and indeed just prompting the user. Do them all."
   (let* ((file (haskell-cabal-find-file))
          (dir (if file (file-name-directory file) default-directory)))
-    (haskell-utils-read-directory-name
-     (format "Cabal dir%s: " (if file (format " (guessed from %s)" (file-relative-name file)) ""))
-     dir)))
+    (if use-defaults
+	dir
+	(haskell-utils-read-directory-name
+	 (format "Cabal dir%s: " (if file (format " (guessed from %s)" (file-relative-name file)) ""))
+	 dir))))
 
 (defun haskell-cabal-compute-checksum (dir)
   "Compute MD5 checksum of package description file in DIR.
