@@ -342,10 +342,6 @@ re-asking about the same imports."
   "Get the process child."
   (haskell-session-get p 'inferior-process))
 
-(defun haskell-session-name (p)
-  "Get the process name."
-  (haskell-session-get p 'name))
-
 (defun haskell-session-cmd (p)
   "Get the process's current command.
 Return nil if no current command."
