@@ -306,10 +306,11 @@ Returns NIL when no completions found."
              (h0 (car s1))) ;; "<limit count> <all count> <unused string>"
         (unless (string-match "\\`\\([0-9]+\\) \\([0-9]+\\) \\(\".*\"\\)\\'" h0)
           (error "Invalid `:complete' response"))
-        (let ((cnt1 (match-string 1 h0)))
+        (let ((cnt1 (match-string 1 h0))
+              (h1 (haskell-string-literal-decode (match-string 3 h0))))
           (unless (= (string-to-number cnt1) (length cs))
             (error "Lengths inconsistent in `:complete' reponse"))
-          cs)))))
+          (cons h1 cs))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessing the process
