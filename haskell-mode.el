@@ -172,7 +172,7 @@ With prefix argument HERE, insert it at point."
 
 ;; Are we looking at a literate script?
 (defvar haskell-literate nil
-  "*If not nil, the current buffer contains a literate Haskell script.
+  "If not nil, the current buffer contains a literate Haskell script.
 Possible values are: `bird' and `tex', for Bird-style and LaTeX-style
 literate scripts respectively.  Set by `haskell-mode' and
 `literate-haskell-mode'.  For an ambiguous literate buffer -- i.e. does
