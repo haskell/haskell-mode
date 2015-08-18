@@ -64,8 +64,8 @@
             nil
             t))
 
-(make-obsolete #'haskell-process-completions-at-point
-               #'haskell-completions-sync-completions-at-point
+(make-obsolete 'haskell-process-completions-at-point
+               'haskell-completions-sync-completions-at-point
                "June 19, 2015")
 (defun haskell-process-completions-at-point ()
   "A completion-at-point function using the current haskell process."
