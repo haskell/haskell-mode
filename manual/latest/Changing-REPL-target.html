@@ -11,10 +11,10 @@ by the Free Software Foundation; with no Invariant Sections, no
 Front-Cover Texts and no Back-Cover Texts. -->
 <!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>Haskell Mode 13.15-git: Editing Cabal files</title>
+<title>Haskell Mode 13.15-git: Changing REPL target</title>
 
-<meta name="description" content="Haskell Mode 13.15-git: Editing Cabal files">
-<meta name="keywords" content="Haskell Mode 13.15-git: Editing Cabal files">
+<meta name="description" content="Haskell Mode 13.15-git: Changing REPL target">
+<meta name="keywords" content="Haskell Mode 13.15-git: Changing REPL target">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
@@ -22,8 +22,8 @@ Front-Cover Texts and no Back-Cover Texts. -->
 <link href="index.html#Top" rel="start" title="Top">
 <link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
 <link href="index.html#Top" rel="up" title="Top">
-<link href="Changing-REPL-target.html#Changing-REPL-target" rel="next" title="Changing REPL target">
-<link href="Interactive-Haskell.html#Interactive-Haskell" rel="prev" title="Interactive Haskell">
+<link href="Concept-index.html#Concept-index" rel="next" title="Concept index">
+<link href="Editing-Cabal-files.html#Editing-Cabal-files" rel="prev" title="Editing Cabal files">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
@@ -58,35 +58,45 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
-<div class="background"> </div><a name="Editing-Cabal-files"></a>
+<div class="background"> </div><a name="Changing-REPL-target"></a>
 <div class="header">
 <p>
-Next: <a href="Changing-REPL-target.html#Changing-REPL-target" accesskey="n" rel="next">Changing REPL target</a>, Previous: <a href="Interactive-Haskell.html#Interactive-Haskell" accesskey="p" rel="prev">Interactive Haskell</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Concept-index.html#Concept-index" accesskey="n" rel="next">Concept index</a>, Previous: <a href="Editing-Cabal-files.html#Editing-Cabal-files" accesskey="p" rel="prev">Editing Cabal files</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="Editing-Cabal-files-1"></a>
-<h2 class="chapter">11 Editing Cabal files</h2>
+<a name="Changing-REPL-target-1"></a>
+<h2 class="chapter">12 Changing REPL target</h2>
 
-<a name="index-haskell_002dcabal_002dmode"></a>
-<a name="index-haskell_002dcabal_002dmode_002dhook"></a>
+<a name="index-haskell_002dsession_002dchange_002dtarget"></a>
+<a name="index-haskell_002dinteractive_002dmode_002dhook"></a>
 
-<p><code>haskell-cabal-mode</code> is a major mode for editing
-<a href="http://www.haskell.org/cabal/users-guide/developing-packages.html">Cabal
-package description files</a> and is automatically associated with files
-having a <samp>.cabal</samp> extension.
+<p>With <code>haskell-session-change-target</code> you can change the section
+(defined in project&rsquo;s <samp>.cabal</samp> file) the interactive REPL session is
+started with.
 </p>
-<a name="index-haskell_002dcabal_002dvisit_002dfile"></a>
-
-<p>For quickly locating and jumping to the nearest <samp>.cabal</samp> file from
-a Haskell source buffer, you can use <kbd>M-x haskell-cabal-visit-file</kbd>;
-with a prefix argument (i.e. <kbd>C-u</kbd>) <code>find-file-other-window</code> is
-used to visit the <samp>.cabal</samp> file.  If you wish, you can bind
-<code>haskell-cabal-visit-file</code> to a convenient key sequence, e.g.
+<p>After the session is started, you can switch the target for
 </p>
-<div class="lisp">
-<pre class="lisp">(eval-after-load &quot;haskell-mode&quot;
-  '(define-key haskell-mode-map (kbd &quot;C-c v c&quot;) 'haskell-cabal-visit-file))
-</pre></div>
+<a name="index-testing"></a>
+<p>- Testing
+</p>
+<p>In <code>haskell-interactive-mode</code> buffer invoke the
+<code>haskell-session-change-target</code> and enter the name of the test you
+wish to perform, i.e. &ldquo;test&rdquo;.
+Answer &ldquo;yes&rdquo; to restart the session.
+</p>
+<a name="index-benchmarking"></a>
+<p>- Benchmark
+</p>
+<p>In <code>haskell-interactive-mode</code> buffer invoke the  <code>haskell-session-change-target</code>
+and enter the name of the benchmark you wish to perform, i.e. &ldquo;bench&rdquo;.
+Answer &ldquo;yes&rdquo; to restart the session.
+</p>
+<p>- Executable
+</p>
+<p>In <code>haskell-interactive-mode</code> buffer invoke the  <code>haskell-session-change-target</code>
+and enter the name of the executable you wish to work with.
+Answer &ldquo;yes&rdquo; to restart the session.
+</p>
 
 <p>TODO/WRITEME
 </p>
