@@ -60,6 +60,7 @@ interpreter (e.g. GHCi).
 * Inferior Haskell interpreter::    How to interact with GHCi (1)
 * Interactive Haskell::             How to interact with GHCi (2)
 * Editing Cabal files::             Cabal support
+* Changing REPL target::            Start REPL with selected target (i.e. test,bench,etc.)
 * Concept index::                   Index of Haskell Mode concepts
 * Function index::                  index of commands
 * Variable index::                  Index of options and types
@@ -591,6 +592,42 @@ used to visit the @file{.cabal} file.  If you wish, you can bind
 (eval-after-load "haskell-mode"
   '(define-key haskell-mode-map (kbd "C-c v c") 'haskell-cabal-visit-file))
 @end lisp
+
+TODO/WRITEME
+
+@node Changing REPL target
+@chapter Changing REPL target
+
+@findex haskell-session-change-target
+@vindex haskell-interactive-mode-hook
+
+With @code{haskell-session-change-target} you can change the section
+(defined in project's @file{.cabal} file) the interactive REPL session is
+started with.
+
+After the session is started, you can switch the target for
+
+@cindex testing
+- Testing
+
+In @code{haskell-interactive-mode} buffer invoke the
+@code{haskell-session-change-target} and enter the name of the test you
+wish to perform, i.e. ``test''.
+Answer ``yes'' to restart the session.
+
+@cindex benchmarking
+- Benchmark
+
+In @code{haskell-interactive-mode} buffer invoke the  @code{haskell-session-change-target}
+and enter the name of the benchmark you wish to perform, i.e. ``bench''.
+Answer ``yes'' to restart the session.
+
+- Executable
+
+In @code{haskell-interactive-mode} buffer invoke the  @code{haskell-session-change-target}
+and enter the name of the executable you wish to work with.
+Answer ``yes'' to restart the session.
+
 
 TODO/WRITEME
 
