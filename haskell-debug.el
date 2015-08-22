@@ -556,8 +556,7 @@ Stopped at /home/foo/project/src/x.hs:6:25-36
     (cl-loop for span in history
              do (let ((string (haskell-debug-get-span-string
                                (plist-get span :path)
-                               (plist-get span :span)))
-                      (index (plist-get span :index)))
+                               (plist-get span :span))))
                   (insert (propertize (format "%4d" i)
                                       'face 'haskell-debug-trace-number-face)
                           " "

@@ -343,7 +343,7 @@ should be inserted."
           expr))))))
 
 ;;;###autoload
-(defun haskell-mode-jump-to-def-or-tag (&optional next-p)
+(defun haskell-mode-jump-to-def-or-tag (&optional _next-p)
   ;; FIXME NEXT-P arg is not used
   "Jump to the definition.
 Jump to definition of identifier at point by consulting GHCi, or
@@ -513,7 +513,7 @@ Requires the :loc-at command from GHCi."
                              'face 'compilation-error)))))))
 
 ;;;###autoload
-(defun haskell-process-cd (&optional not-interactive)
+(defun haskell-process-cd (&optional _not-interactive)
   ;; FIXME optional arg is not used
   "Change directory."
   (interactive)
@@ -585,7 +585,7 @@ Query PROCESS to `:cd` to directory DIR."
              (if (string-match "^[A-Za-z_]" (cdr state))
                  (format ":info %s" (cdr state))
                (format ":info (%s)" (cdr state)))))
-      :complete (lambda (state response)
+      :complete (lambda (_state response)
                   (unless (or (string-match "^Top level" response)
                               (string-match "^<interactive>" response))
                     (haskell-mode-message-line response)))))))
@@ -603,7 +603,7 @@ Query PROCESS to `:cd` to directory DIR."
              (if (string-match "^[A-Za-z_]" (cdr state))
                  (format ":type %s" (cdr state))
                (format ":type (%s)" (cdr state)))))
-      :complete (lambda (state response)
+      :complete (lambda (_state response)
                   (unless (or (string-match "^Top level" response)
                               (string-match "^<interactive>" response))
                     (haskell-mode-message-line response)))))))
@@ -719,7 +719,7 @@ function `xref-find-definitions' after new table was generated."
                         (haskell-process-session (car state)))
                        "find . -name '*.hs' -print0 -or -name '*.lhs' -print0 -or -name '*.hsc' -print0"
                        "xargs -0 hasktags -e -x"))))
-      :complete (lambda (state response)
+      :complete (lambda (state _response)
                   (when (cdr state)
                     (let ((session-tags
                           (haskell-session-tags-filename
@@ -802,9 +802,9 @@ output.  If CMD fails the buffer remains unchanged."
                   (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'" str)
                     (setq str (replace-match "" t t str)))
                   str))
-         (errout (lambda (fmt &rest args)
-                   (let* ((warning-fill-prefix "    "))
-                     (display-warning cmd (apply 'format fmt args) :warning))))
+         (_errout (lambda (fmt &rest args)
+		    (let* ((warning-fill-prefix "    "))
+		      (display-warning cmd (apply 'format fmt args) :warning))))
          (filename (buffer-file-name (current-buffer)))
          (cmd-prefix (replace-regexp-in-string " .*" "" cmd))
          (tmp-file (make-temp-file cmd-prefix))
@@ -813,9 +813,9 @@ output.  If CMD fails the buffer remains unchanged."
                                      haskell-session)
                                 (haskell-session-cabal-dir haskell-session)
                               default-directory))
-         (errcode (with-temp-file tmp-file
-                    (call-process cmd filename
-                                  (list (current-buffer) err-file) nil)))
+         (_errcode (with-temp-file tmp-file
+		     (call-process cmd filename
+				   (list (current-buffer) err-file) nil)))
          (stderr-output
           (with-temp-buffer
             (insert-file-contents err-file)

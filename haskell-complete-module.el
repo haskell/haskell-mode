@@ -35,8 +35,7 @@
 
 (defun haskell-complete-module-read (prompt candidates)
   "Interactively auto-complete from a list of candidates."
-  (let ((continue t)
-        (stack (list))
+  (let ((stack (list))
         (pattern "")
         (result nil))
     (delete-dups candidates)

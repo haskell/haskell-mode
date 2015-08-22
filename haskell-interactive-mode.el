@@ -205,7 +205,7 @@ be nil.")
 
 ;; (define-key haskell-error-mode-map (kbd "q") 'quit-window)
 
-(defun haskell-interactive-mode-handle-h (&optional bound)
+(defun haskell-interactive-mode-handle-h ()
   "Handle ^H in output."
   (let ((bound (point-min))
         (inhibit-read-only t))
@@ -251,9 +251,7 @@ do the
       expr
     (let* ((i 0)
            (lines (split-string expr "\n"))
-           (len (length lines))
-           (indent (make-string (length haskell-interactive-prompt)
-                                ? )))
+           (len (length lines)))
       (mapconcat 'identity
                  (cl-loop for line in lines
                           collect (cond ((= i 0)
@@ -329,15 +327,14 @@ SESSION, otherwise operate on the current buffer.
   "Insert the result of an eval as plain text."
   (with-current-buffer (haskell-session-interactive-buffer session)
     (goto-char (point-max))
-    (let ((start (point)))
-      (insert (ansi-color-apply
-               (propertize text
-                           'font-lock-face 'haskell-interactive-face-result
-                           'rear-nonsticky t
-                           'read-only t
-                           'prompt t
-                           'result t)))
-      (haskell-interactive-mode-handle-h start))
+    (insert (ansi-color-apply
+	     (propertize text
+			 'font-lock-face 'haskell-interactive-face-result
+			 'rear-nonsticky t
+			 'read-only t
+			 'prompt t
+			 'result t)))
+    (haskell-interactive-mode-handle-h)
     (let ((marker (set (make-local-variable 'haskell-interactive-mode-result-end)
                        (make-marker))))
       (set-marker marker
@@ -571,8 +568,7 @@ FILE-NAME only."
 
 (defun haskell-process-suggest-remove-import (session file import line)
   "Suggest removing or commenting out IMPORT on LINE."
-  (let ((continue t)
-        (first t))
+  (let ((first t))
     (cl-case (read-event
               (propertize (format "%sThe import line `%s' is redundant. Remove? (y, n, c: comment out)  "
                                   (if (not first)
@@ -812,7 +808,6 @@ FILE-NAME only."
   "Insert the presentation, hooking up buttons for each slot."
   (let* ((rep (cadr (assoc 'rep presentation)))
          (text (cadr (assoc 'text presentation)))
-         (type (cadr (assoc 'type presentation)))
          (slots (cadr (assoc 'slots presentation)))
          (nullary (null slots)))
     (cond
@@ -1005,7 +1000,6 @@ don't care when the thing completes as long as it's soonish."
   "Offer completions for partial expression between prompt and point"
   (when (haskell-interactive-at-prompt)
     (let* ((process (haskell-interactive-process))
-           (session (haskell-interactive-session))
            (inp (haskell-interactive-mode-input-partial)))
       (if (string= inp (car-safe haskell-interactive-mode-completion-cache))
           (cdr haskell-interactive-mode-completion-cache)

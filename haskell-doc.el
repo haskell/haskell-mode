@@ -1616,8 +1616,7 @@ the haskell-doc database."
           (is-reserved (haskell-doc-is-of sym haskell-doc-reserved-ids))
           (is-prelude  (haskell-doc-is-of sym haskell-doc-prelude-types))
           (is-strategy (haskell-doc-is-of sym haskell-doc-strategy-ids))
-          (is-user-defined (haskell-doc-is-of sym haskell-doc-user-defined-ids))
-          (is-prelude  (haskell-doc-is-of sym haskell-doc-prelude-types)))
+          (is-user-defined (haskell-doc-is-of sym haskell-doc-user-defined-ids)))
       (cond
        ;; if reserved id (i.e. Haskell keyword
        ((and haskell-doc-show-reserved
