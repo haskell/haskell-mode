@@ -444,6 +444,21 @@ OTHER-WINDOW use `find-file-other-window'."
 (defun haskell-cabal-section-data-start-column (section)
   (plist-get section :data-start-column))
 
+(defun haskell-cabal-enum-targets ()
+  "Enumerate .cabal targets."
+  (let ((cabal-file (haskell-cabal-find-file)))
+    (when (and cabal-file (file-readable-p cabal-file))
+      (with-temp-buffer
+	(insert-file-contents cabal-file)
+	(haskell-cabal-mode)
+	(let (matches)
+	  (goto-char (point-min))
+	  (haskell-cabal-next-section)
+	  (while (not (eobp))
+	    (push (haskell-cabal-section-value (haskell-cabal-section)) matches)
+	    (haskell-cabal-next-section))
+	  (reverse matches))))))
+
 (defmacro haskell-cabal-with-subsection (subsection replace &rest funs)
   "Copy subsection data into a temporary buffer, save indentation
 and execute FORMS

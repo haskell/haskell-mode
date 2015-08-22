@@ -773,7 +773,8 @@ inferior GHCi process."
 ;;;###autoload
 (defun haskell-session-change-target (target)
   "Set the build TARGET for cabal REPL."
-  (interactive "sNew build target:")
+  (interactive
+   (list (completing-read "New build target:" (haskell-cabal-enum-targets))))
   (let* ((session haskell-session)
          (old-target (haskell-session-get session 'target)))
     (when session
