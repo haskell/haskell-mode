@@ -205,6 +205,19 @@ Lock minor mode which should be enabled by default in current
 Emacsen. @xref{Font Lock,,,emacs}, for more information on how to
 control @code{font-lock-mode}.
 
+@ifhtml
+@image{anim/font-lock}
+@end ifhtml
+
+@section Completion support
+
+@code{haskell-mode} can complete symbols, pragma directives and language
+extensions. This is part of @code{haskell-interactive-mode}.
+
+@ifhtml
+@image{anim/company-mode-language-pragma}
+@end ifhtml
+
 @node Unicode support
 @chapter Unicode support
 

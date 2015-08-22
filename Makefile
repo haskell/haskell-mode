@@ -151,7 +151,16 @@ doc/html/haskell-mode.svg : images/haskell-mode.svg doc/html/index.html
 doc/html/haskell-mode-32x32.png : images/haskell-mode-32x32.png doc/html/index.html
 	cp $< $@
 
-doc/html : doc/html/index.html doc/html/haskell-mode.css doc/html/haskell-mode.svg doc/html/haskell-mode-32x32.png
+doc/html/anim : doc/anim doc/html/index.html
+	if [ -e $@ ]; then rm -r $@; fi
+	cp -r $< $@
+
+doc/html : doc/html/index.html			\
+           doc/html/haskell-mode.css		\
+           doc/html/haskell-mode.svg		\
+           doc/html/haskell-mode-32x32.png	\
+           doc/html/anim
+
 
 deploy-manual : doc/html
 	cd doc && ./deploy-manual.sh
