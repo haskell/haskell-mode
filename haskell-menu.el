@@ -1,4 +1,4 @@
-;;; haskell-menu.el --- A Haskell sessions menu
+;;; haskell-menu.el --- A Haskell sessions menu -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013  Chris Done
 

@@ -1,4 +1,4 @@
-;;; haskell-bot.el --- A Lambdabot interaction mode
+;;; haskell-bot.el --- A Lambdabot interaction mode -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2004, 2005, 2006, 2007  Free Software Foundation, Inc.
 ;; Copyright (C) 2001  Chris Webb

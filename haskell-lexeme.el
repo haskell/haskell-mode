@@ -1,4 +1,4 @@
-;;; haskell-lexeme.el --- haskell lexical tokens   -*- coding: utf-8 -*-
+;;; haskell-lexeme.el --- haskell lexical tokens   -*- coding: utf-8; lexical-binding: t -*-
 
 ;; Copyright (C) 2015 Gracjan Polak
 

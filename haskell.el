@@ -1,4 +1,4 @@
-;;; haskell.el --- Top-level Haskell package
+;;; haskell.el --- Top-level Haskell package -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2014 Chris Done. All rights reserved.
 

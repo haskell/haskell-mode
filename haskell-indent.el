@@ -1,4 +1,4 @@
-;;; haskell-indent.el --- "semi-intelligent" indentation module for Haskell Mode
+;;; haskell-indent.el --- "semi-intelligent" indentation module for Haskell Mode -*- lexical-binding: t -*-
 
 ;; Copyright 2004, 2005, 2007, 2008, 2009  Free Software Foundation, Inc.
 ;; Copyright 1997-1998  Guy Lapalme

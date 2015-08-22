@@ -1,4 +1,4 @@
-;;; haskell-presentation-mode.el --- Presenting Haskell things
+;;; haskell-presentation-mode.el --- Presenting Haskell things -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013  Chris Done
 

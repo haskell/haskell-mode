@@ -1,4 +1,4 @@
-;;; haskell-repl.el --- REPL evaluation
+;;; haskell-repl.el --- REPL evaluation -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2014 Chris Done. All rights reserved.
 

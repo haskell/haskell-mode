@@ -1,4 +1,4 @@
-;;; haskell-checkers.el --- Emacs interface to haskell lint and style checkers
+;;; haskell-checkers.el --- Emacs interface to haskell lint and style checkers -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2009-2011  Alex Ott, Liam O'Reilly
 ;;

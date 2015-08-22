@@ -1,4 +1,4 @@
-;;; haskell-simple-indent.el --- Simple indentation module for Haskell Mode
+;;; haskell-simple-indent.el --- Simple indentation module for Haskell Mode -*- lexical-binding: t -*-
 
 ;; Copyright (C) 1998  Heribert Schuetz, Graeme E Moss
 

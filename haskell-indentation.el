@@ -1,4 +1,4 @@
-;;; haskell-indentation.el --- indentation module for Haskell Mode
+;;; haskell-indentation.el --- indentation module for Haskell Mode -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013  Kristof Bastiaensen, Gergely Risko
 

@@ -1,4 +1,4 @@
-;;; haskell-navigate-imports.el --- A function for cycling through Haskell import lists
+;;; haskell-navigate-imports.el --- A function for cycling through Haskell import lists -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2010  Chris Done
 

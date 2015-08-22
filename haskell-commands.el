@@ -1,4 +1,4 @@
-;;; haskell-commands.el --- Commands that can be run on the process
+;;; haskell-commands.el --- Commands that can be run on the process -*- lexical-binding: t -*-
 
 ;;; Commentary:
 

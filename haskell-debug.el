@@ -1,4 +1,4 @@
-;;; haskell-debug.el --- Debugging mode via GHCi
+;;; haskell-debug.el --- Debugging mode via GHCi -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2014 Chris Done. All rights reserved.
 

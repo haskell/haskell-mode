@@ -1,4 +1,4 @@
-;;; haskell-mode.el --- A Haskell editing mode    -*- coding: utf-8 -*-
+;;; haskell-mode.el --- A Haskell editing mode    -*- coding: utf-8; lexical-binding: t -*-
 
 ;; Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008  Free Software Foundation, Inc
 ;; Copyright (C) 1992, 1997-1998  Simon Marlow, Graeme E Moss, and Tommy Thorn

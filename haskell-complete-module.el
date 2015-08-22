@@ -1,4 +1,4 @@
-;;; haskell-complete-module.el --- A fast way to complete Haskell module names
+;;; haskell-complete-module.el --- A fast way to complete Haskell module names -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2014 Chris Done. All rights reserved.
 

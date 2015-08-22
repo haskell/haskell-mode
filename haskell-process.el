@@ -1,4 +1,4 @@
-;;; haskell-process.el --- Communicating with the inferior Haskell process
+;;; haskell-process.el --- Communicating with the inferior Haskell process -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2011  Chris Done
 

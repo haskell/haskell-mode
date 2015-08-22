@@ -1,4 +1,4 @@
-;;; haskell-cabal.el --- Support for Cabal packages
+;;; haskell-cabal.el --- Support for Cabal packages -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2007, 2008  Stefan Monnier
 

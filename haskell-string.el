@@ -1,4 +1,4 @@
-;;; haskell-string.el --- Haskell related string utilities
+;;; haskell-string.el --- Haskell related string utilities -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013  Herbert Valerio Riedel
 

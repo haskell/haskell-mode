@@ -1,4 +1,4 @@
-;;; haskell-interactive-mode.el --- The interactive Haskell mode
+;;; haskell-interactive-mode.el --- The interactive Haskell mode -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2011-2012  Chris Done
 

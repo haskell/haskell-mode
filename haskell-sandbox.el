@@ -1,4 +1,4 @@
-;;; haskell-sandbox.el --- Support for sandboxes
+;;; haskell-sandbox.el --- Support for sandboxes -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2014 Chris Done. All rights reserved.
 

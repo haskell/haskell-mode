@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;;; w3m-haddock.el --- Make browsing haddocks with w3m-mode better.
 
 ;; Copyright (C) 2014 Chris Done

@@ -1,4 +1,4 @@
-;;; haskell-doc.el --- show function types in echo area  -*- coding: utf-8 -*-
+;;; haskell-doc.el --- show function types in echo area  -*- coding: utf-8; lexical-binding: t -*-
 
 ;; Copyright (C) 2004, 2005, 2006, 2007, 2009  Free Software Foundation, Inc.
 ;; Copyright (C) 1997  Hans-Wolfgang Loidl

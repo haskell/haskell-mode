@@ -1,4 +1,4 @@
-;;; haskell-modules.el ---
+;;; haskell-modules.el --- -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2014 Chris Done. All rights reserved.
 
