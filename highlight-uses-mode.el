@@ -27,7 +27,7 @@
     (define-key map (kbd "RET") 'highlight-uses-mode-stop-here)
     (define-key map (kbd "C-g") 'highlight-uses-mode)
     map)
-  "Keymap for using haskell-interactive-mode.")
+  "Keymap for using `highlight-uses-mode'.")
 
 (defvar highlight-uses-mode-point nil)
 (make-variable-buffer-local 'highlight-uses-mode-point)
