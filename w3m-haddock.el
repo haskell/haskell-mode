@@ -35,7 +35,7 @@
 (defface w3m-haddock-heading-face
   '((((class color)) :inherit highlight))
   "Face for quarantines."
-  :group 'shm)
+  :group 'haskell)
 
 ;;;###autoload
 (defcustom haskell-w3m-haddock-dirs
@@ -49,7 +49,7 @@ You can rebind this if you're using hsenv by adding it to your
     ((haskell-mode . ((haskell-w3m-haddock-dirs . (\"/home/chris/Projects/foobar/.hsenv/cabal/share/doc\")))))
 
 "
-  :group 'shm
+  :group 'haskell
   :type 'list)
 
 (defvar w3m-haddock-entry-regex "^\\(\\(data\\|type\\) \\|[a-z].* :: \\)"
