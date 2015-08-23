@@ -33,7 +33,7 @@
 
 ;;;###autoload
 (defface w3m-haddock-heading-face
-  '((((class color)) :inherit magit-item-highlight))
+  '((((class color)) :inherit highlight))
   "Face for quarantines."
   :group 'shm)
 
