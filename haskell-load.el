@@ -1,4 +1,4 @@
-;;; haskell-load.el --- Compiling and loading modules in the GHCi process
+;;; haskell-load.el --- Compiling and loading modules in the GHCi process -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2014 Chris Done. All rights reserved.
 

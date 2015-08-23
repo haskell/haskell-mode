@@ -1,4 +1,4 @@
-;;; haskell.el --- Top-level Haskell package
+;;; haskell.el --- Top-level Haskell package -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2014 Chris Done. All rights reserved.
 
@@ -70,7 +70,8 @@
 (defun haskell-process-completions-at-point ()
   "A completion-at-point function using the current haskell process."
   (when (haskell-session-maybe)
-    (let ((process (haskell-process)) symbol symbol-bounds)
+    (let ((process (haskell-process))
+	  symbol-bounds)
       (cond
        ;; ghci can complete module names, but it needs the "import "
        ;; string at the beginning
@@ -319,6 +320,8 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
              (when ident
                (haskell-process-do-try-info ident)))))))
 
+(defvar xref-prompt-for-identifier nil)
+
 ;;;###autoload
 (defun haskell-mode-jump-to-tag (&optional next-p)
   "Jump to the tag of the given identifier."
@@ -345,7 +348,7 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
       (basic-save-buffer))))
 
 ;;;###autoload
-(defun haskell-mode-tag-find (&optional next-p)
+(defun haskell-mode-tag-find (&optional _next-p)
   "The tag find function, specific for the particular session."
   (interactive "P")
   (cond

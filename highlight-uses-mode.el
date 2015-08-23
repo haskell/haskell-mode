@@ -1,4 +1,4 @@
-;;; highlight-uses-mode.el --- Mode for highlighting uses
+;;; highlight-uses-mode.el --- Mode for highlighting uses -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2014 Chris Done. All rights reserved.
 

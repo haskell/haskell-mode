@@ -1,4 +1,4 @@
-;;; haskell-mode.el --- A Haskell editing mode    -*- coding: utf-8 -*-
+;;; haskell-mode.el --- A Haskell editing mode    -*- coding: utf-8; lexical-binding: t -*-
 
 ;; Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008  Free Software Foundation, Inc
 ;; Copyright (C) 1992, 1997-1998  Simon Marlow, Graeme E Moss, and Tommy Thorn
@@ -153,12 +153,12 @@ With prefix argument HERE, insert it at point."
   (interactive "P")
   (let* ((haskell-mode-dir (ignore-errors
                              (file-name-directory (or (locate-library "haskell-mode") ""))))
-         (_version (format "haskell-mode version %s (%s)"
+         (version (format "haskell-mode version %s (%s)"
                            haskell-version
                            haskell-mode-dir)))
     (if here
-        (insert _version)
-      (message "%s" _version))))
+        (insert version)
+      (message "%s" version))))
 
 ;;;###autoload
 (defun haskell-mode-view-news ()
@@ -845,15 +845,13 @@ is asked to show extra info for the items matching QUERY.."
            current-prefix-arg)))
   (if (null haskell-hoogle-command)
       (browse-url (format haskell-hoogle-url (url-hexify-string query)))
-    (let ((hoogle-args (append (when info '("-i"))
-                               (list "--color" (shell-quote-argument query)))))
-      (with-help-window "*hoogle*"
-        (with-current-buffer standard-output
-          (insert (shell-command-to-string
-                   (concat haskell-hoogle-command
-                           (if info " -i " "")
-                           " --color " (shell-quote-argument query))))
-          (ansi-color-apply-on-region (point-min) (point-max)))))))
+    (with-help-window "*hoogle*"
+      (with-current-buffer standard-output
+	(insert (shell-command-to-string
+		 (concat haskell-hoogle-command
+			 (if info " -i " "")
+			 " --color " (shell-quote-argument query))))
+	(ansi-color-apply-on-region (point-min) (point-max))))))
 
 ;;;###autoload
 (defalias 'hoogle 'haskell-hoogle)
@@ -873,7 +871,7 @@ is asked to show extra info for the items matching QUERY.."
 
 (defun hoogle-server-live-p ()
   "Whether hoogle server is live or not."
-  (condition-case err
+  (condition-case _err
       (process-live-p (get-buffer-create hoogle-server-buffer-name))
     (error nil)))
 

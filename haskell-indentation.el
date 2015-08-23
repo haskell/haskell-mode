@@ -1,4 +1,4 @@
-;;; haskell-indentation.el --- indentation module for Haskell Mode
+;;; haskell-indentation.el --- indentation module for Haskell Mode -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013  Kristof Bastiaensen, Gergely Risko
 
@@ -203,8 +203,7 @@ NIL otherwise."
 
 (defun haskell-indentation-reindent-to (col &optional move)
   "Reindent current line to COL, move the point there if MOVE is non-NIL."
-  (let* ((cc (current-column))
-         (ci (haskell-indentation-current-indentation)))
+  (let* ((ci (haskell-indentation-current-indentation)))
     (save-excursion
       (move-to-column ci)
       (if (<= ci col)
@@ -259,8 +258,7 @@ negative ARG.  Handles bird style literate Haskell too."
   (newline)
   (unless (haskell-indentation-bird-outside-code-p)
     (catch 'parse-error
-      (let* ((cc (current-column))
-             (ci (haskell-indentation-current-indentation))
+      (let* ((ci (haskell-indentation-current-indentation))
              (indentations (haskell-indentation-find-indentations-safe)))
         (when (haskell-indentation-bird-p)
           (insert "> "))
@@ -349,8 +347,7 @@ indentation points to the right, we switch going to the left."
    ((and (eq last-command 'indent-for-tab-command)
          (memq haskell-indentation-dyn-last-direction '(left right))
          haskell-indentation-dyn-last-indentations)
-    (let* ((cc (current-column))
-           (ci (haskell-indentation-current-indentation)))
+    (let ((ci (haskell-indentation-current-indentation)))
       (if (eq haskell-indentation-dyn-last-direction 'left)
           (haskell-indentation-reindent-to
            (haskell-indentation-previous-indentation

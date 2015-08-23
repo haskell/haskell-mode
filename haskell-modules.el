@@ -1,4 +1,4 @@
-;;; haskell-modules.el ---
+;;; haskell-modules.el --- -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2014 Chris Done. All rights reserved.
 
@@ -48,9 +48,8 @@
               "\n"))))
 
 ;;;###autoload
-(defun haskell-session-installed-modules (session &optional dontcreate)
-  "Get the modules installed in the current package set.
-If DONTCREATE is non-nil don't create a new session."
+(defun haskell-session-installed-modules (_session &optional _dontcreate)
+  "Get the modules installed in the current package set."
   ;; TODO: Again, this makes HEAVY use of unix utilities. It'll work
   ;; fine in Linux, probably okay on OS X, and probably not at all on
   ;; Windows. Again, if someone wants to test on Windows and come up

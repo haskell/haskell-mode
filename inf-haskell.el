@@ -1,4 +1,4 @@
-;;; inf-haskell.el --- Interaction with an inferior Haskell process
+;;; inf-haskell.el --- Interaction with an inferior Haskell process -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009  Free Software Foundation, Inc.
 
@@ -231,7 +231,7 @@ setting up the inferior-haskell buffer."
 (defvar inferior-haskell-seen-prompt nil)
 (make-variable-buffer-local 'inferior-haskell-seen-prompt)
 
-(defun inferior-haskell-spot-prompt (string)
+(defun inferior-haskell-spot-prompt (_string)
   (let ((proc (get-buffer-process (current-buffer))))
     (when proc
       (save-excursion
@@ -786,7 +786,7 @@ we load it."
   (let* (;; Find the module and look it up in the alist
          (module (inferior-haskell-get-module sym))
          (full-name (inferior-haskell-map-internal-ghc-ident (concat module "." sym)))
-         (success (string-match "\\(.*\\)\\.\\(.*\\)" full-name))
+         (_success (string-match "\\(.*\\)\\.\\(.*\\)" full-name))
          (module (match-string 1 full-name))
          (sym (match-string 2 full-name))
          (alist-record (assoc module (inferior-haskell-module-alist)))

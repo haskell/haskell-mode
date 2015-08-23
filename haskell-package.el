@@ -1,4 +1,4 @@
-;;; haskell-package.el --- Interface for working with Cabal packages
+;;; haskell-package.el --- Interface for working with Cabal packages -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2011  Chris Done
 

@@ -1,4 +1,4 @@
-;;; haskell-sort-imports.el --- Sort the list of Haskell imports at the point alphabetically
+;;; haskell-sort-imports.el --- Sort the list of Haskell imports at the point alphabetically -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2010  Chris Done
 

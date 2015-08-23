@@ -1,4 +1,4 @@
-;;; haskell-compile.el --- Haskell/GHC compilation sub-mode
+;;; haskell-compile.el --- Haskell/GHC compilation sub-mode -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013  Herbert Valerio Riedel
 

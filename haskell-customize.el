@@ -1,4 +1,4 @@
-;;; haskell-customize.el --- Customization settings
+;;; haskell-customize.el --- Customization settings -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2014 Chris Done. All rights reserved.
 

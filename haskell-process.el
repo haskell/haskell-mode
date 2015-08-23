@@ -1,4 +1,4 @@
-;;; haskell-process.el --- Communicating with the inferior Haskell process
+;;; haskell-process.el --- Communicating with the inferior Haskell process -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2011  Chris Done
 
@@ -183,7 +183,7 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
                          (process-name proc)))
               haskell-sessions))
 
-(defun haskell-process-collect (session response process)
+(defun haskell-process-collect (_session response process)
   "Collect input for the response until receives a prompt."
   (haskell-process-set-response process
                                 (concat (haskell-process-response process) response))

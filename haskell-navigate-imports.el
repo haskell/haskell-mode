@@ -1,4 +1,4 @@
-;;; haskell-navigate-imports.el --- A function for cycling through Haskell import lists
+;;; haskell-navigate-imports.el --- A function for cycling through Haskell import lists -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2010  Chris Done
 
@@ -98,10 +98,9 @@
                     (haskell-navigate-imports-after-imports-p) ;; This one just speeds it up.
                     (haskell-navigate-imports-line)))
       (forward-line))
-    (let ((point (point)))
-      (if (haskell-navigate-imports-line)
-          (point)
-        nil))))
+    (if (haskell-navigate-imports-line)
+	(point)
+        nil)))
 
 (defun haskell-navigate-imports-line ()
   "Try to match the current line as a regexp."

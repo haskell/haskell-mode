@@ -1,4 +1,4 @@
-;;; haskell-completions.el --- Haskell Completion package
+;;; haskell-completions.el --- Haskell Completion package -*- lexical-binding: t -*-
 
 ;; Copyright © 2015 Athur Fayzrakhmanov. All rights reserved.
 

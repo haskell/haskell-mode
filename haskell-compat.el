@@ -1,4 +1,4 @@
-;;; haskell-compat.el --- legacy/compatibility backports for haskell-mode
+;;; haskell-compat.el --- legacy/compatibility backports for haskell-mode -*- lexical-binding: t -*-
 ;;
 ;; Filename: haskell-compat.el
 ;; Description: legacy/compatibility backports for haskell-mode

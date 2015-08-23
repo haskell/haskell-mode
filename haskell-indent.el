@@ -1,4 +1,4 @@
-;;; haskell-indent.el --- "semi-intelligent" indentation module for Haskell Mode
+;;; haskell-indent.el --- "semi-intelligent" indentation module for Haskell Mode -*- lexical-binding: t -*-
 
 ;; Copyright 2004, 2005, 2007, 2008, 2009  Free Software Foundation, Inc.
 ;; Copyright 1997-1998  Guy Lapalme
@@ -440,7 +440,7 @@ Returns the location of the start of the comment, nil otherwise."
 
 (defun haskell-indent-next-symbol-safe (end)
   "Puts point to the next following symbol, or to end if there are no more symbols in the sexp."
-  (condition-case errlist (haskell-indent-next-symbol end)
+  (condition-case _errlist (haskell-indent-next-symbol end)
     (error (goto-char end))))
 
 (defun haskell-indent-separate-valdef (start end)
@@ -1302,7 +1302,7 @@ We stay in the cycle as long as the TAB key is pressed."
         (if marker
             (goto-char (marker-position marker)))))))
 
-(defun haskell-indent-region (start end)
+(defun haskell-indent-region (_start _end)
   (error "Auto-reindentation of a region is not supported"))
 
 ;;; alignment functions
@@ -1440,7 +1440,7 @@ TYPE is either 'guard or 'rhs."
             (if regstack
                 (haskell-indent-shift-columns maxcol regstack)))))))
 
-(defun haskell-indent-align-guards-and-rhs (start end)
+(defun haskell-indent-align-guards-and-rhs (_start _end)
   "Align the guards and rhs of functions in the region, which must be active."
   ;; The `start' and `end' args are dummys right now: they're just there so
   ;; we can use the "r" interactive spec which properly signals an error.

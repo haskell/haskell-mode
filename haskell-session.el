@@ -1,4 +1,4 @@
-;;; haskell-session.el --- Haskell sessions
+;;; haskell-session.el --- Haskell sessions -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2011-2012  Chris Done
 

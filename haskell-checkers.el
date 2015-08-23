@@ -1,4 +1,4 @@
-;;; haskell-checkers.el --- Emacs interface to haskell lint and style checkers
+;;; haskell-checkers.el --- Emacs interface to haskell lint and style checkers -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2009-2011  Alex Ott, Liam O'Reilly
 ;;
@@ -128,13 +128,13 @@
           (when (re-search-forward new-old-code eline t)
             (replace-match new-code nil t)))))))
 
-(defun haskell-lint-finish-hook (buf msg)
+(defun haskell-lint-finish-hook (_buf _msg)
   "Function, that is executed at the end of HLint or scan execution"
   (if haskell-checkers-replace-with-suggestions
       (haskell-lint-replace-suggestions)
     (next-error 1 t)))
 
-(defun haskell-scan-finish-hook (buf msg)
+(defun haskell-scan-finish-hook (_buf _msg)
   "Function, that is executed at the end of haskell-scan execution"
   (next-error 1 t))
 

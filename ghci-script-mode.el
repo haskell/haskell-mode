@@ -1,4 +1,4 @@
-;;; ghci-script-mode.el --- GHCi scripts major mode
+;;; ghci-script-mode.el --- GHCi scripts major mode -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2014 Chris Done. All rights reserved.
 

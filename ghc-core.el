@@ -1,4 +1,4 @@
-;;; ghc-core.el --- Syntax highlighting module for GHC Core
+;;; ghc-core.el --- Syntax highlighting module for GHC Core -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2010  Johan Tibell
 

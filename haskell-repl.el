@@ -1,4 +1,4 @@
-;;; haskell-repl.el --- REPL evaluation
+;;; haskell-repl.el --- REPL evaluation -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2014 Chris Done. All rights reserved.
 
@@ -62,8 +62,7 @@
 (defun haskell-interactive-mode-run-expr (expr)
   "Run the given expression."
   (let ((session (haskell-interactive-session))
-        (process (haskell-interactive-process))
-        (lines (length (split-string expr "\n"))))
+        (process (haskell-interactive-process)))
     (haskell-process-queue-command
      process
      (make-haskell-command
@@ -99,7 +98,7 @@
          (with-temp-buffer
            (insert (haskell-interactive-mode-cleanup-response
                     (cl-caddr state) response))
-           (haskell-interactive-mode-handle-h (point-min))
+           (haskell-interactive-mode-handle-h)
            (buffer-string))))
     (when haskell-interactive-mode-eval-mode
       (unless (haskell-process-sent-stdin-p (cadr state))

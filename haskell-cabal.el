@@ -1,4 +1,4 @@
-;;; haskell-cabal.el --- Support for Cabal packages
+;;; haskell-cabal.el --- Support for Cabal packages -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2007, 2008  Stefan Monnier
 
@@ -459,8 +459,7 @@ resultung buffer-content"
             (,beg (plist-get ,section :beginning))
             (,end (plist-get  ,section :end))
             (,start-col (plist-get  ,section :data-start-column))
-            (,section-data (buffer-substring ,beg ,end))
-            (section-name (plist-get ,section :name )))
+            (,section-data (buffer-substring ,beg ,end)))
        (save-excursion
          (prog1
              (with-temp-buffer
@@ -534,8 +533,7 @@ resultung buffer-content"
   "Strip indentation from each line, execute FORMS and reinstate indentation
    so that the indentation of the FIRST LINE matches"
   (let ((old-l1-indent (make-symbol "new-l1-indent"))
-        (new-l1-indent (make-symbol "old-l1-indent"))
-        (res nil))
+        (new-l1-indent (make-symbol "old-l1-indent")))
     `(let ( (,old-l1-indent (save-excursion
                               (goto-char (point-min))
                               (current-indentation))))
@@ -672,9 +670,9 @@ resultung buffer-content"
   (let ((downcase-name (downcase name)))
     (haskell-cabal-find-subsection-by
      section
-     '(lambda (subsection)
+     `(lambda (subsection)
         (string= (downcase (haskell-cabal-section-name subsection))
-                 downcase-name)))))
+                 ,downcase-name)))))
 
 (defun haskell-cabal-goto-subsection (name)
   (let ((subsection (haskell-cabal-find-subsection (haskell-cabal-section) name)))
@@ -807,7 +805,6 @@ Source names from main-is and c-sources sections are left untouched
         (if (null candidates)
             (let* ((src-dir (haskell-cabal-join-paths base-dir (or (car src-dirs) "")))
                    (newfile (haskell-cabal-join-paths src-dir filename))
-                   (subdir (file-name-directory newfile))
                    (do-create-p (y-or-n-p (format "Create file %s ?" newfile))))
               (when do-create-p
                 (find-file-other-window newfile )))
