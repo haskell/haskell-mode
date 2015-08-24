@@ -421,9 +421,10 @@ indentation points to the right, we switch going to the left."
   "Makes sure that haskell-indentation-dyn-overlays contains at least N overlays."
   (let* ((clen (length haskell-indentation-dyn-overlays))
          (needed (- n clen)))
-    (dotimes (n needed haskell-indentation-dyn-overlays)
+    (dotimes (_n needed)
       (setq haskell-indentation-dyn-overlays
-            (cons (make-overlay 1 1) haskell-indentation-dyn-overlays)))))
+            (cons (make-overlay 1 1) haskell-indentation-dyn-overlays)))
+    haskell-indentation-dyn-overlays))
 
 (defun haskell-indentation-unshow-overlays ()
   "Unshows all the overlays."
