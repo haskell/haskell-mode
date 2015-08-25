@@ -777,8 +777,8 @@ inferior GHCi process."
   "Set the build TARGET for cabal REPL."
   (interactive
    (list
-     (completing-read "New build target:" (haskell-cabal-enum-targets)
-		      nil nil nil haskell-cabal-targets-history)))
+     (completing-read "New build target: " (haskell-cabal-enum-targets)
+		      nil nil nil 'haskell-cabal-targets-history)))
   (let* ((session haskell-session)
          (old-target (haskell-session-get session 'target)))
     (when session
