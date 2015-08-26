@@ -39,6 +39,7 @@
 (require 'haskell-mode)
 (require 'haskell-process)
 (require 'haskell-interactive-mode)
+(require 'haskell-customize)
 
 (defvar haskell-completions-pragma-names
   (list "DEPRECATED"
@@ -248,10 +249,10 @@ Returns nil if no completions available."
                      ;; for completions list in case of module name or
                      ;; identifier prefixes
                      (haskell-completions-sync-complete-repl pfx imp)))))
-          (when (or (equal '("") lst)
-                    (eql nil lst))
-            ;; complete things using dabbrev
-            (setq lst (haskell-completions-dabbrev-completions pfx)))
+          ;; (when (or (equal '("") lst)
+          ;;           (eql nil lst))
+          ;;   ;; complete things using dabbrev
+          ;;   (setq lst (haskell-completions-dabbrev-completions pfx)))
           (when lst
             (list beg end lst)))))))
 
@@ -264,13 +265,40 @@ function is supposed for internal use."
    (haskell-interactive-process)
    (if import
        (concat "import " prefix)
-     prefix)))
+     prefix)
+   (haskell-completions-get-candidates-limit)))
 
-(defun haskell-completions-dabbrev-completions (prefix)
-  "Return completion list for PREFIX using dabbrev facility.
-This function is supposed for internal use."
-  (dabbrev--reset-global-variables)
-  (dabbrev--find-all-expansions prefix nil))
+;; (defun haskell-completions-dabbrev-completions (prefix)
+;;   "Return completion list for PREFIX using dabbrev facility.
+;; This function is supposed for internal use."
+;;   (let ((limit (haskell-completions-get-candidates-limit)))
+;;     (dabbrev--reset-global-variables)
+;;     (if limit
+;;         (haskell-completions-dabbrev-find-limit-expansions prefix limit)
+;;       (dabbrev--find-all-expansions prefix nil))))
+
+;; (defun haskell-completions-dabbrev-find-limit-expansions (prefix limit)
+;;   "Search list of dabbrev expansions for PREFIX limited by LIMIT."
+;;   ;; The idea stolen from http://emacswiki.org/emacs/ac-dabbrev.el
+;;   (let ((i 0)
+;;         (all-expansions nil)
+;;         expansion)
+;;     (while (and (< i limit)
+;;                 (setq expansion (dabbrev--find-expansion prefix -1 nil)))
+;;       (setq all-expansions (cons expansion all-expansions))
+;;       ;; Note: sometimes dabbrev expansions return such list:
+;;       ;; m ma map mapC ... mapConcat
+;;       ;; this is the best place to introduce workaround for this stuff.
+;;       (setq i (+ i 1)))
+;;     all-expansions))
+
+(defun haskell-completions-get-candidates-limit ()
+  "Return valid completion candidates limit."
+  (if (and haskell-completion-candidates-limit
+           (< haskell-completion-candidates-limit 1))
+      nil
+    haskell-completion-candidates-limit))
+
 
 (provide 'haskell-completions)
 ;;; haskell-completions.el ends here
