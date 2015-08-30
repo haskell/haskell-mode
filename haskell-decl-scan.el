@@ -491,15 +491,24 @@ datatypes) in a Haskell file for the `imenu' package."
                  (name (car name-posns))
                  (posns (cdr name-posns))
                  (start-pos (car posns))
-                 (type (cdr result))
+                 (type (cdr result)))
                  ;; Place `(name . start-pos)' in the correct alist.
-                 (sym (cdr (assq type
-                                 '((variable . index-var-alist)
-                                   (datatype . index-type-alist)
-                                   (class . index-class-alist)
-                                   (import . index-imp-alist)
-                                   (instance . index-inst-alist))))))
-            (set sym (cons (cons name start-pos) (symbol-value sym))))))
+                 (cl-case type
+                   (variable
+                    (setq index-var-alist
+                          (cl-acons name start-pos index-var-alist)))
+                   (datatype
+                    (setq index-type-alist
+                          (cl-acons name start-pos index-type-alist)))
+                   (class
+                    (setq index-class-alist
+                          (cl-acons name start-pos index-class-alist)))
+                   (import
+                    (setq index-imp-alist
+                          (cl-acons name start-pos index-imp-alist)))
+                   (instance
+                    (setq index-inst-alist
+                          (cl-acons name start-pos index-inst-alist)))))))
     ;; Now sort all the lists, label them, and place them in one list.
     (message "Sorting declarations in %s..." bufname)
     (when index-type-alist
