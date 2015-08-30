@@ -248,10 +248,6 @@ Returns nil if no completions available."
                      ;; for completions list in case of module name or
                      ;; identifier prefixes
                      (haskell-completions-sync-complete-repl pfx imp)))))
-          (when (or (equal '("") lst)
-                    (eql nil lst))
-            ;; complete things using dabbrev
-            (setq lst (haskell-completions-dabbrev-completions pfx)))
           (when lst
             (list beg end lst)))))))
 
@@ -265,12 +261,6 @@ function is supposed for internal use."
    (if import
        (concat "import " prefix)
      prefix)))
-
-(defun haskell-completions-dabbrev-completions (prefix)
-  "Return completion list for PREFIX using dabbrev facility.
-This function is supposed for internal use."
-  (dabbrev--reset-global-variables)
-  (dabbrev--find-all-expansions prefix nil))
 
 (provide 'haskell-completions)
 ;;; haskell-completions.el ends here
