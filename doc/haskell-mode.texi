@@ -218,6 +218,15 @@ extensions. This is part of @code{haskell-interactive-mode}.
 @image{anim/company-mode-language-pragma}
 @end ifhtml
 
+If haskell-interactive-mode is enabled and working haskell mode provides
+completions for import statements taking into account currently loaded
+and available packages.
+
+@ifhtml
+@image{anim/company-mode-import-statement}
+@end ifhtml
+
+
 @node Unicode support
 @chapter Unicode support
 
