@@ -70,32 +70,24 @@ Next: <a href="Concept-index.html#Concept-index" accesskey="n" rel="next">Concep
 <a name="index-haskell_002dsession_002dchange_002dtarget"></a>
 <a name="index-haskell_002dinteractive_002dmode_002dhook"></a>
 
-<p>With <code>haskell-session-change-target</code> you can change the section
-(defined in project&rsquo;s <samp>.cabal</samp> file) the interactive REPL session is
-started with.
+<p>With <code>haskell-session-change-target</code> you can change the target for
+REPL session.
 </p>
-<p>After the session is started, you can switch the target for
+
+<p>After REPL session started, in <code>haskell-interactive-mode</code> buffer invoke the
+<code>haskell-session-change-target</code> and select from available targets for
 </p>
 <a name="index-testing"></a>
 <p>- Testing
 </p>
-<p>In <code>haskell-interactive-mode</code> buffer invoke the
-<code>haskell-session-change-target</code> and enter the name of the test you
-wish to perform, i.e. &ldquo;test&rdquo;.
-Answer &ldquo;yes&rdquo; to restart the session.
-</p>
 <a name="index-benchmarking"></a>
 <p>- Benchmark
 </p>
-<p>In <code>haskell-interactive-mode</code> buffer invoke the  <code>haskell-session-change-target</code>
-and enter the name of the benchmark you wish to perform, i.e. &ldquo;bench&rdquo;.
-Answer &ldquo;yes&rdquo; to restart the session.
-</p>
 <p>- Executable
 </p>
-<p>In <code>haskell-interactive-mode</code> buffer invoke the  <code>haskell-session-change-target</code>
-and enter the name of the executable you wish to work with.
-Answer &ldquo;yes&rdquo; to restart the session.
+<p>- Library
+</p>
+<p>Answer &ldquo;yes&rdquo; to restart the session and run your tests, benchmarks, executables.
 </p>
 
 <p>TODO/WRITEME
