@@ -254,12 +254,19 @@ negative ARG.  Handles bird style literate Haskell too."
 (defun haskell-indentation-newline-and-indent ()
   "Insert newline and indent."
   (interactive)
-  (delete-horizontal-space)
-  (newline)
-  (unless (haskell-indentation-bird-outside-code-p)
+  ;; On RET (or C-j), we:
+  ;;   - just jump to the next line if literate haskell, but outside code
+  (if (haskell-indentation-bird-outside-code-p)
+      (progn
+        (delete-horizontal-space)
+        (newline))    
     (catch 'parse-error
+      ;;  - save the current column
       (let* ((ci (haskell-indentation-current-indentation))
              (indentations (haskell-indentation-find-indentations-safe)))
+        ;; - jump to the next line and reindent to at the least same level        
+        (delete-horizontal-space)
+        (newline)
         (when (haskell-indentation-bird-p)
           (insert "> "))
         (haskell-indentation-reindent-to
