@@ -614,32 +614,24 @@ TODO/WRITEME
 @findex haskell-session-change-target
 @vindex haskell-interactive-mode-hook
 
-With @code{haskell-session-change-target} you can change the section
-(defined in project's @file{.cabal} file) the interactive REPL session is
-started with.
+With @code{haskell-session-change-target} you can change the target for
+REPL session.
 
-After the session is started, you can switch the target for
+
+After REPL session started, in @code{haskell-interactive-mode} buffer invoke the
+@code{haskell-session-change-target} and select from available targets for
 
 @cindex testing
 - Testing
 
-In @code{haskell-interactive-mode} buffer invoke the
-@code{haskell-session-change-target} and enter the name of the test you
-wish to perform, i.e. ``test''.
-Answer ``yes'' to restart the session.
-
 @cindex benchmarking
 - Benchmark
 
-In @code{haskell-interactive-mode} buffer invoke the  @code{haskell-session-change-target}
-and enter the name of the benchmark you wish to perform, i.e. ``bench''.
-Answer ``yes'' to restart the session.
-
 - Executable
 
-In @code{haskell-interactive-mode} buffer invoke the  @code{haskell-session-change-target}
-and enter the name of the executable you wish to work with.
-Answer ``yes'' to restart the session.
+- Library
+
+Answer ``yes'' to restart the session and run your tests, benchmarks, executables.
 
 
 TODO/WRITEME

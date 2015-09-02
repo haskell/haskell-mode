@@ -169,6 +169,8 @@ Use to update mtime on BUFFER's file."
 
 (defvar url-http-response-status)
 (defvar url-http-end-of-headers)
+(defvar haskell-cabal-targets-history nil
+  "History list for session targets.")
 
 (defun haskell-process-hayoo-ident (ident)
   ;; FIXME Obsolete doc string, CALLBACK is not used.
@@ -773,7 +775,10 @@ inferior GHCi process."
 ;;;###autoload
 (defun haskell-session-change-target (target)
   "Set the build TARGET for cabal REPL."
-  (interactive "sNew build target:")
+  (interactive
+   (list
+     (completing-read "New build target: " (haskell-cabal-enum-targets)
+		      nil nil nil 'haskell-cabal-targets-history)))
   (let* ((session haskell-session)
          (old-target (haskell-session-get session 'target)))
     (when session
