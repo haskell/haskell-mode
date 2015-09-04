@@ -1016,8 +1016,8 @@ don't care when the thing completes as long as it's soonish."
   "Look for an <interactive> compile error; if there is one, pop
   that up in a buffer, similar to `debug-on-error'."
   (when (and haskell-interactive-types-for-show-ambiguous
-             (string-match "^\n<interactive>:[0-9]+:[0-9]+:" response)
-             (not (string-match "^\n<interactive>:[0-9]+:[0-9]+:[\n ]+Warning:" response)))
+             (string-match "^\n<interactive>:[-0-9]+:[-0-9]+:" response)
+             (not (string-match "^\n<interactive>:[-0-9]+:[-0-9]+:[\n ]+Warning:" response)))
     (let ((inhibit-read-only t))
       (delete-region haskell-interactive-mode-prompt-start (point))
       (set-marker haskell-interactive-mode-prompt-start
