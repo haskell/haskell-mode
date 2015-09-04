@@ -894,11 +894,14 @@ After a lambda (backslash) there are two possible cases:
   "Parse a list, pair or other expression containing multiple
 items parsed by PARSER, separated by SEP or STMT-SEP, and ending
 with END."
-  (let (implicit-layout-active)
-    (haskell-indentation-with-starter
-     (apply-partially #'haskell-indentation-separated
-                      parser sep stmt-sep)
-     end)))
+  ;; note that we use macro expansion here to preserver Emacs 23
+  ;; compatibility and its lack of lexical binding
+  (haskell-indentation-with-starter
+   `(lambda ()
+      (let ((implicit-layout-active nil))
+        (haskell-indentation-separated
+         #',parser ,sep ,stmt-sep)))
+   end))
 
 (defun haskell-indentation-with-starter (parser &optional end where-expr?)
   "Parse an expression starting with a keyword or parenthesis.
