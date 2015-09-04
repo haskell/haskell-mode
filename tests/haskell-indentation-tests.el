@@ -126,7 +126,7 @@ function = do
   ((2 0) 2)
   ((3 0) 0 2 10))
 
-(hindent-test "2u* Handle underscore in identifiers""
+(hindent-test "2u Handle underscore in identifiers""
 function = do
   (_x) ← return ()
  z"
@@ -142,7 +142,7 @@ function = do
   ((2 0) 2)
   ((3 0) 0 2 12))
 
-(hindent-test "2au* Handle apostrophe in identifiers""
+(hindent-test "2au Handle apostrophe in identifiers""
 function = do
   (_'x') ← return ()
  z"
