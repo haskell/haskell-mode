@@ -506,4 +506,16 @@ let foo = Foo {
   ((5 0) 12)
   ((6 0) 12))
 
+(hindent-test "22 should obey layout only outside parentheses" "
+func = 1234
+  where
+    foo :: Ivory eff ()
+    foo = do
+      return ()"
+  ((1 0) 0)
+  ((2 0) 2)
+  ((3 0) 4)
+  ((4 0) 0 4 11)
+  ((5 0) 6))
+
 ;;; haskell-indentation-tests.el ends here
