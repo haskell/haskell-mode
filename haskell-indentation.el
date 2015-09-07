@@ -625,7 +625,8 @@ the current buffer."
           (case-fold-search nil)
           current-token
           following-token
-          possible-indentations)
+          possible-indentations
+          implicit-layout-active)
       (haskell-indentation-goto-least-indentation)
       (if (<= indentation-point (point))
           (haskell-indentation-first-indentation)
