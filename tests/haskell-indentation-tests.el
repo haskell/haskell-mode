@@ -518,4 +518,11 @@ func = 1234
   ((4 0) 0 4 11)
   ((5 0) 6))
 
+(hindent-test "23* should not fail when seeing comments" "
+-- important non-empty line
+{-
+-}"
+  ((3 2) 0))
+
+
 ;;; haskell-indentation-tests.el ends here
