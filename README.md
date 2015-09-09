@@ -17,7 +17,7 @@ To install `haskell-mode` you need to add a package archive repository that dist
 `haskell-mode`. Execute
 
 ```
-M-x customize-option RET package-archives
+M-x customize-variable RET package-archives
 ```
 
 and add
