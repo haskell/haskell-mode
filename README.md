@@ -9,23 +9,31 @@ This is an Emacs mode for editing, debugging and developing Haskell programs.
 [![Melpa Status](http://melpa.org/packages/haskell-mode-badge.svg)](http://melpa.org/#/haskell-mode)
 [![Melpa Stable Status](http://stable.melpa.org/packages/haskell-mode-badge.svg)](http://stable.melpa.org/#/haskell-mode)
 
-## Installation
+## Quick Installation
 
-`haskell-mode` is best installed as a package.
+Make sure you have this in your [init file](http://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html) (usually `~/.emacs`). If you already have `custom-set-variables` or `custom-set-faces`, merge their contents:
 
-To install `haskell-mode` you need to add a package archive repository that distributes
-`haskell-mode`. Execute
+```elisp
+(require 'package)
+(add-hook 'haskell-mode-hook 'haskell-indentation-mode)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-archives
+   (quote
+    (("gnu" . "http://elpa.gnu.org/packages/")
+     ("melpa-stable" . "http://stable.melpa.org/packages/")))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+ ```
 
-```
-M-x customize-option RET package-archives
-```
-
-and add
-
-    Archive name: melpa-stable
-    URL or directory name: http://stable.melpa.org/packages/
-
-Fetch list of packages with
+Then run emacs, and evaluate:
 
     M-x package-refresh-contents
 
@@ -35,14 +43,6 @@ and then follow by
 
 Voila! `haskell-mode` is installed! You should be able to edit Haskell
 source code in color now.
-
-You need to enable indentation as this does not happen automatically
-currently. Add this line to your ~/.emacs file:
-
-```el
-(add-hook 'haskell-mode-hook 'haskell-indentation-mode)
-
-```
 
 `Haskell-mode` has much much much more to offer but the above should get you
 going!
