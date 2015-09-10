@@ -11,7 +11,7 @@ This is an Emacs mode for editing, debugging and developing Haskell programs.
 
 ## Quick Installation
 
-Make sure you have this in your [init file](http://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html) (usually `~/.emacs`). If you already have `custom-set-variables` or `custom-set-faces`, merge their contents:
+Make sure you have this in your [init file](http://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html) (usually `~/.emacs`). If you already have `custom-set-variables`, merge its contents:
 
 ```elisp
 (require 'package)
@@ -25,12 +25,6 @@ Make sure you have this in your [init file](http://www.gnu.org/software/emacs/ma
    (quote
     (("gnu" . "http://elpa.gnu.org/packages/")
      ("melpa-stable" . "http://stable.melpa.org/packages/")))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
  ```
 
 Then run emacs, and evaluate:
