@@ -52,7 +52,21 @@ Used for locating additional package data files.")
 ;;;###autoload
 (defcustom haskell-process-type
   'auto
-  "The inferior Haskell process type to use."
+  "The inferior Haskell process type to use.
+
+When set to 'auto (the default), the directory contents and
+available programs will be used to make a best guess at the
+process type:
+
+If the project directory or one of its parents contains a
+\"cabal.sandbox.config\" file, then cabal-repl will be used.
+
+If there's a \"stack.yaml\" file and the \"stack\" executable can
+be located, then stack-ghci will be used.
+
+Otherwise if there's a *.cabal file, cabal-repl will be used.
+
+If none of the above apply, ghci will be used."
   :type '(choice (const auto) (const ghci) (const cabal-repl) (const stack-ghci))
   :group 'haskell-interactive)
 
