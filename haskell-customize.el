@@ -399,7 +399,7 @@ same vein as `haskell-indent-spaces'."
   (if (eq 'auto haskell-process-type)
       (cond
        ;; User has explicitly initialized this project with cabal
-       ((locate-dominating-file default-directory ".cabal-sandbox")
+       ((locate-dominating-file default-directory "cabal.sandbox.config")
         'cabal-repl)
        ((and (locate-dominating-file default-directory "stack.yaml")
              (executable-find "stack"))
