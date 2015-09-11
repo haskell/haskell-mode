@@ -398,7 +398,8 @@ same vein as `haskell-indent-spaces'."
   "Return `haskell-process-type', or a guess if that variable is 'auto."
   (if (eq 'auto haskell-process-type)
       (cond
-       ((locate-dominating-file default-directory "stack.yaml")
+       ((and (locate-dominating-file default-directory "stack.yaml")
+             (executable-find "stack"))
         'stack-ghci)
        ((locate-dominating-file
          default-directory
