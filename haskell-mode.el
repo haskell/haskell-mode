@@ -870,8 +870,7 @@ is asked to show extra info for the items matching QUERY.."
             (start-process
                hoogle-server-process-name
                (get-buffer-create hoogle-server-buffer-name)
-               "/bin/sh" "-c"
-               (format "hoogle server -p %i" hoogle-port-number))))
+               "hoogle" "server" "-p" (number-to-string hoogle-port-number))))
     (error "hoogle executable not found")))
 
 (defun hoogle-server-live-p ()
