@@ -397,13 +397,16 @@ same vein as `haskell-indent-spaces'."
 (defun haskell-process-type ()
   "Return `haskell-process-type', or a guess if that variable is 'auto."
   (if (eq 'auto haskell-process-type)
-      (if (locate-dominating-file
-           default-directory
-           (lambda (d)
-             (or (file-directory-p (expand-file-name ".cabal-sandbox" d))
-                 (cl-find-if (lambda (f) (string-match-p ".\\.cabal\\'" f)) (directory-files d)))))
-          'cabal-repl
-        'ghci)
+      (cond
+       ((locate-dominating-file default-directory "stack.yaml")
+        'stack-ghci)
+       ((locate-dominating-file
+         default-directory
+         (lambda (d)
+           (or (file-directory-p (expand-file-name ".cabal-sandbox" d))
+               (cl-find-if (lambda (f) (string-match-p ".\\.cabal\\'" f)) (directory-files d)))))
+        'cabal-repl)
+       (t 'ghci))
     haskell-process-type))
 
 (provide 'haskell-customize)
