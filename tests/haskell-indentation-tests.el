@@ -524,15 +524,37 @@ func = 1234
 -}"
   ((3 2) 0))
 
-(hindent-test "24* should parse inline type signatures properly" "
+(hindent-test "24 should parse inline type signatures properly" "
 foo = do
   _ :: String <- undefined
   _ :: String <- undefined
   return ()"
               ((1 0) 0)
               ((2 0) 2)
-              ((3 0) 2 17)
-              ((4 0) 2 17))
+              ((3 0) 0 2 17)
+              ((4 0) 0 2 17))
+
+(hindent-test "25a* support scoped type declarations" "
+foo = do
+  bar :: String
+      -> String
+    <- undefined"
+              ((1 0) 0)
+              ((2 0) 2)
+              ((3 0) 6 9)
+              ;; here it brakes, it would like to put '<-' on same line with 'bar'
+              ;; the culprit is the 'do' keyword
+              ((4 0) 4))
+
+(hindent-test "25b support scoped type declarations" "
+foo = let
+  bar :: String
+      -> String
+    = undefined"
+              ((1 0) 0)
+              ((2 0) 2)
+              ((3 0) 6 9)
+              ((4 0) 4))
 
 
 ;;; haskell-indentation-tests.el ends here
