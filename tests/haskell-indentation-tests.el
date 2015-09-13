@@ -524,5 +524,15 @@ func = 1234
 -}"
   ((3 2) 0))
 
+(hindent-test "24* should parse inline type signatures properly" "
+foo = do
+  _ :: String <- undefined
+  _ :: String <- undefined
+  return ()"
+              ((1 0) 0)
+              ((2 0) 2)
+              ((3 0) 2 17)
+              ((4 0) 2 17))
+
 
 ;;; haskell-indentation-tests.el ends here
