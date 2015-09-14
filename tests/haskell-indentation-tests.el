@@ -254,7 +254,7 @@ fun = do { putStrLn \"X\";
          }"
   ((1 0) 0)
   ((2 0) 9 11)
-  ((3 0) 0 6))
+  ((3 0) 0))
 
 (hindent-test "13* Don't indent after deriving""
 data X = X

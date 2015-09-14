@@ -1041,7 +1041,7 @@ parser.  If parsing ends here, set indentation to left-indent."
                 (haskell-indentation-add-layout-indent)
                 (throw 'parse-end nil))
               ;; after an 'open' expression such as 'if', exit
-              (unless (member (car parser) '("(" "[" "{" "do" "case"))
+              (unless (member (car parser) '("(" "[" "{" "case"))
                 (throw 'return nil)))))))))
 
 (defun haskell-indentation-test-indentations ()
