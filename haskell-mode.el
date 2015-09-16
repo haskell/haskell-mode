@@ -824,7 +824,7 @@ If nil, use the Hoogle web-site."
   :group 'haskell
   :type '(choice
           (const :tag "haskell-org" "http://haskell.org/hoogle/?q=%s")
-          (const :tag "fp-complete" "https://www.fpcomplete.com/hoogle?q=%s")
+          (const :tag "fp-complete" "https://www.stackage.org/lts/hoogle?q=%s")
           string))
 
 ;;;###autoload
