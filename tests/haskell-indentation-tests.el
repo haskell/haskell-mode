@@ -556,5 +556,11 @@ foo = let
               ((3 0) 6 9)
               ((4 0) 4))
 
+(hindent-test "27* expecting then (GH-884)" "
+foo = do
+    if True
+    then return ()
+"
+              ((4 0) 4))
 
 ;;; haskell-indentation-tests.el ends here
