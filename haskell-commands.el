@@ -145,29 +145,17 @@ If I break, you can:
 Restores -fobject-code after reload finished.
 MODULE-BUFFER is the actual Emacs buffer of the module being loaded."
   (haskell-process-queue-without-filters process ":set -fbyte-code")
-  (haskell-process-touch-buffer process module-buffer)
-  (haskell-process-queue-without-filters process ":reload")
-  (haskell-process-queue-without-filters process ":set -fobject-code"))
-
-;;;###autoload
-(defun haskell-process-touch-buffer (process buffer)
-  "Query PROCESS to `:!touch` BUFFER's file.
-Use to update mtime on BUFFER's file."
-  (interactive)
-  (haskell-process-queue-command
+  ;; We prefix the module's filename with a "*", which asks ghci to
+  ;; ignore any existing object file and interpret the module.
+  ;; Dependencies will still use their object files as usual.
+  (haskell-process-queue-without-filters
    process
-   (make-haskell-command
-    :state (cons process buffer)
-    :go (lambda (state)
-          (haskell-process-send-string
-           (car state)
-           (format ":!%s %s"
-                   "touch"
-                   (shell-quote-argument (buffer-file-name
-                                          (cdr state))))))
-    :complete (lambda (state _)
-                (with-current-buffer (cdr state)
-                  (clear-visited-file-modtime))))))
+   (format ":load \"*%s\""
+           (replace-regexp-in-string
+            "\""
+            "\\\\\""
+            (buffer-file-name module-buffer))))
+  (haskell-process-queue-without-filters process ":set -fobject-code"))
 
 (defvar url-http-response-status)
 (defvar url-http-end-of-headers)
