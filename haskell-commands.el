@@ -87,9 +87,11 @@ You can create new session using function `haskell-session-make'."
     :state process
 
     :go (lambda (process)
-          (haskell-process-send-string process ":set prompt \"\\4\"")
+          ;; We must set the prompt last, so that this command as a
+          ;; whole produces only one prompt marker as a response.
           (haskell-process-send-string process "Prelude.putStrLn \"\"")
-          (haskell-process-send-string process ":set -v1"))
+          (haskell-process-send-string process ":set -v1")
+          (haskell-process-send-string process ":set prompt \"\\4\""))
 
     :live (lambda (process buffer)
             (when (haskell-process-consume
