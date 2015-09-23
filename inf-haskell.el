@@ -402,6 +402,36 @@ If prefix arg \\[universal-argument] is given, just reload the previous file."
     (setq inferior-haskell-seen-prompt nil)
     (comint-send-string proc str)))
 
+(defun inferior-haskell-send-region ()
+  "Send an arbitrary region to an existing inferior haskell."
+  (interactive "*")
+  (save-excursion
+    (let ((haskell-proc (inferior-haskell-process))
+          (region-string (buffer-substring (region-beginning) (region-end))))
+      (inferior-haskell-send-command haskell-proc region-string))))
+
+(defun inferior-haskell-send-paragraph ()
+  "Send the current paragraph to a running inferior haskell."
+  (interactive "*")
+  (save-excursion
+    (let ((haskell-proc (inferior-haskell-process)))
+      (forward-paragraph)
+      (setq region-end (point))
+      (backward-paragraph)
+      (setq region-start (point))
+      (setq region-string (buffer-substring region-start region-end))
+      (inferior-haskell-send-command haskell-proc region-string))))
+
+(defun inferior-haskell-send-line ()
+  "Send the current line to a running haskell process."
+  (interactive "*")
+  (save-excursion
+    (let ((haskell-proc (inferior-haskell-process)))
+      (end-of-line)
+      (set-mark (line-beginning-position))
+      (setq region-string (buffer-substring (region-beginning) (region-end)))
+      (inferior-haskell-send-command haskell-proc region-string))))
+
 (defun inferior-haskell-reload-file ()
   "Tell the inferior haskell process to reread the current buffer's file."
   (interactive)
