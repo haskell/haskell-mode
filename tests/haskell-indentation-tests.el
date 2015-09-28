@@ -556,6 +556,13 @@ foo = let
               ((3 0) 6 9)
               ((4 0) 4))
 
+(hindent-test "26* should parse unindented where-clause properly" "
+foo = do
+    return ()
+  where
+    bar = undefined"
+              ((4 0) 4))
+              
 (hindent-test "27* expecting then (GH-884)" "
 foo = do
     if True
