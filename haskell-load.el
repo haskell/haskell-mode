@@ -345,6 +345,12 @@ correspondingly-named overlay properties of OVL."
 	(t
 	 (message "No further notes from Haskell compiler."))))
 
+(defun haskell-goto-first-error ()
+  (interactive)
+  (haskell-goto-error-overlay
+   (first-overlay-in-if 'haskell-check-overlay-p
+			(buffer-end 0) (buffer-end 1))))
+
 (defun haskell-goto-prev-error ()
   (interactive)
   (haskell-goto-error-overlay
