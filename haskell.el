@@ -54,6 +54,7 @@
     (define-key map [?\C-c ?\C-z] 'haskell-interactive-switch)
     (define-key map (kbd "M-n") 'haskell-goto-next-error)
     (define-key map (kbd "M-p") 'haskell-goto-prev-error)
+    (define-key map (kbd "C-c M-p") 'haskell-goto-first-error)
     map)
   "Keymap for using haskell-interactive-mode.")
 
