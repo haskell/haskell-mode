@@ -987,7 +987,10 @@ parser.  If parsing ends here, set indentation to left-indent."
     (haskell-indentation-add-indentation current-indent)
     (throw 'parse-end nil))
   (let ((current-indent (current-column)))
-    (funcall parser)))
+    (funcall parser)
+    (when (equal current-token "where")
+      (haskell-indentation-with-starter
+       #'haskell-indentation-expression-layout nil))))
 
 (defun haskell-indentation-guard ()
   "Parse \"guard\" statement."
