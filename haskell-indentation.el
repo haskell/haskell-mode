@@ -1352,7 +1352,8 @@ line."
 (defun haskell-indentation-skip-token ()
   "Skip to the next token."
   (let ((case-fold-search nil))
-    (if (or (looking-at "'\\([^\\']\\|\\\\.\\)*'")
+    (if (or (looking-at "'\\([^\\']\\|\\\\.\\)'")
+            (looking-at "'\\\\\\([^\\']\\|\\\\.\\)*'")
             (looking-at "\"\\([^\\\"]\\|\\\\.\\)*\"")
             ;; Hierarchical names always start with uppercase
             (looking-at
