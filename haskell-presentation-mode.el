@@ -92,11 +92,11 @@ buffer before presenting message."
         (let ((buffer-read-only nil))
           (goto-char (point-min))
           (forward-line 2)
-          (insert code "\n\n")))
+          (insert code "\n\n"))))
 
-      (if (eq major-mode 'haskell-presentation-mode)
-          (switch-to-buffer buffer)
-        (pop-to-buffer buffer)))))
+    (if (eq major-mode 'haskell-presentation-mode)
+        (switch-to-buffer buffer)
+      (pop-to-buffer buffer))))
 
 (provide 'haskell-presentation-mode)
 
