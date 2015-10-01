@@ -570,4 +570,24 @@ foo = do
 "
               ((4 0) 4))
 
+(hindent-test "28a names starting with quotes" "
+f = a (a 'A)
+    (a 'A)
+"
+              ((2 0) 0 4))
+
+(hindent-test "28b character literal (escape sequence)" "
+f = '\\\\'
+
+"
+              ((2 0) 0 4))
+
+
+(hindent-test "28c name starting with a quote" "
+function (Operation 'Init) = do
+  print 'Init
+"
+              ((2 0) 2))
+
+
 ;;; haskell-indentation-tests.el ends here
