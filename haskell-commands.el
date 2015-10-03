@@ -697,8 +697,7 @@ function `xref-find-definitions' after new table was generated."
               (haskell-session-send-string
                (car state)
                (format ":!cd %s && %s | %s"
-                       (haskell-session-cabal-dir
-                        (haskell-session-session (car state)))
+                       (haskell-session-cabal-dir (car state))
                        "find . -type f \\( -name '*.hs' -or -name '*.lhs' -or -name '*.hsc' \\) -not \\( -name '#*' -or -name '.*' \\) -print0"
                        "xargs -0 hasktags -e -x"))))
       :complete (lambda (state _response)
