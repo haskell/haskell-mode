@@ -1358,6 +1358,8 @@ line."
     (if (or (looking-at "'\\([^\\']\\|\\\\.\\)'")
             (looking-at "'\\\\\\([^\\']\\|\\\\.\\)*'")
             (looking-at "\"\\([^\\\"]\\|\\\\.\\)*\"")
+            ;; QuasiQuotes, with help of propertize buffer and string delimeters
+            (looking-at "\\s\"\\S\"*\\s\"")
             ;; Hierarchical names always start with uppercase
             (looking-at
              "[[:upper:]]\\(\\s_\\|\\sw\\|'\\)*\\(\\.\\(\\s_\\|\\sw\\|'\\)+\\)*")
