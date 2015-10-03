@@ -25,6 +25,7 @@
 (require 'cl-lib)
 (require 'ert)
 (require 'haskell-mode)
+(require 'haskell-font-lock)
 (require 'haskell-indentation)
 
 ;;; Code:
@@ -70,6 +71,7 @@ because it helps increase coverage."
         (haskell-indentation-mode 1)
         (insert source)
         (newline)
+        (font-lock-fontify-buffer)
         (goto-char (point-min))
         (forward-line (1- line))
         (move-to-column column)
