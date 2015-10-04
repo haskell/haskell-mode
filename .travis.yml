@@ -40,6 +40,7 @@ script:
 
 notifications:
   email: false
+  irc: "irc.freenode.org#haskell-emacs"
 
 # Local Variables:
 # indent-tabs-mode: nil
