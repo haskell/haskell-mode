@@ -1,6 +1,4 @@
-![Haskell Mode Logo](images/haskell-mode-128x128.png)
-
-Haskell Mode for Emacs
+<img src="https://rawgithub.com/haskell/haskell-mode/master/images/haskell-mode.svg" width="35" height="35" /> Haskell Mode for Emacs
 ======================
 
 This is an Emacs mode for editing, debugging and developing Haskell programs.
