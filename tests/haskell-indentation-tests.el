@@ -604,24 +604,24 @@ test = [randomQQ| This is
 
 "
               ((4 0) 0 7))
-(hindent-test "30 parse '[] identifier correctly" "
+(hindent-test "30* parse '[] identifier correctly" "
 instance Callable '[]
 "
 	      ((1 0) 2))
-(hindent-test "31 allow type class declaration without methods" "
+(hindent-test "31* allow type class declaration without methods" "
 class Foo a where
 instance Bar Int
 "
 	      ((2 0) 0))
-(hindent-test "32 allow type operators" "
+(hindent-test "32* allow type operators" "
 data (:.) a b = a :. b
 "
-	      ((2 0) 16))
-(hindent-test "33 parse #else in CPP" "
+	      ((2 0) 0 16))
+(hindent-test "33* parse #else in CPP" "
 #ifdef FLAG
 foo = ()
 #else
 "
-	      ((4 0) 4))
+	      ((4 0) 0))
 
 ;;; haskell-indentation-tests.el ends here
