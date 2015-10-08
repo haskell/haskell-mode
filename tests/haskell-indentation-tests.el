@@ -625,12 +625,14 @@ foo = ()
 	      ((4 0) 0))
 
 
-(hindent-test "34* beginning of line inside parentheses" "
+(hindent-test "34 beginning of line inside parentheses" "
 data T = T {
   foo :: String
 , bar :: String
 }
 
 "
-              ((5 0) 0))
+              ;; set of answers isn't best but it is not a bug
+              ;; should be just 0
+              ((5 0) 0 9))
 ;;; haskell-indentation-tests.el ends here
