@@ -31,13 +31,13 @@
 (require 'haskell-customize)
 (require 'haskell-string)
 
-(defconst haskell-process-prompt-regex "\4"
+(defconst haskell-session-prompt-regex "\4"
   "Used for delimiting command replies. 4 is End of Transmission.")
 
 (defvar haskell-reload-p nil
-  "Used internally for `haskell-process-loadish'.")
+  "Used internally for `haskell-session-loadish'.")
 
-(defconst haskell-process-greetings
+(defconst haskell-session-greetings
   (list "Hello, Haskell!"
         "The lambdas must flow."
         "Hours of hacking await!"
@@ -45,7 +45,7 @@
         "Your wish is my IO ().")
   "Greetings for when the Haskell process starts up.")
 
-(defconst haskell-process-logo
+(defconst haskell-session-logo
   (expand-file-name "logo.svg" haskell-mode-pkg-base-dir)
   "Haskell logo for notifications.")
 
@@ -72,88 +72,83 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Building the process
 
-(defun haskell-process-compute-process-log-and-command (session hptype)
+(defun haskell-session-compute-process-log-and-command (session hptype)
   "Compute the log and process to start command for the SESSION from the HPTYPE.
 Do not actually start any process.
-HPTYPE is the result of calling `'haskell-process-type`' function."
+HPTYPE is the result of calling `'haskell-session-type`' function."
   (let ((session-name (haskell-session-name session)))
     (cl-ecase hptype
       ('ghci
        (append (list (format "Starting inferior GHCi process %s ..."
-                             haskell-process-path-ghci)
+                             haskell-session-path-ghci)
                      session-name
                      nil)
-               (apply haskell-process-wrapper-function
+               (apply haskell-session-wrapper-function
                       (list
-                       (cons haskell-process-path-ghci haskell-process-args-ghci)))))
+                       (cons haskell-session-path-ghci haskell-session-args-ghci)))))
       ('cabal-repl
        (append (list (format "Starting inferior `cabal repl' process using %s ..."
-                             haskell-process-path-cabal)
+                             haskell-session-path-cabal)
                      session-name
                      nil)
-               (apply haskell-process-wrapper-function
+               (apply haskell-session-wrapper-function
                       (list
                        (append
-                        (list haskell-process-path-cabal "repl")
-                        haskell-process-args-cabal-repl
+                        (list haskell-session-path-cabal "repl")
+                        haskell-session-args-cabal-repl
                         (let ((target (haskell-session-target session)))
                           (if target (list target) nil)))))))
       ('stack-ghci
-       (append (list (format "Starting inferior stack GHCi process using %s" haskell-process-path-stack)
+       (append (list (format "Starting inferior stack GHCi process using %s" haskell-session-path-stack)
                      session-name
                      nil)
-               (apply haskell-process-wrapper-function
+               (apply haskell-session-wrapper-function
                       (list
                        (append
-                        (list haskell-process-path-stack "ghci")
+                        (list haskell-session-path-stack "ghci")
                         (let ((target (haskell-session-target session)))
                           (if target (list target) nil))
-                        haskell-process-args-stack-ghci))))))))
-
-(defun haskell-process-make (name)
-  "Make an inferior Haskell process."
-  (list (cons 'name name)))
+                        haskell-session-args-stack-ghci))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Process communication
 
-(defun haskell-process-sentinel (proc event)
+(defun haskell-session-sentinel (proc event)
   "The sentinel for the process pipe."
-  (let ((session (haskell-process-project-by-proc proc)))
+  (let ((session (haskell-session-project-by-proc proc)))
     (when session
-      (let* ((process (haskell-session-process session)))
-        (unless (haskell-process-restarting process)
-          (haskell-process-log
-           (propertize (format "Event: %S\n" event)
-                       'face '((:weight bold))))
-          (haskell-process-log
-           (propertize "Process reset.\n"
-                       'face font-lock-comment-face))
-          (run-hook-with-args 'haskell-process-ended-hook process))))))
+      (unless (haskell-session-restarting session)
+	(haskell-session-log
+	 (propertize (format "Event: %S\n" event)
+		     'face '((:weight bold))))
+	(haskell-session-log
+	 (propertize "Process reset.\n"
+		     'face font-lock-comment-face))
+	(run-hook-with-args 'haskell-session-ended-hook session)))))
 
-(defun haskell-process-filter (proc response)
+(defun haskell-session-filter (proc response)
   "The filter for the process pipe."
   (let ((i 0))
     (cl-loop for line in (split-string response "\n")
-             do (haskell-process-log
+             do (haskell-session-log
                  (concat (if (= i 0)
                              (propertize "<- " 'face font-lock-comment-face)
                            "   ")
                          (propertize line 'face 'haskell-interactive-face-compile-warning)))
              do (setq i (1+ i))))
-  (let ((session (haskell-process-project-by-proc proc)))
+  (let ((session (haskell-session-project-by-proc proc)))
     (when session
-      (if (haskell-process-cmd (haskell-session-process session))
-          (haskell-process-collect session
+      (if (haskell-session-cmd session)
+          (haskell-session-collect session
                                    response
-                                   (haskell-session-process session))
-        (haskell-process-log
+                                   session)
+        (haskell-session-log
          (replace-regexp-in-string "\4" "" response))))))
 
-(defun haskell-process-log (msg)
+(defun haskell-session-log (msg)
   "Effective append MSG to the process log (if enabled)."
-  (when haskell-process-log
-    (let* ((append-to (get-buffer-create "*haskell-process-log*"))
+  (when haskell-session-log
+    (let* ((append-to (get-buffer-create "*haskell-session-log*"))
            (windows (get-buffer-window-list append-to t t))
            move-point-in-windows)
       (with-current-buffer append-to
@@ -176,117 +171,117 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
           (set-window-point window (point-max)))
         (setq buffer-read-only t)))))
 
-(defun haskell-process-project-by-proc (proc)
+(defun haskell-session-project-by-proc (proc)
   "Find project by process."
   (cl-find-if (lambda (project)
                 (string= (haskell-session-name project)
                          (process-name proc)))
               haskell-sessions))
 
-(defun haskell-process-collect (_session response process)
+(defun haskell-session-collect (_session response process)
   "Collect input for the response until receives a prompt."
-  (haskell-process-set-response process
-                                (concat (haskell-process-response process) response))
-  (while (haskell-process-live-updates process))
-  (when (string-match haskell-process-prompt-regex
-                      (haskell-process-response process))
+  (haskell-session-set-response process
+                                (concat (haskell-session-response process) response))
+  (while (haskell-session-live-updates process))
+  (when (string-match haskell-session-prompt-regex
+                      (haskell-session-response process))
     (haskell-command-exec-complete
-     (haskell-process-cmd process)
+     (haskell-session-cmd process)
      (replace-regexp-in-string
-      haskell-process-prompt-regex
+      haskell-session-prompt-regex
       ""
-      (haskell-process-response process)))
-    (haskell-process-reset process)
-    (haskell-process-trigger-queue process)))
+      (haskell-session-response process)))
+    (haskell-session-reset process)
+    (haskell-session-trigger-queue process)))
 
-(defun haskell-process-reset (process)
+(defun haskell-session-reset (process)
   "Reset the process's state, ready for the next send/reply."
-  (progn (haskell-process-set-response-cursor process 0)
-         (haskell-process-set-response process "")
-         (haskell-process-set-cmd process nil)))
+  (progn (haskell-session-set-response-cursor process 0)
+         (haskell-session-set-response process "")
+         (haskell-session-set-cmd process nil)))
 
-(defun haskell-process-consume (process regex)
+(defun haskell-session-consume (process regex)
   "Consume a regex from the response and move the cursor along if succeed."
   (when (string-match regex
-                      (haskell-process-response process)
-                      (haskell-process-response-cursor process))
-    (haskell-process-set-response-cursor process (match-end 0))
+                      (haskell-session-response process)
+                      (haskell-session-response-cursor process))
+    (haskell-session-set-response-cursor process (match-end 0))
     t))
 
-(defun haskell-process-send-string (process string)
+(defun haskell-session-send-string (process string)
   "Try to send a string to the process's process. Ask to restart if it's not running."
-  (let ((child (haskell-process-process process)))
+  (let ((child (haskell-session-process process)))
     (if (equal 'run (process-status child))
         (let ((out (concat string "\n")))
-          (haskell-process-log
+          (haskell-session-log
            (propertize (concat (propertize "-> " 'face font-lock-comment-face)
                                (propertize string 'face font-lock-string-face))
                        'face '((:weight bold))))
           (process-send-string child out))
-      (unless (haskell-process-restarting process)
-        (run-hook-with-args 'haskell-process-ended process)))))
+      (unless (haskell-session-restarting process)
+        (run-hook-with-args 'haskell-session-ended process)))))
 
-(defun haskell-process-live-updates (process)
+(defun haskell-session-live-updates (process)
   "Process live updates."
-  (haskell-command-exec-live (haskell-process-cmd process)
-                             (haskell-process-response process)))
+  (haskell-command-exec-live (haskell-session-cmd process)
+                             (haskell-session-response process)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Making commands
 
-(defun haskell-process-queue-without-filters (process line)
+(defun haskell-session-queue-without-filters (process line)
   "Queue LINE to be sent to PROCESS without bothering to look at
 the response."
-  (haskell-process-queue-command
+  (haskell-session-queue-command
    process
    (make-haskell-command
     :state (cons process line)
     :go (lambda (state)
-          (haskell-process-send-string (car state)
+          (haskell-session-send-string (car state)
                                        (cdr state))))))
 
 
-(defun haskell-process-queue-command (process command)
+(defun haskell-session-queue-command (process command)
   "Add a command to the process command queue."
-  (haskell-process-cmd-queue-add process command)
-  (haskell-process-trigger-queue process))
+  (haskell-session-cmd-queue-add process command)
+  (haskell-session-trigger-queue process))
 
-(defun haskell-process-trigger-queue (process)
+(defun haskell-session-trigger-queue (process)
   "Trigger the next command in the queue to be ran if there is no current command."
-  (if (and (haskell-process-process process)
-           (process-live-p (haskell-process-process process)))
-      (unless (haskell-process-cmd process)
-        (let ((cmd (haskell-process-cmd-queue-pop process)))
+  (if (and (haskell-session-process process)
+           (process-live-p (haskell-session-process process)))
+      (unless (haskell-session-cmd process)
+        (let ((cmd (haskell-session-cmd-queue-pop process)))
           (when cmd
-            (haskell-process-set-cmd process cmd)
+            (haskell-session-set-cmd process cmd)
             (haskell-command-exec-go cmd))))
-    (progn (haskell-process-reset process)
-           (haskell-process-set process 'command-queue nil)
-           (run-hook-with-args 'haskell-process-ended process))))
+    (progn (haskell-session-reset process)
+           (haskell-session-set process 'command-queue nil)
+           (run-hook-with-args 'haskell-session-ended process))))
 
-(defun haskell-process-queue-flushed-p (process)
+(defun haskell-session-queue-flushed-p (process)
   "Return t if command queue has been completely processed."
-  (not (or (haskell-process-cmd-queue process)
-           (haskell-process-cmd process))))
+  (not (or (haskell-session-cmd-queue process)
+           (haskell-session-cmd process))))
 
-(defun haskell-process-queue-flush (process)
+(defun haskell-session-queue-flush (process)
   "Block till PROCESS' command queue has been completely processed.
 This uses `accept-process-output' internally."
-  (while (not (haskell-process-queue-flushed-p process))
-    (haskell-process-trigger-queue process)
-    (accept-process-output (haskell-process-process process) 1)))
+  (while (not (haskell-session-queue-flushed-p process))
+    (haskell-session-trigger-queue process)
+    (accept-process-output (haskell-session-process process) 1)))
 
-(defun haskell-process-queue-sync-request (process reqstr)
+(defun haskell-session-queue-sync-request (process reqstr)
   "Queue submitting REQSTR to PROCESS and return response blockingly."
   (let ((cmd (make-haskell-command
               :state (cons nil process)
-              :go `(lambda (s) (haskell-process-send-string (cdr s) ,reqstr))
+              :go `(lambda (s) (haskell-session-send-string (cdr s) ,reqstr))
               :complete 'setcar)))
-    (haskell-process-queue-command process cmd)
-    (haskell-process-queue-flush process)
+    (haskell-session-queue-command process cmd)
+    (haskell-session-queue-flush process)
     (car-safe (haskell-command-state cmd))))
 
-(defun haskell-process-get-repl-completions (process inputstr &optional limit)
+(defun haskell-session-get-repl-completions (process inputstr &optional limit)
   "Perform `:complete repl ...' query for INPUTSTR using PROCESS.
 Give optional LIMIT arg to limit completion candidates count,
 zero, negative values, and nil means all possible completions.
@@ -297,7 +292,7 @@ Returns NIL when no completions found."
          (reqstr (concat ":complete repl"
                          mlimit
                          (haskell-string-literal-encode inputstr)))
-         (rawstr (haskell-process-queue-sync-request process reqstr)))
+         (rawstr (haskell-session-queue-sync-request process reqstr)))
     ;; TODO use haskell-utils-parse-repl-response
     (if (string-prefix-p "unknown command " rawstr)
         (error "GHCi lacks `:complete' support (try installing 7.8 or ghci-ng)")
@@ -312,132 +307,100 @@ Returns NIL when no completions found."
             (error "Lengths inconsistent in `:complete' reponse"))
           (cons h1 cs))))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Accessing the process
+;; Wrappers using haskell-session-{get,set}
 
-(defun haskell-process-get (process key)
-  "Get the PROCESS's KEY value.
-Returns nil if KEY not set."
-  (cdr (assq key process)))
-
-(defun haskell-process-set (process key value)
-  "Set the PROCESS's KEY to VALUE.
-Returns newly set VALUE."
-  (if process
-      (let ((cell (assq key process)))
-        (if cell
-            (setcdr cell value)         ; modify cell in-place
-          (setcdr process (cons (cons key value) (cdr process))) ; new cell
-          value))
-    (display-warning 'haskell-interactive
-                     "`haskell-process-set' called with nil process")))
-
-;; Wrappers using haskell-process-{get,set}
-
-(defun haskell-process-set-sent-stdin (p v)
+(defun haskell-session-set-sent-stdin (p v)
   "We've sent stdin, so let's not clear the output at the end."
-  (haskell-process-set p 'sent-stdin v))
+  (haskell-session-set p 'sent-stdin v))
 
-(defun haskell-process-sent-stdin-p (p)
+(defun haskell-session-sent-stdin-p (p)
   "Did we send any stdin to the process during evaluation?"
-  (haskell-process-get p 'sent-stdin))
+  (haskell-session-get p 'sent-stdin))
 
-(defun haskell-process-set-suggested-imports (p v)
+(defun haskell-session-set-suggested-imports (p v)
   "Remember what imports have been suggested, to avoid
 re-asking about the same imports."
-  (haskell-process-set p 'suggested-imported v))
+  (haskell-session-set p 'suggested-imported v))
 
-(defun haskell-process-suggested-imports (p)
+(defun haskell-session-suggested-imports (p)
   "Get what modules have already been suggested and accepted."
-  (haskell-process-get p 'suggested-imported))
+  (haskell-session-get p 'suggested-imported))
 
-(defun haskell-process-set-evaluating (p v)
+(defun haskell-session-set-evaluating (p v)
   "Set status of evaluating to be on/off."
-  (haskell-process-set p 'evaluating v))
+  (haskell-session-set p 'evaluating v))
 
-(defun haskell-process-evaluating-p (p)
+(defun haskell-session-evaluating-p (p)
   "Set status of evaluating to be on/off."
-  (haskell-process-get p 'evaluating))
+  (haskell-session-get p 'evaluating))
 
-(defun haskell-process-set-process (p v)
+(defun haskell-session-set-process (p v)
   "Set the process's inferior process."
-  (haskell-process-set p 'inferior-process v))
+  (haskell-session-set p 'inferior-process v))
 
-(defun haskell-process-process (p)
+(defun haskell-session-process (p)
   "Get the process child."
-  (haskell-process-get p 'inferior-process))
+  (haskell-session-get p 'inferior-process))
 
-(defun haskell-process-name (p)
-  "Get the process name."
-  (haskell-process-get p 'name))
-
-(defun haskell-process-cmd (p)
+(defun haskell-session-cmd (p)
   "Get the process's current command.
 Return nil if no current command."
-  (haskell-process-get p 'current-command))
+  (haskell-session-get p 'current-command))
 
-(defun haskell-process-set-cmd (p v)
+(defun haskell-session-set-cmd (p v)
   "Set the process's current command."
-  (haskell-process-set-evaluating p nil)
-  (haskell-process-set-sent-stdin p nil)
-  (haskell-process-set-suggested-imports p nil)
-  (haskell-process-set p 'current-command v))
+  (haskell-session-set-evaluating p nil)
+  (haskell-session-set-sent-stdin p nil)
+  (haskell-session-set-suggested-imports p nil)
+  (haskell-session-set p 'current-command v))
 
-(defun haskell-process-response (p)
+(defun haskell-session-response (p)
   "Get the process's current response."
-  (haskell-process-get p 'current-response))
+  (haskell-session-get p 'current-response))
 
-(defun haskell-process-session (p)
-  "Get the process's current session."
-  (haskell-process-get p 'session))
-
-(defun haskell-process-set-response (p v)
+(defun haskell-session-set-response (p v)
   "Set the process's current response."
-  (haskell-process-set p 'current-response v))
+  (haskell-session-set p 'current-response v))
 
-(defun haskell-process-set-session (p v)
-  "Set the process's current session."
-  (haskell-process-set p 'session v))
-
-(defun haskell-process-response-cursor (p)
+(defun haskell-session-response-cursor (p)
   "Get the process's current response cursor."
-  (haskell-process-get p 'current-response-cursor))
+  (haskell-session-get p 'current-response-cursor))
 
-(defun haskell-process-set-response-cursor (p v)
+(defun haskell-session-set-response-cursor (p v)
   "Set the process's response cursor."
-  (haskell-process-set p 'current-response-cursor v))
+  (haskell-session-set p 'current-response-cursor v))
 
 ;; low-level command queue operations
 
-(defun haskell-process-restarting (process)
+(defun haskell-session-restarting (process)
   "Is the PROCESS restarting?"
-  (haskell-process-get process 'is-restarting))
+  (haskell-session-get process 'is-restarting))
 
-(defun haskell-process-cmd-queue (process)
+(defun haskell-session-cmd-queue (process)
   "Get the PROCESS' command queue.
 New entries get added to the end of the list. Use
-`haskell-process-cmd-queue-add' and
-`haskell-process-cmd-queue-pop' to modify the command queue."
-  (haskell-process-get process 'command-queue))
+`haskell-session-cmd-queue-add' and
+`haskell-session-cmd-queue-pop' to modify the command queue."
+  (haskell-session-get process 'command-queue))
 
-(defun haskell-process-cmd-queue-add (process cmd)
+(defun haskell-session-cmd-queue-add (process cmd)
   "Add CMD to end of PROCESS's command queue."
   (cl-check-type cmd haskell-command)
-  (haskell-process-set process
+  (haskell-session-set process
                        'command-queue
-                       (append (haskell-process-cmd-queue process)
+                       (append (haskell-session-cmd-queue process)
                                (list cmd))))
 
-(defun haskell-process-cmd-queue-pop (process)
+(defun haskell-session-cmd-queue-pop (process)
   "Pop the PROCESS' next entry from command queue.
 Returns nil if queue is empty."
-  (let ((queue (haskell-process-cmd-queue process)))
+  (let ((queue (haskell-session-cmd-queue process)))
     (when queue
-      (haskell-process-set process 'command-queue (cdr queue))
+      (haskell-session-set process 'command-queue (cdr queue))
       (car queue))))
 
 
-(defun haskell-process-unignore-file (session file)
+(defun haskell-session-unignore-file (session file)
   "
 
 Note to Windows Emacs hackers:
@@ -492,4 +455,4 @@ function and remove this comment.
 
 (provide 'haskell-process)
 
-;;; haskell-process.el ends here
+;;; haskell-session.el ends here

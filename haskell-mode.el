@@ -234,7 +234,7 @@ executable found in PATH.")
     ["(Un)Comment region" comment-region mark-active]
     "---"
     ["Start interpreter" haskell-interactive-switch]
-    ["Load file" haskell-process-load-file]
+    ["Load file" haskell-session-load-file]
     "---"
     ["Load tidy core" ghc-core-create-core]
     "---"

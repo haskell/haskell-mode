@@ -29,10 +29,10 @@
          ;; If already evaluating, then the user is trying to send
          ;; input to the REPL during evaluation. Most likely in
          ;; response to a getLine-like function.
-         ((and (haskell-process-evaluating-p (haskell-interactive-process))
+         ((and (haskell-session-evaluating-p (haskell-interactive-session))
                (= (line-end-position) (point-max)))
           (goto-char (point-max))
-          (let ((process (haskell-interactive-process))
+          (let ((process (haskell-interactive-session))
                 (string (buffer-substring-no-properties
                          haskell-interactive-mode-result-end
                          (point))))
@@ -43,8 +43,8 @@
             ;; Bring the marker forward
             (setq haskell-interactive-mode-result-end
                   (point-max))
-            (haskell-process-set-sent-stdin process t)
-            (haskell-process-send-string process string)))
+            (haskell-session-set-sent-stdin process t)
+            (haskell-session-send-string process string)))
          ;; Otherwise we start a normal evaluation call.
          (t (setq haskell-interactive-mode-old-prompt-start
                   (copy-marker haskell-interactive-mode-prompt-start))
@@ -62,8 +62,8 @@
 (defun haskell-interactive-mode-run-expr (expr)
   "Run the given expression."
   (let ((session (haskell-interactive-session))
-        (process (haskell-interactive-process)))
-    (haskell-process-queue-command
+        (process (haskell-interactive-session)))
+    (haskell-session-queue-command
      process
      (make-haskell-command
       :state (list session process expr 0)
@@ -72,15 +72,15 @@
             (insert "\n")
             (setq haskell-interactive-mode-result-end
                   (point-max))
-            (haskell-process-send-string (cadr state)
+            (haskell-session-send-string (cadr state)
                                          (haskell-interactive-mode-multi-line (cl-caddr state)))
-            (haskell-process-set-evaluating (cadr state) t))
+            (haskell-session-set-evaluating (cadr state) t))
       :live (lambda (state buffer)
               (unless (and (string-prefix-p ":q" (cl-caddr state))
                            (string-prefix-p (cl-caddr state) ":quit"))
                 (let* ((cursor (cl-cadddr state))
                        (next (replace-regexp-in-string
-                              haskell-process-prompt-regex
+                              haskell-session-prompt-regex
                               ""
                               (substring buffer cursor))))
                   (haskell-interactive-mode-eval-result (car state) next)
@@ -88,7 +88,7 @@
                   nil)))
       :complete
       (lambda (state response)
-        (haskell-process-set-evaluating (cadr state) nil)
+        (haskell-session-set-evaluating (cadr state) nil)
         (unless (haskell-interactive-mode-trigger-compile-error state response)
           (haskell-interactive-mode-expr-result state response)))))))
 
@@ -101,7 +101,7 @@
            (haskell-interactive-mode-handle-h)
            (buffer-string))))
     (when haskell-interactive-mode-eval-mode
-      (unless (haskell-process-sent-stdin-p (cadr state))
+      (unless (haskell-session-sent-stdin-p (cadr state))
         (haskell-interactive-mode-eval-as-mode (car state) response))))
   (haskell-interactive-mode-prompt (car state)))
 

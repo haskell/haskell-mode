@@ -23,7 +23,7 @@
 ;; Customization variables
 
 ;;;###autoload
-(defcustom haskell-process-load-or-reload-prompt nil
+(defcustom haskell-session-load-or-reload-prompt nil
   "Nil means there will be no prompts on starting REPL. Defaults will be accepted."
   :type 'boolean
   :group 'haskell-interactive)
@@ -50,7 +50,7 @@ Used for locating additional package data files.")
           (function :tag "Custom function")))
 
 ;;;###autoload
-(defcustom haskell-process-type
+(defcustom haskell-session-type
   'auto
   "The inferior Haskell process type to use.
 
@@ -71,7 +71,7 @@ If none of the above apply, ghci will be used."
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defcustom haskell-process-wrapper-function
+(defcustom haskell-session-wrapper-function
   #'identity
   "Wrap or transform haskell process commands using this function.
 
@@ -110,7 +110,7 @@ when showing type information about symbols."
   :type 'boolean
   :safe 'booleanp)
 
-(defvar haskell-process-end-hook nil
+(defvar haskell-session-end-hook nil
   "Hook for when the haskell process ends.")
 
 ;;;###autoload
@@ -120,39 +120,39 @@ when showing type information about symbols."
   :group 'haskell)
 
 ;;;###autoload
-(defcustom haskell-process-path-ghci
+(defcustom haskell-session-path-ghci
   "ghci"
   "The path for starting ghci."
   :group 'haskell-interactive
   :type '(choice string (repeat string)))
 
 ;;;###autoload
-(defcustom haskell-process-path-cabal
+(defcustom haskell-session-path-cabal
   "cabal"
   "Path to the `cabal' executable."
   :group 'haskell-interactive
   :type '(choice string (repeat string)))
 
 ;;;###autoload
-(defcustom haskell-process-path-stack
+(defcustom haskell-session-path-stack
   "stack"
   "The path for starting stack."
   :group 'haskell-interactive
   :type '(choice string (repeat string)))
 
 ;;;###autoload
-(defcustom haskell-process-args-ghci
+(defcustom haskell-session-args-ghci
   '("-ferror-spans")
   "Any arguments for starting ghci."
   :group 'haskell-interactive
   :type '(repeat (string :tag "Argument")))
 
 ;;;###autoload
-(defcustom haskell-process-args-cabal-repl
+(defcustom haskell-session-args-cabal-repl
   '("--ghc-option=-ferror-spans")
   "Additional arguments for `cabal repl' invocation.
-Note: The settings in `haskell-process-path-ghci' and
-`haskell-process-args-ghci' are not automatically reused as `cabal repl'
+Note: The settings in `haskell-session-path-ghci' and
+`haskell-session-args-ghci' are not automatically reused as `cabal repl'
 currently invokes `ghc --interactive'. Use
 `--with-ghc=<path-to-executable>' if you want to use a different
 interactive GHC frontend; use `--ghc-option=<ghc-argument>' to
@@ -161,29 +161,29 @@ pass additional flags to `ghc'."
   :type '(repeat (string :tag "Argument")))
 
 ;;;###autoload
-(defcustom haskell-process-args-stack-ghci
+(defcustom haskell-session-args-stack-ghci
   '("--ghc-options=-ferror-spans")
   "Additional arguments for `stack ghci' invocation."
   :group 'haskell-interactive
   :type '(repeat (string :tag "Argument")))
 
 ;;;###autoload
-(defcustom haskell-process-do-cabal-format-string
+(defcustom haskell-session-do-cabal-format-string
   ":!cd %s && %s"
   "The way to run cabal comands. It takes two arguments -- the directory and the command.
-See `haskell-process-do-cabal' for more details."
+See `haskell-session-do-cabal' for more details."
   :group 'haskell-interactive
   :type 'string)
 
 ;;;###autoload
-(defcustom haskell-process-log
+(defcustom haskell-session-log
   nil
-  "Enable debug logging to \"*haskell-process-log*\" buffer."
+  "Enable debug logging to \"*haskell-session-log*\" buffer."
   :type 'boolean
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defcustom haskell-process-show-debug-tips
+(defcustom haskell-session-show-debug-tips
   t
   "Show debugging tips when starting the process."
   :type 'boolean
@@ -197,42 +197,42 @@ See `haskell-process-do-cabal' for more details."
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defcustom haskell-process-suggest-no-warn-orphans
+(defcustom haskell-session-suggest-no-warn-orphans
   t
   "Suggest adding -fno-warn-orphans pragma to file when getting orphan warnings."
   :type 'boolean
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defcustom haskell-process-suggest-hoogle-imports
+(defcustom haskell-session-suggest-hoogle-imports
   nil
   "Suggest to add import statements using Hoogle as a backend."
   :type 'boolean
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defcustom haskell-process-suggest-hayoo-imports
+(defcustom haskell-session-suggest-hayoo-imports
   nil
   "Suggest to add import statements using Hayoo as a backend."
   :type 'boolean
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defcustom haskell-process-hayoo-query-url
+(defcustom haskell-session-hayoo-query-url
   "http://hayoo.fh-wedel.de/json/?query=%s"
   "Query url for json hayoo results."
   :type 'string
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defcustom haskell-process-suggest-haskell-docs-imports
+(defcustom haskell-session-suggest-haskell-docs-imports
   nil
   "Suggest to add import statements using haskell-docs as a backend."
   :type 'boolean
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defcustom haskell-process-suggest-add-package
+(defcustom haskell-session-suggest-add-package
   t
   "Suggest to add packages to your .cabal file when Cabal says it
 is a member of the hidden package, blah blah."
@@ -240,28 +240,28 @@ is a member of the hidden package, blah blah."
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defcustom haskell-process-suggest-language-pragmas
+(defcustom haskell-session-suggest-language-pragmas
   t
   "Suggest adding LANGUAGE pragmas recommended by GHC."
   :type 'boolean
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defcustom haskell-process-suggest-remove-import-lines
+(defcustom haskell-session-suggest-remove-import-lines
   nil
   "Suggest removing import lines as warned by GHC."
   :type 'boolean
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defcustom haskell-process-suggest-overloaded-strings
+(defcustom haskell-session-suggest-overloaded-strings
   t
   "Suggest adding OverloadedStrings pragma to file when getting type mismatches with [Char]."
   :type 'boolean
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defcustom haskell-process-check-cabal-config-on-load
+(defcustom haskell-session-check-cabal-config-on-load
   t
   "Check changes cabal config on loading Haskell files and
 restart the GHCi process if changed.."
@@ -269,7 +269,7 @@ restart the GHCi process if changed.."
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defcustom haskell-process-prompt-restart-on-cabal-change
+(defcustom haskell-session-prompt-restart-on-cabal-change
   t
   "Ask whether to restart the GHCi process when the Cabal file
 has changed?"
@@ -277,14 +277,14 @@ has changed?"
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defcustom haskell-process-auto-import-loaded-modules
+(defcustom haskell-session-auto-import-loaded-modules
   nil
   "Auto import the modules reported by GHC to have been loaded?"
   :type 'boolean
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defcustom haskell-process-reload-with-fbytecode
+(defcustom haskell-session-reload-with-fbytecode
   nil
   "When using -fobject-code, auto reload with -fbyte-code (and
 then restore the -fobject-code) so that all module info and
@@ -293,7 +293,7 @@ imports become available?"
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defcustom haskell-process-use-presentation-mode
+(defcustom haskell-session-use-presentation-mode
   nil
   "Use presentation mode to show things like type info instead of
   printing to the message area."
@@ -301,7 +301,7 @@ imports become available?"
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defcustom haskell-process-suggest-restart
+(defcustom haskell-session-suggest-restart
   t
   "Suggest restarting the process when it has died"
   :type 'boolean
@@ -408,9 +408,9 @@ same vein as `haskell-indent-spaces'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessor functions
 
-(defun haskell-process-type ()
-  "Return `haskell-process-type', or a guess if that variable is 'auto."
-  (if (eq 'auto haskell-process-type)
+(defun haskell-session-type ()
+  "Return `haskell-session-type', or a guess if that variable is 'auto."
+  (if (eq 'auto haskell-session-type)
       (cond
        ;; User has explicitly initialized this project with cabal
        ((locate-dominating-file default-directory "cabal.sandbox.config")
@@ -424,6 +424,6 @@ same vein as `haskell-indent-spaces'."
            (cl-find-if (lambda (f) (string-match-p ".\\.cabal\\'" f)) (directory-files d))))
         'cabal-repl)
        (t 'ghci))
-    haskell-process-type))
+    haskell-session-type))
 
 (provide 'haskell-customize)

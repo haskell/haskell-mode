@@ -110,10 +110,6 @@ with all relevant buffers)."
                                 haskell-sessions)))
       session)))
 
-(defun haskell-session-clear ()
-  "Clear the buffer of any Haskell session choice."
-  (set (make-local-variable 'haskell-session) nil))
-
 (defun haskell-session-lookup (name)
   "Get the session by name."
   (cl-remove-if-not (lambda (s)
@@ -151,11 +147,11 @@ with all relevant buffers)."
 
 (defun haskell-session-target (s)
   "Get the session build target.
-If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
+If `haskell-session-load-or-reload-prompt' is nil, accept `default'."
   (let* ((maybe-target (haskell-session-get s 'target))
          (target (if maybe-target maybe-target
                    (let ((new-target
-			  (if haskell-process-load-or-reload-prompt
+			  (if haskell-session-load-or-reload-prompt
 			      (read-string "build target (empty for default):")
 			    "")))
                      (haskell-session-set-target s new-target)))))
@@ -168,15 +164,6 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
 (defun haskell-session-set-interactive-buffer (s v)
   "Set the session interactive buffer."
   (haskell-session-set s 'interactive-buffer v))
-
-(defun haskell-session-set-process (s v)
-  "Set the session process."
-  (haskell-session-set s 'process v))
-
-;;;###autoload
-(defun haskell-session-process (s)
-  "Get the session process."
-  (haskell-session-get s 'process))
 
 (defun haskell-session-set-cabal-dir (s v)
   "Set the session cabal-dir."
@@ -197,7 +184,7 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
 (defun haskell-session-cabal-dir (s)
   "Get the session cabal-dir."
   (or (haskell-session-get s 'cabal-dir)
-      (let ((set-dir (haskell-cabal-get-dir (not haskell-process-load-or-reload-prompt))))
+      (let ((set-dir (haskell-cabal-get-dir (not haskell-session-load-or-reload-prompt))))
 	(if set-dir
 	    (progn (haskell-session-set-cabal-dir s set-dir)
 		   set-dir)
@@ -219,11 +206,14 @@ Returns nil if KEY not set."
 (defun haskell-session-set (session key value)
   "Set the SESSION's KEY to VALUE.
 Returns newly set VALUE."
-  (let ((cell (assq key session)))
-    (if cell
-        (setcdr cell value) ; modify cell in-place
-      (setcdr session (cons (cons key value) (cdr session))) ; new cell
-      value)))
+  (if session
+      (let ((cell (assq key session)))
+	(if cell
+	    (setcdr cell value)		; modify cell in-place
+	    (setcdr session (cons (cons key value) (cdr session))) ; new cell
+	    value))
+      (display-warning 'haskell-interactive
+		       "`haskell-session-set' called with nil session")))
 
 (provide 'haskell-session)
 

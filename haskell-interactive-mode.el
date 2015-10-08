@@ -70,7 +70,7 @@ interference with prompts that look like haskell expressions."
     (define-key map (kbd "C-a") 'haskell-interactive-mode-beginning)
     (define-key map (kbd "<home>") 'haskell-interactive-mode-beginning)
     (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
-    (define-key map (kbd "C-c C-c") 'haskell-process-interrupt)
+    (define-key map (kbd "C-c C-c") 'haskell-session-interrupt)
     (define-key map (kbd "C-c C-f") 'next-error-follow-minor-mode)
     (define-key map (kbd "C-c C-z") 'haskell-interactive-switch-back)
     (define-key map (kbd "M-p") 'haskell-interactive-mode-history-previous)
@@ -522,18 +522,18 @@ FILE-NAME only."
         (switch-to-buffer-other-window buffer)
         buffer))))
 
-(defun haskell-process-cabal-live (state buffer)
+(defun haskell-session-cabal-live (state buffer)
   "Do live updates for Cabal processes."
   (haskell-interactive-mode-insert
-   (haskell-process-session (cadr state))
+   (cadr state)
    (replace-regexp-in-string
-    haskell-process-prompt-regex
+    haskell-session-prompt-regex
     ""
     (substring buffer (cl-cadddr state))))
   (setf (cl-cdddr state) (list (length buffer)))
   nil)
 
-(defun haskell-process-parse-error (string)
+(defun haskell-session-parse-error (string)
   "Parse the line number from the error."
   (let ((span nil))
     (cl-loop for regex
@@ -549,7 +549,7 @@ FILE-NAME only."
                                       (string-to-number (match-string 5 string)))))))
     span))
 
-(defun haskell-process-suggest-add-package (session msg)
+(defun haskell-session-suggest-add-package (session msg)
   "Add the (matched) module to your cabal file."
   (let* ((suggested-package (match-string 1 msg))
          (package-name (replace-regexp-in-string "-[^-]+$" "" suggested-package))
@@ -563,10 +563,10 @@ FILE-NAME only."
                    cabal-file))
       (haskell-cabal-add-dependency package-name version nil t)
       (when (y-or-n-p (format "Enable -package %s in the GHCi session?" package-name))
-        (haskell-process-queue-without-filters (haskell-session-process session)
+        (haskell-session-queue-without-filters session
                                                (format ":set -package %s" package-name))))))
 
-(defun haskell-process-suggest-remove-import (session file import line)
+(defun haskell-session-suggest-remove-import (session file import line)
   "Suggest removing or commenting out IMPORT on LINE."
   (let ((first t))
     (cl-case (read-event
@@ -577,7 +577,7 @@ FILE-NAME only."
                                   import)
                           'face 'minibuffer-prompt))
       (?y
-       (haskell-process-find-file session file)
+       (haskell-session-find-file session file)
        (save-excursion
          (goto-char (point-min))
          (forward-line (1- line))
@@ -587,14 +587,14 @@ FILE-NAME only."
       (?n
        (message "Ignoring redundant import %s" import))
       (?c
-       (haskell-process-find-file session file)
+       (haskell-session-find-file session file)
        (save-excursion
          (goto-char (point-min))
          (forward-line (1- line))
          (goto-char (line-beginning-position))
          (insert "-- "))))))
 
-(defun haskell-process-find-file (session file)
+(defun haskell-session-find-file (session file)
   "Find the given file in the project."
   (find-file (cond ((file-exists-p (concat (haskell-session-current-dir session) "/" file))
                     (concat (haskell-session-current-dir session) "/" file))
@@ -602,11 +602,11 @@ FILE-NAME only."
                     (concat (haskell-session-cabal-dir session) "/" file))
                    (t file))))
 
-(defun haskell-process-suggest-pragma (session pragma extension file)
+(defun haskell-session-suggest-pragma (session pragma extension file)
   "Suggest to add something to the top of the file."
   (let ((string  (format "{-# %s %s #-}" pragma extension)))
     (when (y-or-n-p (format "Add %s to the top of the file? " string))
-      (haskell-process-find-file session file)
+      (haskell-session-find-file session file)
       (save-excursion
         (goto-char (point-min))
         (insert (concat string "\n"))))))
@@ -672,7 +672,7 @@ FILE-NAME only."
 
       (when (string-match haskell-interactive-mode-error-regexp orig-line)
         (let* ((msgmrk (set-marker (make-marker) (line-beginning-position)))
-               (location (haskell-process-parse-error orig-line))
+               (location (haskell-session-parse-error orig-line))
                (file (plist-get location :file))
                (line (plist-get location :line))
                (col1 (plist-get location :col))
@@ -710,28 +710,22 @@ FILE-NAME only."
            (haskell-session-choose)
            (error "No session associated with this buffer. Try M-x haskell-session-change or report this as a bug.")))))
 
-(defun haskell-interactive-process ()
-  "Get the Haskell session."
-  (or (haskell-session-process (haskell-interactive-session))
-      (error "No Haskell session/process associated with this
-      buffer. Maybe run M-x haskell-process-restart?")))
-
 (defun haskell-interactive-mode-do-presentation (expr)
   "Present the given expression. Requires the `present` package
   to be installed. Will automatically import it qualified as Present."
-  (let ((p (haskell-interactive-process)))
+  (let ((p (haskell-interactive-session)))
     ;; If Present.code isn't available, we probably need to run the
     ;; setup.
-    (unless (string-match "^Present" (haskell-process-queue-sync-request p ":t Present.encode"))
+    (unless (string-match "^Present" (haskell-session-queue-sync-request p ":t Present.encode"))
       (haskell-interactive-mode-setup-presentation p))
     ;; Happily, let statements don't affect the `it' binding in any
     ;; way, so we can fake it, no pun intended.
-    (let ((error (haskell-process-queue-sync-request
+    (let ((error (haskell-session-queue-sync-request
                   p (concat "let it = Present.asData (" expr ")"))))
       (if (not (string= "" error))
           (haskell-interactive-mode-eval-result (haskell-interactive-session) (concat error "\n"))
         (let ((hash (haskell-interactive-mode-presentation-hash)))
-          (haskell-process-queue-sync-request
+          (haskell-session-queue-sync-request
            p (format "let %s = Present.asData (%s)" hash expr))
           (let* ((presentation (haskell-interactive-mode-present-id
                                 hash
@@ -744,10 +738,10 @@ FILE-NAME only."
 (defun haskell-interactive-mode-present-id (hash id)
   "Generate a presentation for the current expression at ID."
   ;; See below for commentary of this statement.
-  (let ((p (haskell-interactive-process)))
-    (haskell-process-queue-without-filters
+  (let ((p (haskell-interactive-session)))
+    (haskell-session-queue-without-filters
      p "let _it = it")
-    (let* ((text (haskell-process-queue-sync-request
+    (let* ((text (haskell-session-queue-sync-request
                   p
                   (format "Present.putStr (Present.encode (Present.fromJust (Present.present (Present.fromJust (Present.fromList [%s])) %s)))"
                           (mapconcat 'identity (mapcar 'number-to-string id) ",")
@@ -758,7 +752,7 @@ FILE-NAME only."
               (read text))))
       ;; Not necessary, but nice to restore it to the expression that
       ;; the user actually typed in.
-      (haskell-process-queue-without-filters
+      (haskell-session-queue-without-filters
        p "let it = _it")
       reply)))
 
@@ -904,13 +898,13 @@ Using asynchronous queued commands as opposed to sync at this
 stage, as sync would freeze up the UI a bit, and we actually
 don't care when the thing completes as long as it's soonish."
   ;; Import dependencies under Present.* namespace
-  (haskell-process-queue-without-filters p "import qualified Data.Maybe as Present")
-  (haskell-process-queue-without-filters p "import qualified Data.ByteString.Lazy as Present")
-  (haskell-process-queue-without-filters p "import qualified Data.AttoLisp as Present")
-  (haskell-process-queue-without-filters p "import qualified Present.ID as Present")
-  (haskell-process-queue-without-filters p "import qualified Present as Present")
+  (haskell-session-queue-without-filters p "import qualified Data.Maybe as Present")
+  (haskell-session-queue-without-filters p "import qualified Data.ByteString.Lazy as Present")
+  (haskell-session-queue-without-filters p "import qualified Data.AttoLisp as Present")
+  (haskell-session-queue-without-filters p "import qualified Present.ID as Present")
+  (haskell-session-queue-without-filters p "import qualified Present as Present")
   ;; Make a dummy expression to avoid "Loading package" nonsense
-  (haskell-process-queue-without-filters
+  (haskell-session-queue-without-filters
    p "Present.present (Present.fromJust (Present.fromList [0])) ()"))
 
 (defvar haskell-interactive-mode-presentation-hash 0
@@ -991,7 +985,7 @@ don't care when the thing completes as long as it's soonish."
       (haskell-interactive-mode-prompt session)
       (haskell-session-set session 'next-error-region nil)
       (haskell-session-set session 'next-error-locus nil))
-    (with-current-buffer (get-buffer-create "*haskell-process-log*")
+    (with-current-buffer (get-buffer-create "*haskell-session-log*")
       (let ((inhibit-read-only t))
         (delete-region (point-min) (point-max)))
       (remove-overlays))))
@@ -999,11 +993,11 @@ don't care when the thing completes as long as it's soonish."
 (defun haskell-interactive-mode-completion-at-point-function ()
   "Offer completions for partial expression between prompt and point"
   (when (haskell-interactive-at-prompt)
-    (let* ((process (haskell-interactive-process))
+    (let* ((process (haskell-interactive-session))
            (inp (haskell-interactive-mode-input-partial)))
       (if (string= inp (car-safe haskell-interactive-mode-completion-cache))
           (cdr haskell-interactive-mode-completion-cache)
-        (let* ((resp2 (haskell-process-get-repl-completions process inp))
+        (let* ((resp2 (haskell-session-get-repl-completions process inp))
                (rlen (-  (length inp) (length (car resp2))))
                (coll (append (if (string-prefix-p inp "import") '("import"))
                              (if (string-prefix-p inp "let") '("let"))
@@ -1027,9 +1021,9 @@ don't care when the thing completes as long as it's soonish."
      ((and (not (haskell-interactive-mode-line-is-query (elt state 2)))
            (or (string-match "No instance for (?Show[ \n]" response)
                (string-match "Ambiguous type variable " response)))
-      (haskell-process-reset (haskell-interactive-process))
-      (let ((resp (haskell-process-queue-sync-request
-                   (haskell-interactive-process)
+      (haskell-session-reset (haskell-interactive-session))
+      (let ((resp (haskell-session-queue-sync-request
+                   (haskell-interactive-session)
                    (concat ":t "
                            (buffer-substring-no-properties
                             haskell-interactive-mode-prompt-start
@@ -1093,22 +1087,22 @@ don't care when the thing completes as long as it's soonish."
                           'rear-nonsticky t)))))
 
 ;;;###autoload
-(defun haskell-process-show-repl-response (line)
+(defun haskell-session-show-repl-response (line)
   "Send LINE to the GHCi process and echo the result in some fashion.
 Result will be printed in the minibuffer or presented using
 function `haskell-presentation-present', depending on variable
-`haskell-process-use-presentation-mode'."
-  (let ((process (haskell-interactive-process)))
-    (haskell-process-queue-command
+`haskell-session-use-presentation-mode'."
+  (let ((process (haskell-interactive-session)))
+    (haskell-session-queue-command
      process
      (make-haskell-command
       :state (cons process line)
       :go (lambda (state)
-            (haskell-process-send-string (car state) (cdr state)))
+            (haskell-session-send-string (car state) (cdr state)))
       :complete (lambda (state response)
-                  (if haskell-process-use-presentation-mode
+                  (if haskell-session-use-presentation-mode
                       (haskell-presentation-present
-                       (haskell-process-session (car state))
+                       (car state)
                        response)
                     (haskell-mode-message-line response)))))))
 

@@ -1507,7 +1507,7 @@ current buffer."
   hasn't been displayed yet.")
 
 (defun haskell-doc-current-info--interaction (&optional sync)
-  "Asynchronous call to `haskell-process-get-type', suitable for
+  "Asynchronous call to `haskell-session-get-type', suitable for
 use in the eldoc function `haskell-doc-current-info'.
 
 If SYNC is non-nil, the call will be synchronous instead, and
@@ -1527,14 +1527,14 @@ will be returned directly."
                  (region-beginning) (region-end))
               (haskell-ident-at-point)))
       (if sync
-          (haskell-process-get-type sym #'identity t)
-        (haskell-process-get-type
+          (haskell-session-get-type sym #'identity t)
+        (haskell-session-get-type
          sym (lambda (response)
                (setq haskell-doc-current-info--interaction-last
                      (cons 'async response))
                (eldoc-print-current-symbol-info))))))))
 
-(defun haskell-process-get-type (expr-string &optional callback sync)
+(defun haskell-session-get-type (expr-string &optional callback sync)
   "Asynchronously get the type of a given string.
 
 EXPR-STRING should be an expression passed to :type in ghci.
@@ -1543,8 +1543,7 @@ CALLBACK will be called with a formatted type string.
 
 If SYNC is non-nil, make the call synchronously instead."
   (unless callback (setq callback (lambda (response) (message "%s" response))))
-  (let ((process (and (haskell-session-maybe)
-                    (haskell-session-process (haskell-session-maybe))))
+  (let ((process (haskell-session-maybe))
         ;; Avoid passing bad strings to ghci
         (expr-okay
          (and (not (string-match-p "\\`[[:space:]]*\\'" expr-string))
@@ -1573,16 +1572,16 @@ If SYNC is non-nil, make the call synchronously instead."
              response))))
     (when (and process expr-okay)
       (if sync
-          (let ((response (haskell-process-queue-sync-request process ghci-command)))
+          (let ((response (haskell-session-queue-sync-request process ghci-command)))
             (funcall callback (funcall process-response response)))
         (lexical-let ((process process)
                       (callback callback)
                       (ghci-command ghci-command)
                       (process-response process-response))
-          (haskell-process-queue-command
+          (haskell-session-queue-command
            process
            (make-haskell-command
-            :go (lambda (_) (haskell-process-send-string process ghci-command))
+            :go (lambda (_) (haskell-session-send-string process ghci-command))
             :complete
             (lambda (_ response)
               (funcall callback (funcall process-response response))))))
