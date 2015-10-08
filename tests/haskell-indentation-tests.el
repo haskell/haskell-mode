@@ -613,7 +613,7 @@ class Foo a where
 instance Bar Int
 "
 	      ((2 0) 0))
-(hindent-test "32* allow type operators" "
+(hindent-test "32 allow type operators" "
 data (:.) a b = a :. b
 "
 	      ((2 0) 0 16))
