@@ -603,11 +603,18 @@ the current buffer."
       (while (not (bobp))
         (forward-comment (- (buffer-size)))
         (beginning-of-line)
-        (let ((ps (nth 8 (syntax-ppss))))
-          (when ps ;; inside comment or string
-            (goto-char ps)))
-        (when (= 0 (haskell-indentation-current-indentation))
-          (throw 'return nil))))
+        (let* ((ps (syntax-ppss))
+              (start-of-comment-or-string (nth 8 ps))
+              (start-of-list-expression (nth 1 ps)))
+          (cond
+           (start-of-comment-or-string
+            ;; inside comment or string
+            (goto-char start-of-comment-or-string))
+           (start-of-list-expression
+            ;; inside a parenthesized expression
+            (goto-char start-of-list-expression))
+           ((= 0 (haskell-indentation-current-indentation))
+             (throw 'return nil))))))
     (beginning-of-line)
     (when (bobp)
       (forward-comment (buffer-size)))))
