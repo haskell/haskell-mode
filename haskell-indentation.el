@@ -679,15 +679,9 @@ the current buffer."
 
 (defconst haskell-indentation-toplevel-list
   `(("module"   . haskell-indentation-module)
-    ("data"     .
-     ,(apply-partially 'haskell-indentation-statement-right
-                       'haskell-indentation-data))
-    ("type"     .
-     ,(apply-partially 'haskell-indentation-statement-right
-                       'haskell-indentation-data))
-    ("newtype"  .
-     ,(apply-partially 'haskell-indentation-statement-right
-                       'haskell-indentation-data))
+    ("data"     . haskell-indentation-data)
+    ("type"     . haskell-indentation-data)
+    ("newtype"  .   haskell-indentation-data)
     ("class"    . haskell-indentation-class-declaration)
     ("instance" . haskell-indentation-class-declaration))
   "Alist of toplevel keywords with associated parsers.")
