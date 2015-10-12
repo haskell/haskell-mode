@@ -635,4 +635,15 @@ data T = T {
               ;; set of answers isn't best but it is not a bug
               ;; should be just 0
               ((5 0) 0 9))
+
+(hindent-test "35* baroque construct which causes parse error" "
+az = Projection
+  { unproject = \x -> do
+        case x of
+          _ -> return
+  , maxR = pi
+  }
+"
+	      ((6 0) 2))
+
 ;;; haskell-indentation-tests.el ends here
