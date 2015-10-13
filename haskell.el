@@ -398,7 +398,7 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
   (interactive)
   (save-buffer)
   (haskell-interactive-mode-reset-error (haskell-session))
-  (haskell-process-file-loadish "reload" t nil))
+  (haskell-process-file-loadish "reload" t (current-buffer)))
 
 ;;;###autoload
 (defun haskell-process-load-or-reload (&optional toggle)
