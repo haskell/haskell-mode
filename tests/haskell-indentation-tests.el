@@ -27,6 +27,8 @@
 (require 'haskell-mode)
 (require 'haskell-font-lock)
 (require 'haskell-indentation)
+(require 'haskell-indent)
+(require 'haskell-simple-indent)
 
 ;;; Code:
 
@@ -112,6 +114,32 @@ macro quotes them for you."
           ,@(mapcar (lambda (x)
                       (list 'quote x))
                     test-cases))))))
+
+(ert-deftest haskell-indentation-turns-off-haskell-indent ()
+  (with-temp-buffer
+    (haskell-mode)
+    (haskell-indent-mode)
+    (should haskell-indent-mode)
+    (haskell-indentation-mode)
+    (should haskell-indentation-mode)
+    (should-not haskell-indent-mode)
+
+    (haskell-indent-mode)
+    (should-not haskell-indentation-mode)
+    (should haskell-indent-mode)))
+
+(ert-deftest haskell-indentation-turns-off-haskell-simple-indent ()
+  (with-temp-buffer
+    (haskell-mode)
+    (haskell-simple-indent-mode)
+    (should haskell-simple-indent-mode)
+    (haskell-indentation-mode)
+    (should haskell-indentation-mode)
+    (should-not haskell-simple-indent-mode)
+
+    (haskell-simple-indent-mode)
+    (should-not haskell-indentation-mode)
+    (should haskell-simple-indent-mode)))
 
 (hindent-test "1 Check if '{' on its own line gets properly indented""
 function = Record
