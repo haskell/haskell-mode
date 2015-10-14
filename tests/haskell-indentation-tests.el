@@ -646,8 +646,8 @@ az = Projection
 "
 	      ((6 0) 2))
 
-(hindent-test "36* yet another parser failure" "
-tokOpenTag = 
+(hindent-test "36 yet another parser failure" "
+tokOpenTag =
   asum [ do void
        , return
        ]

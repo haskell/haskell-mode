@@ -1152,8 +1152,9 @@ layout starts."
   ;; put `haskell-indentation-read-next-token' outside the current-indent
   ;; definition so it will not return 'layout-end again
   (when (eq current-token 'layout-end)
-    ;; leave layout at 'layout-end or illegal token
-    (haskell-indentation-read-next-token)))
+    (let ((implicit-layout-active t))
+      ;; leave layout at 'layout-end or illegal token
+      (haskell-indentation-read-next-token))))
 
 (defun haskell-indentation-if ()
   "" ; FIXME
