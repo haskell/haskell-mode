@@ -259,19 +259,24 @@ negative ARG.  Handles bird style literate Haskell too."
   (if (haskell-indentation-bird-outside-code-p)
       (progn
         (delete-horizontal-space)
-        (newline))    
-    (catch 'parse-error
-      ;;  - save the current column
-      (let* ((ci (haskell-indentation-current-indentation))
-             (indentations (haskell-indentation-find-indentations-safe)))
-        ;; - jump to the next line and reindent to at the least same level        
-        (delete-horizontal-space)
-        (newline)
-        (when (haskell-indentation-bird-p)
-          (insert "> "))
-        (haskell-indentation-reindent-to
-         (haskell-indentation-next-indentation (- ci 1) indentations 'nofail)
-         'move)))))
+        (newline))
+    (let ((res (catch 'parse-error
+		;;  - save the current column
+		(let* ((ci (haskell-indentation-current-indentation))
+		       (indentations (haskell-indentation-find-indentations-safe)))
+		  ;; - jump to the next line and reindent to at the least same level        
+		  (delete-horizontal-space)
+		  (newline)
+		  (when (haskell-indentation-bird-p)
+		    (insert "> "))
+		  (haskell-indentation-reindent-to
+		   (haskell-indentation-next-indentation (- ci 1) indentations 'nofail)
+		   'move)))))
+      ;; Here we try to determine whether parse failed or not.
+      ;; On failure expression above returns string and integer otherwise
+      (if (eq 'string (type-of res))
+	  (newline))
+      )))
 
 (defun haskell-indentation-next-indentation (col indentations &optional nofail)
   "Find the leftmost indentation which is greater than COL.
