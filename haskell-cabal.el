@@ -455,7 +455,11 @@ OTHER-WINDOW use `find-file-other-window'."
 	  (goto-char (point-min))
 	  (haskell-cabal-next-section)
 	  (while (not (eobp))
-	    (push (haskell-cabal-section-value (haskell-cabal-section)) matches)
+	    (if (haskell-cabal-source-section-p (haskell-cabal-section))
+		(let ((val (haskell-cabal-section-value (haskell-cabal-section))))
+		  (if (string= val "")
+		      (push "library" matches)
+		    (push val matches))))
 	    (haskell-cabal-next-section))
 	  (reverse matches))))))
 
