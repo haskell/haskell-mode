@@ -189,17 +189,20 @@ NIL otherwise."
 
 (defun haskell-indentation-auto-fill-function ()
   "" ; FIXME
-  (when (> (current-column) fill-column)
-    (while (> (current-column) fill-column)
-      (skip-syntax-backward "-")
-      (skip-syntax-backward "^-"))
-    (let ((indent (car (last (haskell-indentation-find-indentations-safe)))))
-      (delete-horizontal-space)
-      (newline)
-      (when (haskell-indentation-bird-p)
-        (insert ">"))
-      (indent-to indent)
-      (end-of-line))))
+   (when (> (current-column) fill-column)
+      (if (save-excursion (comment-beginning))
+         (funcall comment-line-break-function)
+         (progn
+            (while (> (current-column) fill-column)
+               (skip-syntax-backward "-")
+               (skip-syntax-backward "^-"))
+            (let ((indent (car (last (haskell-indentation-find-indentations-safe)))))
+               (delete-horizontal-space)
+               (newline)
+               (when (haskell-indentation-bird-p)
+                  (insert ">"))
+               (indent-to indent)
+               (end-of-line))))))
 
 (defun haskell-indentation-reindent-to (col &optional move)
   "Reindent current line to COL, move the point there if MOVE is non-NIL."
