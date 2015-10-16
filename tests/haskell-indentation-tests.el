@@ -653,5 +653,31 @@ tokOpenTag =
        ]
 "
 	      ((4 0) 7))
+(hindent-test "37* Indent continuation lines in multiline string literal" "
+a = \"multiline\
+"
+	      ((2 0) 4))
+
+(hindent-test "38* Indent in do block after multiline string literal" "
+s = do
+  a <- "multiline\
+       \ line 2"
+"
+       ((4 0) 0 2 4))
+
+(hindent-test "39* do not crash after two multiline literals in do block" "
+servePost = do
+  a <- fun \"line 1\
+           \line 2\"
+  b <- queryT \"comma is important: , \
+             \ line 2 \"
+"
+	      ((6 0) 0 2 4))
+
+(hindent-test "40 parse error in multiline tuple" "
+a = ( 1
+, "
+	      ((2 0) 4)
+	      ((2 2) 6))
 
 ;;; haskell-indentation-tests.el ends here
