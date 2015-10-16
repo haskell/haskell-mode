@@ -1056,26 +1056,6 @@ parser.  If parsing ends here, set indentation to left-indent."
               (unless (member (car parser) '("(" "[" "{" "case"))
                 (throw 'return nil)))))))))
 
-(defun haskell-indentation-test-indentations ()
-  "Insert markers on a fresh line indicating indentation positions.
-Use for testing."
-  (interactive)
-  (let ((indentations
-         (save-excursion
-           (haskell-indentation-find-indentations-safe)))
-        (str "")
-        (pos 0))
-    (while indentations
-      (when (>= (car indentations) pos)
-        (setq str (concat str
-                          (make-string (- (car indentations) pos) ?\ )
-                          "|"))
-        (setq pos (+ 1 (car indentations))))
-      (setq indentations (cdr indentations)))
-    (end-of-line)
-    (newline)
-    (insert str)))
-
 (defun haskell-indentation-separated (parser separator &optional stmt-separator)
   "Evaluate PARSER separated by SEPARATOR and STMT-SEPARATOR.
 If STMT-SEPARATOR is not NIL, it will be used to set a new starter-indent.
@@ -1269,15 +1249,6 @@ layout starts."
             (< indent (car possible-indentations)))
     (setq possible-indentations
           (cons indent possible-indentations))))
-
-(defun haskell-indentation-token-test ()
-  "" ; FIXME
-  (let ((current-token nil)
-        (following-token nil)
-        (layout-indent 0)
-        (parse-line-number 0)
-        (indentation-point (mark)))
-    (haskell-indentation-read-next-token)))
 
 (defun haskell-indentation-read-next-token ()
   "Go to the next token and set current-token to the next token.
