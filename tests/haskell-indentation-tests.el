@@ -152,37 +152,38 @@ function = do
   ((2 0) 2)
   ((3 0) 0 2 11))
 
-(hindent-test "3* Import statememnt symbol list 1""
+(hindent-test "3 Import statememnt symbol list 1""
 import Control.Concurrent
   ( forkIO,
     killThread )"
   ((1 0) 0)
   ((2 0) 0 2)
   ((3 0) 4)
-  ((4 0) 0))
+  ((4 0) 0 2))
 
-(hindent-test "4* Import statememnt symbol list 2""
+(hindent-test "4 Import statememnt symbol list 2""
 import Control.Concurrent
   ( forkIO
-  , killThread )"
+  , killThread )
+"
   ((1 0) 0)
   ((2 0) 0 2)
   ((3 0) 2)
-  ((4 0) 0))
+  ((4 0) 0 2))
 
-(hindent-test "5* List comprehension""
+(hindent-test "5 List comprehension""
 fun = [ x | y
           , z ]"
   ((1 0) 0)
   ((2 0) 10)
-  ((3 0) 0))
+  ((3 0) 0 6))
 
 (hindent-test "5a* List comprehension""
 fun = [ x | y,
             z ]"
   ((1 0) 0)
   ((2 0) 12)
-  ((3 0) 0))
+  ((3 0) 0 6))
 
 (hindent-test "6* \"let\" in list comprehension""
 fun = [ f | x <- xs
@@ -193,7 +194,7 @@ fun = [ f | x <- xs
   ((2 0) 10)
   ((3 0) 10)
   ((4 0) 10)
-  ((5 0) 0))
+  ((5 0) 0 6))
 
 (hindent-test "6u* \"let\" in list comprehension""
 fun = [ f | x ← xs
@@ -636,7 +637,17 @@ data T = T {
               ;; should be just 0
               ((5 0) 0 9))
 
-(hindent-test "35* baroque construct which causes parse error" "
+(hindent-test "35 baroque construct which causes parse error" "
+az = Projection
+  { unproject = do
+        case x of
+          _ -> return
+  , maxR = pi
+  }
+"
+	      ((6 0) 2))
+
+(hindent-test "35a* parse a backslash properly" "
 az = Projection
   { unproject = \x -> do
         case x of
