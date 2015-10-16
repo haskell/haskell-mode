@@ -38,6 +38,7 @@
 (require 'ansi-color)
 (require 'cl-lib)
 (require 'etags)
+(require 'helm)
 
 (defvar haskell-interactive-mode-history-index)
 (make-variable-buffer-local 'haskell-interactive-mode-history-index)
@@ -973,6 +974,18 @@ don't care when the thing completes as long as it's soonish."
            (and (search-backward-regexp (haskell-interactive-prompt-regex) nil t)
                 (match-end 0)))))
     (when prev-prompt-pos (goto-char prev-prompt-pos))))
+
+(defun haskell-interactive-ido-history ()
+  (interactive)
+  (insert (ido-completing-read "history:" haskell-interactive-mode-history)))
+
+(defun haskell-interactive-helm-history ()
+  (interactive)
+  (helm
+   :sources `((
+	       (name . "history")
+	       (candidates . ,haskell-interactive-mode-history)
+	       (action . insert)))))
 
 (defun haskell-interactive-mode-prompt-next ()
   "Jump to the next prompt."
