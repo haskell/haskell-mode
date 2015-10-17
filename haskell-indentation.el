@@ -138,8 +138,7 @@ positions are allowed."
 (define-minor-mode haskell-indentation-mode
   "Haskell indentation mode that deals with the layout rule.
 It rebinds RET, DEL and BACKSPACE, so that indentations can be
-set and deleted as if they were real tabs.  It supports
-`auto-fill-mode'.
+set and deleted as if they were real tabs.
 
 It is possible to render indent stops for current line as
 overlays.  Please read documentation for option
@@ -150,14 +149,13 @@ clashing with other modes."
   :keymap haskell-indentation-mode-map
   (kill-local-variable 'indent-line-function)
   (kill-local-variable 'indent-region-function)
-  (kill-local-variable 'normal-auto-fill-function)
+
   (when haskell-indentation-mode
     (set (make-local-variable 'indent-line-function)
          'haskell-indentation-indent-line)
     (set (make-local-variable 'indent-region-function)
          'haskell-indentation-indent-region)
-    (set (make-local-variable 'normal-auto-fill-function)
-         'haskell-indentation-auto-fill-function)
+
     (when haskell-indentation-show-indentations
       (haskell-indentation-enable-show-indentations))))
 
@@ -186,20 +184,6 @@ NIL otherwise."
 
 ;;----------------------------------------------------------------------------
 ;; UI starts here
-
-(defun haskell-indentation-auto-fill-function ()
-  "" ; FIXME
-  (when (> (current-column) fill-column)
-    (while (> (current-column) fill-column)
-      (skip-syntax-backward "-")
-      (skip-syntax-backward "^-"))
-    (let ((indent (car (last (haskell-indentation-find-indentations-safe)))))
-      (delete-horizontal-space)
-      (newline)
-      (when (haskell-indentation-bird-p)
-        (insert ">"))
-      (indent-to indent)
-      (end-of-line))))
 
 (defun haskell-indentation-reindent-to (col &optional move)
   "Reindent current line to COL, move the point there if MOVE is non-NIL."
