@@ -964,6 +964,11 @@ don't care when the thing completes as long as it's soonish."
       (setq haskell-interactive-mode-history-index 0)
       (haskell-interactive-mode-history-toggle -1))))
 
+(defun haskell-interactive-mode-history-completing-read ()
+  "Select history item using completing-read."
+  (interactive)
+  (insert (funcall haskell-completing-read-function "history:" haskell-interactive-mode-history)))
+
 (defun haskell-interactive-mode-prompt-previous ()
   "Jump to the previous prompt."
   (interactive)
