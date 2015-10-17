@@ -287,23 +287,23 @@ fun = do
   ((4 0) 4)
   ((5 0) 2 4))
 
-(hindent-test "16* Lambda and a \"do\" block""
-fun = \x -> do"
+(hindent-test "16 Lambda and a \"do\" block""
+fun = \\x -> do"
   ((1 0) 0)
   ((2 0) 2))
 
-(hindent-test "16a* A lambda""
-fun = \x ->"
+(hindent-test "16a A lambda""
+fun = \\x ->"
   ((1 0) 0)
   ((2 0) 2))
 
-(hindent-test "16u* Lambda and a do block""
-fun = \x → do"
+(hindent-test "16u Lambda and a do block""
+fun = \\x → do"
   ((1 0) 0)
   ((2 0) 2))
 
-(hindent-test "16au* A lambda""
-fun = \x →"
+(hindent-test "16au A lambda""
+fun = \\x →"
   ((1 0) 0)
   ((2 0) 2))
 
@@ -647,9 +647,9 @@ az = Projection
 "
 	      ((6 0) 2))
 
-(hindent-test "35a* parse a backslash properly" "
+(hindent-test "35a parse a backslash properly" "
 az = Projection
-  { unproject = \x -> do
+  { unproject = \\x -> do
         case x of
           _ -> return
   , maxR = pi
@@ -665,25 +665,25 @@ tokOpenTag =
 "
 	      ((4 0) 7))
 (hindent-test "37* Indent continuation lines in multiline string literal" "
-a = \"multiline\
+a = \"multiline\\
 "
 	      ((2 0) 4))
 
-(hindent-test "38* Indent in do block after multiline string literal" "
+(hindent-test "38 Indent in do block after multiline string literal" "
 s = do
-  a <- "multiline\
-       \ line 2"
+  a <- \"multiline\\
+       \\ line 2\"
 "
-       ((4 0) 0 2 4))
+       ((4 0) 0 2 7))
 
-(hindent-test "39* do not crash after two multiline literals in do block" "
+(hindent-test "39 do not crash after two multiline literals in do block" "
 servePost = do
-  a <- fun \"line 1\
-           \line 2\"
-  b <- queryT \"comma is important: , \
-             \ line 2 \"
+  a <- fun \"line 1\\
+           \\line 2\"
+  b <- queryT \"comma is important: , \\
+             \\ line 2 \"
 "
-	      ((6 0) 0 2 4))
+	      ((6 0) 0 2 7))
 
 (hindent-test "40 parse error in multiline tuple" "
 a = ( 1
