@@ -62,12 +62,9 @@
     (save-excursion (insert "bcd"))
     (should (eql nil (haskell-completions-can-grab-prefix)))
     ;; region case
-    (let ((p (point)))
-      (goto-char (point-min))
-      (push-mark)
-      (goto-char p)
-      (activate-mark)
-      (should (eql nil (haskell-completions-can-grab-prefix))))))
+    (push-mark (point-min) t)
+    (activate-mark)
+    (should (eql nil (haskell-completions-can-grab-prefix)))))
 
 
 (ert-deftest haskell-completions-grab-pragma-prefix-nil-cases-test ()
