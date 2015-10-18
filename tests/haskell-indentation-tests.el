@@ -234,23 +234,23 @@ fun = x
   ((1 0) 0)
   ((2 0) 0 6))
 
-(hindent-test "11* Guards with commas""
+(hindent-test "11 Guards with commas""
 clunky env var1 var2
   | Just val1 <- lookup env var1
   , Just val2 <- lookup env var2"
   ((1 0) 0)
   ((2 0) 2)
-  ((3 0) 0 2)
-  ((4 0) 0 2))
+  ((3 0) 2)
+  ((4 0) 0 17))
 
-(hindent-test "11u* Guards with commas""
+(hindent-test "11u Guards with commas""
 clunky env var1 var2
   | Just val1 ← lookup env var1
   , Just val2 ← lookup env var2"
   ((1 0) 0)
   ((2 0) 2)
-  ((3 0) 0 2)
-  ((4 0) 0 2))
+  ((3 0) 2)
+  ((4 0) 0 16))
 
 (hindent-test "12 \"do\" as expression""
 fun = do { putStrLn \"X\";
