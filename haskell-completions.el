@@ -74,11 +74,11 @@ whitespace or new line, otherwise returns nil.
 
   Returns nil in presense of active region."
   (when (not (region-active-p))
-    (when (looking-at (rx (| space line-end punct)))
+    (when (looking-at-p (rx (| space line-end punct)))
       (when (not (bobp))
         (save-excursion
           (backward-char)
-          (not (looking-at (rx (| space line-end)))))))))
+          (not (looking-at-p (rx (| space line-end)))))))))
 
 (defun haskell-completions-grab-pragma-prefix ()
   "Grab completion prefix for pragma completions.
