@@ -678,6 +678,7 @@ Minor modes that work well with `haskell-mode':
   ;; TABs stops are 8 chars apart, as mandated by the Haskell Report.  --Stef
   (set (make-local-variable 'indent-tabs-mode) nil)
   (set (make-local-variable 'tab-width) 8)
+  (set (make-local-variable 'comment-auto-fill-only-comments) t)
   ;; Haskell is not generally suitable for electric indentation, since
   ;; there is no unambiguously correct indent level for any given line.
   (when (boundp 'electric-indent-inhibit)
