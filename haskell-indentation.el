@@ -40,8 +40,6 @@
 ;; TODO `haskell-indentation-find-indentation' — fix it, get rid of "safe"
 ;; version
 
-(require 'hl-line)
-(require 'syntax)
 (require 'cl-lib)
 
 ;;;###autoload
@@ -50,37 +48,6 @@
   :link '(custom-manual "(haskell-mode)Indentation")
   :group 'haskell
   :prefix "haskell-indentation-")
-
-;;;###autoload
-(defcustom haskell-indentation-show-indentations nil
-  "If t the current line's indentation points will be showed as
-underscore overlays in new haskell-mode buffers.  Use
-`haskell-indentation-enable-show-indentations' and
-`haskell-indentation-disable-show-indentations' to switch the
-behavior for already existing buffers."
-  :type 'boolean
-  :group 'haskell-indentation)
-
-;;;###autoload
-(defcustom haskell-indentation-show-indentations-after-eol nil
-  "If t, try to show indentation points after the end of line.
-This requires strange overlay hacks and can collide with other
-modes (e.g. fill-column-indicator)."
-  :type 'boolean
-  :group 'haskell-indentation)
-
-;;;###autoload
-(defface haskell-indentation-show-normal-face
-  '((t :underline t))
-  "Default face for indentations overlay."
-  :group 'haskell-indentation)
-
-;;;###autoload
-(defface haskell-indentation-show-hl-line-face
-  '((t :underline t :inherit hl-line))
-  "Face used for indentations overlay after EOL if `hl-line-mode'
-is enabled."
-  :group 'haskell-indentation)
 
 ;;;###autoload
 (defcustom haskell-indentation-indent-leftmost t
@@ -138,14 +105,7 @@ positions are allowed."
 (define-minor-mode haskell-indentation-mode
   "Haskell indentation mode that deals with the layout rule.
 It rebinds RET, DEL and BACKSPACE, so that indentations can be
-set and deleted as if they were real tabs.
-
-It is possible to render indent stops for current line as
-overlays.  Please read documentation for option
-`haskell-indentation-enable-show-indentations' and option
-`haskell-indentation-show-indentations-after-eol'.  These options
-were disabled by default because in most cases occurs overlay
-clashing with other modes."
+set and deleted as if they were real tabs."
   :keymap haskell-indentation-mode-map
   (kill-local-variable 'indent-line-function)
   (kill-local-variable 'indent-region-function)
@@ -154,10 +114,7 @@ clashing with other modes."
     (set (make-local-variable 'indent-line-function)
          'haskell-indentation-indent-line)
     (set (make-local-variable 'indent-region-function)
-         'haskell-indentation-indent-region)
-
-    (when haskell-indentation-show-indentations
-      (haskell-indentation-enable-show-indentations))))
+         'haskell-indentation-indent-region)))
 
 ;;;###autoload
 (defun turn-on-haskell-indentation ()
@@ -395,134 +352,6 @@ indentation points to the right, we switch going to the left."
            (car (haskell-indentation-first-indentation)) cursor-in-whitespace)
         (haskell-indentation-reindent-to pi cursor-in-whitespace))))))
 
-;;----------------------------------------------------------------------------
-;; haskell-indentation show indentations UI starts here
-
-(defvar haskell-indentation-dyn-show-indentations nil
-  "Whether showing of indentation points is enabled in this buffer.")
-
-(make-variable-buffer-local 'haskell-indentation-dyn-show-indentations)
-
-(defvar haskell-indentation-dyn-overlays nil
-  "Overlays used by haskell-indentation-enable-show-indentations.")
-
-(make-variable-buffer-local 'haskell-indentation-dyn-overlays)
-
-(defun haskell-indentation-init-overlays (n)
-  "Makes sure that haskell-indentation-dyn-overlays contains at least N overlays."
-  (let* ((clen (length haskell-indentation-dyn-overlays))
-         (needed (- n clen)))
-    (dotimes (_n needed)
-      (setq haskell-indentation-dyn-overlays
-            (cons (make-overlay 1 1) haskell-indentation-dyn-overlays)))
-    haskell-indentation-dyn-overlays))
-
-(defun haskell-indentation-unshow-overlays ()
-  "Unshows all the overlays."
-  (mapc #'delete-overlay haskell-indentation-dyn-overlays))
-
-(defvar haskell-indentation-pending-delay-show-overlays nil
-  "Indicates that there are pending overlays to be shown.
-
-Holds time object value as received from `run-at-time'.
-
-Used to debounce `haskell-indentation-delay-show-overlays'.")
-
-(make-local-variable 'haskell-indentation-pending-delay-show-overlays)
-
-(defun haskell-indentation-delay-show-overlays ()
-  "Show overlays after a little while.
-
-We use delay here so that it does not get in the way of normal
-cursor movement.
-
-If there is a running show overlays timer cancel it first."
-  (when haskell-indentation-pending-delay-show-overlays
-    (cancel-timer haskell-indentation-pending-delay-show-overlays))
-  (setq haskell-indentation-pending-delay-show-overlays
-        (run-at-time
-         "0.1 sec" nil
-         (lambda ()
-           (setq haskell-indentation-pending-delay-show-overlays nil)
-           (haskell-indentation-show-overlays)))))
-
-(defun haskell-indentation-show-overlays ()
-  "Put an underscore overlay at all the indentations points in
-the current buffer."
-  (if (and (memq major-mode '(haskell-mode literate-haskell-mode))
-           (memq 'haskell-indentation-mode minor-mode-list)
-           haskell-indentation-dyn-show-indentations)
-      (catch 'parse-error
-        (save-excursion
-          (let* ((columns (progn
-                            (end-of-line)
-                            (current-column)))
-                 (ci (haskell-indentation-current-indentation))
-                 (allinds (save-excursion
-                            ;; XXX: remove when
-                            ;; haskell-indentation-find-indentations is
-                            ;; fixed
-                            (move-to-column ci)
-                            ;; don't freak out on parse-error
-                            (haskell-indentation-find-indentations-safe)))
-                 ;; indentations that are easy to show
-                 (inds (cl-remove-if (lambda (i) (>= i columns)) allinds))
-                 ;; tricky indentations, that are after the current EOL
-                 (overinds (cl-member-if (lambda (i) (>= i columns)) allinds))
-                 ;; +1: leave space for an extra overlay to show overinds
-                 (overlays (haskell-indentation-init-overlays
-                            (+ 1 (length inds)))))
-            (while inds
-              (move-to-column (car inds))
-              (overlay-put (car overlays)
-                           'face
-                           'haskell-indentation-show-normal-face)
-              (overlay-put (car overlays)
-                           'after-string nil)
-              (move-overlay (car overlays) (point) (+ 1 (point)))
-              (setq inds (cdr inds))
-              (setq overlays (cdr overlays)))
-            (when (and overinds
-                       haskell-indentation-show-indentations-after-eol)
-              (let ((o (car overlays))
-                    (s (make-string (+ 1 (- (car (last overinds)) columns)) ? )))
-                ;; needed for the cursor to be in the good position, see:
-                ;; http://lists.gnu.org/archive/html/bug-gnu-emacs/2013-03/msg00079.html
-                (put-text-property 0 1 'cursor t s)
-                ;; color the whole line ending overlay with `hl-line-mode'
-                ;; face if needed
-                (when (or hl-line-mode global-hl-line-mode)
-                  (put-text-property 0 (length s) 'face 'hl-line s))
-                ;; put in the underlines at the correct positions
-                (dolist (i overinds)
-                  (put-text-property
-                   (- i columns) (+ 1 (- i columns))
-                   'face (if (or hl-line-mode global-hl-line-mode)
-                             'haskell-indentation-show-hl-line-face
-                           'haskell-indentation-show-normal-face)
-                   s))
-                (overlay-put o 'face nil)
-                (overlay-put o 'after-string s)
-                (end-of-line)
-                (move-overlay o (point) (point)))))))))
-
-(defun haskell-indentation-enable-show-indentations ()
-  "Enable showing of indentation points in the current buffer."
-  (interactive)
-  (setq haskell-indentation-dyn-show-indentations t)
-  (setq haskell-indentation-pending-delay-show-overlays nil)
-  (add-hook 'change-major-mode-hook #'haskell-indentation-unshow-overlays nil t)
-  (add-hook 'pre-command-hook #'haskell-indentation-unshow-overlays nil t)
-  (add-hook 'post-command-hook #'haskell-indentation-delay-show-overlays nil t))
-
-(defun haskell-indentation-disable-show-indentations ()
-  "Disable showing of indentation points in the current buffer."
-  (interactive)
-  (setq haskell-indentation-dyn-show-indentations nil)
-  (remove-hook 'post-command-hook #'haskell-indentation-delay-show-overlays t)
-  (haskell-indentation-unshow-overlays)
-  (remove-hook 'change-major-mode-hook #'haskell-indentation-unshow-overlays t)
-  (remove-hook 'pre-command-hook #'haskell-indentation-unshow-overlays t))
 
 ;;----------------------------------------------------------------------------
 ;; Parser Starts Here
