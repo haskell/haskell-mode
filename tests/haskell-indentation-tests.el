@@ -145,8 +145,7 @@ macro quotes them for you."
 function = Record
        { field = 123 }"
   ((1 0) 0)
-  ((2 0) 0 11)
-  ((3 0) 0 7))
+  ((2 0) 0 11))
 
 (hindent-test "2 Handle underscore in identifiers""
 function = do
@@ -719,4 +718,32 @@ a = ( 1
 	      ((2 0) 4)
 	      ((2 2) 6))
 
+(hindent-test "41 open do inside a list" "
+x = asum [ withX $ do
+             return ()
+         ]
+"
+	      ((2 0) 13))
+
+(hindent-test "42 open do inside a list second element" "
+x = asum [ mzero
+         , withX $ do
+             return ()
+         ]
+"
+	      ((3 0) 13))
+
+(hindent-test "43 open do inside a list second element, reset alignment" "
+x = asum [ mzero
+             , withX $ do
+                 return ()
+         ]
+"
+	      ((3 0) 17))
+
+(hindent-test "44 expression continues, reset alignment" "
+function = abc
+       def
+       xyz"
+  ((3 0) 0 7))
 ;;; haskell-indentation-tests.el ends here
