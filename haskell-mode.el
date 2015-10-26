@@ -889,41 +889,6 @@ LOC = (list FILE LINE COL)"
   (goto-char (+ (line-beginning-position)
                 (1- (elt loc 2)))))
 
-;; From Bryan O'Sullivan's blog:
-;; http://www.serpentine.com/blog/2007/10/09/using-emacs-to-insert-scc-annotations-in-haskell-code/
-(defun haskell-mode-insert-scc-at-point ()
-  "Insert an SCC annotation at point."
-  (interactive)
-  (if (or (looking-at "\\b\\|[ \t]\\|$") (and (not (bolp))
-                                              (save-excursion
-                                                (forward-char -1)
-                                                (looking-at "\\b\\|[ \t]"))))
-      (let ((space-at-point (looking-at "[ \t]")))
-        (unless (and (not (bolp)) (save-excursion
-                                    (forward-char -1)
-                                    (looking-at "[ \t]")))
-          (insert " "))
-        (insert "{-# SCC \"\" #-}")
-        (unless space-at-point
-          (insert " "))
-        (forward-char (if space-at-point -5 -6)))
-    (error "Not over an area of whitespace")))
-
-;; Also Bryan O'Sullivan's.
-(defun haskell-mode-kill-scc-at-point ()
-  "Kill the SCC annotation at point."
-  (interactive)
-  (save-excursion
-    (let ((old-point (point))
-          (scc "\\({-#[ \t]*SCC \"[^\"]*\"[ \t]*#-}\\)[ \t]*"))
-      (while (not (or (looking-at scc) (bolp)))
-        (forward-char -1))
-      (if (and (looking-at scc)
-               (<= (match-beginning 1) old-point)
-               (> (match-end 1) old-point))
-          (kill-region (match-beginning 0) (match-end 0))
-        (error "No SCC at point")))))
-
 (defun haskell-guess-module-name ()
   "Guess the current module name of the buffer."
   (interactive)
