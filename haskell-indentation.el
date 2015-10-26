@@ -756,7 +756,7 @@ Skip the keyword or parenthesis." ; FIXME: better description needed
            (starter-indent (min starter-column current-indent))
            (left-indent
             (if end
-                (+ current-indent haskell-indentation-starter-offset)
+                (+ starter-indent haskell-indentation-starter-offset)
               left-indent)))
       (funcall parser)
       (cond ((eq current-token 'end-tokens)
@@ -926,7 +926,9 @@ l = [  1
            (throw 'return nil))
           (separator-column ; on the beginning of the line
            (setq current-indent (current-column))
-           (setq starter-indent separator-column)))))
+           (setq starter-indent separator-column)
+           (setq left-indent
+            (+ starter-indent haskell-indentation-starter-offset))))))
 
 (defun haskell-indentation-implicit-layout-list (parser)
   "An implicit layout list, elements are parsed with PARSER.
@@ -1119,7 +1121,6 @@ line."
            (when (= (current-column) (haskell-indentation-current-indentation))
              ;; on a new line
              (setq current-indent (current-column))
-             (setq left-indent (current-column))
              (setq parse-line-number (+ parse-line-number 1)))
            (cond ((and implicit-layout-active
                        (> layout-indent (current-column)))
