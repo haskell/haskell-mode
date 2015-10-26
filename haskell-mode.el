@@ -600,9 +600,6 @@ Indentation modes:
     `haskell-indent-mode', Guy Lapalme
       Intelligent semi-automatic indentation.
 
-    `haskell-simple-indent-mode', Graeme E Moss and Heribert Schuetz
-      Simple indentation.
-
 Interaction modes:
 
     `interactive-haskell-mode'

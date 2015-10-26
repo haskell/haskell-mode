@@ -350,12 +350,6 @@ trade-offs:
 
 @ftable @code
 
-@item haskell-simple-indent-mode
-
-A very simple indentation scheme; In this scheme, @key{TAB} will now
-move the cursor to the next indent point in the previous non-blank line.
-An indent point is a non-whitespace character following whitespace.
-
 @item haskell-indent-mode
 
 Intelligent semi-automatic indentation for Haskell's layout rule.  The
@@ -386,7 +380,6 @@ convenient user interface or by adding @emph{one} of the following three
 lines to your @file{.emacs} file:
 
 @lisp
-(add-hook 'haskell-mode-hook 'haskell-simple-indent-mode)
 (add-hook 'haskell-mode-hook 'haskell-indent-mode)
 (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
 @end lisp
