@@ -404,6 +404,13 @@ same vein as `haskell-indent-spaces'."
   :group 'haskell
   :type '(repeat 'string))
 
+;;;###autoload
+(defcustom haskell-tags-command
+  "find . -type f \\( -name '*.hs' -or -name '*.lhs' -or -name '*.hsc' \\) -not \\( -name '#*' -or -name '.*' \\) -print0 | xargs -0 hasktags -e -x"
+  "Command to run from the project root to find haskell files and generate a TAGS file"
+  :type 'string
+  :group 'haskell)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessor functions

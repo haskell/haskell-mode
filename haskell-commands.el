@@ -33,6 +33,7 @@
 (require 'haskell-presentation-mode)
 (require 'haskell-utils)
 (require 'highlight-uses-mode)
+(require 'haskell-customize)
 
 ;;;###autoload
 (defun haskell-process-restart ()
@@ -702,11 +703,11 @@ function `xref-find-definitions' after new table was generated."
                             (haskell-session-cabal-dir (haskell-process-session (car state)))))
               (haskell-process-send-string
                (car state)
-               (format ":!cd %s && %s | %s"
+               (format ":!cd %s && %s"
                        (haskell-session-cabal-dir
                         (haskell-process-session (car state)))
-                       "find . -type f \\( -name '*.hs' -or -name '*.lhs' -or -name '*.hsc' \\) -not \\( -name '#*' -or -name '.*' \\) -print0"
-                       "xargs -0 hasktags -e -x"))))
+                       haskell-tags-command
+                       ))))
       :complete (lambda (state _response)
                   (when (cdr state)
                     (let ((session-tags
