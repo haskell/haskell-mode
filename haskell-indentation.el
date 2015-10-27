@@ -507,7 +507,8 @@ indentation points to the right, we switch going to the left."
   `(("module"   . haskell-indentation-module)
     ("data"     . haskell-indentation-data)
     ("type"     . haskell-indentation-data)
-    ("newtype"  .   haskell-indentation-data)
+    ("newtype"  . haskell-indentation-data)
+    ("import"   . haskell-indentation-import)
     ("class"    . haskell-indentation-class-declaration)
     ("instance" . haskell-indentation-class-declaration))
   "Alist of toplevel keywords with associated parsers.")
@@ -676,6 +677,10 @@ For example
            ((string= current-token "where")
             (haskell-indentation-with-starter
              #'haskell-indentation-expression-layout nil))))))
+
+(defun haskell-indentation-import ()
+  "Parse import declaration."
+  (haskell-indentation-with-starter #'haskell-indentation-expression))
 
 (defun haskell-indentation-class-declaration ()
   "Parse class declaration."
@@ -946,7 +951,9 @@ layout starts."
                (haskell-indentation-read-next-token))
               ((eq current-token 'end-tokens)
                (when (or (haskell-indentation-expression-token-p following-token)
-                         (string= following-token ";"))
+                         (string= following-token ";")
+                         (and (equal layout-indent 0)
+                              (member following-token (mapcar #'car haskell-indentation-toplevel-list))))
                  (haskell-indentation-add-layout-indent))
                (throw 'return nil))
               (t (throw 'return nil))))))
@@ -1132,7 +1139,7 @@ line."
 
 (defun haskell-indentation-peek-token ()
   "Return token starting at point."
-  (cond ((looking-at "\\(if\\|then\\|else\\|let\\|in\\|mdo\\|rec\\|do\\|proc\\|case\\|of\\|where\\|module\\|deriving\\|data\\|type\\|newtype\\|class\\|instance\\)\\([^[:alnum:]'_]\\|$\\)")
+  (cond ((looking-at "\\(if\\|then\\|else\\|let\\|in\\|mdo\\|rec\\|do\\|proc\\|case\\|of\\|where\\|module\\|deriving\\|import\\|data\\|type\\|newtype\\|class\\|instance\\)\\([^[:alnum:]'_]\\|$\\)")
          (match-string-no-properties 1))
         ((looking-at "[][(){}[,;]")
          (match-string-no-properties 0))
