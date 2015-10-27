@@ -210,7 +210,7 @@ negative ARG.  Handles bird style literate Haskell too."
     (catch 'parse-error
       ;;  - save the current column
       (let* ((ci (haskell-indentation-current-indentation))
-             (indentations (haskell-indentation-find-indentations-safe)))
+             (indentations (haskell-indentation-find-indentations)))
         ;; - jump to the next line and reindent to at the least same level        
         (delete-horizontal-space)
         (newline)
@@ -261,20 +261,18 @@ indentation points to the right, we switch going to the left."
     (unless (save-excursion
               (beginning-of-line)
               (nth 8 (syntax-ppss)))
-      ;; parse error is intentionally not catched here, it may come from
-      ;; `haskell-indentation-find-indentations-safe', but escapes the scope
+      ;; parse error is intentionally not cought here, it may come from
+      ;; `haskell-indentation-find-indentations', but escapes the scope
       ;; and aborts the opertaion before any moving happens
       (let* ((cc (current-column))
              (ci (haskell-indentation-current-indentation))
              (inds (save-excursion
                      (move-to-column ci)
-                     (haskell-indentation-find-indentations-safe)))
+                     (haskell-indentation-find-indentations)))
              (valid (memq ci inds))
              (cursor-in-whitespace (< cc ci)))
-        ;; can't happen right now, because of -safe, but we may want to have
-        ;; this in the future
-        ;; (when (null inds)
-        ;;   (error "returned indentations empty, but no parse error"))
+        (when (null inds)
+          (error "returned indentations empty, but no parse error"))
         (if (and valid cursor-in-whitespace)
             (move-to-column ci)
           (haskell-indentation-reindent-to
@@ -349,7 +347,7 @@ indentation points to the right, we switch going to the left."
            (ci (haskell-indentation-current-indentation))
            (inds (save-excursion
                    (move-to-column ci)
-                   (haskell-indentation-find-indentations-safe)))
+                   (haskell-indentation-find-indentations)))
            (cursor-in-whitespace (< cc ci))
            (pi (haskell-indentation-previous-indentation ci inds)))
       (if (null pi)
@@ -484,11 +482,6 @@ indentation points to the right, we switch going to the left."
         (haskell-indentation-first-indentation)))
      (t
       (haskell-indentation-parse-to-indentations)))))
-
-;; XXX: this is a hack, the parser shouldn't return nil without parse-error
-(defun haskell-indentation-find-indentations-safe ()
-  (or (haskell-indentation-find-indentations)
-      (haskell-indentation-first-indentation)))
 
 (defconst haskell-indentation-unicode-tokens
   '(("→" . "->")     ;; #x2192 RIGHTWARDS ARROW
