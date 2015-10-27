@@ -181,22 +181,21 @@ function = do
 
 (hindent-test "3 Import statememnt symbol list 1""
 import Control.Concurrent
-  ( forkIO,
-    killThread )"
+       ( forkIO,
+         killThread )"
   ((1 0) 0)
-  ((2 0) 0 2)
-  ((3 0) 4)
-  ((4 0) 0 2))
+  ((2 0) 0 7)
+  ((3 0) 9)
+  ((4 0) 0 7))
 
 (hindent-test "4 Import statememnt symbol list 2""
 import Control.Concurrent
-  ( forkIO
-  , killThread )
-"
+       ( forkIO
+       , killThread )"
   ((1 0) 0)
-  ((2 0) 0 2)
-  ((3 0) 2)
-  ((4 0) 0 2))
+  ((2 0) 0 7)
+  ((3 0) 7)
+  ((4 0) 0 7))
 
 (hindent-test "5 List comprehension""
 fun = [ x | y
@@ -234,12 +233,24 @@ fun = [ f | x ← xs
   ((4 0) 10)
   ((5 0) 0))
 
-(hindent-test "7* \"import\" after \"import\"""
+(hindent-test "7a \"data\" after \"data\"""
+data ABC = ABC
+data DEF = DEF"
+  ((1 0) 0)
+  ((2 0) 0))
+
+(hindent-test "7 \"import\" after \"import\"""
 import ABC
 import DEF"
   ((1 0) 0)
   ((2 0) 0)
-  ((3 0) 0))
+  ((3 0) 0 7))
+
+(hindent-test "7b* declaration after declaration" "
+fun1 = undefined
+fun2 = undefined"
+  ((1 0) 0)
+  ((2 0) 0))
 
 (hindent-test "8* Guards in function definition""
 resolve (amount, max) number
