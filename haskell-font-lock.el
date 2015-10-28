@@ -35,7 +35,7 @@
   "Display \\ and -> and such using symbols in fonts.
 
 This may sound like a neat trick, but be extra careful: it changes the
-alignment and can thus lead to nasty surprises w.r.t layout."
+alignment and can thus lead to nasty surprises with regards to layout."
   :group 'haskell
   :type 'boolean)
 
