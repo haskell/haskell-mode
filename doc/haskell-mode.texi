@@ -209,6 +209,58 @@ control @code{font-lock-mode}.
 @image{anim/font-lock}
 @end ifhtml
 
+@section Managing imports
+
+There are a few functions for managing imports.
+
+@subsection Jump to imports
+
+To jump to your import list, run
+
+    @code{M-x haskell-navigate-imports}
+
+It's nicer to have a keybinding to do this, for example:
+
+@lisp
+(define-key haskell-mode-map [f8] 'haskell-navigate-imports)
+@end lisp
+
+You can hit it repeatedly to jump between groups of imports. It will
+cycle.
+
+@subsection Format imports
+
+To generally format (sort, align) your imports, you can run
+
+    @code{M-x haskell-mode-format-imports}
+
+Or @kbd{C-c C-.}.
+
+@subsection Sort imports
+
+To just sort imports, jump to an import section and run
+
+    @code{M-x haskell-sort-imports}
+
+@subsection Align imports
+
+To just align imports, jump to an import section and run
+
+    @code{M-x haskell-align-imports}
+
+@subsection Entering imports
+
+If you have Haskell Interactive Mode enabled and a session open,
+you can write
+
+    @code{import}
+
+And then hit @kbd{SPC} (running @code{M-x haskell-mode-contextual-space})
+which will prompt a list of all modules, either installed modules or
+local project directory files. Then it'll insert it and then format that
+module section.
+
+
 @section Completion support
 
 @code{haskell-mode} can complete symbols, pragma directives and language
