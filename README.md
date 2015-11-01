@@ -13,7 +13,6 @@ Make sure you have this in your [init file](http://www.gnu.org/software/emacs/ma
 
 ```elisp
 (require 'package)
-(add-hook 'haskell-mode-hook 'haskell-indentation-mode)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
