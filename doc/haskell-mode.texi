@@ -589,7 +589,19 @@ associated with at most one GHCi session, so when you call
 no session associated yet, you're asked which GHCi session to create or
 associate with.
 
-TODO/WRITEME
+@section Using GHCi-ng
+
+Put @code{:set +c} in your @code{.ghci} or run it in the REPL. Then use
+these keybindings:
+
+@lisp
+(define-key interactive-haskell-mode-map (kbd "M-.") 'haskell-mode-goto-loc)
+(define-key interactive-haskell-mode-map (kbd "C-c C-t") 'haskell-mode-show-type-at)
+@end lisp
+
+You have to load the module before it works, after that it will remember
+for the current GHCi session.
+
 
 @node Editing Cabal files
 @chapter Editing Cabal files
