@@ -62,6 +62,7 @@ ELFILES = \
 	haskell-doc.el \
 	haskell.el \
 	haskell-font-lock.el \
+	haskell-hoogle.el \
 	haskell-indentation.el \
 	haskell-indent.el \
 	haskell-interactive-mode.el \
