@@ -486,6 +486,64 @@ need to add the following to your Emacs initialization:
   '(add-to-list 'which-func-modes 'haskell-mode))
 @end lisp
 
+@section Speedbar
+
+Haskell-mode comes with declaration scanning support. This means that if you enable Haskell support for speedbar:
+
+@lisp
+(speedbar-add-supported-extension ".hs")
+@end lisp
+
+And open speedbar with
+
+@code{M-x speedbar}
+
+It gives a listing of each module and under each module:
+
+@example
+    Imports
+    Instances
+    Data types
+    Classes
+    Bindings
+@end example
+
+You will get a bar that looks like this:
+
+@verbatim
+~/Projects/ace/src/ACE/
+0:<+> Types
+0:[+] Combinators.hs
+0:[-] Datalog.hs
+1:   {-} Classes
+2:      > ToTerm
+1:   {-} Imports
+2:      > ACE.Types.Syntax
+2:      > Database.Datalog
+1:   {-} Instances
+2:    {+} ToTerm A
+2:    {+} ToTerm Co to ToTerm Gen
+2:    {+} ToTerm Intransitive to ToTerm N
+2:    {+} ToTerm P
+2:    {+} ToTerm Quotation to ToTerm Un
+2:    {+} ToTerm V
+0:[-] Html.hs
+1:   {+} Imports
+1:   {+} Instances
+1:     > mtoMarkup
+1:     > toMarkupm
+1:     > wrap
+0:[-] Parsers.hs
+1:   {+} Imports
+1:   {-} Datatypes
+2:      > ACEParser
+0:[+] Pretty.hs
+0:[+] Tokenizer.hs
+@end verbatim
+
+The hierarchy is expandable/collapsible and each entry will jump to the
+line in the right file when clicked/selected.
+
 @node Compilation
 @chapter Compilation
 
