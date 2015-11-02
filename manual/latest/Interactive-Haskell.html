@@ -104,8 +104,21 @@ associated with at most one GHCi session, so when you call
 no session associated yet, you&rsquo;re asked which GHCi session to create or
 associate with.
 </p>
-<p>TODO/WRITEME
+<a name="Using-GHCi_002dng"></a>
+<h3 class="section">10.1 Using GHCi-ng</h3>
+
+<p>Put <code>:set +c</code> in your <code>.ghci</code> or run it in the REPL. Then use
+these keybindings:
 </p>
+<div class="lisp">
+<pre class="lisp">(define-key interactive-haskell-mode-map (kbd &quot;M-.&quot;) 'haskell-mode-goto-loc)
+(define-key interactive-haskell-mode-map (kbd &quot;C-c C-t&quot;) 'haskell-mode-show-type-at)
+</pre></div>
+
+<p>You have to load the module before it works, after that it will remember
+for the current GHCi session.
+</p>
+
 
 
 

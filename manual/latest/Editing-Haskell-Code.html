@@ -123,8 +123,66 @@ control <code>font-lock-mode</code>.
 </p>
 <img src="anim/font-lock.gif" alt="anim/font-lock">
 
+<a name="Managing-imports"></a>
+<h3 class="section">4.2 Managing imports</h3>
+
+<p>There are a few functions for managing imports.
+</p>
+<a name="Jump-to-imports"></a>
+<h4 class="subsection">4.2.1 Jump to imports</h4>
+
+<p>To jump to your import list, run
+</p>
+<p><code>M-x haskell-navigate-imports</code>
+</p>
+<p>It&rsquo;s nicer to have a keybinding to do this, for example:
+</p>
+<div class="lisp">
+<pre class="lisp">(define-key haskell-mode-map [f8] 'haskell-navigate-imports)
+</pre></div>
+
+<p>You can hit it repeatedly to jump between groups of imports. It will
+cycle.
+</p>
+<a name="Format-imports"></a>
+<h4 class="subsection">4.2.2 Format imports</h4>
+
+<p>To generally format (sort, align) your imports, you can run
+</p>
+<p><code>M-x haskell-mode-format-imports</code>
+</p>
+<p>Or <kbd>C-c C-.</kbd>.
+</p>
+<a name="Sort-imports"></a>
+<h4 class="subsection">4.2.3 Sort imports</h4>
+
+<p>To just sort imports, jump to an import section and run
+</p>
+<p><code>M-x haskell-sort-imports</code>
+</p>
+<a name="Align-imports"></a>
+<h4 class="subsection">4.2.4 Align imports</h4>
+
+<p>To just align imports, jump to an import section and run
+</p>
+<p><code>M-x haskell-align-imports</code>
+</p>
+<a name="Entering-imports"></a>
+<h4 class="subsection">4.2.5 Entering imports</h4>
+
+<p>If you have Haskell Interactive Mode enabled and a session open,
+you can write
+</p>
+<p><code>import</code>
+</p>
+<p>And then hit <kbd>SPC</kbd> (running <code>M-x haskell-mode-contextual-space</code>)
+which will prompt a list of all modules, either installed modules or
+local project directory files. Then it&rsquo;ll insert it and then format that
+module section.
+</p>
+
 <a name="Completion-support"></a>
-<h3 class="section">4.2 Completion support</h3>
+<h3 class="section">4.3 Completion support</h3>
 
 <p><code>haskell-mode</code> can complete symbols, pragma directives and language
 extensions. This is part of <code>haskell-interactive-mode</code>.
