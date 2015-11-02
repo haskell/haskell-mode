@@ -209,6 +209,58 @@ control @code{font-lock-mode}.
 @image{anim/font-lock}
 @end ifhtml
 
+@section Managing imports
+
+There are a few functions for managing imports.
+
+@subsection Jump to imports
+
+To jump to your import list, run
+
+    @code{M-x haskell-navigate-imports}
+
+It's nicer to have a keybinding to do this, for example:
+
+@lisp
+(define-key haskell-mode-map [f8] 'haskell-navigate-imports)
+@end lisp
+
+You can hit it repeatedly to jump between groups of imports. It will
+cycle.
+
+@subsection Format imports
+
+To generally format (sort, align) your imports, you can run
+
+    @code{M-x haskell-mode-format-imports}
+
+Or @kbd{C-c C-.}.
+
+@subsection Sort imports
+
+To just sort imports, jump to an import section and run
+
+    @code{M-x haskell-sort-imports}
+
+@subsection Align imports
+
+To just align imports, jump to an import section and run
+
+    @code{M-x haskell-align-imports}
+
+@subsection Entering imports
+
+If you have Haskell Interactive Mode enabled and a session open,
+you can write
+
+    @code{import}
+
+And then hit @kbd{SPC} (running @code{M-x haskell-mode-contextual-space})
+which will prompt a list of all modules, either installed modules or
+local project directory files. Then it'll insert it and then format that
+module section.
+
+
 @section Completion support
 
 @code{haskell-mode} can complete symbols, pragma directives and language
@@ -434,6 +486,64 @@ need to add the following to your Emacs initialization:
   '(add-to-list 'which-func-modes 'haskell-mode))
 @end lisp
 
+@section Speedbar
+
+Haskell-mode comes with declaration scanning support. This means that if you enable Haskell support for speedbar:
+
+@lisp
+(speedbar-add-supported-extension ".hs")
+@end lisp
+
+And open speedbar with
+
+@code{M-x speedbar}
+
+It gives a listing of each module and under each module:
+
+@example
+    Imports
+    Instances
+    Data types
+    Classes
+    Bindings
+@end example
+
+You will get a bar that looks like this:
+
+@verbatim
+~/Projects/ace/src/ACE/
+0:<+> Types
+0:[+] Combinators.hs
+0:[-] Datalog.hs
+1:   {-} Classes
+2:      > ToTerm
+1:   {-} Imports
+2:      > ACE.Types.Syntax
+2:      > Database.Datalog
+1:   {-} Instances
+2:    {+} ToTerm A
+2:    {+} ToTerm Co to ToTerm Gen
+2:    {+} ToTerm Intransitive to ToTerm N
+2:    {+} ToTerm P
+2:    {+} ToTerm Quotation to ToTerm Un
+2:    {+} ToTerm V
+0:[-] Html.hs
+1:   {+} Imports
+1:   {+} Instances
+1:     > mtoMarkup
+1:     > toMarkupm
+1:     > wrap
+0:[-] Parsers.hs
+1:   {+} Imports
+1:   {-} Datatypes
+2:      > ACEParser
+0:[+] Pretty.hs
+0:[+] Tokenizer.hs
+@end verbatim
+
+The hierarchy is expandable/collapsible and each entry will jump to the
+line in the right file when clicked/selected.
+
 @node Compilation
 @chapter Compilation
 
@@ -589,7 +699,19 @@ associated with at most one GHCi session, so when you call
 no session associated yet, you're asked which GHCi session to create or
 associate with.
 
-TODO/WRITEME
+@section Using GHCi-ng
+
+Put @code{:set +c} in your @code{.ghci} or run it in the REPL. Then use
+these keybindings:
+
+@lisp
+(define-key interactive-haskell-mode-map (kbd "M-.") 'haskell-mode-goto-loc)
+(define-key interactive-haskell-mode-map (kbd "C-c C-t") 'haskell-mode-show-type-at)
+@end lisp
+
+You have to load the module before it works, after that it will remember
+for the current GHCi session.
+
 
 @node Editing Cabal files
 @chapter Editing Cabal files
