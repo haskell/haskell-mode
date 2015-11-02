@@ -709,12 +709,10 @@ function `xref-find-definitions' after new table was generated."
                        "xargs -0 hasktags -e -x"))))
       :complete (lambda (state _response)
                   (when (cdr state)
-                    (let ((session-tags
-                          (haskell-session-tags-filename
-                           (haskell-process-session (car state)))))
-                      (add-to-list 'tags-table-list session-tags)
-                      (setq tags-file-name nil))
-                    (xref-find-definitions (cdr state)))
+                    (let ((tags-file-name
+                           (haskell-session-tags-filename
+                            (haskell-process-session (car state)))))
+                      (xref-find-definitions (cdr state))))
                   (haskell-mode-message-line "Tags generated."))))))
 
 (defun haskell-process-add-cabal-autogen ()
