@@ -918,6 +918,10 @@ successful, nil otherwise."
   (if (not (haskell-mode-try-insert-scc-at-point))
       (error "Not over an area of whitespace")))
 
+(make-obsolete
+ 'haskell-mode-insert-scc-at-point
+ 'haskell-mode-toggle-scc-at-point)
+
 (defun haskell-mode-try-kill-scc-at-point ()
   "Try to kill an SCC annotation at point.  Return true if
 successful, nil otherwise."
@@ -938,6 +942,10 @@ successful, nil otherwise."
   (interactive)
   (if (not (haskell-mode-try-kill-scc-at-point))
       (error "No SCC at point")))
+
+(make-obsolete
+ 'haskell-mode-kill-scc-at-point
+ 'haskell-mode-toggle-scc-at-point)
 
 (defun haskell-mode-toggle-scc-at-point ()
   "If point is in an SCC annotation, kill the annotation.  Otherwise, try to insert a new annotation."
