@@ -920,7 +920,8 @@ successful, nil otherwise."
 
 (make-obsolete
  'haskell-mode-insert-scc-at-point
- 'haskell-mode-toggle-scc-at-point)
+ 'haskell-mode-toggle-scc-at-point
+ "2015-11-11")
 
 (defun haskell-mode-try-kill-scc-at-point ()
   "Try to kill an SCC annotation at point.  Return true if
@@ -945,7 +946,8 @@ successful, nil otherwise."
 
 (make-obsolete
  'haskell-mode-kill-scc-at-point
- 'haskell-mode-toggle-scc-at-point)
+ 'haskell-mode-toggle-scc-at-point
+ "2015-11-11")
 
 (defun haskell-mode-toggle-scc-at-point ()
   "If point is in an SCC annotation, kill the annotation.  Otherwise, try to insert a new annotation."
