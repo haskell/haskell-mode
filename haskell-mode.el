@@ -895,10 +895,12 @@ LOC = (list FILE LINE COL)"
 (defun haskell-mode-try-insert-scc-at-point ()
   "Try to insert an SCC annotation at point.  Return true if
 successful, nil otherwise."
-  (if (or (looking-at "\\b\\|[ \t]\\|$") (and (not (bolp))
-                                              (save-excursion
-                                                (forward-char -1)
-                                                (looking-at "\\b\\|[ \t]"))))
+  (if (or (looking-at "\\b\\|[ \t]\\|$")
+          ;; Allow SCC if point is on a non-letter with whitespace to the left
+          (and (not (bolp))
+               (save-excursion
+                 (forward-char -1)
+                 (looking-at "[ \t]"))))
       (let ((space-at-point (looking-at "[ \t]")))
         (unless (and (not (bolp)) (save-excursion
                                     (forward-char -1)
