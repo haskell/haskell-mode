@@ -170,7 +170,7 @@
   (should (with-temp-buffer
             (haskell-mode)
             (insert "Äöèąċōïá")
-            (string= "Äöèąċōïá" (haskell-ident-at-point)))))            
+            (string= "Äöèąċōïá" (haskell-ident-at-point)))))
 
 (ert-deftest unicode-pos ()
   (should (with-temp-buffer
@@ -384,5 +384,32 @@ Also should respect 10 column fill."
                 "-- d e")
 	      '("-- @| a b c d"
                 "-- e")))
+
+(ert-deftest insert-scc-feasible ()
+  "insert an SCC where it's possible to do so"
+  (should (with-temp-buffer
+            (insert "hello world")
+            (goto-char 6)
+            (haskell-mode-toggle-scc-at-point)
+            (string= "hello {-# SCC \"\" #-} world"
+                     (buffer-substring 1 (point-max))))))
+
+(ert-deftest insert-scc-infeasible ()
+  "insert an SCC where it's not possible to do so"
+  (should-error (with-temp-buffer
+            (insert "hello world")
+            (goto-char 3)
+            (haskell-mode-toggle-scc-at-point)
+            (string= "hello world"
+                     (buffer-substring 1 (point-max))))))
+
+(ert-deftest remove-scc ()
+  "insert an SCC where it's possible to do so"
+  (should (with-temp-buffer
+            (insert "hello {-# SCC \"\" #-} world")
+            (goto-char 10)
+            (haskell-mode-toggle-scc-at-point)
+            (string= "hello world"
+                     (buffer-substring 1 (point-max))))))
 
 (provide 'haskell-mode-tests)
