@@ -398,7 +398,7 @@ Also should respect 10 column fill."
   "insert an SCC where it's not possible to do so"
   (should-error (with-temp-buffer
             (insert "hello world")
-            (goto-char 3)
+            (goto-char 2)
             (haskell-mode-toggle-scc-at-point)
             (string= "hello world"
                      (buffer-substring 1 (point-max))))))
