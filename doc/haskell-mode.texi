@@ -278,6 +278,15 @@ and available packages.
 @image{anim/company-mode-import-statement}
 @end ifhtml
 
+@section Profiling and Debugging support
+
+When profiling code with GHC, it is often useful to add
+@uref{https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/profiling.html#cost-centres,
+cost centres} by hand.  These allow finer-grained information about
+program behavior.  @code{haskell-mode} provides the function
+@code{haskell-mode-toggle-scc-at-point} to make this more convenient.
+It will remove an SCC annotation at point if one is present, or add
+one if point is over whitespace.  By default it is bound to @kbd{C-c C-s}.
 
 @node Unicode support
 @chapter Unicode support
