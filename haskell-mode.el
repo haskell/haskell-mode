@@ -202,6 +202,7 @@ be set to the preferred literate style."
     (define-key map (kbd "C-c C-v") 'haskell-mode-enable-process-minor-mode)
     (define-key map (kbd "C-c C-t") 'haskell-mode-enable-process-minor-mode)
     (define-key map (kbd "C-c C-i") 'haskell-mode-enable-process-minor-mode)
+    (define-key map (kbd "C-c C-s") 'haskell-mode-toggle-scc-at-point)
     map)
   "Keymap used in Haskell mode.")
 
