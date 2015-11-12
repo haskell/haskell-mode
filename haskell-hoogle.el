@@ -1,4 +1,4 @@
-;;; haskell-hoogle.el --- Look up Haskell documentation via hoogle or hayoo  -*- lexical-binding: t; -*-
+;;; haskell-hoogle.el --- Look up Haskell documentation via hoogle  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2015  Steve Purcell
 
@@ -20,7 +20,7 @@
 
 ;;; Commentary:
 
-;; Functions for looking up documentation with hayoo or hoogle, via
+;; Functions for looking up documentation with hoogle, via
 ;; either local or remote servers.
 
 ;;; Code:
@@ -117,34 +117,6 @@ is asked to show extra info for the items matching QUERY.."
                           (read-string "hoogle: " (haskell-ident-at-point))))
     (when (y-or-n-p "Hoogle server not running, start hoogle server? ")
       (haskell-hoogle-start-server))))
-
-
-
-;;;###autoload
-(defcustom haskell-hayoo-url "http://hayoo.fh-wedel.de/?query=%s"
-  "Default value for hayoo web site."
-  :group 'haskell
-  :type '(choice
-          (const :tag "fh-wedel.de" "http://hayoo.fh-wedel.de/?query=%s")
-          string))
-
-;;;###autoload
-(defun haskell-hayoo (query)
-  "Do a Hayoo search for QUERY."
-  (interactive
-   (let ((def (haskell-ident-at-point)))
-     (if (and def (symbolp def)) (setq def (symbol-name def)))
-     (list (read-string (if def
-                            (format "Hayoo query (default %s): " def)
-                          "Hayoo query: ")
-                        nil nil def))))
-  (browse-url (format haskell-hayoo-url (url-hexify-string query))))
-
-;;;###autoload
-(defalias 'hayoo 'haskell-hayoo)
-
-
-
 
 (provide 'haskell-hoogle)
 ;;; haskell-hoogle.el ends here
