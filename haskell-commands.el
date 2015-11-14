@@ -605,8 +605,8 @@ default (please follow GHCi-ng README available at URL
 
 \\<haskell-interactive-mode-map>
 To make this function works sometimes you need to load the file in REPL
-first using command `haskell-process-load-or-reload' bound to
-\\[haskell-process-load-or-reload].
+first using command `haskell-process-load-file' bound to
+\\[haskell-process-load-file].
 
 Optional argument INSERT-VALUE indicates that
 recieved type signature should be inserted (but only if nothing
