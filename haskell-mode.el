@@ -202,6 +202,7 @@ be set to the preferred literate style."
     (define-key map (kbd "C-c C-v") 'haskell-mode-enable-process-minor-mode)
     (define-key map (kbd "C-c C-t") 'haskell-mode-enable-process-minor-mode)
     (define-key map (kbd "C-c C-i") 'haskell-mode-enable-process-minor-mode)
+    (define-key map (kbd "C-c C-s") 'haskell-mode-toggle-scc-at-point)
     map)
   "Keymap used in Haskell mode.")
 
@@ -891,13 +892,15 @@ LOC = (list FILE LINE COL)"
 
 ;; From Bryan O'Sullivan's blog:
 ;; http://www.serpentine.com/blog/2007/10/09/using-emacs-to-insert-scc-annotations-in-haskell-code/
-(defun haskell-mode-insert-scc-at-point ()
-  "Insert an SCC annotation at point."
-  (interactive)
-  (if (or (looking-at "\\b\\|[ \t]\\|$") (and (not (bolp))
-                                              (save-excursion
-                                                (forward-char -1)
-                                                (looking-at "\\b\\|[ \t]"))))
+(defun haskell-mode-try-insert-scc-at-point ()
+  "Try to insert an SCC annotation at point.  Return true if
+successful, nil otherwise."
+  (if (or (looking-at "\\b\\|[ \t]\\|$")
+          ;; Allow SCC if point is on a non-letter with whitespace to the left
+          (and (not (bolp))
+               (save-excursion
+                 (forward-char -1)
+                 (looking-at "[ \t]"))))
       (let ((space-at-point (looking-at "[ \t]")))
         (unless (and (not (bolp)) (save-excursion
                                     (forward-char -1)
@@ -906,13 +909,23 @@ LOC = (list FILE LINE COL)"
         (insert "{-# SCC \"\" #-}")
         (unless space-at-point
           (insert " "))
-        (forward-char (if space-at-point -5 -6)))
-    (error "Not over an area of whitespace")))
+        (forward-char (if space-at-point -5 -6))
+        t )))
 
-;; Also Bryan O'Sullivan's.
-(defun haskell-mode-kill-scc-at-point ()
-  "Kill the SCC annotation at point."
+(defun haskell-mode-insert-scc-at-point ()
+  "Insert an SCC annotation at point."
   (interactive)
+  (if (not (haskell-mode-try-insert-scc-at-point))
+      (error "Not over an area of whitespace")))
+
+(make-obsolete
+ 'haskell-mode-insert-scc-at-point
+ 'haskell-mode-toggle-scc-at-point
+ "2015-11-11")
+
+(defun haskell-mode-try-kill-scc-at-point ()
+  "Try to kill an SCC annotation at point.  Return true if
+successful, nil otherwise."
   (save-excursion
     (let ((old-point (point))
           (scc "\\({-#[ \t]*SCC \"[^\"]*\"[ \t]*#-}\\)[ \t]*"))
@@ -921,8 +934,27 @@ LOC = (list FILE LINE COL)"
       (if (and (looking-at scc)
                (<= (match-beginning 1) old-point)
                (> (match-end 1) old-point))
-          (kill-region (match-beginning 0) (match-end 0))
-        (error "No SCC at point")))))
+          (progn (kill-region (match-beginning 0) (match-end 0))
+                 t)))))
+
+;; Also Bryan O'Sullivan's.
+(defun haskell-mode-kill-scc-at-point ()
+  "Kill the SCC annotation at point."
+  (interactive)
+  (if (not (haskell-mode-try-kill-scc-at-point))
+      (error "No SCC at point")))
+
+(make-obsolete
+ 'haskell-mode-kill-scc-at-point
+ 'haskell-mode-toggle-scc-at-point
+ "2015-11-11")
+
+(defun haskell-mode-toggle-scc-at-point ()
+  "If point is in an SCC annotation, kill the annotation.  Otherwise, try to insert a new annotation."
+  (interactive)
+  (if (not (haskell-mode-try-kill-scc-at-point))
+      (if (not (haskell-mode-try-insert-scc-at-point))
+          (error "Could not insert or remove SCC"))))
 
 (defun haskell-guess-module-name ()
   "Guess the current module name of the buffer."
