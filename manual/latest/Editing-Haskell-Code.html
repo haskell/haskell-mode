@@ -195,7 +195,16 @@ and available packages.
 </p>
 <img src="anim/company-mode-import-statement.gif" alt="anim/company-mode-import-statement">
 
+<a name="Profiling-and-Debugging-support"></a>
+<h3 class="section">4.4 Profiling and Debugging support</h3>
 
+<p>When profiling code with GHC, it is often useful to add
+<a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/profiling.html#cost-centres">cost centres</a> by hand.  These allow finer-grained information about
+program behavior.  <code>haskell-mode</code> provides the function
+<code>haskell-mode-toggle-scc-at-point</code> to make this more convenient.
+It will remove an SCC annotation at point if one is present, or add
+one if point is over whitespace.  By default it is bound to <kbd>C-c C-s</kbd>.
+</p>
 <div class="footnote">
 <hr>
 <h4 class="footnotes-heading">Footnotes</h4>
