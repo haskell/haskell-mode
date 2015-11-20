@@ -110,9 +110,17 @@ bound to <kbd>C-c C-c</kbd>.
 Haskell program your currently visited buffer belongs to, by searching
 for a <samp>.cabal</samp> file in the current of enclosing parent folders. If
 a <samp>.cabal</samp> file was found, the command defined in the
-<code>haskell-compile-cabal-build-command</code> option is used. Moreover,
-when requesting to compile a <samp>.cabal</samp>-file is detected and a
-negative prefix argument (e.g. <kbd>C-- C-c C-c</kbd>) was given, the
+<code>haskell-compile-cabal-build-command</code> option is used. Note that to
+compile a <code>stack</code> based project you will need to set this variable to
+<code>stack build</code>. As usual you can do it using <code>M-x customize-variable</code>
+or with:
+</p>
+<div class="lisp">
+<pre class="lisp">(setq haskell-compile-cabal-build-command &quot;stack build&quot;)
+</pre></div>
+
+<p>Moreover, when requesting to compile a <samp>.cabal</samp>-file is detected and
+a negative prefix argument (e.g. <kbd>C-- C-c C-c</kbd>) was given, the
 alternative <code>haskell-compile-cabal-build-command-alt</code> is
 invoked. By default, <code>haskell-compile-cabal-build-command-alt</code>
 contains a &lsquo;<samp>cabal clean -s</samp>&rsquo; command in order to force a full
