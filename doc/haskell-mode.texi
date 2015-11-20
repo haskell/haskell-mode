@@ -603,9 +603,17 @@ When invoked, @code{haskell-compile} tries to guess how to compile the
 Haskell program your currently visited buffer belongs to, by searching
 for a @file{.cabal} file in the current of enclosing parent folders. If
 a @file{.cabal} file was found, the command defined in the
-@code{haskell-compile-cabal-build-command} option is used. Moreover,
-when requesting to compile a @file{.cabal}-file is detected and a
-negative prefix argument (e.g. @kbd{C-- C-c C-c}) was given, the
+@code{haskell-compile-cabal-build-command} option is used. Note that to
+compile a @code{stack} based project you will need to set this variable to
+@code{stack build}. As usual you can do it using @code{M-x customize-variable}
+or with:
+
+@lisp
+(setq haskell-compile-cabal-build-command "stack build")
+@end lisp
+
+Moreover, when requesting to compile a @file{.cabal}-file is detected and
+a negative prefix argument (e.g. @kbd{C-- C-c C-c}) was given, the
 alternative @code{haskell-compile-cabal-build-command-alt} is
 invoked. By default, @code{haskell-compile-cabal-build-command-alt}
 contains a @samp{cabal clean -s} command in order to force a full
