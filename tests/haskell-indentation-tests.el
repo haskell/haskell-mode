@@ -757,4 +757,26 @@ function = abc
        def
        xyz"
   ((3 0) 0 7))
+
+
+(ert-deftest haskell-indentation-ret-indents ()
+  (switch-to-buffer (get-buffer-create "source.hs"))
+  (haskell-mode)
+  (insert "main = do")
+  (execute-kbd-macro (kbd "<RET>"))
+  (should (equal 2 (count-lines (point-min) (point))))
+  (should (equal 2 (- (point) (line-beginning-position)))))
+
+(ert-deftest haskell-indentation-tab-and-backtab ()
+  (switch-to-buffer (get-buffer-create "source.hs"))
+  (haskell-mode)
+  (insert "main = do\n  lala\n  ")
+  (execute-kbd-macro (kbd "TAB"))
+  (should (equal 4 (count-lines (point-min) (point))))
+  (should (equal 4 (- (point) (line-beginning-position))))
+  (execute-kbd-macro (kbd "<backtab>"))
+  (should (equal 4 (count-lines (point-min) (point))))
+  (should (equal 2 (- (point) (line-beginning-position)))))
+
+
 ;;; haskell-indentation-tests.el ends here
