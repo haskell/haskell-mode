@@ -22,7 +22,7 @@ Make sure you have this in your [init file](http://www.gnu.org/software/emacs/ma
    (quote
     (("gnu" . "http://elpa.gnu.org/packages/")
      ("melpa-stable" . "http://stable.melpa.org/packages/")))))
- ```
+```
 
 Then run emacs, and evaluate:
 
