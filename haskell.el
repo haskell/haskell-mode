@@ -41,7 +41,8 @@
 
 (defvar interactive-haskell-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c C-l") 'haskell-process-load-or-reload)
+    (define-key map (kbd "C-c C-l") 'haskell-process-load-file)
+    (define-key map (kbd "C-c C-r") 'haskell-process-reload)
     (define-key map (kbd "C-c C-t") 'haskell-process-do-type)
     (define-key map (kbd "C-c C-i") 'haskell-process-do-info)
     (define-key map (kbd "M-.") 'haskell-mode-jump-to-def-or-tag)
@@ -394,12 +395,18 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
                                 (current-buffer)))
 
 ;;;###autoload
-(defun haskell-process-reload-file ()
+(defun haskell-process-reload ()
   "Re-load the current buffer file."
   (interactive)
   (save-buffer)
   (haskell-interactive-mode-reset-error (haskell-session))
   (haskell-process-file-loadish "reload" t (current-buffer)))
+
+;;;###autoload
+(defun haskell-process-reload-file () (haskell-process-reload))
+
+(make-obsolete 'haskell-process-reload-file 'haskell-process-reload
+               "2015-11-14")
 
 ;;;###autoload
 (defun haskell-process-load-or-reload (&optional toggle)
@@ -411,7 +418,10 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
                       (if haskell-reload-p
                           "Now running :reload."
                         "Now running :load <buffer-filename>.")))
-    (if haskell-reload-p (haskell-process-reload-file) (haskell-process-load-file))))
+    (if haskell-reload-p (haskell-process-reload) (haskell-process-load-file))))
+
+(make-obsolete 'haskell-process-load-or-reload 'haskell-process-load-file
+               "2015-11-14")
 
 ;;;###autoload
 (defun haskell-process-cabal-build ()
