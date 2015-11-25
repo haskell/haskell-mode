@@ -713,9 +713,9 @@ variances in source span notation."
 For example:
 
 X                ( /home/foo/X.hs, interpreted )
-
+Main             ( /home/foo/X.hs, /home/foo/X.o )
 "
-  (if (string-match "^\\([^ ]+\\)[ ]+( \\([^ ]+?\\), [a-z]+ )$"
+  (if (string-match "\\([^ ]+\\)[ ]+( \\([^ ]+?\\), [/a-zA-Z0-9\.]+ )$"
                     string)
       (list :module (match-string 1 string)
             :path (match-string 2 string))
