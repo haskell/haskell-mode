@@ -132,12 +132,6 @@ set and deleted as if they were real tabs."
                'haskell-indentation-mode
                "2015-05-25")
 
-(defun haskell-indentation-parse-error (&rest args)
-  "Create error message from ARGS, log it and throw."
-  (let ((msg (apply 'format args)))
-    (message "%s" msg)
-    (throw 'parse-error msg)))
-
 (defvar haskell-literate) ; defined in haskell-mode.el
 
 (defun haskell-indentation-bird-p ()
@@ -456,10 +450,7 @@ indentation points to the right, we switch going to the left."
           (haskell-indentation-first-indentation)
         (setq current-token (haskell-indentation-peek-token))
         (catch 'parse-end
-          (haskell-indentation-toplevel)
-          (unless (eq current-token 'end-tokens)
-            (haskell-indentation-parse-error
-             "Illegal token: %s" current-token)))
+          (haskell-indentation-toplevel))
         possible-indentations))))
 
 (defun haskell-indentation-first-indentation ()
@@ -765,9 +756,7 @@ Skip the keyword or parenthesis." ; FIXME: better description needed
              (when end
                (throw 'parse-end nil)))
             ((equal current-token end)
-             (haskell-indentation-read-next-token)) ; continue
-            (end (haskell-indentation-parse-error
-                  "Illegal token: %s" current-token))))))
+             (haskell-indentation-read-next-token))))))
 
 (defun haskell-indentation-case-alternative ()
   "" ; FIXME
@@ -1032,8 +1021,7 @@ layout starts."
                       left-indent)))))
           (throw 'parse-end nil))
         (haskell-indentation-phrase-rest (cddr phrase))))
-     ((string= (cadr phrase) "in")) ; fallthrough
-     (t (haskell-indentation-parse-error "Expecting %s" (cadr phrase))))))
+     ((string= (cadr phrase) "in")))))
 
 (defun haskell-indentation-add-indentation (indent)
   "" ; FIXME
