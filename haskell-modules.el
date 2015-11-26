@@ -25,7 +25,9 @@
 (require 'haskell-sandbox)
 
 (defun haskell-add-import (&optional module)
-  "Add an import to the import list."
+  "Add an import to the import list.  Sorts and aligns imports,
+unless `haskell-stylish-on-save' is set, in which case we defer
+to stylish-haskell."
   (interactive)
   (save-excursion
     (goto-char (point-max))
@@ -35,8 +37,8 @@
                  (haskell-complete-module-read
                   "Module: "
                   (haskell-session-all-modules (haskell-modules-session))))))
-    (haskell-sort-imports)
-    (haskell-align-imports)))
+    (unless haskell-stylish-on-save (haskell-sort-imports)
+            (haskell-align-imports))))
 
 (defun haskell-import-for-module (module)
   "Get import statements for the given module."
