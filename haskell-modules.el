@@ -23,6 +23,7 @@
 (require 'haskell-navigate-imports)
 (require 'haskell-complete-module)
 (require 'haskell-sandbox)
+(require 'haskell-customize)
 
 (defun haskell-add-import (&optional module)
   "Add an import to the import list.  Sorts and aligns imports,

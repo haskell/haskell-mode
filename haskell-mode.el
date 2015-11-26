@@ -821,14 +821,6 @@ Note that negative arguments do not work so well."
                  (string :tag "Other command")))
 
 ;;;###autoload
-(defcustom haskell-stylish-on-save nil
-  "Whether to run stylish-haskell on the buffer before saving.
-If this is true, `haskell-add-import' will not sort or align the
-imports."
-  :group 'haskell
-  :type 'boolean)
-
-;;;###autoload
 (defcustom haskell-tags-on-save nil
   "Generate tags via hasktags after saving."
   :group 'haskell
