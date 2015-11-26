@@ -200,19 +200,19 @@ negative ARG.  Handles bird style literate Haskell too."
   (if (haskell-indentation-bird-outside-code-p)
       (progn
         (delete-horizontal-space)
-        (newline))    
-    (catch 'parse-error
-      ;;  - save the current column
-      (let* ((ci (haskell-indentation-current-indentation))
-             (indentations (haskell-indentation-find-indentations)))
-        ;; - jump to the next line and reindent to at the least same level        
-        (delete-horizontal-space)
-        (newline)
-        (when (haskell-indentation-bird-p)
-          (insert "> "))
-        (haskell-indentation-reindent-to
-         (haskell-indentation-next-indentation (- ci 1) indentations 'nofail)
-         'move)))))
+        (newline))
+    ;;  - save the current column
+    (let* ((ci (haskell-indentation-current-indentation))
+           (indentations (or (haskell-indentation-find-indentations)
+                             '(0))))
+      ;; - jump to the next line and reindent to at the least same level
+      (delete-horizontal-space)
+      (newline)
+      (when (haskell-indentation-bird-p)
+        (insert "> "))
+      (haskell-indentation-reindent-to
+       (haskell-indentation-next-indentation (- ci 1) indentations 'nofail)
+       'move))))
 
 (defun haskell-indentation-next-indentation (col indentations &optional nofail)
   "Find the leftmost indentation which is greater than COL.
@@ -262,11 +262,11 @@ indentation points to the right, we switch going to the left."
              (ci (haskell-indentation-current-indentation))
              (inds (save-excursion
                      (move-to-column ci)
-                     (haskell-indentation-find-indentations)))
+                     (or (haskell-indentation-find-indentations)
+                         '(0))))
              (valid (memq ci inds))
              (cursor-in-whitespace (< cc ci)))
-        (when (null inds)
-          (error "returned indentations empty, but no parse error"))
+
         (if (and valid cursor-in-whitespace)
             (move-to-column ci)
           (haskell-indentation-reindent-to
@@ -341,7 +341,8 @@ indentation points to the right, we switch going to the left."
            (ci (haskell-indentation-current-indentation))
            (inds (save-excursion
                    (move-to-column ci)
-                   (haskell-indentation-find-indentations)))
+                   (or (haskell-indentation-find-indentations)
+                       '(0))))
            (cursor-in-whitespace (< cc ci))
            (pi (haskell-indentation-previous-indentation ci inds)))
       (if (null pi)
