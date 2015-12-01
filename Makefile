@@ -44,7 +44,6 @@ ELFILES = \
 	ghci-script-mode.el \
 	highlight-uses-mode.el \
 	haskell-align-imports.el \
-	haskell-bot.el \
 	haskell-cabal.el \
 	haskell-checkers.el \
 	haskell-collapse.el \
