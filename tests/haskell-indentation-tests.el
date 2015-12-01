@@ -80,7 +80,13 @@ because it helps increase coverage."
         (should
          (equal (cons (list (line-number-at-pos)
                             (current-column))
-                      (haskell-indentation-find-indentations))
+                      (condition-case condition
+                          (haskell-indentation-find-indentations)
+                        (error
+                         ;; for unknown reason Emacs 24.4 ERT does not
+                         ;; catch overrun recursion, so we have to
+                         ;; catch it here, and throw it again
+                         (signal (car condition) (cdr condition)))))
                 current))))))
 
 (defmacro hindent-test (name source &rest test-cases)
@@ -756,7 +762,129 @@ x = asum [ mzero
 function = abc
        def
        xyz"
-  ((3 0) 0 7))
+    ((3 0) 0 7))
+
+(hindent-test "45* phrase should not eat whole stack" "
+function =
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+  if True
+  then True
+  else
+"
+              ((118 0) 0 4))
 
 
 (ert-deftest haskell-indentation-ret-indents ()
