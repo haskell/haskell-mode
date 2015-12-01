@@ -609,7 +609,7 @@ foo = do
   where
     bar = undefined"
               ((4 0) 4))
-              
+
 (hindent-test "27* expecting then (GH-884)" "
 foo = do
     if True
@@ -906,5 +906,13 @@ function =
   (should (equal 4 (count-lines (point-min) (point))))
   (should (equal 2 (- (point) (line-beginning-position)))))
 
+(ert-deftest haskell-indentation-altj-comment ()
+  :expected-result :failed
+  (switch-to-buffer (get-buffer-create "another.hs"))
+  (haskell-mode)
+  (insert "main = do\n    return ()\n\n-- comment")
+  (execute-kbd-macro (kbd "M-j"))
+  (should (equal 2 (count-lines (point-min) (point))))
+  (should (equal 3 (- (point) (line-beginning-position)))))
 
 ;;; haskell-indentation-tests.el ends here
