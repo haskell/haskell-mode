@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual is for Haskell mode, version 13.15-git
+
+Copyright (C) 2013 Haskell Mode contributors.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the http://www.gnu.org/licenses/fdl.html (GNU
+Free Documentation License), Version 1.3 or any later version published
+by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts and no Back-Cover Texts. -->
+<!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>Haskell Mode 13.15-git: Editing Haskell Code</title>
+
+<meta name="description" content="Haskell Mode 13.15-git: Editing Haskell Code">
+<meta name="keywords" content="Haskell Mode 13.15-git: Editing Haskell Code">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="index.html#Top" rel="start" title="Top">
+<link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
+<link href="index.html#Top" rel="up" title="Top">
+<link href="Unicode-support.html#Unicode-support" rel="next" title="Unicode support">
+<link href="Getting-Started.html#Getting-Started" rel="prev" title="Getting Started">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.indentedblock {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smallindentedblock {margin-left: 3.2em; font-size: smaller}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style:oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nocodebreak {white-space:nowrap}
+span.nolinebreak {white-space:nowrap}
+span.roman {font-family:serif; font-weight:normal}
+span.sansserif {font-family:sans-serif; font-weight:normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="haskell-mode.css">
+
+<link rel="shortcut icon" href="haskell-mode-32x32.png">
+</head>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+<div class="background"> </div><a name="Editing-Haskell-Code"></a>
+<div class="header">
+<p>
+Next: <a href="Unicode-support.html#Unicode-support" accesskey="n" rel="next">Unicode support</a>, Previous: <a href="Getting-Started.html#Getting-Started" accesskey="p" rel="prev">Getting Started</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<a name="Editing-Haskell-Code-1"></a>
+<h2 class="chapter">4 Editing Haskell Code</h2>
+
+<a name="index-haskell_002dmode-1"></a>
+<a name="index-haskell_002dmode"></a>
+
+<p><em>Haskell Mode</em> is actually a collection of so-called major
+modes<a name="DOCF1" href="#FOOT1"><sup>1</sup></a> one of which is called
+<code>haskell-mode</code>.  To avoid confusion, when referring to this package
+the name &ldquo;Haskell mode&rdquo; is written in a normal font, whereas when
+referring the major mode of the same name <code>haskell-mode</code> written
+with a dash in-between in a typewriter font is used.
+</p>
+<p>As one might guess, <code>haskell-mode</code> is the (programming
+language<a name="DOCF2" href="#FOOT2"><sup>2</sup></a>)
+major mode for editing (non-literate) Haskell source
+code. <code>haskell-mode</code> is associated with the file extensions listed
+below by default<a name="DOCF3" href="#FOOT3"><sup>3</sup></a>.
+</p>
+<dl compact="compact">
+<dt><samp>.hs</samp></dt>
+<dd><p>official file extension for (non-literate) Haskell 98/2010 files
+</p></dd>
+<dt><samp>.hsc</samp></dt>
+<dd><p>&ldquo;almost-Haskell&rdquo; input file for the
+<a href="http://www.haskell.org/ghc/docs/latest/html/users_guide/hsc2hs.html">hsc2hs</a>
+pre-processor
+</p></dd>
+<dt><samp>.cpphs</samp></dt>
+<dd><p>input file for the <a href="http://projects.haskell.org/cpphs/">cpphs</a>
+pre-processor
+</p></dd>
+</dl>
+
+<a name="index-literate-programming"></a>
+<a name="index-literate_002dhaskell_002dmode"></a>
+
+<p>The major mode <code>literate-haskell-mode</code> (which is derived from
+<code>haskell-mode</code> and thus transitively from <code>prog-mode</code>)
+provides support for
+<a href="http://www.haskell.org/haskellwiki/Literate_programming">literate
+Haskell programs</a> and is associated with the <samp>.lhs</samp> file extension
+by default.
+</p>
+<p><code>literate-haskell-mode</code> supports Bird-style as well as TeX-style
+literate Haskell files. The currently detected literate Haskell variant
+is shown in the mode line (see <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Mode-Line.html#Mode-Line">(emacs)Mode Line</a>) as either
+&lsquo;<samp>LitHaskell/bird</samp>&rsquo; or &lsquo;<samp>LitHaskell/tex</samp>&rsquo;.
+</p>
+<a name="Font-Lock-Support"></a>
+<h3 class="section">4.1 Font Lock Support</h3>
+
+<p><code>haskell-mode</code> supports <em>syntax highlighting</em> via Emacs&rsquo; Font
+Lock minor mode which should be enabled by default in current
+Emacsen. See <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Font-Lock.html#Font-Lock">(emacs)Font Lock</a>, for more information on how to
+control <code>font-lock-mode</code>.
+</p>
+<img src="anim/font-lock.gif" alt="anim/font-lock">
+
+<a name="Managing-imports"></a>
+<h3 class="section">4.2 Managing imports</h3>
+
+<p>There are a few functions for managing imports.
+</p>
+<a name="Jump-to-imports"></a>
+<h4 class="subsection">4.2.1 Jump to imports</h4>
+
+<p>To jump to your import list, run
+</p>
+<p><code>M-x haskell-navigate-imports</code>
+</p>
+<p>It&rsquo;s nicer to have a keybinding to do this, for example:
+</p>
+<div class="lisp">
+<pre class="lisp">(define-key haskell-mode-map [f8] 'haskell-navigate-imports)
+</pre></div>
+
+<p>You can hit it repeatedly to jump between groups of imports. It will
+cycle.
+</p>
+<a name="Format-imports"></a>
+<h4 class="subsection">4.2.2 Format imports</h4>
+
+<p>To generally format (sort, align) your imports, you can run
+</p>
+<p><code>M-x haskell-mode-format-imports</code>
+</p>
+<p>Or <kbd>C-c C-.</kbd>.
+</p>
+<a name="Sort-imports"></a>
+<h4 class="subsection">4.2.3 Sort imports</h4>
+
+<p>To just sort imports, jump to an import section and run
+</p>
+<p><code>M-x haskell-sort-imports</code>
+</p>
+<a name="Align-imports"></a>
+<h4 class="subsection">4.2.4 Align imports</h4>
+
+<p>To just align imports, jump to an import section and run
+</p>
+<p><code>M-x haskell-align-imports</code>
+</p>
+<a name="Entering-imports"></a>
+<h4 class="subsection">4.2.5 Entering imports</h4>
+
+<p>If you have Haskell Interactive Mode enabled and a session open,
+you can write
+</p>
+<p><code>import</code>
+</p>
+<p>And then hit <kbd>SPC</kbd> (running <code>M-x haskell-mode-contextual-space</code>)
+which will prompt a list of all modules, either installed modules or
+local project directory files. Then it&rsquo;ll insert it and then format that
+module section.
+</p>
+
+<a name="Completion-support"></a>
+<h3 class="section">4.3 Completion support</h3>
+
+<p><code>haskell-mode</code> can complete symbols, pragma directives and language
+extensions. This is part of <code>haskell-interactive-mode</code>.
+</p>
+<img src="anim/company-mode-language-pragma.gif" alt="anim/company-mode-language-pragma">
+
+<p>If haskell-interactive-mode is enabled and working haskell mode provides
+completions for import statements taking into account currently loaded
+and available packages.
+</p>
+<img src="anim/company-mode-import-statement.gif" alt="anim/company-mode-import-statement">
+
+<a name="Profiling-and-Debugging-support"></a>
+<h3 class="section">4.4 Profiling and Debugging support</h3>
+
+<p>When profiling code with GHC, it is often useful to add
+<a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/profiling.html#cost-centres">cost centres</a> by hand.  These allow finer-grained information about
+program behavior.  <code>haskell-mode</code> provides the function
+<code>haskell-mode-toggle-scc-at-point</code> to make this more convenient.
+It will remove an SCC annotation at point if one is present, or add
+one if point is over whitespace.  By default it is bound to <kbd>C-c C-s</kbd>.
+</p>
+<div class="footnote">
+<hr>
+<h4 class="footnotes-heading">Footnotes</h4>
+
+<h3><a name="FOOT1" href="#DOCF1">(1)</a></h3>
+<p>for more information about the concept of <em>major
+modes</em> see <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Major-Modes.html#Major-Modes">(emacs)Major Modes</a></p>
+<h3><a name="FOOT2" href="#DOCF2">(2)</a></h3>
+<p><code>haskell-mode</code> is derived from <code>prog-mode</code></p>
+<h3><a name="FOOT3" href="#DOCF3">(3)</a></h3>
+<p>for more information about file associations,
+see <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Choosing-Modes.html#Choosing-Modes">(emacs)Choosing Modes</a></p>
+</div>
+<hr>
+<div class="header">
+<p>
+Next: <a href="Unicode-support.html#Unicode-support" accesskey="n" rel="next">Unicode support</a>, Previous: <a href="Getting-Started.html#Getting-Started" accesskey="p" rel="prev">Getting Started</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>
