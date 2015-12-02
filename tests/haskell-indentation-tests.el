@@ -764,7 +764,7 @@ function = abc
        xyz"
     ((3 0) 0 7))
 
-(hindent-test "45* phrase should not eat whole stack" "
+(hindent-test "45 phrase should not eat whole stack" "
 function =
   if True
   then True
@@ -847,44 +847,8 @@ function =
   if True
   then True
   else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
-  if True
-  then True
-  else
 "
-              ((118 0) 0 4))
+              ((84 0) 4))
 
 
 (ert-deftest haskell-indentation-ret-indents ()

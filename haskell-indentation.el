@@ -969,60 +969,63 @@ layout starts."
    (apply-partially #'haskell-indentation-phrase-rest phrase)
    nil))
 
-(defun haskell-indentation-phrase-rest (phrase)
+(defun haskell-indentation-phrase-rest (phrase1)
   "" ; FIXME
-  (let ((starter-line parse-line-number))
-    (let ((current-indent (current-column)))
-      (funcall (car phrase)))
-    (cond
-     ((eq current-token 'end-tokens)
-      (cond ((null (cdr phrase))) ;; fallthrough
-            ((equal following-token (cadr phrase))
-             (haskell-indentation-add-indentation starter-indent)
-             (throw 'parse-end nil))
-            ((string= (cadr phrase) "in")
-             (when (= left-indent layout-indent)
-               (haskell-indentation-add-layout-indent)
-               (throw 'parse-end nil)))
-            (t (throw 'parse-end nil))))
-     ((null (cdr phrase)))
-     ((equal (cadr phrase) current-token)
-      (let* ((on-new-line (= (current-column)
-                             (haskell-indentation-current-indentation)))
-             (lines-between (- parse-line-number starter-line))
-             (left-indent (if (<= lines-between 0)
-                              left-indent
-                            starter-indent)))
-        (haskell-indentation-read-next-token)
-        (when (eq current-token 'end-tokens)
-          (cond ((member (cadr phrase) '("then" "else"))
-                 (haskell-indentation-add-indentation
-                  (+ starter-indent haskell-indentation-ifte-offset)))
+  (while phrase1
+    (let ((starter-line parse-line-number)
+          (phrase phrase1))
+      (setq phrase1 nil)
+      (let ((current-indent (current-column)))
+        (funcall (car phrase)))
+      (cond
+       ((eq current-token 'end-tokens)
+        (cond ((null (cdr phrase))) ;; fallthrough
+              ((equal following-token (cadr phrase))
+               (haskell-indentation-add-indentation starter-indent)
+               (throw 'parse-end nil))
+              ((string= (cadr phrase) "in")
+               (when (= left-indent layout-indent)
+                 (haskell-indentation-add-layout-indent)
+                 (throw 'parse-end nil)))
+              (t (throw 'parse-end nil))))
+       ((null (cdr phrase)))
+       ((equal (cadr phrase) current-token)
+        (let* ((on-new-line (= (current-column)
+                               (haskell-indentation-current-indentation)))
+               (lines-between (- parse-line-number starter-line))
+               (left-indent (if (<= lines-between 0)
+                                left-indent
+                              starter-indent)))
+          (haskell-indentation-read-next-token)
+          (when (eq current-token 'end-tokens)
+            (cond ((member (cadr phrase) '("then" "else"))
+                   (haskell-indentation-add-indentation
+                    (+ starter-indent haskell-indentation-ifte-offset)))
 
-                ((member (cadr phrase) '("in" "->"))
-                 ;; expression ending in another expression
-                 (when (or (not haskell-indentation-indent-leftmost)
-                           (eq haskell-indentation-indent-leftmost 'both))
-                   (haskell-indentation-add-indentation
-                    (+ starter-indent haskell-indentation-starter-offset)))
-                 (when haskell-indentation-indent-leftmost
-                   (haskell-indentation-add-indentation
-                    (if on-new-line
-                        (+ left-indent haskell-indentation-starter-offset)
-                      left-indent))))
-                (t
-                 (when (or (not haskell-indentation-indent-leftmost)
-                           (eq haskell-indentation-indent-leftmost 'both))
-                   (haskell-indentation-add-indentation
-                    (+ starter-indent haskell-indentation-starter-offset)))
-                 (when haskell-indentation-indent-leftmost
-                   (haskell-indentation-add-indentation
-                    (if on-new-line
-                        (+ left-indent haskell-indentation-starter-offset)
-                      left-indent)))))
-          (throw 'parse-end nil))
-        (haskell-indentation-phrase-rest (cddr phrase))))
-     ((string= (cadr phrase) "in")))))
+                  ((member (cadr phrase) '("in" "->"))
+                   ;; expression ending in another expression
+                   (when (or (not haskell-indentation-indent-leftmost)
+                             (eq haskell-indentation-indent-leftmost 'both))
+                     (haskell-indentation-add-indentation
+                      (+ starter-indent haskell-indentation-starter-offset)))
+                   (when haskell-indentation-indent-leftmost
+                     (haskell-indentation-add-indentation
+                      (if on-new-line
+                          (+ left-indent haskell-indentation-starter-offset)
+                        left-indent))))
+                  (t
+                   (when (or (not haskell-indentation-indent-leftmost)
+                             (eq haskell-indentation-indent-leftmost 'both))
+                     (haskell-indentation-add-indentation
+                      (+ starter-indent haskell-indentation-starter-offset)))
+                   (when haskell-indentation-indent-leftmost
+                     (haskell-indentation-add-indentation
+                      (if on-new-line
+                          (+ left-indent haskell-indentation-starter-offset)
+                        left-indent)))))
+            (throw 'parse-end nil))
+          (setq phrase1 (cddr phrase))))
+       ((string= (cadr phrase) "in"))))))
 
 (defun haskell-indentation-add-indentation (indent)
   "" ; FIXME
