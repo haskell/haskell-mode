@@ -56,16 +56,29 @@
       ;; check for special case of being called by
       ;; `newline-and-indent': if the user has `electric-indent-mode'
       ;; on and RET bound to `newline-and-indent', we'll end up
-      ;; indenting too far
+      ;; indenting too far, or not enough if the previous line was a
+      ;; top level declaration
       (unless (let ((previous-line-tabs (haskell-tab-indent--previous-line-tabs))
                     (this-line-tabs (haskell-tab-indent--this-line-tabs)))
-                (and (equal this-command 'newline-and-indent)
-                     (= this-line-tabs previous-line-tabs)))
+                (or
+                 ;; avoid indenting too far
+                 (and (equal this-command 'newline-and-indent)
+                      (= this-line-tabs previous-line-tabs)
+                      (not (haskell-tab-indent--previous-line-topdecl-p)))
+                 ;; avoid indenting too little
+                 (and (haskell-tab-indent--previous-line-topdecl-p)
+                      (= 1 this-line-tabs))))
         (haskell-tab-indent--cycle))))
   ;; On a line with only indentation, ensure point is at the end of
   ;; it.
   (when (save-excursion (beginning-of-line) (looking-at "[[:space:]]*$"))
     (end-of-line)))
+
+(defun haskell-tab-indent--previous-line-topdecl-p ()
+  "Determine whether previous line is a top-level declaration."
+  (save-excursion
+    (beginning-of-line 0)               ; go up one line
+    (equal 'haskell-definition-face (car (cdr (text-properties-at (point)))))))
 
 (defun haskell-tab-indent--where ()
   ;; `haskell-tab-indent' leaves us just after the indentation
