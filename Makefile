@@ -78,6 +78,7 @@ ELFILES = \
 	haskell-simple-indent.el \
 	haskell-sort-imports.el \
 	haskell-string.el \
+	haskell-tab-indent.el \
 	haskell-unicode-input-method.el \
 	haskell-utils.el \
 	inf-haskell.el
