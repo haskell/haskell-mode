@@ -91,7 +91,9 @@
 
 (defun haskell-tab-indent--previous-line-tabs ()
   (save-excursion
-    (forward-line -1)
+    (beginning-of-line 0)               ; go up one line
+    ;; keep going up past blank spacer lines
+    (while (looking-at "[[:space:]]*$") (beginning-of-line 0))
     (haskell-tab-indent--this-line-tabs)))
 
 (defun haskell-tab-indent--this-line-tabs ()
