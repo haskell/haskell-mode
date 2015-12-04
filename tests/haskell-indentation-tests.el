@@ -850,7 +850,7 @@ function =
 "
               ((84 0) 4))
 
-(hindent-test "46 case expression with paths on their own lines" "
+(hindent-test "46* case expression with paths on their own lines" "
 fact n =
   case n of
     0 -> 1
