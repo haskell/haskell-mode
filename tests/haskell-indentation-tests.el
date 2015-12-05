@@ -77,15 +77,15 @@ because it helps increase coverage."
         (goto-char (point-min))
         (forward-line (1- line))
         (should
-         (equal (cons (line-number-at-pos)
+         (equal current
+                (cons (line-number-at-pos)
                       (condition-case condition
                           (haskell-indentation-find-indentations)
                         (error
                          ;; for unknown reason Emacs 24.4 ERT does not
                          ;; catch overrun recursion, so we have to
                          ;; catch it here, and throw it again
-                         (signal (car condition) (cdr condition)))))
-                current))))))
+                         (signal (car condition) (cdr condition)))))))))))
 
 (defmacro hindent-test (name source &rest test-cases)
   "Define ert test using `haskell-indentation-check'.
