@@ -149,7 +149,7 @@ macro quotes them for you."
 function = Record
        { field = 123 }"
               (1 0)
-              (2 0 11))
+              (2 0 2))
 
 (hindent-test "2 Handle underscore in identifiers""
 function = do
@@ -157,7 +157,7 @@ function = do
  z"
               (1 0)
               (2 2)
-              (3 0 2 10))
+              (3 0 2 4))
 
 (hindent-test "2u Handle underscore in identifiers""
 function = do
@@ -165,7 +165,7 @@ function = do
  z"
               (1 0)
               (2 2)
-              (3 0 2 9))
+              (3 0 2 4))
 
 (hindent-test "2a Handle apostrophe in identifiers""
 function = do
@@ -173,7 +173,7 @@ function = do
  z"
               (1 0)
               (2 2)
-              (3 0 2 12))
+              (3 0 2 4))
 
 (hindent-test "2au Handle apostrophe in identifiers""
 function = do
@@ -181,7 +181,7 @@ function = do
  z"
               (1 0)
               (2 2)
-              (3 0 2 11))
+              (3 0 2 4))
 
 (hindent-test "3 Import statememnt symbol list 1""
 import Control.Concurrent
@@ -206,7 +206,7 @@ fun = [ x | y
           , z ]"
               (1 0)
               (2 10)
-              (3 0 6))
+              (3 0 2))
 
 (hindent-test "5a* List comprehension""
 fun = [ x | y,
@@ -274,7 +274,7 @@ fun = x ++"
 fun = x
       ++ z"
               (1 0)
-              (2 0 6))
+              (2 0 2))
 
 (hindent-test "11 Guards with commas""
 clunky env var1 var2
@@ -283,7 +283,7 @@ clunky env var1 var2
               (1 0)
               (2 2)
               (3 2)
-              (4 0 17))
+              (4 0 4))
 
 (hindent-test "11u Guards with commas""
 clunky env var1 var2
@@ -292,7 +292,7 @@ clunky env var1 var2
               (1 0)
               (2 2)
               (3 2)
-              (4 0 16))
+              (4 0 4))
 
 (hindent-test "12 \"do\" as expression""
 fun = do { putStrLn \"X\";
@@ -576,8 +576,8 @@ foo = do
   return ()"
               (1 0)
               (2 2)
-              (3 0 2 17)
-              (4 0 2 17))
+              (3 0 2 4)
+              (4 0 2 4))
 
 (hindent-test "25a* support scoped type declarations" "
 foo = do
@@ -619,13 +619,13 @@ foo = do
 f = a (a 'A)
     (a 'A)
 "
-              (2 0 4))
+              (2 0 2))
 
 (hindent-test "28b character literal (escape sequence)" "
 f = '\\\\'
 
 "
-              (2 0 4))
+              (2 0 2))
 
 
 (hindent-test "28c name starting with a quote" "
@@ -638,7 +638,7 @@ function (Operation 'Init) = do
 test = [randomQQ| This is a quasiquote with the word in |]
 
 "
-              (2 0 7))
+              (2 0 2))
 
 (hindent-test "29b quasiquote multiple lines" "
 test = [randomQQ| This is
@@ -646,20 +646,24 @@ test = [randomQQ| This is
           with the word in |]
 
 "
-              (4 0 7))
+              (4 0 2))
+
 (hindent-test "30* parse '[] identifier correctly" "
 instance Callable '[]
 "
 	      (1 2))
+
 (hindent-test "31* allow type class declaration without methods" "
 class Foo a where
 instance Bar Int
 "
 	      (2 0))
+
 (hindent-test "32 allow type operators" "
 data (:.) a b = a :. b
 "
 	      (2 0 16))
+
 (hindent-test "33* parse #else in CPP" "
 #ifdef FLAG
 foo = ()
@@ -716,7 +720,7 @@ s = do
   a <- \"multiline\\
        \\ line 2\"
 "
-              (4 0 2 7))
+              (4 0 2 4))
 
 (hindent-test "39 do not crash after two multiline literals in do block" "
 servePost = do
@@ -725,13 +729,13 @@ servePost = do
   b <- queryT \"comma is important: , \\
              \\ line 2 \"
 "
-	      (6 0 2 7))
+	      (6 0 2 4))
 
 (hindent-test "40 parse error in multiline tuple" "
 a = ( 1
 , "
 	      (2 4)
-	      (3 6))
+	      (3 2))
 
 (hindent-test "41 open do inside a list" "
 x = asum [ withX $ do
@@ -857,8 +861,8 @@ fact n =
               (1 0)
               (2 2)
               (3 4)
-              (4 4)
-              (5 0 2 4 18))
+              (4 0 2 4 9)
+              (5 0 2 4 9))
 
 (ert-deftest haskell-indentation-ret-indents ()
   (switch-to-buffer (get-buffer-create "source.hs"))
