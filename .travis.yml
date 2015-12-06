@@ -1,4 +1,6 @@
 language: emacs-lisp
+sudo: required
+dist: precise
 
 env:
   matrix:
