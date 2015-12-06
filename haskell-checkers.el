@@ -144,7 +144,7 @@
 
 (defun haskell-lint-make-command (file)
   "Generates command line for scan"
-  (concat haskell-lint-command  " \"/" file "/\"" " " haskell-lint-options))
+  (concat haskell-lint-command  " \"" file "\"" " " haskell-lint-options))
 
 (defmacro haskell-checkers-setup (type name)
   "Performs setup of corresponding checker. Receives two arguments:
