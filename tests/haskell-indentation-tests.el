@@ -852,7 +852,7 @@ function =
 "
               (84 4))
 
-(hindent-test "46* case expression with paths on their own lines" "
+(hindent-test "46 case expression with paths on their own lines" "
 fact n =
   case n of
     0 -> 1
@@ -861,8 +861,8 @@ fact n =
               (1 0)
               (2 2)
               (3 4)
-              (4 0 2 4 9)
-              (5 0 2 4 9))
+              (4 0 2 4 6)
+              (5 0 2 4 6))
 
 (ert-deftest haskell-indentation-ret-indents ()
   (switch-to-buffer (get-buffer-create "source.hs"))
