@@ -1,6 +1,20 @@
-language: emacs-lisp
+language: generic
 sudo: required
 dist: trusty
+
+cache:
+  - apt
+
+addons:
+  apt:
+    sources:
+      - cassou-emacs
+      - ubuntu-elisp
+    packages:
+      - emacs23-nox
+      - emacs24-nox
+      - emacs-snapshot
+      - texinfo
 
 env:
   matrix:
@@ -17,27 +31,10 @@ matrix:
         - EMACS=emacs-snapshot    TARGET=check
 
 install:
-  - if [ "$EMACS" = "emacs23" ]; then
-        sudo apt-get update -qq &&
-        sudo apt-get install -qq emacs23-gtk emacs23-el;
-    fi
-  - if [ "$EMACS" = "emacs24" ]; then
-        sudo add-apt-repository -y ppa:cassou/emacs &&
-        sudo apt-get update -qq &&
-        sudo apt-get install -qq emacs24 emacs24-el;
-    fi
-  - if [ "$EMACS" = "emacs-snapshot" ]; then
-        sudo add-apt-repository -y ppa:ubuntu-elisp/ppa &&
-        sudo apt-get update -qq &&
-        sudo apt-get install -qq emacs-snapshot emacs-snapshot-el;
-    fi
-  - if [ "$TARGET" = "deploy-manual" ]; then
-        sudo apt-get update -qq &&
-        sudo apt-get install -qq texinfo;
-    fi
 
 script:
-  make $TARGET
+  - makeinfo --version
+  - make $TARGET
 
 notifications:
   email: false
