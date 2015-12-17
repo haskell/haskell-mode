@@ -69,7 +69,6 @@ ELFILES = \
 	haskell-process.el \
 	haskell-repl.el \
 	haskell-session.el \
-	haskell-simple-indent.el \
 	haskell-sort-imports.el \
 	haskell-string.el \
 	haskell-unicode-input-method.el \
