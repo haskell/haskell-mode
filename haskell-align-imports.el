@@ -223,8 +223,9 @@
   "Are we after the imports list?"
   (save-excursion
     (goto-char (line-beginning-position))
-    (not (not (search-forward-regexp "\\( = \\|\\<instance\\>\\| :: \\| ∷ \\)"
-                                     (line-end-position) t 1)))))
+    (let ((case-fold-search nil))
+      (not (not (search-forward-regexp "\\( = \\|\\<instance\\>\\| :: \\| ∷ \\)"
+                                       (line-end-position) t 1))))))
 
 (provide 'haskell-align-imports)
 
