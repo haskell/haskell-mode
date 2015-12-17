@@ -276,7 +276,7 @@ Prompts for an arbitrary regexp given a prefix arg PROMPT."
                  (read-from-minibuffer "Look for: ")
                (haskell-ident-at-point))))
     (rgrep sym
-           "*.hs" ;; TODO: common Haskell extensions.
+           "*.hs *.lhs *.hsc *.chs *.hs-boot *.lhs-boot"
            (haskell-session-current-dir (haskell-interactive-session)))))
 
 ;;;###autoload
