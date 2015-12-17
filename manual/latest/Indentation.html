@@ -83,15 +83,6 @@ includes three different indentation minor modes with different
 trade-offs:
 </p>
 <dl compact="compact">
-<dt><code>haskell-simple-indent-mode</code>
-<a name="index-haskell_002dsimple_002dindent_002dmode"></a>
-</dt>
-<dd>
-<p>A very simple indentation scheme; In this scheme, <tt class="key">TAB</tt> will now
-move the cursor to the next indent point in the previous non-blank line.
-An indent point is a non-whitespace character following whitespace.
-</p>
-</dd>
 <dt><code>haskell-indent-mode</code>
 <a name="index-haskell_002dindent_002dmode"></a>
 </dt>
@@ -128,8 +119,7 @@ convenient user interface or by adding <em>one</em> of the following three
 lines to your <samp>.emacs</samp> file:
 </p>
 <div class="lisp">
-<pre class="lisp">(add-hook 'haskell-mode-hook 'haskell-simple-indent-mode)
-(add-hook 'haskell-mode-hook 'haskell-indent-mode)
+<pre class="lisp">(add-hook 'haskell-mode-hook 'haskell-indent-mode)
 (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
 </pre></div>
 
