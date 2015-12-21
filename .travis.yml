@@ -13,8 +13,7 @@ env:
 
 matrix:
   allow_failures:
-    - env:
-        - EMACS=emacs-snapshot    TARGET=check
+    - env: EMACS=emacs-snapshot    TARGET=check
 
 install:
   - if [ "$EMACS" = "emacs23" ]; then
