@@ -234,8 +234,6 @@ NOFAIL is non-NIL."
         (when nofail
           (car rev)))))
 
-(defvar haskell-indentation-dyn-first-position nil
-  "") ; FIXME
 (defvar haskell-indentation-dyn-last-direction nil
   "") ; FIXME
 (defvar haskell-indentation-dyn-last-indentations nil
@@ -273,8 +271,6 @@ indentation points to the right, we switch going to the left."
            (haskell-indentation-next-indentation ci inds 'nofail)
            cursor-in-whitespace))
         (setq haskell-indentation-dyn-last-direction 'right
-              haskell-indentation-dyn-first-position
-              (haskell-indentation-current-indentation)
               haskell-indentation-dyn-last-indentations inds)))))
 
 (defun haskell-indentation-indent-line-repeat ()
@@ -306,12 +302,6 @@ indentation points to the right, we switch going to the left."
               ci haskell-indentation-dyn-last-indentations 'nofail))
           ;; but failed, switch to left
           (setq haskell-indentation-dyn-last-direction 'left)
-          ;; and skip to the point where the user started pressing TABs.
-          ;; except if there are <= 2 indentation points, because this
-          ;; behavior is very confusing in that case
-          (when (< 2 (length haskell-indentation-dyn-last-indentations))
-            (haskell-indentation-reindent-to
-             haskell-indentation-dyn-first-position))
           (haskell-indentation-indent-line-repeat)))
       t))
    (t nil)))
