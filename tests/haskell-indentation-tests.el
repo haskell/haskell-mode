@@ -850,32 +850,46 @@ fact n =
               (4 0 2 4 6)
               (5 0 2 4 6))
 
+(defmacro with-temp-switch-to-buffer (&rest body)
+  "Create a temporary buffer, use `switch-to-buffer' and evaluate BODY there like `progn'.
+
+Seems that `execute-kbd-macro' is not able to correctly execute keybindings without this."
+  (declare (indent 0) (debug t))
+  (let ((temp-buffer (make-symbol "temp-buffer")))
+    `(let ((,temp-buffer (generate-new-buffer " *temp*")))
+       ;; FIXME: kill-buffer can change current-buffer in some odd cases.
+       (unwind-protect
+           (progn
+             (switch-to-buffer ,temp-buffer)
+             ,@body)
+         (and (buffer-name ,temp-buffer)
+              (kill-buffer ,temp-buffer))))))
+
 (ert-deftest haskell-indentation-ret-indents ()
-  (switch-to-buffer (get-buffer-create "source.hs"))
-  (haskell-mode)
-  (insert "main = do")
-  (execute-kbd-macro (kbd "<RET>"))
-  (should (equal 2 (count-lines (point-min) (point))))
-  (should (equal 2 (- (point) (line-beginning-position)))))
+  (with-temp-switch-to-buffer
+   (haskell-mode)
+   (insert "main = do")
+
+   (execute-kbd-macro (kbd "<RET>"))
+   (should (equal 2 (- (point) (line-beginning-position))))))
 
 (ert-deftest haskell-indentation-tab-and-backtab ()
-  (switch-to-buffer (get-buffer-create "source.hs"))
-  (haskell-mode)
-  (insert "main = do\n  lala\n  ")
-  (execute-kbd-macro (kbd "TAB"))
-  (should (equal 4 (count-lines (point-min) (point))))
-  (should (equal 4 (- (point) (line-beginning-position))))
-  (execute-kbd-macro (kbd "<backtab>"))
-  (should (equal 4 (count-lines (point-min) (point))))
-  (should (equal 2 (- (point) (line-beginning-position)))))
+  (with-temp-switch-to-buffer
+    (haskell-mode)
+    (insert "main = do\n  lala\n  ")
+
+    (execute-kbd-macro (kbd "TAB"))
+    (should (equal 4 (- (point) (line-beginning-position))))
+
+    (execute-kbd-macro (kbd "<backtab>"))
+    (should (equal 2 (- (point) (line-beginning-position))))))
 
 (ert-deftest haskell-indentation-altj-comment ()
   :expected-result :failed
-  (switch-to-buffer (get-buffer-create "another.hs"))
-  (haskell-mode)
-  (insert "main = do\n    return ()\n\n-- comment")
-  (execute-kbd-macro (kbd "M-j"))
-  (should (equal 2 (count-lines (point-min) (point))))
-  (should (equal 3 (- (point) (line-beginning-position)))))
+  (with-temp-switch-to-buffer
+    (haskell-mode)
+    (insert "main = do\n    return ()\n\n-- comment")
+    (execute-kbd-macro (kbd "M-j"))
+    (should (equal 3 (- (point) (line-beginning-position))))))
 
 ;;; haskell-indentation-tests.el ends here
