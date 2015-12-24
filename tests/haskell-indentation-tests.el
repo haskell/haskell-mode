@@ -850,6 +850,26 @@ fact n =
               (4 0 2 4 6)
               (5 0 2 4 6))
 
+(hindent-test "47a multiline strings" "
+fact n = \"\\
+         \\a\""
+              (1 0)
+              ;; we want to offer both a continuation style and the
+              ;; align to left column style (like in lisp)
+              (2 0 9)
+              (3 0 2))
+
+(hindent-test "47b multiline strings" "
+fact n = \"\\
+      \\a\\
+      \\x\""
+              ;; here we want to keep third line like the second one,
+              ;; although the second one wasn't best indented
+              (1 0)
+              (2 0 9)
+              (3 6))
+
+
 (defmacro with-temp-switch-to-buffer (&rest body)
   "Create a temporary buffer, use `switch-to-buffer' and evaluate BODY there like `progn'.
 
