@@ -249,29 +249,25 @@ indentation points to the right, we switch going to the left."
   ;; try to repeat
   (when (not (haskell-indentation-indent-line-repeat))
     (setq haskell-indentation-dyn-last-direction nil)
-    ;; do nothing if we're inside a string or comment
-    (unless (save-excursion
-              (beginning-of-line)
-              (nth 8 (syntax-ppss)))
-      ;; parse error is intentionally not cought here, it may come from
-      ;; `haskell-indentation-find-indentations', but escapes the scope
-      ;; and aborts the opertaion before any moving happens
-      (let* ((cc (current-column))
-             (ci (haskell-indentation-current-indentation))
-             (inds (save-excursion
-                     (move-to-column ci)
-                     (or (haskell-indentation-find-indentations)
-                         '(0))))
-             (valid (memq ci inds))
-             (cursor-in-whitespace (< cc ci)))
+    ;; parse error is intentionally not cought here, it may come from
+    ;; `haskell-indentation-find-indentations', but escapes the scope
+    ;; and aborts the opertaion before any moving happens
+    (let* ((cc (current-column))
+           (ci (haskell-indentation-current-indentation))
+           (inds (save-excursion
+                   (move-to-column ci)
+                   (or (haskell-indentation-find-indentations)
+                       '(0))))
+           (valid (memq ci inds))
+           (cursor-in-whitespace (< cc ci)))
 
-        (if (and valid cursor-in-whitespace)
-            (move-to-column ci)
-          (haskell-indentation-reindent-to
-           (haskell-indentation-next-indentation ci inds 'nofail)
-           cursor-in-whitespace))
-        (setq haskell-indentation-dyn-last-direction 'right
-              haskell-indentation-dyn-last-indentations inds)))))
+      (if (and valid cursor-in-whitespace)
+          (move-to-column ci)
+        (haskell-indentation-reindent-to
+         (haskell-indentation-next-indentation ci inds 'nofail)
+         cursor-in-whitespace))
+      (setq haskell-indentation-dyn-last-direction 'right
+            haskell-indentation-dyn-last-indentations inds))))
 
 (defun haskell-indentation-indent-line-repeat ()
   "Cycle though indentation positions."
@@ -453,7 +449,20 @@ indentation points to the right, we switch going to the left."
   (let ((ppss (syntax-ppss)))
     (cond
      ((nth 3 ppss)
-      (haskell-indentation-first-indentation))
+      (if (save-excursion
+            (and (forward-line -1)
+                 (< (nth 8 ppss) (point))))
+          ;; if this string goes over more than one line we want to
+          ;; sync with the last line, not the first one
+          (list (save-excursion
+                  (forward-line -1)
+                  (current-indentation)))
+
+        (append
+         (haskell-indentation-first-indentation)
+         (list (save-excursion
+                 (goto-char (nth 8 ppss))
+                 (current-column))))))
      ((nth 4 ppss)
       (if (save-excursion
             (and (skip-syntax-forward "-")
