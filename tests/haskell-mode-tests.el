@@ -378,8 +378,6 @@ Also should respect 10 column fill."
 	      '("-- @| a b c d")))
 
 (ert-deftest fill-comment-haddock-2 ()
-  ;; FIXME: This shouldn't be failing, https://github.com/haskell/haskell-mode/issues/851.
-  :expected-result :failed
   (check-fill '("-- | a b c"
                 "-- d e")
 	      '("-- @| a b c d"

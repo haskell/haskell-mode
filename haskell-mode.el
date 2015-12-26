@@ -644,7 +644,7 @@ Minor modes that work well with `haskell-mode':
   (set (make-local-variable 'paragraph-start)
        (concat " *{-\\| *-- |\\|" page-delimiter))
   (set (make-local-variable 'paragraph-separate)
-       (concat " *$\\| *-- |\\| *\\({-\\|-}\\) *$\\|" page-delimiter))
+       (concat " *$\\| *\\({-\\|-}\\) *$\\|" page-delimiter))
   (set (make-local-variable 'fill-paragraph-function) 'haskell-fill-paragraph)
   ;; (set (make-local-variable 'adaptive-fill-function) 'haskell-adaptive-fill)
   (set (make-local-variable 'adaptive-fill-mode) nil)
