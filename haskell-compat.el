@@ -65,6 +65,9 @@ A process is considered alive if its status is `run', `open',
                        xref-prompt-for-identifier)))
       (find-tag ident next-p))))
 
+(unless (fboundp 'font-lock-ensure)
+  (defalias 'font-lock-ensure 'font-lock-fontify-buffer))
+
 (provide 'haskell-compat)
 
 ;;; haskell-compat.el ends here
