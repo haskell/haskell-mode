@@ -53,7 +53,6 @@ interpreter (e.g. GHCi).
 * Getting Help and Reporting Bugs:: How to improve Haskell Mode
 * Getting Started::                 How to get started
 * Editing Haskell Code::            How to edit code
-* Unicode support::                 How to use Unicode
 * Indentation::                     Notes about indentation
 * Declaration scanning::            How to navigate in a source file
 * Compilation::                     How to compile
@@ -287,46 +286,6 @@ program behavior.  @code{haskell-mode} provides the function
 @code{haskell-mode-toggle-scc-at-point} to make this more convenient.
 It will remove an SCC annotation at point if one is present, or add
 one if point is over whitespace.  By default it is bound to @kbd{C-c C-s}.
-
-@node Unicode support
-@chapter Unicode support
-
-@cindex Unicode
-
-See the Haskell Wiki's entry on
-@uref{http://www.haskell.org/haskellwiki/Unicode-symbols, Unicode
-Symbols} for general information about Unicode support in Haskell.
-
-As Emacs supports editing files containing Unicode out of the box, so
-does Haskell Mode. As an add-on, Haskell Mode includes the
-@code{haskell-unicode} input method which allows you to easily type a
-number of Unicode symbols that are useful when writing Haskell code;
-@xref{Input Methods,,,emacs}, for more details.
-
-To automatically enable the @code{haskell-unicode} input method in
-haskell-mode buffers use @kbd{M-x customize-variable @key{RET}
-haskell-mode-hook} or put the following code in your @file{.emacs} file:
-
-@lisp
-(add-hook 'haskell-mode-hook 'turn-on-haskell-unicode-input-method)
-@end lisp
-
-@noindent
-To temporarily enable this input method for a single buffer you can use
-@kbd{M-x turn-on-haskell-unicode-input-method}.
-
-When the @code{haskell-unicode} input method is active, you can simply
-type @samp{->} and it is immediately replaced with @samp{→}. Use
-@kbd{C-\} to toggle the input method. To see a table of all key
-sequences use @kbd{M-x describe-input-method @key{RET}
-haskell-unicode}. A sequence like @samp{<=} is ambiguous and can mean
-either @samp{⇐} or @samp{≤}. Typing it presents you with a choice. Type
-@kbd{1} or @kbd{2} to select an option or keep typing to use the default
-option.
-
-If you don't like the highlighting of partially matching tokens you can
-turn it off by setting @code{input-method-highlight-flag} to @code{nil}
-via @kbd{M-x customize-variable}.
 
 @node Indentation
 @chapter Indentation
