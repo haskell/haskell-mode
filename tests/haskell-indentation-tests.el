@@ -502,40 +502,36 @@ instance (Monad m) ⇒ C m a where
               (2 2)
               (3 0 2))
 
-(hindent-test "21a* fix \"let\" statement in \"do\" block""
+(hindent-test "21a fix \"let\" statement in \"do\" block""
 main :: IO ()
 main = do
 let foo = Foo {
       bar = 0
-    , baz = 0"
+      , baz = 0"
               (1 0)
-              (2 0)
+              (2 0 8)
               (3 2)
               (4 6)
-              (5 4)
-              (6 4))
+              (5 6)
+              (6 8))
 
-(hindent-test "21b* fix named fields in \"data\" declaration""
+(hindent-test "21b fix named fields in \"data\" declaration""
 data Foo = Foo {
   bar :: Int
-, baz :: Int"
+  , baz :: Int"
               (1 0)
-              (2 4)
+              (2 2)
               (3 2)
-              (4 2))
+              (4 4 11))
 
-(hindent-test "21c* fix \"let\" statement and record in \"do\" block""
-main :: IO ()
-main = do
-let foo = Foo {
-            bar = 0
-            , baz = 0"
+(hindent-test "21c* \"data\" declaration open on next line" "
+data Foo = Foo
+  { bar :: Int
+  , baz :: Int"
               (1 0)
-              (2 0)
+              (2 2)
               (3 2)
-              (4 14)
-              (5 12)
-              (6 12))
+              (4 4 11))
 
 (hindent-test "22 should obey layout only outside parentheses" "
 func = 1234
