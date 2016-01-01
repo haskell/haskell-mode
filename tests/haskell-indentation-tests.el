@@ -135,7 +135,7 @@ macro quotes them for you."
 function = Record
        { field = 123 }"
               (1 0)
-              (2 0 2))
+              (2 2))
 
 (hindent-test "2 Handle underscore in identifiers""
 function = do
@@ -522,7 +522,7 @@ data Foo = Foo {
               (1 0)
               (2 2)
               (3 2)
-              (4 4 11))
+              (4 11))
 
 (hindent-test "21c* \"data\" declaration open on next line" "
 data Foo = Foo
@@ -644,7 +644,7 @@ instance Bar Int
 (hindent-test "32 allow type operators" "
 data (:.) a b = a :. b
 "
-	      (2 0 16))
+	      (2 0 2))
 
 (hindent-test "33* parse #else in CPP" "
 #ifdef FLAG
@@ -661,9 +661,7 @@ data T = T {
 }
 
 "
-              ;; set of answers isn't best but it is not a bug
-              ;; should be just 0
-              (5 0 9))
+              (5 0 2))
 
 (hindent-test "35 baroque construct which causes parse error" "
 az = Projection
