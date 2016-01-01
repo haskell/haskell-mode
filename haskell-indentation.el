@@ -646,18 +646,16 @@ For example
 
 (defun haskell-indentation-data ()
   "Parse data or type declaration."
-  (haskell-indentation-with-starter
-   (lambda ()
-     (when (string= current-token "instance")
-       (haskell-indentation-read-next-token))
-     (haskell-indentation-type)
-     (cond ((string= current-token "=")
-            (haskell-indentation-with-starter
-             (apply-partially #'haskell-indentation-separated
-                              #'haskell-indentation-type "|" "deriving")))
-           ((string= current-token "where")
-            (haskell-indentation-with-starter
-             #'haskell-indentation-expression-layout nil))))))
+  (haskell-indentation-read-next-token)
+  (when (string= current-token "instance")
+    (haskell-indentation-read-next-token))
+  (haskell-indentation-type)
+  (cond ((string= current-token "=")
+         (haskell-indentation-separated
+          #'haskell-indentation-expression "|" "deriving"))
+        ((string= current-token "where")
+         (haskell-indentation-with-starter
+          #'haskell-indentation-expression-layout nil))))
 
 (defun haskell-indentation-import ()
   "Parse import declaration."
@@ -927,7 +925,9 @@ layout starts."
         (cond ((member current-token '(layout-item ";"))
                (haskell-indentation-read-next-token))
               ((eq current-token 'end-tokens)
-               (when (or (haskell-indentation-expression-token-p following-token)
+               (when (or (and
+                          (not (string= following-token "{"))
+                          (haskell-indentation-expression-token-p following-token))
                          (string= following-token ";")
                          (and (equal layout-indent 0)
                               (member following-token (mapcar #'car haskell-indentation-toplevel-list))))
