@@ -39,14 +39,12 @@
   :group 'haskell
   :prefix "ghc-core-")
 
-;;;###autoload
 (defcustom ghc-core-program
   "ghc"
   "Name of the GHC executable (excluding any arguments)."
   :type 'string
   :group 'ghc-core)
 
-;;;###autoload
 (defcustom ghc-core-program-args
   '("-O2")
   "Additional options to be passed to GHC when generating core output.

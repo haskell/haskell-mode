@@ -183,7 +183,6 @@ of `haskell-literate-default' is used.")
 (make-variable-buffer-local 'haskell-literate)
 (put 'haskell-literate 'safe-local-variable 'symbolp)
 ;; Default literate style for ambiguous literate buffers.
-;;;###autoload
 (defcustom haskell-literate-default 'bird
   "Default value for `haskell-literate'.
 Used if the style of a literate buffer is ambiguous.  This variable should
@@ -561,7 +560,6 @@ May return a qualified name."
     (delete-indentation arg)))
 
 ;; Various mode variables.
-;;;###autoload
 (defcustom haskell-mode-contextual-import-completion
   t
   "Enable import completion on haskell-mode-contextual-space."
@@ -809,7 +807,6 @@ Note that negative arguments do not work so well."
 (add-to-list 'completion-ignored-extensions ".hi")
 
 
-;;;###autoload
 (defcustom haskell-check-command "hlint"
   "*Command used to check a Haskell file."
   :group 'haskell
@@ -817,7 +814,6 @@ Note that negative arguments do not work so well."
                  (const "ghc -fno-code")
                  (string :tag "Other command")))
 
-;;;###autoload
 (defcustom haskell-tags-on-save nil
   "Generate tags via hasktags after saving."
   :group 'haskell
@@ -826,7 +822,6 @@ Note that negative arguments do not work so well."
 (defvar haskell-saved-check-command nil
   "Internal use.")
 
-;;;###autoload
 (defcustom haskell-indent-spaces 2
   "Number of spaces to indent inwards."
   :group 'haskell)
