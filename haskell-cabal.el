@@ -309,7 +309,6 @@ OTHER-WINDOW use `find-file-other-window'."
   :group 'haskell
 )
 
-;;;###autoload
 (defcustom haskell-cabal-list-comma-position
   'before
   "Where to put the comma in lists"

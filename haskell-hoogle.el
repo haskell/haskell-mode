@@ -29,7 +29,6 @@
 (require 'haskell-mode)
 
 
-;;;###autoload
 (defcustom haskell-hoogle-command
   (if (executable-find "hoogle") "hoogle")
   "Name of the command to use to query Hoogle.
@@ -38,7 +37,6 @@ If nil, use the Hoogle web-site."
   :type '(choice (const :tag "Use Web-site" nil)
                  string))
 
-;;;###autoload
 (defcustom haskell-hoogle-url "http://haskell.org/hoogle/?q=%s"
   "Default value for hoogle web site."
   :group 'haskell
@@ -120,7 +118,6 @@ is asked to show extra info for the items matching QUERY.."
 
 
 
-;;;###autoload
 (defcustom haskell-hayoo-url "http://hayoo.fh-wedel.de/?query=%s"
   "Default value for hayoo web site."
   :group 'haskell

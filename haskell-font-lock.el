@@ -30,7 +30,6 @@
 (require 'haskell-mode)
 (require 'font-lock)
 
-;;;###autoload
 (defcustom haskell-font-lock-symbols nil
   "Display \\ and -> and such using symbols in fonts.
 
@@ -39,7 +38,6 @@ alignment and can thus lead to nasty surprises with regards to layout."
   :group 'haskell
   :type 'boolean)
 
-;;;###autoload
 (defcustom haskell-font-lock-symbols-alist
   '(("\\" . "λ")
     ("not" . "¬")
@@ -92,7 +90,6 @@ This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
               (string= " " (string (char-after start)))
               (string= " " (string (char-before start))))))))
 
-;;;###autoload
 (defcustom haskell-font-lock-quasi-quote-modes
   `(("hsx" . xml-mode)
     ("hamlet" . xml-mode)

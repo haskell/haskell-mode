@@ -19,14 +19,12 @@
 
 (require 'cl-lib)
 
-;;;###autoload
 (defcustom haskell-complete-module-preferred
   '()
   "Override ordering of module results by specifying preferred modules."
   :group 'haskell
   :type '(repeat string))
 
-;;;###autoload
 (defcustom haskell-complete-module-max-display
   10
   "Maximum items to display in minibuffer."

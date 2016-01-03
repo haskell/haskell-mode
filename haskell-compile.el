@@ -35,7 +35,6 @@
   :link '(custom-manual "(haskell-mode)compilation")
   :group 'haskell)
 
-;;;###autoload
 (defcustom haskell-compile-cabal-build-command
   "cd %s && cabal build --ghc-option=-ferror-spans"
   "Default build command to use for `haskell-cabal-build' when a cabal file is detected.
@@ -43,7 +42,6 @@ The `%s' placeholder is replaced by the cabal package top folder."
   :group 'haskell-compile
   :type 'string)
 
-;;;###autoload
 (defcustom haskell-compile-cabal-build-alt-command
   "cd %s && cabal clean -s && cabal build --ghc-option=-ferror-spans"
   "Alternative build command to use when `haskell-cabal-build' is called with a negative prefix argument.
@@ -51,7 +49,6 @@ The `%s' placeholder is replaced by the cabal package top folder."
   :group 'haskell-compile
   :type 'string)
 
-;;;###autoload
 (defcustom haskell-compile-command
   "ghc -Wall -ferror-spans -fforce-recomp -c %s"
   "Default build command to use for `haskell-cabal-build' when no cabal file is detected.
@@ -59,7 +56,6 @@ The `%s' placeholder is replaced by the current buffer's filename."
   :group 'haskell-compile
   :type 'string)
 
-;;;###autoload
 (defcustom haskell-compile-ghc-filter-linker-messages
   t
   "Filter out unremarkable \"Loading package...\" linker messages during compilation."
