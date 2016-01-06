@@ -501,6 +501,50 @@ executable found in PATH.")
     table)
   "Syntax table used in Haskell mode.")
 
+(defun haskell-syntax-propertize (begin end)
+  (save-excursion
+    (goto-char begin)
+    (let ((ppss (syntax-ppss)))
+      (when (nth 8 ppss)
+        ;; go to the beginning of a comment or string
+        (goto-char (nth 8 ppss))
+        (when (equal "|" (nth 3 ppss))
+          ;; if this is a quasi quote we need to backtrack even more
+          ;; to the opening bracket
+          (skip-chars-backward "^[")
+          (goto-char (1- (point)))))
+
+      (while (< (point) end)
+        (let
+            ((token-kind (haskell-lexeme-looking-at-token)))
+
+          (cond
+           ((equal token-kind 'qsymid)
+            (when (member
+                   (haskell-lexeme-classify-by-first-char (char-after (match-beginning 1)))
+                   '(varsym consym))
+              ;; we have to neutralize potential comments here
+              (put-text-property (match-beginning 1) (match-end 1) 'syntax-table (string-to-syntax "."))))
+           ((equal token-kind 'number)
+            (put-text-property (match-beginning 0) (match-end 0) 'syntax-table (string-to-syntax "w")))
+           ((equal token-kind 'char)
+            (put-text-property (match-beginning 0) (1+ (match-beginning 0)) 'syntax-table (string-to-syntax "\""))
+            (put-text-property (1- (match-end 0)) (match-end 0) 'syntax-table (string-to-syntax "\"")))
+           ((equal token-kind 'string)
+            (save-excursion
+              (goto-char (match-beginning 2))
+              (let ((limit (match-end 2)))
+                (save-match-data
+                  (while (re-search-forward "\"" limit t)
+                    (put-text-property (match-beginning 0) (match-end 0) 'syntax-table (string-to-syntax ".")))))
+              (put-text-property (match-beginning 3) (match-end 3) 'syntax-table (string-to-syntax "\""))))
+           ((equal token-kind 'template-haskell-quasi-quote)
+            (put-text-property (match-beginning 2) (match-end 2) 'syntax-table (string-to-syntax "\""))
+            (put-text-property (match-beginning 4) (match-end 4) 'syntax-table (string-to-syntax "\""))))
+          (if token-kind
+              (goto-char (match-end 0))
+            (goto-char end)))))))
+
 (defun haskell-ident-at-point ()
   "Return the identifier under point, or nil if none found.
 May return a qualified name."
@@ -659,6 +703,7 @@ Minor modes that work well with `haskell-mode':
   (set (make-local-variable 'comment-end-skip) "[ \t]*\\(-}\\|\\s>\\)")
   (set (make-local-variable 'forward-sexp-function) #'haskell-forward-sexp)
   (set (make-local-variable 'parse-sexp-ignore-comments) nil)
+  (set (make-local-variable 'syntax-propertize-function) #'haskell-syntax-propertize)
 
   ;; Set things up for eldoc-mode.
   (set (make-local-variable 'eldoc-documentation-function)

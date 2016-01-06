@@ -117,7 +117,6 @@ if all of its characters have syntax and face. See
 
 (ert-deftest haskell-syntactic-test-7b ()
   "Take quotes and double quotes under control."
-  :expected-result :failed
   (check-properties
     ;; do not get fooled
    '("\"\'\"\'\"\'\"\'\"\'\"\'\"\'\"\'\"\' Cons")
@@ -136,11 +135,11 @@ if all of its characters have syntax and face. See
   (check-properties
    '("\"\\  \\\\\\ \\  "
      "   \\\" Cons")
-   '(("\\" "\\" t)               ; 1st is escape
+   '(("\\" "." t)               ; 1st is escape
      ("\\"  "." t)               ; 2nd is punctuation
-     ("\\" "\\" t)               ; 3rd is escape
+     ("\\" "." t)               ; 3rd is escape
      ("\\"  "." t)               ; 4th is punctuation
-     ("\\" "\\" t)               ; 5th is escape
+     ("\\" "." t)               ; 5th is escape
      ("\\"  "." t)               ; 6th is punctuation
      ("Cons" "w" haskell-constructor-face))))
 
@@ -237,7 +236,6 @@ if all of its characters have syntax and face. See
 
 (ert-deftest haskell-syntactic-string-vs-comment-escape ()
   "Check string escape vs comment escape"
-  :expected-result :failed
   (check-properties
    ;; "\"" \--  Cons
    '("\"\\\"\" \\--  Cons")
@@ -309,7 +307,6 @@ if all of its characters have syntax and face. See
   "Syntax for haddock comments"
   ;; Note: all of these are prefixed with space so that
   ;; top-level definition detection does not kick in.
-  :expected-result :failed
   (check-properties
    '(" 'a''b'"                          ; ('a','b')
      " 12'c'"                           ; (12,'c')
