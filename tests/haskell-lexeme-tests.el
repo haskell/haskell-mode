@@ -195,3 +195,25 @@ order."
   (check-lexemes
    '("0.12 34.22.33 1e+23 1e23 1e+33 455.33E1456.4")
    '("0.12" "34.22" "." "33" "1e+23" "1e23" "1e+33" "455.33E1456" "." "4")))
+
+(ert-deftest haskell-lexeme-quasi-quote-1 ()
+  (check-lexemes
+   '("[xml| <xml /> |]")
+   '("[xml| <xml /> |]")))
+
+(ert-deftest haskell-lexeme-quasi-quote-2 ()
+  (check-lexemes
+   '("[xml| <xml /> |] |]")
+   '("[xml| <xml /> |]" "|" "]")))
+
+(ert-deftest haskell-lexeme-quasi-quote-3 ()
+  :expected-result :failed
+  (check-lexemes
+   '("[xml| <xml /> |")
+   '("[xml| <xml /> |")))
+
+(ert-deftest haskell-lexeme-quasi-quote-4 ()
+  :expected-result :failed
+  (check-lexemes
+   '("[xml| <xml />")
+   '("[xml| <xml />")))
