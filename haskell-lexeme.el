@@ -121,26 +121,73 @@ Note that negative sign char is not part of a number.")
   (rx-to-string `(: "'" (regexp ,haskell-lexeme-char-literal-inside) "'"))
   "Regexp matching a character literal.")
 
-(defconst haskell-lexeme-string-literal-inside
-  (rx (* (| (regexp "[^\n\"\\]")
-            (: "\\"
-               (| "a" "b" "f" "n" "r" "t" "v" "\\" "\"" "'" "&"
-                  "NUL" "SOH" "STX" "ETX" "EOT" "ENQ" "ACK"
-                  "BEL" "BS" "HT" "LF" "VT" "FF" "CR" "SO" "SI" "DLE"
-                  "DC1" "DC2" "DC3" "DC4" "NAK" "SYN" "ETB" "CAN"
-                  "EM" "SUB" "ESC" "FS" "GS" "RS" "US" "SP" "DEL"
-                  (: "^" (regexp "[]A-Z@^_\\[]"))
-                  (regexp "[ \t\n\r\v\f]*\\\\"))))))
-  "Regexp matching an inside of a string literal.")
+(defconst haskell-lexeme-string-literal-inside-item
+  (rx (| (not (any "\n\"\\"))
+         (: "\\"
+            (| "a" "b" "f" "n" "r" "t" "v" "\\" "\"" "'" "&"
+               "NUL" "SOH" "STX" "ETX" "EOT" "ENQ" "ACK"
+               "BEL" "BS" "HT" "LF" "VT" "FF" "CR" "SO" "SI" "DLE"
+               "DC1" "DC2" "DC3" "DC4" "NAK" "SYN" "ETB" "CAN"
+               "EM" "SUB" "ESC" "FS" "GS" "RS" "US" "SP" "DEL"
+               (: "^" (regexp "[]A-Z@^_\\[]"))
+               (regexp "[ \t\n\r\v\f]*\\\\")))))
+  "Regexp matching an item that is a single character or a single
+escape sequence inside of a string literal.
+
+Note that `haskell-lexeme-string-literal-inside-item' matches
+strictly only escape sequences defined in Haskell Report.")
 
 (defconst haskell-lexeme-string-literal
-  (rx-to-string `(: "\"" (regexp ,haskell-lexeme-string-literal-inside) "\""))
-  "Regexp matching a string literal.")
+  (rx (: (group "\"")
+         (group (* (| (regexp "\\\\[ \t\n\r\v\f]*\\\\")
+                      "\\\""
+                      (regexp "[^\"\n]"))))
+         (group (| "\"" (regexp "$")))))
+  "Regexp matching a string literal lookalike.
+
+Note that `haskell-lexeme-string-literal' matches more than
+Haskell Report specifies because we want to support also code
+under edit.
+
+String literals end with double quote or unescaped newline or end
+of buffer.
+
+Regexp has subgroup expressions:
+ (match-text 1) matches the opening doublequote.
+ (match-text 2) matches the inside of the string.
+ (match-text 3) matches the closing quote, or a closing
+                newline or empty string at the end of the buffer.")
+
+(defconst haskell-lexeme-quasi-quote-literal
+  (rx-to-string `(: "[" (optional "$")
+                    (group (regexp ,haskell-lexeme-id))
+                    (group "|")
+                    (group (* (| (not (any "|"))
+                                 (: "|" (not (any "]"))))
+                              ))
+                    (group "|")
+                    "]"))
+  "Regexp matching a quasi quote literal.
+
+Quasi quotes start with '[xxx|' or '[$xxx|' sequence and end with
+'|]'. The 'xxx' is quoter name There is no escaping mechanism
+provided for the ending sequence.
+
+Regexp has subgroup expressions:
+ (match-text 1) matches the quoter name (without $ sign if present).
+ (match-text 2) matches the opening vertical bar.
+ (match-text 3) matches the inside of the quoted string.
+ (match-text 4) matches the closing vertical bar
+                or empty string if at the end of the buffer.
+
+Note that this regexp admits 'e', 't', 'd', 'p' as quoter names
+although template Haskell explicitly rejects those.")
 
 (defun haskell-lexeme-classify-by-first-char (char)
   "Classify token by CHAR.
 
-CHAR is a chararacter that is assumed to be first character of a token."
+CHAR is a chararacter that is assumed to be the first character
+of a token."
   (let ((category (get-char-code-property char 'general-category)))
 
     (cond
@@ -158,7 +205,7 @@ CHAR is a chararacter that is assumed to be first character of a token."
       'conid)
      ((or (equal char ?_)
           (member category '(Ll Lo)))
-      'varsym)
+      'varid)
      ((and (>= char ?0) (<= char 9))
       'number)
      ((member char '(?\] ?\[ ?\( ?\) ?\{ ?\} ?\` ?\, ?\;))
@@ -179,8 +226,9 @@ Possible results are:
 - 'qsymid: for qualified identifiers or symbols
 - 'string: for strings literals
 - 'char: for char literals
-- 'decimal: for decimal, float, hexadecimal and octal number literals
+- 'number: for decimal, float, hexadecimal and octal number literals
 - 'template-haskell-quote: for a string of apostrophes for template haskell
+- 'template-haskell-quasi-quote: for a string of apostrophes for template haskell
 
 Note that for qualified symbols (match-string 1) returns the
 unqualified identifier or symbol.  Further qualification for
@@ -195,20 +243,27 @@ See `haskell-lexeme-classify-by-first-char' for details."
        (point (point-marker)))
     (or
      (and (looking-at "{-")
-          (progn
-            (save-excursion
-              (forward-comment 1)
-              (set-match-data (list point (point-marker))))
+          (save-excursion
+            (forward-comment 1)
+            (set-match-data (list point (point-marker)))
             'nested-comment))
      (and (looking-at haskell-lexeme-char-literal)
           'char)
      (and (looking-at haskell-lexeme-string-literal)
           'string)
      (and (looking-at "[][(){}`,;]")
-          'special)
+          (let ((match-data (match-data)))
+            (if (and (equal "[" (match-string-no-properties 0))
+                     (looking-at haskell-lexeme-quasi-quote-literal))
+                (if (member (match-string-no-properties 1) '("e" "d" "p" "t"))
+                    (progn
+                      (set-match-data match-data)
+                      'special)
+                    'template-haskell-quasi-quote)
+              'special)))
      (and (looking-at haskell-lexeme-qid-or-qsym)
-          (if (and (eq (- (match-end 0) (match-beginning 0)) 2)
-                   (equal (match-string 0) "--"))
+          (if (save-match-data
+                (string-match "\\`---*\\'" (match-string-no-properties 0)))
               (progn
                 (set-match-data (list point (set-marker (make-marker) (line-end-position))))
                 'comment)
@@ -216,7 +271,9 @@ See `haskell-lexeme-classify-by-first-char' for details."
      (and (looking-at haskell-lexeme-number)
           'number)
      (and (looking-at "'+")
-          'template-haskell-quote))))
+          'template-haskell-quote)
+     (and (looking-at ".")
+          'illegal))))
 
 (provide 'haskell-lexeme)
 
