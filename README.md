@@ -65,8 +65,7 @@ for setup and user guide.
 
 ## Installation - more information
 
-`haskell-mode` supports GNU Emacs versions 23, 24 and upcoming 25
-(snapshot).
+`haskell-mode` supports GNU Emacs version 24 or later.
 
 `haskell-mode` is available from [melpa-stable](http://stable.melpa.org) (releases) and [melpa](http://melpa.org)
 (git snapshots).
@@ -74,18 +73,6 @@ for setup and user guide.
 Other means of obtaining `haskell-mode` include
 [el-get](https://github.com/dimitri/el-get),
 [Emacs Prelude](https://github.com/bbatsov/prelude) and [Debian package](https://packages.debian.org/search?keywords=haskell-mode).
-
-Emacs23 requires an the use of "cl-lib".  cl-lib.el can be found in
-the tests/compat directory.  Copy cl-lib.el to your emacs
-directory, e.g. ~/.emacs.d directory and put
-
-```el
-(add-to-list 'load-path "~/.emacs.d/")
-(require 'cl-lib)
-```
-
-in your .emacs file.
-
 
 ## Installation from git repository
 

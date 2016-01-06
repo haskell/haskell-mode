@@ -4,7 +4,6 @@ dist: trusty
 
 env:
   matrix:
-    - EMACS=emacs23           TARGET=check
     - EMACS=emacs24           TARGET=check
     - EMACS=emacs-snapshot    TARGET=check
     - TARGET=deploy-manual
@@ -16,10 +15,6 @@ matrix:
     - env: EMACS=emacs-snapshot    TARGET=check
 
 install:
-  - if [ "$EMACS" = "emacs23" ]; then
-        sudo apt-get update &&
-        sudo apt-get install --no-install-suggests --no-install-recommends --assume-yes emacs23-nox;
-    fi
   - if [ "$EMACS" = "emacs24" ]; then
         sudo apt-get update &&
         sudo apt-get install --no-install-suggests --no-install-recommends --assume-yes emacs24-nox;
