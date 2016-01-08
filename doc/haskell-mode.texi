@@ -126,8 +126,58 @@ Requests}.
 @node Getting Started
 @chapter Getting Started
 
-If you are reading this, you have most likely already managed to install
-Haskell Mode in one way or another.
+@section Quick Installation
+
+Make sure you have this in your @uref{http://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html, init file} (usually `~/.emacs`). If you already have @code{custom-set-variables}, merge its contents:
+
+@lisp
+(require 'package)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-archives
+   (quote
+    (("gnu" . "http://elpa.gnu.org/packages/")
+     ("melpa-stable" . "http://stable.melpa.org/packages/")))))
+@end lisp
+
+Then run emacs, and evaluate:
+
+    @code{M-x package-refresh-contents}
+
+and then follow by
+
+    @code{M-x package-install RET haskell-mode}
+
+Voila! @code{haskell-mode} is installed! You should be able to edit Haskell
+source code in color now.
+
+@section Installation - more information
+
+@code{haskell-mode} supports GNU Emacs versions 23, 24 and upcoming 25
+(snapshot).
+
+@code{haskell-mode} is available from @uref{http://stable.melpa.org,melpa-stable (releases)} and @uref{http://melpa.org, melpa
+(git snapshots)}.
+
+Other means of obtaining `haskell-mode` include
+@uref{https://github.com/dimitri/el-get, el-get},
+@uref{https://github.com/bbatsov/prelude, Emacs Prelude}) and @uref{https://packages.debian.org/search?keywords=haskell-mode, Debian package}.
+
+Emacs23 requires an the use of @code{cl-lib}.  cl-lib.el can be found in
+the tests/compat directory.  Copy cl-lib.el to your emacs
+directory, e.g. ~/.emacs.d directory and put
+
+@lisp
+(add-to-list 'load-path "~/.emacs.d/")
+(require 'cl-lib)
+@end lisp
+
+in your .emacs file.
+
+@section Customizing
 
 @cindex customizing
 Most of Haskell Mode's settings are configurable via customizable
