@@ -425,26 +425,8 @@ Either of these will turn off @code{haskell-indentation-mode}.
 
 @section Interactive Block Indentation
 
-By inserting the key bindings for @kbd{C-,} and @kbd{C-.} (these
-bindings are convenient on keyboard layouts where @key{,} and @key{.}
-are adjacent keys) as shown below you can interactively de/indent either
-the following nested block or, if a region is active while in Transient
-Mark Mode (@pxref{Disabled Transient Mark,,,emacs}), de/indent the
-active region.
-
-By using a numeric prefix argument (@pxref{Prefix Command
-Arguments,,,elisp}) you can modify the shift-amount; for instance,
-@kbd{C-u C-,} increases indentation by 4 characters at once.
-
-@findex haskell-move-nested-left
-@findex haskell-move-nested-right
-
-@lisp
-(eval-after-load "haskell-mode"
-  '(progn
-     (define-key haskell-mode-map (kbd "C-,") 'haskell-move-nested-left)
-     (define-key haskell-mode-map (kbd "C-.") 'haskell-move-nested-right)))
-@end lisp
+@code{haskell-indentation} can move whole blocks to the left or to the
+right. Just mark a block and then use @key{TAB} or @key{S-TAB}.
 
 @section Rectangle Commands
 
