@@ -180,7 +180,17 @@ which will prompt a list of all modules, either installed modules or
 local project directory files. Then it&rsquo;ll insert it and then format that
 module section.
 </p>
+<a name="stylish_002dhaskell"></a>
+<h4 class="subsection">4.2.6 stylish-haskell</h4>
 
+<p>As an alternative to the elisp functions described above, haskell-mode
+can use the program <a href="http://hackage.haskell.org/package/stylish-haskell">stylish-haskell</a>
+to format imports.  You can set this behavior by typing: <kbd>M-x
+customize-variable <span class="key">RET</span> haskell-stylish-on-save</kbd>.  You can
+install <code>stylish-haskell</code> by running <code>stack install
+stylish-haskell</code>, or if you have not installed <code>stack</code>,
+<code>cabal install stylish-haskell</code>.
+</p>
 <a name="Completion-support"></a>
 <h3 class="section">4.3 Completion support</h3>
 

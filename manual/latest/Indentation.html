@@ -77,78 +77,37 @@ see <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Indentatio
 <p>In Haskell, code indentation has semantic meaning as it defines the
 block structure<a name="DOCF4" href="#FOOT4"><sup>4</sup></a>.
 </p>
-<p>As GNU Emacs&rsquo; default indentation function (i.e. <code>indent-relative</code>)
-is not designed for use with Haskell&rsquo;s layout rule, Haskell mode
-includes three different indentation minor modes with different
-trade-offs:
+<p>As GNU Emacs&rsquo; default indentation function
+(i.e. <code>indent-relative</code>) is not designed for use with Haskell&rsquo;s
+layout rule, Haskell mode includes indentation rules adapted to
+Haskell.  <code>haskell-indentation-mode</code> binds <tt class="key">TAB</tt> to cycle
+through possible indentation points based on some clever heuristics.
+<tt class="key">SHIFT-TAB</tt> cycles in the reverse direction, and <tt class="key">RET</tt> moves
+to a new line and indents to the first possible indentation level.
 </p>
-<dl compact="compact">
-<dt><code>haskell-indent-mode</code>
-<a name="index-haskell_002dindent_002dmode"></a>
-</dt>
-<dd>
-<p>Intelligent semi-automatic indentation for Haskell&rsquo;s layout rule.  The
-basic idea is to have <tt class="key">TAB</tt> cycle through possibilities indentation
-points based on some clever heuristics.
-</p>
-<p>The rationale and the implementation principles are described in more
-detail in the article <cite>Dynamic tabbing for automatic indentation
-with the layout rule</cite> published in the Journal of Functional Programming
-8.5 (1998).
-</p>
-</dd>
-<dt><code>haskell-indentation-mode</code>
-<a name="index-haskell_002dindentation_002dmode"></a>
-</dt>
-<dd>
-<p>Improved variation of <code>haskell-indent-mode</code> indentation
-mode. Rebinds <tt class="key">RET</tt> and <tt class="key">DEL</tt>, so that indentations can be set
-and deleted as if they were real tabs.
-</p>
-</dd>
-</dl>
+<a name="haskell_002dindent_002dmode"></a>
+<h3 class="section">6.1 haskell-indent-mode</h3>
 
-<p>To enable one of these three mutually exclusive indentation schemes, you
-just need call one (and only one!) of the <code>*-mode</code> commands
-while in the buffer you want the indentation scheme to be activated for.
-</p>
-<p>The recommended way is to add one of <code>*-mode</code> commands to
-<code>haskell-mode-hook</code>. This can be done either by using <kbd>M-x
-customize-variable <span class="key">RET</span> haskell-mode-hook</kbd> which provides a
-convenient user interface or by adding <em>one</em> of the following three
-lines to your <samp>.emacs</samp> file:
+<p>If you want to use the obsolete <code>haskell-indent-mode</code>, the
+recommended way is to load it in <code>haskell-mode-hook</code>. This can be
+done either by using <kbd>M-x customize-variable <span class="key">RET</span>
+haskell-mode-hook</kbd> which provides a convenient user interface or by
+adding the following line to your <samp>.emacs</samp> file:
 </p>
 <div class="lisp">
 <pre class="lisp">(add-hook 'haskell-mode-hook 'haskell-indent-mode)
-(add-hook 'haskell-mode-hook 'haskell-indentation-mode)
 </pre></div>
 
+<p>This will turn off <code>haskell-indentation-mode</code>.
+</p>
 <a name="Interactive-Block-Indentation"></a>
-<h3 class="section">6.1 Interactive Block Indentation</h3>
+<h3 class="section">6.2 Interactive Block Indentation</h3>
 
-<p>By inserting the key bindings for <kbd>C-,</kbd> and <kbd>C-.</kbd> (these
-bindings are convenient on keyboard layouts where <tt class="key">,</tt> and <tt class="key">.</tt>
-are adjacent keys) as shown below you can interactively de/indent either
-the following nested block or, if a region is active while in Transient
-Mark Mode (see <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Disabled-Transient-Mark.html#Disabled-Transient-Mark">(emacs)Disabled Transient Mark</a>), de/indent the
-active region.
+<p><code>haskell-indentation</code> can move whole blocks to the left or to the
+right. Just mark a block and then use <tt class="key">TAB</tt> or <tt class="key">S-TAB</tt>.
 </p>
-<p>By using a numeric prefix argument (see <a href="http://www.gnu.org/software/emacs/manual/html_node/elisp/Prefix-Command-Arguments.html#Prefix-Command-Arguments">(elisp)Prefix Command
-Arguments</a>) you can modify the shift-amount; for instance,
-<kbd>C-u C-,</kbd> increases indentation by 4 characters at once.
-</p>
-<a name="index-haskell_002dmove_002dnested_002dleft"></a>
-<a name="index-haskell_002dmove_002dnested_002dright"></a>
-
-<div class="lisp">
-<pre class="lisp">(eval-after-load &quot;haskell-mode&quot;
-  '(progn
-     (define-key haskell-mode-map (kbd &quot;C-,&quot;) 'haskell-move-nested-left)
-     (define-key haskell-mode-map (kbd &quot;C-.&quot;) 'haskell-move-nested-right)))
-</pre></div>
-
 <a name="Rectangle-Commands"></a>
-<h3 class="section">6.2 Rectangle Commands</h3>
+<h3 class="section">6.3 Rectangle Commands</h3>
 
 <a name="index-rectangle"></a>
 <a name="index-CUA-mode"></a>

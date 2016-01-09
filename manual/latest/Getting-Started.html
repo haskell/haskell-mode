@@ -67,9 +67,62 @@ Next: <a href="Editing-Haskell-Code.html#Editing-Haskell-Code" accesskey="n" rel
 <a name="Getting-Started-1"></a>
 <h2 class="chapter">3 Getting Started</h2>
 
-<p>If you are reading this, you have most likely already managed to install
-Haskell Mode in one way or another.
+<a name="Quick-Installation"></a>
+<h3 class="section">3.1 Quick Installation</h3>
+
+<p>Make sure you have this in your <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html">init file</a> (usually &lsquo;~/.emacs&lsquo;). If you already have <code>custom-set-variables</code>, merge its contents:
 </p>
+<div class="lisp">
+<pre class="lisp">(require 'package)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-archives
+   (quote
+    ((&quot;gnu&quot; . &quot;http://elpa.gnu.org/packages/&quot;)
+     (&quot;melpa-stable&quot; . &quot;http://stable.melpa.org/packages/&quot;)))))
+</pre></div>
+
+<p>Then run emacs, and evaluate:
+</p>
+<p><code>M-x package-refresh-contents</code>
+</p>
+<p>and then follow by
+</p>
+<p><code>M-x package-install RET haskell-mode</code>
+</p>
+<p>Voila! <code>haskell-mode</code> is installed! You should be able to edit Haskell
+source code in color now.
+</p>
+<a name="Installation-_002d-more-information"></a>
+<h3 class="section">3.2 Installation - more information</h3>
+
+<p><code>haskell-mode</code> supports GNU Emacs versions 23, 24 and upcoming 25
+(snapshot).
+</p>
+<p><code>haskell-mode</code> is available from <a href="http://stable.melpa.org">melpa-stable (releases)</a> and <a href="http://melpa.org">melpa
+(git snapshots)</a>.
+</p>
+<p>Other means of obtaining &lsquo;haskell-mode&lsquo; include
+<a href="https://github.com/dimitri/el-get">el-get</a>,
+<a href="https://github.com/bbatsov/prelude">Emacs Prelude</a>) and <a href="https://packages.debian.org/search?keywords=haskell-mode">Debian package</a>.
+</p>
+<p>Emacs23 requires an the use of <code>cl-lib</code>.  cl-lib.el can be found in
+the tests/compat directory.  Copy cl-lib.el to your emacs
+directory, e.g. ~/.emacs.d directory and put
+</p>
+<div class="lisp">
+<pre class="lisp">(add-to-list 'load-path &quot;~/.emacs.d/&quot;)
+(require 'cl-lib)
+</pre></div>
+
+<p>in your .emacs file.
+</p>
+<a name="Customizing"></a>
+<h3 class="section">3.3 Customizing</h3>
+
 <a name="index-customizing"></a>
 <p>Most of Haskell Mode&rsquo;s settings are configurable via customizable
 variables (see <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html#Easy-Customization">(emacs)Easy Customization</a>, for details). You can use
@@ -82,11 +135,14 @@ customization sub-tree.
 <code>haskell-mode-hook</code> variable (see <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Hooks.html#Hooks">(emacs)Hooks</a>) which gets run
 right after the <code>haskell-mode</code> major mode is initialized for a
 buffer. You can customize <code>haskell-mode-hook</code> by <kbd>M-x
-customize-variable <span class="key">RET</span> haskell-mode-hook</kbd>. It&rsquo;s highly recommended
-you set up indentation to match your preferences; See <a href="Indentation.html#Indentation">Indentation</a>,
-for more details about the indentation modes included with Haskell Mode.
+customize-variable <span class="key">RET</span> haskell-mode-hook</kbd>.
 </p>
 
+<hr>
+<div class="header">
+<p>
+Next: <a href="Editing-Haskell-Code.html#Editing-Haskell-Code" accesskey="n" rel="next">Editing Haskell Code</a>, Previous: <a href="Getting-Help-and-Reporting-Bugs.html#Getting-Help-and-Reporting-Bugs" accesskey="p" rel="prev">Getting Help and Reporting Bugs</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
 
 
 
