@@ -200,13 +200,10 @@ Regexp match data 0 points to the chars."
 	  ;; no face.  So force evaluation by using `keep'.
 	  keep)))))
 
-;; The font lock regular expressions.
-(defun haskell-font-lock-keywords-create (literate)
-  "Create fontification definitions for Haskell scripts.
-Returns keywords suitable for `font-lock-keywords'."
+(defconst haskell-font-lock-keywords
   (let* (;; Bird-style literate scripts start a line of code with
          ;; "^>", otherwise a line of code starts with "^".
-         (line-prefix (if (eq literate 'bird) "^> ?" "^"))
+         (line-prefix "^\\(?:> ?\\)?")
 
          (varid "\\b[[:lower:]_][[:alnum:]'_]*\\b")
          ;; We allow ' preceding conids because of DataKinds/PolyKinds
@@ -234,8 +231,7 @@ Returns keywords suitable for `font-lock-keywords'."
          (topdecl-var
           (concat line-prefix "\\(" varid "\\(?:\\s-*,\\s-*" varid "\\)*" "\\)\\s-*"
                   ;; optionally allow for a single newline after identifier
-                  ;; NOTE: not supported for bird-style .lhs files
-                  (if (eq literate 'bird) nil "\\([\n]\\s-+\\)?")
+                  "\\([\n]\\s-+\\)?"
                   ;; A toplevel declaration can be followed by a definition
                   ;; (=), a type (::) or (∷), a guard, or a pattern which can
                   ;; either be a variable, a constructor, a parenthesized
@@ -322,7 +318,8 @@ Returns keywords suitable for `font-lock-keywords'."
                              (not (member (match-string 0) '("::" "∷"))))
                         'haskell-constructor-face
                       'haskell-operator-face))))
-    keywords))
+    keywords)
+  "Font lock definitions for literate and non-literate Haskell.")
 
 
 (defun haskell-font-lock-fontify-block (lang-mode start end)
@@ -412,30 +409,10 @@ Returns keywords suitable for `font-lock-keywords'."
     'font-lock-doc-face)
    (t 'font-lock-comment-face)))
 
-(defconst haskell-font-lock-keywords
-  (haskell-font-lock-keywords-create nil)
-  "Font lock definitions for non-literate Haskell.")
-
-(defconst haskell-font-lock-bird-literate-keywords
-  (haskell-font-lock-keywords-create 'bird)
-  "Font lock definitions for Bird-style literate Haskell.")
-
-(defconst haskell-font-lock-latex-literate-keywords
-  (haskell-font-lock-keywords-create 'latex)
-  "Font lock definitions for LaTeX-style literate Haskell.")
-
-;;;###autoload
-(defun haskell-font-lock-choose-keywords ()
-  (let ((literate (if (boundp 'haskell-literate) haskell-literate)))
-    (cl-case literate
-      (bird haskell-font-lock-bird-literate-keywords)
-      ((latex tex) haskell-font-lock-latex-literate-keywords)
-      (t haskell-font-lock-keywords))))
-
 (defun haskell-font-lock-defaults-create ()
   "Locally set `font-lock-defaults' for Haskell."
   (set (make-local-variable 'font-lock-defaults)
-       '(haskell-font-lock-choose-keywords
+       '(haskell-font-lock-keywords
          nil nil nil nil
          (font-lock-syntactic-face-function
           . haskell-syntactic-face-function)

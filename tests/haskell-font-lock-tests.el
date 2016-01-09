@@ -548,7 +548,6 @@ if all of its characters have syntax and face. See
    'literate))
 
 (ert-deftest haskell-literate-mixed-1 ()
-  :expected-result :failed
   ;; Although Haskell Report does not advice mixing modes, it is a
   ;; perfectly valid construct that we should support in syntax
   ;; highlighting.

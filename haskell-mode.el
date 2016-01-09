@@ -752,7 +752,7 @@ Minor modes that work well with `haskell-mode':
        'haskell-ds-create-imenu-index)
   ;; Set things up for font-lock.
   (set (make-local-variable 'font-lock-defaults)
-       '(haskell-font-lock-choose-keywords
+       '(haskell-font-lock-keywords
          nil nil nil nil
          (font-lock-syntactic-face-function
           . haskell-syntactic-face-function)
