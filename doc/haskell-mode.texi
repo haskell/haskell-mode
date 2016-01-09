@@ -421,7 +421,7 @@ adding the following line to your @file{.emacs} file:
 (add-hook 'haskell-mode-hook 'haskell-indent-mode)
 @end lisp
 
-Either of these will turn off @code{haskell-indentation-mode}.
+This will turn off @code{haskell-indentation-mode}.
 
 @section Interactive Block Indentation
 
