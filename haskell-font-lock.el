@@ -319,55 +319,6 @@ Returns keywords suitable for `font-lock-keywords'."
                       'haskell-operator-face))))
     keywords))
 
-(defvar haskell-font-lock-latex-cache-pos nil
-  "Position of cache point used by `haskell-font-lock-latex-cache-in-comment'.
-Should be at the start of a line.")
-(make-variable-buffer-local 'haskell-font-lock-latex-cache-pos)
-
-(defvar haskell-font-lock-latex-cache-in-comment nil
-  "If `haskell-font-lock-latex-cache-pos' is outside a
-\\begin{code}..\\end{code} block (and therefore inside a comment),
-this variable is set to t, otherwise nil.")
-(make-variable-buffer-local 'haskell-font-lock-latex-cache-in-comment)
-
-(defun haskell-font-lock-latex-comments (end)
-  "Sets `match-data' according to the region of the buffer before end
-that should be commented under LaTeX-style literate scripts."
-  (let ((start (point)))
-    (if (= start end)
-        ;; We're at the end.  No more to fontify.
-        nil
-      (if (not (eq start haskell-font-lock-latex-cache-pos))
-          ;; If the start position is not cached, calculate the state
-          ;; of the start.
-          (progn
-            (setq haskell-font-lock-latex-cache-pos start)
-            ;; If the previous \begin{code} or \end{code} is a
-            ;; \begin{code}, then start is not in a comment, otherwise
-            ;; it is in a comment.
-            (setq haskell-font-lock-latex-cache-in-comment
-                  (if (and
-                       (re-search-backward
-                        "^\\(\\(\\\\begin{code}\\)\\|\\(\\\\end{code}\\)\\)$"
-                        (point-min) t)
-                       (match-end 2))
-                      nil t))
-            ;; Restore position.
-            (goto-char start)))
-      (if haskell-font-lock-latex-cache-in-comment
-          (progn
-            ;; If start is inside a comment, search for next \begin{code}.
-            (re-search-forward "^\\\\begin{code}$" end 'move)
-            ;; Mark start to end of \begin{code} (if present, till end
-            ;; otherwise), as a comment.
-            (set-match-data (list start (point)))
-            ;; Return point, as a normal regexp would.
-            (point))
-        ;; If start is inside a code block, search for next \end{code}.
-        (if (re-search-forward "^\\\\end{code}$" end t)
-            ;; If one found, mark it as a comment, otherwise finish.
-            (point))))))
-
 (defconst haskell-basic-syntactic-keywords
   '(;; Character constants (since apostrophe can't have string syntax).
     ;; Beware: do not match something like 's-}' or '\n"+' since the first '

@@ -51,7 +51,7 @@ after a test as this aids interactive debugging."
        (haskell-mode)
        ,@body)))
 
-(defun check-properties (lines props)
+(defun check-properties (lines props &optional literate)
   "Check if syntax properties and font-lock properties as set properly.
 
 LINES is a list of strings that will be inserted to a new
@@ -63,10 +63,12 @@ if all of its characters have syntax and face. See
     (kill-buffer "*haskell-mode-buffer*"))
   (save-current-buffer
     (set-buffer (get-buffer-create "*haskell-mode-buffer*"))
-    (haskell-mode)
     (dolist (line lines)
       (insert line)
       (insert "\n"))
+    (if literate
+        (literate-haskell-mode)
+      (haskell-mode))
     (font-lock-fontify-buffer)
     (goto-char (point-min))
     (dolist (prop props)
@@ -464,3 +466,91 @@ if all of its characters have syntax and face. See
   (check-properties
    '("Q +++ 12.12")
    '(("+++" t haskell-definition-face))))
+
+(ert-deftest haskell-literate-bird-1 ()
+  (check-properties
+   '("Comment1"
+     ""
+     "> code1 = 1"
+     "> code2 = 1"
+     ""
+     "Comment2"
+     ""
+     "> code3 = 1"
+     ""
+     "Comment3")
+   '(("Comment1" t haskell-literate-comment-face)
+     ("code1" t haskell-definition-face)
+     ("code2" t haskell-definition-face)
+     ("Comment2" t haskell-literate-comment-face)
+     ("code3" t haskell-definition-face)
+     ("Comment3" t haskell-literate-comment-face))
+   'literate))
+
+(ert-deftest haskell-literate-bird-2 ()
+  ;; Haskell Report requires empty line before bird code block. So it
+  ;; is a code block, just in error.
+  :expected-result :failed
+  (check-properties
+   '("Comment1"
+     "> code1 = 1"
+     "> code2 = 1"
+     "Comment2"
+     ""
+     "> code3 = 1"
+     ""
+     "Comment3")
+   '(("Comment1" t haskell-literate-comment-face)
+     (">" t font-lock-warning-face)
+     ("code1" t haskell-definition-face)
+     ("code2" t haskell-definition-face)
+     ("Comment2" t haskell-literate-comment-face)
+     ("code3" t haskell-definition-face)
+     ("Comment3" t haskell-literate-comment-face))
+   'literate))
+
+(ert-deftest haskell-literate-latex-1 ()
+  (check-properties
+   '("Comment1"
+     ""
+     "\\begin{code}"
+     "code1 = 1"
+     "code2 = 1"
+     "\\end{code}"
+     ""
+     "Comment2"
+     "\\begin{code}"
+     "code3 = 1"
+     "\\end{code}"
+     "Comment3")
+   '(("Comment1" t haskell-literate-comment-face)
+     ("code1" t haskell-definition-face)
+     ("code2" t haskell-definition-face)
+     ("Comment2" t haskell-literate-comment-face)
+     ("code3" t haskell-definition-face)
+     ("Comment3" t haskell-literate-comment-face))
+   'literate))
+
+(ert-deftest haskell-literate-mixed-1 ()
+  :expected-result :failed
+  ;; Although Haskell Report does not advice mixing modes, it is a
+  ;; perfectly valid construct that we should support in syntax
+  ;; highlighting.
+  (check-properties
+   '("Comment1"
+     ""
+     "> code1 = 1"
+     "> code2 = 1"
+     ""
+     "Comment2"
+     "\\begin{code}"
+     "code3 = 1"
+     "\\end{code}"
+     "Comment3")
+   '(("Comment1" t haskell-literate-comment-face)
+     ("code1" t haskell-definition-face)
+     ("code2" t haskell-definition-face)
+     ("Comment2" t haskell-literate-comment-face)
+     ("code3" t haskell-definition-face)
+     ("Comment3" t haskell-literate-comment-face))
+   'literate))
