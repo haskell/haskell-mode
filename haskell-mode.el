@@ -503,6 +503,45 @@ executable found in PATH.")
 
 (defun haskell-syntax-propertize (begin end)
   (save-excursion
+    (when haskell-literate
+      (goto-char begin)
+      ;; Algorithm (first matching rule wins):
+      ;; - current line is latex code if previous non-empty line was
+      ;;   latex code or was \begin{code} and current line is not
+      ;;   \end{code}
+      ;; - current line is bird code if it starts with >
+      ;; - else literate comment
+      (let ((previous-line-latex-code
+             (catch 'return
+               (save-excursion
+                 (when (= (forward-line -1) 0)
+                   (while (looking-at-p "^[\t ]*$")
+                     (unless (= (forward-line -1) 0)
+                       (throw 'return nil)))
+                   (or
+                    (and
+                     (not (equal (string-to-syntax "<") (syntax-after (point))))
+                     (not (looking-at-p "^>")))
+                    (looking-at-p "^\\\\begin{code}[\t ]*$")))))))
+        (while (< (point) end)
+          (unless (looking-at-p "^[\t ]*$")
+            (if previous-line-latex-code
+                (if (looking-at-p "^\\\\end{code}[\t ]*$")
+                    (progn
+                      (put-text-property (point) (1+ (point)) 'syntax-table (string-to-syntax "<"))
+                      (setq previous-line-latex-code nil))
+                  ;; continue latex-code
+                  )
+              (if (looking-at-p "^>")
+                  ;; this is a whitespace
+                  (put-text-property (point) (1+ (point)) 'syntax-table (string-to-syntax "-"))
+                ;; this is a literate comment
+                (progn
+                  (put-text-property (point) (1+ (point)) 'syntax-table (string-to-syntax "<"))
+                  (when (looking-at-p "^\\\\begin{code}[\t ]*$")
+                    (setq previous-line-latex-code t))))))
+          (forward-line 1))))
+
     (goto-char begin)
     (let ((ppss (syntax-ppss)))
       (when (nth 8 ppss)
