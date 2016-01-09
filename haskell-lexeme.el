@@ -242,6 +242,11 @@ See `haskell-lexeme-classify-by-first-char' for details."
       ((case-fold-search nil)
        (point (point-marker)))
     (or
+     (and
+      (equal (string-to-syntax "<") (syntax-after (point)))
+      (progn
+        (set-match-data (list point (set-marker (make-marker) (line-end-position))))
+        'literate-comment))
      (and (looking-at "{-")
           (save-excursion
             (forward-comment 1)
