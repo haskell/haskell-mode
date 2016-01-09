@@ -100,7 +100,7 @@
             (line-beginning-position)))
         (list (match-beginning 0) (match-end 0) haskell-ghc-supported-options))
        ;; Complete LANGUAGE, a list of completions comes from variable
-       ;; `haskell-ghc-supported-options'
+       ;; `haskell-ghc-supported-extensions'
        ((and (nth 4 (syntax-ppss))
            (save-excursion
              (let ((p (point)))

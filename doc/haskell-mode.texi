@@ -126,8 +126,58 @@ Requests}.
 @node Getting Started
 @chapter Getting Started
 
-If you are reading this, you have most likely already managed to install
-Haskell Mode in one way or another.
+@section Quick Installation
+
+Make sure you have this in your @uref{http://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html, init file} (usually `~/.emacs`). If you already have @code{custom-set-variables}, merge its contents:
+
+@lisp
+(require 'package)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-archives
+   (quote
+    (("gnu" . "http://elpa.gnu.org/packages/")
+     ("melpa-stable" . "http://stable.melpa.org/packages/")))))
+@end lisp
+
+Then run emacs, and evaluate:
+
+    @code{M-x package-refresh-contents}
+
+and then follow by
+
+    @code{M-x package-install RET haskell-mode}
+
+Voila! @code{haskell-mode} is installed! You should be able to edit Haskell
+source code in color now.
+
+@section Installation - more information
+
+@code{haskell-mode} supports GNU Emacs versions 23, 24 and upcoming 25
+(snapshot).
+
+@code{haskell-mode} is available from @uref{http://stable.melpa.org,melpa-stable (releases)} and @uref{http://melpa.org, melpa
+(git snapshots)}.
+
+Other means of obtaining `haskell-mode` include
+@uref{https://github.com/dimitri/el-get, el-get},
+@uref{https://github.com/bbatsov/prelude, Emacs Prelude}) and @uref{https://packages.debian.org/search?keywords=haskell-mode, Debian package}.
+
+Emacs23 requires an the use of @code{cl-lib}.  cl-lib.el can be found in
+the tests/compat directory.  Copy cl-lib.el to your emacs
+directory, e.g. ~/.emacs.d directory and put
+
+@lisp
+(add-to-list 'load-path "~/.emacs.d/")
+(require 'cl-lib)
+@end lisp
+
+in your .emacs file.
+
+@section Customizing
 
 @cindex customizing
 Most of Haskell Mode's settings are configurable via customizable
@@ -141,9 +191,7 @@ One of the important setting you should customize is the
 @code{haskell-mode-hook} variable (@pxref{Hooks,,,emacs}) which gets run
 right after the @code{haskell-mode} major mode is initialized for a
 buffer. You can customize @code{haskell-mode-hook} by @kbd{M-x
-customize-variable @key{RET} haskell-mode-hook}. It's highly recommended
-you set up indentation to match your preferences; @xref{Indentation},
-for more details about the indentation modes included with Haskell Mode.
+customize-variable @key{RET} haskell-mode-hook}.
 
 @c TODO:
 @c provide basic instructions to get up and running with haskell-mode
@@ -260,6 +308,16 @@ which will prompt a list of all modules, either installed modules or
 local project directory files. Then it'll insert it and then format that
 module section.
 
+@subsection stylish-haskell
+
+As an alternative to the elisp functions described above, haskell-mode
+can use the program @url{
+http://hackage.haskell.org/package/stylish-haskell, stylish-haskell}
+to format imports.  You can set this behavior by typing: @kbd{M-x
+customize-variable @key{RET} haskell-stylish-on-save}.  You can
+install @code{stylish-haskell} by running @code{stack install
+stylish-haskell}, or if you have not installed @code{stack},
+@code{cabal install stylish-haskell}.
 
 @section Completion support
 
@@ -343,69 +401,32 @@ block structure@footnote{Haskell also supports braces and semicolons
 notation for conveying the block structure. However, most Haskell
 programs written by humans use indentation for block structuring.}.
 
-As GNU Emacs' default indentation function (i.e. @code{indent-relative})
-is not designed for use with Haskell's layout rule, Haskell mode
-includes three different indentation minor modes with different
-trade-offs:
+As GNU Emacs' default indentation function
+(i.e. @code{indent-relative}) is not designed for use with Haskell's
+layout rule, Haskell mode includes indentation rules adapted to
+Haskell.  @code{haskell-indentation-mode} binds @key{TAB} to cycle
+through possible indentation points based on some clever heuristics.
+@key{SHIFT-TAB} cycles in the reverse direction, and @key{RET} moves
+to a new line and indents to the first possible indentation level.
 
-@ftable @code
+@section haskell-indent-mode
 
-@item haskell-indent-mode
-
-Intelligent semi-automatic indentation for Haskell's layout rule.  The
-basic idea is to have @key{TAB} cycle through possibilities indentation
-points based on some clever heuristics.
-
-The rationale and the implementation principles are described in more
-detail in the article @cite{Dynamic tabbing for automatic indentation
-with the layout rule} published in the Journal of Functional Programming
-8.5 (1998).
-
-@item haskell-indentation-mode
-
-Improved variation of @code{haskell-indent-mode} indentation
-mode. Rebinds @key{RET} and @key{DEL}, so that indentations can be set
-and deleted as if they were real tabs.
-
-@end ftable
-
-To enable one of these three mutually exclusive indentation schemes, you
-just need call one (and only one!) of the @code{*-mode} commands
-while in the buffer you want the indentation scheme to be activated for.
-
-The recommended way is to add one of @code{*-mode} commands to
-@code{haskell-mode-hook}. This can be done either by using @kbd{M-x
-customize-variable @key{RET} haskell-mode-hook} which provides a
-convenient user interface or by adding @emph{one} of the following three
-lines to your @file{.emacs} file:
+If you want to use the obsolete @code{haskell-indent-mode}, the
+recommended way is to load it in @code{haskell-mode-hook}. This can be
+done either by using @kbd{M-x customize-variable @key{RET}
+haskell-mode-hook} which provides a convenient user interface or by
+adding the following line to your @file{.emacs} file:
 
 @lisp
 (add-hook 'haskell-mode-hook 'haskell-indent-mode)
-(add-hook 'haskell-mode-hook 'haskell-indentation-mode)
 @end lisp
+
+This will turn off @code{haskell-indentation-mode}.
 
 @section Interactive Block Indentation
 
-By inserting the key bindings for @kbd{C-,} and @kbd{C-.} (these
-bindings are convenient on keyboard layouts where @key{,} and @key{.}
-are adjacent keys) as shown below you can interactively de/indent either
-the following nested block or, if a region is active while in Transient
-Mark Mode (@pxref{Disabled Transient Mark,,,emacs}), de/indent the
-active region.
-
-By using a numeric prefix argument (@pxref{Prefix Command
-Arguments,,,elisp}) you can modify the shift-amount; for instance,
-@kbd{C-u C-,} increases indentation by 4 characters at once.
-
-@findex haskell-move-nested-left
-@findex haskell-move-nested-right
-
-@lisp
-(eval-after-load "haskell-mode"
-  '(progn
-     (define-key haskell-mode-map (kbd "C-,") 'haskell-move-nested-left)
-     (define-key haskell-mode-map (kbd "C-.") 'haskell-move-nested-right)))
-@end lisp
+@code{haskell-indentation} can move whole blocks to the left or to the
+right. Just mark a block and then use @key{TAB} or @key{S-TAB}.
 
 @section Rectangle Commands
 
