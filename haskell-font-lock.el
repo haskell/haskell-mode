@@ -324,90 +324,6 @@ Returns keywords suitable for `font-lock-keywords'."
                       'haskell-operator-face))))
     keywords))
 
-(defconst haskell-basic-syntactic-keywords
-  '(;; Character constants (since apostrophe can't have string syntax).
-    ;; Beware: do not match something like 's-}' or '\n"+' since the first '
-    ;; might be inside a comment or a string.
-    ;; This still gets fooled with "'"'"'"'"'"', but ... oh well.
-    ("\\Sw\\('\\)\\([^\\'\n]\\|\\\\.[^\\'\n \"}]*\\)\\('\\)" (1 "\"") (3 "\""))
-    ;; Deal with instances of `--' which don't form a comment
-    ("[!#$%&*+./:<=>?@^|~\\]*--[!#$%&*+./:<=>?@^|~\\-]*" (0 (cond ((or (nth 3 (syntax-ppss)) (numberp (nth 4 (syntax-ppss))))
-                              ;; There are no such instances inside
-                              ;; nestable comments or strings
-                              nil)
-                             ((string-match "\\`-*\\'" (match-string 0))
-                              ;; Sequence of hyphens. Do nothing in
-                              ;; case of things like `{---'.
-                              nil)
-                             ((string-match "\\`[^-]+--.*" (match-string 0))
-                              ;; Extra characters before comment starts
-                              ".")
-                             (t ".")))) ; other symbol sequence
-
-    ;; Implement Haskell Report 'escape' and 'gap' rules. Backslash
-    ;; inside of a string is escaping unless it is preceeded by
-    ;; another escaping backslash. There can be whitespace between
-    ;; those two.
-    ;;
-    ;; Backslashes outside of string never escape.
-    ;;
-    ;; Note that (> 0 (skip-syntax-backward ".")) this skips over *escaping*
-    ;; backslashes only.
-    ("\\\\" (0 (when (save-excursion (and (nth 3 (syntax-ppss))
-                                          (goto-char (match-beginning 0))
-                                          (skip-syntax-backward "->")
-                                          (or (not (eq ?\\ (char-before)))
-                                              (> 0 (skip-syntax-backward ".")))))
-                  "\\")))
-
-    ;; QuasiQuotes syntax: [quoter| string |], quoter is unqualified
-    ;; name, no spaces, string is arbitrary (including newlines),
-    ;; finishes at the first occurence of |], no escaping is provided.
-    ;;
-    ;; The quoter cannot be "e", "t", "d", or "p", since those overlap
-    ;; with Template Haskell quotations.
-    ;;
-    ;; QuasiQuotes opens only when outside of a string or a comment
-    ;; and closes only when inside a quasiquote.
-    ;;
-    ;; (syntax-ppss) returns list with two interesting elements:
-    ;; nth 3. non-nil if inside a string. (it is the character that will
-    ;;        terminate the string, or t if the string should be terminated
-    ;;        by a generic string delimiter.)
-    ;; nth 4. nil if outside a comment, t if inside a non-nestable comment,
-    ;;        else an integer (the current comment nesting).
-    ;;
-    ;; Note also that we need to do in in a single pass, hence a regex
-    ;; that covers both the opening and the ending of a quasiquote.
-
-    ("\\(\\[[[:alnum:]]+\\)?\\(|\\)\\(]\\)?"
-     (2 (save-excursion
-          (goto-char (match-beginning 0))
-          (if (eq ?\[ (char-after))
-              ;; opening case
-              (unless (or (nth 3 (syntax-ppss))
-                          (nth 4 (syntax-ppss))
-                          (member (match-string 1)
-                                  '("[e" "[t" "[d" "[p")))
-                "\"")
-            ;; closing case
-            (when (and (eq ?| (nth 3 (syntax-ppss)))
-                       (equal "]" (match-string 3))
-                       )
-              "\"")))))
-    ))
-
-(defconst haskell-bird-syntactic-keywords
-  (cons '("^[^\n>]"  (0 "<"))
-        haskell-basic-syntactic-keywords))
-
-(defconst haskell-latex-syntactic-keywords
-  (append
-   '(("^\\\\begin{code}\\(\n\\)" 1 "!")
-     ;; Note: buffer is widened during font-locking.
-     ("\\`\\(.\\|\n\\)" (1 "!"))               ; start comment at buffer start
-     ("^\\(\\\\\\)end{code}$" 1 "!"))
-   haskell-basic-syntactic-keywords))
 
 (defun haskell-font-lock-fontify-block (lang-mode start end)
   "Fontify a block as LANG-MODE."
@@ -457,19 +373,19 @@ Returns keywords suitable for `font-lock-keywords'."
             ;; fontify normally as string because lang-mode is not present
             'haskell-quasi-quote-face))
       'font-lock-string-face))
-   ;; Else comment.  If it's from syntax table, use default face.
-   ((or (eq 'syntax-table (nth 7 state))
-        (and (eq haskell-literate 'bird)
-             (memq (char-before (nth 8 state)) '(nil ?\n))))
+   ;; Detect literate comment lines starting with syntax class '<'
+   ((save-excursion
+      (goto-char (nth 8 state))
+      (equal (string-to-syntax "<") (syntax-after (point))))
     'haskell-literate-comment-face)
    ;; Detect pragmas. A pragma is enclosed in special comment
    ;; delimeters {-# .. #-}.
    ((save-excursion
       (goto-char (nth 8 state))
-      (and (looking-at "{-#")
+      (and (looking-at-p "{-#")
            (forward-comment 1)
            (goto-char (- (point) 3))
-           (looking-at "#-}")))
+           (looking-at-p "#-}")))
     'haskell-pragma-face)
    ;; Haddock comment start with either "-- [|^*$]" or "{- ?[|^*$]"
    ;; (note space optional for nested comments and mandatory for
@@ -485,8 +401,8 @@ Returns keywords suitable for `font-lock-keywords'."
    ;; comments newline is outside of comment.
    ((save-excursion
       (goto-char (nth 8 state))
-      (or (looking-at "\\(?:{- ?\\|-- \\)[|^*$]")
-	  (and (looking-at "--")              ; are we at double dash comment
+      (or (looking-at-p "\\(?:{- ?\\|-- \\)[|^*$]")
+	  (and (looking-at-p "--")              ; are we at double dash comment
 	       (forward-line -1)              ; this is nil on first line
 	       (eq (get-text-property (line-end-position) 'face)
 		   'font-lock-doc-face)	      ; is a doc face
@@ -516,20 +432,11 @@ Returns keywords suitable for `font-lock-keywords'."
       ((latex tex) haskell-font-lock-latex-literate-keywords)
       (t haskell-font-lock-keywords))))
 
-(defun haskell-font-lock-choose-syntactic-keywords ()
-  (let ((literate (if (boundp 'haskell-literate) haskell-literate)))
-    (cl-case literate
-      (bird haskell-bird-syntactic-keywords)
-      ((latex tex) haskell-latex-syntactic-keywords)
-      (t haskell-basic-syntactic-keywords))))
-
 (defun haskell-font-lock-defaults-create ()
   "Locally set `font-lock-defaults' for Haskell."
   (set (make-local-variable 'font-lock-defaults)
        '(haskell-font-lock-choose-keywords
          nil nil nil nil
-         (font-lock-syntactic-keywords
-          . haskell-font-lock-choose-syntactic-keywords)
          (font-lock-syntactic-face-function
           . haskell-syntactic-face-function)
          ;; Get help from font-lock-syntactic-keywords.

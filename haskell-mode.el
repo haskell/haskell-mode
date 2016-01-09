@@ -754,8 +754,6 @@ Minor modes that work well with `haskell-mode':
   (set (make-local-variable 'font-lock-defaults)
        '(haskell-font-lock-choose-keywords
          nil nil nil nil
-         (font-lock-syntactic-keywords
-          . haskell-font-lock-choose-syntactic-keywords)
          (font-lock-syntactic-face-function
           . haskell-syntactic-face-function)
          ;; Get help from font-lock-syntactic-keywords.
