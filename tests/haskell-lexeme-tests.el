@@ -5,7 +5,7 @@
 (require 'haskell-mode)
 (require 'haskell-font-lock)
 
-(defun check-lexemes (lines lexemes)
+(defun check-lexemes (lines lexemes &optional literate)
   "Checks if tokenization works as expected.
 
 LINES is a list of strings that will be inserted to a new
@@ -18,12 +18,15 @@ order."
 
     ;; Note that all of this should work both in haskell-mode and
     ;; outside of it. Currently we test only haskell-mode setup.
-    (haskell-mode)
-    (font-lock-fontify-buffer)
+    (if literate
+        (literate-haskell-mode)
+      (haskell-mode))
 
     (dolist (line lines)
       (insert line)
       (insert "\n"))
+
+    (font-lock-fontify-buffer)
 
     (goto-char (point-min))
     (let (current-token
@@ -81,6 +84,13 @@ order."
 
 (ert-deftest haskell-lexeme-unicode-ids-1 ()
   "Unicode ids"
+  (check-lexemes
+   '("Żółw.head,Data.żółw,Артур.Артур ")
+   '("Żółw.head" "," "Data.żółw" "," "Артур.Артур")))
+
+(ert-deftest haskell-lexeme-unicode-ids-2 ()
+  "Unicode ids, unicode as last character in line"
+  :expected-result :failed
   (check-lexemes
    '("Żółw.head,Data.żółw,Артур.Артур")
    '("Żółw.head" "," "Data.żółw" "," "Артур.Артур")))
@@ -227,3 +237,29 @@ order."
   (check-lexemes
    '("[xml| <xml />")
    '("[xml| <xml />")))
+
+(ert-deftest haskell-lexeme-literate-1 ()
+  (check-lexemes
+   '("no code"
+     "\\begin{code}"
+     "code code"
+     "\\end{code}"
+     "no code no code")
+   '("no code"
+     "\\begin{code}"
+     "code"
+     "code"
+     "\\end{code}"
+     "no code no code")
+   'literate))
+
+(ert-deftest haskell-lexeme-literate-2 ()
+  (check-lexemes
+   '("no code"
+     "> code code"
+     "no code")
+   '("no code"
+     "code"
+     "code"
+     "no code")
+   'literate))
