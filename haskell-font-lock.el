@@ -30,12 +30,18 @@
 (require 'haskell-compat)
 (require 'font-lock)
 
+;;;###autoload
+(defgroup haskell-appearance nil
+  "Haskell Appearance."
+  :group 'haskell)
+
+
 (defcustom haskell-font-lock-symbols nil
   "Display \\ and -> and such using symbols in fonts.
 
 This may sound like a neat trick, but be extra careful: it changes the
 alignment and can thus lead to nasty surprises with regards to layout."
-  :group 'haskell
+  :group 'haskell-appearance
   :type 'boolean)
 
 (defcustom haskell-font-lock-symbols-alist
@@ -77,7 +83,7 @@ PREDICATE if present is a function of one argument (the start position
 of the symbol) which should return non-nil if this mapping should
 be disabled at that position."
   :type '(alist string string)
-  :group 'haskell)
+  :group 'haskell-appearance)
 
 (defun haskell-font-lock-dot-is-not-composition (start)
   "Return non-nil if the \".\" at START is not a composition operator.
@@ -107,20 +113,20 @@ This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
 
 If a quasi quote is seen in Haskell code its contents will have
 font faces assigned as if respective mode was enabled."
-  :group 'haskell
+  :group 'haskell-appearance
   :type '(repeat (cons string symbol)))
 
 ;;;###autoload
 (defface haskell-keyword-face
   '((t :inherit font-lock-keyword-face))
   "Face used to highlight Haskell keywords."
-  :group 'haskell)
+  :group 'haskell-appearance)
 
 ;;;###autoload
 (defface haskell-constructor-face
   '((t :inherit font-lock-type-face))
   "Face used to highlight Haskell constructors."
-  :group 'haskell)
+  :group 'haskell-appearance)
 
 ;; This used to be `font-lock-variable-name-face' but it doesn't result in
 ;; a highlighting that's consistent with other modes (it's mostly used
@@ -128,7 +134,7 @@ font faces assigned as if respective mode was enabled."
 (defface haskell-definition-face
   '((t :inherit font-lock-function-name-face))
   "Face used to highlight Haskell definitions."
-  :group 'haskell)
+  :group 'haskell-appearance)
 
 ;; This is probably just wrong, but it used to use
 ;; `font-lock-function-name-face' with a result that was not consistent with
@@ -137,20 +143,20 @@ font faces assigned as if respective mode was enabled."
 (defface haskell-operator-face
   '((t :inherit font-lock-variable-name-face))
   "Face used to highlight Haskell operators."
-  :group 'haskell)
+  :group 'haskell-appearance)
 
 ;;;###autoload
 (defface haskell-pragma-face
   '((t :inherit font-lock-preprocessor-face))
   "Face used to highlight Haskell pragmas."
-  :group 'haskell)
+  :group 'haskell-appearance)
 
 ;;;###autoload
 (defface haskell-literate-comment-face
   '((t :inherit font-lock-doc-face))
   "Face with which to fontify literate comments.
 Inherit from `default' to avoid fontification of them."
-  :group 'haskell)
+  :group 'haskell-appearance)
 
 (defface haskell-quasi-quote-face
   '((t :inherit font-lock-string-face))
@@ -158,7 +164,7 @@ Inherit from `default' to avoid fontification of them."
 
 Some quote types are fontified according to other mode defined in
 `haskell-font-lock-quasi-quote-modes'."
-  :group 'haskell)
+  :group 'haskell-appearance)
 
 (defun haskell-font-lock-compose-symbol (alist)
   "Compose a sequence of ascii chars into a symbol.
