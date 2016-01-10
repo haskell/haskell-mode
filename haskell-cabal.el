@@ -211,7 +211,7 @@ Return nil if no Cabal description file could be located via
   "Search for package description file upwards starting from DIR.
 If DIR is nil, `default-directory' is used as starting point for
 directory traversal.  Upward traversal is aborted if file owner
-changes.  Uses`haskell-cabal-find-pkg-desc' internally."
+changes.  Uses `haskell-cabal-find-pkg-desc' internally."
   (let ((use-dir (or dir default-directory)))
     (while (and use-dir (not (file-directory-p use-dir)))
       (setq use-dir (file-name-directory (directory-file-name use-dir))))
@@ -373,14 +373,14 @@ OTHER-WINDOW use `find-file-other-window'."
   (goto-char (haskell-cabal-section-end)))
 
 (defun haskell-cabal-next-section ()
-  "Go to the next extion"
+  "Go to the next section"
   (interactive)
   (when (haskell-cabal-section-header-p) (forward-line))
   (while (not (or (eobp) (haskell-cabal-section-header-p)))
     (forward-line)))
 
 (defun haskell-cabal-previous-section ()
-  "Go to the next extion"
+  "Go to the next section"
   (interactive)
   (when (haskell-cabal-section-header-p) (forward-line -1))
   (while (not (or (bobp) (haskell-cabal-section-header-p)))
@@ -471,7 +471,7 @@ OTHER-WINDOW use `find-file-other-window'."
 and execute FORMS
 
 If REPLACE is non-nil the subsection data is replaced with the
-resultung buffer-content"
+resulting buffer-content"
   (let ((section (make-symbol "section"))
         (beg (make-symbol "beg"))
         (end (make-symbol "end"))
@@ -502,7 +502,7 @@ resultung buffer-content"
                  (insert ,section-data))))))))
 
 (defmacro haskell-cabal-each-line (&rest fun)
-  "Execute FOMRS on each line"
+  "Execute FORMS on each line"
   `(save-excursion
      (while (< (point) (point-max))
        ,@fun
@@ -663,7 +663,7 @@ resultung buffer-content"
   (haskell-cabal-forward-to-line-entry))
 
 (defun haskell-cabal-previous-subsection ()
-  "go to the next subsection"
+  "go to the previous subsection"
   (interactive)
   (if (haskell-cabal-header-p) (forward-line -1))
   (while (and (not (bobp))
@@ -674,7 +674,7 @@ resultung buffer-content"
 
 
 (defun haskell-cabal-find-subsection-by (section pred)
-  "Find sunsection with name NAME"
+  "Find subsection with name NAME"
   (save-excursion
     (when section (goto-char (haskell-cabal-section-start section)))
     (let* ((end (if section (haskell-cabal-section-end) (point-max)))
@@ -688,7 +688,7 @@ resultung buffer-content"
       found)))
 
 (defun haskell-cabal-find-subsection (section name)
-  "Find sunsection with name NAME"
+  "Find subsection with name NAME"
   (let ((downcase-name (downcase name)))
     (haskell-cabal-find-subsection-by
      section
@@ -747,7 +747,11 @@ resultung buffer-content"
           (marked-line (goto-char marked-line)))))
 
 (defmacro haskell-cabal-with-subsection-line (replace &rest forms)
-  "Mark line and "
+  "Mark line, copy subsection data into a temporary buffer, save indentation
+and execute FORMS at the marked line.
+
+If REPLACE is non-nil the subsection data is replaced with the
+resulting buffer-content.  Unmark line at the end."
   `(progn
      (haskell-cabal-mark)
      (unwind-protect
@@ -937,7 +941,7 @@ Source names from main-is and c-sources sections are left untouched
                      'haskell-cabal-sort-lines-key-fun)))))))
 
 (defun haskell-cabal-add-build-dependency (dependency &optional sort silent)
-  "Add a build dependencies to sections"
+  "Add the given build dependency to every section"
   (haskell-cabal-map-sections
    (lambda (section)
      (when (haskell-cabal-source-section-p section)

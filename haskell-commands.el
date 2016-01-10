@@ -164,8 +164,7 @@ MODULE-BUFFER is the actual Emacs buffer of the module being loaded."
   "History list for session targets.")
 
 (defun haskell-process-hayoo-ident (ident)
-  ;; FIXME Obsolete doc string, CALLBACK is not used.
-  "Hayoo for IDENT, return a list of modules asyncronously through CALLBACK."
+  "Hayoo for IDENT, return a list of modules"
   ;; We need a real/simulated closure, because otherwise these
   ;; variables will be unbound when the url-retrieve callback is
   ;; called.
@@ -309,7 +308,6 @@ If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
 
 ;;;###autoload
 (defun haskell-process-do-type (&optional insert-value)
-  ;; FIXME insert value functionallity seems to be missing.
   "Print the type of the given expression.
 
 Given INSERT-VALUE prefix indicates that result type signature

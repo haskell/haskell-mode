@@ -88,8 +88,8 @@
 
 (defun haskell-session-assign (session)
   "Assing current buffer to SESSION.
-More verbose doc string for `haskell-session-assign`
-This could be helpfull for temporal or auxilar buffers such as
+
+This could be helpful for temporary or auxiliary buffers such as
 presentation mode buffers (e.g. in case when session is killed
 with all relevant buffers)."
   (set (make-local-variable 'haskell-session) session))

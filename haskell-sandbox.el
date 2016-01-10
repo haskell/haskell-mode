@@ -21,7 +21,7 @@
 (require 'haskell-session)
 
 (defun haskell-sandbox-path (session)
-  "Is there a cabal sandbox?"
+  "If there is a haskell-session, return the path to the usual sandbox location."
   (concat (haskell-session-cabal-dir session)
           "/.cabal-sandbox"))
 

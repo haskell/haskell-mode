@@ -356,7 +356,7 @@ re-asking about the same imports."
   (haskell-process-set p 'evaluating v))
 
 (defun haskell-process-evaluating-p (p)
-  "Set status of evaluating to be on/off."
+  "Get status of evaluating (on/off)."
   (haskell-process-get p 'evaluating))
 
 (defun haskell-process-set-process (p v)

@@ -72,7 +72,7 @@ Returns t if point is either at whitespace character, or at
 punctuation, or at line end and preceeding character is not a
 whitespace or new line, otherwise returns nil.
 
-  Returns nil in presense of active region."
+  Returns nil in presence of active region."
   (when (not (region-active-p))
     (when (looking-at-p (rx (| space line-end punct)))
       (when (not (bobp))
@@ -84,7 +84,7 @@ whitespace or new line, otherwise returns nil.
   "Grab completion prefix for pragma completions.
 Returns a list of form '(prefix-start-position
 prefix-end-position prefix-value prefix-type) for pramga names
-such as WARNING, DEPRECATED, LANGUAGE and etc.  Also returns
+such as WARNING, DEPRECATED, LANGUAGE etc.  Also returns
 completion prefixes for options in case OPTIONS_GHC pragma, or
 language extensions in case of LANGUAGE pragma.  Obsolete OPTIONS
 pragma is supported also."
@@ -206,7 +206,7 @@ identifier at point depending on result of function
 Returns a list of form '(prefix-start-position
 prefix-end-position prefix-value prefix-type) depending on
 situation, e.g. is it needed to complete pragma, module name,
-arbitrary identifier, and etc.  Rerurns nil in case it is
+arbitrary identifier, etc. Returns nil in case it is
 impossible to grab prefix.
 
 If provided optional MINLEN parameter this function will return
@@ -252,7 +252,7 @@ Returns nil if no completions available."
             (list beg end lst)))))))
 
 (defun haskell-completions-sync-complete-repl (prefix &optional import)
-  "Return completion list for given PREFIX quering REPL synchronously.
+  "Return completion list for given PREFIX querying REPL synchronously.
 When optional IMPORT argument is non-nil complete PREFIX
 prepending \"import \" keyword (useful for module names).  This
 function is supposed for internal use."
