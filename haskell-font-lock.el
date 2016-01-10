@@ -153,11 +153,10 @@ Inherit from `default' to avoid fontification of them."
   :group 'haskell)
 
 (defface haskell-quasi-quote-face
-  '((((background light)) :background "gray90")
-    (((background dark))  :background "gray10")
-    (t :inherit font-lock-string-face))
-  "Face for background with which to fontify quasi quotes that
-are fontified according to other mode defined in
+  '((t :inherit font-lock-string-face))
+  "Generic face for quasiquotes.
+
+Some quote types are fontified according to other mode defined in
 `haskell-font-lock-quasi-quote-modes'."
   :group 'haskell)
 
@@ -442,16 +441,15 @@ Returns keywords suitable for `font-lock-keywords'."
 
           (if (and lang-mode
                    (fboundp lang-mode))
-            (save-excursion
-              ;; find the end of the QuasiQuote
-              (parse-partial-sexp (point) (point-max) nil nil state
-                                  'syntax-table)
-              (haskell-font-lock-fontify-block lang-mode (1+ (nth 8 state)) (1- (point)))
-              (font-lock-prepend-text-property (nth 8 state) (point) 'face 'haskell-quasi-quote-face)
-              ;; must return nil here so that it is not fontified again as string
-              nil)
+              (save-excursion
+                ;; find the end of the QuasiQuote
+                (parse-partial-sexp (point) (point-max) nil nil state
+                                    'syntax-table)
+                (haskell-font-lock-fontify-block lang-mode (1+ (nth 8 state)) (1- (point)))
+                ;; must return nil here so that it is not fontified again as string
+                nil)
             ;; fontify normally as string because lang-mode is not present
-            '(haskell-quasi-quote-face font-lock-string-face)))
+            'haskell-quasi-quote-face))
       'font-lock-string-face))
    ;; Else comment.  If it's from syntax table, use default face.
    ((or (eq 'syntax-table (nth 7 state))

@@ -250,7 +250,7 @@ if all of its characters have syntax and face. See
   (check-properties
    '("[qq| \\|]  Cons")
    '(("qq" "w" nil)
-     ("\\" "." (haskell-quasi-quote-face font-lock-string-face))
+     ("\\" "." haskell-quasi-quote-face)
      ("Cons" "w" haskell-constructor-face))))
 
 (ert-deftest haskell-syntactic-quasiquote-three-punctuation ()
@@ -258,7 +258,7 @@ if all of its characters have syntax and face. See
   (check-properties
    '("[qq| %\\|]  Cons")
    '(("qq" "w" nil)
-     ("%\\" "." (haskell-quasi-quote-face font-lock-string-face))
+     ("%\\" "." haskell-quasi-quote-face)
      ("Cons" "w" haskell-constructor-face))))
 
 (ert-deftest haskell-syntactic-test-11a ()
@@ -360,9 +360,9 @@ if all of its characters have syntax and face. See
   (check-properties
    '("v = [quoter| string |] Cons")
    '(("[" t nil)
-     ("|" t (haskell-quasi-quote-face font-lock-string-face))
-     ("string" t (haskell-quasi-quote-face font-lock-string-face))
-     ("|" t (haskell-quasi-quote-face font-lock-string-face))
+     ("|" t haskell-quasi-quote-face)
+     ("string" t haskell-quasi-quote-face)
+     ("|" t haskell-quasi-quote-face)
      ("]" t nil)
      ("Cons" "w" haskell-constructor-face))))
 
@@ -374,10 +374,10 @@ if all of its characters have syntax and face. See
      " finishing line"
      "|] Cons")
    '(("[" t nil)
-     ("|" t (haskell-quasi-quote-face font-lock-string-face))
-     ("string" t (haskell-quasi-quote-face font-lock-string-face))
-     ("line" t (haskell-quasi-quote-face font-lock-string-face))
-     ("|" t (haskell-quasi-quote-face font-lock-string-face))
+     ("|" t haskell-quasi-quote-face)
+     ("string" t haskell-quasi-quote-face)
+     ("line" t haskell-quasi-quote-face)
+     ("|" t haskell-quasi-quote-face)
      ("]" t nil)
      ("Cons" "w" haskell-constructor-face))))
 
@@ -386,10 +386,10 @@ if all of its characters have syntax and face. See
   (check-properties
    '("v = [quoter| [inner| string {- -- |] Outside |]")
    '(("[" t nil)
-     ("|" t (haskell-quasi-quote-face font-lock-string-face))
-     ("inner" t (haskell-quasi-quote-face font-lock-string-face))
-     ("string" t (haskell-quasi-quote-face font-lock-string-face))
-     ("|" t (haskell-quasi-quote-face font-lock-string-face))
+     ("|" t haskell-quasi-quote-face)
+     ("inner" t haskell-quasi-quote-face)
+     ("string" t haskell-quasi-quote-face)
+     ("|" t haskell-quasi-quote-face)
      ("]" t nil)
      ("Outside" "w" haskell-constructor-face)
      )))
@@ -401,8 +401,8 @@ if all of its characters have syntax and face. See
      "    [inner| string {- -- |] Outside1 |] Outside2")
    '(("quoter" t font-lock-comment-face)
      ("inner" t nil)
-     ("string" t (haskell-quasi-quote-face font-lock-string-face))
-     ("|" t (haskell-quasi-quote-face font-lock-string-face))
+     ("string" t haskell-quasi-quote-face)
+     ("|" t haskell-quasi-quote-face)
      ("]" t nil)
      ("Outside1" "w" haskell-constructor-face)
      ("Outside2" "w" haskell-constructor-face)
@@ -422,7 +422,7 @@ if all of its characters have syntax and face. See
      ("Cons_t" t haskell-constructor-face)
      ("Cons_d" t haskell-constructor-face)
      ("Cons_p" t haskell-constructor-face)
-     ("Cons_x" t (haskell-quasi-quote-face font-lock-string-face)))))
+     ("Cons_x" t haskell-quasi-quote-face))))
 
 (ert-deftest haskell-syntactic-test-special-not-redefined ()
   "QuasiQuote should not conflict with TemplateHaskell"
