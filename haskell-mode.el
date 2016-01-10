@@ -182,6 +182,7 @@ its own, nor does it contain \">\" at the start of a line -- the value
 of `haskell-literate-default' is used.")
 (make-variable-buffer-local 'haskell-literate)
 (put 'haskell-literate 'safe-local-variable 'symbolp)
+
 ;; Default literate style for ambiguous literate buffers.
 (defcustom haskell-literate-default 'bird
   "Default value for `haskell-literate'.
@@ -577,7 +578,7 @@ May return a qualified name."
 (define-derived-mode haskell-mode haskell-parent-mode "Haskell"
   "Major mode for editing Haskell programs.
 
-For more information aee also Info node `(haskell-mode)Getting Started'.
+For more information see also Info node `(haskell-mode)Getting Started'.
 
 \\<haskell-mode-map>
 
@@ -621,17 +622,11 @@ example, `M-x haskell-doc-mode'. Run it again to disable it.
 To enable a mode for every haskell-mode buffer, add a hook in
 your Emacs configuration. To do that you can customize
 `haskell-mode-hook' or add lines to your .emacs file. For
-example, to enable `haskell-indent-mode' and
-`interactive-haskell-mode', use the following:
+example, to enable `interactive-haskell-mode', use the following:
 
-    (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
     (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
 
 For more details see Info node `(haskell-mode)haskell-mode-hook'.
-
-Warning: do not enable more than one of the above indentation
-modes. See Info node `(haskell-mode)indentation' for more
-details.
 
 Minor modes that work well with `haskell-mode':
 

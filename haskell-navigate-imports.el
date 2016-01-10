@@ -52,7 +52,7 @@
 
 ;;;###autoload
 (defun haskell-navigate-imports-go ()
-  "Go to the first line of a list of consequtive import lines. Cycles."
+  "Go to the first line of a list of consecutive import lines. Cycles."
   (interactive)
   (unless (or (haskell-navigate-imports-line)
               (equal (line-beginning-position) (point-min))
@@ -70,7 +70,7 @@
     (goto-char haskell-navigate-imports-start-point)))
 
 (defun haskell-navigate-imports-go-internal ()
-  "Go to the first line of a list of consequtive import lines. Cycle."
+  "Go to the first line of a list of consecutive import lines. Cycle."
   (if (haskell-navigate-imports-line)
       (progn (haskell-navigate-imports-goto-end)
              (when (haskell-navigate-imports-find-forward-line)
@@ -85,7 +85,7 @@
                    (search-forward "\n\n" nil t 1))))))))
 
 (defun haskell-navigate-imports-goto-end ()
-  "Skip a bunch of consequtive import lines."
+  "Skip a bunch of consecutive import lines."
   (while (not (or (equal (point)
                          (point-max))
                   (not (haskell-navigate-imports-line))))

@@ -417,7 +417,7 @@ last input, no documentation will be printed.
 If this variable is set to 0, no idle time is required.")
 
 (defvar haskell-doc-argument-case 'identity ; 'upcase
-  "Case to display argument names of functions, as a symbol.
+  "Case in which to display argument names of functions, as a symbol.
 This has two preferred values: `upcase' or `downcase'.
 Actually, any name of a function which takes a string as an argument and
 returns another string is acceptable.")

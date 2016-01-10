@@ -79,7 +79,7 @@ This hook pushes value of variable `this-command' to flag variable
 (defun haskell-utils-async-watch-changes ()
   "Watch for triggered commands during async operation execution.
 Resets flag variable
-`haskell-utils-async-update-post-command-flag' to NIL.  By chanhges it is
+`haskell-utils-async-update-post-command-flag' to NIL.  By changes it is
 assumed that nothing happened, e.g. nothing was inserted in
 buffer, point was not moved, etc.  To collect data `post-command-hook' is used."
   (setq haskell-utils-async-post-command-flag nil)
@@ -99,18 +99,18 @@ execusion."
      'post-command-hook #'haskell-utils-async-update-post-command-flag t)))
 
 (defun haskell-utils-reduce-string (s)
-  "Remove newlines ans extra whitespace from S.
+  "Remove newlines and extra whitespace from S.
 Removes all extra whitespace at the beginning of each line leaving
-only single one.  Then removes all newlines."
+only a single space.  Then removes all newlines."
   (let ((s_ (replace-regexp-in-string "^\s+" " " s)))
     (replace-regexp-in-string "\n" "" s_)))
 
 (defun haskell-utils-parse-repl-response (r)
   "Parse response R from REPL and return special kind of result.
-The result is response string itself with speacial property
+The result is the response string itself with the special property
 response-type added.
 
-This property could be of the following:
+This property could be one of the following:
 
 + unknown-command
 + option-missing

@@ -123,7 +123,7 @@ You can rebind this if you're using hsenv by adding it to your
         (search-forward ident)))))
 
 (defun w3m-haddock-display (_url)
-  "To be ran by w3m's display hook. This takes a normal w3m
+  "To be run by w3m's display hook. This takes a normal w3m
   buffer containing hadddock documentation and reformats it to be
   more usable and look like a dedicated documentation page."
   (when (w3m-haddock-page-p)

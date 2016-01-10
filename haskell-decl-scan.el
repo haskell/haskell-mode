@@ -344,14 +344,15 @@ declaration by this function.  So, if point is within a top-level
 declaration then move it to the start of that declaration.  If point
 is already at the start of a top-level declaration, then move it to
 the start of the preceding declaration.  Returns point if point is
-left at the start of a declaration, and nil otherwise, ie. because
+left at the start of a declaration, and nil otherwise, because
 point is at the beginning of the buffer and no declaration starts
 there."
   (interactive)
   (haskell-ds-move-to-decl nil (haskell-ds-bird-p) nil))
 
 (defun haskell-ds-forward-decl ()
-  "As `haskell-ds-backward-decl' but forward."
+  "Move forward to the first character that starts a top-level
+declaration.  As `haskell-ds-backward-decl' but forward."
   (interactive)
   (haskell-ds-move-to-decl t (haskell-ds-bird-p) nil))
 
