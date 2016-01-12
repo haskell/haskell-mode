@@ -110,7 +110,11 @@ check-%: tests/%-tests.el
 	$(BATCH) -l "$<" -f ert-run-tests-batch-and-exit;
 
 check: $(ELCHECKS) build-$(EMACS_VERSION)
-	$(BATCH) $(patsubst %,-l %,$(ELCHECKS)) -f ert-run-tests-batch-and-exit
+	$(BATCH) --eval "(when (>= emacs-major-version 24)                            \
+                           (require 'undercover)                                      \
+                           (undercover \"*.el\" (:exclude \"haskell-mode-pkg.el\")))" \
+                 $(patsubst %,-l %,$(ELCHECKS))				              \
+                 -f ert-run-tests-batch-and-exit
 	@TAB=$$(echo "\t"); \
 	if grep -Hn "[ $${TAB}]\+\$$" *.el; then \
 	    echo "Some files contain whitespace at the end of lines, correct it"; \
