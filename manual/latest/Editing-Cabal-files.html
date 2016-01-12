@@ -80,14 +80,9 @@ having a <samp>.cabal</samp> extension.
 <p>For quickly locating and jumping to the nearest <samp>.cabal</samp> file from
 a Haskell source buffer, you can use <kbd>M-x haskell-cabal-visit-file</kbd>;
 with a prefix argument (i.e. <kbd>C-u</kbd>) <code>find-file-other-window</code> is
-used to visit the <samp>.cabal</samp> file.  If you wish, you can bind
-<code>haskell-cabal-visit-file</code> to a convenient key sequence, e.g.
+used to visit the <samp>.cabal</samp> file.
+<code>haskell-cabal-visit-file</code> is bound to the key sequence <kbd>C-c v c</kbd>.
 </p>
-<div class="lisp">
-<pre class="lisp">(eval-after-load &quot;haskell-mode&quot;
-  '(define-key haskell-mode-map (kbd &quot;C-c v c&quot;) 'haskell-cabal-visit-file))
-</pre></div>
-
 <p>TODO/WRITEME
 </p>
 
