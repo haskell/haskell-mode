@@ -760,13 +760,8 @@ having a @file{.cabal} extension.
 For quickly locating and jumping to the nearest @file{.cabal} file from
 a Haskell source buffer, you can use @kbd{M-x haskell-cabal-visit-file};
 with a prefix argument (i.e. @kbd{C-u}) @code{find-file-other-window} is
-used to visit the @file{.cabal} file.  If you wish, you can bind
-@code{haskell-cabal-visit-file} to a convenient key sequence, e.g.
-
-@lisp
-(eval-after-load "haskell-mode"
-  '(define-key haskell-mode-map (kbd "C-c v c") 'haskell-cabal-visit-file))
-@end lisp
+used to visit the @file{.cabal} file.
+@code{haskell-cabal-visit-file} is bound to the key sequence @kbd{C-c v c}.
 
 TODO/WRITEME
 
