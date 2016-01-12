@@ -289,6 +289,12 @@ Returns keywords suitable for `font-lock-keywords'."
              (1 'haskell-keyword-face nil lax)
              (2 'haskell-keyword-face nil lax))
 
+            ;; Special case for `type role'
+            ;; `role' is only reserved in this context.
+            ("\\<\\(type\\)[ \t]+\\(role\\>\\)"
+             (1 'haskell-keyword-face nil lax)
+             (2 'haskell-keyword-face nil lax))
+
             ;; Toplevel Declarations.
             ;; Place them *before* generic id-and-op highlighting.
             (,topdecl-var  (1 'haskell-definition-face))
