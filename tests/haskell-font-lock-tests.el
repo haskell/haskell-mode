@@ -555,6 +555,27 @@ if all of its characters have syntax and face. See
      ("Comment3" t haskell-literate-comment-face))
    'literate))
 
+(ert-deftest haskell-type-family ()
+  "Fontify \"family\" after \"type\""
+  (check-properties
+   '("type family Foo a :: *")
+    '(("type" "w" haskell-keyword-face)
+      ("family" "w" haskell-keyword-face))))
+
+(ert-deftest haskell-data-family ()
+  "Fontify \"family\" after \"data\""
+  (check-properties
+   '("data family Foo a :: *")
+    '(("data" "w" haskell-keyword-face)
+      ("family" "w" haskell-keyword-face))))
+
+(ert-deftest haskell-no-family ()
+  "Don't fontify \"family\" when not after \"type\" or \"data\""
+  (check-properties
+   '("foo family = 10")
+    '(("foo" "w" haskell-definition-face)
+      ("family" "w" nil))))
+
 (ert-deftest haskell-type-role ()
   "Fontify \"role\" after \"type\""
   (check-properties
