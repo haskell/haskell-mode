@@ -140,6 +140,7 @@
 (require 'haskell-sort-imports)
 (require 'haskell-string)
 (require 'haskell-indentation)
+(require 'haskell-font-lock)
 
 ;; All functions/variables start with `(literate-)haskell-'.
 
