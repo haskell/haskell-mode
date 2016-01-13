@@ -555,6 +555,15 @@ if all of its characters have syntax and face. See
      ("Comment3" t haskell-literate-comment-face))
    'literate))
 
+(ert-deftest haskell-type-instance ()
+  "Fontify \"instance\" after \"type\""
+  ;; Note that instance is always fontified, because it is a keyword even
+  ;; without 'type' before it.
+  (check-properties
+   '("type instance Foo Int = Char")
+    '(("type" "w" haskell-keyword-face)
+      ("instance" "w" haskell-keyword-face))))
+
 (ert-deftest haskell-type-family ()
   "Fontify \"family\" after \"type\""
   (check-properties
