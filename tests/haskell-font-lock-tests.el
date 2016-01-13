@@ -555,10 +555,47 @@ if all of its characters have syntax and face. See
      ("Comment3" t haskell-literate-comment-face))
    'literate))
 
+(ert-deftest haskell-type-instance ()
+  "Fontify \"instance\" after \"type\""
+  ;; Note that instance is always fontified, because it is a keyword even
+  ;; without 'type' before it.
+  (check-properties
+   '("type instance Foo Int = Char")
+    '(("type" "w" haskell-keyword-face)
+      ("instance" "w" haskell-keyword-face))))
+
+(ert-deftest haskell-type-family ()
+  "Fontify \"family\" after \"type\""
+  (check-properties
+   '("type family Foo a :: *")
+    '(("type" "w" haskell-keyword-face)
+      ("family" "w" haskell-keyword-face))))
+
+(ert-deftest haskell-data-family ()
+  "Fontify \"family\" after \"data\""
+  (check-properties
+   '("data family Foo a :: *")
+    '(("data" "w" haskell-keyword-face)
+      ("family" "w" haskell-keyword-face))))
+
+(ert-deftest haskell-no-family ()
+  "Don't fontify \"family\" when not after \"type\" or \"data\""
+  (check-properties
+   '("foo family = 10")
+    '(("foo" "w" haskell-definition-face)
+      ("family" "w" nil))))
+
 (ert-deftest haskell-type-role ()
-  "fontify \"role\" after \"type\""
+  "Fontify \"role\" after \"type\""
   (check-properties
     '("type role Ptr representational")
     '(("type" "w" haskell-keyword-face)
       ("role" "w" haskell-keyword-face)
       ("Ptr" "w" haskell-constructor-face))))
+
+(ert-deftest haskell-no-type-role ()
+  "Don't fontify \"role\" when not after \"type\""
+  (check-properties
+    '("foo role = 3")
+    '(("foo" "w" haskell-definition-face)
+      ("role" "w" nil))))
