@@ -7,6 +7,9 @@
     (insert line)
     (insert "\n")))
 
+;; Emacs 24.3 has sql-mode that runs without a product and therefore
+;; without font lock initially and needs to be extra enabled
+(add-hook 'sql-mode-hook (lambda () (sql-set-product 'ansi)))
 
 (defun check-syntax-and-face-match-range (beg end syntax face)
   "Check if all charaters between positions BEG and END have
@@ -423,6 +426,26 @@ if all of its characters have syntax and face. See
      ("Cons_d" t haskell-constructor-face)
      ("Cons_p" t haskell-constructor-face)
      ("Cons_x" t haskell-quasi-quote-face))))
+
+(ert-deftest haskell-syntactic-test-quasiquoter-sql-1 ()
+  "Embedded SQL statements"
+  (check-properties
+   '("sql = [sql| SELECT title FROM books; |]")
+   '(("SELECT" t font-lock-keyword-face)
+     ("title" t nil)
+     ("FROM" t font-lock-keyword-face)
+     ("books" t nil))))
+
+(ert-deftest haskell-syntactic-test-quasiquoter-sql-2 ()
+  "Embedded SQL statements"
+  :expected-result :failed
+  ;; for now we have this problem that connstructor faces are used,
+  ;; org-mode knows how to get around this problem
+  (check-properties
+   '("sql = [sql| SELECT Title FROM Books; |]")
+   '(("Title" t nil)
+     ("Books" t nil))))
+
 
 (ert-deftest haskell-syntactic-test-special-not-redefined ()
   "QuasiQuote should not conflict with TemplateHaskell"
