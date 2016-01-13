@@ -556,9 +556,16 @@ if all of its characters have syntax and face. See
    'literate))
 
 (ert-deftest haskell-type-role ()
-  "fontify \"role\" after \"type\""
+  "Fontify \"role\" after \"type\""
   (check-properties
     '("type role Ptr representational")
     '(("type" "w" haskell-keyword-face)
       ("role" "w" haskell-keyword-face)
       ("Ptr" "w" haskell-constructor-face))))
+
+(ert-deftest haskell-no-type-role ()
+  "Don't fontify \"role\" when not after \"type\""
+  (check-properties
+    '("foo role = 3")
+    '(("foo" "w" haskell-definition-face)
+      ("role" "w" nil))))
