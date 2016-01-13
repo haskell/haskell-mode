@@ -206,7 +206,7 @@ of a token."
      ((or (equal char ?_)
           (member category '(Ll Lo)))
       'varid)
-     ((and (>= char ?0) (<= char 9))
+     ((and (>= char ?0) (<= char ?9))
       'number)
      ((member char '(?\] ?\[ ?\( ?\) ?\{ ?\} ?\` ?\, ?\;))
       'special))))

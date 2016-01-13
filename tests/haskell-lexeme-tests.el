@@ -38,6 +38,16 @@ order."
         (goto-char (match-end 0)))
       (should (equal nil left-lexemes)))))
 
+(ert-deftest haskell-lexeme-classify-chars-1 ()
+  (should (equal 'varsym (haskell-lexeme-classify-by-first-char ?=)))
+  (should (equal 'conid (haskell-lexeme-classify-by-first-char ?L)))
+  (should (equal 'consym (haskell-lexeme-classify-by-first-char ?:)))
+  (should (equal 'varid (haskell-lexeme-classify-by-first-char ?_)))
+  (should (equal 'varid (haskell-lexeme-classify-by-first-char ?x)))
+  (should (equal 'char (haskell-lexeme-classify-by-first-char ?')))
+  (should (equal 'string (haskell-lexeme-classify-by-first-char ?\")))
+  (should (equal 'special (haskell-lexeme-classify-by-first-char ?\;)))
+  (should (equal 'number (haskell-lexeme-classify-by-first-char ?4))))
 
 (ert-deftest haskell-lexeme-basic-tokens-1 ()
   "Get some basic self delimiting tokens right"
