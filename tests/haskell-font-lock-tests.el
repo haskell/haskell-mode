@@ -554,3 +554,11 @@ if all of its characters have syntax and face. See
      ("code3" t haskell-definition-face)
      ("Comment3" t haskell-literate-comment-face))
    'literate))
+
+(ert-deftest haskell-type-role ()
+  "fontify \"role\" after \"type\""
+  (check-properties
+    '("type role Ptr representational")
+    '(("type" "w" haskell-keyword-face)
+      ("role" "w" haskell-keyword-face)
+      ("Ptr" "w" haskell-constructor-face))))
