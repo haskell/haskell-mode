@@ -55,7 +55,14 @@
             name
             version))))
 
-(cl-defstruct haskell-package "Haskell package object.")
+;; Haskell package object
+(cl-defstruct haskell-package
+  name version id license copyright maintainer stability homepage
+  package-url description categories authors is-exposed
+  exposed-modules hidden-modules imports-dirs library-dirs
+  haskell-libraries extra-libraries extra-ghci-libraries include-dirs
+  includes depends hugs-options cc-options ld-options framework-dirs
+  frameworks haddock-interfaces haddock-html)
 
 (defun haskell-package-parse (text)
   "Parse a package into a package object."
