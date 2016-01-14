@@ -223,6 +223,18 @@ fun = [ f | x ← xs
               (4 10)
               (5 0))
 
+(hindent-test "6b \"let\" in do""
+fact n = do
+  let g = 7
+  z <- let x = 5
+       in return (x + 4)"
+              (1 0)
+              (2 2)
+              (3 2 6 8)
+              (4 7)
+              (5 2 10))
+
+
 (hindent-test "7a \"data\" after \"data\"""
 data ABC = ABC
 data DEF = DEF"
@@ -758,6 +770,18 @@ fact n =
               (4 0 2 4 6)
               (5 0 2 4 6))
 
+(hindent-test "46b case expression with guards" "
+fact n = case n of
+  n | n == 0 -> 1
+  _ | n > 0
+    , True == True -> n * fact (n - 1)"
+              (1 0)
+              (2 2)
+              ;; returns (0 2 2 6), to investigate
+              (3 0 2 6)
+              (4 4)
+              (5 0 2 6))
+
 (hindent-test "47a multiline strings" "
 fact n = \"\\
          \\a\""
@@ -777,6 +801,84 @@ fact n = \"\\
               (2 0 9)
               (3 6))
 
+(hindent-test "48 functional dependencies" "
+class X a b | a -> b
+            , b -> a where
+  fun :: a -> b"
+              (1 0)
+              (2 12)
+              (3 2)
+              (4 0 2 9))
+
+(hindent-test "49 data with GADT syntax" "
+data Term a where
+  Lit :: Int -> Term Int
+  Pair :: Term a -> Term b -> Term (a,b)"
+              (1 0)
+              (2 2)
+              (3 0 2 9)
+              (4 0 2 10))
+
+(hindent-test "49b* data with GADT syntax and a deriving clause" "
+data G [a] b where
+  G1 :: c -> G [Int] b
+  deriving (Eq)"
+              (1 0)
+              (2 2)
+              (3 0 2))
+
+(hindent-test "50* standalone deriving" "
+data Name = Name String
+deriving instance Eq Name"
+              (1 0)
+              ;; We accept position 2 here because we have just one
+              ;; look-ahead token so we do not see 'instance'
+              ;; following 'deriving'.
+              (2 0 2))
+
+(hindent-test "51 standalone deriving" "
+data family T a
+data    instance T Int  = T1 Int | T2 Bool
+newtype instance T Char = TC Bool"
+              ;; We check that indentation does not bail on 'instance'
+              ;; here, we do not really check if it is working
+              ;; correctly. Needs better test.
+              (1 0)
+              (2 0)
+              (3 0)
+              (4 0 2))
+
+(hindent-test "52a* module simplest case two lines" "
+module A.B
+where"
+              (1 0)
+              (2 0)
+              (3 0))
+
+(hindent-test "52b module simplest case one line" "
+module A.B where"
+              (1 0)
+              (2 0))
+
+(hindent-test "52c* module with exports" "
+module A.B
+  ( x
+  , y
+  )
+where"
+              (1 0)
+              (2 2)
+              (3 2)
+              (4 2)
+              (5 0)
+              (6 0))
+
+(hindent-test "53 multiway if" "
+fun = if | guard1 -> expr1
+         | guardN -> exprN"
+              (1 0)
+              (2 9)
+              (3 0 11))
 
 (defmacro with-temp-switch-to-buffer (&rest body)
   "Create a temporary buffer, use `switch-to-buffer' and evaluate BODY there like `progn'.
