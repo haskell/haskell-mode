@@ -863,15 +863,6 @@ To be added to `flymake-init-create-temp-buffer-copy'."
   "Function that will be called before buffer's saving."
   )
 
-(defun haskell-mode-jump-to-loc (loc)
-  "Jump to the given location.
-LOC = (list FILE LINE COL)"
-  (find-file (elt loc 0))
-  (goto-char (point-min))
-  (forward-line (1- (elt loc 1)))
-  (goto-char (+ (line-beginning-position)
-                (1- (elt loc 2)))))
-
 ;; From Bryan O'Sullivan's blog:
 ;; http://www.serpentine.com/blog/2007/10/09/using-emacs-to-insert-scc-annotations-in-haskell-code/
 (defun haskell-mode-try-insert-scc-at-point ()
