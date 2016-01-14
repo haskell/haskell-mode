@@ -454,7 +454,12 @@ Returns:
   "Either jump to or echo a generic location LOC.
 Either a file or a library."
   (cl-case (car loc)
-    (file (haskell-mode-jump-to-loc (cdr loc)))
+    (file (progn
+              (find-file (elt loc 1))
+              (goto-char (point-min))
+              (forward-line (1- (elt loc 2)))
+              (goto-char (+ (line-beginning-position)
+                            (1- (elt loc 3))))))
     (library (message "Defined in `%s' (%s)."
                       (elt loc 2)
                       (elt loc 1)))
