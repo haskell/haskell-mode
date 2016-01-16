@@ -8,6 +8,18 @@ This is an Emacs mode for editing, debugging and developing Haskell programs.
 [![Melpa Status](http://melpa.org/packages/haskell-mode-badge.svg)](http://melpa.org/#/haskell-mode)
 [![Melpa Stable Status](http://stable.melpa.org/packages/haskell-mode-badge.svg)](http://stable.melpa.org/#/haskell-mode)
 
+
+> I just want to thank everybody involved in one way or another with the Haskell Emacs tooling.
+> It is one of the best language experiences I had in Emacs.
+> -- [cocreature, 2015-03-01](https://www.reddit.com/r/haskell/comments/2xjum3/haskellmode_february_2015_developments/cp0qa9a)
+
+> I've been using it for a long time and love it. Great work on haskell-mode! Keep up the good work!
+> -- [LukeHoersten, 2015-04-02](https://www.reddit.com/r/haskell/comments/316hcm/month_in_haskell_mode_march_2015/cpyutph)
+
+> This sounds wonderful. Does anything similar exist for Vim?
+> -- [earldouglas, 2015-07-02](https://www.reddit.com/r/haskell/comments/3bsa0f/month_in_haskell_mode_june_2015/cspdbb6)
+
+
 ## Quick Installation
 
 Make sure you have this in your [init file](http://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html) (usually `~/.emacs`). If you already have `custom-set-variables`, merge its contents:
