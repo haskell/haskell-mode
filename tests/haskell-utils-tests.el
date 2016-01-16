@@ -31,6 +31,7 @@
 (require 'haskell-utils)
 
 (defun insert-lines (&rest lines)
+  "Insert all LINES in current buffer."
   (dolist (line lines)
     (insert (concat line "\n"))))
 
