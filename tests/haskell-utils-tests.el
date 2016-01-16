@@ -131,4 +131,49 @@
                    (forward-line 0)
                    (haskell-utils-parse-import-statement-at-point)))))
 
+(ert-deftest type-at-command-composition ()
+  "Test haskell-utils-compose-type-at-command.
+Test only position conversion to line and column numbers, do not
+test last string compontent, it is used in `:type-at` command to
+provide user friendly output only and could be any string, even
+empty one. Very likely the way how its composed for multilne
+strings will change in future."
+  (with-temp-buffer
+    (insert-lines "module A where"
+                  ""
+                  "int :: Int"
+                  "int = 369"
+                  ""
+                  "act ="
+                  "  do print int"
+                  "     return int")
+    (goto-char (point-min))
+    (let (test-a-points
+          test-b-points
+          test-a-result
+          test-b-result)
+      ;; go to third line, e.g. `int` definition
+      (forward-line 3)
+      (setq test-a-points (point))
+      ;; go to at the end of `int` definition, i.e. point stands at whitespace
+      (forward-char 3)
+      (setq test-a-points `(,test-a-points . ,(point)))
+      (goto-char (line-beginning-position))
+      ;; go to do-block line
+      (forward-line 3)
+      ;; go to `do` keyword beginning
+      (forward-char 2)
+      (setq test-b-points (point))
+      ;; go to the end of do-block
+      (goto-char (point-max))
+      ;; note `insert-line' inserts one extra newline, go up one line
+      (forward-line -1)
+      (goto-char (line-end-position))
+      (setq test-b-points `(,test-b-points . ,(point)))
+      (setq test-a-result
+            (haskell-utils-compose-type-at-command test-a-points))
+      (setq test-b-result
+            (haskell-utils-compose-type-at-command test-b-points))
+      (should (string-prefix-p ":type-at nil 4 1 4 4" test-a-result))
+      (should (string-prefix-p ":type-at nil 7 3 8 16" test-b-result)))))
 ;;; haskell-utils-tests.el ends here
