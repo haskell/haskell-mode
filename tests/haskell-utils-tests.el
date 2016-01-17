@@ -1,6 +1,6 @@
 ;;; haskell-utils-tests.el --- Tests for Haskell utilities package
 
-;; Copyright © 2016 Athur Fayzrakhmanov. All rights reserved.
+;; Copyright © 2016 Arthur Fayzrakhmanov. All rights reserved.
 
 ;; This file is part of haskell-mode package.
 ;; You can contact with authors using GitHub issue tracker:
@@ -132,7 +132,7 @@
                    (haskell-utils-parse-import-statement-at-point)))))
 
 (ert-deftest type-at-command-composition ()
-  "Test haskell-utils-compose-type-at-command.
+  "Test `haskell-utils-compose-type-at-command'.
 Test only position conversion to line and column numbers, do not
 test last string compontent, it is used in `:type-at` command to
 provide user friendly output only and could be any string, even
@@ -176,4 +176,29 @@ strings will change in future."
             (haskell-utils-compose-type-at-command test-b-points))
       (should (string-prefix-p ":type-at nil 4 1 4 4" test-a-result))
       (should (string-prefix-p ":type-at nil 7 3 8 16" test-b-result)))))
+
+(ert-deftest parse-repl-response ()
+  "Test `haskell-utils-repl-response-error-status' function."
+  (let* ((t1-str "unknown command ':type-at'\nuse :? for help.")
+         (t2-str "\n<interactive>:3:5: Not in scope: ‘x’")
+         (t3-str "Couldn't guess that module name. Does it exist?")
+         (t4-str "Hello World!")
+         (t5-str " ")
+         (t6-str "")
+         (t7-str "\n\n\n\n")
+         (r1 (haskell-utils-repl-response-error-status t1-str))
+         (r2 (haskell-utils-repl-response-error-status t2-str))
+         (r3 (haskell-utils-repl-response-error-status t3-str))
+         (r4 (haskell-utils-repl-response-error-status t4-str))
+         (r5 (haskell-utils-repl-response-error-status t5-str))
+         (r6 (haskell-utils-repl-response-error-status t6-str))
+         (r7 (haskell-utils-repl-response-error-status t7-str)))
+    (should (equal r1 'unknown-command))
+    (should (equal r2 'interactive-error))
+    (should (equal r3 'option-missing))
+    (should (equal r4 'no-error))
+    (should (equal r5 'no-error))
+    (should (equal r6 'no-error))
+    (should (equal r7 'no-error))))
+
 ;;; haskell-utils-tests.el ends here
