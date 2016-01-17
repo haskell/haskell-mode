@@ -106,25 +106,37 @@ only a single space.  Then removes all newlines."
   (let ((s_ (replace-regexp-in-string "^\s+" " " s)))
     (replace-regexp-in-string "\n" "" s_)))
 
-(defun haskell-utils-parse-repl-response (r)
-  "Parse response R from REPL and return special kind of result.
-The result is the response string itself with the special property
-response-type added.
-
-This property could be one of the following:
+(defun haskell-utils-repl-response-error-status (response)
+  "Parse response REPL's RESPONSE for errors.
+Returns one of the following symbols:
 
 + unknown-command
 + option-missing
 + interactive-error
-+ success"
-  (let ((first-line (car (split-string r "\n"))))
++ no-error
+
+*Warning*: this funciton covers only three kind of responses:
+
+* \"unknown command …\"
+  REPL missing requested command
+* \"<interactive>:3:5: …\"
+  interactive REPL error
+* \"Couldn't guess that module name. Does it exist?\"
+  (:type-at and maybe some other commands error)
+* *all other reposnses* are treated as success reposneses and
+  'no-error is returned."
+  (let ((first-line (car (split-string response "\n" t))))
     (cond
-     ((string-match-p "^unknown command" first-line) 'unknown-command)
-     ((string-match-p "^Couldn't guess that module name. Does it exist?"
-                      first-line)
+     ((null first-line) 'no-error)
+     ((string-match-p "^unknown command" first-line)
+      'unknown-command)
+     ((string-match-p
+       "^Couldn't guess that module name. Does it exist?"
+       first-line)
       'option-missing)
-     ((string-match-p "^<interactive>:" first-line) 'interactive-error)
-     (t 'success))))
+     ((string-match-p "^<interactive>:" first-line)
+      'interactive-error)
+     (t 'no-error))))
 
 (defun haskell-utils-compose-type-at-command (pos)
   "Prepare :type-at command to be send to haskell process.

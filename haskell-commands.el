@@ -639,7 +639,7 @@ happened since function invocation)."
                (min-pos (caar pos-reg))
                (max-pos (cdar pos-reg))
                (sig (haskell-utils-reduce-string response))
-               (res-type (haskell-utils-parse-repl-response sig)))
+               (res-type (haskell-utils-repl-response-error-status sig)))
 
           (cl-case res-type
             ;; neither popup presentation buffer
