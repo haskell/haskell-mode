@@ -1,6 +1,7 @@
 ;;; haskell-utils.el --- General utility functions used by haskell-mode modules -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013  Herbert Valerio Riedel
+;; Copyright © 2013 Herbert Valerio Riedel
+;;             2016 Arthur Fayzrakhmanov
 
 ;; Author: Herbert Valerio Riedel <hvr@gnu.org>
 

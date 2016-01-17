@@ -1,6 +1,6 @@
 ;;; haskell-utils-tests.el --- Tests for Haskell utilities package
 
-;; Copyright © 2016 Athur Fayzrakhmanov. All rights reserved.
+;; Copyright © 2016 Arthur Fayzrakhmanov. All rights reserved.
 
 ;; This file is part of haskell-mode package.
 ;; You can contact with authors using GitHub issue tracker:
@@ -132,7 +132,7 @@
                    (haskell-utils-parse-import-statement-at-point)))))
 
 (ert-deftest type-at-command-composition ()
-  "Test haskell-utils-compose-type-at-command.
+  "Test `haskell-utils-compose-type-at-command'.
 Test only position conversion to line and column numbers, do not
 test last string compontent, it is used in `:type-at` command to
 provide user friendly output only and could be any string, even
