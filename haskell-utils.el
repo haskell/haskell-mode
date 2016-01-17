@@ -100,12 +100,13 @@ execusion."
     (remove-hook
      'post-command-hook #'haskell-utils-async-update-post-command-flag t)))
 
-(defun haskell-utils-reduce-string (s)
-  "Remove newlines and extra whitespace from S.
-Removes all extra whitespace at the beginning of each line leaving
-only a single space.  Then removes all newlines."
-  (let ((s_ (replace-regexp-in-string "^\s+" " " s)))
-    (replace-regexp-in-string "\n" "" s_)))
+(defun haskell-utils-reduce-string (str)
+  "Remove newlines and extra whitespace from string STR.
+If line starts with a sequence of whitespaces, substitutes this
+sequence with a single whitespace.  Removes all newline
+characters."
+  (let ((s (replace-regexp-in-string "^\s+" " " str)))
+    (replace-regexp-in-string "\r?\n" "" s)))
 
 (defun haskell-utils-repl-response-error-status (response)
   "Parse response REPL's RESPONSE for errors.

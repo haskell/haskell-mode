@@ -201,4 +201,28 @@ strings will change in future."
     (should (equal r6 'no-error))
     (should (equal r7 'no-error))))
 
+(ert-deftest reduce-strign ()
+  "Test `haskell-utils-reduce-strign' command.
+Whitespace sequences at beginning of lines should be replaced
+with single whitespace, all newline characters should be
+removed."
+  (should (string-equal "" (haskell-utils-reduce-string "\n")))
+  (should (string-equal "" (haskell-utils-reduce-string "\r\n")))
+  (should (string-equal " " (haskell-utils-reduce-string "    \n")))
+  (should (string-equal
+           "TestTest"
+           (haskell-utils-reduce-string "Test\nTest")))
+  (should (string-equal
+           "Test Test"
+           (haskell-utils-reduce-string "Test\n     Test")))
+  (should (string-equal
+           " Test Test"
+           (haskell-utils-reduce-string "   Test\r\n     Test")))
+  (should (string-equal
+           " TestTest"
+           (haskell-utils-reduce-string "  Test\r\nTest")))
+  (should (string-equal
+           " TestTest Test test"
+           (haskell-utils-reduce-string " Test\r\nTest\n    Test test"))))
+
 ;;; haskell-utils-tests.el ends here
