@@ -1,6 +1,7 @@
 ;;; haskell-indentation-tests.el --- tests for indentation module
 
-;; Copyright (C) 2015 Haskell Mode contributors
+;; Copyright © 2015 Haskell Mode contributors. All rights reserved.
+;;             2016 Arthur Fayzrakhmanov.
 
 ;; This file is not part of GNU Emacs.
 
@@ -19,11 +20,12 @@
 
 ;;; Commentary:
 
-;; These are tests for `haskell-indentation-mode'. It's easy to add new
+;; These are tests for `haskell-indentation-mode'.  It's easy to add new
 ;; tests, just...
 
 (require 'cl-lib)
 (require 'ert)
+(require 'haskell-test-utils)
 (require 'haskell-mode)
 (require 'haskell-font-lock)
 (require 'haskell-indentation)
@@ -879,21 +881,6 @@ fun = if | guard1 -> expr1
               (1 0)
               (2 9)
               (3 0 11))
-
-(defmacro with-temp-switch-to-buffer (&rest body)
-  "Create a temporary buffer, use `switch-to-buffer' and evaluate BODY there like `progn'.
-
-Seems that `execute-kbd-macro' is not able to correctly execute keybindings without this."
-  (declare (indent 0) (debug t))
-  (let ((temp-buffer (make-symbol "temp-buffer")))
-    `(let ((,temp-buffer (generate-new-buffer " *temp*")))
-       ;; FIXME: kill-buffer can change current-buffer in some odd cases.
-       (unwind-protect
-           (progn
-             (switch-to-buffer ,temp-buffer)
-             ,@body)
-         (and (buffer-name ,temp-buffer)
-              (kill-buffer ,temp-buffer))))))
 
 (ert-deftest haskell-indentation-ret-indents ()
   (with-temp-switch-to-buffer

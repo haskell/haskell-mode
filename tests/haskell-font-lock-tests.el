@@ -1,11 +1,7 @@
 (require 'ert)
+(require 'haskell-test-utils)
 (require 'haskell-font-lock)
 (require 'haskell-mode)
-
-(defun insert-lines (&rest lines)
-  (dolist (line lines)
-    (insert line)
-    (insert "\n")))
 
 ;; Emacs 24.3 has sql-mode that runs without a product and therefore
 ;; without font lock initially and needs to be extra enabled
