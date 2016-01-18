@@ -37,6 +37,12 @@ EFLAGS = --eval "(add-to-list 'load-path (expand-file-name \"tests/compat\") 'ap
 
 BATCH = $(EMACS) $(EFLAGS) --batch -Q -L .
 
+ifeq ($(CONTINUOUS_INTEGRATION),true)
+INDEX_JS = -c EXTRA_HEAD="<script src=\"../../index.js\">"
+else
+INDEX_JS =
+endif
+
 ELFILES = \
 	ghc-core.el \
 	ghci-script-mode.el \
@@ -142,6 +148,7 @@ doc/html/index.html : doc/haskell-mode.texi
 	    --css-ref=haskell-mode.css							\
 	    -c AFTER_BODY_OPEN='<div class="background"> </div>'			\
 	    -c EXTRA_HEAD='<link rel="shortcut icon" href="haskell-mode-32x32.png">'	\
+	    $(INDEX_JS)                                                                 \
 	    -c SHOW_TITLE=0								\
 	    -o doc/html $<
 
