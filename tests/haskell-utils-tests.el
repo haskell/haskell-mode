@@ -218,4 +218,30 @@ removed."
            " TestTest Test test"
            (haskell-utils-reduce-string " Test\r\nTest\n    Test test"))))
 
+(ert-deftest post-command-hooks ()
+  "Test commands related `haskell-utils-async-post-command-flag'.
+Tests flag updates and `post-command-hook' cleanup."
+  (with-temp-switch-to-buffer
+    ;; set some random value to flag to test that it will be reseted
+    (setq haskell-utils-async-post-command-flag "non nil")
+    (haskell-utils-async-watch-changes)
+    ;; now flag should be empty
+    (should (null haskell-utils-async-post-command-flag))
+    ;; execute some commands
+    (save-excursion (insert "Hello World!"))
+    (execute-kbd-macro (kbd "SPC"))
+    ;; now flag should not be empty
+    (should (not (null haskell-utils-async-post-command-flag)))
+    ;; check that hook was installed
+    (should (cl-member #'haskell-utils-async-update-post-command-flag
+                       post-command-hook
+                       :test #'equal))
+    ;; check that flag was cleaned up
+    (haskell-utils-async-stop-watching-changes (current-buffer))
+    (should (null haskell-utils-async-post-command-flag))
+    ;; check that hook was removed
+    (should (not (cl-member #'haskell-utils-async-update-post-command-flag
+                            post-command-hook
+                            :test #'equal)))))
+
 ;;; haskell-utils-tests.el ends here
