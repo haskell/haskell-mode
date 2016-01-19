@@ -28,12 +28,8 @@
 ;;; Code:
 
 (require 'ert)
+(require 'haskell-test-utils)
 (require 'haskell-utils)
-
-(defun insert-lines (&rest lines)
-  "Insert all LINES in current buffer."
-  (dolist (line lines)
-    (insert (concat line "\n"))))
 
 (ert-deftest simple-import-parse ()
   (should (equal "A.B.C"
@@ -166,9 +162,6 @@ strings will change in future."
       (setq test-b-points (point))
       ;; go to the end of do-block
       (goto-char (point-max))
-      ;; note `insert-line' inserts one extra newline, go up one line
-      (forward-line -1)
-      (goto-char (line-end-position))
       (setq test-b-points `(,test-b-points . ,(point)))
       (setq test-a-result
             (haskell-utils-compose-type-at-command test-a-points))
