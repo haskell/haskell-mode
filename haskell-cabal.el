@@ -309,14 +309,6 @@ OTHER-WINDOW use `find-file-other-window'."
   :group 'haskell
 )
 
-(defcustom haskell-cabal-list-comma-position
-  'before
-  "Where to put the comma in lists"
-  :safe t
-  :group 'haskell-cabal
-  :type '(choice (const before)
-                 (const after)))
-
 (defconst haskell-cabal-section-header-regexp "^[[:alnum:]]" )
 (defconst haskell-cabal-subsection-header-regexp "^[ \t]*[[:alnum:]]\\w*:")
 (defconst haskell-cabal-comment-regexp "^[ \t]*--")
