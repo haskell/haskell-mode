@@ -50,6 +50,124 @@
       (haskell-cabal-previous-subsection)
       (haskell-cabal-previous-section))))
 
+(ert-deftest haskell-cabal-subsection-arrange-lines-keep-commas ()
+  (should (with-temp-buffer
+            (insert "Executable bin-1
+    Main-Is:          TestParsing.hs
+    Build-Depends:    base,
+                      bytestring,
+                      directory,
+                      filepath,
+                      text
+    Ghc-Options: -O -Wall
+")
+            (haskell-cabal-mode)
+            (goto-char (point-min))
+            (search-forward "Build-Depends:")
+            (haskell-cabal-subsection-arrange-lines)
+            (string= (buffer-string)
+                     "Executable bin-1
+    Main-Is:          TestParsing.hs
+    Build-Depends:    base
+                    , bytestring
+                    , directory
+                    , filepath
+                    , text
+    Ghc-Options: -O -Wall
+"))))
+
+(ert-deftest haskell-cabal-subsection-arrange-lines-no-commas ()
+  (should (with-temp-buffer
+            (insert "Executable bin-1
+    Main-Is:          TestParsing.hs
+    Other-Modules:    Some.Module
+                      Some.Other.Other.Module
+                      Some.Other.Module
+")
+            (haskell-cabal-mode)
+            (goto-char (point-min))
+            (search-forward "Other-Modules:")
+            (haskell-cabal-subsection-arrange-lines)
+            (string= (buffer-string)
+                     "Executable bin-1
+    Main-Is:          TestParsing.hs
+    Other-Modules:    Some.Module
+                      Some.Other.Module
+                      Some.Other.Other.Module
+"))))
+
+
+(ert-deftest haskell-cabal-subsection-arrange-lines-quoted-items ()
+  (should (with-temp-buffer
+            (insert "Executable bin-1
+    Main-Is:          TestParsing.hs
+    GHC-Options:      -fprof-auto \"-with-rtsopts=-N -p -s -h -i0.1\"
+")
+            (haskell-cabal-mode)
+            (goto-char (point-min))
+            (search-forward "GHC-Options:")
+            (haskell-cabal-subsection-arrange-lines)
+            (string= (buffer-string)
+                     "Executable bin-1
+    Main-Is:          TestParsing.hs
+    GHC-Options:      -fprof-auto \"-with-rtsopts=-N -p -s -h -i0.1\"
+"))))
+
+(ert-deftest haskell-cabal-subsection-arrange-lines-no-commas-quoted-comma ()
+  (should (with-temp-buffer
+            (insert "Executable bin-1
+    Main-Is:          TestParsing.hs
+    GHC-Options:      -Wall -fprof-auto \"foo, bar\"
+")
+            (haskell-cabal-mode)
+            (goto-char (point-min))
+            (search-forward "GHC-Options:")
+            (haskell-cabal-subsection-arrange-lines)
+            (string= (buffer-string)
+                     "Executable bin-1
+    Main-Is:          TestParsing.hs
+    GHC-Options:      -Wall -fprof-auto \"foo, bar\"
+"))))
+
+(ert-deftest haskell-cabal-subsection-arrange-lines-commas-quoted-comma ()
+  (should (with-temp-buffer
+            (insert "Executable bin-1
+    Main-Is:          TestParsing.hs
+    GHC-Options:      -Wall, -fprof-auto \"foo, bar\"
+")
+            (haskell-cabal-mode)
+            (goto-char (point-min))
+            (search-forward "GHC-Options:")
+            (haskell-cabal-subsection-arrange-lines)
+            (string= (buffer-string)
+                     "Executable bin-1
+    Main-Is:          TestParsing.hs
+    GHC-Options:      -Wall
+                    , -fprof-auto \"foo, bar\"
+"))))
+
+(ert-deftest haskell-cabal-subsection-arrange-lines-comma-in-commment ()
+  (should (with-temp-buffer
+            (insert "Executable bin-1
+    Main-Is:          TestParsing.hs
+    Other-Modules:    Some.Module
+                      Some.Other.Other.Module
+                      Some.Other.Module
+                      -- Foo, bar
+")
+            (haskell-cabal-mode)
+            (goto-char (point-min))
+            (search-forward "Other-Modules:")
+            (haskell-cabal-subsection-arrange-lines)
+            (string= (buffer-string)
+                     "Executable bin-1
+    Main-Is:          TestParsing.hs
+    Other-Modules:    Some.Module
+                      Some.Other.Module
+                      Some.Other.Other.Module
+                      -- Foo, bar
+"))))
+
 (provide 'haskell-cabal-tests)
 
 ;;; haskell-cabal-tests.el ends here
