@@ -50,15 +50,41 @@
       (haskell-cabal-previous-subsection)
       (haskell-cabal-previous-section))))
 
-(ert-deftest haskell-cabal-subsection-arrange-lines-keep-commas ()
+(ert-deftest haskell-cabal-subsection-arrange-lines-keep-trailing-commas ()
   (should (with-temp-buffer
             (insert "Executable bin-1
+    Main-Is:          TestParsing.hs
+    Build-Depends:    base,
+                      bytestring,
+                      filepath,
+                      directory,
+                      text
+    Ghc-Options: -O -Wall
+")
+            (haskell-cabal-mode)
+            (goto-char (point-min))
+            (search-forward "Build-Depends:")
+            (haskell-cabal-subsection-arrange-lines)
+            (string= (buffer-string)
+                     "Executable bin-1
     Main-Is:          TestParsing.hs
     Build-Depends:    base,
                       bytestring,
                       directory,
                       filepath,
                       text
+    Ghc-Options: -O -Wall
+"))))
+
+(ert-deftest haskell-cabal-subsection-arrange-lines-keep-commas-before ()
+  (should (with-temp-buffer
+            (insert "Executable bin-1
+    Main-Is:          TestParsing.hs
+    Build-Depends:    base
+                    , bytestring
+                    , filepath
+                    , directory
+                    , text
     Ghc-Options: -O -Wall
 ")
             (haskell-cabal-mode)
@@ -96,6 +122,29 @@
                       Some.Other.Other.Module
 "))))
 
+(ert-deftest haskell-cabal-subsection-arrange-lines-mixed-styles ()
+  (should (with-temp-buffer
+            (insert "Executable bin-1
+    Main-Is:          TestParsing.hs
+    Build-Depends:    base
+                    , bytestring,
+                      filepath, directory, text
+    Ghc-Options: -O -Wall
+")
+            (haskell-cabal-mode)
+            (goto-char (point-min))
+            (search-forward "Build-Depends:")
+            (haskell-cabal-subsection-arrange-lines)
+            (string= (buffer-string)
+                     "Executable bin-1
+    Main-Is:          TestParsing.hs
+    Build-Depends:    base
+                    , bytestring
+                    , directory
+                    , filepath
+                    , text
+    Ghc-Options: -O -Wall
+"))))
 
 (ert-deftest haskell-cabal-subsection-arrange-lines-quoted-items ()
   (should (with-temp-buffer
@@ -129,11 +178,46 @@
     GHC-Options:      -Wall -fprof-auto \"foo, bar\"
 "))))
 
-(ert-deftest haskell-cabal-subsection-arrange-lines-commas-quoted-comma ()
+(ert-deftest haskell-cabal-subsection-arrange-lines-single-line-quoted-comma ()
   (should (with-temp-buffer
             (insert "Executable bin-1
     Main-Is:          TestParsing.hs
+    GHC-Options:      -Wall,-fprof-auto \"foo, bar\"
+")
+            (haskell-cabal-mode)
+            (goto-char (point-min))
+            (search-forward "GHC-Options:")
+            (haskell-cabal-subsection-arrange-lines)
+            (string= (buffer-string)
+                     "Executable bin-1
+    Main-Is:          TestParsing.hs
     GHC-Options:      -Wall, -fprof-auto \"foo, bar\"
+"))))
+
+(ert-deftest haskell-cabal-subsection-arrange-lines-trailing-commas-quoted-comma ()
+  (should (with-temp-buffer
+            (insert "Executable bin-1
+    Main-Is:          TestParsing.hs
+    GHC-Options:      -Wall,
+                      -fprof-auto \"foo, bar\"
+")
+            (haskell-cabal-mode)
+            (goto-char (point-min))
+            (search-forward "GHC-Options:")
+            (haskell-cabal-subsection-arrange-lines)
+            (string= (buffer-string)
+                     "Executable bin-1
+    Main-Is:          TestParsing.hs
+    GHC-Options:      -Wall,
+                      -fprof-auto \"foo, bar\"
+"))))
+
+(ert-deftest haskell-cabal-subsection-arrange-lines-commas-before-quoted-comma ()
+  (should (with-temp-buffer
+            (insert "Executable bin-1
+    Main-Is:          TestParsing.hs
+    GHC-Options:      -Wall
+                    , -fprof-auto \"foo, bar\"
 ")
             (haskell-cabal-mode)
             (goto-char (point-min))
