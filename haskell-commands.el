@@ -355,7 +355,9 @@ position with `xref-pop-marker-stack'."
         (haskell-mode-handle-generic-loc loc)
       (call-interactively 'haskell-mode-tag-find))
     (unless (equal initial-loc (point-marker))
-      (xref-push-marker-stack initial-loc))))
+      (save-excursion
+        (goto-char initial-loc)
+        (xref-push-marker-stack)))))
 
 ;;;###autoload
 (defun haskell-mode-goto-loc ()

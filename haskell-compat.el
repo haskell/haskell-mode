@@ -29,23 +29,15 @@
 (eval-when-compile
   (setq byte-compile-warnings '(not cl-functions obsolete)))
 
-;; Missing in Emacs23, stolen from Emacs24's `subr.el'
-(unless (fboundp 'process-live-p)
-  (defun process-live-p (process)
-    "Returns non-nil if PROCESS is alive.
-A process is considered alive if its status is `run', `open',
-`listen', `connect' or `stop'."
-    (memq (process-status process)
-	  '(run open listen connect stop))))
 
 ;; Cross-referencing commands have been replaced since Emacs 25.1.
 ;; These aliases are required to provide backward compatibility.
 (unless (fboundp 'xref-push-marker-stack)
   (defalias 'xref-pop-marker-stack 'pop-tag-mark)
 
-  (defun xref-push-marker-stack (&optional m)
+  (defun xref-push-marker-stack ()
     "Add point to the marker stack."
-    (ring-insert find-tag-marker-ring (or m (point-marker)))))
+    (ring-insert find-tag-marker-ring (point-marker))))
 
 (unless (fboundp 'outline-hide-sublevels)
   (defalias 'outline-hide-sublevels 'hide-sublevels))
