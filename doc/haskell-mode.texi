@@ -730,6 +730,21 @@ associated with at most one GHCi session, so when you call
 no session associated yet, you're asked which GHCi session to create or
 associate with.
 
+@section Goto Error
+
+In a Haskell source buffer associated with a GHCi session, errors that
+prevent the file from loading are highlighted with
+@code{haskell-error-face}.  You can move between these error lines with
+
+@table @kbd
+@item M-n
+is bound to @code{haskell-goto-next-error}
+@item M-p
+is bound to @code{haskell-goto-prev-error}
+@item C-c M-p
+is bound to @code{haskell-goto-first-error}
+@end table
+
 @section Using GHCi-ng
 
 Put @code{:set +c} in your @code{.ghci} or run it in the REPL. Then use
