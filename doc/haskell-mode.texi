@@ -42,7 +42,7 @@ Front-Cover Texts and no Back-Cover Texts.
 @top Haskell Mode
 
 Haskell Mode is an Haskell development Environment for GNU Emacs version
-23 or later.  It provides syntax-based indentation, font locking,
+24 or later.  It provides syntax-based indentation, font locking,
 editing cabal files, and supports running an inferior Haskell
 interpreter (e.g. GHCi).
 
@@ -156,7 +156,7 @@ source code in color now.
 
 @section Installation - more information
 
-@code{haskell-mode} supports GNU Emacs versions 23, 24 and upcoming 25
+@code{haskell-mode} supports GNU Emacs versions 24 and upcoming 25
 (snapshot).
 
 @code{haskell-mode} is available from @uref{http://stable.melpa.org,melpa-stable (releases)} and @uref{http://melpa.org, melpa
@@ -166,16 +166,9 @@ Other means of obtaining `haskell-mode` include
 @uref{https://github.com/dimitri/el-get, el-get},
 @uref{https://github.com/bbatsov/prelude, Emacs Prelude}) and @uref{https://packages.debian.org/search?keywords=haskell-mode, Debian package}.
 
-Emacs23 requires an the use of @code{cl-lib}.  cl-lib.el can be found in
-the tests/compat directory.  Copy cl-lib.el to your emacs
-directory, e.g. ~/.emacs.d directory and put
-
-@lisp
-(add-to-list 'load-path "~/.emacs.d/")
-(require 'cl-lib)
-@end lisp
-
-in your .emacs file.
+Last version of haskell-mode that supported Emacs 23 is haskell-mode
+13.18 available at
+@uref{https://github.com/haskell/haskell-mode/releases/tag/v13.18}.
 
 @section Customizing
 

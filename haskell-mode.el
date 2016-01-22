@@ -634,6 +634,9 @@ Minor modes that work well with `haskell-mode':
 - `smerge-mode': show and work with diff3 conflict markers used
   by git, svn and other version control systems."
   :group 'haskell
+  (when (< emacs-major-version 24)
+    (error "haskell-mode requires at least Emacs 24"))
+
   ;; paragraph-{start,separate} should treat comments as paragraphs as well.
   (set (make-local-variable 'paragraph-start)
        (concat " *{-\\| *-- |\\|" page-delimiter))
