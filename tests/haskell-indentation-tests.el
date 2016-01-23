@@ -888,6 +888,15 @@ fun = if | guard1 -> expr1
               (2 9)
               (3 0 11))
 
+(hindent-test "54 equal after guards on separate line" "
+foo x
+  | True
+  = X"
+              (1 0)
+              (2 2)
+              (3 2))
+
+
 (ert-deftest haskell-indentation-ret-indents ()
   (with-temp-switch-to-buffer
    (haskell-mode)
