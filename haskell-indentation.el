@@ -795,15 +795,15 @@ parser.  If parsing ends here, set indentation to left-indent."
 (defun haskell-indentation-declaration ()
   "Parse function or type declaration."
   (haskell-indentation-separated #'haskell-indentation-expression "," nil)
-  (cond ((string= current-token "|")
-         (haskell-indentation-with-starter
-          (apply-partially #'haskell-indentation-separated
-                           #'haskell-indentation-guard "|" nil)
-          nil))
-        ((eq current-token 'end-tokens)
-         (when (member following-token '("|" "=" "::" ","))
-           (haskell-indentation-add-indentation current-indent)
-           (throw 'parse-end nil)))))
+  (when (string= current-token "|")
+    (haskell-indentation-with-starter
+     (apply-partially #'haskell-indentation-separated
+                      #'haskell-indentation-guard "|" nil)
+     nil))
+  (when (eq current-token 'end-tokens)
+   (when (member following-token '("|" "=" "::" ","))
+     (haskell-indentation-add-indentation current-indent)
+     (throw 'parse-end nil))))
 
 (defun haskell-indentation-layout (parser)
   "Parse layout list, where each layout item is parsed by parser."
