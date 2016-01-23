@@ -308,6 +308,12 @@ data X = X
               (2 0 2)
               (3 0))
 
+(hindent-test "13b honour = on a separate line in data declaration" "
+data X a b
+  = X"
+              (1 0)
+              (2 2))
+
 (hindent-test "14* Line starting with operator inside \"do\" needs to be indented""
 fun = do
   pure X
