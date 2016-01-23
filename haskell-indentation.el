@@ -643,7 +643,11 @@ For example
   (when (string= current-token "instance")
     (haskell-indentation-read-next-token))
   (haskell-indentation-type)
-  (cond ((string= current-token "=")
+  (cond ((eq current-token 'end-tokens)
+         (when (member following-token '("=" "where"))
+           (haskell-indentation-add-indentation current-indent)
+           (throw 'parse-end nil)))
+        ((string= current-token "=")
          (haskell-indentation-separated
           #'haskell-indentation-expression "|" "deriving"))
         ((string= current-token "where")
