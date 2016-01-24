@@ -164,7 +164,7 @@ source code in color now.
 
 Other means of obtaining `haskell-mode` include
 @uref{https://github.com/dimitri/el-get, el-get},
-@uref{https://github.com/bbatsov/prelude, Emacs Prelude}) and @uref{https://packages.debian.org/search?keywords=haskell-mode, Debian package}.
+@uref{https://github.com/bbatsov/prelude, Emacs Prelude} and @uref{https://packages.debian.org/search?keywords=haskell-mode, Debian package}.
 
 Last version of haskell-mode that supported Emacs 23 is haskell-mode
 13.18 available at
