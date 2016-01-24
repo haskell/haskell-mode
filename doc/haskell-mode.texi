@@ -143,7 +143,7 @@ Make sure you have this in your @uref{http://www.gnu.org/software/emacs/manual/h
      ("melpa-stable" . "http://stable.melpa.org/packages/")))))
 @end lisp
 
-Then run emacs, and evaluate:
+Then run Emacs, and evaluate:
 
     @code{M-x package-refresh-contents}
 
