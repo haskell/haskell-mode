@@ -105,8 +105,27 @@ associated with at most one GHCi session, so when you call
 no session associated yet, you&rsquo;re asked which GHCi session to create or
 associate with.
 </p>
+<a name="Goto-Error"></a>
+<h3 class="section">10.1 Goto Error</h3>
+
+<p>In a Haskell source buffer associated with a GHCi session, errors that
+prevent the file from loading are highlighted with
+<code>haskell-error-face</code>.  You can move between these error lines with
+</p>
+<dl compact="compact">
+<dt><kbd>M-n</kbd></dt>
+<dd><p>is bound to <code>haskell-goto-next-error</code>
+</p></dd>
+<dt><kbd>M-p</kbd></dt>
+<dd><p>is bound to <code>haskell-goto-prev-error</code>
+</p></dd>
+<dt><kbd>C-c M-p</kbd></dt>
+<dd><p>is bound to <code>haskell-goto-first-error</code>
+</p></dd>
+</dl>
+
 <a name="Using-GHCi_002dng"></a>
-<h3 class="section">10.1 Using GHCi-ng</h3>
+<h3 class="section">10.2 Using GHCi-ng</h3>
 
 <p>Put <code>:set +c</code> in your <code>.ghci</code> or run it in the REPL. Then use
 these keybindings:
@@ -120,6 +139,11 @@ these keybindings:
 for the current GHCi session.
 </p>
 
+<hr>
+<div class="header">
+<p>
+Next: <a href="Editing-Cabal-files.html#Editing-Cabal-files" accesskey="n" rel="next">Editing Cabal files</a>, Previous: <a href="Inferior-Haskell-interpreter.html#Inferior-Haskell-interpreter" accesskey="p" rel="prev">Inferior Haskell interpreter</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
 
 
 
