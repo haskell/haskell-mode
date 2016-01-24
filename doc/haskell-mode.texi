@@ -162,18 +162,18 @@ source code in color now.
 @code{haskell-mode} is available from @uref{http://stable.melpa.org,melpa-stable (releases)} and @uref{http://melpa.org, melpa
 (git snapshots)}.
 
-Other means of obtaining `haskell-mode` include
+Other means of obtaining @code{haskell-mode} include
 @uref{https://github.com/dimitri/el-get, el-get},
 @uref{https://github.com/bbatsov/prelude, Emacs Prelude} and @uref{https://packages.debian.org/search?keywords=haskell-mode, Debian package}.
 
-Last version of haskell-mode that supported Emacs 23 is haskell-mode
+Last version of @code{haskell-mode} that supported Emacs 23 is @code{haskell-mode}
 13.18 available at
 @uref{https://github.com/haskell/haskell-mode/releases/tag/v13.18}.
 
 @section Customizing
 
 @cindex customizing
-Most of Haskell Mode's settings are configurable via customizable
+Most of @code{haskell-mode}'s settings are configurable via customizable
 variables (@pxref{Easy Customization,,,emacs}, for details). You can use
 
 @kbd{M-x customize-group @key{RET} haskell} to browse the @code{haskell}
