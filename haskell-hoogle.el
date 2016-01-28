@@ -1,6 +1,7 @@
 ;;; haskell-hoogle.el --- Look up Haskell documentation via hoogle or hayoo  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2015  Steve Purcell
+;; Copyright © 2015 Steve Purcell
+;;             2016 Arthur Fayzrakhmanov
 
 ;; Author: Steve Purcell <steve@sanityinc.com>
 ;; Keywords: docs
@@ -113,10 +114,12 @@ is asked to show extra info for the items matching QUERY.."
       (browse-url (format "http://localhost:%i/?hoogle=%s"
                           haskell-hoogle-port-number
                           (read-string "hoogle: " (haskell-ident-at-point))))
-    (when (y-or-n-p "Hoogle server not running, start hoogle server? ")
-      (haskell-hoogle-start-server))))
+    (haskell-mode-toggle-interactive-prompt-state)
+    (unwind-protect
+        (when (y-or-n-p "Hoogle server not running, start hoogle server? ")
+          (haskell-hoogle-start-server))
+      (haskell-mode-toggle-interactive-prompt-state t))))
 
-
 
 (defcustom haskell-hayoo-url "http://hayoo.fh-wedel.de/?query=%s"
   "Default value for hayoo web site."

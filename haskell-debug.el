@@ -1,6 +1,7 @@
 ;;; haskell-debug.el --- Debugging mode via GHCi -*- lexical-binding: t -*-
 
-;; Copyright (c) 2014 Chris Done. All rights reserved.
+;; Copyright © 2014 Chris Done. All rights reserved.
+;;             2016 Arthur Fayzrakhmanov
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -223,13 +224,16 @@
   (cond
    ((get-text-property (point) 'break)
     (let ((break (get-text-property (point) 'break)))
-      (when (y-or-n-p (format "Delete breakpoint #%d?"
-                              (plist-get break :number)))
-        (haskell-process-queue-sync-request
-         (haskell-debug-process)
-         (format ":delete %d"
-                 (plist-get break :number)))
-        (haskell-debug/refresh))))))
+      (haskell-mode-toggle-interactive-prompt-state)
+      (unwind-protect
+          (when (y-or-n-p (format "Delete breakpoint #%d?"
+                                  (plist-get break :number)))
+            (haskell-process-queue-sync-request
+             (haskell-debug-process)
+             (format ":delete %d"
+                     (plist-get break :number)))
+            (haskell-debug/refresh))
+        (haskell-mode-toggle-interactive-prompt-state t))))))
 
 (defun haskell-debug/trace ()
   "Trace the expression."
@@ -272,16 +276,20 @@
             (t
              (if context
                  (message "Computation finished.")
-               (when (y-or-n-p "Computation completed without breaking. Reload the module and retry?")
-                 (message "Reloading and resetting breakpoints...")
-                 (haskell-interactive-mode-reset-error (haskell-debug-session))
-                 (cl-loop for break in breakpoints
-                          do (haskell-process-queue-sync-request
-                              (haskell-debug-process)
-                              (concat ":load " (plist-get break :path))))
-                 (cl-loop for break in breakpoints
-                          do (haskell-debug-break break))
-                 (haskell-debug/step expr)))))))))
+               (progn
+                 (haskell-mode-toggle-interactive-prompt-state)
+                 (unwind-protect
+                     (when (y-or-n-p "Computation completed without breaking. Reload the module and retry?")
+                       (message "Reloading and resetting breakpoints...")
+                       (haskell-interactive-mode-reset-error (haskell-debug-session))
+                       (cl-loop for break in breakpoints
+                                do (haskell-process-queue-sync-request
+                                    (haskell-debug-process)
+                                    (concat ":load " (plist-get break :path))))
+                       (cl-loop for break in breakpoints
+                                do (haskell-debug-break break))
+                       (haskell-debug/step expr))
+                   (haskell-mode-toggle-interactive-prompt-state t))))))))))
    (haskell-debug/refresh)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

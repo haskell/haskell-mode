@@ -28,8 +28,8 @@
 (require 'haskell-session)
 
 (defun haskell-process-look-config-changes (session)
-  "Checks whether a cabal configuration file has
-changed. Restarts the process if that is the case."
+  "Check whether a cabal configuration file has changed.
+Restarts the SESSION's process if that is the case."
   (let ((current-checksum (haskell-session-get session 'cabal-checksum))
         (new-checksum (haskell-cabal-compute-checksum
                        (haskell-session-get session 'cabal-dir))))
@@ -40,10 +40,14 @@ changed. Restarts the process if that is the case."
       (haskell-session-set-cabal-checksum
        session
        (haskell-session-get session 'cabal-dir))
-      (unless
-          (and haskell-process-prompt-restart-on-cabal-change
-               (not (y-or-n-p "Cabal file changed; restart GHCi process? ")))
-        (haskell-process-start (haskell-interactive-session))))))
+      (haskell-mode-toggle-interactive-prompt-state)
+      (unwind-protect
+          (unless
+              (and haskell-process-prompt-restart-on-cabal-change
+                   (not
+                    (y-or-n-p "Cabal file changed. Restart GHCi process? ")))
+            (haskell-process-start (haskell-interactive-session)))
+        (haskell-mode-toggle-interactive-prompt-state t)))))
 
 (defun haskell-process-live-build (process buffer echo-in-repl)
   "Show live updates for loading files."
@@ -125,34 +129,39 @@ actual Emacs buffer of the module being loaded."
         (quit nil)))))
 
 (defun haskell-process-suggest-imports (session file modules ident)
-  "Given a list of MODULES, suggest adding them to the import section."
+  "Suggest add missed imports to file.
+Asks user to add to SESSION's FILE missed import.  MODULES is a
+list of modules where missed IDENT was found."
   (cl-assert session)
   (cl-assert file)
   (cl-assert ident)
-  (let* ((process (haskell-session-process session))
-         (suggested-already (haskell-process-suggested-imports process))
-         (module
-          (cond
-           ((> (length modules) 1)
-            (when (y-or-n-p
-                   (format
-                    "Identifier `%s' not in scope, choose module to import?"
-                    ident))
-              (haskell-complete-module-read "Module: " modules)))
-           ((= (length modules) 1)
-            (let ((module (car modules)))
-              (unless (member module suggested-already)
-                (haskell-process-set-suggested-imports
-                 process
-                 (cons module suggested-already))
+  (haskell-mode-toggle-interactive-prompt-state)
+  (unwind-protect
+      (let* ((process (haskell-session-process session))
+             (suggested-already (haskell-process-suggested-imports process))
+             (module
+              (cond
+               ((> (length modules) 1)
                 (when (y-or-n-p
-                       (format "Identifier `%s' not in scope, import `%s'?"
-                               ident
-                               module))
-                  module)))))))
-    (when module
-      (haskell-process-find-file session file)
-      (haskell-add-import module))))
+                       (format
+                        "Identifier `%s' not in scope, choose module to import?"
+                        ident))
+                  (haskell-complete-module-read "Module: " modules)))
+               ((= (length modules) 1)
+                (let ((module (car modules)))
+                  (unless (member module suggested-already)
+                    (haskell-process-set-suggested-imports
+                     process
+                     (cons module suggested-already))
+                    (when (y-or-n-p
+                           (format "Identifier `%s' not in scope, import `%s'?"
+                                   ident
+                                   module))
+                      module)))))))
+        (when module
+          (haskell-process-find-file session file)
+          (haskell-add-import module)))
+    (haskell-mode-toggle-interactive-prompt-state t)))
 
 (defun haskell-process-trigger-suggestions (session msg file line)
   "Trigger prompting to add any extension suggestions."
@@ -559,40 +568,43 @@ applications.  Put your development version of the program in
 new thread, and use the `foreign-store' package to access the
 running context across :load/:reloads in GHCi."
   (interactive)
-  (with-current-buffer
-      (or (get-buffer "DevelMain.hs")
-          (if (y-or-n-p
-               "You need to open a buffer named DevelMain.hs. Find now?")
-              (ido-find-file)
-            (error "No DevelMain.hs buffer.")))
-    (let ((session (haskell-interactive-session)))
-      (let ((process (haskell-interactive-process)))
-        (haskell-process-queue-command
-         process
-         (make-haskell-command
-          :state (list :session session
-                       :process process
-                       :buffer (current-buffer))
-          :go (lambda (state)
-                (haskell-process-send-string (plist-get state ':process)
-                                             ":l DevelMain"))
-          :live (lambda (state buffer)
-                  (haskell-process-live-build (plist-get state ':process)
-                                              buffer
-                                              nil))
-          :complete (lambda (state response)
-                      (haskell-process-load-complete
-                       (plist-get state ':session)
-                       (plist-get state ':process)
-                       response
-                       nil
-                       (plist-get state ':buffer)
-                       (lambda (ok)
-                         (when ok
-                           (haskell-process-queue-without-filters
-                            (haskell-interactive-process)
-                            "DevelMain.update")
-                           (message "DevelMain updated.")))))))))))
+  (haskell-mode-toggle-interactive-prompt-state)
+  (unwind-protect
+      (with-current-buffer
+          (or (get-buffer "DevelMain.hs")
+              (if (y-or-n-p
+                   "You need to open a buffer named DevelMain.hs. Find now?")
+                  (ido-find-file)
+                (error "No DevelMain.hs buffer.")))
+        (let ((session (haskell-interactive-session)))
+          (let ((process (haskell-interactive-process)))
+            (haskell-process-queue-command
+             process
+             (make-haskell-command
+              :state (list :session session
+                           :process process
+                           :buffer (current-buffer))
+              :go (lambda (state)
+                    (haskell-process-send-string (plist-get state ':process)
+                                                 ":l DevelMain"))
+              :live (lambda (state buffer)
+                      (haskell-process-live-build (plist-get state ':process)
+                                                  buffer
+                                                  nil))
+              :complete (lambda (state response)
+                          (haskell-process-load-complete
+                           (plist-get state ':session)
+                           (plist-get state ':process)
+                           response
+                           nil
+                           (plist-get state ':buffer)
+                           (lambda (ok)
+                             (when ok
+                               (haskell-process-queue-without-filters
+                                (haskell-interactive-process)
+                                "DevelMain.update")
+                               (message "DevelMain updated."))))))))))
+    (haskell-mode-toggle-interactive-prompt-state t)))
 
 (provide 'haskell-load)
 ;;; haskell-load.el ends here
