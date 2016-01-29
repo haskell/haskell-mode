@@ -45,9 +45,6 @@
 (defvar haskell-interactive-mode-history (list))
 (make-variable-buffer-local 'haskell-interactive-mode-history)
 
-(defvar haskell-interactive-mode-completion-cache)
-(make-variable-buffer-local 'haskell-interactive-mode-completion-cache)
-
 (defvar haskell-interactive-mode-old-prompt-start
   nil
   "Mark used for the old beginning of the prompt.")
@@ -95,7 +92,6 @@ Key bindings:
   :group 'haskell-interactive
   (setq haskell-interactive-mode-history (list))
   (setq haskell-interactive-mode-history-index 0)
-  (setq haskell-interactive-mode-completion-cache nil)
 
   (setq next-error-function 'haskell-interactive-next-error-function)
   (add-hook 'completion-at-point-functions
@@ -1002,17 +998,13 @@ don't care when the thing completes as long as it's soonish."
   "Offer completions for partial expression between prompt and point"
   (when (haskell-interactive-at-prompt)
     (let* ((process (haskell-interactive-process))
-           (inp (haskell-interactive-mode-input-partial)))
-      (if (string= inp (car-safe haskell-interactive-mode-completion-cache))
-          (cdr haskell-interactive-mode-completion-cache)
-        (let* ((resp2 (haskell-process-get-repl-completions process inp))
-               (rlen (-  (length inp) (length (car resp2))))
-               (coll (append (if (string-prefix-p inp "import") '("import"))
-                             (if (string-prefix-p inp "let") '("let"))
-                             (cdr resp2)))
-               (result (list (- (point) rlen) (point) coll)))
-          (setq haskell-interactive-mode-completion-cache (cons inp result))
-          result)))))
+           (inp (haskell-interactive-mode-input-partial))
+           (resp2 (haskell-process-get-repl-completions process inp))
+           (rlen (-  (length inp) (length (car resp2))))
+           (coll (append (if (string-prefix-p inp "import") '("import"))
+                         (if (string-prefix-p inp "let") '("let"))
+                         (cdr resp2))))
+      (list (- (point) rlen) (point) coll))))
 
 (defun haskell-interactive-mode-trigger-compile-error (state response)
   "Look for an <interactive> compile error; if there is one, pop
