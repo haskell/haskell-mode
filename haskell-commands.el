@@ -6,7 +6,8 @@
 ;;; specific commands such as show type signature, show info, haskell process
 ;;; commands and etc.
 
-;; Copyright (c) 2014 Chris Done. All rights reserved.
+;; Copyright © 2014 Chris Done.  All rights reserved.
+;;             2016 Arthur Fayzrakhmanov
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -25,6 +26,7 @@
 
 (require 'cl-lib)
 (require 'etags)
+(require 'haskell-mode)
 (require 'haskell-compat)
 (require 'haskell-process)
 (require 'haskell-font-lock)
@@ -740,39 +742,53 @@ inferior GHCi process."
   (interactive)
   (let ((session (haskell-interactive-session))
         (changed nil))
-    (if (null (haskell-session-get session
-                                   'ignored-files))
+    (if (null (haskell-session-get session 'ignored-files))
         (message "Nothing to unignore!")
-      (cl-loop for file in (haskell-session-get session
-                                                'ignored-files)
-               do (cl-case (read-event
-                            (propertize (format "Set permissions? %s (y, n, v: stop and view file)"
-                                                file)
-                                        'face 'minibuffer-prompt))
-                    (?y
-                     (haskell-process-unignore-file session file)
-                     (setq changed t))
-                    (?v
-                     (find-file file)
-                     (cl-return))))
-      (when (and changed
-                 (y-or-n-p "Restart GHCi process now? "))
-        (haskell-process-restart)))))
+      (cl-loop for file in (haskell-session-get session 'ignored-files)
+               do
+               (haskell-mode-toggle-interactive-prompt-state)
+               (unwind-protect
+                   (progn
+                     (cl-case
+                         (read-event
+                          (propertize
+                           (format "Set permissions? %s (y, n, v: stop and view file)"
+                                   file)
+                           'face
+                           'minibuffer-prompt))
+                       (?y
+                        (haskell-process-unignore-file session file)
+                        (setq changed t))
+                       (?v
+                        (find-file file)
+                        (cl-return)))
+                     (when (and changed
+                                (y-or-n-p "Restart GHCi process now? "))
+                       (haskell-process-restart)))
+                 ;; unwind
+                 (haskell-mode-toggle-interactive-prompt-state t))))))
 
 ;;;###autoload
 (defun haskell-session-change-target (target)
   "Set the build TARGET for cabal REPL."
   (interactive
    (list
-     (completing-read "New build target: " (haskell-cabal-enum-targets)
-		      nil nil nil 'haskell-cabal-targets-history)))
+    (completing-read "New build target: "
+                     (haskell-cabal-enum-targets)
+                     nil
+                     nil
+                     nil
+                     'haskell-cabal-targets-history)))
   (let* ((session haskell-session)
          (old-target (haskell-session-get session 'target)))
     (when session
       (haskell-session-set-target session target)
-      (when (and (not (string= old-target target))
-                 (y-or-n-p "Target changed, restart haskell process?"))
-        (haskell-process-start session)))))
+      (when (not (string= old-target target))
+        (haskell-mode-toggle-interactive-prompt-state)
+        (unwind-protect
+            (when (y-or-n-p "Target changed, restart haskell process?")
+              (haskell-process-start session)))
+        (haskell-mode-toggle-interactive-prompt-state t)))))
 
 ;;;###autoload
 (defun haskell-mode-stylish-buffer ()

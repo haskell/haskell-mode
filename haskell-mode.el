@@ -1,13 +1,16 @@
 ;;; haskell-mode.el --- A Haskell editing mode    -*- coding: utf-8; lexical-binding: t -*-
 
-;; Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008  Free Software Foundation, Inc
-;; Copyright (C) 1992, 1997-1998  Simon Marlow, Graeme E Moss, and Tommy Thorn
+;; Copyright © 2003, 2004, 2005, 2006, 2007, 2008, 2016
+;;             Free Software Foundation, Inc
+
+;; Copyright © 1992, 1997-1998  Simon Marlow, Graeme E Moss, and Tommy Thorn
 
 ;; Author:  1992      Simon Marlow
 ;;          1997-1998 Graeme E Moss <gem@cs.york.ac.uk> and
 ;;                    Tommy Thorn <thorn@irisa.fr>,
 ;;          2001-2002 Reuben Thomas (>=v1.4)
 ;;          2003      Dave Love <fx@gnu.org>
+;;          2016      Arthur Fayzrakhmanov
 ;; Keywords: faces files Haskell
 ;; Version: 16.1-git
 ;; URL: https://github.com/haskell/haskell-mode
@@ -570,6 +573,10 @@ May return a qualified name."
 
 (defvar eldoc-print-current-symbol-info-function)
 
+(defvar haskell-mode-interactive-prompt-state nil
+  "Special variable indicating a state of user input waiting.")
+
+
 ;; For compatibility with Emacs < 24, derive conditionally
 (defalias 'haskell-parent-mode
   (if (fboundp 'prog-mode) 'prog-mode 'fundamental-mode))
@@ -956,7 +963,12 @@ successful, nil otherwise."
     (goto-char (point-min))
     (end-of-line)))
 
-
+(defun haskell-mode-toggle-interactive-prompt-state (&optional disabled)
+  "Set `haskell-mode-interactive-prompt-state' to t.
+If given DISABLED argument sets variable value to nil, otherwise to t."
+  (setq haskell-mode-interactive-prompt-state (not disabled)))
+
+
 ;; Provide ourselves:
 
 (provide 'haskell-mode)

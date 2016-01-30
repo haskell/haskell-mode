@@ -1,6 +1,7 @@
 ;;; haskell-cabal.el --- Support for Cabal packages -*- lexical-binding: t -*-
 
-;; Copyright (C) 2007, 2008  Stefan Monnier
+;; Copyright © 2007, 2008  Stefan Monnier
+;;             2016 Arthur Fayzrakhmanov
 
 ;; Author: Stefan Monnier <monnier@iro.umontreal.ca>
 
@@ -857,7 +858,7 @@ Source names from main-is and c-sources sections are left untouched
 )
 
 (defun haskell-cabal-find-or-create-source-file ()
-  "Open the source file this line refers to"
+  "Open the source file this line refers to."
   (interactive)
   (let* ((src-dirs (append (haskell-cabal-subsection-entry-list
                             (haskell-cabal-section) "hs-source-dirs")
@@ -868,17 +869,25 @@ Source names from main-is and c-sources sections are left untouched
       (let ((candidates
              (delq nil (mapcar
                         (lambda (dir)
-                          (let ((file (haskell-cabal-join-paths base-dir dir filename)))
+                          (let ((file (haskell-cabal-join-paths base-dir
+                                                                dir
+                                                                filename)))
                             (when (and (file-readable-p file)
                                        (not (file-directory-p file)))
                               file)))
                         src-dirs))))
         (if (null candidates)
-            (let* ((src-dir (haskell-cabal-join-paths base-dir (or (car src-dirs) "")))
-                   (newfile (haskell-cabal-join-paths src-dir filename))
-                   (do-create-p (y-or-n-p (format "Create file %s ?" newfile))))
-              (when do-create-p
-                (find-file-other-window newfile )))
+            (unwind-protect
+                (progn
+                  (haskell-mode-toggle-interactive-prompt-state)
+                  (let* ((src-dir
+                          (haskell-cabal-join-paths base-dir
+                                                    (or (car src-dirs) "")))
+                         (newfile (haskell-cabal-join-paths src-dir filename))
+                         (do-create-p (y-or-n-p (format "Create file %s ?" newfile))))
+                    (when do-create-p
+                      (find-file-other-window newfile ))))
+              (haskell-mode-toggle-interactive-prompt-state t))
           (find-file-other-window (car candidates)))))))
 
 
@@ -986,40 +995,50 @@ Source names from main-is and c-sources sections are left untouched
                      'haskell-cabal-sort-lines-key-fun)))))))
 
 (defun haskell-cabal-add-build-dependency (dependency &optional sort silent)
-  "Add the given build dependency to every section"
+  "Add the given DEPENDENCY to every section in cabal file.
+If SORT argument is given sort dependencies in section after update.
+Pass SILENT argument to update all sections without asking user."
   (haskell-cabal-map-sections
    (lambda (section)
      (when (haskell-cabal-source-section-p section)
-       (when (or silent
-                 (y-or-n-p (format  "Add dependency %s to %s section %s?"
-                                    dependency
-                                    (haskell-cabal-section-name section)
-                                    (haskell-cabal-section-value section))))
-         (haskell-cabal-section-add-build-dependency dependency sort section)
-         nil)))))
+       (unwind-protect
+           (progn
+             (when
+                 (or silent
+                     (y-or-n-p (format  "Add dependency %s to %s section %s?"
+                                        dependency
+                                        (haskell-cabal-section-name section)
+                                        (haskell-cabal-section-value section))))
+               (haskell-cabal-section-add-build-dependency dependency
+                                                           sort
+                                                           section))
+             nil)
+         (haskell-mode-toggle-interactive-prompt-state t))))))
 
-(defun haskell-cabal-add-dependency (package &optional version no-prompt
-                                                   sort silent)
-  "Add PACKAGE (and optionally suffix -VERSION) to the cabal
-file. Prompts the user before doing so.
-
+(defun haskell-cabal-add-dependency
+    (package &optional version no-prompt sort silent)
+  "Add PACKAGE to the cabal file.
 If VERSION is non-nil it will be appended as a minimum version.
-If NO-PROMPT is nil the minimum-version is read from the minibuffer
-When SORT is non-nil the package entries are sorted afterwards
-If SILENT ist nil the user is prompted for each source-section
-"
+If NO-PROMPT is nil the minimum package version is read from the
+minibuffer.  When SORT is non-nil the package entries are sorted
+afterwards.  If SILENT is non-nil the user is prompted for each
+source-section."
   (interactive
-   (list (read-from-minibuffer "Package entry: ")
-         nil t t nil))
-  (save-window-excursion
-    (find-file-other-window (haskell-cabal-find-file))
-    (let ((entry (if no-prompt package
-                   (read-from-minibuffer
-                    "Package entry: "
-                    (concat package (if version (concat " >= " version) ""))))))
-      (haskell-cabal-add-build-dependency entry sort silent)
-      (when (or silent (y-or-n-p "Save cabal file?"))
-        (save-buffer)))))
+   (list (read-from-minibuffer "Package entry: ") nil t t nil))
+  (haskell-mode-toggle-interactive-prompt-state)
+  (unwind-protect
+      (save-window-excursion
+        (find-file-other-window (haskell-cabal-find-file))
+        (let ((entry (if no-prompt package
+                       (read-from-minibuffer
+                        "Package entry: "
+                        (concat package
+                                (if version (concat " >= " version) ""))))))
+          (haskell-cabal-add-build-dependency entry sort silent)
+          (when (or silent (y-or-n-p "Save cabal file?"))
+            (save-buffer))))
+    ;; unwind
+    (haskell-mode-toggle-interactive-prompt-state t)))
 
 (provide 'haskell-cabal)
 

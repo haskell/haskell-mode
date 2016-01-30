@@ -1,7 +1,8 @@
 ;;; haskell-doc.el --- show function types in echo area  -*- coding: utf-8; lexical-binding: t -*-
 
-;; Copyright (C) 2004, 2005, 2006, 2007, 2009  Free Software Foundation, Inc.
-;; Copyright (C) 1997  Hans-Wolfgang Loidl
+;; Copyright © 2004, 2005, 2006, 2007, 2009, 2016  Free Software Foundation, Inc.
+;; Copyright © 1997  Hans-Wolfgang Loidl
+;;             2016  Arthur Fayzrakhmanov
 
 ;; Author: Hans-Wolfgang Loidl <hwloidl@dcs.glasgow.ac.uk>
 ;; Temporary Maintainer and Hacker: Graeme E Moss <gem@cs.york.ac.uk>
@@ -1424,6 +1425,7 @@ is not."
 This function is run by an idle timer to print the type
  automatically if `haskell-doc-mode' is turned on."
   (and haskell-doc-mode
+       (not haskell-mode-interactive-prompt-state)
        (not (eobp))
        (not executing-kbd-macro)
        ;; Having this mode operate in the minibuffer makes it impossible to

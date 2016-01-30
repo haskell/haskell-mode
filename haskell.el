@@ -1,6 +1,7 @@
 ;;; haskell.el --- Top-level Haskell package -*- lexical-binding: t -*-
 
-;; Copyright (c) 2014 Chris Done. All rights reserved.
+;; Copyright © 2014 Chris Done.  All rights reserved.
+;;             2016 Arthur Fayzrakhmanov
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -14,6 +15,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
 
 ;;; Code:
 
@@ -132,40 +135,49 @@
   "Kill the session process and buffer, delete the session.
 0. Prompt to kill all associated buffers.
 1. Kill the process.
-2. Kill the interactive buffer.
+2. Kill the interactive buffer unless LEAVE-INTERACTIVE-BUFFER is not given.
 3. Walk through all the related buffers and set their haskell-session to nil.
 4. Remove the session from the sessions list."
   (interactive)
-  (let* ((session (haskell-session))
-         (name (haskell-session-name session))
-         (also-kill-buffers
-          (and haskell-ask-also-kill-buffers
-               (y-or-n-p (format "Killing `%s'. Also kill all associated buffers?" name)))))
-    (haskell-kill-session-process session)
-    (unless leave-interactive-buffer
-      (kill-buffer (haskell-session-interactive-buffer session)))
-    (cl-loop for buffer in (buffer-list)
-             do (with-current-buffer buffer
-                  (when (and (boundp 'haskell-session)
-                             (string= (haskell-session-name haskell-session) name))
-                    (setq haskell-session nil)
-                    (when also-kill-buffers
-                      (kill-buffer)))))
-    (setq haskell-sessions
-          (cl-remove-if (lambda (session)
-                          (string= (haskell-session-name session)
-                                   name))
-                        haskell-sessions))))
+  (haskell-mode-toggle-interactive-prompt-state)
+  (unwind-protect
+      (let* ((session (haskell-session))
+             (name (haskell-session-name session))
+             (also-kill-buffers
+              (and haskell-ask-also-kill-buffers
+                   (y-or-n-p
+                    (format "Killing `%s'. Also kill all associated buffers?"
+                            name)))))
+        (haskell-kill-session-process session)
+        (unless leave-interactive-buffer
+          (kill-buffer (haskell-session-interactive-buffer session)))
+        (cl-loop for buffer in (buffer-list)
+                 do (with-current-buffer buffer
+                      (when (and (boundp 'haskell-session)
+                                 (string= (haskell-session-name haskell-session)
+                                          name))
+                        (setq haskell-session nil)
+                        (when also-kill-buffers
+                          (kill-buffer)))))
+        (setq haskell-sessions
+              (cl-remove-if (lambda (session)
+                              (string= (haskell-session-name session)
+                                       name))
+                            haskell-sessions)))
+    (haskell-mode-toggle-interactive-prompt-state t)))
 
 ;;;###autoload
 (defun haskell-interactive-kill ()
   "Kill the buffer and (maybe) the session."
   (interactive)
   (when (eq major-mode 'haskell-interactive-mode)
-    (when (and (boundp 'haskell-session)
-               haskell-session
-               (y-or-n-p "Kill the whole session?"))
-      (haskell-session-kill t))))
+    (haskell-mode-toggle-interactive-prompt-state)
+    (unwind-protect
+        (when (and (boundp 'haskell-session)
+                   haskell-session
+                   (y-or-n-p "Kill the whole session?"))
+          (haskell-session-kill t)))
+    (haskell-mode-toggle-interactive-prompt-state t)))
 
 (defun haskell-session-make (name)
   "Make a Haskell session."
@@ -182,9 +194,12 @@
 If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
   (let ((name (haskell-session-default-name)))
     (unless (haskell-session-lookup name)
-      (if (or (not haskell-process-load-or-reload-prompt)
-	      (y-or-n-p (format "Start a new project named “%s”? " name)))
-	    (haskell-session-make name)))))
+      (haskell-mode-toggle-interactive-prompt-state)
+      (unwind-protect
+          (if (or (not haskell-process-load-or-reload-prompt)
+                  (y-or-n-p (format "Start a new project named “%s”? " name)))
+              (haskell-session-make name))
+        (haskell-mode-toggle-interactive-prompt-state t)))))
 
 ;;;###autoload
 (defun haskell-session ()
@@ -212,10 +227,15 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
   (let ((name (read-from-minibuffer "Project name: " (haskell-session-default-name))))
     (when (not (string= name ""))
       (let ((session (haskell-session-lookup name)))
-        (if session
-            (when (y-or-n-p (format "Session %s already exists. Use it?" name))
-              session)
-          (haskell-session-make name))))))
+        (haskell-mode-toggle-interactive-prompt-state)
+        (unwind-protect
+            (if session
+                (when
+                    (y-or-n-p
+                     (format "Session %s already exists. Use it?" name))
+                  session)
+              (haskell-session-make name)))
+        (haskell-mode-toggle-interactive-prompt-state t)))))
 
 ;;;###autoload
 (defun haskell-session-change ()
@@ -226,44 +246,60 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
                               (haskell-session-new))))
 
 (defun haskell-process-prompt-restart (process)
-  "Prompt to restart the died process."
+  "Prompt to restart the died PROCESS."
   (let ((process-name (haskell-process-name process)))
     (if haskell-process-suggest-restart
-        (cond
-         ((string-match "You need to re-run the 'configure' command."
-                        (haskell-process-response process))
-          (cl-case (read-event
-                    (concat "The Haskell process ended. Cabal wants you to run "
-                            (propertize "cabal configure" 'face 'font-lock-keyword-face)
-                            " because there is a version mismatch. Re-configure (y, n, l: view log)?"
-                            "\n\n"
-                            "Cabal said:\n\n"
-                            (propertize (haskell-process-response process)
-                                        'face 'font-lock-comment-face)))
-            (?y (let ((default-directory (haskell-session-cabal-dir (haskell-process-session process))))
-                  (message "%s" (shell-command-to-string "cabal configure"))))
-            (?l (let* ((response (haskell-process-response process))
-                       (buffer (get-buffer "*haskell-process-log*")))
-                  (if buffer
-                      (switch-to-buffer buffer)
-                    (progn (switch-to-buffer (get-buffer-create "*haskell-process-log*"))
-                           (insert response)))))
-            (?n)))
-         (t
-          (cl-case (read-event
-                    (propertize (format "The Haskell process `%s' has died. Restart? (y, n, l: show process log)"
-                                        process-name)
-                                'face 'minibuffer-prompt))
-            (?y (haskell-process-start (haskell-process-session process)))
-            (?l (let* ((response (haskell-process-response process))
-                       (buffer (get-buffer "*haskell-process-log*")))
-                  (if buffer
-                      (switch-to-buffer buffer)
-                    (progn (switch-to-buffer (get-buffer-create "*haskell-process-log*"))
-                           (insert response)))))
-            (?n))))
-      (message (format "The Haskell process `%s' is dearly departed."
-                       process-name)))))
+        (progn
+          (haskell-mode-toggle-interactive-prompt-state)
+          (unwind-protect
+              (cond
+               ((string-match "You need to re-run the 'configure' command."
+                              (haskell-process-response process))
+                (cl-case (read-event
+                          (concat
+                           "The Haskell process ended. Cabal wants you to run "
+                           (propertize "cabal configure"
+                                       'face
+                                       'font-lock-keyword-face)
+                           " because there is a version mismatch. Re-configure (y, n, l: view log)?"
+                           "\n\n"
+                           "Cabal said:\n\n"
+                           (propertize (haskell-process-response process)
+                                       'face
+                                       'font-lock-comment-face)))
+                  (?y (let ((default-directory
+                              (haskell-session-cabal-dir
+                               (haskell-process-session process))))
+                        (message "%s"
+                                 (shell-command-to-string "cabal configure"))))
+                  (?l (let* ((response (haskell-process-response process))
+                             (buffer (get-buffer "*haskell-process-log*")))
+                        (if buffer
+                            (switch-to-buffer buffer)
+                          (progn (switch-to-buffer
+                                  (get-buffer-create "*haskell-process-log*"))
+                                 (insert response)))))
+                  (?n)))
+               (t
+                (cl-case (read-event
+                          (propertize
+                           (format "The Haskell process `%s' has died. Restart? (y, n, l: show process log)"
+                                   process-name)
+                           'face
+                           'minibuffer-prompt))
+                  (?y (haskell-process-start (haskell-process-session process)))
+                  (?l (let* ((response (haskell-process-response process))
+                             (buffer (get-buffer "*haskell-process-log*")))
+                        (if buffer
+                            (switch-to-buffer buffer)
+                          (progn (switch-to-buffer
+                                  (get-buffer-create "*haskell-process-log*"))
+                                 (insert response)))))
+                  (?n))))
+            ;; unwind
+            (haskell-mode-toggle-interactive-prompt-state t)))
+      (message
+       (format "The Haskell process `%s' is dearly departed." process-name)))))
 
 (defun haskell-process ()
   "Get the current process from the current session."
@@ -520,3 +556,4 @@ for various things, but is optional."
                t))))))
 
 (provide 'haskell)
+;;; haskell.el ends here

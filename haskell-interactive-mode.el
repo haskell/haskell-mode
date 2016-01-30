@@ -1,6 +1,7 @@
 ;;; haskell-interactive-mode.el --- The interactive Haskell mode -*- lexical-binding: t -*-
 
-;; Copyright (C) 2011-2012  Chris Done
+;; Copyright © 2011-2012  Chris Done
+;;             2016       Arthur Fayzrakhmanov
 
 ;; Author: Chris Done <chrisdone@gmail.com>
 
@@ -27,6 +28,7 @@
 
 ;;; Code:
 
+(require 'haskell-mode)
 (require 'haskell-compile)
 (require 'haskell-navigate-imports)
 (require 'haskell-process)
@@ -548,49 +550,61 @@ FILE-NAME only."
     span))
 
 (defun haskell-process-suggest-add-package (session msg)
-  "Add the (matched) module to your cabal file."
+  "Add tthe (matched) module to your cabal file.
+Cabal file is selected using SESSION's name, module matching is done in MSG."
   (let* ((suggested-package (match-string 1 msg))
          (package-name (replace-regexp-in-string "-[^-]+$" "" suggested-package))
          (version (progn (string-match "\\([^-]+\\)$" suggested-package)
                          (match-string 1 suggested-package)))
          (cabal-file (concat (haskell-session-name session)
                              ".cabal")))
-    (when (y-or-n-p
-           (format "Add `%s' to %s?"
-                   package-name
-                   cabal-file))
-      (haskell-cabal-add-dependency package-name version nil t)
-      (when (y-or-n-p (format "Enable -package %s in the GHCi session?" package-name))
-        (haskell-process-queue-without-filters (haskell-session-process session)
-                                               (format ":set -package %s" package-name))))))
+    (haskell-mode-toggle-interactive-prompt-state)
+    (unwind-protect
+        (when (y-or-n-p
+               (format "Add `%s' to %s?"
+                       package-name
+                       cabal-file))
+          (haskell-cabal-add-dependency package-name version nil t)
+          (when (y-or-n-p (format "Enable -package %s in the GHCi session?" package-name))
+            (haskell-process-queue-without-filters
+             (haskell-session-process session)
+             (format ":set -package %s" package-name))))
+      (haskell-mode-toggle-interactive-prompt-state t))))
 
 (defun haskell-process-suggest-remove-import (session file import line)
-  "Suggest removing or commenting out IMPORT on LINE."
+  "Suggest removing or commenting out import statement.
+Asks user to handle redundant import statement using interactive
+SESSION in specified FILE to remove IMPORT on given LINE."
   (let ((first t))
-    (cl-case (read-event
-              (propertize (format "%sThe import line `%s' is redundant. Remove? (y, n, c: comment out)  "
-                                  (if (not first)
-                                      "Please answer n, y or c: "
-                                    "")
-                                  import)
-                          'face 'minibuffer-prompt))
-      (?y
-       (haskell-process-find-file session file)
-       (save-excursion
-         (goto-char (point-min))
-         (forward-line (1- line))
-         (goto-char (line-beginning-position))
-         (delete-region (line-beginning-position)
-                        (line-end-position))))
-      (?n
-       (message "Ignoring redundant import %s" import))
-      (?c
-       (haskell-process-find-file session file)
-       (save-excursion
-         (goto-char (point-min))
-         (forward-line (1- line))
-         (goto-char (line-beginning-position))
-         (insert "-- "))))))
+    (haskell-mode-toggle-interactive-prompt-state)
+    (unwind-protect
+        (cl-case (read-event
+                  (propertize (format "%sThe import line `%s' is redundant. Remove? (y, n, c: comment out)  "
+                                      (if (not first)
+                                          "Please answer n, y or c: "
+                                        "")
+                                      import)
+                              'face
+                              'minibuffer-prompt))
+          (?y
+           (haskell-process-find-file session file)
+           (save-excursion
+             (goto-char (point-min))
+             (forward-line (1- line))
+             (goto-char (line-beginning-position))
+             (delete-region (line-beginning-position)
+                            (line-end-position))))
+          (?n
+           (message "Ignoring redundant import %s" import))
+          (?c
+           (haskell-process-find-file session file)
+           (save-excursion
+             (goto-char (point-min))
+             (forward-line (1- line))
+             (goto-char (line-beginning-position))
+             (insert "-- "))))
+      ;; unwind
+      (haskell-mode-toggle-interactive-prompt-state t))))
 
 (defun haskell-process-find-file (session file)
   "Find the given file in the project."
@@ -601,13 +615,18 @@ FILE-NAME only."
                    (t file))))
 
 (defun haskell-process-suggest-pragma (session pragma extension file)
-  "Suggest to add something to the top of the file."
+  "Suggest to add something to the top of the file.
+SESSION is used to search given file.  Adds PRAGMA and EXTENSION
+wrapped in compiler directive at the top of FILE."
   (let ((string  (format "{-# %s %s #-}" pragma extension)))
-    (when (y-or-n-p (format "Add %s to the top of the file? " string))
-      (haskell-process-find-file session file)
-      (save-excursion
-        (goto-char (point-min))
-        (insert (concat string "\n"))))))
+    (haskell-mode-toggle-interactive-prompt-state)
+    (unwind-protect
+        (when (y-or-n-p (format "Add %s to the top of the file? " string))
+          (haskell-process-find-file session file)
+          (save-excursion
+            (goto-char (point-min))
+            (insert (concat string "\n"))))
+      (haskell-mode-toggle-interactive-prompt-state t))))
 
 (defun haskell-interactive-mode-insert-error (response)
   "Insert an error message."
