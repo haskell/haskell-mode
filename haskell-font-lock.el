@@ -206,7 +206,10 @@ Regexp match data 0 points to the chars."
 	  ;; no face.  So force evaluation by using `keep'.
 	  keep)))))
 
-(defconst haskell-font-lock-keywords
+(defun haskell-font-lock-keywords ()
+  ;; this has to be a function because it depends on global value of
+  ;; `haskell-font-lock-symbols'
+  "Generate font lock eywords."
   (let* (;; Bird-style literate scripts start a line of code with
          ;; "^>", otherwise a line of code starts with "^".
          (line-prefix "^\\(?:> ?\\)?")
@@ -324,8 +327,7 @@ Regexp match data 0 points to the chars."
                              (not (member (match-string 0) '("::" "∷"))))
                         'haskell-constructor-face
                       'haskell-operator-face))))
-    keywords)
-  "Font lock definitions for literate and non-literate Haskell.")
+    keywords))
 
 
 (defun haskell-font-lock-fontify-block (lang-mode start end)
@@ -418,7 +420,7 @@ Regexp match data 0 points to the chars."
 (defun haskell-font-lock-defaults-create ()
   "Locally set `font-lock-defaults' for Haskell."
   (set (make-local-variable 'font-lock-defaults)
-       '(haskell-font-lock-keywords
+       '((haskell-font-lock-keywords)
          nil nil nil nil
          (font-lock-syntactic-face-function
           . haskell-syntactic-face-function)
