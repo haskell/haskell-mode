@@ -485,7 +485,7 @@ function and remove this comment.
   "Call the command's complete function."
   (let ((comp-func (haskell-command-complete command)))
     (when comp-func
-      (condition-case e
+      (condition-case-unless-debug e
           (funcall comp-func
                    (haskell-command-state command)
                    response)
