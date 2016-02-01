@@ -537,7 +537,7 @@ When MODULE-BUFFER is non-NIL, paint error overlays."
                   session
                   error-msg
                   file
-                  (plist-get (haskell-process-parse-error final-msg) :line))
+                  line)
                  t)))))))
 
 (defun haskell-interactive-show-load-message (session type module-name file-name echo th)
