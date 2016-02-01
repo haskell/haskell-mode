@@ -98,7 +98,9 @@
      (1 font-lock-keyword-face) (2 font-lock-constant-face))
     ("^ *\\(if\\)[ \t]+.*\\({\\|$\\)" (1 font-lock-keyword-face))
     ("^ *\\(}[ \t]*\\)?\\(else\\)[ \t]*\\({\\|$\\)"
-     (2 font-lock-keyword-face))))
+     (2 font-lock-keyword-face))
+    ("\\<\\(?:True\\|False\\)\\>"
+     (0 font-lock-constant-face))))
 
 (defvar haskell-cabal-buffers nil
   "List of Cabal buffers.")
