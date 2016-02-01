@@ -581,7 +581,7 @@ SESSION in specified FILE to remove IMPORT on given LINE."
         (cl-case (read-event
                   (propertize (format "%sThe import line `%s' is redundant. Remove? (y, n, c: comment out)  "
                                       (if (not first)
-                                          "Please answer n, y or c: "
+                                          "Please answer y, n or c: "
                                         "")
                                       import)
                               'face
@@ -591,9 +591,9 @@ SESSION in specified FILE to remove IMPORT on given LINE."
            (save-excursion
              (goto-char (point-min))
              (forward-line (1- line))
-             (goto-char (line-beginning-position))
-             (delete-region (line-beginning-position)
-                            (line-end-position))))
+             (let ((bounds (haskell-interactive-mode--import-statement-bounds)))
+               (delete-region (car bounds) (cdr bounds))
+               (kill-line 1))))
           (?n
            (message "Ignoring redundant import %s" import))
           (?c
@@ -601,10 +601,27 @@ SESSION in specified FILE to remove IMPORT on given LINE."
            (save-excursion
              (goto-char (point-min))
              (forward-line (1- line))
-             (goto-char (line-beginning-position))
-             (insert "-- "))))
+             (let ((bounds (haskell-interactive-mode--import-statement-bounds)))
+               (comment-region (car bounds) (cdr bounds))))))
       ;; unwind
       (haskell-mode-toggle-interactive-prompt-state t))))
+
+(defun haskell-interactive-mode--import-statement-bounds ()
+  "For internal use in `haskell-process-suggest-remove-import'.
+This function supposed to be called having point placed on first
+line of import statement, if this is a case it search import
+statement bounds relying on layout and returns them as cons cell;
+otherwise returns nil."
+  (save-excursion
+    (goto-char (line-beginning-position))
+    (when (looking-at-p (regexp-quote "import"))
+      (let ((a (point))
+            (z (line-end-position)))
+        (forward-line 1)
+        (while (looking-at-p (rx (and not-newline (1+ whitespace))))
+          (setq z (line-end-position))
+          (forward-line 1))
+        (cons a z)))))
 
 (defun haskell-process-find-file (session file)
   "Find the given file in the project."
