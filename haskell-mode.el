@@ -830,7 +830,8 @@ Note that negative arguments do not work so well."
 
 (defcustom haskell-indent-spaces 2
   "Number of spaces to indent inwards."
-  :group 'haskell)
+  :group 'haskell
+  :type 'integer)
 
 ;; Like Python.  Should be abstracted, sigh.
 (defun haskell-check (command)
