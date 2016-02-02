@@ -123,7 +123,7 @@ actual Emacs buffer of the module being loaded."
         (haskell-mode-message-line (if reload "Reloaded OK." "OK."))
       (haskell-interactive-mode-compile-error session "Compilation failed."))
     (when cont
-      (condition-case e
+      (condition-case-unless-debug e
           (funcall cont ok)
         (error (message "%S" e))
         (quit nil)))))
