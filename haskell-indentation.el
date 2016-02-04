@@ -648,8 +648,10 @@ For example
            (haskell-indentation-add-indentation current-indent)
            (throw 'parse-end nil)))
         ((string= current-token "=")
-         (haskell-indentation-separated
-          #'haskell-indentation-expression "|" "deriving"))
+         (haskell-indentation-with-starter
+          (lambda ()
+            (haskell-indentation-separated
+             #'haskell-indentation-expression "|" "deriving"))))
         ((string= current-token "where")
          (haskell-indentation-with-starter
           #'haskell-indentation-expression-layout nil))))
