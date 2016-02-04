@@ -896,13 +896,13 @@ foo x
               (2 2)
               (3 2))
 
-(hindent-test "55 data constructor on separate line" "
+(hindent-test "55* data constructor on separate line" "
 data Foo = Bar
          | Baz"
               (1 0)
               (2 9))
 
-(hindent-test "55a deriving below aligned data constructors" "
+(hindent-test "55a* deriving below aligned data constructors" "
 data Foo = Bar
          | Baz
          deriving (Show)"
