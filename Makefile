@@ -68,7 +68,6 @@ ELFILES = \
 	haskell-mode.el \
 	haskell-move-nested.el \
 	haskell-navigate-imports.el \
-	haskell-package.el \
 	haskell-presentation-mode.el \
 	haskell-process.el \
 	haskell-repl.el \
