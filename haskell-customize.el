@@ -115,19 +115,28 @@ when showing type information about symbols."
 
 (defcustom haskell-process-path-ghci
   "ghci"
-  "The path for starting ghci."
+  "The path for starting ghci.
+This can either be a single string or a list of strings, where the
+first elements is a string and the remaining elements are arguments,
+which will be prepended to `haskell-process-args-ghci'."
   :group 'haskell-interactive
   :type '(choice string (repeat string)))
 
 (defcustom haskell-process-path-cabal
   "cabal"
-  "Path to the `cabal' executable."
+  "Path to the `cabal' executable.
+This can either be a single string or a list of strings, where the
+first elements is a string and the remaining elements are arguments,
+which will be prepended to `haskell-process-args-cabal-repl'."
   :group 'haskell-interactive
   :type '(choice string (repeat string)))
 
 (defcustom haskell-process-path-stack
   "stack"
-  "The path for starting stack."
+  "The path for starting stack.
+This can either be a single string or a list of strings, where the
+first elements is a string and the remaining elements are arguments,
+which will be prepended to `haskell-process-args-stack-ghci'."
   :group 'haskell-interactive
   :type '(choice string (repeat string)))
 
