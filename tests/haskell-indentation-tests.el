@@ -664,7 +664,7 @@ instance Bar Int
 (hindent-test "32 allow type operators" "
 data (:.) a b = a :. b
 "
-	      (2 0 2))
+	      (2 0 16))
 
 (hindent-test "33* parse #else in CPP" "
 #ifdef FLAG
@@ -681,7 +681,7 @@ data T = T {
 }
 
 "
-              (5 0 2))
+              (5 0 9))
 
 (hindent-test "35 baroque construct which causes parse error" "
 az = Projection
@@ -854,7 +854,7 @@ newtype instance T Char = TC Bool"
               (1 0)
               (2 0)
               (3 0)
-              (4 0 2))
+              (4 0 26))
 
 (hindent-test "52a* module simplest case two lines" "
 module A.B
@@ -896,13 +896,13 @@ foo x
               (2 2)
               (3 2))
 
-(hindent-test "55* data constructor on separate line" "
+(hindent-test "55 data constructor on separate line" "
 data Foo = Bar
          | Baz"
               (1 0)
               (2 9))
 
-(hindent-test "55a* deriving below aligned data constructors" "
+(hindent-test "55a deriving below aligned data constructors" "
 data Foo = Bar
          | Baz
          deriving (Show)"
