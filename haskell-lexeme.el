@@ -140,9 +140,11 @@ strictly only escape sequences defined in Haskell Report.")
 (defconst haskell-lexeme-string-literal
   (rx (: (group "\"")
          (group (* (| (regexp "\\\\[ \t\n\r\v\f]*\\\\")
-                      "\\\""
-                      (regexp "[^\"\n]"))))
-         (group (| "\"" (regexp "$")))))
+                      (regexp "\\\\[ \t\n\r\v\f]+")
+                      (regexp "\\\\[^ \t\n\r\v\f]")
+                      (regexp "[^\"\n\\]"))))
+         (group (| "\"" (regexp "$") (regexp "\\\\?\\'")
+                   ))))
   "Regexp matching a string literal lookalike.
 
 Note that `haskell-lexeme-string-literal' matches more than
@@ -237,7 +239,13 @@ symbol or identifier can be done with:
    (haskell-lexeme-classify-by-first-char (char-after (match-beginning 1)))
 
 See `haskell-lexeme-classify-by-first-char' for details."
-  (skip-syntax-forward "->")
+  (while
+      ;; Due to how unterminated strings terminate at newline, some
+      ;; newlines have syntax set to generic string delimeter. We want
+      ;; those to be treated as whitespace anyway
+      (or
+       (> (skip-syntax-forward "->") 0)
+       (> (skip-chars-forward "\n") 0)))
   (let
       ((case-fold-search nil)
        (point (point-marker)))

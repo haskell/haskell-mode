@@ -185,6 +185,13 @@ order."
    '("\"\\\\\"")
    '("\"\\\\\"")))
 
+(ert-deftest haskell-lexeme-string-literal-8 ()
+  (check-lexemes
+   '("foo = \"zonk"
+     "       Cons")
+   '("foo" "=" "\"zonk"
+     "Cons")))
+
 (ert-deftest haskell-lexeme-line-comment-1 ()
   (check-lexemes
    '("   -- x  "
