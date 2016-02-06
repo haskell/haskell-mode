@@ -5,7 +5,7 @@
 (require 'haskell-mode)
 (require 'haskell-font-lock)
 
-(defun check-lexemes (lines lexemes &optional literate)
+(defun check-lexemes (lines-or-contents lexemes &optional literate)
   "Checks if tokenization works as expected.
 
 LINES is a list of strings that will be inserted to a new
@@ -22,9 +22,11 @@ order."
         (literate-haskell-mode)
       (haskell-mode))
 
-    (dolist (line lines)
-      (insert line)
-      (insert "\n"))
+    (if (consp lines-or-contents)
+        (dolist (line lines-or-contents)
+          (insert line)
+          (insert "\n"))
+      (insert lines-or-contents))
 
     (font-lock-fontify-buffer)
 
@@ -234,15 +236,13 @@ order."
    '("[xml| <xml /> |]" "|" "]")))
 
 (ert-deftest haskell-lexeme-quasi-quote-3 ()
-  :expected-result :failed
   (check-lexemes
-   '("[xml| <xml /> |")
+   "[xml| <xml /> |"
    '("[xml| <xml /> |")))
 
 (ert-deftest haskell-lexeme-quasi-quote-4 ()
-  :expected-result :failed
   (check-lexemes
-   '("[xml| <xml />")
+   "[xml| <xml />"
    '("[xml| <xml />")))
 
 (ert-deftest haskell-lexeme-literate-1 ()

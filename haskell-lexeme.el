@@ -167,12 +167,12 @@ Regexp has subgroup expressions:
                     (group (* (| (not (any "|"))
                                  (: "|" (not (any "]"))))
                               ))
-                    (group "|")
-                    "]"))
+                    (group (| "|" eos))
+                    (| "]" eos)))
   "Regexp matching a quasi quote literal.
 
 Quasi quotes start with '[xxx|' or '[$xxx|' sequence and end with
-'|]'. The 'xxx' is quoter name There is no escaping mechanism
+'|]'. The 'xxx' is a quoter name. There is no escaping mechanism
 provided for the ending sequence.
 
 Regexp has subgroup expressions:
