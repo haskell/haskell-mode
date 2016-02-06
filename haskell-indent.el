@@ -1499,15 +1499,15 @@ One indentation cycle is used."
     ;; (define-key map "\177"  'backward-delete-char-untabify)
     ;; The binding to TAB is already handled by indent-line-function.  --Stef
     ;; (define-key map "\t"    'haskell-indent-cycle)
-    (define-key map [?\C-c ?\C-=] 'haskell-indent-insert-equal)
-    (define-key map [?\C-c ?\C-|] 'haskell-indent-insert-guard)
+    (define-key map (kbd "C-c C-=") 'haskell-indent-insert-equal)
+    (define-key map (kbd "C-c C-|") 'haskell-indent-insert-guard)
     ;; Alternate binding, in case C-c C-| is too inconvenient to type.
     ;; Duh, C-g is a special key, let's not use it here.
-    ;; (define-key map [?\C-c ?\C-g] 'haskell-indent-insert-guard)
-    (define-key map [?\C-c ?\C-o] 'haskell-indent-insert-otherwise)
-    (define-key map [?\C-c ?\C-w] 'haskell-indent-insert-where)
-    (define-key map [?\C-c ?\C-.] 'haskell-indent-align-guards-and-rhs)
-    (define-key map [?\C-c ?\C->] 'haskell-indent-put-region-in-literate)
+    ;; (define-key map (kbd "C-c C-g") 'haskell-indent-insert-guard)
+    (define-key map (kbd "C-c C-o") 'haskell-indent-insert-otherwise)
+    (define-key map (kbd "C-c C-w") 'haskell-indent-insert-where)
+    (define-key map (kbd "C-c C-.") 'haskell-indent-align-guards-and-rhs)
+    (define-key map (kbd "C-c C->") 'haskell-indent-put-region-in-literate)
     map))
 
 ;;;###autoload
