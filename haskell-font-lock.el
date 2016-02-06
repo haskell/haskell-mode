@@ -379,23 +379,22 @@ Regexp match data 0 points to the chars."
             ;; fontify normally as string because lang-mode is not present
             'haskell-quasi-quote-face))
       (save-excursion
-        (parse-partial-sexp (point) (point-max) nil nil state
-                            'syntax-table)
+        (let
+            ((state2
+              (parse-partial-sexp (point) (point-max) nil nil state
+                                  'syntax-table))
+             (end-of-string (point)))
 
-        (put-text-property (nth 8 state) (point)
-                           'face 'font-lock-string-face)
-
-        (when nil
           (put-text-property (nth 8 state) (point)
-                             'font-lock-multiline t))
+                             'face 'font-lock-string-face)
 
-        (if (or (eobp) (equal t (nth 3 state)))
-            ;; This is unterminated string constant, use warning face
-            ;; for the opening quote
-            (put-text-property (nth 8 state) (1+ (nth 8 state))
-                               'face 'font-lock-warning-face))
 
-        (let ((end-of-string (point)))
+          (if (or (equal t (nth 3 state)) (nth 3 state2))
+              ;; This is an unterminated string constant, use warning
+              ;; face for the opening quote.
+              (put-text-property (nth 8 state) (1+ (nth 8 state))
+                                 'face 'font-lock-warning-face))
+
           (goto-char (1+ (nth 8 state)))
           (while (re-search-forward "\\\\" end-of-string t)
 
