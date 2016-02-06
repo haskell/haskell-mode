@@ -263,7 +263,7 @@ To jump to your import list, run
 It's nicer to have a keybinding to do this, for example:
 
 @lisp
-(define-key haskell-mode-map [f8] 'haskell-navigate-imports)
+(define-key haskell-mode-map (kbd "<f8>") 'haskell-navigate-imports)
 @end lisp
 
 You can hit it repeatedly to jump between groups of imports. It will

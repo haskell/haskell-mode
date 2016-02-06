@@ -36,7 +36,7 @@
 ;; Example usage:
 
 ;; (require 'haskell-navigate-imports)
-;; (define-key haskell-mode-map [f8] 'haskell-navigate-imports)
+;; (define-key haskell-mode-map (kbd "<f8>") 'haskell-navigate-imports)
 
 ;;; Code:
 
