@@ -129,6 +129,9 @@ Note that negative sign char is not part of a number.")
                "BEL" "BS" "HT" "LF" "VT" "FF" "CR" "SO" "SI" "DLE"
                "DC1" "DC2" "DC3" "DC4" "NAK" "SYN" "ETB" "CAN"
                "EM" "SUB" "ESC" "FS" "GS" "RS" "US" "SP" "DEL"
+               (regexp "[0-9]+")
+               (: "x" (regexp "[0-9a-fA-F]+"))
+               (: "o" (regexp "[0-7]+"))
                (: "^" (regexp "[]A-Z@^_\\[]"))
                (regexp "[ \t\n\r\v\f]*\\\\")))))
   "Regexp matching an item that is a single character or a single
