@@ -751,6 +751,43 @@ these keybindings:
 You have to load the module before it works, after that it will remember
 for the current GHCi session.
 
+@section Customizing
+
+@cindex customizing
+What kind of Haskell REPL @code{haskell-interactive-mode} will start up
+depends on the value of @code{haskell-process-type}.  This can be one of
+the symbols @code{auto}, @code{ghci}, @code{cabal-repl}, or
+@code{stack-ghci}.  If it's @code{auto}, the directory contents and
+available programs will be used to make a best guess at the
+process type.  The actual process type will then determine which
+variables @code{haskell-interactive-mode} will access to determine the
+program to start and its arguments:
+
+@itemize
+@item
+If it's @code{ghci}, @code{haskell-process-path-ghci} and
+@code{haskell-process-args-ghci} will be used.
+@item
+If it's @code{cabal-repl}, @code{haskell-process-path-ghci} and 
+@code{haskell-process-args-ghci}.
+@item
+If it's @code{stack-ghci}, @code{haskell-process-path-stack} and
+@code{haskell-process-args-stack-ghci} will be used.
+@end itemize
+
+With each of these pairs, the the @code{haskell-process-path-...}
+variable needs to be a string specifying the program path, or a list of
+strings where the first element is the program path and the rest are
+initial arguments.  The @code{haskell-process-args-...} is a list of
+strings specifying (further) command-line arguments.
+
+@vindex haskell-process-type
+@vindex haskell-process-path-ghci
+@vindex haskell-process-path-cabal
+@vindex haskell-process-path-stack
+@vindex haskell-process-args-ghci
+@vindex haskell-process-args-cabal-repl
+@vindex haskell-process-args-stack-ghci
 
 @node Editing Cabal files
 @chapter Editing Cabal files
