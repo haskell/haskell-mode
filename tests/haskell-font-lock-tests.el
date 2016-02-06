@@ -622,19 +622,19 @@ if all of its characters have syntax and face. See
   (check-properties
    '("foo = \"zonk"
      "       Cons")
-    '(("\"" "|" font-lock-string-face)
+    '(("\"" "|" font-lock-warning-face)
       ("zonk" t font-lock-string-face)
       ("Cons" "w" haskell-constructor-face))))
 
 (ert-deftest haskell-unterminated-string-2 ()
   (check-properties
    '"foo = \"zonk"
-    '(("\"" "\"" font-lock-string-face)
+    '(("\"" "\"" font-lock-warning-face)
       ("zonk" t font-lock-string-face))))
 
 (ert-deftest haskell-unterminated-string-3 ()
   (check-properties
    '"foo = \"zonk\\"
-    '(("\"" "\"" font-lock-string-face)
+    '(("\"" "\"" font-lock-warning-face)
       ("zonk" t font-lock-string-face)
-      ("\\" t font-lock-string-face))))
+      ("\\" t font-lock-warning-face))))

@@ -28,6 +28,7 @@
 
 (require 'cl-lib)
 (require 'haskell-compat)
+(require 'haskell-lexeme)
 (require 'font-lock)
 
 ;;;###autoload
@@ -377,7 +378,39 @@ Regexp match data 0 points to the chars."
                 nil)
             ;; fontify normally as string because lang-mode is not present
             'haskell-quasi-quote-face))
-      'font-lock-string-face))
+      (save-excursion
+        (parse-partial-sexp (point) (point-max) nil nil state
+                            'syntax-table)
+
+        (put-text-property (nth 8 state) (point)
+                           'face 'font-lock-string-face)
+
+        (when nil
+          (put-text-property (nth 8 state) (point)
+                             'font-lock-multiline t))
+
+        (if (or (eobp) (equal t (nth 3 state)))
+            ;; This is unterminated string constant, use warning face
+            ;; for the opening quote
+            (put-text-property (nth 8 state) (1+ (nth 8 state))
+                               'face 'font-lock-warning-face))
+
+        (let ((end-of-string (point)))
+          (goto-char (1+ (nth 8 state)))
+          (while (re-search-forward "\\\\" end-of-string t)
+
+            (goto-char (1- (point)))
+
+            (if (looking-at haskell-lexeme-string-literal-inside-item)
+                (goto-char (match-end 0))
+
+              ;; We are looking at an unacceptable escape
+              ;; sequence. Use warning face to highlight that.
+              (put-text-property (point) (1+ (point))
+                                 'face 'font-lock-warning-face)
+              (goto-char (1+ (point)))))))
+      ;; must return nil here so that it is not fontified again as string
+      nil))
    ;; Detect literate comment lines starting with syntax class '<'
    ((save-excursion
       (goto-char (nth 8 state))
