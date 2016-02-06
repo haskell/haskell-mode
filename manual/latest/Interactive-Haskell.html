@@ -138,6 +138,41 @@ these keybindings:
 <p>You have to load the module before it works, after that it will remember
 for the current GHCi session.
 </p>
+<a name="Customizing-1"></a>
+<h3 class="section">10.3 Customizing</h3>
+
+<a name="index-customizing-1"></a>
+<p>What kind of Haskell REPL <code>haskell-interactive-mode</code> will start up
+depends on the value of <code>haskell-process-type</code>.  This can be one of
+the symbols <code>auto</code>, <code>ghci</code>, <code>cabal-repl</code>, or
+<code>stack-ghci</code>.  If it&rsquo;s <code>auto</code>, the directory contents and
+available programs will be used to make a best guess at the
+process type.  The actual process type will then determine which
+variables <code>haskell-interactive-mode</code> will access to determine the
+program to start and its arguments:
+</p>
+<ul>
+<li> If it&rsquo;s <code>ghci</code>, <code>haskell-process-path-ghci</code> and
+<code>haskell-process-args-ghci</code> will be used.
+</li><li> If it&rsquo;s <code>cabal-repl</code>, <code>haskell-process-path-ghci</code> and 
+<code>haskell-process-args-ghci</code>.
+</li><li> If it&rsquo;s <code>stack-ghci</code>, <code>haskell-process-path-stack</code> and
+<code>haskell-process-args-stack-ghci</code> will be used.
+</li></ul>
+
+<p>With each of these pairs, the the <code>haskell-process-path-...</code>
+variable needs to be a string specifying the program path, or a list of
+strings where the first element is the program path and the rest are
+initial arguments.  The <code>haskell-process-args-...</code> is a list of
+strings specifying (further) command-line arguments.
+</p>
+<a name="index-haskell_002dprocess_002dtype"></a>
+<a name="index-haskell_002dprocess_002dpath_002dghci"></a>
+<a name="index-haskell_002dprocess_002dpath_002dcabal"></a>
+<a name="index-haskell_002dprocess_002dpath_002dstack"></a>
+<a name="index-haskell_002dprocess_002dargs_002dghci"></a>
+<a name="index-haskell_002dprocess_002dargs_002dcabal_002drepl"></a>
+<a name="index-haskell_002dprocess_002dargs_002dstack_002dghci"></a>
 
 <hr>
 <div class="header">
