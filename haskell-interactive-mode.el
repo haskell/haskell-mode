@@ -519,7 +519,7 @@ FILE-NAME only."
         (with-current-buffer buffer
           (haskell-interactive-mode)
           (haskell-session-assign s))
-        (switch-to-buffer-other-window buffer)
+        (haskell-interactive-switch)
         buffer))))
 
 (defun haskell-process-cabal-live (state buffer)
