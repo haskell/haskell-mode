@@ -872,8 +872,7 @@ To be added to `flymake-init-create-temp-buffer-copy'."
 
 (defun haskell-mode-before-save-handler ()
   "Function that will be called before buffer's saving."
-  (when haskell-stylish-on-save
-    (ignore-errors (haskell-mode-stylish-buffer))))
+  )
 
 ;; From Bryan O'Sullivan's blog:
 ;; http://www.serpentine.com/blog/2007/10/09/using-emacs-to-insert-scc-annotations-in-haskell-code/

@@ -380,7 +380,12 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
   "Function that will be called after buffer's saving."
   (when haskell-tags-on-save
     (ignore-errors (when (and (boundp 'haskell-session) haskell-session)
-                     (haskell-process-generate-tags)))))
+                     (haskell-process-generate-tags))))
+  (when haskell-stylish-on-save
+    (ignore-errors (haskell-mode-stylish-buffer))
+    (let ((before-save-hook '())
+          (after-save-hook '()))
+      (basic-save-buffer))))
 
 ;;;###autoload
 (defun haskell-mode-tag-find (&optional _next-p)
