@@ -250,6 +250,14 @@ control @code{font-lock-mode}.
 @image{anim/font-lock}
 @end ifhtml
 
+Syntax highlighting facilities parse strings and string escape sequences
+and are able to highlight unrecognized constructs.
+
+@ifhtml
+@image{anim/string-escape-highlight}
+@end ifhtml
+
+
 @section Managing imports
 
 There are a few functions for managing imports.
