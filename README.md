@@ -9,7 +9,7 @@ This is an Emacs mode for editing, debugging and developing Haskell programs.
 [![Melpa Stable Status](http://stable.melpa.org/packages/haskell-mode-badge.svg)](http://stable.melpa.org/#/haskell-mode)
 [![Latest Docs](http://img.shields.io/badge/docs-latest-fc1e5e.svg)](http://haskell.github.io/haskell-mode/manual/latest/)
 [![License GPL3](https://img.shields.io/badge/license-GPL3-blue.svg)](https://github.com/haskell/haskell-mode/blob/master/COPYING)
-[![Twitter Follow](https://img.shields.io/twitter/follow/HaskellMode.svg?style=social?style=social)](https://twitter.com/HaskellMode)
+[![Twitter Follow](https://img.shields.io/twitter/follow/HaskellMode.svg?style=social)](https://twitter.com/HaskellMode)
 
 > I just want to thank everybody involved in one way or another with the Haskell Emacs tooling.
 > It is one of the best language experiences I had in Emacs.
