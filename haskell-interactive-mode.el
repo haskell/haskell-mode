@@ -298,26 +298,24 @@ do the
 (defun haskell-interactive-mode-prompt (&optional session)
   "Show a prompt at the end of the REPL buffer.
 If SESSION is non-nil, use the REPL buffer associated with
-SESSION, otherwise operate on the current buffer.
-"
+SESSION, otherwise operate on the current buffer."
   (with-current-buffer (if session
                            (haskell-session-interactive-buffer session)
                          (current-buffer))
     (goto-char (point-max))
-    (insert (propertize haskell-interactive-prompt
-                        'font-lock-face 'haskell-interactive-face-prompt
-                        'read-only t
-                        'rear-nonsticky t
-                        'prompt t))
+    (let ((prompt (propertize haskell-interactive-prompt
+                              'font-lock-face 'haskell-interactive-face-prompt
+                              'prompt t
+                              'read-only t
+                              'rear-nonsticky t)))
+      ;; At the time of writing, front-stickying the first char gives an error
+      ;; Has unfortunate side-effect of being able to insert before the prompt
+      (insert (substring prompt 0 1)
+              (propertize (substring prompt 1)
+                          'front-sticky t)))
     (let ((marker (set (make-local-variable 'haskell-interactive-mode-prompt-start)
                        (make-marker))))
-      (set-marker marker
-                  (point)
-                  (current-buffer))
-      (when nil
-        (let ((o (make-overlay (point) (point-max) nil nil t)))
-          (overlay-put o 'line-prefix (make-string (length haskell-interactive-prompt)
-                                                   ? )))))
+      (set-marker marker (point)))
     (when haskell-interactive-mode-scroll-to-bottom
       (haskell-interactive-mode-scroll-to-bottom))))
 
@@ -328,9 +326,10 @@ SESSION, otherwise operate on the current buffer.
     (insert (ansi-color-apply
 	     (propertize text
 			 'font-lock-face 'haskell-interactive-face-result
-			 'rear-nonsticky t
-			 'read-only t
+                         'front-sticky t
 			 'prompt t
+			 'read-only t
+			 'rear-nonsticky t
 			 'result t)))
     (haskell-interactive-mode-handle-h)
     (let ((marker (set (make-local-variable 'haskell-interactive-mode-result-end)
@@ -365,22 +364,25 @@ SESSION, otherwise operate on the current buffer.
     (save-excursion
       (haskell-interactive-mode-goto-end-point)
       (let ((lines (string-match "^\\(.*\\)\n\\([[:unibyte:][:nonascii:]]+\\)" message)))
-        (when lines
-          (insert (propertize (concat (match-string 1 message) " …\n")
-                              'font-lock-face type
-                              'read-only t
-                              'rear-nonsticky t
-                              'expandable t))
-          (insert (propertize (concat (match-string 2 message) "\n")
-                              'font-lock-face type
-                              'read-only t
-                              'rear-nonsticky t
-                              'collapsible t
-                              'invisible haskell-interactive-mode-hide-multi-line-errors
-                              'message-length (length (match-string 2 message)))))
-        (unless lines
+        (if lines
+            (progn
+              (insert (propertize (concat (match-string 1 message) " …\n")
+                                  'expandable t
+                                  'font-lock-face type
+                                  'front-sticky t
+                                  'read-only t
+                                  'rear-nonsticky t))
+              (insert (propertize (concat (match-string 2 message) "\n")
+                                  'collapsible t
+                                  'font-lock-face type
+                                  'front-sticky t
+                                  'invisible haskell-interactive-mode-hide-multi-line-errors
+                                  'message-length (length (match-string 2 message))
+                                  'read-only t
+                                  'rear-nonsticky t)))
           (insert (propertize (concat message "\n")
                               'font-lock-face type
+                              'front-sticky t
                               'read-only t
                               'rear-nonsticky t)))))))
 
@@ -390,6 +392,7 @@ SESSION, otherwise operate on the current buffer.
     (save-excursion
       (haskell-interactive-mode-goto-end-point)
       (insert (propertize message
+                          'front-sticky t
                           'read-only t
                           'rear-nonsticky t)))))
 
@@ -736,8 +739,7 @@ wrapped in compiler directive at the top of FILE."
             (error "don't know where to find %S" file)))))))
 
 (defun haskell-interactive-session ()
-  "Get the `haskell-session', throw an error if it's not
-  available."
+  "Get the `haskell-session', throw an error if it's not available."
   (or (haskell-session-maybe)
       (haskell-session-assign
        (or (haskell-session-from-buffer)
@@ -751,8 +753,8 @@ wrapped in compiler directive at the top of FILE."
       buffer. Maybe run M-x haskell-process-restart?")))
 
 (defun haskell-interactive-mode-do-presentation (expr)
-  "Present the given expression. Requires the `present` package
-  to be installed. Will automatically import it qualified as Present."
+  "Present the given expression. Requires the `present' package
+to be installed. Will automatically import it qualified as Present."
   (let ((p (haskell-interactive-process)))
     ;; If Present.code isn't available, we probably need to run the
     ;; setup.
@@ -1083,6 +1085,7 @@ don't care when the thing completes as long as it's soonish."
                    (concat message "\n")
                    mode)
                 (propertize (concat message "\n")
+                            'front-sticky t
                             'read-only t
                             'rear-nonsticky t))))))
 
@@ -1118,6 +1121,7 @@ don't care when the thing completes as long as it's soonish."
     (save-excursion
       (haskell-interactive-mode-goto-end-point)
       (insert (propertize message
+                          'front-sticky t
                           'font-lock-face 'haskell-interactive-face-garbage
                           'read-only t
                           'rear-nonsticky t)))))
