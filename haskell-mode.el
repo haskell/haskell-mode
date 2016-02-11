@@ -860,10 +860,16 @@ Note that negative arguments do not work so well."
         (goto-char (or (scan-sexps (point) arg) (buffer-end arg)))
         (backward-prefix-chars))
     (save-match-data
-      (if (haskell-lexeme-looking-at-token)
-          (if (member (match-string 0) (list "(" "[" "{"))
-              (goto-char (or (scan-sexps (point) arg) (buffer-end arg)))
-            (goto-char (match-end 0)))))))
+      (while (> arg 0)
+        (when (haskell-lexeme-looking-at-token)
+          (cond ((member (match-string 0) (list "(" "[" "{"))
+                 (goto-char (or (scan-sexps (point) 1) (buffer-end 1))))
+                ((member (match-string 0) (list ")" "]" "}"))
+                 (signal 'scan-error (list "Containing expression ends prematurely."
+                                           (match-beginning 0)
+                                           (match-end 0))))
+                (t (goto-char (match-end 0)))))
+        (setf arg (1- arg))))))
 
 
 
