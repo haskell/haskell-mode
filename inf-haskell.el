@@ -816,7 +816,7 @@ we load it."
     (define-key map (kbd "C-c C-d") 'inferior-haskell-find-haddock)
     (define-key map (kbd "C-c C-v") 'haskell-check)
     map)
-  "Keymap for using inf-haskell.")
+  "Keymap for using `inf-haskell-mode'.")
 
 ;;;###autoload
 (define-minor-mode inf-haskell-mode

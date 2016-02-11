@@ -89,10 +89,11 @@ positions are allowed."
   :group 'haskell-indentation)
 
 (defconst haskell-indentation-mode-map
-  (let ((keymap (make-sparse-keymap)))
-    (define-key keymap (kbd "RET") 'haskell-indentation-newline-and-indent)
-    (define-key keymap (kbd "<backtab>") 'haskell-indentation-indent-backwards)
-    keymap))
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "RET") 'haskell-indentation-newline-and-indent)
+    (define-key map (kbd "<backtab>") 'haskell-indentation-indent-backwards)
+    map)
+  "Keymap for `haskell-indentation-mode'.")
 
 ;;;###autoload
 (define-minor-mode haskell-indentation-mode

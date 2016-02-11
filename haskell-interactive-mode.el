@@ -81,7 +81,7 @@ interference with prompts that look like haskell expressions."
     (define-key map (kbd "TAB") 'haskell-interactive-mode-tab)
     (define-key map (kbd "<C-S-backspace>") 'haskell-interactive-mode-kill-whole-line)
     map)
-  "Interactive Haskell mode map.")
+  "Keymap used in `haskell-interactive-mode'")
 
 (define-derived-mode haskell-interactive-mode fundamental-mode "Interactive-Haskell"
   "Interactive mode for Haskell.

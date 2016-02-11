@@ -59,7 +59,7 @@
     (define-key map (kbd "M-p") 'haskell-goto-prev-error)
     (define-key map (kbd "C-c M-p") 'haskell-goto-first-error)
     map)
-  "Keymap for using haskell-interactive-mode.")
+  "Keymap for using `interactive-haskell-mode'.")
 
 ;;;###autoload
 (define-minor-mode interactive-haskell-mode
