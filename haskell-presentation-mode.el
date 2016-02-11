@@ -28,6 +28,13 @@
 (require 'haskell-mode)
 (require 'haskell-session)
 
+(defvar haskell-presentation-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "q") 'quit-window)
+    (define-key map (kbd "c") 'haskell-presentation-clear)
+    map)
+  "Keymap for `haskell-presentation-mode'.")
+
 (define-derived-mode haskell-presentation-mode
   haskell-mode "Presentation"
   "Major mode for viewing Haskell snippets.
@@ -41,12 +48,6 @@
 (defconst haskell-presentation-hint-message
   "-- Hit `q' to close this window; `c' to clear.\n\n"
   "Hint message appered in Haskell Presentation buffer.")
-
-(easy-mmode-defmap
- haskell-presentation-mode-map
- `(("q" . quit-window)
-   ("c" . haskell-presentation-clear))
- "The base key map for `haskell-presentation-mode'.")
 
 (defun haskell-presentation-buffer ()
   "Return Haskell Presentaion buffer.

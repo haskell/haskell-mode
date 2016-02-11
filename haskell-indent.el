@@ -1524,9 +1524,8 @@ One indentation cycle is used."
   (let ((map (current-local-map)))
     (while (and map (not (eq map haskell-indent-map)))
       (setq map (keymap-parent map)))
-    (if map
-        ;; haskell-indent-map is already active: nothing to do.
-        nil
+    ;; if haskell-indent-map is already active: there's nothing to do.
+    (unless map
       ;; Put our keymap on top of the others.  We could also put it in
       ;; second place, or in a minor-mode.  The minor-mode approach would be
       ;; easier, but it's harder for the user to override it.  This approach
