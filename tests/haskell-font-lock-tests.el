@@ -50,7 +50,7 @@ after a test as this aids interactive debugging."
        (haskell-mode)
        ,@body)))
 
-(defun check-properties (lines props &optional literate)
+(defun check-properties (lines-or-contents props &optional literate)
   "Check if syntax properties and font-lock properties as set properly.
 
 LINES is a list of strings that will be inserted to a new
@@ -62,9 +62,12 @@ if all of its characters have syntax and face. See
     (kill-buffer "*haskell-mode-buffer*"))
   (save-current-buffer
     (set-buffer (get-buffer-create "*haskell-mode-buffer*"))
-    (dolist (line lines)
-      (insert line)
-      (insert "\n"))
+    (if (consp lines-or-contents)
+        (dolist (line lines-or-contents)
+          (insert line)
+          (insert "\n"))
+      (insert lines-or-contents))
+
     (if literate
         (literate-haskell-mode)
       (haskell-mode))
@@ -117,7 +120,6 @@ if all of its characters have syntax and face. See
 
 (ert-deftest haskell-syntactic-test-7b ()
   "Take quotes and double quotes under control."
-  :expected-result :failed
   (check-properties
     ;; do not get fooled
    '("\"\'\"\'\"\'\"\'\"\'\"\'\"\'\"\'\"\' Cons")
@@ -136,11 +138,11 @@ if all of its characters have syntax and face. See
   (check-properties
    '("\"\\  \\\\\\ \\  "
      "   \\\" Cons")
-   '(("\\" "\\" t)               ; 1st is escape
+   '(("\\" "." t)               ; 1st is escape
      ("\\"  "." t)               ; 2nd is punctuation
-     ("\\" "\\" t)               ; 3rd is escape
+     ("\\" "." t)               ; 3rd is escape
      ("\\"  "." t)               ; 4th is punctuation
-     ("\\" "\\" t)               ; 5th is escape
+     ("\\" "." t)               ; 5th is escape
      ("\\"  "." t)               ; 6th is punctuation
      ("Cons" "w" haskell-constructor-face))))
 
@@ -237,7 +239,6 @@ if all of its characters have syntax and face. See
 
 (ert-deftest haskell-syntactic-string-vs-comment-escape ()
   "Check string escape vs comment escape"
-  :expected-result :failed
   (check-properties
    ;; "\"" \--  Cons
    '("\"\\\"\" \\--  Cons")
@@ -309,7 +310,6 @@ if all of its characters have syntax and face. See
   "Syntax for haddock comments"
   ;; Note: all of these are prefixed with space so that
   ;; top-level definition detection does not kick in.
-  :expected-result :failed
   (check-properties
    '(" 'a''b'"                          ; ('a','b')
      " 12'c'"                           ; (12,'c')
@@ -551,7 +551,6 @@ if all of its characters have syntax and face. See
    'literate))
 
 (ert-deftest haskell-literate-mixed-1 ()
-  :expected-result :failed
   ;; Although Haskell Report does not advice mixing modes, it is a
   ;; perfectly valid construct that we should support in syntax
   ;; highlighting.
@@ -618,3 +617,24 @@ if all of its characters have syntax and face. See
     '("foo role = 3")
     '(("foo" "w" haskell-definition-face)
       ("role" "w" nil))))
+
+(ert-deftest haskell-unterminated-string-1 ()
+  (check-properties
+   '("foo = \"zonk"
+     "       Cons")
+    '(("\"" "|" font-lock-warning-face)
+      ("zonk" t font-lock-string-face)
+      ("Cons" "w" haskell-constructor-face))))
+
+(ert-deftest haskell-unterminated-string-2 ()
+  (check-properties
+   '"foo = \"zonk"
+    '(("\"" "\"" font-lock-warning-face)
+      ("zonk" t font-lock-string-face))))
+
+(ert-deftest haskell-unterminated-string-3 ()
+  (check-properties
+   '"foo = \"zonk\\"
+    '(("\"" "\"" font-lock-warning-face)
+      ("zonk" t font-lock-string-face)
+      ("\\" t font-lock-warning-face))))

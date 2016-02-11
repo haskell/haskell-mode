@@ -501,6 +501,97 @@ executable found in PATH.")
     table)
   "Syntax table used in Haskell mode.")
 
+(defun haskell-syntax-propertize (begin end)
+  (save-excursion
+    (when haskell-literate
+      (goto-char begin)
+      ;; Algorithm (first matching rule wins):
+      ;; - current line is latex code if previous non-empty line was
+      ;;   latex code or was \begin{code} and current line is not
+      ;;   \end{code}
+      ;; - current line is bird code if it starts with >
+      ;; - else literate comment
+      (let ((previous-line-latex-code
+             (catch 'return
+               (save-excursion
+                 (when (= (forward-line -1) 0)
+                   (while (looking-at-p "^[\t ]*$")
+                     (unless (= (forward-line -1) 0)
+                       (throw 'return nil)))
+                   (or
+                    (and
+                     (not (equal (string-to-syntax "<") (syntax-after (point))))
+                     (not (looking-at-p "^>")))
+                    (looking-at-p "^\\\\begin{code}[\t ]*$")))))))
+        (while (< (point) end)
+          (unless (looking-at-p "^[\t ]*$")
+            (if previous-line-latex-code
+                (if (looking-at-p "^\\\\end{code}[\t ]*$")
+                    (progn
+                      (put-text-property (point) (1+ (point)) 'syntax-table (string-to-syntax "<"))
+                      (setq previous-line-latex-code nil))
+                  ;; continue latex-code
+                  )
+              (if (looking-at-p "^>")
+                  ;; this is a whitespace
+                  (put-text-property (point) (1+ (point)) 'syntax-table (string-to-syntax "-"))
+                ;; this is a literate comment
+                (progn
+                  (put-text-property (point) (1+ (point)) 'syntax-table (string-to-syntax "<"))
+                  (when (looking-at-p "^\\\\begin{code}[\t ]*$")
+                    (setq previous-line-latex-code t))))))
+          (forward-line 1))))
+
+    (goto-char begin)
+    (let ((ppss (syntax-ppss)))
+      (when (nth 8 ppss)
+        ;; go to the beginning of a comment or string
+        (goto-char (nth 8 ppss))
+        (when (equal "|" (nth 3 ppss))
+          ;; if this is a quasi quote we need to backtrack even more
+          ;; to the opening bracket
+          (skip-chars-backward "^[")
+          (goto-char (1- (point)))))
+
+      (while (< (point) end)
+        (let
+            ((token-kind (haskell-lexeme-looking-at-token)))
+
+          (cond
+           ((equal token-kind 'qsymid)
+            (when (member
+                   (haskell-lexeme-classify-by-first-char (char-after (match-beginning 1)))
+                   '(varsym consym))
+              ;; we have to neutralize potential comments here
+              (put-text-property (match-beginning 1) (match-end 1) 'syntax-table (string-to-syntax "."))))
+           ((equal token-kind 'number)
+            (put-text-property (match-beginning 0) (match-end 0) 'syntax-table (string-to-syntax "w")))
+           ((equal token-kind 'char)
+            (put-text-property (match-beginning 0) (1+ (match-beginning 0)) 'syntax-table (string-to-syntax "\""))
+            (put-text-property (1- (match-end 0)) (match-end 0) 'syntax-table (string-to-syntax "\"")))
+           ((equal token-kind 'string)
+            (save-excursion
+              (goto-char (match-beginning 2))
+              (let ((limit (match-end 2)))
+                (save-match-data
+                  (while (re-search-forward "\"" limit t)
+                    (put-text-property (match-beginning 0) (match-end 0) 'syntax-table (string-to-syntax ".")))))
+              ;; Place a generic string delimeter only when an open
+              ;; quote is closed by end-of-line Emacs acts strangely
+              ;; when a generic delimiter is not closed so in case
+              ;; string ends at the end of the buffer we will use
+              ;; plain string
+              (when (and (equal (match-beginning 3) (match-end 3))
+                         (not (equal (match-beginning 3) (point-max))))
+                (put-text-property (match-beginning 1) (match-end 1) 'syntax-table (string-to-syntax "|"))
+                (put-text-property (match-beginning 3) (1+ (match-end 3)) 'syntax-table (string-to-syntax "|")))))
+           ((equal token-kind 'template-haskell-quasi-quote)
+            (put-text-property (match-beginning 2) (match-end 2) 'syntax-table (string-to-syntax "\""))
+            (put-text-property (match-beginning 4) (match-end 4) 'syntax-table (string-to-syntax "\""))))
+          (if token-kind
+              (goto-char (match-end 0))
+            (goto-char end)))))))
+
 (defun haskell-ident-at-point ()
   "Return the identifier under point, or nil if none found.
 May return a qualified name."
@@ -655,6 +746,7 @@ Minor modes that work well with `haskell-mode':
   (set (make-local-variable 'comment-end-skip) "[ \t]*\\(-}\\|\\s>\\)")
   (set (make-local-variable 'forward-sexp-function) #'haskell-forward-sexp)
   (set (make-local-variable 'parse-sexp-ignore-comments) nil)
+  (set (make-local-variable 'syntax-propertize-function) #'haskell-syntax-propertize)
 
   ;; Set things up for eldoc-mode.
   (set (make-local-variable 'eldoc-documentation-function)
@@ -664,10 +756,8 @@ Minor modes that work well with `haskell-mode':
        'haskell-ds-create-imenu-index)
   ;; Set things up for font-lock.
   (set (make-local-variable 'font-lock-defaults)
-       '(haskell-font-lock-choose-keywords
-         nil nil ((?\' . "w") (?_  . "w")) nil
-         (font-lock-syntactic-keywords
-          . haskell-font-lock-choose-syntactic-keywords)
+       '((haskell-font-lock-keywords)
+         nil nil nil nil
          (font-lock-syntactic-face-function
           . haskell-syntactic-face-function)
          ;; Get help from font-lock-syntactic-keywords.
