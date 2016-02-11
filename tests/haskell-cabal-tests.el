@@ -50,6 +50,24 @@
       (haskell-cabal-previous-subsection)
       (haskell-cabal-previous-section))))
 
+(ert-deftest haskell-cabal-period-is-a-word-break ()
+  (with-temp-buffer
+    (insert "Executable bin
+    Main-Is:           Main
+    Exposed-Modules:   Some.Internal.Type
+")
+    (haskell-cabal-mode)
+    (goto-char (point-min))
+    (search-forward "Modules:")
+    (skip-chars-forward " ")
+    (should (looking-at-p "Some"))
+    (forward-word)
+    (should (looking-at-p ".Internal"))
+    (forward-word)
+    (should (looking-at-p ".Type"))
+    (backward-word)
+    (should (looking-at-p "Internal"))))
+
 (ert-deftest haskell-cabal-subsection-arrange-lines-keep-trailing-commas ()
   (should (with-temp-buffer
             (insert "Executable bin-1

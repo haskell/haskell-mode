@@ -80,7 +80,6 @@
     ;; We could use font-lock-syntactic-keywords, but is it worth it?
     ;; (modify-syntax-entry ?-  ". 12" st)
     (modify-syntax-entry ?\n ">" st)
-    (modify-syntax-entry ?. "w"  st)
     (modify-syntax-entry ?- "w"  st)
     st))
 
