@@ -577,13 +577,9 @@ May return a qualified name."
   "Special variable indicating a state of user input waiting.")
 
 
-;; For compatibility with Emacs < 24, derive conditionally
-(defalias 'haskell-parent-mode
-  (if (fboundp 'prog-mode) 'prog-mode 'fundamental-mode))
-
 ;; The main mode functions
 ;;;###autoload
-(define-derived-mode haskell-mode haskell-parent-mode "Haskell"
+(define-derived-mode haskell-mode prog-mode "Haskell"
   "Major mode for editing Haskell programs.
 
 For more information see also Info node `(haskell-mode)Getting Started'.

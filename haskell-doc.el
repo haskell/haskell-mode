@@ -1251,8 +1251,6 @@ URL is the URL of the online doc."
                   (append (default-value 'minor-mode-alist)
                           '((haskell-doc-mode haskell-doc-minor-mode-string)))))
 
-;; a dummy definition needed for XEmacs (I know, it's horrible :-(
-
 
 (defvar haskell-doc-keymap
   (let ((map (make-sparse-keymap)))
@@ -1490,13 +1488,8 @@ current buffer."
         ;; In Emacs 19.29 and later, and XEmacs 19.13 and later, all
         ;; messages are recorded in a log.  Do not put haskell-doc messages
         ;; in that log since they are legion.
-        (if (eval-when-compile (fboundp 'display-message))
-            ;; XEmacs 19.13 way of preventing log messages.
-            ;;(display-message 'no-log (format <args>))
-            ;; XEmacs 19.15 seems to be a bit different.
-            (display-message 'message (format "%s" doc))
-          (let ((message-log-max nil))
-            (message "%s" doc)))))))
+        (let ((message-log-max nil))
+          (message "%s" doc))))))
 
 (defvar haskell-doc-current-info--interaction-last nil
   "If non-nil, a previous eldoc message from an async call, that
