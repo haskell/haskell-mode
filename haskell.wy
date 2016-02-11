@@ -1,0 +1,184 @@
+;;; haskell.wy --- A permissive Haskell grammar    -*- coding: utf-8; lexical-binding: t -*-
+
+;; Copyright © 2016 Gracjan Polak
+;; Author:  2016 Gracjan Polak
+;; Keywords: Haskell grammar
+
+;; This file is not part of GNU Emacs.
+
+;; This file is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 3, or (at your option)
+;; any later version.
+
+;; This file is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; haskell.wy is a Wisent grammar file. Grammar tries to be as
+;; permissive as possible, anything resembling Haskell will be
+;; parsed. All definitions and usage points are marked using
+;; Wisent/Semantic TAG construct so that navigation to the definition
+;; can work correctly.
+
+;;; Change Log:
+
+;; See git repo.
+
+;;; Code:
+
+%start topdecl
+
+;; Token definitions as per Haskell 2010 Report: 2.2 Lexical Structure
+
+%token <string> TOPBLOCK
+
+%token <string> QVARSYM
+%token <string> QCONSYM
+%token <string> QVARID
+%token <string> QCONID
+%token <string> LITERAL                  ;; any literal, string, number, char
+%token <string> COMMENT                  ;; any comment
+%token <string> OPEN-PAREN               ;; (
+%token <string> CLOSE-PAREN              ;; )
+%token <string> OPEN-BRACKET             ;; [
+%token <string> CLOSE-BRACKET            ;; ]
+%token <string> OPEN-BRACE               ;; {
+%token <string> CLOSE-BRACE              ;; }
+%token <string> COMMA                    ;; ,
+%token <string> SEMICOLON                ;; ;
+%token <string> DOTDOT                   ;; ..
+%token <string> COLON                    ;; :
+%token <string> DOUBLE-COLON             ;; ::
+%token <string> EQUAL                    ;; =
+%token <string> LAMBDA                   ;; \
+%token <string> VERTICAL-BAR             ;; |
+%token <string> BACKQUOTE                ;; `
+%token <string> LEFT-ARROW               ;; <-
+%token <string> RIGHT-ARROW              ;; ->
+%token <string> AT                       ;; @
+%token <string> TILDE                    ;; ~
+%token <string> DOUBLE-ARROW             ;; =>
+%token <string> UNDERSCORE               ;; _
+%token <string> WHERE                    ;; where
+%token <string> NEVER                    ;; this never happens
+
+%%
+
+topdecl : decl
+        ;
+
+decl : gendecl
+     | funlhs rhs
+     | pat rhs
+       (FUNCTION-TAG $1 nil nil)
+     ;
+
+decls : decls decl
+      |
+      ;
+
+gendecl : NEVER
+        ;
+
+
+funlhs : QVARID apat apats
+         (FUNCTION-TAG $1 nil nil)
+      ;; | pati+1 varop(a,i) pati+1
+      ;; | lpati varop(l,i) pati+1
+      ;; | pati+1 varop(r,i) rpati
+       | OPEN-PAREN funlhs CLOSE-PAREN apat apats
+         (identity $2)
+       ;
+
+apats : apats apat
+      | ;; empty
+      ;
+
+apat : QVARID
+     | QVARID AT apat
+     | gcon
+     | qcon
+     | qcon OPEN-BRACE fpats CLOSE-BRACE
+     | LITERAL
+     | UNDERSCORE
+     | OPEN-PAREN pat CLOSE-PAREN
+     | OPEN-PAREN comma_pats CLOSE-PAREN
+     | OPEN-BRACKET comma_pats CLOSE-BRACKET
+     | TILDE apat
+     ;
+
+comma_pats : NEVER
+           ;
+
+pat : apat qconop_apats
+    | gcon apats
+    | qcon apats
+    ;
+
+qconop_apats : qconop_apats qconop apat
+           |
+           ;
+
+gcon : OPEN-PAREN CLOSE-PAREN
+     | OPEN-BRACKET CLOSE-BRACKET
+     | OPEN-PAREN commas CLOSE-PAREN
+     | qcon
+     ;
+
+commas : NEVER
+       ;
+
+qcon : QCONID
+     | OPEN-PAREN QCONSYM CLOSE-PAREN
+     ;
+
+qconop : QCONSYM
+       | BACKQUOTE QCONID BACKQUOTE
+       ;
+
+fpats1 : fpats1 COMMA fpat
+       | fpat
+       ;
+
+fpats : fpats1
+      |
+      ;
+
+fpat : QVARID EQUAL pat
+     | QVARID
+     ;
+
+rhs : EQUAL exp opt_where_decls
+    | gdrhs opt_where_decls
+    | ;; empty
+    ;
+
+opt_where_decls : WHERE decls
+                |
+                ;
+
+gdrhs : gd EQUAL exp gdrhs0
+      ;
+
+gdrhs0 : gdrhs
+       |
+       ;
+
+gd : VERTICAL-BAR exp0
+   ;
+
+exp : NEVER
+    ;
+
+exp0 : NEVER
+     ;
+
+
+%%
