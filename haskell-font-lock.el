@@ -191,8 +191,7 @@ Regexp match data 0 points to the chars."
 
 (defun haskell-font-lock-symbols-keywords ()
   (when (and haskell-font-lock-symbols
-	     haskell-font-lock-symbols-alist
-	     (fboundp 'compose-region))
+	     haskell-font-lock-symbols-alist)
     `((,(regexp-opt (mapcar 'car haskell-font-lock-symbols-alist) t)
        (0 (haskell-font-lock-compose-symbol ',haskell-font-lock-symbols-alist)
 	  ;; In Emacs-21, if the `override' field is nil, the face

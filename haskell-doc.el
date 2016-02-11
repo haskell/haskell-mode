@@ -493,37 +493,6 @@ Each element is of the form (ID . DOC) where both ID and DOC are strings.
 DOC should be a concise single-line string describing the construct in which
 the keyword is used.")
 
-(eval-and-compile
-  (defalias 'haskell-doc-split-string
-    (if (condition-case ()
-            (split-string "" nil t)
-          (wrong-number-of-arguments nil))
-        'split-string
-      ;; copied from Emacs 22
-      (lambda (string &optional separators omit-nulls)
-        (let ((keep-nulls (not (if separators omit-nulls t)))
-              (rexp (or separators "[ \f\t\n\r\v]+"))
-              (start 0)
-              notfirst
-              (list nil))
-          (while (and (string-match rexp string
-                                    (if (and notfirst
-                                             (= start (match-beginning 0))
-                                             (< start (length string)))
-                                        (1+ start) start))
-                      (< start (length string)))
-            (setq notfirst t)
-            (if (or keep-nulls (< start (match-beginning 0)))
-                (setq list
-                      (cons (substring string start (match-beginning 0))
-                            list)))
-            (setq start (match-end 0)))
-          (if (or keep-nulls (< start (length string)))
-              (setq list
-                    (cons (substring string start)
-                          list)))
-          (nreverse list))))))
-
 
 (defun haskell-doc-extract-types (url)
   (with-temp-buffer
@@ -636,7 +605,7 @@ the keyword is used.")
                     ;;        module vars)
                     nil)
                 (setq curclass nil))
-              (dolist (var (haskell-doc-split-string vars comma-re t))
+              (dolist (var (split-string vars comma-re t))
                 (if (string-match "(.*)" var) (setq var (substring var 1 -1)))
                 (push (cons var type) elems))))
            ;; A datatype decl.
@@ -657,7 +626,7 @@ the keyword is used.")
                       (if (string-match ",\\'" type)
                           (setq type (substring type 0 -1)))
                       (setq type (concat name " -> " type))
-                      (dolist (var (haskell-doc-split-string vars comma-re t))
+                      (dolist (var (split-string vars comma-re t))
                         (if (string-match "(.*)" var)
                             (setq var (substring var 1 -1)))
                         (push (cons var type) elems))))))))
@@ -1251,8 +1220,6 @@ URL is the URL of the online doc."
                   (append (default-value 'minor-mode-alist)
                           '((haskell-doc-mode haskell-doc-minor-mode-string)))))
 
-;; a dummy definition needed for XEmacs (I know, it's horrible :-(
-
 
 (defvar haskell-doc-keymap
   (let ((map (make-sparse-keymap)))
@@ -1490,13 +1457,8 @@ current buffer."
         ;; In Emacs 19.29 and later, and XEmacs 19.13 and later, all
         ;; messages are recorded in a log.  Do not put haskell-doc messages
         ;; in that log since they are legion.
-        (if (eval-when-compile (fboundp 'display-message))
-            ;; XEmacs 19.13 way of preventing log messages.
-            ;;(display-message 'no-log (format <args>))
-            ;; XEmacs 19.15 seems to be a bit different.
-            (display-message 'message (format "%s" doc))
-          (let ((message-log-max nil))
-            (message "%s" doc)))))))
+        (let ((message-log-max nil))
+          (message "%s" doc))))))
 
 (defvar haskell-doc-current-info--interaction-last nil
   "If non-nil, a previous eldoc message from an async call, that
