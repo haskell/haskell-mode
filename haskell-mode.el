@@ -547,7 +547,7 @@ executable found in PATH.")
       (when (nth 8 ppss)
         ;; go to the beginning of a comment or string
         (goto-char (nth 8 ppss))
-        (when (equal "|" (nth 3 ppss))
+        (when (equal ?| (nth 3 ppss))
           ;; if this is a quasi quote we need to backtrack even more
           ;; to the opening bracket
           (skip-chars-backward "^[")
