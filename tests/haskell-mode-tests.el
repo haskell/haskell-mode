@@ -410,4 +410,58 @@ Also should respect 10 column fill."
             (string= "hello world"
                      (buffer-substring 1 (point-max))))))
 
+(ert-deftest forward-sexp-function-1 ()
+  "Check if `forward-sexp-function' behaves properly on end of
+sexp."
+  (should (with-temp-buffer
+            (haskell-mode)
+            (insert "(foo) bar")
+            (goto-char 5)
+            (condition-case err
+                (progn (forward-sexp)
+                       nil)
+              (scan-error (equal (cddr err) (list 5 6)))))))
+
+(ert-deftest forward-sexp-function-2 ()
+  "Check if `forward-sexp-function' behaves properly on beginning
+of sexp."
+  (should (with-temp-buffer
+            (haskell-mode)
+            (insert "(foo) bar")
+            (goto-char 1)
+            (forward-sexp)
+            (eq (point) 6))))
+
+(ert-deftest haskell-forward-sexp-1 ()
+  "Check if `haskell-forward-sexp' properly moves over sexps."
+  (should (with-temp-buffer
+            (insert "foo = bar . baz")
+            (goto-char 1)
+            (haskell-forward-sexp 4)
+            (eq (point) 12))))
+
+(ert-deftest haskell-forward-sexp-2 ()
+  "Check if `haskell-forward-sexp' properly moves over sexps."
+  (should (with-temp-buffer
+            (insert "foo = bar . baz")
+            (goto-char 1)
+            (haskell-forward-sexp 1)
+            (eq (point) 4))))
+
+(ert-deftest haskell-forward-sexp-3 ()
+  "Check if `haskell-forward-sexp' properly moves over sexps."
+  (should (with-temp-buffer
+            (insert "(a b) c = d . e")
+            (goto-char 1)
+            (haskell-forward-sexp 5)
+            (eq (point) 14))))
+
+(ert-deftest haskell-forward-sexp-4 ()
+  "Check if `haskell-forward-sexp' properly moves over sexps."
+  (should (with-temp-buffer
+            (insert "(a b) c = d . e")
+            (goto-char 1)
+            (haskell-forward-sexp 1)
+            (eq (point) 6))))
+
 (provide 'haskell-mode-tests)
