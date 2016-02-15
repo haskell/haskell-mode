@@ -464,4 +464,25 @@ of sexp."
             (haskell-forward-sexp 1)
             (eq (point) 6))))
 
+(ert-deftest backward-sexp ()
+  "Check if `forward-sexp-function' behaves properly on
+beginning of sexp."
+  (should (with-temp-buffer
+            (haskell-mode)
+            (insert "(foo) bar")
+            (goto-char 2)
+            (condition-case err
+                (progn (backward-sexp)
+                       nil)
+              (scan-error (equal (cddr err) (list 1 1)))))))
+
+(ert-deftest haskell-backward-sexp ()
+  "Check if `haskell-forward-sexp' with negatives arg properly
+moves over sexps."
+  (should (with-temp-buffer
+            (insert "a (b c) = d . e")
+            (goto-char 15)
+            (haskell-forward-sexp -4)
+            (eq (point) 3))))
+
 (provide 'haskell-mode-tests)
