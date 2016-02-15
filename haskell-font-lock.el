@@ -455,7 +455,8 @@ Regexp match data 0 points to the chars."
          (font-lock-syntactic-face-function
           . haskell-syntactic-face-function)
          ;; Get help from font-lock-syntactic-keywords.
-         (parse-sexp-lookup-properties . t))))
+         (parse-sexp-lookup-properties . t)
+         (font-lock-extra-managed-props . (composition)))))
 
 (defun haskell-fontify-as-mode (text mode)
   "Fontify TEXT as MODE, returning the fontified text."
