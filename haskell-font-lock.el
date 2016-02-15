@@ -217,9 +217,6 @@ Regexp match data 0 points to the chars."
          (varid "\\b[[:lower:]_][[:alnum:]'_]*\\b")
          ;; We allow ' preceding conids because of DataKinds/PolyKinds
          (conid "\\b'?[[:upper:]][[:alnum:]'_]*\\b")
-         (modid (concat "\\b" conid "\\(\\." conid "\\)*\\b"))
-         (qvarid (concat modid "\\." varid))
-         (qconid (concat modid "\\." conid))
          (sym "\\s.+")
 
          ;; Reserved identifiers
@@ -314,19 +311,23 @@ Regexp match data 0 points to the chars."
             ("(\\(,*\\|->\\))" 0 'haskell-constructor-face)
             ("\\[\\]" 0 'haskell-constructor-face)
 
-            (,(concat "`" varid "`") 0 'haskell-operator-face)
-            (,(concat "`" conid "`") 0 'haskell-operator-face)
-            (,(concat "`" qvarid "`") 0 'haskell-operator-face)
-            (,(concat "`" qconid "`") 0 'haskell-operator-face)
+            (,(concat "`" haskell-lexeme-qid-or-qsym "`") 0 'haskell-operator-face)
 
-            (,qconid 0 'haskell-constructor-face)
-
-            (,conid 0 'haskell-constructor-face)
-
-            (,sym 0 (if (and (eq (char-after (match-beginning 0)) ?:)
-                             (not (member (match-string 0) '("::" "∷"))))
-                        'haskell-constructor-face
-                      'haskell-operator-face))))
+            (,haskell-lexeme-qid-or-qsym
+             0 (cl-case (haskell-lexeme-classify-by-first-char (char-after (match-beginning 1)))
+                 (varid nil)
+                 (conid 'haskell-constructor-face)
+                 (varsym (when (and (not (member (match-string 0) '("-" "+" ".")))
+                                      (not (save-excursion
+                                             (goto-char (match-beginning 1))
+                                             (looking-at-p "\\sw"))))
+                             ;; We need to protect against the case of
+                             ;; plus, minus or dot inside a floating
+                             ;; point number.
+                             'haskell-operator-face))
+                 (consym (if (not (member (match-string 1) '("::" "∷")))
+                             'haskell-constructor-face
+                           'haskell-operator-face))))))
     keywords))
 
 

@@ -162,16 +162,16 @@ if all of its characters have syntax and face. See
      ("." "." haskell-constructor-face)
      ("C" "w" haskell-constructor-face)
 
-     ("D" "w" haskell-constructor-face)
-     ("." "." haskell-constructor-face)
-     ("E" "w" haskell-constructor-face)
-     ("." "." haskell-operator-face)
+     ("D" "w" nil)
+     ("." "." nil)
+     ("E" "w" nil)
+     ("." "." nil)
      ("f" "w" nil)
 
-     ("G" "w" haskell-constructor-face)
-     ("." "." haskell-constructor-face)
-     ("H" "w" haskell-constructor-face)
-     ("." "." haskell-operator-face)        ; this is wrong
+     ("G" "w" haskell-operator-face)
+     ("." "." haskell-operator-face)
+     ("H" "w" haskell-operator-face)
+     ("." "." haskell-operator-face)
      (">>=" "." haskell-operator-face)
 
      ("<=<" "." haskell-operator-face))))
@@ -452,7 +452,7 @@ if all of its characters have syntax and face. See
      "nope :: nope"
      "nope <- nope"
      "nope ` nope")
-   '(("," t haskell-operator-face)
+   '(("," t nil)
      ("=" t haskell-operator-face)
      ("->" t haskell-operator-face)
      ("::" t haskell-operator-face)
