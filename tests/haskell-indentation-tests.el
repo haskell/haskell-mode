@@ -301,14 +301,20 @@ fun = do { putStrLn \"X\";
               (2 9 11)
               (3 0))
 
-(hindent-test "13* Don't indent after deriving""
+(hindent-test "13a* Deriving on new line""
+data X = X | Y
+deriving (Eq, Ord, Show)"
+              (1 0)
+              (2 2))
+
+(hindent-test "13b* Don't indent after deriving""
 data X = X
   deriving (Eq, Ord, Show)"
               (1 0)
-              (2 0 2)
+              (2 2)
               (3 0))
 
-(hindent-test "13b honour = on a separate line in data declaration" "
+(hindent-test "13c honour = on a separate line in data declaration" "
 data X a b
   = X"
               (1 0)
