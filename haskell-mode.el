@@ -849,16 +849,28 @@ it that many times.  Negative arg -N means move backward across N
 balanced expressions.  This command assumes point is not in a
 string or comment.
 
-Note that negative arguments do not work so well."
+If unable to move over a sexp, signal `scan-error' with three
+arguments: a message, the start of the obstacle (a parenthesis or
+list marker of some kind), and end of the obstacle."
   (interactive "^p")
   (or arg (setq arg 1))
   (if (< arg 0)
-      ;; Fall back to native Emacs method for negative arguments.
-      ;; Haskell has maximum munch rule that does not work well
-      ;; backwards.
-      (progn
-        (goto-char (or (scan-sexps (point) arg) (buffer-end arg)))
-        (backward-prefix-chars))
+      (while (< arg 0)
+        (skip-syntax-backward "->")
+        ;; Navigate backwards using plain `backward-sexp', assume that it
+        ;; skipped over at least one Haskell expression, and jump forward until
+        ;; last possible point before the starting position. If applicable,
+        ;; `scan-error' is signalled by `backward-sexp'.
+        (let ((end (point))
+              (forward-sexp-function nil))
+          (backward-sexp)
+          (let ((cur (point)))
+            (while (< (point) end)
+              (setf cur (point))
+              (haskell-forward-sexp)
+              (skip-syntax-forward "->"))
+            (goto-char cur)))
+        (setf arg (1+ arg)))
     (save-match-data
       (while (> arg 0)
         (when (haskell-lexeme-looking-at-token)
