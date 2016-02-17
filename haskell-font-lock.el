@@ -217,24 +217,15 @@ Regexp match data 0 points to the chars."
          (varid "\\b[[:lower:]_][[:alnum:]'_]*\\b")
          ;; We allow ' preceding conids because of DataKinds/PolyKinds
          (conid "\\b'?[[:upper:]][[:alnum:]'_]*\\b")
-         (modid (concat "\\b" conid "\\(\\." conid "\\)*\\b"))
-         (qvarid (concat modid "\\." varid))
-         (qconid (concat modid "\\." conid))
          (sym "\\s.+")
-
-         ;; Reserved identifiers
-         (reservedid
-          (concat "\\<"
-                  ;; `as', `hiding', and `qualified' are part of the import
-                  ;; spec syntax, but they are not reserved.
-                  ;; `_' can go in here since it has temporary word syntax.
-                  ;; (regexp-opt
-                  ;;  '("case" "class" "data" "default" "deriving" "do"
-                  ;;    "else" "if" "import" "in" "infix" "infixl"
-                  ;;    "infixr" "instance" "let" "module" "newtype" "of"
-                  ;;    "then" "type" "where" "_") t)
-                  "\\(_\\|c\\(ase\\|lass\\)\\|d\\(ata\\|e\\(fault\\|riving\\)\\|o\\)\\|else\\|i\\(mport\\|n\\(fix[lr]?\\|stance\\)\\|[fn]\\)\\|let\\|module\\|mdo\\|newtype\\|of\\|rec\\|proc\\|t\\(hen\\|ype\\)\\|where\\)"
-                  "\\>"))
+         (reservedids
+          ;; `as', `hiding', and `qualified' are part of the import
+          ;; spec syntax, but they are not reserved.
+          ;; `_' can go in here since it has temporary word syntax.
+          '("case" "class" "data" "default" "deriving" "do"
+            "else" "if" "import" "in" "infix" "infixl"
+            "infixr" "instance" "let" "module" "mdo" "newtype" "of"
+            "rec" "proc" "then" "type" "where" "_"))
 
          ;; Top-level declarations
          (topdecl-var
@@ -262,8 +253,6 @@ Regexp match data 0 points to the chars."
             ("^#.*$" 0 'font-lock-preprocessor-face t)
 
             ,@(haskell-font-lock-symbols-keywords)
-
-            (,reservedid 1 'haskell-keyword-face)
 
             ;; Special case for `as', `hiding', `safe' and `qualified', which are
             ;; keywords in import statements but are not otherwise reserved.
@@ -302,9 +291,12 @@ Regexp match data 0 points to the chars."
 
             ;; Toplevel Declarations.
             ;; Place them *before* generic id-and-op highlighting.
-            (,topdecl-var  (1 'haskell-definition-face))
-            (,topdecl-var2 (2 'haskell-definition-face))
-            (,topdecl-bangpat  (1 'haskell-definition-face))
+            (,topdecl-var  (1 (unless (member (match-string 1) ',reservedids)
+                                'haskell-definition-face)))
+            (,topdecl-var2 (2 (unless (member (match-string 2) ',reservedids)
+                                'haskell-definition-face)))
+            (,topdecl-bangpat  (1 (unless (member (match-string 1) ',reservedids)
+                                'haskell-definition-face)))
             (,topdecl-sym  (2 (unless (member (match-string 2) '("\\" "=" "->" "→" "<-" "←" "::" "∷" "," ";" "`"))
                                 'haskell-definition-face)))
             (,topdecl-sym2 (1 (unless (member (match-string 1) '("\\" "=" "->" "→" "<-" "←" "::" "∷" "," ";" "`"))
@@ -314,19 +306,26 @@ Regexp match data 0 points to the chars."
             ("(\\(,*\\|->\\))" 0 'haskell-constructor-face)
             ("\\[\\]" 0 'haskell-constructor-face)
 
-            (,(concat "`" varid "`") 0 'haskell-operator-face)
-            (,(concat "`" conid "`") 0 'haskell-operator-face)
-            (,(concat "`" qvarid "`") 0 'haskell-operator-face)
-            (,(concat "`" qconid "`") 0 'haskell-operator-face)
+            (,(concat "`" haskell-lexeme-qid-or-qsym "`") 0 'haskell-operator-face)
 
-            (,qconid 0 'haskell-constructor-face)
-
-            (,conid 0 'haskell-constructor-face)
-
-            (,sym 0 (if (and (eq (char-after (match-beginning 0)) ?:)
-                             (not (member (match-string 0) '("::" "∷"))))
-                        'haskell-constructor-face
-                      'haskell-operator-face))))
+            (,haskell-lexeme-qid-or-qsym
+             0 (cl-case (haskell-lexeme-classify-by-first-char (char-after (match-beginning 1)))
+                 (varid (when (member (match-string 0) ',reservedids)
+                          ;; Note: keywords parse as keywords only when not qualified.
+                          ;; GHC parses Control.let as a single but illegal lexeme.
+                          'haskell-keyword-face))
+                 (conid 'haskell-constructor-face)
+                 (varsym (when (and (not (member (match-string 0) '("-" "+" ".")))
+                                      (not (save-excursion
+                                             (goto-char (match-beginning 1))
+                                             (looking-at-p "\\sw"))))
+                             ;; We need to protect against the case of
+                             ;; plus, minus or dot inside a floating
+                             ;; point number.
+                             'haskell-operator-face))
+                 (consym (if (not (member (match-string 1) '("::" "∷")))
+                             'haskell-constructor-face
+                           'haskell-operator-face))))))
     keywords))
 
 
@@ -456,7 +455,8 @@ Regexp match data 0 points to the chars."
          (font-lock-syntactic-face-function
           . haskell-syntactic-face-function)
          ;; Get help from font-lock-syntactic-keywords.
-         (parse-sexp-lookup-properties . t))))
+         (parse-sexp-lookup-properties . t)
+         (font-lock-extra-managed-props . (composition)))))
 
 (defun haskell-fontify-as-mode (text mode)
   "Fontify TEXT as MODE, returning the fontified text."

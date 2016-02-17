@@ -92,7 +92,7 @@ order."
 
 (ert-deftest haskell-lexeme-unicode-ids-2 ()
   "Unicode ids, unicode as last character in line"
-  :expected-result :failed
+  ;;:expected-result :failed
   (check-lexemes
    '("Żółw.head,Data.żółw,Артур.Артур")
    '("Żółw.head" "," "Data.żółw" "," "Артур.Артур")))
