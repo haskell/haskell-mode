@@ -136,15 +136,19 @@ haskell-mode.info: doc/haskell-mode.texi
 
 doc/haskell-mode.html: doc/haskell-mode.texi doc/haskell-mode.css
 	LANG=en_US.UTF-8 $(MAKEINFO) $(MAKEINFO_FLAGS) --html --css-include=doc/haskell-mode.css --no-split -o $@ $<
+	$(BATCH) -l doc/haskell-manual-fixups.el -f haskell-manual-fixups-batch-and-exit $@
 
 doc/html/index.html : doc/haskell-mode.texi
 	if [ -e doc/html ]; then rm -r doc/html; fi
+	mkdir doc/html
+	cp -r doc/anim doc/html/anim
 	LANG=en_US.UTF-8 $(MAKEINFO) $(MAKEINFO_FLAGS) --html				\
 	    --css-ref=haskell-mode.css							\
 	    -c AFTER_BODY_OPEN='<div class="background"> </div>'			\
 	    -c EXTRA_HEAD='<link rel="shortcut icon" href="haskell-mode-32x32.png">'	\
 	    -c SHOW_TITLE=0								\
 	    -o doc/html $<
+	$(BATCH) -l doc/haskell-manual-fixups.el -f haskell-manual-fixups-batch-and-exit doc/html/*.html
 
 doc/html/haskell-mode.css : doc/haskell-mode.css doc/html/index.html
 	cp $< $@
@@ -155,16 +159,10 @@ doc/html/haskell-mode.svg : images/haskell-mode.svg doc/html/index.html
 doc/html/haskell-mode-32x32.png : images/haskell-mode-32x32.png doc/html/index.html
 	cp $< $@
 
-doc/html/anim : doc/anim doc/html/index.html
-	if [ -e $@ ]; then rm -r $@; fi
-	cp -r $< $@
-
 doc/html : doc/html/index.html			\
            doc/html/haskell-mode.css		\
            doc/html/haskell-mode.svg		\
-           doc/html/haskell-mode-32x32.png	\
-           doc/html/anim
-
+           doc/html/haskell-mode-32x32.png
 
 deploy-manual : doc/html
 	cd doc && ./deploy-manual.sh
