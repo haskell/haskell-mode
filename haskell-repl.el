@@ -22,9 +22,16 @@
 
 (defun haskell-interactive-handle-expr ()
   "Handle an inputted expression at the REPL."
-  (when (haskell-interactive-at-prompt)
-    (let ((expr (haskell-interactive-mode-input)))
-      (unless (string= "" (replace-regexp-in-string " " "" expr))
+  (let ((expr (haskell-interactive-mode-input))
+        (at-prompt-line (>= (line-end-position)
+                            haskell-interactive-mode-prompt-start)))
+    (if (and at-prompt-line
+             (string= "" (replace-regexp-in-string " " "" expr)))
+        (progn
+            (goto-char (point-max))
+            (insert "\n")
+            (haskell-interactive-mode-prompt))
+      (when (haskell-interactive-at-prompt)
         (cond
          ;; If already evaluating, then the user is trying to send
          ;; input to the REPL during evaluation. Most likely in
@@ -37,7 +44,7 @@
                          haskell-interactive-mode-result-end
                          (point))))
             ;; here we need to go to end of line again as evil-mode
-            ;; might hae managed to put us one char back
+            ;; might have managed to put us one char back
             (goto-char (point-max))
             (insert "\n")
             ;; Bring the marker forward
