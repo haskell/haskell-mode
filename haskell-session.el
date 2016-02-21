@@ -80,11 +80,13 @@
 
 (defun haskell-session-default-name ()
   "Generate a default project name for the new project prompt."
-  (let ((file (haskell-cabal-find-file)))
-    (or (when file
-          (downcase (file-name-sans-extension
-                     (file-name-nondirectory file))))
-        "haskell")))
+  (if (eq 'stack-ghci (haskell-process-type))
+      (locate-dominating-file default-directory "stack.yaml")
+    (let ((file (haskell-cabal-find-file)))
+      (or (when file
+            (downcase (file-name-sans-extension
+                       (file-name-nondirectory file))))
+          "haskell"))))
 
 (defun haskell-session-assign (session)
   "Assing current buffer to SESSION.
