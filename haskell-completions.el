@@ -1,6 +1,6 @@
 ;;; haskell-completions.el --- Haskell Completion package -*- lexical-binding: t -*-
 
-;; Copyright © 2015 Athur Fayzrakhmanov. All rights reserved.
+;; Copyright © 2015-2016 Athur Fayzrakhmanov. All rights reserved.
 
 ;; This file is part of haskell-mode package.
 ;; You can contact with authors using GitHub issue tracker:
@@ -63,8 +63,51 @@
         "WARNING")
   "A list of supported pragmas.
 This list comes from GHC documentation (URL
-`https://downloads.haskell.org/~ghc/7.10.1/docs/html/users_guide/pragmas.html'.
-")
+`https://downloads.haskell.org/~ghc/7.10.1/docs/html/users_guide/pragmas.html'.")
+
+(defvar haskell-completions--keywords
+  (list
+   "as"
+   "case"
+   "class"
+   "data family"
+   "data instance"
+   "data"
+   "default"
+   "deriving instance"
+   "deriving"
+   "do"
+   "else"
+   "family"
+   "forall"
+   "foreign import"
+   "foreign"
+   "hiding"
+   "if"
+   "import qualified"
+   "import"
+   "in"
+   "infix"
+   "infixl"
+   "infixr"
+   "instance"
+   "let"
+   "mdo"
+   "module"
+   "newtype"
+   "of"
+   "proc"
+   "qualified"
+   "rec"
+   "then"
+   "type family"
+   "type instance"
+   "type"
+   "where")
+  "A list of Haskell's keywords (URL `https://wiki.haskell.org/Keywords').
+Single char keywords and operator like keywords are not included
+in this list.")
+
 
 (defun haskell-completions-can-grab-prefix ()
   "Check if the case is appropriate for grabbing completion prefix.
@@ -206,7 +249,7 @@ identifier at point depending on result of function
 Returns a list of form '(prefix-start-position
 prefix-end-position prefix-value prefix-type) depending on
 situation, e.g. is it needed to complete pragma, module name,
-arbitrary identifier, etc. Returns nil in case it is
+arbitrary identifier, etc.  Returns nil in case it is
 impossible to grab prefix.
 
 If provided optional MINLEN parameter this function will return
