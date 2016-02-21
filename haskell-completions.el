@@ -40,7 +40,7 @@
 (require 'haskell-process)
 (require 'haskell-interactive-mode)
 
-(defvar haskell-completions-pragma-names
+(defvar haskell-completions--pragma-names
   (list "DEPRECATED"
         "INCLUDE"
         "INCOHERENT"
@@ -276,7 +276,7 @@ Returns nil if no completions available."
                 (cl-case typ
                   ;; non-interactive completions first
                   ('haskell-completions-pragma-name-prefix
-                   haskell-completions-pragma-names)
+                   haskell-completions--pragma-names)
                   ('haskell-completions-ghc-option-prefix
                    haskell-ghc-supported-options)
                   ('haskell-completions-language-extension-prefix
