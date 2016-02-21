@@ -252,6 +252,17 @@ situation, e.g. is it needed to complete pragma, module name,
 arbitrary identifier, etc.  Returns nil in case it is
 impossible to grab prefix.
 
+Possible prefix types are:
+
+* haskell-completions-pragma-name-prefix
+* haskell-completions-ghc-option-prefix
+* haskell-completions-language-extension-prefix
+* haskell-completions-module-name-prefix
+* haskell-completions-identifier-prefix
+* haskell-completions-general-prefix
+
+the last type is used in cases when completing things inside comments.
+
 If provided optional MINLEN parameter this function will return
 result only if prefix length is not less than MINLEN."
    (when (haskell-completions-can-grab-prefix)
