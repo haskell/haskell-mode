@@ -65,13 +65,13 @@ is asked to show extra info for the items matching QUERY.."
            current-prefix-arg)))
   (if (null haskell-hoogle-command)
       (browse-url (format haskell-hoogle-url (url-hexify-string query)))
-    (with-help-window "*hoogle*"
-      (with-current-buffer standard-output
-        (insert (shell-command-to-string
-                 (concat haskell-hoogle-command
-                         (if info " -i " "")
-                         " --color " (shell-quote-argument query))))
-        (ansi-color-apply-on-region (point-min) (point-max))))))
+    (let ((command (concat haskell-hoogle-command
+                           (if info " -i " "")
+                           " --color " (shell-quote-argument query))))
+      (with-help-window "*hoogle*"
+        (with-current-buffer standard-output
+          (insert (shell-command-to-string command))
+          (ansi-color-apply-on-region (point-min) (point-max)))))))
 
 ;;;###autoload
 (defalias 'hoogle 'haskell-hoogle)
