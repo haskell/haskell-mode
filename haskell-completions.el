@@ -263,6 +263,38 @@ result only if prefix length is not less than MINLEN."
                 prefix))
              (prefix prefix)))))
 
+(defun haskell-completions--simple-completions (prefix)
+  "Provide a list of completion candidates for given PREFIX.
+This function is used internally in
+`haskell-completions-completion-at-point' and
+`haskell-completions-sync-repl-completion-at-point'.
+
+It provides completions for haskell keywords, language pragmas,
+GHC's options, and language extensions.
+
+PREFIX should be a list such one returned by
+`haskell-completions-grab-identifier-prefix'."
+  (cl-destructuring-bind (beg end _pfx typ) prefix
+    (let ((candidates
+           (cl-case typ
+             ('haskell-completions-pragma-name-prefix
+              haskell-completions--pragma-names)
+             ('haskell-completions-ghc-option-prefix
+              haskell-ghc-supported-options)
+             ('haskell-completions-language-extension-prefix
+              haskell-ghc-supported-extensions)
+             (otherwise
+              haskell-completions--keywords))))
+      (list beg end candidates))))
+
+
+(defun haskell-completions-completion-at-point ()
+  "Provide a list of completion candidates.
+This function is supposed to be used in non-interactive context.
+It provides completions for haskell keywords, language pragmas,
+GHC's options, and language extensions, but not identifiers."
+  (let ((prefix (haskell-completions-grab-prefix)))
+    (haskell-completions--simple-completions prefix)))
 
 (defun haskell-completions-sync-completions-at-point ()
   "A `completion-at-point' function using the current haskell process.
