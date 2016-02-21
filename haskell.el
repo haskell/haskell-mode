@@ -67,12 +67,12 @@
   :lighter " Interactive"
   :keymap interactive-haskell-mode-map
   (add-hook 'completion-at-point-functions
-            #'haskell-completions-sync-completions-at-point
+            #'haskell-completions-sync-repl-completion-at-point
             nil
             t))
 
 (make-obsolete 'haskell-process-completions-at-point
-               'haskell-completions-sync-completions-at-point
+               'haskell-completions-sync-repl-completion-at-point
                "June 19, 2015")
 (defun haskell-process-completions-at-point ()
   "A completion-at-point function using the current haskell process."

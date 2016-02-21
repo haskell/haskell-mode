@@ -307,35 +307,36 @@ GHC's options, and language extensions, but not identifiers."
   (let ((prefix (haskell-completions-grab-prefix)))
     (haskell-completions--simple-completions prefix)))
 
-(defun haskell-completions-sync-completions-at-point ()
+(defun haskell-completions-sync-repl-completion-at-point ()
   "A `completion-at-point' function using the current haskell process.
 Returns nil if no completions available."
   (let ((prefix-data (haskell-completions-grab-prefix)))
     (when prefix-data
       (cl-destructuring-bind (beg end pfx typ) prefix-data
-        (let ((imp (eql typ 'haskell-completions-module-name-prefix))
-              lst)
-          (setq lst
-                (cl-case typ
-                  ;; non-interactive completions first
-                  ('haskell-completions-pragma-name-prefix
-                   haskell-completions--pragma-names)
-                  ('haskell-completions-ghc-option-prefix
-                   haskell-ghc-supported-options)
-                  ('haskell-completions-language-extension-prefix
-                   haskell-ghc-supported-extensions)
-                  (otherwise
-                   (when (and
-                          (not (eql typ 'haskell-completions-general-prefix))
-                          (haskell-session-maybe)
-                          (not
-                           (haskell-process-cmd (haskell-interactive-process))))
-                     ;; if REPL is available and not busy try to query it
-                     ;; for completions list in case of module name or
-                     ;; identifier prefixes
-                     (haskell-completions-sync-complete-repl pfx imp)))))
-          (when lst
-            (list beg end lst)))))))
+        (when (not (eql typ 'haskell-completions-general-prefix))
+          ;; do not complete things in comments
+          (if (cl-member
+               typ
+               '(haskell-completions-pragma-name-prefix
+                 haskell-completions-ghc-option-prefix
+                 haskell-completions-language-extension-prefix))
+              ;; provide simple completions
+              (haskell-completions--simple-completions prefix-data)
+            ;; only two cases left: haskell-completions-module-name-prefix
+            ;; and haskell-completions-identifier-prefix
+            (let* ((is-import (eql typ 'haskell-completions-module-name-prefix))
+                   (candidates
+                    (when (and (haskell-session-maybe)
+                               (not (haskell-process-cmd
+                                     (haskell-interactive-process))))
+                      ;; if REPL is available and not busy try to query it for
+                      ;; completions list in case of module name or identifier
+                      ;; prefixes
+                      (haskell-completions-sync-complete-repl pfx is-import))))
+              ;; append candidates with keywords
+              (list beg end (append
+                             candidates
+                             haskell-completions--keywords)))))))))
 
 (defun haskell-completions-sync-complete-repl (prefix &optional import)
   "Return completion list for given PREFIX querying REPL synchronously.
