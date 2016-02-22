@@ -946,4 +946,47 @@ data Foo = Bar
     (execute-kbd-macro (kbd "M-j"))
     (should (equal 3 (- (point) (line-beginning-position))))))
 
+(ert-deftest haskell-indentation-cycle ()
+  "Test if the indentation cycles properly."
+  (with-temp-buffer
+    (haskell-mode)
+    (insert "
+test = test' []
+  where
+    test' = test''
+      where
+        test'' :: [a] -> [a]
+      test'' = something")
+    (let* ((inds (save-excursion
+                   (move-to-column (haskell-indentation-current-indentation))
+                   (haskell-indentation-find-indentations)))
+           (count (1- (length inds)))
+           (current count))
+      (should (eq count 3))
+      (setq current 2)                  ; will be at third position
+      ;; do first indent as normal
+      (haskell-indentation-indent-line)
+      (should (eq (haskell-indentation-current-indentation)
+                  (nth current inds)))
+      ;; indent until the max indent position
+      ;; behave as if re-indenting
+      (while (< current count)
+        (cl-incf current)
+        (let ((last-command 'indent-for-tab-command))
+          (haskell-indentation-indent-line))
+        (should (eq (haskell-indentation-current-indentation)
+                    (nth current inds))))
+      ;; start to indent backwards
+      (cl-decf current)
+      (haskell-indentation-indent-line)
+      (should (eq (haskell-indentation-current-indentation)
+                  (nth current inds)))
+      ;; indent back the rest of the way
+      (while (> current 0)
+        (cl-decf current)
+        (let ((last-command 'indent-for-tab-command))
+          (haskell-indentation-indent-line))
+        (should (eq (haskell-indentation-current-indentation)
+                    (nth current inds)))))))
+
 ;;; haskell-indentation-tests.el ends here
