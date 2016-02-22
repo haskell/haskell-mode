@@ -300,15 +300,23 @@ PREFIX should be a list such one returned by
 
 
 (defun haskell-completions-completion-at-point ()
-  "Provide a list of completion candidates.
-This function is supposed to be used in non-interactive context.
-It provides completions for haskell keywords, language pragmas,
+  "Provide completion list for thing at point.
+This function is used in non-interactive `haskell-mode'.  It
+provides completions for haskell keywords, language pragmas,
 GHC's options, and language extensions, but not identifiers."
   (let ((prefix (haskell-completions-grab-prefix)))
     (haskell-completions--simple-completions prefix)))
 
 (defun haskell-completions-sync-repl-completion-at-point ()
-  "A `completion-at-point' function using the current haskell process.
+  "A completion function used in `interactive-haskell-mode'.
+Completion candidates are provided quering current haskell
+process, that is sending `:complete repl' command.
+
+Completes all possible things: everything that can be completed
+with non-interactive function
+`haskell-completions-completion-at-point' plus identifier
+completions.
+
 Returns nil if no completions available."
   (let ((prefix-data (haskell-completions-grab-prefix)))
     (when prefix-data

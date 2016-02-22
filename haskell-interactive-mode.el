@@ -1016,7 +1016,8 @@ don't care when the thing completes as long as it's soonish."
       (remove-overlays))))
 
 (defun haskell-interactive-mode-completion-at-point-function ()
-  "Offer completions for partial expression between prompt and point"
+  "Offer completions for partial expression between prompt and point.
+This completion function is used in interactive REPL buffer itself."
   (when (haskell-interactive-at-prompt)
     (let* ((process (haskell-interactive-process))
            (inp (haskell-interactive-mode-input-partial))
