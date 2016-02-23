@@ -712,7 +712,7 @@ function `xref-find-definitions' after new table was generated."
                (format ":!cd %s && %s | %s"
                        (haskell-session-cabal-dir
                         (haskell-process-session (car state)))
-                       "find . -type f \\( -name '*.hs' -or -name '*.lhs' -or -name '*.hsc' \\) -not \\( -name '#*' -or -name '.*' \\) -print0"
+                       "find . -type d \\( -path ./.stack-work -o -path ./dist -o -path ./.cabal-sandbox \\) -prune -o -type f \\( -name '*.hs' -or -name '*.lhs' -or -name '*.hsc' \\) -not \\( -name '#*' -or -name '.*' \\) -print0"
                        "xargs -0 hasktags -e -x"))))
       :complete (lambda (state _response)
                   (when (cdr state)
