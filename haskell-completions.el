@@ -1,6 +1,6 @@
 ;;; haskell-completions.el --- Haskell Completion package -*- lexical-binding: t -*-
 
-;; Copyright © 2015 Athur Fayzrakhmanov. All rights reserved.
+;; Copyright © 2015-2016 Athur Fayzrakhmanov. All rights reserved.
 
 ;; This file is part of haskell-mode package.
 ;; You can contact with authors using GitHub issue tracker:
@@ -40,7 +40,7 @@
 (require 'haskell-process)
 (require 'haskell-interactive-mode)
 
-(defvar haskell-completions-pragma-names
+(defvar haskell-completions--pragma-names
   (list "DEPRECATED"
         "INCLUDE"
         "INCOHERENT"
@@ -63,8 +63,51 @@
         "WARNING")
   "A list of supported pragmas.
 This list comes from GHC documentation (URL
-`https://downloads.haskell.org/~ghc/7.10.1/docs/html/users_guide/pragmas.html'.
-")
+`https://downloads.haskell.org/~ghc/7.10.1/docs/html/users_guide/pragmas.html'.")
+
+(defvar haskell-completions--keywords
+  (list
+   "as"
+   "case"
+   "class"
+   "data family"
+   "data instance"
+   "data"
+   "default"
+   "deriving instance"
+   "deriving"
+   "do"
+   "else"
+   "family"
+   "forall"
+   "foreign import"
+   "foreign"
+   "hiding"
+   "if"
+   "import qualified"
+   "import"
+   "in"
+   "infix"
+   "infixl"
+   "infixr"
+   "instance"
+   "let"
+   "mdo"
+   "module"
+   "newtype"
+   "of"
+   "proc"
+   "qualified"
+   "rec"
+   "then"
+   "type family"
+   "type instance"
+   "type"
+   "where")
+  "A list of Haskell's keywords (URL `https://wiki.haskell.org/Keywords').
+Single char keywords and operator like keywords are not included
+in this list.")
+
 
 (defun haskell-completions-can-grab-prefix ()
   "Check if the case is appropriate for grabbing completion prefix.
@@ -206,8 +249,19 @@ identifier at point depending on result of function
 Returns a list of form '(prefix-start-position
 prefix-end-position prefix-value prefix-type) depending on
 situation, e.g. is it needed to complete pragma, module name,
-arbitrary identifier, etc. Returns nil in case it is
+arbitrary identifier, etc.  Returns nil in case it is
 impossible to grab prefix.
+
+Possible prefix types are:
+
+* haskell-completions-pragma-name-prefix
+* haskell-completions-ghc-option-prefix
+* haskell-completions-language-extension-prefix
+* haskell-completions-module-name-prefix
+* haskell-completions-identifier-prefix
+* haskell-completions-general-prefix
+
+the last type is used in cases when completing things inside comments.
 
 If provided optional MINLEN parameter this function will return
 result only if prefix length is not less than MINLEN."
@@ -220,36 +274,77 @@ result only if prefix length is not less than MINLEN."
                 prefix))
              (prefix prefix)))))
 
+(defun haskell-completions--simple-completions (prefix)
+  "Provide a list of completion candidates for given PREFIX.
+This function is used internally in
+`haskell-completions-completion-at-point' and
+`haskell-completions-sync-repl-completion-at-point'.
 
-(defun haskell-completions-sync-completions-at-point ()
-  "A `completion-at-point' function using the current haskell process.
+It provides completions for haskell keywords, language pragmas,
+GHC's options, and language extensions.
+
+PREFIX should be a list such one returned by
+`haskell-completions-grab-identifier-prefix'."
+  (cl-destructuring-bind (beg end _pfx typ) prefix
+    (let ((candidates
+           (cl-case typ
+             ('haskell-completions-pragma-name-prefix
+              haskell-completions--pragma-names)
+             ('haskell-completions-ghc-option-prefix
+              haskell-ghc-supported-options)
+             ('haskell-completions-language-extension-prefix
+              haskell-ghc-supported-extensions)
+             (otherwise
+              haskell-completions--keywords))))
+      (list beg end candidates))))
+
+
+(defun haskell-completions-completion-at-point ()
+  "Provide completion list for thing at point.
+This function is used in non-interactive `haskell-mode'.  It
+provides completions for haskell keywords, language pragmas,
+GHC's options, and language extensions, but not identifiers."
+  (let ((prefix (haskell-completions-grab-prefix)))
+    (haskell-completions--simple-completions prefix)))
+
+(defun haskell-completions-sync-repl-completion-at-point ()
+  "A completion function used in `interactive-haskell-mode'.
+Completion candidates are provided quering current haskell
+process, that is sending `:complete repl' command.
+
+Completes all possible things: everything that can be completed
+with non-interactive function
+`haskell-completions-completion-at-point' plus identifier
+completions.
+
 Returns nil if no completions available."
   (let ((prefix-data (haskell-completions-grab-prefix)))
     (when prefix-data
       (cl-destructuring-bind (beg end pfx typ) prefix-data
-        (let ((imp (eql typ 'haskell-completions-module-name-prefix))
-              lst)
-          (setq lst
-                (cl-case typ
-                  ;; non-interactive completions first
-                  ('haskell-completions-pragma-name-prefix
-                   haskell-completions-pragma-names)
-                  ('haskell-completions-ghc-option-prefix
-                   haskell-ghc-supported-options)
-                  ('haskell-completions-language-extension-prefix
-                   haskell-ghc-supported-extensions)
-                  (otherwise
-                   (when (and
-                          (not (eql typ 'haskell-completions-general-prefix))
-                          (haskell-session-maybe)
-                          (not
-                           (haskell-process-cmd (haskell-interactive-process))))
-                     ;; if REPL is available and not busy try to query it
-                     ;; for completions list in case of module name or
-                     ;; identifier prefixes
-                     (haskell-completions-sync-complete-repl pfx imp)))))
-          (when lst
-            (list beg end lst)))))))
+        (when (not (eql typ 'haskell-completions-general-prefix))
+          ;; do not complete things in comments
+          (if (cl-member
+               typ
+               '(haskell-completions-pragma-name-prefix
+                 haskell-completions-ghc-option-prefix
+                 haskell-completions-language-extension-prefix))
+              ;; provide simple completions
+              (haskell-completions--simple-completions prefix-data)
+            ;; only two cases left: haskell-completions-module-name-prefix
+            ;; and haskell-completions-identifier-prefix
+            (let* ((is-import (eql typ 'haskell-completions-module-name-prefix))
+                   (candidates
+                    (when (and (haskell-session-maybe)
+                               (not (haskell-process-cmd
+                                     (haskell-interactive-process))))
+                      ;; if REPL is available and not busy try to query it for
+                      ;; completions list in case of module name or identifier
+                      ;; prefixes
+                      (haskell-completions-sync-complete-repl pfx is-import))))
+              ;; append candidates with keywords
+              (list beg end (append
+                             candidates
+                             haskell-completions--keywords)))))))))
 
 (defun haskell-completions-sync-complete-repl (prefix &optional import)
   "Return completion list for given PREFIX querying REPL synchronously.
