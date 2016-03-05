@@ -1736,23 +1736,6 @@ ToDo: Also eliminate leading and trailing whitespace."
       (setq str (replace-match " " t t str)))
     str))
 
-;; ToDo: make this more efficient!!
-;;(defun haskell-doc-string-nub-ws (str)
-;;  "Replace all sequences of whitespaces in STR by just one whitespace."
-;;  (let ( (res "")
-;;       (l (length str))
-;;       (i 0)
-;;       (j 0)
-;;       (in-ws nil))
-;;   (while (< i l)
-;;     (let* ( (c (string-to-char (substring str i (1+ i))))
-;;          (is-ws (eq (char-syntax c) ? )) )
-;;       (if (not (and in-ws is-ws))
-;;           (setq res (concat res (char-to-string c))))
-;;       (setq in-ws is-ws)
-;;       (setq i (1+ i))))
-;;   res))
-
 (defun haskell-doc-chop-off-context (str)
   "Eliminate the context in a type represented by the string STR."
   (let ((i (string-match "=>" str)) )
