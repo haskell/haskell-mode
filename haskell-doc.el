@@ -1434,6 +1434,7 @@ function.  Only the user interface is different."
     (haskell-doc-show-type)))
 
 (defun haskell-doc-in-code-p ()
+  "A predicate indicating suitable case to show docs."
   (not (or (and (eq haskell-literate 'bird)
                 ;; Copied from haskell-indent-bolp.
                 (<= (current-column) 2)
@@ -1442,7 +1443,7 @@ function.  Only the user interface is different."
 
 ;;;###autoload
 (defun haskell-doc-show-type (&optional sym)
-  "Show the type of the function near point.
+  "Show the type of the function near point or given symbol SYM.
 For the function under point, show the type in the echo area.
 This information is extracted from the `haskell-doc-prelude-types' alist
 of prelude functions and their types, or from the local functions in the
@@ -1461,12 +1462,13 @@ current buffer."
           (message "%s" doc))))))
 
 (defvar haskell-doc-current-info--interaction-last nil
-  "If non-nil, a previous eldoc message from an async call, that
-  hasn't been displayed yet.")
+  "Async message stack.
+If non-nil, a previous eldoc message from an async call, that
+hasn't been displayed yet.")
 
 (defun haskell-doc-current-info--interaction (&optional sync)
-  "Asynchronous call to `haskell-process-get-type', suitable for
-use in the eldoc function `haskell-doc-current-info'.
+  "Asynchronous call to `haskell-process-get-type'.
+Suitable for use in the eldoc function `haskell-doc-current-info'.
 
 If SYNC is non-nil, the call will be synchronous instead, and
 instead of calling `eldoc-print-current-symbol-info', the result
@@ -1547,7 +1549,7 @@ If SYNC is non-nil, make the call synchronously instead."
         'async))))
 
 (defun haskell-doc-sym-doc (sym)
-  "Show the type of the function near point.
+  "Show the type of given symbol SYM.
 For the function under point, show the type in the echo area.
 This information is extracted from the `haskell-doc-prelude-types' alist
 of prelude functions and their types, or from the local functions in the
