@@ -333,33 +333,6 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
              (haskell-interactive-mode-error-backward)
              (haskell-interactive-jump-to-error-line)))))
 
-;;;###autoload
-(defun haskell-mode-contextual-space ()
-  "Contextually do clever stuff when hitting space."
-  (interactive)
-  (if (or (not (bound-and-true-p interactive-haskell-mode))
-          (not (haskell-session-maybe)))
-      (self-insert-command 1)
-    (cond ((and haskell-mode-contextual-import-completion
-                (save-excursion (forward-word -1)
-                                (looking-at "^import$")))
-           (insert " ")
-           (let ((module (haskell-complete-module-read
-                          "Module: "
-                          (haskell-session-all-modules (haskell-session)))))
-             (let ((mapping (assoc module haskell-import-mapping)))
-               (if mapping
-                   (progn (delete-region (line-beginning-position)
-                                         (line-end-position))
-                          (insert (cdr mapping)))
-                 (insert module)))
-             (haskell-mode-format-imports)))
-          (t
-           (let ((ident (save-excursion (forward-char -1) (haskell-ident-at-point))))
-             (insert " ")
-             (when ident
-               (haskell-process-do-try-info ident)))))))
-
 (defvar xref-prompt-for-identifier nil)
 
 ;;;###autoload

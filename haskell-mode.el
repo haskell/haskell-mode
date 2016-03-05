@@ -655,13 +655,6 @@ May return a qualified name."
   (let ((fill-prefix (or fill-prefix (if (eq haskell-literate 'bird) ">"))))
     (delete-indentation arg)))
 
-;; Various mode variables.
-(defcustom haskell-mode-contextual-import-completion
-  t
-  "Enable import completion on haskell-mode-contextual-space."
-  :type 'boolean
-  :group 'haskell-interactive)
-
 (defvar eldoc-print-current-symbol-info-function)
 
 (defvar haskell-mode-interactive-prompt-state nil
