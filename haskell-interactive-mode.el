@@ -180,6 +180,21 @@ be nil.")
       (switch-to-buffer-other-window haskell-interactive-previous-buffer)
     (message "No previous buffer.")))
 
+(defun haskell-interactive-copy-to-prompt ()
+  "Copy the current line to the prompt, overwriting the current
+prompt."
+  (interactive)
+  (let ((l (buffer-substring-no-properties (line-beginning-position)
+                                           (line-end-position))))
+    ;; If it looks like the prompt is at the start of the line, chop
+    ;; it off.
+    (when (and (>= (length l) (length haskell-interactive-prompt))
+               (string= (substring l 0 (length haskell-interactive-prompt))
+                        haskell-interactive-prompt))
+      (setq l (substring l (length haskell-interactive-prompt))))
+
+    (haskell-interactive-mode-set-prompt l)))
+
 (defun haskell-interactive-mode-space (n)
   "Handle the space key."
   (interactive "p")

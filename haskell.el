@@ -125,10 +125,17 @@
   "Handle the return key."
   (interactive)
   (cond
+   ;; At a compile message, jump to the location of the error in the
+   ;; source.
    ((haskell-interactive-at-compile-message)
     (next-error-internal))
+   ;; At the input prompt, handle the expression in the usual way.
+   ((haskell-interactive-at-prompt)
+    (haskell-interactive-handle-expr))
+   ;; At any other location in the buffer, copy the line to the
+   ;; current prompt.
    (t
-    (haskell-interactive-handle-expr))))
+    (haskell-interactive-copy-to-prompt))))
 
 ;;;###autoload
 (defun haskell-session-kill (&optional leave-interactive-buffer)
