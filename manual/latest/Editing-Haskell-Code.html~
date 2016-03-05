@@ -55,7 +55,6 @@ ul.no-bullet {list-style: none}
 <link rel="stylesheet" type="text/css" href="haskell-mode.css">
 
 <link rel="shortcut icon" href="haskell-mode-32x32.png">
-<script src="../../index.js"> </script>
 </head>
 
 <body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
@@ -122,12 +121,12 @@ Lock minor mode which should be enabled by default in current
 Emacsen. See <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Font-Lock.html#Font-Lock">(emacs)Font Lock</a>, for more information on how to
 control <code>font-lock-mode</code>.
 </p>
-<img width="309" height="182" src="anim/font-lock.gif" alt="anim/font-lock">
+<img src="anim/font-lock.gif" alt="anim/font-lock">
 
 <p>Syntax highlighting facilities parse strings and string escape sequences
 and are able to highlight unrecognized constructs.
 </p>
-<img width="309" height="102" src="anim/string-escape-highlight.gif" alt="anim/string-escape-highlight">
+<img src="anim/string-escape-highlight.gif" alt="anim/string-escape-highlight">
 
 
 <a name="Managing-imports"></a>
@@ -204,13 +203,13 @@ stylish-haskell</code>, or if you have not installed <code>stack</code>,
 <p><code>haskell-mode</code> can complete symbols, pragma directives and language
 extensions. This is part of <code>haskell-interactive-mode</code>.
 </p>
-<img width="309" height="182" src="anim/company-mode-language-pragma.gif" alt="anim/company-mode-language-pragma">
+<img src="anim/company-mode-language-pragma.gif" alt="anim/company-mode-language-pragma">
 
 <p>If haskell-interactive-mode is enabled and working haskell mode provides
 completions for import statements taking into account currently loaded
 and available packages.
 </p>
-<img width="519" height="262" src="anim/company-mode-import-statement.gif" alt="anim/company-mode-import-statement">
+<img src="anim/company-mode-import-statement.gif" alt="anim/company-mode-import-statement">
 
 <a name="Profiling-and-Debugging-support"></a>
 <h3 class="section">4.4 Profiling and Debugging support</h3>

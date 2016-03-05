@@ -55,7 +55,6 @@ ul.no-bullet {list-style: none}
 <link rel="stylesheet" type="text/css" href="haskell-mode.css">
 
 <link rel="shortcut icon" href="haskell-mode-32x32.png">
-<script src="../../index.js"> </script>
 </head>
 
 <body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
@@ -73,7 +72,7 @@ standard Emacs mode for this purpose, <code>flyspell-prog-mode</code>, that
 can be enabled in Haskell buffers. Spelling errors are underlined using
 squiggly red lines.
 </p>
-<img width="519" height="182" src="anim/flyspell-prog-mode.gif" alt="anim/flyspell-prog-mode">
+<img src="anim/flyspell-prog-mode.gif" alt="anim/flyspell-prog-mode">
 
 <p>Documentation for <code>flyspell-prog-mode</code> can be found in
 See <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Spelling.html#Spelling">(emacs)Spelling</a>. Here we point to a couple of useful
