@@ -61,6 +61,7 @@ interpreter (e.g. GHCi).
 * Interactive Haskell::             How to interact with GHCi (2)
 * Editing Cabal files::             Cabal support
 * Changing REPL target::            Start REPL with selected target (i.e. test,bench,etc.)
+* Using with flyspell-prog-mode::   Spell check comments and strings
 * Concept index::                   Index of Haskell Mode concepts
 * Function index::                  index of commands
 * Variable index::                  Index of options and types
@@ -845,6 +846,41 @@ Answer ``yes'' to restart the session and run your tests, benchmarks, executable
 
 
 TODO/WRITEME
+
+@node Using with flyspell-prog-mode
+@chapter Using with @code{flyspell-prog-mode}
+
+Strings and comments can be checked for spelling mistakes. There is a
+standard Emacs mode for this purpose, @code{flyspell-prog-mode}, that
+can be enabled in Haskell buffers. Spelling errors are underlined using
+squiggly red lines.
+
+@ifhtml
+@image{anim/flyspell-prog-mode}
+@end ifhtml
+
+Documentation for @code{flyspell-prog-mode} can be found in
+@xref{Spelling,,,emacs}. Here we point to a couple of useful
+keybindings:
+
+@itemize
+@item
+@kbd{M-$} - Check and correct spelling of the word at point (@code{ispell-word}).
+
+@item
+@kbd{digit} - Replace the word, just this time, with one of the
+displayed near-misses. Each near-miss is listed with a digit; type that
+digit to select it.
+
+@item
+@kbd{SPC} - Skip this word—continue to consider it incorrect, but don’t
+change it here.
+@end itemize
+
+To enable spell checking of strings and comments add this line to your
+@code{~/.emacs} file:
+
+@code{(add-hook 'haskell-mode-hook 'flyspell-prog-mode)}
 
 @node Concept index
 @unnumbered Concept index
