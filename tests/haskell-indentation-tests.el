@@ -656,6 +656,13 @@ test = [randomQQ| This is
 "
               (4 0 2))
 
+(hindent-test "29c* quasiquote with quotes in it and a string outside" "
+foo = do
+  let bar = [text|\"some text\"|]
+  button \"Cancel\" $ do
+"
+              (4 4))
+
 (hindent-test "30* parse '[] identifier correctly" "
 instance Callable '[]
 "
