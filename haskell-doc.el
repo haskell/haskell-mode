@@ -1392,12 +1392,14 @@ is not."
 This function is run by an idle timer to print the type
  automatically if `haskell-doc-mode' is turned on."
   (and haskell-doc-mode
+       (haskell-doc-in-code-p)
        (not haskell-mode-interactive-prompt-state)
        (not (eobp))
        (not executing-kbd-macro)
        ;; Having this mode operate in the minibuffer makes it impossible to
        ;; see what you're doing.
        (not (eq (selected-window) (minibuffer-window)))
+       ;; not in string or comment
        ;; take a nap, if run straight from post-command-hook.
        (if (fboundp 'run-with-idle-timer) t
          (sit-for haskell-doc-idle-delay))
@@ -1416,12 +1418,11 @@ This function is run by an idle timer to print the type
 Meant for `eldoc-documentation-function'."
   ;; There are a number of possible documentation functions.
   ;; Some of them are asynchronous.
-  (let ((msg (or
-              (haskell-doc-current-info--interaction)
-              (haskell-doc-sym-doc (haskell-ident-at-point)))))
-    (unless (symbolp msg) msg)))
-
-
+  (when (haskell-doc-in-code-p)
+    (let ((msg (or
+                (haskell-doc-current-info--interaction)
+                (haskell-doc-sym-doc (haskell-ident-at-point)))))
+      (unless (symbolp msg) msg))))
 
 (defun haskell-doc-ask-mouse-for-type (event)
   "Read the identifier under the mouse and echo its type.
@@ -1476,23 +1477,25 @@ will be returned directly."
   ;; Return nil if nothing is available, or 'async if something might
   ;; be available, but asynchronously later. This will call
   ;; `eldoc-print-current-symbol-info' later.
-  (let (sym prev-message)
-    (cond
-     ((setq prev-message haskell-doc-current-info--interaction-last)
-      (setq haskell-doc-current-info--interaction-last nil)
-      (cdr prev-message))
-     ((setq sym
-            (if (use-region-p)
-                (buffer-substring-no-properties
-                 (region-beginning) (region-end))
-              (haskell-ident-at-point)))
-      (if sync
-          (haskell-process-get-type sym #'identity t)
-        (haskell-process-get-type
-         sym (lambda (response)
-               (setq haskell-doc-current-info--interaction-last
-                     (cons 'async response))
-               (eldoc-print-current-symbol-info))))))))
+  (when (haskell-doc-in-code-p)
+    ;; do nothing when inside string or comment
+    (let (sym prev-message)
+      (cond
+       ((setq prev-message haskell-doc-current-info--interaction-last)
+        (setq haskell-doc-current-info--interaction-last nil)
+        (cdr prev-message))
+       ((setq sym
+              (if (use-region-p)
+                  (buffer-substring-no-properties
+                   (region-beginning) (region-end))
+                (haskell-ident-at-point)))
+        (if sync
+            (haskell-process-get-type sym #'identity t)
+          (haskell-process-get-type
+           sym (lambda (response)
+                 (setq haskell-doc-current-info--interaction-last
+                       (cons 'async response))
+                 (eldoc-print-current-symbol-info)))))))))
 
 (defun haskell-process-get-type (expr-string &optional callback sync)
   "Asynchronously get the type of a given string.
