@@ -6,7 +6,7 @@ env:
   matrix:
     - EMACS=emacs24           TARGET=check
     - EMACS=emacs-snapshot    TARGET=check
-    - TARGET=deploy-manual
+    - EMACS=emacs24           TARGET=deploy-manual
   global:
     - secure: "ejv1+ub/v+Hm/23fhp4zLAHT3HiCG+YdDHai57LDe4LfEZCeGz4i/6LazbPbwm58v2YuKvMcdNshebc1s4A293ARJryPyFfW/8kEe+3hQ+cDxunNdHfqcS8SyhcDG0mrv7dqiVAtMJqB8qZb0c161KeEM8nyhC0wyQ+EZ5qJnzM="
 
