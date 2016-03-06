@@ -587,7 +587,13 @@ executable found in PATH.")
                 (put-text-property (match-beginning 3) (1+ (match-end 3)) 'syntax-table (string-to-syntax "|")))))
            ((equal token-kind 'template-haskell-quasi-quote)
             (put-text-property (match-beginning 2) (match-end 2) 'syntax-table (string-to-syntax "\""))
-            (put-text-property (match-beginning 4) (match-end 4) 'syntax-table (string-to-syntax "\""))))
+            (put-text-property (match-beginning 4) (match-end 4) 'syntax-table (string-to-syntax "\""))
+            (save-excursion
+              (goto-char (match-beginning 3))
+              (let ((limit (match-end 3)))
+                (save-match-data
+                  (while (re-search-forward "\"" limit t)
+                    (put-text-property (match-beginning 0) (match-end 0) 'syntax-table (string-to-syntax "."))))))))
           (if token-kind
               (goto-char (match-end 0))
             (goto-char end)))))))
