@@ -129,8 +129,7 @@ set and deleted as if they were real tabs."
 (defvar haskell-literate) ; defined in haskell-mode.el
 
 (defun haskell-indentation-bird-p ()
-  "Return t if this is a literate Haskell buffer in bird style,
-NIL otherwise."
+  "Return t if this is a literate Haskell buffer in bird style, NIL otherwise."
   (eq haskell-literate 'bird))
 
 ;;----------------------------------------------------------------------------

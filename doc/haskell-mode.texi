@@ -298,18 +298,6 @@ To just align imports, jump to an import section and run
 
     @code{M-x haskell-align-imports}
 
-@subsection Entering imports
-
-If you have Haskell Interactive Mode enabled and a session open,
-you can write
-
-    @code{import}
-
-And then hit @kbd{SPC} (running @code{M-x haskell-mode-contextual-space})
-which will prompt a list of all modules, either installed modules or
-local project directory files. Then it'll insert it and then format that
-module section.
-
 @subsection stylish-haskell
 
 As an alternative to the elisp functions described above, haskell-mode
@@ -777,7 +765,7 @@ program to start and its arguments:
 If it's @code{ghci}, @code{haskell-process-path-ghci} and
 @code{haskell-process-args-ghci} will be used.
 @item
-If it's @code{cabal-repl}, @code{haskell-process-path-ghci} and 
+If it's @code{cabal-repl}, @code{haskell-process-path-ghci} and
 @code{haskell-process-args-ghci}.
 @item
 If it's @code{stack-ghci}, @code{haskell-process-path-stack} and
