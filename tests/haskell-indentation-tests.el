@@ -203,7 +203,7 @@ fun = [ x | y,
               (2 12)
               (3 0 6))
 
-(hindent-test "6* \"let\" in list comprehension""
+(hindent-test "6a* \"let\" in list comprehension""
 fun = [ f | x <- xs
           , y <- ys
           , let c = 123
@@ -213,6 +213,25 @@ fun = [ f | x <- xs
               (3 10)
               (4 10)
               (5 0 6))
+
+(hindent-test "6b* \"let\" in list comprehension""
+fun = [ f | x <- [1]
+          , y <- [2]
+          , let c, d :: Int
+                c = 123
+                d = 45
+          , f <- [x * y * c * d] ]"
+              ;; this one is interesting because the comma betweed c
+              ;; and d does not count as a comma for list
+              ;; comprehension elements
+              (1 0)
+              (2 10)
+              (3 10)
+              (4 16)
+              (5 16)
+              (6 10)
+              (7 0 6))
+
 
 (hindent-test "6u* \"let\" in list comprehension""
 fun = [ f | x ← xs
