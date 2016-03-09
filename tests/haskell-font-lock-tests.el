@@ -27,9 +27,9 @@ not checked."
       (should (equal (list text (list face))
                      (list text all-faces))))))
 
-(defun check-face-match-range (face 0)
-  (let ((beg (match-beginning 0))
-        (end (match-end 0)))
+(defun check-face-match-range (face n)
+  (let ((beg (match-beginning n))
+        (end (match-end n)))
     (while (< beg end)
       (should (eq face (get-text-property beg 'face)))
       (setq beg (1+ beg)))))
