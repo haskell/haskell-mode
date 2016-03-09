@@ -296,10 +296,17 @@ indentation points to the right, we switch going to the left."
    (t nil)))
 
 (defun haskell-indentation-indent-region (start end)
-  "Indent region from START to END."
-  (setq haskell-indentation-dyn-last-direction 'region)
-  (haskell-indentation-indent-rigidly start end 1)
-  (message "Press TAB or S-TAB again to indent the region more"))
+  "This function does nothing.
+
+It is better to do nothing to indent region in Haskell than to
+break the semantics of indentation. This function is used for
+`indent-region-function' because the default is to call
+`indent-line-function' on every line from START to END and that
+also produces catastrophic results.
+
+Someday we will have indent region that preserves semantics and
+fixes up only indentation."
+  nil)
 
 (defun haskell-indentation-indent-backwards ()
   "Indent the current line to the previous indentation point."
