@@ -94,11 +94,15 @@
                           "sizeof")
                  (+ ws)
                  cid)
-            ;; this could be extended further
             (seq (group-n 2
                           "enum"
-                          (? (+ ws)
-                             "define"))
+                          (+ ws)
+                          "define")
+                 (+ ws)
+                 cid)
+            ;; TODO: vanilla enum fontification is incomplete
+            (seq (group-n 2
+                          "enum")
                  (+ ws)
                  cid
                  (opt (+ ws)
