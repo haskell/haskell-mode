@@ -296,7 +296,7 @@ This uses `accept-process-output' internally."
     (car-safe (haskell-command-state cmd))))
 
 (defun haskell-process-get-repl-completions (process inputstr &optional limit)
-  "Perform `:complete repl ...' query for INPUTSTR using PROCESS.
+  "Query PROCESS with `:complete repl ...' for INPUTSTR.
 Give optional LIMIT arg to limit completion candidates count,
 zero, negative values, and nil means all possible completions.
 Returns NIL when no completions found."
