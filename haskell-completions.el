@@ -305,7 +305,8 @@ This function is used in non-interactive `haskell-mode'.  It
 provides completions for haskell keywords, language pragmas,
 GHC's options, and language extensions, but not identifiers."
   (let ((prefix (haskell-completions-grab-prefix)))
-    (haskell-completions--simple-completions prefix)))
+    (when prefix
+      (haskell-completions--simple-completions prefix))))
 
 (defun haskell-completions-sync-repl-completion-at-point ()
   "A completion function used in `interactive-haskell-mode'.
