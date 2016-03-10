@@ -286,17 +286,18 @@ GHC's options, and language extensions.
 PREFIX should be a list such one returned by
 `haskell-completions-grab-identifier-prefix'."
   (cl-destructuring-bind (beg end _pfx typ) prefix
-    (let ((candidates
-           (cl-case typ
-             ('haskell-completions-pragma-name-prefix
-              haskell-completions--pragma-names)
-             ('haskell-completions-ghc-option-prefix
-              haskell-ghc-supported-options)
-             ('haskell-completions-language-extension-prefix
-              haskell-ghc-supported-extensions)
-             (otherwise
-              haskell-completions--keywords))))
-      (list beg end candidates))))
+    (when (not (eql typ 'haskell-completions-general-prefix))
+      (let ((candidates
+             (cl-case typ
+               ('haskell-completions-pragma-name-prefix
+                haskell-completions--pragma-names)
+               ('haskell-completions-ghc-option-prefix
+                haskell-ghc-supported-options)
+               ('haskell-completions-language-extension-prefix
+                haskell-ghc-supported-extensions)
+               (otherwise
+                haskell-completions--keywords))))
+        (list beg end candidates)))))
 
 
 (defun haskell-completions-completion-at-point ()
