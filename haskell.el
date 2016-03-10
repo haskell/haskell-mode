@@ -36,12 +36,6 @@
 (require 'haskell-utils)
 (require 'haskell-customize)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Basic configuration hooks
-
-(add-hook 'haskell-process-ended-hook 'haskell-process-prompt-restart)
-(add-hook 'kill-buffer-hook 'haskell-interactive-kill)
-
 (defvar interactive-haskell-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-l") 'haskell-process-load-file)

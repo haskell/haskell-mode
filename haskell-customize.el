@@ -104,7 +104,7 @@ when showing type information about symbols."
   :type 'boolean
   :safe 'booleanp)
 
-(defvar haskell-process-end-hook nil
+(defvar haskell-process-ended-functions (list 'haskell-process-prompt-restart)
   "Hook for when the haskell process ends.")
 
 ;;;###autoload
