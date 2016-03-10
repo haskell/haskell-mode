@@ -338,7 +338,11 @@ Returns nil if no completions available."
                    (candidates
                     (when (and (haskell-session-maybe)
                                (not (haskell-process-cmd
-                                     (haskell-interactive-process))))
+                                     (haskell-interactive-process)))
+                               ;; few possible extra checks would be:
+                               ;; (haskell-process-get 'is-restarting)
+                               ;; (haskell-process-get 'evaluating)
+                               )
                       ;; if REPL is available and not busy try to query it for
                       ;; completions list in case of module name or identifier
                       ;; prefixes
