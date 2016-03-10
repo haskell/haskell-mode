@@ -311,16 +311,20 @@ Returns NIL when no completions found."
     (if (eq 'unknown-command response-status)
         (error
          "GHCi lacks `:complete' support (try installing GHC 7.8+ or ghci-ng)")
-      (let* ((s1 (split-string rawstr "\r?\n" t))
-             (cs (mapcar #'haskell-string-literal-decode (cdr s1)))
-             (h0 (car s1))) ;; "<limit count> <all count> <unused string>"
-        (unless (string-match "\\`\\([0-9]+\\) \\([0-9]+\\) \\(\".*\"\\)\\'" h0)
-          (error "Invalid `:complete' response"))
-        (let ((cnt1 (match-string 1 h0))
-              (h1 (haskell-string-literal-decode (match-string 3 h0))))
-          (unless (= (string-to-number cnt1) (length cs))
-            (error "Lengths inconsistent in `:complete' reponse"))
-          (cons h1 cs))))))
+      (when rawstr
+        ;; parse REPL response if any
+        (let* ((s1 (split-string rawstr "\r?\n" t))
+               (cs (mapcar #'haskell-string-literal-decode (cdr s1)))
+               (h0 (car s1))) ;; "<limit count> <all count> <unused string>"
+          (unless (string-match
+                   "\\`\\([0-9]+\\) \\([0-9]+\\) \\(\".*\"\\)\\'"
+                   h0)
+            (error "Invalid `:complete' response"))
+          (let ((cnt1 (match-string 1 h0))
+                (h1 (haskell-string-literal-decode (match-string 3 h0))))
+            (unless (= (string-to-number cnt1) (length cs))
+              (error "Lengths inconsistent in `:complete' reponse"))
+            (cons h1 cs)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessing the process
