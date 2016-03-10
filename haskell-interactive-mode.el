@@ -95,10 +95,10 @@ Key bindings:
   (setq haskell-interactive-mode-history (list))
   (setq haskell-interactive-mode-history-index 0)
 
-  (setq next-error-function 'haskell-interactive-next-error-function)
+  (setq next-error-function #'haskell-interactive-next-error-function)
   (add-hook 'completion-at-point-functions
-            'haskell-interactive-mode-completion-at-point-function nil t)
-
+            #'haskell-interactive-mode-completion-at-point-function nil t)
+  (add-hook 'kill-buffer-hook #'haskell-interactive-kill nil t)
   (haskell-interactive-mode-prompt))
 
 (defvar haskell-interactive-mode-prompt-start

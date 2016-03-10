@@ -138,7 +138,7 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
           (haskell-process-log
            (propertize "Process reset.\n"
                        'face font-lock-comment-face))
-          (run-hook-with-args 'haskell-process-ended-hook process))))))
+          (run-hook-with-args 'haskell-process-ended-functions process))))))
 
 (defun haskell-process-filter (proc response)
   "The filter for the process pipe."
@@ -233,7 +233,7 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
                        'face '((:weight bold))))
           (process-send-string child out))
       (unless (haskell-process-restarting process)
-        (run-hook-with-args 'haskell-process-ended process)))))
+        (run-hook-with-args 'haskell-process-ended-functions process)))))
 
 (defun haskell-process-live-updates (process)
   "Process live updates."
@@ -271,7 +271,7 @@ the response."
             (haskell-command-exec-go cmd))))
     (progn (haskell-process-reset process)
            (haskell-process-set process 'command-queue nil)
-           (run-hook-with-args 'haskell-process-ended process))))
+           (run-hook-with-args 'haskell-process-ended-functions process))))
 
 (defun haskell-process-queue-flushed-p (process)
   "Return t if command queue has been completely processed."
