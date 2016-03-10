@@ -74,8 +74,9 @@
 (make-obsolete 'haskell-process-completions-at-point
                'haskell-completions-sync-repl-completion-at-point
                "June 19, 2015")
+
 (defun haskell-process-completions-at-point ()
-  "A completion-at-point function using the current haskell process."
+  "A `completion-at-point' function using the current haskell process."
   (when (haskell-session-maybe)
     (let ((process (haskell-process))
 	  symbol-bounds)
@@ -461,9 +462,9 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
                       (list "build --ghc-options=-fforce-recomp"))))))
 
 (defun haskell-process-file-loadish (command reload-p module-buffer)
-  "Run a loading-ish COMMAND that wants to pick up type errors
-and things like that. RELOAD-P indicates whether the notification
-should say 'reloaded' or 'loaded'. MODULE-BUFFER may be used
+  "Run a loading-ish COMMAND that wants to pick up type errors\
+and things like that.  RELOAD-P indicates whether the notification
+should say 'reloaded' or 'loaded'.  MODULE-BUFFER may be used
 for various things, but is optional."
   (let ((session (haskell-session)))
     (haskell-session-current-dir session)

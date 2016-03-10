@@ -53,8 +53,8 @@
 (make-variable-buffer-local 'haskell-interactive-mode-old-prompt-start)
 
 (defun haskell-interactive-prompt-regex ()
-  "Generate a regex for searching for any occurence of the prompt
-at the beginning of the line. This should prevent any
+  "Generate a regex for searching for any occurence of the prompt\
+at the beginning of the line.  This should prevent any
 interference with prompts that look like haskell expressions."
   (concat "^" (regexp-quote haskell-interactive-prompt)))
 
@@ -81,7 +81,7 @@ interference with prompts that look like haskell expressions."
     (define-key map (kbd "TAB") 'haskell-interactive-mode-tab)
     (define-key map (kbd "<C-S-backspace>") 'haskell-interactive-mode-kill-whole-line)
     map)
-  "Keymap used in `haskell-interactive-mode'")
+  "Keymap used in `haskell-interactive-mode'.")
 
 (define-derived-mode haskell-interactive-mode fundamental-mode "Interactive-Haskell"
   "Interactive mode for Haskell.
@@ -107,8 +107,8 @@ Key bindings:
 
 (defvar haskell-interactive-mode-result-end
   nil
-  "Mark used to figure out where the end of the current result
-  output is. Used to distinguish betwen user input.")
+  "Mark used to figure out where the end of the current result output is.
+Used to distinguish betwen user input.")
 
 (defvar haskell-interactive-previous-buffer nil
   "Records the buffer to which `haskell-interactive-switch-back' should jump.
@@ -181,8 +181,7 @@ be nil.")
     (message "No previous buffer.")))
 
 (defun haskell-interactive-copy-to-prompt ()
-  "Copy the current line to the prompt, overwriting the current
-prompt."
+  "Copy the current line to the prompt, overwriting the current prompt."
   (interactive)
   (let ((l (buffer-substring-no-properties (line-beginning-position)
                                            (line-end-position))))
@@ -206,7 +205,7 @@ prompt."
       (self-insert-command n))))
 
 (defun haskell-interactive-at-prompt ()
-  "If at prompt, returns start position of user-input, otherwise returns nil."
+  "If at prompt, return start position of user-input, otherwise return nil."
   (if (>= (point)
           haskell-interactive-mode-prompt-start)
       haskell-interactive-mode-prompt-start
@@ -252,14 +251,13 @@ prompt."
       out)))
 
 (defun haskell-interactive-mode-multi-line (expr)
-  "If a multi-line expression has been entered, then reformat it to be:
+  "If a multi-line expression EXPR has been entered, then reformat it to be:
 
 :{
 do the
    multi-liner
    expr
-:}
-"
+:}"
   (if (not (string-match "\n" expr))
       expr
     (let* ((i 0)
@@ -277,7 +275,7 @@ do the
                  "\n"))))
 
 (defun haskell-interactive-trim (line)
-  "Trim indentation off of lines in the REPL."
+  "Trim indentation off of LINE in the REPL."
   (if (and (string-match "^[ ]+" line)
            (> (length line)
               (length haskell-interactive-prompt)))
@@ -412,12 +410,12 @@ SESSION, otherwise operate on the current buffer."
                           'rear-nonsticky t)))))
 
 (defun haskell-interactive-mode-goto-end-point ()
-  "Go to the 'end' of the buffer (before the prompt.)"
+  "Go to the 'end' of the buffer (before the prompt)."
   (goto-char haskell-interactive-mode-prompt-start)
   (goto-char (line-beginning-position)))
 
 (defun haskell-interactive-mode-history-add (input)
-  "Add item to the history."
+  "Add INPUT to the history."
   (setq haskell-interactive-mode-history
         (cons ""
               (cons input
@@ -552,7 +550,7 @@ FILE-NAME only."
   nil)
 
 (defun haskell-process-parse-error (string)
-  "Parse the line number from the error."
+  "Parse the line number from the error string STRING."
   (let ((span nil))
     (cl-loop for regex
              in haskell-compilation-error-regexp-alist
@@ -751,8 +749,9 @@ wrapped in compiler directive at the top of FILE."
       buffer. Maybe run M-x haskell-process-restart?")))
 
 (defun haskell-interactive-mode-do-presentation (expr)
-  "Present the given expression. Requires the `present' package
-to be installed. Will automatically import it qualified as Present."
+  "Present the given expression EXPR.
+Requires the `present' package to be installed.
+Will automatically import it qualified as Present."
   (let ((p (haskell-interactive-process)))
     ;; If Present.code isn't available, we probably need to run the
     ;; setup.
@@ -797,7 +796,7 @@ to be installed. Will automatically import it qualified as Present."
       reply)))
 
 (defun haskell-presentation-present-slot (btn)
-  "The callback to evaluate the slot and present it in place of the button."
+  "The callback to evaluate the slot and present it in place of the button BTN."
   (let ((id (button-get btn 'presentation-id))
         (hash (button-get btn 'hash))
         (parent-rep (button-get btn 'parent-rep))
@@ -962,7 +961,7 @@ don't care when the thing completes as long as it's soonish."
   'help-echo "Click to expand…")
 
 (defun haskell-interactive-mode-history-toggle (n)
-  "Toggle the history n items up or down."
+  "Toggle the history N items up or down."
   (unless (null haskell-interactive-mode-history)
     (setq haskell-interactive-mode-history-index
           (mod (+ haskell-interactive-mode-history-index n)
@@ -1044,8 +1043,8 @@ This completion function is used in interactive REPL buffer itself."
       (list (- (point) rlen) (point) coll))))
 
 (defun haskell-interactive-mode-trigger-compile-error (state response)
-  "Look for an <interactive> compile error; if there is one, pop
-  that up in a buffer, similar to `debug-on-error'."
+  "Look for an <interactive> compile error.
+If there is one, pop that up in a buffer, similar to `debug-on-error'."
   (when (and haskell-interactive-types-for-show-ambiguous
              (string-match "^\n<interactive>:[-0-9]+:[-0-9]+:" response)
              (not (string-match "^\n<interactive>:[-0-9]+:[-0-9]+:[\n ]+Warning:" response)))
@@ -1089,7 +1088,7 @@ This completion function is used in interactive REPL buffer itself."
                             'rear-nonsticky t))))))
 
 (defun haskell-interactive-mode-splices-buffer (session)
-  "Get the splices buffer for the current session."
+  "Get the splices buffer for the current SESSION."
   (get-buffer-create (haskell-interactive-mode-splices-buffer-name session)))
 
 (defun haskell-interactive-mode-splices-buffer-name (session)
