@@ -339,7 +339,10 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
 
 ;;;###autoload
 (defun haskell-mode-jump-to-tag (&optional next-p)
-  "Jump to the tag of the given identifier."
+  "Jump to the tag of the given identifier.
+
+Give optional NEXT-P parameter to override value of
+`xref-prompt-for-identifier' during definition search."
   (interactive "P")
   (let ((ident (haskell-ident-at-point))
         (tags-file-dir (haskell-cabal--find-tags-dir))
