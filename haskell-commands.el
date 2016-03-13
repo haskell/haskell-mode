@@ -35,6 +35,7 @@
 (require 'haskell-presentation-mode)
 (require 'haskell-utils)
 (require 'highlight-uses-mode)
+(require 'haskell-cabal)
 
 ;;;###autoload
 (defun haskell-process-restart ()
@@ -700,20 +701,13 @@ function `xref-find-definitions' after new table was generated."
      process
      (make-haskell-command
       :state (cons process and-then-find-this-tag)
-      :go (lambda (state)
-            (if (eq system-type 'windows-nt)
-                (haskell-process-send-string
-                 (car state)
-                 (format ":!hasktags --output=\"%s\\TAGS\" -x -e \"%s\""
-                            (haskell-session-cabal-dir (haskell-process-session (car state)))
-                            (haskell-session-cabal-dir (haskell-process-session (car state)))))
-              (haskell-process-send-string
-               (car state)
-               (format ":!cd %s && %s | %s"
-                       (haskell-session-cabal-dir
-                        (haskell-process-session (car state)))
-                       "find . -type d \\( -path ./.stack-work -o -path ./dist -o -path ./.cabal-sandbox \\) -prune -o -type f \\( -name '*.hs' -or -name '*.lhs' -or -name '*.hsc' \\) -not \\( -name '#*' -or -name '.*' \\) -print0"
-                       "xargs -0 hasktags -e -x"))))
+      :go
+      (lambda (state)
+        (let* ((process (car state))
+               (cabal-dir (haskell-session-cabal-dir
+                           (haskell-process-session process)))
+               (command (haskell-cabal--compose-hasktags-command cabal-dir)))
+          (haskell-process-send-string process command)))
       :complete (lambda (state _response)
                   (when (cdr state)
                     (let ((tags-file-name
