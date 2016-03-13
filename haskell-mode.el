@@ -144,6 +144,7 @@
 (require 'haskell-string)
 (require 'haskell-indentation)
 (require 'haskell-font-lock)
+(require 'haskell-cabal)
 
 ;; All functions/variables start with `(literate-)haskell-'.
 
@@ -1069,8 +1070,13 @@ successful, nil otherwise."
     (goto-char (point-min))
     (end-of-line)))
 
+(defun haskell-mode-generate-tags ()
+  "Generate tags using Hasktags.  This is synchronous function."
+  (let ((command (haskell-cabal--compose-hasktags-command)))
+    (if command
+        (shell-command command)
+      (error "Unable to compose hasktags command"))))
+
 ;; Provide ourselves:
-
 (provide 'haskell-mode)
-
 ;;; haskell-mode.el ends here
