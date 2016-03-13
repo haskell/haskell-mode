@@ -690,7 +690,9 @@ happened since function invocation)."
 
             (haskell-utils-async-stop-watching-changes init-buffer))))))))
 
-;;;###autoload
+(make-obsolete #'haskell-process-generate-tags
+               #'haskell-mode-generate-tags
+               "2016-03-14")
 (defun haskell-process-generate-tags (&optional and-then-find-this-tag)
   "Regenerate the TAGS table.
 If optional AND-THEN-FIND-THIS-TAG argument is present it is used with
