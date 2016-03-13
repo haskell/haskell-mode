@@ -105,6 +105,13 @@
   "List of Cabal buffers.")
 
 (defun haskell-cabal-buffers-clean (&optional buffer)
+  "Refresh list of known cabal buffers.
+
+Check each buffer in variable `haskell-cabal-buffers' and remove
+it from list if one of the following conditions are hold:
++ buffer is killed;
++ buffer's mode is not derived from `haskell-cabal-mode';
++ buffer is a BUFFER (if given)."
   (let ((bufs ()))
     (dolist (buf haskell-cabal-buffers)
       (if (and (buffer-live-p buf) (not (eq buf buffer))
@@ -113,6 +120,7 @@
     (setq haskell-cabal-buffers bufs)))
 
 (defun haskell-cabal-unregister-buffer ()
+  "Exclude current buffer from global list of known cabal buffers."
   (haskell-cabal-buffers-clean (current-buffer)))
 
 ;;;###autoload
@@ -151,6 +159,7 @@
   )
 
 (defun haskell-cabal-get-setting (name)
+  "Try to read value of field with NAME from current buffer."
   (save-excursion
     (let ((case-fold-search t))
       (goto-char (point-min))
