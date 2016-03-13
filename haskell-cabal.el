@@ -1070,6 +1070,15 @@ source-section."
     (haskell-mode-toggle-interactive-prompt-state t)))
 
 
+(defun haskell-cabal--find-tags-dir ()
+  "Return a directory where TAGS file will be generated.
+Tries to find cabal file first and if succeeds uses its location.
+If cabal file not found uses current file directory.  If current
+buffer not visiting a file returns nil."
+  (or (haskell-cabal-find-dir)
+      (when buffer-file-name
+        (file-name-directory buffer-file-name))))
+
 (defun haskell-cabal--compose-hasktags-command (&optional cabal-dir)
   "Prepare command to execute hasktags for current file.
 By default following parameters are passed to Hasktags
