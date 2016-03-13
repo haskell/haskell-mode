@@ -16,20 +16,20 @@
     (should (equal '("Test" "test-1" "bench-1" "bin-1")
 		   (haskell-cabal-enum-targets)))))
 
-(ert-deftest haskell-cabal-guess-setting-1 ()
+(ert-deftest haskell-cabal-get-field-1 ()
   (with-temp-buffer
     (let ((scriptDir
 	   (file-name-directory
-	     (or (symbol-file 'haskell-cabal-guess-setting-1)
+	     (or (symbol-file 'haskell-cabal-get-field-1)
 		 (buffer-file-name)))))
       (set-visited-file-name (expand-file-name "test-data/Source.hs" scriptDir) t t))
     (should (equal "Simple"
-		   (haskell-cabal-guess-setting "build-type")))))
+		   (haskell-cabal-get-field "build-type")))))
 
 (ert-deftest haskell-cabal-compute-checksum-1 ()
   (let ((scriptDir
          (file-name-directory
-          (or (symbol-file 'haskell-cabal-guess-setting-1)
+          (or (symbol-file 'haskell-cabal-get-field-1)
               (buffer-file-name)))))
 
     (should (equal "263e67082326a27585639420f4d42c8b"
@@ -38,7 +38,7 @@
 (ert-deftest haskell-cabal-compute-next-prev-section-1 ()
   (let ((scriptDir
          (file-name-directory
-          (or (symbol-file 'haskell-cabal-guess-setting-1)
+          (or (symbol-file 'haskell-cabal-get-field-1)
               (buffer-file-name)))))
 
     (with-temp-buffer

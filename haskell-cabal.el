@@ -105,14 +105,23 @@
   "List of Cabal buffers.")
 
 (defun haskell-cabal-buffers-clean (&optional buffer)
+  "Refresh list of known cabal buffers.
+
+Check each buffer in variable `haskell-cabal-buffers' and remove
+it from list if one of the following conditions are hold:
++ buffer is killed;
++ buffer's mode is not derived from `haskell-cabal-mode';
++ buffer is a BUFFER (if given)."
   (let ((bufs ()))
     (dolist (buf haskell-cabal-buffers)
-      (if (and (buffer-live-p buf) (not (eq buf buffer))
+      (if (and (buffer-live-p buf)
+               (not (eq buf buffer))
                (with-current-buffer buf (derived-mode-p 'haskell-cabal-mode)))
           (push buf bufs)))
     (setq haskell-cabal-buffers bufs)))
 
 (defun haskell-cabal-unregister-buffer ()
+  "Exclude current buffer from global list of known cabal buffers."
   (haskell-cabal-buffers-clean (current-buffer)))
 
 ;;;###autoload
@@ -150,7 +159,8 @@
   (setq indent-tabs-mode nil)
   )
 
-(defun haskell-cabal-get-setting (name)
+(defun haskell-cabal--get-field (name)
+  "Try to read value of field with NAME from current buffer."
   (save-excursion
     (let ((case-fold-search t))
       (goto-char (point-min))
@@ -174,8 +184,8 @@
           val)))))
 
 ;;;###autoload
-(defun haskell-cabal-guess-setting (name)
-  "Guess the specified setting of this project.
+(defun haskell-cabal-get-field (name)
+  "Read the value of field with NAME from project's cabal file.
 If there is no valid .cabal file to get the setting from (or
 there is no corresponding setting with that name in the .cabal
 file), then this function returns nil."
@@ -185,7 +195,7 @@ file), then this function returns nil."
       (when (and cabal-file (file-readable-p cabal-file))
         (with-temp-buffer
           (insert-file-contents cabal-file)
-          (haskell-cabal-get-setting name))))))
+          (haskell-cabal--get-field name))))))
 
 ;;;###autoload
 (defun haskell-cabal-get-dir (&optional use-defaults)
@@ -442,23 +452,24 @@ OTHER-WINDOW use `find-file-other-window'."
   (let ((cabal-file (haskell-cabal-find-file)))
     (when (and cabal-file (file-readable-p cabal-file))
       (with-temp-buffer
-	(insert-file-contents cabal-file)
-	(haskell-cabal-mode)
-	(goto-char (point-min))
-	(let ((matches)
-	      (projectName (haskell-cabal-get-setting "name")))
-	  (haskell-cabal-next-section)
-	  (while (not (eobp))
-	    (if (haskell-cabal-source-section-p (haskell-cabal-section))
-		(let ((val (car (split-string
-				 (haskell-cabal-section-value (haskell-cabal-section))))))
-		  (if (or (string= val "")
-			  (string= val "{")
-			  (not val))
-		      (push projectName matches)
-		    (push val matches))))
-	    (haskell-cabal-next-section))
-	  (reverse matches))))))
+        (insert-file-contents cabal-file)
+        (haskell-cabal-mode)
+        (goto-char (point-min))
+        (let ((matches)
+              (projectName (haskell-cabal--get-field "name")))
+          (haskell-cabal-next-section)
+          (while (not (eobp))
+            (if (haskell-cabal-source-section-p (haskell-cabal-section))
+                (let ((val (car (split-string
+                                 (haskell-cabal-section-value
+                                  (haskell-cabal-section))))))
+                  (if (or (string= val "")
+                          (string= val "{")
+                          (not val))
+                      (push projectName matches)
+                    (push val matches))))
+            (haskell-cabal-next-section))
+          (reverse matches))))))
 
 (defmacro haskell-cabal-with-subsection (subsection replace &rest funs)
   "Copy subsection data into a temporary buffer, save indentation
@@ -1036,7 +1047,7 @@ source-section."
                         (concat package
                                 (if version (concat " >= " version) ""))))))
           (haskell-cabal-add-build-dependency entry sort silent)
-          (when (or silent (y-or-n-p "Save cabal file?"))
+          (when (or silent (y-or-n-p "Save cabal file? "))
             (save-buffer))))
     ;; unwind
     (haskell-mode-toggle-interactive-prompt-state t)))
