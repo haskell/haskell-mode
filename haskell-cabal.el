@@ -1047,7 +1047,7 @@ source-section."
                         (concat package
                                 (if version (concat " >= " version) ""))))))
           (haskell-cabal-add-build-dependency entry sort silent)
-          (when (or silent (y-or-n-p "Save cabal file?"))
+          (when (or silent (y-or-n-p "Save cabal file? "))
             (save-buffer))))
     ;; unwind
     (haskell-mode-toggle-interactive-prompt-state t)))
