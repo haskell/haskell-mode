@@ -1077,6 +1077,18 @@ successful, nil otherwise."
     (if command
         (shell-command command)
       (error "Unable to compose hasktags command"))))
+(defun haskell-mode-message-line (str)
+  "Echo STR in mini-buffer.
+Given string is shrinken to single line, multiple lines just
+disturbs the programmer."
+  (message (haskell-mode-one-line str (frame-width))))
+
+(defun haskell-mode-one-line (str width)
+  "Try to fit STR as much as possible on one line according to given WIDTH."
+  (let* ((long-line (replace-regexp-in-string "\n" " " str))
+         (condensed  (replace-regexp-in-string
+                      " +" " " (haskell-string-trim long-line))))
+    (truncate-string-to-width condensed width nil nil "…")))
 
 ;; Provide ourselves:
 (provide 'haskell-mode)
