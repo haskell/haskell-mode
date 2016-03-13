@@ -1070,6 +1070,7 @@ successful, nil otherwise."
     (goto-char (point-min))
     (end-of-line)))
 
+;;;###autoload
 (defun haskell-mode-generate-tags (&optional and-then-find-this-tag)
   "Generate tags using Hasktags.  This is synchronous function.
 

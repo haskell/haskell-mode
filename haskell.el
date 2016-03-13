@@ -342,23 +342,21 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
   "Jump to the tag of the given identifier."
   (interactive "P")
   (let ((ident (haskell-ident-at-point))
-        (tags-file-name (haskell-session-tags-filename (haskell-session)))
+        (tags-file-dir (haskell-cabal--find-tags-dir))
         (tags-revert-without-query t))
-    (when (and ident (not (string= "" (haskell-string-trim ident))))
-      (cond ((file-exists-p tags-file-name)
-             (let ((xref-prompt-for-identifier next-p))
-               (xref-find-definitions ident)))
-            (t (haskell-process-generate-tags ident))))))
+    (when (and ident
+               (not (string= "" (haskell-string-trim ident)))
+               tags-file-dir)
+      (let ((tags-file-name (concat tags-file-dir "TAGS")))
+        (cond ((file-exists-p tags-file-name)
+               (let ((xref-prompt-for-identifier next-p))
+                 (xref-find-definitions ident)))
+              (t (haskell-mode-generate-tags ident)))))))
 
 ;;;###autoload
 (defun haskell-mode-after-save-handler ()
   "Function that will be called after buffer's saving."
-  (when haskell-tags-on-save
-    (ignore-errors
-      (if (and (boundp 'haskell-session)
-               haskell-session)
-          (haskell-process-generate-tags)
-        (haskell-mode-generate-tags))))
+  (when haskell-tags-on-save (ignore-errors (haskell-mode-generate-tags)))
   (when haskell-stylish-on-save
     (ignore-errors (haskell-mode-stylish-buffer))
     (let ((before-save-hook '())
