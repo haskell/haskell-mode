@@ -1070,13 +1070,22 @@ successful, nil otherwise."
     (goto-char (point-min))
     (end-of-line)))
 
-(defun haskell-mode-generate-tags ()
-  "Generate tags using Hasktags.  This is synchronous function."
+(defun haskell-mode-generate-tags (&optional and-then-find-this-tag)
+  "Generate tags using Hasktags.  This is synchronous function.
+
+If optional AND-THEN-FIND-THIS-TAG argument is present it is used
+with function `xref-find-definitions' after new table was
+generated."
   (let* ((dir (haskell-cabal--find-tags-dir))
          (command (haskell-cabal--compose-hasktags-command dir)))
-    (if command
-        (shell-command command)
-      (error "Unable to compose hasktags command"))))
+    (if (not command)
+        (error "Unable to compose hasktags command")
+      (shell-command command)
+      (haskell-mode-message-line "Tags generated.")
+      (when and-then-find-this-tag
+        (let ((tags-file-name dir))
+          (xref-find-definitions and-then-find-this-tag))))))
+
 (defun haskell-mode-message-line (str)
   "Echo STR in mini-buffer.
 Given string is shrinken to single line, multiple lines just
