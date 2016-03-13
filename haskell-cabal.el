@@ -159,7 +159,7 @@ it from list if one of the following conditions are hold:
   (setq indent-tabs-mode nil)
   )
 
-(defun haskell-cabal-get-setting (name)
+(defun haskell-cabal--get-field (name)
   "Try to read value of field with NAME from current buffer."
   (save-excursion
     (let ((case-fold-search t))
@@ -184,8 +184,8 @@ it from list if one of the following conditions are hold:
           val)))))
 
 ;;;###autoload
-(defun haskell-cabal-guess-setting (name)
-  "Guess the specified setting of this project.
+(defun haskell-cabal-get-field (name)
+  "Read the value of field with NAME from project's cabal file.
 If there is no valid .cabal file to get the setting from (or
 there is no corresponding setting with that name in the .cabal
 file), then this function returns nil."
@@ -195,7 +195,7 @@ file), then this function returns nil."
       (when (and cabal-file (file-readable-p cabal-file))
         (with-temp-buffer
           (insert-file-contents cabal-file)
-          (haskell-cabal-get-setting name))))))
+          (haskell-cabal--get-field name))))))
 
 ;;;###autoload
 (defun haskell-cabal-get-dir (&optional use-defaults)
@@ -456,7 +456,7 @@ OTHER-WINDOW use `find-file-other-window'."
         (haskell-cabal-mode)
         (goto-char (point-min))
         (let ((matches)
-              (projectName (haskell-cabal-get-setting "name")))
+              (projectName (haskell-cabal--get-field "name")))
           (haskell-cabal-next-section)
           (while (not (eobp))
             (if (haskell-cabal-source-section-p (haskell-cabal-section))

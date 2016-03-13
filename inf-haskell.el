@@ -272,7 +272,7 @@ The process PROC should be associated to a comint buffer."
            )
       (or (when cabal
             (with-current-buffer cabal
-              (let ((hsd (haskell-cabal-get-setting "hs-source-dirs")))
+              (let ((hsd (haskell-cabal--get-field "hs-source-dirs")))
                 (if (null hsd)
                     ;; If there's a Cabal file with no Hs-Source-Dirs, then
                     ;; just use the Cabal file's directory.
