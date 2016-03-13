@@ -1072,7 +1072,8 @@ successful, nil otherwise."
 
 (defun haskell-mode-generate-tags ()
   "Generate tags using Hasktags.  This is synchronous function."
-  (let ((command (haskell-cabal--compose-hasktags-command)))
+  (let* ((dir (haskell-cabal--find-tags-dir))
+         (command (haskell-cabal--compose-hasktags-command dir)))
     (if command
         (shell-command command)
       (error "Unable to compose hasktags command"))))

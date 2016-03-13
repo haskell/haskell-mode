@@ -1086,9 +1086,9 @@ executable:
 -e - generate ETAGS file
 -x - generate additional information in CTAGS file.
 
-Tries to find cabal file location, give optional CABAL-DIR
-parameter to override it.  If cabal file not found uses current
-file directory.
+Tries to find cabal file location, give optional CABAL-DIR parameter to
+override it.  If cabal file not found uses current file
+directory if current buffer is visiting a file.  Otherwise returns nil.
 
 This function takes into account user's operation system: in case
 of Windows it generates simple command like
@@ -1101,9 +1101,7 @@ In other cases it uses `find` command to find all source files
 recursively avoiding visiting unnecessary heavy directories like
 .git, .svn, _darcs and build directories created by
 cabal-install, stack, etc."
-  (let ((dir (or cabal-dir
-                 (haskell-cabal-find-dir)
-                 (file-name-directory buffer-file-name))))
+  (let ((dir (or cabal-dir (haskell-cabal--find-tags-dir))))
     (when dir
       (if (eq system-type 'windows-nt)
           (format "hasktags --output=\"%s\\TAGS\" -x -e \"%s\"" dir dir)
