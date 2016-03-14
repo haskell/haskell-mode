@@ -43,7 +43,6 @@
   "Face for highlighting c2hs hook names."
   :group 'haskell)
 
-;;;###autoload
 (defvar c2hs-font-lock-keywords
   `((,(haskell--rx-let ((ws (any ?\s ?\t ?\n ?\r))
                         (anychar (or (not (any ?#))
