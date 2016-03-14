@@ -133,3 +133,5 @@ $(AUTOLOADS): $(ELFILES)
 		--eval '(setq make-backup-files nil)' \
 		--eval '(setq generated-autoload-file "$(CURDIR)/$@")' \
 		-f batch-update-autoloads "."
+	# check if autoloads will really load
+	$(BATCH) -l "$@"
