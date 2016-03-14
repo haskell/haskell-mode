@@ -286,17 +286,18 @@ GHC's options, and language extensions.
 PREFIX should be a list such one returned by
 `haskell-completions-grab-identifier-prefix'."
   (cl-destructuring-bind (beg end _pfx typ) prefix
-    (let ((candidates
-           (cl-case typ
-             ('haskell-completions-pragma-name-prefix
-              haskell-completions--pragma-names)
-             ('haskell-completions-ghc-option-prefix
-              haskell-ghc-supported-options)
-             ('haskell-completions-language-extension-prefix
-              haskell-ghc-supported-extensions)
-             (otherwise
-              haskell-completions--keywords))))
-      (list beg end candidates))))
+    (when (not (eql typ 'haskell-completions-general-prefix))
+      (let ((candidates
+             (cl-case typ
+               ('haskell-completions-pragma-name-prefix
+                haskell-completions--pragma-names)
+               ('haskell-completions-ghc-option-prefix
+                haskell-ghc-supported-options)
+               ('haskell-completions-language-extension-prefix
+                haskell-ghc-supported-extensions)
+               (otherwise
+                haskell-completions--keywords))))
+        (list beg end candidates)))))
 
 
 (defun haskell-completions-completion-at-point ()
@@ -305,7 +306,8 @@ This function is used in non-interactive `haskell-mode'.  It
 provides completions for haskell keywords, language pragmas,
 GHC's options, and language extensions, but not identifiers."
   (let ((prefix (haskell-completions-grab-prefix)))
-    (haskell-completions--simple-completions prefix)))
+    (when prefix
+      (haskell-completions--simple-completions prefix))))
 
 (defun haskell-completions-sync-repl-completion-at-point ()
   "A completion function used in `interactive-haskell-mode'.
@@ -336,7 +338,11 @@ Returns nil if no completions available."
                    (candidates
                     (when (and (haskell-session-maybe)
                                (not (haskell-process-cmd
-                                     (haskell-interactive-process))))
+                                     (haskell-interactive-process)))
+                               ;; few possible extra checks would be:
+                               ;; (haskell-process-get 'is-restarting)
+                               ;; (haskell-process-get 'evaluating)
+                               )
                       ;; if REPL is available and not busy try to query it for
                       ;; completions list in case of module name or identifier
                       ;; prefixes
