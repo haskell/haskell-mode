@@ -56,5 +56,70 @@ keybindings without this."
          (and (buffer-name ,temp-buffer)
               (kill-buffer ,temp-buffer))))))
 
+(defun check-syntax-and-face-match-range (beg end syntax face)
+  "Check if all charaters between positions BEG and END have
+syntax set to SYNTAX and face set to FACE.
+
+If SYNTAX or FACE are set to t then any syntex respective face is
+not checked."
+  (let (all-syntaxes
+        all-faces
+        (text (buffer-substring-no-properties beg end)))
+    (while (< beg end)
+      (add-to-list 'all-syntaxes (syntax-class (syntax-after beg)))
+      (add-to-list 'all-faces (get-text-property beg 'face))
+      (setq beg (1+ beg)))
+    (unless (eq syntax t)
+      (should (equal (list text (list (syntax-class (string-to-syntax syntax))))
+                     (list text all-syntaxes))))
+    (unless (eq face t)
+      (should (equal (list text (list face))
+                     (list text all-faces))))))
+
+(defun check-face-match-range (face n)
+  (let ((beg (match-beginning n))
+        (end (match-end n)))
+    (while (< beg end)
+      (should (eq face (get-text-property beg 'face)))
+      (setq beg (1+ beg)))))
+
+(defmacro with-haskell-test-buffer (mode &rest body)
+  "Run BODY in the context of a new buffer set to `haskell-mode'.
+
+Buffer is named *haskell-mode-buffer*. It is not deleted
+after a test as this aids interactive debugging."
+  (declare (indent 1) (debug t))
+  `(progn
+     ;; we want to create buffer from scratch so that there are no
+     ;; leftover state from the previous test
+     (when (get-buffer "*haskell-test-buffer*")
+       (kill-buffer "*haskell-test-buffer*"))
+     (save-current-buffer
+       (set-buffer (get-buffer-create "*haskell-test-buffer*"))
+       (funcall ,mode)
+       ,@body)))
+
+(defun check-properties (lines-or-contents props &optional mode)
+  "Check if syntax properties and font-lock properties as set properly.
+
+LINES is a list of strings that will be inserted to a new
+buffer. Then PROPS is a list of tripples of (string syntax
+face). String is searched for in the buffer and then is checked
+if all of its characters have syntax and face. See
+`check-syntax-and-face-match-range`."
+  (with-haskell-test-buffer (or mode #'haskell-mode)
+    (if (consp lines-or-contents)
+        (dolist (line lines-or-contents)
+          (insert line)
+          (insert "\n"))
+      (insert lines-or-contents))
+
+    (font-lock-fontify-buffer)
+    (goto-char (point-min))
+    (dolist (prop props)
+      (cl-destructuring-bind (string syntax face) prop
+        (search-forward string)
+        (check-syntax-and-face-match-range (match-beginning 0) (match-end 0) syntax face)))))
+
 (provide 'haskell-test-utils)
 ;;; haskell-test-utils.el ends here
