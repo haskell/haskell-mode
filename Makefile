@@ -78,8 +78,12 @@ check: $(ELCHECKS) build-$(EMACS_VERSION)
                  $(patsubst %,-l %,$(ELCHECKS))							\
                  -f ert-run-tests-batch-and-exit
 	@TAB=$$(echo "\t"); \
-	if grep -Hn "[ $${TAB}]\+\$$" *.el; then \
-	    echo "Some files contain whitespace at the end of lines, correct it"; \
+	if grep -Hn "[ $${TAB}]\+\$$" *.el tests/*.el; then \
+	    echo "Error: Files contain whitespace at the end of lines" >&2; \
+	    exit 3; \
+	fi; \
+	if grep -Hn "[$${TAB}]" *.el tests/*.el; then \
+	    echo "Error: Tab character is not allowed" >&2; \
 	    exit 3; \
 	fi
 	@echo "checks passed!"
