@@ -527,8 +527,8 @@ of which the latter defaults to the current buffer."
   (or (haskell-session-get session 'current-dir)
       (haskell-session-get session 'cabal-dir)
       (if (buffer-file-name buffer)
-	  (file-name-directory (buffer-file-name buffer))
-	  "~/")))
+          (file-name-directory (buffer-file-name buffer))
+          "~/")))
 
 (defun haskell-session-prompt-set-current-dir (session &optional use-default)
   "Prompt for the current directory.
@@ -537,8 +537,8 @@ Return current working directory for SESSION."
     (haskell-session-set-current-dir
      session
      (if use-default
-	 default
-	 (haskell-utils-read-directory-name "Set current directory: " default))))
+         default
+         (haskell-utils-read-directory-name "Set current directory: " default))))
   (haskell-session-get session 'current-dir))
 
 (defun haskell-process-change-dir (session process dir)
@@ -813,8 +813,8 @@ output.  If CMD fails the buffer remains unchanged."
                     (setq str (replace-match "" t t str)))
                   str))
          (_errout (lambda (fmt &rest args)
-		    (let* ((warning-fill-prefix "    "))
-		      (display-warning cmd (apply 'format fmt args) :warning))))
+                    (let* ((warning-fill-prefix "    "))
+                      (display-warning cmd (apply 'format fmt args) :warning))))
          (filename (buffer-file-name (current-buffer)))
          (cmd-prefix (replace-regexp-in-string " .*" "" cmd))
          (tmp-file (make-temp-file cmd-prefix))
@@ -824,8 +824,8 @@ output.  If CMD fails the buffer remains unchanged."
                                 (haskell-session-cabal-dir haskell-session)
                               default-directory))
          (_errcode (with-temp-file tmp-file
-		     (call-process cmd filename
-				   (list (current-buffer) err-file) nil)))
+                     (call-process cmd filename
+                                   (list (current-buffer) err-file) nil)))
          (stderr-output
           (with-temp-buffer
             (insert-file-contents err-file)

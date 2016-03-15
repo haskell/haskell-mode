@@ -695,25 +695,25 @@ foo = [|forever $ do
 (hindent-test "30* parse '[] identifier correctly" "
 instance Callable '[]
 "
-	      (1 2))
+              (1 2))
 
 (hindent-test "31* allow type class declaration without methods" "
 class Foo a where
 instance Bar Int
 "
-	      (2 0))
+              (2 0))
 
 (hindent-test "32 allow type operators" "
 data (:.) a b = a :. b
 "
-	      (2 0 16))
+              (2 0 16))
 
 (hindent-test "33* parse #else in CPP" "
 #ifdef FLAG
 foo = ()
 #else
 "
-	      (4 0))
+              (4 0))
 
 
 (hindent-test "34 beginning of line inside parentheses" "
@@ -733,7 +733,7 @@ az = Projection
   , maxR = pi
   }
 "
-	      (6 2))
+              (6 2))
 
 (hindent-test "35a parse a backslash properly" "
 az = Projection
@@ -743,7 +743,7 @@ az = Projection
   , maxR = pi
   }
 "
-	      (6 2))
+              (6 2))
 
 (hindent-test "36 yet another parser failure" "
 tokOpenTag =
@@ -751,11 +751,11 @@ tokOpenTag =
        , return
        ]
 "
-	      (4 7))
+              (4 7))
 (hindent-test "37* Indent continuation lines in multiline string literal" "
 a = \"multiline\\
 "
-	      (2 4))
+              (2 4))
 
 (hindent-test "38 Indent in do block after multiline string literal" "
 s = do
@@ -771,20 +771,20 @@ servePost = do
   b <- queryT \"comma is important: , \\
              \\ line 2 \"
 "
-	      (6 0 2 4))
+              (6 0 2 4))
 
 (hindent-test "40 parse error in multiline tuple" "
 a = ( 1
 , "
-	      (2 4)
-	      (3 2))
+              (2 4)
+              (3 2))
 
 (hindent-test "41 open do inside a list" "
 x = asum [ withX $ do
              return ()
          ]
 "
-	      (2 13))
+              (2 13))
 
 (hindent-test "42 open do inside a list second element" "
 x = asum [ mzero
@@ -792,7 +792,7 @@ x = asum [ mzero
              return ()
          ]
 "
-	      (3 13))
+              (3 13))
 
 (hindent-test "43 open do inside a list second element, reset alignment" "
 x = asum [ mzero
@@ -800,7 +800,7 @@ x = asum [ mzero
                  return ()
          ]
 "
-	      (3 17))
+              (3 17))
 
 (hindent-test "44 expression continues, reset alignment" "
 function = abc

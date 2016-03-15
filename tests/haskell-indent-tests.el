@@ -10,35 +10,35 @@
   ;; even in batch mode. So we do not run this test.
   (skip-unless (< emacs-major-version 25))
   (should (with-temp-buffer
-	    (haskell-mode)
-	    (haskell-indent-mode)
-	    (insert (concat "module Test where\n"
-			    "-- {{{ A header\n"
-			    "--\n"))
-	    (indent-for-tab-command)
-	    t)))
+            (haskell-mode)
+            (haskell-indent-mode)
+            (insert (concat "module Test where\n"
+                            "-- {{{ A header\n"
+                            "--\n"))
+            (indent-for-tab-command)
+            t)))
 
 
 ;; haskell-indent-put-region-in-literate happens to be in haskell-indent
 ;; when the function is moved, move the tests also
 (ert-deftest haskell-indent-put-region-in-literate-1 ()
   (should (equal "> literate"
-		 (with-temp-buffer
-		   (insert "literate")
-		   (literate-haskell-mode)
-		   (haskell-indent-put-region-in-literate (point-min) (point-max))
-		   (buffer-substring-no-properties (point-min) (point-max))))))
+                 (with-temp-buffer
+                   (insert "literate")
+                   (literate-haskell-mode)
+                   (haskell-indent-put-region-in-literate (point-min) (point-max))
+                   (buffer-substring-no-properties (point-min) (point-max))))))
 
 (ert-deftest haskell-indent-put-region-in-literate-2 ()
   :expected-result (if (< emacs-major-version 24)
-		       :failed
-		     :passed)
+                       :failed
+                     :passed)
   (should (equal "literate"
-		 (with-temp-buffer
-		   (insert "> literate")
-		   (literate-haskell-mode)
-		   (haskell-indent-put-region-in-literate (point-min) (point-max) -1)
-		   (buffer-substring-no-properties (point-min) (point-max))))))
+                 (with-temp-buffer
+                   (insert "> literate")
+                   (literate-haskell-mode)
+                   (haskell-indent-put-region-in-literate (point-min) (point-max) -1)
+                   (buffer-substring-no-properties (point-min) (point-max))))))
 
 (defsubst string-trim-left (string)
   "Remove leading whitespace from STRING."
@@ -653,25 +653,25 @@ test = [randomQQ| This is
 (hindent1-test "30* parse '[] identifier correctly" "
 instance Callable '[]
 "
-	      (1 2))
+              (1 2))
 
 (hindent1-test "31* allow type class declaration without methods" "
 class Foo a where
 instance Bar Int
 "
-	      (2 0))
+              (2 0))
 
 (hindent1-test "32* allow type operators" "
 data (:.) a b = a :. b
 "
-	      (2 0 2))
+              (2 0 2))
 
 (hindent1-test "33* parse #else in CPP" "
 #ifdef FLAG
 foo = ()
 #else
 "
-	      (4 0))
+              (4 0))
 
 
 (hindent1-test "34 beginning of line inside parentheses" "
@@ -691,7 +691,7 @@ az = Projection
   , maxR = pi
   }
 "
-	      (6 2))
+              (6 2))
 
 (hindent1-test "35a* parse a backslash properly" "
 az = Projection
@@ -701,7 +701,7 @@ az = Projection
   , maxR = pi
   }
 "
-	      (6 2))
+              (6 2))
 
 (hindent1-test "36* yet another parser failure" "
 tokOpenTag =
@@ -709,12 +709,12 @@ tokOpenTag =
        , return
        ]
 "
-	      (4 7))
+              (4 7))
 
 (hindent1-test "37* Indent continuation lines in multiline string literal" "
 a = \"multiline\\
 "
-	      (2 4))
+              (2 4))
 
 (hindent1-test "38* Indent in do block after multiline string literal" "
 s = do
@@ -730,20 +730,20 @@ servePost = do
   b <- queryT \"comma is important: , \\
              \\ line 2 \"
 "
-	      (6 0 2 4))
+              (6 0 2 4))
 
 (hindent1-test "40* parse error in multiline tuple" "
 a = ( 1
 , "
-	      (2 4)
-	      (3 2))
+              (2 4)
+              (3 2))
 
 (hindent1-test "41 open do inside a list" "
 x = asum [ withX $ do
              return ()
          ]
 "
-	      (2 13))
+              (2 13))
 
 (hindent1-test "42 open do inside a list second element" "
 x = asum [ mzero
@@ -751,7 +751,7 @@ x = asum [ mzero
              return ()
          ]
 "
-	      (3 13))
+              (3 13))
 
 (hindent1-test "43 open do inside a list second element, reset alignment" "
 x = asum [ mzero
@@ -759,7 +759,7 @@ x = asum [ mzero
                  return ()
          ]
 "
-	      (3 15))
+              (3 15))
 
 (hindent1-test "44 expression continues, reset alignment" "
 function = abc

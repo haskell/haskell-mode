@@ -99,7 +99,7 @@
                     (haskell-navigate-imports-line)))
       (forward-line))
     (if (haskell-navigate-imports-line)
-	(point)
+        (point)
         nil)))
 
 (defun haskell-navigate-imports-line ()

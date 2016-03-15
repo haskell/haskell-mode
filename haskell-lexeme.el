@@ -29,7 +29,7 @@
             (and (consp key) (> (car key) 128))
             (and (numberp key) (> key 128)))
            (if (member val '(Pc Pd Po Sm Sc Sk So))
-	       (modify-category-entry key ?P))))
+               (modify-category-entry key ?P))))
    unicode-category-table)
 
   (dolist (key (string-to-list "!#$%&*+./<=>?@^|~\\-"))

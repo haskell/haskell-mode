@@ -204,10 +204,10 @@ file), then this function returns nil."
   (let* ((file (haskell-cabal-find-file))
          (dir (if file (file-name-directory file) default-directory)))
     (if use-defaults
-	dir
-	(haskell-utils-read-directory-name
-	 (format "Cabal dir%s: " (if file (format " (guessed from %s)" (file-relative-name file)) ""))
-	 dir))))
+        dir
+        (haskell-utils-read-directory-name
+         (format "Cabal dir%s: " (if file (format " (guessed from %s)" (file-relative-name file)) ""))
+         dir))))
 
 (defun haskell-cabal-compute-checksum (dir)
   "Compute MD5 checksum of package description file in DIR.

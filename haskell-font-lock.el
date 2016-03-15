@@ -198,13 +198,13 @@ Regexp match data 0 points to the chars."
 
 (defun haskell-font-lock-symbols-keywords ()
   (when (and haskell-font-lock-symbols
-	     haskell-font-lock-symbols-alist)
+             haskell-font-lock-symbols-alist)
     `((,(regexp-opt (mapcar 'car haskell-font-lock-symbols-alist) t)
        (0 (haskell-font-lock-compose-symbol ',haskell-font-lock-symbols-alist)
-	  ;; In Emacs-21, if the `override' field is nil, the face
-	  ;; expressions is only evaluated if the text has currently
-	  ;; no face.  So force evaluation by using `keep'.
-	  keep)))))
+          ;; In Emacs-21, if the `override' field is nil, the face
+          ;; expressions is only evaluated if the text has currently
+          ;; no face.  So force evaluation by using `keep'.
+          keep)))))
 
 (defun haskell-font-lock-keywords ()
   ;; this has to be a function because it depends on global value of
@@ -437,13 +437,13 @@ Regexp match data 0 points to the chars."
    ((save-excursion
       (goto-char (nth 8 state))
       (or (looking-at-p "\\(?:{- ?\\|-- \\)[|^*$]")
-	  (and (looking-at-p "--")              ; are we at double dash comment
-	       (forward-line -1)              ; this is nil on first line
-	       (eq (get-text-property (line-end-position) 'face)
-		   'font-lock-doc-face)	      ; is a doc face
-	       (forward-line)
-	       (skip-syntax-forward "-")      ; see if there is only whitespace
-	       (eq (point) (nth 8 state)))))  ; we are back in position
+          (and (looking-at-p "--")              ; are we at double dash comment
+               (forward-line -1)              ; this is nil on first line
+               (eq (get-text-property (line-end-position) 'face)
+                   'font-lock-doc-face)              ; is a doc face
+               (forward-line)
+               (skip-syntax-forward "-")      ; see if there is only whitespace
+               (eq (point) (nth 8 state)))))  ; we are back in position
     'font-lock-doc-face)
    (t 'font-lock-comment-face)))
 

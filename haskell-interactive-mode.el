@@ -337,13 +337,13 @@ SESSION, otherwise operate on the current buffer."
   (with-current-buffer (haskell-session-interactive-buffer session)
     (goto-char (point-max))
     (insert (ansi-color-apply
-	     (propertize text
-			 'font-lock-face 'haskell-interactive-face-result
+             (propertize text
+                         'font-lock-face 'haskell-interactive-face-result
                          'front-sticky t
-			 'prompt t
-			 'read-only t
-			 'rear-nonsticky t
-			 'result t)))
+                         'prompt t
+                         'read-only t
+                         'rear-nonsticky t
+                         'result t)))
     (haskell-interactive-mode-handle-h)
     (let ((marker (set (make-local-variable 'haskell-interactive-mode-result-end)
                        (make-marker))))
