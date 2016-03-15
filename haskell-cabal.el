@@ -159,6 +159,14 @@ it from list if one of the following conditions are hold:
   (setq indent-tabs-mode nil)
   )
 
+(make-obsolete #'haskell-cabal-get-setting
+               #'haskell-cabal--get-field
+               "March 14, 2016")
+(defalias #'haskell-cabal-get-setting #'haskell-cabal--get-field
+  "Try to read value of field with NAME from current buffer.
+Obsolete function.  Defined for backward compatibility.  Use
+`haskell-cabal--get-field' instead.")
+
 (defun haskell-cabal--get-field (name)
   "Try to read value of field with NAME from current buffer."
   (save-excursion
@@ -182,6 +190,15 @@ it from list if one of the following conditions are hold:
               (setq start (1+ (match-beginning 0)))
               (setq val (replace-match "" t t val))))
           val)))))
+
+
+(make-obsolete #'haskell-cabal-guess-setting
+               #'haskell-cabal-get-field
+               "March 14, 2016")
+(defalias #'haskell-cabal-guess-setting #'haskell-cabal-get-field
+  "Read the value of field with NAME from project's cabal file.
+Obsolete function.  Defined for backward compatibility.  Use
+`haskell-cabal-get-field' instead.")
 
 ;;;###autoload
 (defun haskell-cabal-get-field (name)
