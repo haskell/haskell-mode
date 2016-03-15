@@ -180,23 +180,5 @@ expression bounds."
                end-c
                value)))))
 
-(defmacro haskell--rx-let (definitions &rest main-expr)
-  "Return `rx' invokation of main-expr that has symbols defined in
-DEFINITIONS substituted by definition body. DEFINITIONS is list
-of let-bindig forms, (<symbol> <body>). No recursion is permitted -
-no defined symbol should show up in body of its definition or in
-body of any futher definition."
-  (declare (indent 1))
-  (let ((invalid-def (cl-find-if (lambda (def) (not (= 2 (length def)))) definitions)))
-    (when invalid-def
-      (error "haskell--rx-let: every definition must consist of two elements: (name def), but this one doesn't: %s"
-             invalid-def)))
-  `(rx ,@(cl-reduce (lambda (def expr)
-                      (cl-subst (cadr def) (car def) expr
-                                :test #'eq))
-                    definitions
-                    :initial-value main-expr
-                    :from-end t)))
-
 (provide 'haskell-utils)
 ;;; haskell-utils.el ends here

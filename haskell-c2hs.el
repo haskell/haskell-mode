@@ -44,137 +44,141 @@
   :group 'haskell)
 
 (defvar haskell-c2hs-font-lock-keywords
-  `((,(haskell--rx-let ((ws (any ?\s ?\t ?\n ?\r))
-                        (anychar (or (not (any ?#))
-                                     (seq "#"
-                                          (not (any ?\})))))
-                        (any-nonquote (or (not (any ?# ?\"))
-                                          (seq "#"
-                                               (not (any ?\} ?\")))))
-                        (cid (seq (any (?a . ?z) (?A . ?Z) ?_)
-                                  (* (any (?a . ?z) (?A . ?Z) (?0 . ?9) ?_))))
-                        (hsid-type (seq (? "'")
-                                        (any (?A . ?Z))
-                                        (* (any (?a . ?z) (?A . ?Z) (?0 . ?9) ?_ ?'))))
-                        (equals-str-val (seq (* ws)
-                                             "="
-                                             (* ws)
-                                             "\""
-                                             (* any-nonquote)
-                                             "\"")))
-        (group-n 1 "{#")
-        (* ws)
-        (or (seq (group-n 2
-                          "import"
-                          (opt (+ ws)
-                               "qualified"))
-                 (+ ws))
-            (seq (group-n 2
-                          "context")
-                 (opt (+ ws)
-                      (group-n 3
-                               "lib")
-                      equals-str-val)
-                 (opt (+ ws)
-                      (group-n 4
-                               "prefix")
-                      equals-str-val)
-                 (opt (+ ws)
-                      (group-n 5
-                               "add"
-                               (+ ws)
-                               "prefix")
-                      equals-str-val))
-            (seq (group-n 2
-                          "type")
-                 (+ ws)
-                 cid)
-            (seq (group-n 2
-                          "sizeof")
-                 (+ ws)
-                 cid)
-            (seq (group-n 2
-                          "enum"
-                          (+ ws)
-                          "define")
-                 (+ ws)
-                 cid)
-            ;; TODO: vanilla enum fontification is incomplete
-            (seq (group-n 2
-                          "enum")
-                 (+ ws)
-                 cid
-                 (opt (+ ws)
-                      (group-n 3
-                               "as")))
-            ;; TODO: fun hook highlighting is incompelete
-            (seq (group-n 2
-                          (or "call"
-                              "fun")
-                          (opt (+ ws)
-                               "pure")
-                          (opt (+ ws)
-                               "unsafe"))
-                 (+ ws)
-                 cid
-                 (opt (+ ws)
-                      (group-n 3
-                               "as")
-                      (opt (+ ws)
-                           (group-n 8
-                                    "^"))))
-            (group-n 2
-                     "get")
-            (group-n 2
-                     "set")
-            (seq (group-n 2
-                          "pointer")
-                 (or (seq (* ws)
-                          (group-n 3 "*")
-                          (* ws))
-                     (+ ws))
-                 cid
-                 (opt (+ ws)
-                      (group-n 4 "as")
-                      (+ ws)
-                      hsid-type)
-                 (opt (+ ws)
-                      (group-n 5
-                               (or "foreign"
-                                   "stable")))
-                 (opt
-                  (or (seq (+ ws)
-                           (group-n 6
-                                    "newtype"))
-                      (seq (* ws)
-                           "->"
-                           (* ws)
-                           hsid-type)))
-                 (opt (+ ws)
-                      (group-n 7
-                               "nocode")))
-            (group-n 2
-                     "class")
-            (group-n 2
-                     "alignof")
-            (group-n 2
-                     "offsetof")
-            (seq (group-n 2
-                          "const")
-                 (+ ws)
-                 cid)
-            (seq (group-n 2
-                          "typedef")
-                 (+ ws)
-                 cid
-                 (+ ws)
-                 hsid-type)
-            (group-n 2
-                     "nonGNU")
-            ;; TODO: default hook not implemented
-            )
-        (* anychar)
-        (group-n 9 "#}"))
+  `((,(eval-when-compile
+        (let* ((ws '(any ?\s ?\t ?\n ?\r))
+               (anychar '(or (not (any ?#))
+                             (seq "#"
+                                  (not (any ?\})))))
+               (any-nonquote '(or (not (any ?# ?\"))
+                                  (seq "#"
+                                       (not (any ?\} ?\")))))
+               (cid '(seq (any (?a . ?z) (?A . ?Z) ?_)
+                          (* (any (?a . ?z) (?A . ?Z) (?0 . ?9) ?_))))
+               (hsid-type '(seq (? "'")
+                                (any (?A . ?Z))
+                                (* (any (?a . ?z) (?A . ?Z) (?0 . ?9) ?_ ?'))))
+               (equals-str-val `(seq (* ,ws)
+                                     "="
+                                     (* ,ws)
+                                     "\""
+                                     (* ,any-nonquote)
+                                     "\"")))
+          (eval
+           `(rx
+             (seq
+              (group-n 1 "{#")
+              (* ,ws)
+              (or (seq (group-n 2
+                                "import"
+                                (opt (+ ,ws)
+                                     "qualified"))
+                       (+ ,ws))
+                  (seq (group-n 2
+                                "context")
+                       (opt (+ ,ws)
+                            (group-n 3
+                                     "lib")
+                            ,equals-str-val)
+                       (opt (+ ,ws)
+                            (group-n 4
+                                     "prefix")
+                            ,equals-str-val)
+                       (opt (+ ,ws)
+                            (group-n 5
+                                     "add"
+                                     (+ ,ws)
+                                     "prefix")
+                            ,equals-str-val))
+                  (seq (group-n 2
+                                "type")
+                       (+ ,ws)
+                       ,cid)
+                  (seq (group-n 2
+                                "sizeof")
+                       (+ ,ws)
+                       ,cid)
+                  (seq (group-n 2
+                                "enum"
+                                (+ ,ws)
+                                "define")
+                       (+ ,ws)
+                       ,cid)
+                  ;; TODO: vanilla enum fontification is incomplete
+                  (seq (group-n 2
+                                "enum")
+                       (+ ,ws)
+                       ,cid
+                       (opt (+ ,ws)
+                            (group-n 3
+                                     "as")))
+                  ;; TODO: fun hook highlighting is incompelete
+                  (seq (group-n 2
+                                (or "call"
+                                    "fun")
+                                (opt (+ ,ws)
+                                     "pure")
+                                (opt (+ ,ws)
+                                     "unsafe"))
+                       (+ ,ws)
+                       ,cid
+                       (opt (+ ,ws)
+                            (group-n 3
+                                     "as")
+                            (opt (+ ,ws)
+                                 (group-n 8
+                                          "^"))))
+                  (group-n 2
+                           "get")
+                  (group-n 2
+                           "set")
+                  (seq (group-n 2
+                                "pointer")
+                       (or (seq (* ,ws)
+                                (group-n 3 "*")
+                                (* ,ws))
+                           (+ ,ws))
+                       ,cid
+                       (opt (+ ,ws)
+                            (group-n 4 "as")
+                            (+ ,ws)
+                            ,hsid-type)
+                       (opt (+ ,ws)
+                            (group-n 5
+                                     (or "foreign"
+                                         "stable")))
+                       (opt
+                        (or (seq (+ ,ws)
+                                 (group-n 6
+                                          "newtype"))
+                            (seq (* ,ws)
+                                 "->"
+                                 (* ,ws)
+                                 ,hsid-type)))
+                       (opt (+ ,ws)
+                            (group-n 7
+                                     "nocode")))
+                  (group-n 2
+                           "class")
+                  (group-n 2
+                           "alignof")
+                  (group-n 2
+                           "offsetof")
+                  (seq (group-n 2
+                                "const")
+                       (+ ,ws)
+                       ,cid)
+                  (seq (group-n 2
+                                "typedef")
+                       (+ ,ws)
+                       ,cid
+                       (+ ,ws)
+                       ,hsid-type)
+                  (group-n 2
+                           "nonGNU")
+                  ;; TODO: default hook not implemented
+                  )
+              (* ,anychar)
+              (group-n 9 "#}"))))))
      ;; Override highlighting for pairs in order to always distinguish them.
      (1 'haskell-c2hs-hook-pair-face t)
      (2 'haskell-c2hs-hook-name-face)
