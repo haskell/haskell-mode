@@ -9,22 +9,22 @@
   (with-temp-buffer
     (haskell-cabal-mode)
     (let ((scriptDir
-	   (file-name-directory
-	     (or (symbol-file 'haskell-cabal-enum-targets-1)
-		 (buffer-file-name)))))
+           (file-name-directory
+             (or (symbol-file 'haskell-cabal-enum-targets-1)
+                 (buffer-file-name)))))
       (setq default-directory (expand-file-name "test-data" scriptDir)))
     (should (equal '("Test" "test-1" "bench-1" "bin-1")
-		   (haskell-cabal-enum-targets)))))
+                   (haskell-cabal-enum-targets)))))
 
 (ert-deftest haskell-cabal-get-field-1 ()
   (with-temp-buffer
     (let ((scriptDir
-	   (file-name-directory
-	     (or (symbol-file 'haskell-cabal-get-field-1)
-		 (buffer-file-name)))))
+           (file-name-directory
+             (or (symbol-file 'haskell-cabal-get-field-1)
+                 (buffer-file-name)))))
       (set-visited-file-name (expand-file-name "test-data/Source.hs" scriptDir) t t))
     (should (equal "Simple"
-		   (haskell-cabal-get-field "build-type")))))
+                   (haskell-cabal-get-field "build-type")))))
 
 (ert-deftest haskell-cabal-compute-checksum-1 ()
   (let ((scriptDir

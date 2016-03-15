@@ -86,7 +86,7 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
                (apply haskell-process-wrapper-function
                       (list
                        (append (haskell-process-path-to-list haskell-process-path-ghci)
-			       haskell-process-args-ghci)))))
+                               haskell-process-args-ghci)))))
       ('cabal-repl
        (append (list (format "Starting inferior `cabal repl' process using %s ..."
                              haskell-process-path-cabal)
@@ -95,7 +95,7 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
                (apply haskell-process-wrapper-function
                       (list
                        (append
-			(haskell-process-path-to-list haskell-process-path-cabal)
+                        (haskell-process-path-to-list haskell-process-path-cabal)
                         (list "repl")
                         haskell-process-args-cabal-repl
                         (let ((target (haskell-session-target session)))
@@ -107,7 +107,7 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
                (apply haskell-process-wrapper-function
                       (list
                        (append
-			(haskell-process-path-to-list haskell-process-path-stack)
+                        (haskell-process-path-to-list haskell-process-path-stack)
                         (list "ghci")
                         (let ((target (haskell-session-target session)))
                           (if target (list target) nil))

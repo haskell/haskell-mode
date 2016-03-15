@@ -46,12 +46,12 @@
 
 (ert-deftest haskell-string-literal-decode-empty ()
   (dolist (s0 (list "\"\""
-		    "\"\\&\""
-		    "\"\\&\\&\\&\""
-		    "\"\\	   \\\""
-		    "\"\\	  \\\\	  \\\""
-		    "\"\\&\\     \\\""
-		    "\"\\ \\\\&\\	  \\\""))
+                  "\"\\&\""
+                  "\"\\&\\&\\&\""
+                  "\"\\          \\\""
+                  "\"\\         \\\\         \\\""
+                  "\"\\&\\     \\\""
+                  "\"\\ \\\\&\\         \\\""))
     (should (string= "" (haskell-string-literal-decode s0)))
     (should (string= "" (haskell-string-literal-decode (substring s0 1 -1) t)))))
 
@@ -95,15 +95,15 @@
   (random "c7430a4")
   ;; some edge cases
   (dolist (s0 (list "\x0e\x48" ;; '\SO' 'H'
-		    "\x01"     ;; '\SOH'
-		    "\x00df\x30" ;; '\223' '0'
-		    "'"
+                  "\x01"     ;; '\SOH'
+                  "\x00df\x30" ;; '\223' '0'
+                  "'"
                     "\'"
-		    "\""
-		    "\x0e&H"
-		    "\\"
-		    " \\   \\"
-		    "\\\\\""
+                  "\""
+                  "\x0e&H"
+                  "\\"
+                  " \\   \\"
+                  "\\\\\""
                     (string 40 945 8322 946 8323 8743 947 178 949 178 41)
                     "x"
                     "xy"
@@ -111,7 +111,7 @@
                     "\\ \\x123"
                     " "
                     "  "
-		    ""))                ;
+                  ""))
     (should (string= s0 (haskell-string-literal-decode (haskell-string-literal-encode s0))))
     (should (string= s0 (haskell-string-literal-decode (haskell-string-literal-encode s0 t) t))))
 

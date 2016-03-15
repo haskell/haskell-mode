@@ -73,7 +73,7 @@
   "A `completion-at-point' function using the current haskell process."
   (when (haskell-session-maybe)
     (let ((process (haskell-process))
-	  symbol-bounds)
+          symbol-bounds)
       (cond
        ;; ghci can complete module names, but it needs the "import "
        ;; string at the beginning

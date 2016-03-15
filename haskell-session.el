@@ -65,7 +65,7 @@
                  (let ((dir (haskell-session-get a 'cabal-dir)))
                    (if dir
                        (if (string-prefix-p dir
-					    (file-name-directory (buffer-file-name)))
+                                            (file-name-directory (buffer-file-name)))
                            (if acc
                                (if (and
                                     (> (length (haskell-session-get a 'cabal-dir))
@@ -155,9 +155,9 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
   (let* ((maybe-target (haskell-session-get s 'target))
          (target (if maybe-target maybe-target
                    (let ((new-target
-			  (if haskell-process-load-or-reload-prompt
-			      (read-string "build target (empty for default):")
-			    "")))
+                          (if haskell-process-load-or-reload-prompt
+                              (read-string "build target (empty for default):")
+                            "")))
                      (haskell-session-set-target s new-target)))))
     (if (not (string= target "")) target nil)))
 
@@ -198,10 +198,10 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
   "Get the session cabal-dir."
   (or (haskell-session-get s 'cabal-dir)
       (let ((set-dir (haskell-cabal-get-dir (not haskell-process-load-or-reload-prompt))))
-	(if set-dir
-	    (progn (haskell-session-set-cabal-dir s set-dir)
-		   set-dir)
-	    (haskell-session-cabal-dir s)))))
+        (if set-dir
+            (progn (haskell-session-set-cabal-dir s set-dir)
+                   set-dir)
+            (haskell-session-cabal-dir s)))))
 
 (defun haskell-session-modify (session key update)
   "Update the value at KEY in SESSION with UPDATE."
