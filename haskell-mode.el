@@ -617,43 +617,106 @@ May return a qualified name."
             (cons start end)))))))
 
 (defun haskell-ident-pos-at-point ()
-  "Return the span of the identifier under point, or nil if none found.
-May return a qualified name."
-  (save-excursion
-    ;; Skip whitespace if we're on it.  That way, if we're at "map ", we'll
-    ;; see the word "map".
-    (if (and (not (eobp))
-             (eq ?  (char-syntax (char-after))))
-        (skip-chars-backward " \t"))
-
-    (let ((case-fold-search nil))
-      (cl-multiple-value-bind (start end)
-          (list
-           (progn (skip-syntax-backward "w_") (point))
-           (progn (skip-syntax-forward "w_") (point)))
-        ;; If we're looking at a module ID that qualifies further IDs, add
-        ;; those IDs.
-        (goto-char start)
-        (while (and (looking-at "[[:upper:]]") (eq (char-after end) ?.)
-                    ;; It's a module ID that qualifies further IDs.
-                    (goto-char (1+ end))
-                    (save-excursion
-                      (when (not (zerop (skip-syntax-forward
-                                         (if (looking-at "\\s_") "_" "w'"))))
-                        (setq end (point))))))
-        ;; If we're looking at an ID that's itself qualified by previous
-        ;; module IDs, add those too.
-        (goto-char start)
-        (if (eq (char-after) ?.) (forward-char 1)) ;Special case for "."
-        (while (and (eq (char-before) ?.)
-                    (progn (forward-char -1)
-                           (not (zerop (skip-syntax-backward "w'"))))
-                    (skip-syntax-forward "'")
-                    (looking-at "[[:upper:]]"))
-          (setq start (point)))
-        ;; This is it.
-        (unless (= start end)
+  "Return the span of the identifier near point going backward.
+Returns nil if no identifier found or point is inside string or
+comment.  May return a qualified name."
+  (when (not (nth 8 (syntax-ppss)))
+    ;; Do not handle comments and strings
+    (let (start end)
+      ;; Initial point position is non-deterministic, it may occur anywhere
+      ;; inside identifier span, so the approach is:
+      ;; - first try go left and find left boundary
+      ;; - then try go right and find right boundary
+      ;;
+      ;; In both cases assume the longest path, e.g. when going left take into
+      ;; account than point may occur at the end of identifier, when going right
+      ;; take into account that point may occur at the beginning of identifier.
+      ;;
+      ;; We should handle `.` character very careful because it is heavily
+      ;; overloaded.  Examples of possible cases:
+      ;; Control.Monad.>>=  -- delimiter
+      ;; Control.Monad.when -- delimiter
+      ;; Data.Aeson..:      -- delimiter and operator symbol
+      ;; concat.map         -- composition function
+      ;; .?                 -- operator symbol
+      (save-excursion
+        ;; First, skip whitespace if we're on it, moving point to last
+        ;; identifier char.  That way, if we're at "map ", we'll see the word
+        ;; "map".
+        (when (and (looking-at (rx eol))
+                   (not (bolp)))
+          (backward-char))
+        (when (and (not (eobp))
+                   (eq (char-syntax (char-after)) ? ))
+          (skip-chars-backward " \t")
+          (backward-char))
+        ;; Now let's try to go left.
+        (save-excursion
+          (if (not (haskell-mode--looking-at-varsym))
+              ;; Looking at non-operator char, this is quite simple
+              (progn
+                (skip-syntax-backward "w_")
+                ;; Remember position
+                (setq start (point)))
+            ;; Looking at operator char.
+            (while (and (not (bobp))
+                        (haskell-mode--looking-at-varsym))
+              ;; skip all operator chars backward
+              (setq start (point))
+              (backward-char))
+            ;; Extra check for case when reached beginning of the buffer.
+            (when (haskell-mode--looking-at-varsym)
+              (setq start (point))))
+          ;; Slurp qualification part if present.  If identifier is qualified in
+          ;; case of non-operator point will stop before `.` dot, but in case of
+          ;; operator it will stand at `.` delimiting dot.  So if we're looking
+          ;; at `.` let's step one char forward and try to get qualification
+          ;; part.
+          (goto-char start)
+          (when (looking-at-p (rx "."))
+            (forward-char))
+          (let ((pos (haskell-mode--skip-qualification-backward)))
+            (when pos
+              (setq start pos))))
+        ;; Finally, let's try to go right.
+        (save-excursion
+          ;; Try to slurp qualification part first.
+          (skip-syntax-forward "w_")
+          (setq end (point))
+          (while (and (looking-at (rx "." upper))
+                      (not (zerop (progn (forward-char)
+                                         (skip-syntax-forward "w_")))))
+            (setq end (point)))
+          ;; If point was at non-operator we already done, otherwise we need an
+          ;; extra check.
+          (while (haskell-mode--looking-at-varsym)
+            (forward-char)
+            (setq end (point))))
+        (when (not (= start end))
           (cons start end))))))
+
+(defun haskell-mode--looking-at-varsym ()
+  "Return t when point stands at operator symbol."
+  (when (not (eobp))
+    (let ((lex (haskell-lexeme-classify-by-first-char (char-after))))
+      (or (eq lex 'varsym)
+          (eq lex 'consym)))))
+
+(defun haskell-mode--skip-qualification-backward ()
+  "Skip qualified part of identifier backward.
+Expects point stands *after* delimiting dot.
+Returns beginning position of qualified part or nil if no qualified part found."
+  (when (not (and (bobp)
+                  (looking-at (rx bol))))
+    (let ((case-fold-search nil)
+          pos)
+      (while (and (eq (char-before) ?.)
+                  (progn (backward-char)
+                         (not (zerop (skip-syntax-backward "w'"))))
+                  (skip-syntax-forward "'")
+                  (looking-at "[[:upper:]]"))
+        (setq pos (point)))
+      pos)))
 
 (defun haskell-delete-indentation (&optional arg)
   "Like `delete-indentation' but ignoring Bird-style \">\"."
