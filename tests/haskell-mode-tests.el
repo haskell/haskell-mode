@@ -39,34 +39,34 @@
   (should (with-temp-buffer
             (haskell-mode)
             (insert "foo ::")
-            (eq nil (haskell-ident-at-point)))))
+            (string= "::" (haskell-ident-at-point)))))
 
 (ert-deftest aftercolons-pos ()
   (should (with-temp-buffer
             (haskell-mode)
             (insert "foo ::")
-            (eq nil (haskell-ident-pos-at-point)))))
+            (not (eq nil (haskell-ident-pos-at-point))))))
 
 (ert-deftest beforetype ()
   (should (with-temp-buffer
             (haskell-mode)
             (insert "foo ::")
             (save-excursion (insert " bar -> baz"))
-            (eq nil (haskell-ident-at-point)))))
+            (string= "::" (haskell-ident-at-point)))))
 
 (ert-deftest beforetype-pos ()
   (should (with-temp-buffer
             (haskell-mode)
             (insert "foo ::")
             (save-excursion (insert " bar -> baz"))
-            (eq nil (haskell-ident-pos-at-point)))))
+            (not (eq nil (haskell-ident-pos-at-point))))))
 
 (ert-deftest beforetype-spanable ()
   (should (with-temp-buffer
             (haskell-mode)
             (insert "foo ::")
             (save-excursion (insert " bar -> baz"))
-            (eq nil (haskell-spanable-pos-at-point)))))
+            (not (eq nil (haskell-spanable-pos-at-point))))))
 
 (ert-deftest single ()
   (should (with-temp-buffer
@@ -85,7 +85,7 @@
             (haskell-mode)
             (insert "\"Hello\"")
             (goto-char (1- (point-max)))
-            (string= "Hello" (haskell-ident-at-point)))))
+            (eq nil (haskell-ident-at-point)))))
 
 (ert-deftest in-commas ()
   (should (with-temp-buffer
