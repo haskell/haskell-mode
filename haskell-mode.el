@@ -599,7 +599,7 @@ executable found in PATH.")
             (goto-char end)))))))
 
 (defun haskell-ident-at-point ()
-  "Return the identifier under point, or nil if none found.
+  "Return the identifier near point going backward or nil if none found.
 May return a qualified name."
   (let ((reg (haskell-ident-pos-at-point)))
     (when reg
