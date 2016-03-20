@@ -70,7 +70,7 @@ check-%: tests/%-tests.el
 	$(BATCH) -l "$<" -f ert-run-tests-batch-and-exit;
 
 check: $(ELCHECKS) build-$(EMACS_VERSION)
-	$(BATCH) --eval "(when (>= emacs-major-version 24)					\
+	$(BATCH) --eval "(when (= emacs-major-version 24)					\
                            (require 'undercover)						\
                            (undercover \"*.el\"							\
                               (:exclude \"haskell-mode-pkg.el\" \"haskell-compat.el\")))"	\
