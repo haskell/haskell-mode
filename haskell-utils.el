@@ -35,9 +35,12 @@
 
 ;;; Code:
 
-;; NOTE: This module is supposed to be a leaf-module and shall not
-;;       require/depend-on any other haskell-mode modules in order to
-;;       stay at the bottom of the module dependency graph.
+;; =============================================================================
+;;                                     NOTE:
+;; THIS MODULE IS SUPPOSED TO BE A LEAF-MODULE AND SHALL NOT REQUIRE/DEPEND-ON
+;; ANY OTHER HASKELL-MODE MODULES IN ORDER TO STAY AT THE BOTTOM OF THE MODULE
+;; DEPENDENCY GRAPH.
+;; =============================================================================
 
 (eval-when-compile (require 'cl-lib))
 
