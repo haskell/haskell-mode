@@ -23,6 +23,7 @@
 (require 'haskell-process)
 (require 'haskell-interactive-mode)
 (require 'haskell-font-lock)
+(require 'haskell-utils)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configuration

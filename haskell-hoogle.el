@@ -28,6 +28,7 @@
 
 (require 'ansi-color)
 (require 'haskell-mode)
+(require 'haskell-utils)
 
 
 (defcustom haskell-hoogle-command

@@ -48,6 +48,9 @@
   "Non-nil means some commands were triggered during async function execution.")
 (make-variable-buffer-local 'haskell-utils-async-post-command-flag)
 
+(defvar haskell-mode-interactive-prompt-state nil
+  "Special variable indicating a state of user input waiting.")
+
 (defun haskell-utils-read-directory-name (prompt default)
   "Read directory name and normalize to true absolute path.
 Refer to `read-directory-name' for the meaning of PROMPT and
@@ -180,6 +183,12 @@ expression bounds."
                end-l
                end-c
                value)))))
+
+
+(defun haskell-mode-toggle-interactive-prompt-state (&optional disabled)
+  "Set `haskell-mode-interactive-prompt-state' to t.
+If given DISABLED argument sets variable value to nil, otherwise to t."
+  (setq haskell-mode-interactive-prompt-state (not disabled)))
 
 (provide 'haskell-utils)
 ;;; haskell-utils.el ends here

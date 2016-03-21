@@ -31,6 +31,7 @@
 (require 'haskell-mode)
 (require 'haskell-doc)
 (require 'haskell-test-utils)
+(require 'haskell-utils)
 
 
 (ert-deftest interactive-prompt-state ()
