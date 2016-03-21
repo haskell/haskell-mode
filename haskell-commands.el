@@ -690,8 +690,8 @@ happened since function invocation)."
 
             (haskell-utils-async-stop-watching-changes init-buffer))))))))
 
-(make-obsolete #'haskell-process-generate-tags
-               #'haskell-mode-generate-tags
+(make-obsolete 'haskell-process-generate-tags
+               'haskell-mode-generate-tags
                "2016-03-14")
 (defun haskell-process-generate-tags (&optional and-then-find-this-tag)
   "Regenerate the TAGS table.
