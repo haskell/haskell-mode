@@ -44,8 +44,6 @@
 
 (eval-when-compile (require 'cl-lib))
 
-(require 'haskell-customize)
-
 (defvar haskell-utils-async-post-command-flag nil
   "Non-nil means some commands were triggered during async function execution.")
 (make-variable-buffer-local 'haskell-utils-async-post-command-flag)
