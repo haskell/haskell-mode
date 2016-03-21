@@ -339,23 +339,27 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
 
 ;;;###autoload
 (defun haskell-mode-jump-to-tag (&optional next-p)
-  "Jump to the tag of the given identifier."
+  "Jump to the tag of the given identifier.
+
+Give optional NEXT-P parameter to override value of
+`xref-prompt-for-identifier' during definition search."
   (interactive "P")
   (let ((ident (haskell-ident-at-point))
-        (tags-file-name (haskell-session-tags-filename (haskell-session)))
+        (tags-file-dir (haskell-cabal--find-tags-dir))
         (tags-revert-without-query t))
-    (when (and ident (not (string= "" (haskell-string-trim ident))))
-      (cond ((file-exists-p tags-file-name)
-             (let ((xref-prompt-for-identifier next-p))
-               (xref-find-definitions ident)))
-            (t (haskell-process-generate-tags ident))))))
+    (when (and ident
+               (not (string= "" (haskell-string-trim ident)))
+               tags-file-dir)
+      (let ((tags-file-name (concat tags-file-dir "TAGS")))
+        (cond ((file-exists-p tags-file-name)
+               (let ((xref-prompt-for-identifier next-p))
+                 (xref-find-definitions ident)))
+              (t (haskell-mode-generate-tags ident)))))))
 
 ;;;###autoload
 (defun haskell-mode-after-save-handler ()
   "Function that will be called after buffer's saving."
-  (when haskell-tags-on-save
-    (ignore-errors (when (and (boundp 'haskell-session) haskell-session)
-                     (haskell-process-generate-tags))))
+  (when haskell-tags-on-save (ignore-errors (haskell-mode-generate-tags)))
   (when haskell-stylish-on-save
     (ignore-errors (haskell-mode-stylish-buffer))
     (let ((before-save-hook '())

@@ -144,6 +144,7 @@
 (require 'haskell-string)
 (require 'haskell-indentation)
 (require 'haskell-font-lock)
+(require 'haskell-cabal)
 
 ;; All functions/variables start with `(literate-)haskell-'.
 
@@ -1069,8 +1070,36 @@ successful, nil otherwise."
     (goto-char (point-min))
     (end-of-line)))
 
+;;;###autoload
+(defun haskell-mode-generate-tags (&optional and-then-find-this-tag)
+  "Generate tags using Hasktags.  This is synchronous function.
+
+If optional AND-THEN-FIND-THIS-TAG argument is present it is used
+with function `xref-find-definitions' after new table was
+generated."
+  (let* ((dir (haskell-cabal--find-tags-dir))
+         (command (haskell-cabal--compose-hasktags-command dir)))
+    (if (not command)
+        (error "Unable to compose hasktags command")
+      (shell-command command)
+      (haskell-mode-message-line "Tags generated.")
+      (when and-then-find-this-tag
+        (let ((tags-file-name dir))
+          (xref-find-definitions and-then-find-this-tag))))))
+
+(defun haskell-mode-message-line (str)
+  "Echo STR in mini-buffer.
+Given string is shrinken to single line, multiple lines just
+disturbs the programmer."
+  (message (haskell-mode-one-line str (frame-width))))
+
+(defun haskell-mode-one-line (str width)
+  "Try to fit STR as much as possible on one line according to given WIDTH."
+  (let* ((long-line (replace-regexp-in-string "\n" " " str))
+         (condensed  (replace-regexp-in-string
+                      " +" " " (haskell-string-trim long-line))))
+    (truncate-string-to-width condensed width nil nil "…")))
+
 ;; Provide ourselves:
-
 (provide 'haskell-mode)
-
 ;;; haskell-mode.el ends here

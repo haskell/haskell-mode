@@ -1069,6 +1069,55 @@ source-section."
     ;; unwind
     (haskell-mode-toggle-interactive-prompt-state t)))
 
-(provide 'haskell-cabal)
 
+(defun haskell-cabal--find-tags-dir ()
+  "Return a directory where TAGS file will be generated.
+Tries to find cabal file first and if succeeds uses its location.
+If cabal file not found uses current file directory.  If current
+buffer not visiting a file returns nil."
+  (or (haskell-cabal-find-dir)
+      (when buffer-file-name
+        (file-name-directory buffer-file-name))))
+
+(defun haskell-cabal--compose-hasktags-command (dir)
+  "Prepare command to execute `hasktags` command in DIR folder.
+By default following parameters are passed to Hasktags
+executable:
+-e - generate ETAGS file
+-x - generate additional information in CTAGS file.
+
+This function takes into account user's operation system: in case
+of Windows it generates simple command, relying on Hasktags
+itself to find source files:
+
+hasktags --output=DIR\TAGS -x -e DIR
+
+In other cases it uses `find` command to find all source files
+recursively avoiding visiting unnecessary heavy directories like
+.git, .svn, _darcs and build directories created by
+cabal-install, stack, etc and passes list of found files to Hasktags."
+  (if (eq system-type 'windows-nt)
+      (format "hasktags --output=\"%s\\TAGS\" -x -e \"%s\"" dir dir)
+    (format "cd %s && %s | %s"
+            dir
+            (concat "find . "
+                    "-type d \\( "
+                    "-path ./.git "
+                    "-o -path ./.svn "
+                    "-o -path ./_darcs "
+                    "-o -path ./.stack-work "
+                    "-o -path ./dist "
+                    "-o -path ./.cabal-sandbox "
+                    "\\) -prune "
+                    "-o -type f \\( "
+                    "-name '*.hs' "
+                    "-or -name '*.lhs' "
+                    "-or -name '*.hsc' "
+                    "\\) -not \\( "
+                    "-name '#*' "
+                    "-or -name '.*' "
+                    "\\) -print0")
+            "xargs -0 hasktags -e -x")))
+
+(provide 'haskell-cabal)
 ;;; haskell-cabal.el ends here

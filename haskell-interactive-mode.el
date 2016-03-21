@@ -425,18 +425,6 @@ SESSION, otherwise operate on the current buffer."
   (setq haskell-interactive-mode-history-index
         0))
 
-(defun haskell-mode-message-line (str)
-  "Message only one line, multiple lines just disturbs the programmer."
-  (message (haskell-mode-one-line str (frame-width))))
-
-(defun haskell-mode-one-line (str width)
-  "Try to fit as much as possible on one line."
-  (let*
-      ((long-line (replace-regexp-in-string "\n" " " str))
-       (condensed  (replace-regexp-in-string " +" " "
-                                             (haskell-string-trim long-line))))
-    (truncate-string-to-width condensed width nil nil "…")))
-
 (defun haskell-interactive-mode-tab ()
   "Do completion if at prompt or else try collapse/expand."
   (interactive)
