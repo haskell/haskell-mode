@@ -219,6 +219,53 @@
             (equal (cons (point-min) (point-max))
                    (haskell-spanable-pos-at-point)))))
 
+(ert-deftest haskell-mode-ident-at-point-operators ()
+  "Test `haskell-ident-at-point' for all operator cases."
+  (with-temp-buffer
+    (haskell-mode)
+    ;; point at the end of unqualified operator
+    (insert ">>")
+    (should (string= ">>" (haskell-ident-at-point)))
+    ;; point in the middle of unqualified operator
+    (save-excursion
+      (insert "=")
+      (insert "\n"))
+    (should (string= ">>=" (haskell-ident-at-point)))
+    (forward-line)
+    ;; point at the end of qualified operator
+    (insert "Control.Monad.>>=")
+    (should (string= "Control.Monad.>>=" (haskell-ident-at-point)))
+    ;; point at the beginning of qualified operator
+    (goto-char (line-beginning-position))
+    (should (string= "Control.Monad.>>=" (haskell-ident-at-point)))
+    ;; point in the middle of qualified part of operator
+    (forward-char)
+    (should (string= "Control.Monad.>>=" (haskell-ident-at-point)))
+    ;; point atfer `.` dot in qualified part of operator
+    (search-forward ".")
+    (should (string= "Control.Monad.>>=" (haskell-ident-at-point)))
+    ;; point at `.` dot in qualified part
+    (backward-char)
+    (should (string= "Control.Monad.>>=" (haskell-ident-at-point)))
+    (goto-char (line-end-position))
+    (insert "\n")
+    ;; Overloaded `.` dot tests.
+    ;; point at operator's `.` dot preceded by delimiting `.` dot
+    (insert "Data.Aeson.")
+    (save-excursion
+      (insert ".:"))
+    (should (string= "Data.Aeson..:" (haskell-ident-at-point)))
+    (forward-char)
+    (should (string= "Data.Aeson..:" (haskell-ident-at-point)))
+    ;; surrounding parentheses
+    (goto-char (line-beginning-position))
+    (save-excursion (insert "("))
+    (should (eq nil (haskell-ident-at-point)))
+    (goto-char (line-end-position))
+    (insert ")")
+    (should (eq nil (haskell-ident-at-point)))
+    (backward-char 2)
+    (should (string= "Data.Aeson..:" (haskell-ident-at-point)))))
 
 (defun check-fill (expected initial)
   "Check using ERT if `fill-paragraph' over `initial' gives
