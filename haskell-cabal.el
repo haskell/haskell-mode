@@ -51,7 +51,6 @@
 
 (require 'cl-lib)
 (require 'haskell-utils)
-(require 'haskell-mode)
 
 (defconst haskell-cabal-general-fields
   ;; Extracted with (haskell-cabal-extract-fields-from-doc "general-fields")

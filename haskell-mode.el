@@ -663,10 +663,6 @@ May return a qualified name."
 
 (defvar eldoc-print-current-symbol-info-function)
 
-(defvar haskell-mode-interactive-prompt-state nil
-  "Special variable indicating a state of user input waiting.")
-
-
 ;; The main mode functions
 ;;;###autoload
 (define-derived-mode haskell-mode prog-mode "Haskell"
@@ -1072,12 +1068,6 @@ successful, nil otherwise."
     (insert (format haskell-auto-insert-module-format-string (haskell-guess-module-name)))
     (goto-char (point-min))
     (end-of-line)))
-
-(defun haskell-mode-toggle-interactive-prompt-state (&optional disabled)
-  "Set `haskell-mode-interactive-prompt-state' to t.
-If given DISABLED argument sets variable value to nil, otherwise to t."
-  (setq haskell-mode-interactive-prompt-state (not disabled)))
-
 
 ;; Provide ourselves:
 

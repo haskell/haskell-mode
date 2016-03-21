@@ -26,6 +26,7 @@
 (require 'haskell-modules)
 (require 'haskell-commands)
 (require 'haskell-session)
+(require 'haskell-utils)
 
 (defun haskell-process-look-config-changes (session)
   "Check whether a cabal configuration file has changed.

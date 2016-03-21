@@ -35,17 +35,21 @@
 
 ;;; Code:
 
-;; NOTE: This module is supposed to be a leaf-module and shall not
-;;       require/depend-on any other haskell-mode modules in order to
-;;       stay at the bottom of the module dependency graph.
+;; =============================================================================
+;;                                     NOTE:
+;; THIS MODULE IS SUPPOSED TO BE A LEAF-MODULE AND SHALL NOT REQUIRE/DEPEND-ON
+;; ANY OTHER HASKELL-MODE MODULES IN ORDER TO STAY AT THE BOTTOM OF THE MODULE
+;; DEPENDENCY GRAPH.
+;; =============================================================================
 
 (eval-when-compile (require 'cl-lib))
-
-(require 'haskell-customize)
 
 (defvar haskell-utils-async-post-command-flag nil
   "Non-nil means some commands were triggered during async function execution.")
 (make-variable-buffer-local 'haskell-utils-async-post-command-flag)
+
+(defvar haskell-mode-interactive-prompt-state nil
+  "Special variable indicating a state of user input waiting.")
 
 (defun haskell-utils-read-directory-name (prompt default)
   "Read directory name and normalize to true absolute path.
@@ -179,6 +183,12 @@ expression bounds."
                end-l
                end-c
                value)))))
+
+
+(defun haskell-mode-toggle-interactive-prompt-state (&optional disabled)
+  "Set `haskell-mode-interactive-prompt-state' to t.
+If given DISABLED argument sets variable value to nil, otherwise to t."
+  (setq haskell-mode-interactive-prompt-state (not disabled)))
 
 (provide 'haskell-utils)
 ;;; haskell-utils.el ends here
