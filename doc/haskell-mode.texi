@@ -303,28 +303,51 @@ To just align imports, jump to an import section and run
 As an alternative to the elisp functions described above, haskell-mode
 can use the program @url{
 http://hackage.haskell.org/package/stylish-haskell, stylish-haskell}
-to format imports.  You can set this behavior by typing: @kbd{M-x
-customize-variable @key{RET} haskell-stylish-on-save}.  You can
-install @code{stylish-haskell} by running @code{stack install
+to format imports.  You can set this behavior by typing: @kbd{M-x}
+@code{customize-variable} @kbd{RET} @code{haskell-stylish-on-save}.
+You can install @code{stylish-haskell} by running @code{stack install
 stylish-haskell}, or if you have not installed @code{stack},
 @code{cabal install stylish-haskell}.
 
 @section Completion support
 
-@code{haskell-mode} can complete symbols, pragma directives and language
-extensions. This is part of @code{haskell-interactive-mode}.
+@code{haskell-mode} can complete symbols, pragma directives and
+language extensions out-of-box.  @code{haskell-mode} completes
+identifiers using tags, however you can get more precise completions
+with @code{haskell-interactive-mode}.  In interactive mode completion
+candidates are produced by querying GHCi REPL.
 
 @ifhtml
 @image{anim/company-mode-language-pragma}
 @end ifhtml
 
-If haskell-interactive-mode is enabled and working haskell mode provides
-completions for import statements taking into account currently loaded
-and available packages.
+If haskell-interactive-mode is enabled and working haskell mode
+provides completions for import statements taking into account
+currently loaded and available packages.
 
 @ifhtml
 @image{anim/company-mode-import-statement}
 @end ifhtml
+
+Unfortunatelly, it is not possible to provide candidates for
+identifiers defined locally in @code{let} and @code{where} blocks even
+in interactive mode.  But if you're using
+@url{http://company-mode.github.io/, company-mode} you can override
+@code{company-backends} variable for Haskell buffers to combine
+completion candidates from completion-at-point function
+(@code{company-capf} backend) and dynamic abbrevs.
+@code{company-mode} provides special backend for dabbrev code
+completions, namely @code{company-dabbrev-code}.  To combine
+completions from diffrent backends you can create grouped backends, it
+is very easy — a grouped backend is just a list of backends:
+
+@lisp
+(add-hook 'haskell-mode-hook
+          (lambda ()
+            (set (make-local-variable 'company-backends)
+                 (append '((company-capf company-dabbrev-code))
+                         company-backends))))
+@end lisp
 
 @section Profiling and Debugging support
 
