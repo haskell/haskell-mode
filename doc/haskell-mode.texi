@@ -309,13 +309,26 @@ You can install @code{stylish-haskell} by running @code{stack install
 stylish-haskell}, or if you have not installed @code{stack},
 @code{cabal install stylish-haskell}.
 
+@section Haskell Tags
+
+@code{haskell-mode} can generate tags when saving source files.  To
+generate tags @code{haskell-mode} uses external program —
+@url{https://github.com/MarcWeber/hasktags, Hasktags}
+(@url{https://wiki.haskell.org/Tags, wiki-article}).  To turn on tags
+generatation customize or set to @code{t} @code{haskell-tags-on-save}
+variable.  Also, you may find useful to revert tags tables
+automatically, this can be done by customizing
+@code{tags-revert-without-query} variable (either globally or for
+Haskell buffers only).
+
 @section Completion support
 
 @code{haskell-mode} can complete symbols, pragma directives and
 language extensions out-of-box.  @code{haskell-mode} completes
-identifiers using tags, however you can get more precise completions
-with @code{haskell-interactive-mode}.  In interactive mode completion
-candidates are produced by querying GHCi REPL.
+identifiers using tags (see @xref{Tags}), however you can get more
+precise completions with @code{haskell-interactive-mode}.  In
+interactive mode completion candidates are produced by querying GHCi
+REPL.
 
 @ifhtml
 @image{anim/company-mode-language-pragma}
