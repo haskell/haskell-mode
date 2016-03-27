@@ -323,12 +323,12 @@ Haskell buffers only).
 
 @section Completion support
 
-@code{haskell-mode} can complete symbols, pragma directives and
-language extensions out-of-box.  @code{haskell-mode} completes
-identifiers using tags (see @xref{Tags}), however you can get more
-precise completions with @code{haskell-interactive-mode}.  In
-interactive mode completion candidates are produced by querying GHCi
-REPL.
+@code{haskell-mode} can complete symbols, pragma directives, language
+extensions, and language keywords out-of-box.  @code{haskell-mode}
+completes identifiers (symbols) using tags (see ``Tags''), however you
+can get more precise completions with @code{haskell-interactive-mode}.
+In interactive mode completion candidates are produced by querying
+GHCi REPL.
 
 @ifhtml
 @image{anim/company-mode-language-pragma}
