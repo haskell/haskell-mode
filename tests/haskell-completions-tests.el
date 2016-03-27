@@ -353,8 +353,7 @@ identifiers and module identifiers."
         (should (equal expected (haskell-completions-grab-identifier-prefix)))
         (should (equal expected (haskell-completions-grab-prefix)))
         (insert " (T.pack (\"Hello")
-        (setq expected
-              (list 108 113 "Hello" 'haskell-completions-general-prefix))
+        (setq expected nil)
         (should (equal expected (haskell-completions-grab-identifier-prefix)))
         (should (equal expected (haskell-completions-grab-prefix)))
         (insert " World!\" :: String")
@@ -363,8 +362,7 @@ identifiers and module identifiers."
         (should (equal expected (haskell-completions-grab-identifier-prefix)))
         (should (equal expected (haskell-completions-grab-prefix)))
         (insert " -- Comment")
-        (setq expected
-              (list 135 142 "Comment" 'haskell-completions-general-prefix))
+        (setq expected nil)
         (should (equal expected (haskell-completions-grab-identifier-prefix)))
         (should (equal expected (haskell-completions-grab-prefix))))
       ;; test in the middle of line
