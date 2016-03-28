@@ -124,6 +124,12 @@ font faces assigned as if respective mode was enabled."
   :group 'haskell-appearance)
 
 ;;;###autoload
+(defface haskell-type-face
+  '((t :inherit font-lock-function-name-face))
+  "Face used to highlight Haskell types"
+  :group 'haskell-appearance)
+
+;;;###autoload
 (defface haskell-constructor-face
   '((t :inherit font-lock-type-face))
   "Face used to highlight Haskell constructors."
@@ -206,6 +212,117 @@ Regexp match data 0 points to the chars."
           ;; no face.  So force evaluation by using `keep'.
           keep)))))
 
+(defconst haskell-font-lock--reverved-ids
+  ;; `as', `hiding', and `qualified' are part of the import
+  ;; spec syntax, but they are not reserved.
+  ;; `_' can go in here since it has temporary word syntax.
+  '("case" "class" "data" "default" "deriving" "do"
+    "else" "if" "import" "in" "infix" "infixl"
+    "infixr" "instance" "let" "module" "mdo" "newtype" "of"
+    "rec" "proc" "then" "type" "where" "_")
+  "Identifiers treated as reserved keywords in Haskell.")
+
+(defun haskell-font-lock--forward-type (&optional ignore)
+  "Find where does this type declaration end.
+
+Moves the point to the end of type declaration. It should be
+invoked with point just after one of type introducing keywords
+like ::, class, instance, data, newtype, type."
+  (interactive)
+  (let ((cont t)
+        (end (point))
+        (token nil)
+        ;; we are starting right after ::
+        (last-token-was-operator t)
+        (last-token-was-newline nil))
+    (while cont
+      (setq token (haskell-lexeme-looking-at-token 'newline))
+
+      (cond
+       ((null token)
+        (setq cont nil))
+       ((member token '(newline))
+        (setq last-token-was-newline (not last-token-was-operator))
+        (setq end (match-end 0))
+        (goto-char (match-end 0)))
+       ((and (or (member (match-string-no-properties 0)
+                         '("<-" "=" "<-" "←"  "," ";"
+                           ")" "]" "}" "|"))
+                 (member (match-string-no-properties 0) haskell-font-lock--reverved-ids))
+             (not (member (match-string-no-properties 0) ignore)))
+        (setq cont nil)
+        (setq last-token-was-newline nil))
+       ((member (match-string-no-properties 0)
+                '("(" "[" "{"))
+        (if last-token-was-newline
+            (setq cont nil)
+          (goto-char (match-beginning 0))
+          (condition-case err
+                (forward-sexp)
+              (scan-error (goto-char (nth 3 err))))
+          (setq end (point))
+          (setq last-token-was-newline nil)))
+       ((member token '(qsymid char string number template-haskell-quote template-haskell-quasi-quote))
+        (setq last-token-was-operator (member (haskell-lexeme-classify-by-first-char (char-after (match-beginning 1)))
+                                              '(varsym consym)))
+        (if (and (not last-token-was-operator) last-token-was-newline)
+            (setq cont nil)
+
+          (goto-char (match-end 0))
+          (setq end (point)))
+        (setq last-token-was-newline nil))
+       ((member token '(comment nested-comment literate-comment))
+        (goto-char (match-end 0))
+        (setq end (point)))
+       (t
+        (goto-char (match-end 0))
+        (setq end (point))
+        (setq last-token-was-newline nil))))
+    (goto-char end)))
+
+
+(defun haskell-font-lock--put-face-on-type-or-constructor ()
+  "Private function used to put either type or constructor face
+  on an uppercase identifier."
+  (cl-case (haskell-lexeme-classify-by-first-char (char-after (match-beginning 1)))
+    (varid (when (member (match-string 0) haskell-font-lock--reverved-ids)
+             ;; Note: keywords parse as keywords only when not qualified.
+             ;; GHC parses Control.let as a single but illegal lexeme.
+             (when (member (match-string 0) '("class" "instance" "type" "data" "newtype"))
+               (save-excursion
+                 (goto-char (match-end 0))
+                 (save-match-data
+                   (haskell-font-lock--forward-type
+                    (cond
+                     ((member (match-string 0) '("class" "instance"))
+                      '("|"))
+                     ((member (match-string 0) '("type"))
+                      ;; Need to support 'type instance'
+                      '("=" "instance")))))
+                 (add-text-properties (match-end 0) (point) '(font-lock-multiline t haskell-type t))))
+             'haskell-keyword-face))
+    (conid (if (get-text-property (match-beginning 0) 'haskell-type)
+               'haskell-type-face
+             'haskell-constructor-face))
+    (varsym (when (and (not (member (match-string 0) '("-" "+" ".")))
+                       (not (save-excursion
+                              (goto-char (match-beginning 1))
+                              (looking-at-p "\\sw"))))
+              ;; We need to protect against the case of
+              ;; plus, minus or dot inside a floating
+              ;; point number.
+              'haskell-operator-face))
+    (consym (if (not (member (match-string 1) '("::" "∷")))
+                (if (get-text-property (match-beginning 0) 'haskell-type)
+                    'haskell-type-face
+                  'haskell-constructor-face)
+              (save-excursion
+                (goto-char (match-end 0))
+                (save-match-data
+                  (haskell-font-lock--forward-type))
+                (add-text-properties (match-end 0) (point) '(font-lock-multiline t haskell-type t)))
+              'haskell-operator-face))))
+
 (defun haskell-font-lock-keywords ()
   ;; this has to be a function because it depends on global value of
   ;; `haskell-font-lock-symbols'
@@ -218,14 +335,6 @@ Regexp match data 0 points to the chars."
          ;; We allow ' preceding conids because of DataKinds/PolyKinds
          (conid "\\b'?[[:upper:]][[:alnum:]'_]*\\b")
          (sym "\\s.+")
-         (reservedids
-          ;; `as', `hiding', and `qualified' are part of the import
-          ;; spec syntax, but they are not reserved.
-          ;; `_' can go in here since it has temporary word syntax.
-          '("case" "class" "data" "default" "deriving" "do"
-            "else" "if" "import" "in" "infix" "infixl"
-            "infixr" "instance" "let" "module" "mdo" "newtype" "of"
-            "rec" "proc" "then" "type" "where" "_"))
 
          ;; Top-level declarations
          (topdecl-var
@@ -291,11 +400,11 @@ Regexp match data 0 points to the chars."
 
             ;; Toplevel Declarations.
             ;; Place them *before* generic id-and-op highlighting.
-            (,topdecl-var  (1 (unless (member (match-string 1) ',reservedids)
+            (,topdecl-var  (1 (unless (member (match-string 1) haskell-font-lock--reverved-ids)
                                 'haskell-definition-face)))
-            (,topdecl-var2 (2 (unless (member (match-string 2) ',reservedids)
+            (,topdecl-var2 (2 (unless (member (match-string 2) haskell-font-lock--reverved-ids)
                                 'haskell-definition-face)))
-            (,topdecl-bangpat  (1 (unless (member (match-string 1) ',reservedids)
+            (,topdecl-bangpat  (1 (unless (member (match-string 1) haskell-font-lock--reverved-ids)
                                 'haskell-definition-face)))
             (,topdecl-sym  (2 (unless (member (match-string 2) '("\\" "=" "->" "→" "<-" "←" "::" "∷" "," ";" "`"))
                                 'haskell-definition-face)))
@@ -309,23 +418,7 @@ Regexp match data 0 points to the chars."
             (,(concat "`" haskell-lexeme-qid-or-qsym "`") 0 'haskell-operator-face)
 
             (,haskell-lexeme-qid-or-qsym
-             0 (cl-case (haskell-lexeme-classify-by-first-char (char-after (match-beginning 1)))
-                 (varid (when (member (match-string 0) ',reservedids)
-                          ;; Note: keywords parse as keywords only when not qualified.
-                          ;; GHC parses Control.let as a single but illegal lexeme.
-                          'haskell-keyword-face))
-                 (conid 'haskell-constructor-face)
-                 (varsym (when (and (not (member (match-string 0) '("-" "+" ".")))
-                                      (not (save-excursion
-                                             (goto-char (match-beginning 1))
-                                             (looking-at-p "\\sw"))))
-                             ;; We need to protect against the case of
-                             ;; plus, minus or dot inside a floating
-                             ;; point number.
-                             'haskell-operator-face))
-                 (consym (if (not (member (match-string 1) '("::" "∷")))
-                             'haskell-constructor-face
-                           'haskell-operator-face))))))
+             (0 (haskell-font-lock--put-face-on-type-or-constructor)))))
     keywords))
 
 
