@@ -237,7 +237,6 @@ executable found in PATH.")
   ;; - look up docs
   `("Haskell"
     ["Indent line" indent-according-to-mode]
-    ["Indent region" indent-region mark-active]
     ["(Un)Comment region" comment-region mark-active]
     "---"
     ["Start interpreter" haskell-interactive-switch]
