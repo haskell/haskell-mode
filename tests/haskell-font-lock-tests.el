@@ -190,6 +190,20 @@
      ("%\\" "." haskell-quasi-quote-face)
      ("Cons" "w" haskell-constructor-face))))
 
+(ert-deftest haskell-syntactic-quasiquote-constructor ()
+  "Check string escape vs comment escape"
+  (check-properties
+   '("[Cons1| Cons2 |]")
+   '(("Cons1" "w" haskell-constructor-face)
+     ("Cons2" "w" haskell-constructor-face))))
+
+(ert-deftest haskell-syntactic-quasiquote-number ()
+  "Check string escape vs comment escape"
+  (check-properties
+   '("[11| Cons2 |]")
+   '(("1" "w" nil)
+     ("Cons2" "w" haskell-constructor-face))))
+
 (ert-deftest haskell-syntactic-test-11a ()
   "Syntax for haddock comments"
   (check-properties
