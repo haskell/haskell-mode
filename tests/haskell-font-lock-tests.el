@@ -220,7 +220,7 @@
      " --  ^ Com7"
      " --  * Com8"
      " {-| Dcom10 -}"                   ; haddocks
-     " {-$ dcom11 -}"
+     " {-$ Dcom11 -}"
      " {-^ Dcom12 -}"
      " {-* Dcom13 -}"
      " {- | Dcom14 -}"                  ; also haddocks

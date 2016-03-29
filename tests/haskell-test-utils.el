@@ -118,7 +118,8 @@ if all of its characters have syntax and face. See
     (goto-char (point-min))
     (dolist (prop props)
       (cl-destructuring-bind (string syntax face) prop
-        (search-forward string)
+        (let ((case-fold-search nil))
+          (search-forward string))
         (check-syntax-and-face-match-range (match-beginning 0) (match-end 0) syntax face)))))
 
 (provide 'haskell-test-utils)
