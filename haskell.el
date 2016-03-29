@@ -406,10 +406,6 @@ Give optional NEXT-P parameter to override value of
                          "\\\\\""
                          file-name)))
 
-
-(defvar haskell-process-do-hsc2hs t
-  "If non-nil, run hsc2hs first on source files ending in .hsc.")
-
 (defun haskell--process-hsc2hs-load ()
   "Run hsc2hs and load the resulting file (unless hsc2hs failed)."
   ;; assumes lexical-binding
@@ -443,8 +439,7 @@ currently ignored)."
   (interactive)
   (save-buffer)
   (haskell-interactive-mode-reset-error (haskell-session))
-  (if (and haskell-process-do-hsc2hs
-           (equal "hsc" (file-name-extension (buffer-file-name))))
+  (if (equal "hsc" (file-name-extension (buffer-file-name)))
       (haskell--process-hsc2hs-load)
     (haskell-process-file-loadish (haskell--file-name-to-load-string (buffer-file-name))
                                   nil
