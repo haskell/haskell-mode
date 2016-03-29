@@ -406,12 +406,18 @@ Give optional NEXT-P parameter to override value of
                          "\\\\\""
                          file-name)))
 
+(defvar haskell-process-path-hsc2hs "hsc2hs"
+  "The path for running hsc2hs.
+This should be a single string.")
+
 (defun haskell--process-hsc2hs-load ()
   "Run hsc2hs and load the resulting file (unless hsc2hs failed)."
   ;; assumes lexical-binding
   (let* ((hwin (get-buffer-window (current-buffer)))
          (hs (replace-regexp-in-string "\\.hsc\\'" ".hs" (buffer-file-name)))
-         (cbuf (compilation-start (format "hsc2hs %s" (buffer-file-name))
+         (cbuf (compilation-start (format "%s %s"
+                                          haskell-process-path-hsc2hs
+                                          (buffer-file-name))
                                   nil
                                   (lambda (_) "*hsc2hs*")))
          (proc (get-buffer-process cbuf)))
