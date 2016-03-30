@@ -1,14 +1,15 @@
-#!/bin/sh
+#!/usr/bin/awk -f
 
 # Very stupid fake hsc2hs specific to our tests
 
-awk -v hs="${1%c}" '
 /^#{/ {
     skip = 1
 }
+
 !skip && !/^#include/ {
     lines = lines $0"\n"
 }
+
 /}/ {
     skip = 0
 }
@@ -23,7 +24,14 @@ END {
     if(lines) {
         lines = lines "rand_max  :: NUMBERS\n"
         lines = lines "rand_max  = NUMBERS 2147483647\n"
-        print lines > hs
+        hs = FILENAME
+        sub(/hsc$/, "hs", hs)
+        if(FILENAME==hs) {
+            print FILENAME" doesn't seem to end in .hsc">"/dev/stderr"
+            exit(1)
+        }
+        else {
+            print lines > hs
+        }
     }
 }
-' "$1"

@@ -27,8 +27,7 @@ newtype NUMBERS = NUMBERS { unNUMBERS :: CInt }
 
 (defmacro with-hsc2hs (contents &rest body)
   "Load CONTENTS as a .hsc, then run BODY after it's loaded into REPL.
-Uses `haskell-process-path-hsc2hs' if executable exists,
-otherwise fake script hsc2hs.sh from this directory."
+Uses fake hsc2hs script from this directory."
   (declare (debug t) (indent 1))
   `(with-temp-switch-to-buffer
      (let ((f (make-temp-file "haskell-hsc2hs-tests.el" nil ".hsc")))
@@ -37,7 +36,7 @@ otherwise fake script hsc2hs.sh from this directory."
        (haskell-mode)
        (let* ((dir (file-name-directory
                     (find-lisp-object-file-name 'with-hsc2hs nil)))
-              (haskell-process-path-hsc2hs (format "%s/%s" dir "hsc2hs.sh")))
+              (haskell-process-path-hsc2hs (format "%s/%s" dir "fake-hsc2hs")))
          (haskell-process-load-file))
        (let ((proc (get-buffer-process "*hsc2hs*")))
          (while (eq (process-status proc) 'run) ; TODO: is there no built-in way to block-wait on a process?
