@@ -37,8 +37,9 @@ otherwise fake script hsc2hs.sh from this directory."
        (haskell-mode)
        (let* ((dir (file-name-directory
                     (find-lisp-object-file-name 'with-hsc2hs nil)))
+              (existing-hsc2hs (executable-find haskell-process-path-hsc2hs))
               (haskell-process-path-hsc2hs
-               (if (file-executable-p (executable-find haskell-process-path-hsc2hs))
+               (if (and existing-hsc2hs (file-executable-p existing-hsc2hs))
                    haskell-process-path-hsc2hs
                  (format "%s/%s" dir "hsc2hs.sh"))))
          (haskell-process-load-file))
