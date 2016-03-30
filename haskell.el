@@ -406,9 +406,12 @@ Give optional NEXT-P parameter to override value of
                          "\\\\\""
                          file-name)))
 
-(defvar haskell-process-path-hsc2hs "hsc2hs"
+(defcustom haskell-process-path-hsc2hs
+  "hsc2hs"
   "The path for running hsc2hs.
-This should be a single string.")
+This should be a single string."
+  :group 'haskell-interactive
+  :type 'string)
 
 (defun haskell--process-hsc2hs-load ()
   "Run hsc2hs and load the resulting file (unless hsc2hs failed)."
