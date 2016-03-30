@@ -42,7 +42,8 @@ Uses fake hsc2hs script from this directory."
          (while (eq (process-status proc) 'run) ; TODO: is there no built-in way to block-wait on a process?
            (sit-for 0.5))
          ,@body
-         (delete-file f)))))
+         (delete-file f)
+         (delete-file (replace-regexp-in-string "\\.hsc\\'" ".hs" f))))))
 
 (ert-deftest hsc2hs-errors ()
   (let ((error-hsc (concat default-hsc
