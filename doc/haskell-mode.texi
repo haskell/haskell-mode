@@ -1171,6 +1171,172 @@ For example:
 @end example
 
 
+@section Compiling
+
+Once a [[session has been started|Haskell Interactive Mode Sessions]],
+there are a bunch of ways to compile Haskell modules. This page covers
+a few of them.
+
+@subsection Load into GHCi
+
+To compile and load a Haskell module into GHCi, run the following
+
+@example
+    M-x haskell-process-load
+@end example
+
+Or @kbd{C-c C-l}. You'll see any compile errors in the REPL window.
+
+@subsection Build the Cabal project
+
+To compile the whole Cabal project, run the following
+
+@example
+    M-x haskell-process-cabal-build
+@end example
+
+Or @kbd{C-c C-c}. You'll see any compile errors in the REPL window.
+
+@subsection Reloading modules
+
+To reload the current module, even when you're in other modules, you can
+run @kbd{C-u M-x} @code{haskell-process-load-or-reload} or @kbd{C-u C-c
+C-l}. It will now reload that module whenever you run @kbd{C-c C-l} in
+the future from whatever module you're in. To disable this mode, just
+run @kbd{C-u C-c C-l} again.
+
+@subsection Jumping to compile errors
+
+You can use the standard compile error navigation function:
+
+* @kbd{C-x `} — jump to the next error.
+
+Or you can move your cursor to an error in the REPL and hit `RET` to
+jump to it.
+
+@subsection Auto-removing imports
+
+If the customization variable
+`haskell-process-suggest-remove-import-lines` is enabled.
+
+@lisp
+(custom-set-variables
+  '(haskell-process-suggest-remove-import-lines t))
+@end lisp
+
+Building and loading modules which output warnings like,
+
+@example
+    Warning: The import of `Control.Monad' is redundant
+      except perhaps to import instances from `Control.Monad'
+    To import instances alone, use: import Control.Monad()
+@end example
+
+will prompt the user with
+
+@example
+> The import line `Control.Monad' is redundant. Remove? (y, n, c: comment out)
+@end example
+
+If you answer
+
+   * `y`: it will delete the import, but leave the empty line
+     remaining (this avoids messing with line positions in subsequent
+     error messages).
+   * `n`: it will leave the import.
+   * `c`: it will comment out the import (this is handy for when you
+     just want to temporarily hide an import).
+
+@subsection Auto-adding of modules to import
+
+Enable the customization variable
+@code{haskell-process-suggest-hoogle-imports}.
+
+@lisp
+(custom-set-variables
+  '(haskell-process-suggest-hoogle-imports t))
+@end lisp
+
+Whenever GHC says something is not in scope, it will hoogle that
+symbol. If there are results, it will prompt to add one of the modules
+from Hoogle's results.
+
+You need to make sure you've generated your Hoogle database properly.
+
+@subsection Auto-adding of extensions
+
+It you use an extension which is not enabled, GHC will often inform
+you. For example, if you write:
+
+@example
+newtype X a = X (IO a)
+  deriving (Monad)
+@end example
+
+
+Then you'll see a message like:
+
+@example
+    x.hs:13:13: Can't make a derived instance of `Monad X': …
+          `Monad' is not a derivable class
+          Try -XGeneralizedNewtypeDeriving for GHC's newtype-deriving extension
+        In the newtype declaration for `X'
+@end example
+
+This @code{-XFoo} pattern will be picked up and you will be prompted:
+
+@example
+> Add `@{-# LANGUAGE GeneralizedNewtypeDeriving #-@}` to the top of the
+> file? (y or n)
+@end example
+
+If you answer `y`, it will temporarily jump to the buffer and it to
+the top of the file.
+
+@subsection Orphan instances
+
+If GHC complains about orphan instances, you usually are doing it
+intentionally, so it prompts to add @code{-fno-warn-orphans} to the top of
+the file with an @kbd{OPTIONS} pragma.
+
+@subsection Auto-adding of dependencies
+
+When doing a build, you will sometimes get a message from GHC like:
+
+@example
+    src/ACE/Tokenizer.hs:11:18: Could not find module `Data.Attoparsec.Text' …
+        It is a member of the hidden package `attoparsec-0.11.1.0'.
+@end example
+
+This message contains all the necessary information to add this to
+your .cabal file, so you will be prompted to add it to your .cabal
+file:
+
+@example
+    Add `attoparsec' to ace.cabal? (y or n)  y
+@end example
+
+If you hit `y`, it will prompt with this:
+
+@example
+    attoparsec >= 0.11.1.0
+@end example
+
+Which you can edit (e.g. do some PVP decision or remove constraints
+entirely), and then it will open up your .cabal file and go through
+each section:
+
+@example
+    Add to library? (y or n)  y
+@end example
+
+This will add it to the top of the @code{build-depends} field in your
+library section. If you have any executables, it will go through each
+of those, prompting, too.
+
+Now you can rebuild with @kbd{C-c C-c} again.
+
+
 @node Editing Cabal files
 @chapter Editing Cabal files
 
