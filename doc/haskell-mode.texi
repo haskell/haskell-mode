@@ -1646,6 +1646,71 @@ line at point, run the following command:
 or @kbd{C-c C-i}. It will print all exports by running @code{:browse
 The.Module} in the GHCi process.
 
+@section Haskell Interactive Mode Cabal integration
+
+There's some integration with Cabal in Haskell Interactive Mode. Once
+you've started a session, the features below are available.
+
+@subsection Cabal building
+
+The most common Cabal action is building, so that has a specific command:
+
+@example
+    M-x haskell-process-cabal-build
+@end example
+
+Or @kbd{C-c C-c}. When building, it will hide unneccessary output.
+
+For example, to build the `ace` package, the output is simply:
+
+@example
+    Compiling: ACE.Types.Tokens
+    Compiling: ACE.Combinators
+    Compiling: ACE.Tokenizer
+    Compiling: ACE.Parsers
+    Compiling: ACE.Pretty
+    Compiling: ACE
+    Complete: cabal build (0 compiler messages)
+@end example
+
+Whereas the complete output is normally:
+
+@example
+    Building ace-0.5...
+    Preprocessing library ace-0.5...
+    [4 of 9] Compiling ACE.Types.Tokens ( src/ACE/Types/Tokens.hs, dist/build/ACE/Types/Tokens.o )
+    [5 of 9] Compiling ACE.Combinators  ( src/ACE/Combinators.hs, dist/build/ACE/Combinators.o ) [ACE.Types.Tokens changed]
+    [6 of 9] Compiling ACE.Tokenizer    ( src/ACE/Tokenizer.hs, dist/build/ACE/Tokenizer.o ) [ACE.Types.Tokens changed]
+    [7 of 9] Compiling ACE.Parsers      ( src/ACE/Parsers.hs, dist/build/ACE/Parsers.o )
+    [8 of 9] Compiling ACE.Pretty       ( src/ACE/Pretty.hs, dist/build/ACE/Pretty.o )
+    [9 of 9] Compiling ACE              ( src/ACE.hs, dist/build/ACE.o ) [ACE.Tokenizer changed]
+    In-place registering ace-0.5...
+@end example
+
+Which is considerably more verbose but rarely useful or interesting.
+
+@subsection Arbitrary cabal commands
+
+To run an arbitrary Cabal command:
+
+@example
+    C-u M-x haskell-process-cabal
+@end example
+
+Or run @kbd{C-u C-c c}.
+
+It will prompt for an input, so you can write `configure -fdev`, for example.
+
+@subsection Completing cabal commands
+
+To run some common Cabal commands, just run:
+
+@example
+    M-x haskell-process-cabal
+@end example
+
+Or @kbd{C-c c}. This is commonly used to do @code{install}, @code{haddock}, @code{configure}, etc.
+
 
 
 @node Editing Cabal files
