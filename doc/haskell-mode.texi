@@ -899,6 +899,116 @@ strings specifying (further) command-line arguments.
 @vindex haskell-process-args-cabal-repl
 @vindex haskell-process-args-stack-ghci
 
+@section Haskell Interactive Mode Setup
+
+The most straight-forward way to get setup with Interactive Mode is to
+bind the right keybindings and set some customizations. This page
+contains a good base setup.
+
+To enable the minor mode which activates keybindings associated with interactive mode, use:
+
+@lisp
+(require 'haskell-interactive-mode)
+(require 'haskell-process)
+(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+@end lisp
+
+@subsection Customizations
+
+This enables some handy and benign features.
+
+@lisp
+(custom-set-variables
+  '(haskell-process-suggest-remove-import-lines t)
+  '(haskell-process-auto-import-loaded-modules t)
+  '(haskell-process-log t))
+@end lisp
+
+
+@subsection Haskell-mode bindings
+
+This gives the basic ways to start a session. In a Haskell buffer:
+
+@itemize
+@item
+Run @kbd{C-`} to make a REPL open, this will create a
+session, start GHCi, and open the REPL.
+@item
+Or: run @kbd{C-c C-l} to load the file. This will first try to start a
+session as the previous command does.
+@item
+Or: run any command which requires a running session. It will always
+prompt to create one if there isn't one already for the current project.
+@end itemize
+
+@lisp
+(define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-or-reload)
+(define-key haskell-mode-map (kbd "C-`") 'haskell-interactive-bring)
+(define-key haskell-mode-map (kbd "C-c C-t") 'haskell-process-do-type)
+(define-key haskell-mode-map (kbd "C-c C-i") 'haskell-process-do-info)
+(define-key haskell-mode-map (kbd "C-c C-c") 'haskell-process-cabal-build)
+(define-key haskell-mode-map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
+(define-key haskell-mode-map (kbd "C-c c") 'haskell-process-cabal)
+@end lisp
+
+
+@subsection Cabal-mode bindings
+
+The below commands pretty much match the ones above, but are handy to
+have in cabal-mode, too:
+
+@lisp
+(define-key haskell-cabal-mode-map (kbd "C-`") 'haskell-interactive-bring)
+(define-key haskell-cabal-mode-map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
+(define-key haskell-cabal-mode-map (kbd "C-c C-c") 'haskell-process-cabal-build)
+(define-key haskell-cabal-mode-map (kbd "C-c c") 'haskell-process-cabal)
+@end lisp
+
+@subsection GHCi process type
+
+By default @code{haskell-process-type} is set to @code{auto}. It is
+smart enough to pick the right type based on your project structure and
+installed tools, but in case something goes funky or you want to
+explicitly set the process type and ignore the inferred type, you can
+customize this setting by running @kbd{M-x} @code{customize-variable}
+@kbd{RET} @code{haskell-process-type} @kbd{RET}, or by setting the code:
+
+@lisp
+(custom-set-variables
+  '(haskell-process-type 'cabal-repl))
+@end lisp
+
+Here is a list of available process types:
+
+@itemize
+@item ghci
+@item cabal-repl
+@item cabal-dev
+@item cabal-ghci
+@item stack-ghci
+@end itemize
+
+Please, check the documentation for @code{haskell-process-type} to see how
+the real type is guessed, when it's set to @code{auto}.
+
+@subsection Troubleshooting
+
+Launching your GHCi process can fail when you're first getting setup,
+depending on the type you choose. If it does fail to launch, switch to
+the buffer @code{*haskell-process-log*} and see what's up. The buffer
+contains a log of incoming/outgoing messages to the GHCi process.
+
+@subsection All done!
+
+You're all done and ready to go! But wait!
+
+There're a bunch more features to this mode and for which you might
+want to add configurations and keybindings. So it is suggested that
+once you've setup and played with the above, you continue reading what
+other features are available in the [[Haskell Interactive Mode]]
+documentation.
+
+
 @node Editing Cabal files
 @chapter Editing Cabal files
 
