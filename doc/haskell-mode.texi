@@ -1093,6 +1093,83 @@ resolve this simply run the following:
 
 And you're done!
 
+@section Sessions
+
+All commands in [[Haskell Interactive Mode]] work within a
+session. Consider it like a “project” or a “solution” in popular
+IDEs. It tracks the root of your project and an associated process and
+REPL.
+
+Make sure you have [[setup your keybindings|Haskell Interactive Mode Setup]].
+
+@subsection Start a session
+
+To start a session run the following steps (assumes you've already
+[[setup your keybindings|Haskell Interactive Mode Setup]]).
+
+* Open some Cabal or Haskell file.
+* Run <code>C-`</code> to make a REPL open, this will create a
+  session, start GHCi, and open the REPL.
+* Or: run `C-c C-l` to load the file. This will first try to start a
+  session as the previous command does.
+* Or: run any command which requires a running session. It will always
+  prompt to create one if there isn't one already for the current project.
+
+It will prompt for a Cabal directory and a current directory. It
+figures out where the cabal directory is and defaults for the current
+directory, so you should be able to just hit RET twice.
+
+@subsection Switch a session
+
+Sometimes a particular file is used in two different
+sessions/projects. You can run
+
+@example
+    M-x haskell-session-change
+@end example
+
+If it prompts you to make a new session, tell it no (that's a
+bug). It will ask you to choose from a list of sessions.
+
+@subsection Killing a session
+
+To kill a session you can run
+
+@example
+    M-x haskell-session-kill
+@end example
+
+Which will prompt to kill all associated buffers, too. Hit `n` to
+retain them.
+
+Alternatively, you can switch to the REPL and just kill the buffer
+normally with @kbd{C-x k RET}. It will prompt
+
+@example
+    Kill the whole session (y or n)?
+@end example
+
+You can choose @kbd{y} to kill the session itself, or @kbd{n} to just
+kill the REPL buffer. You can bring it back with @kbd{M-x}
+@code{haskell-interactive-bring}.
+
+@subsection Menu
+
+To see a list of all sessions you have open with some simple
+statistics about memory usage, etc. run
+
+@example
+    M-x haskell-menu
+@end example
+
+For example:
+
+@example
+    foo  14648 08:21:42 214MB /path/to/fpco/foo/  /path/to/fpco/foo/ ghci
+    bar  29119 00:22:03 130MB /path/to/bar/       /path/to/bar/      ghci
+    mu   22575 08:48:20 73MB  /path/to/fpco/mu/   /path/to/fpco/mu/  ghci
+@end example
+
 
 @node Editing Cabal files
 @chapter Editing Cabal files
