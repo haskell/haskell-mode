@@ -1711,6 +1711,200 @@ To run some common Cabal commands, just run:
 
 Or @kbd{C-c c}. This is commonly used to do @code{install}, @code{haddock}, @code{configure}, etc.
 
+@section Haskell Interactive Mode Debugger
+
+There is limited support for debugging in
+GHCi. [[Haskell Interactive Mode]] provides an interface for
+interacting with this.
+
+@subsection Opening the debug buffer
+
+To open the debug buffer run the following command from any buffer
+associated with a session:
+
+@example
+    M-x haskell-debug
+@end example
+
+It will open a buffer that looks like this:
+
+@example
+    Debugging haskell
+
+    You have to load a module to start debugging.
+
+    g - refresh
+
+    Modules
+
+    No loaded modules.
+@end example
+
+
+@subsection Loading modules
+
+To debug anything you need to load something into GHCi. Switch to a
+normal file, for example:
+
+@example
+main = do putStrLn "Hello!"
+          putStrLn "World"
+@end example
+
+and load it into GHCi (@kbd{C-c C-l}). Now when you hit `g`
+(to refresh) in the debugging buffer, you'll see something like:
+
+@example
+
+    Debugging haskell
+
+    b - breakpoint, g - refresh
+
+    Context
+
+    Not debugging right now.
+
+    Breakpoints
+
+    No active breakpoints.
+
+    Modules
+
+    Main - hello.hs
+@end example
+
+@subsection Setting a breakpoint
+
+To set a breakpoint hit `b` in the debugger buffer. It will prompt for
+a name. Enter `main` and hit `RET`.
+
+Now the buffer will look like this:
+
+@example
+    Debugging haskell
+
+    s - step into an expression, b - breakpoint
+    d - delete breakpoint, g - refresh
+
+    Context
+
+    Not debugging right now.
+
+    Breakpoints
+
+    0 - Main (1:8)
+
+    Modules
+
+    Main - hello.hs
+@end example
+
+@subsection Start stepping
+
+Hit `s` to step through an expression: it will prompt for an
+expression to evaluate and step through. Enter `main` and hit
+@kbd{RET}. Now the buffer will look like this:
+
+@example
+    Debugging haskell
+
+    s - step into an expression, b - breakpoint
+    d - delete breakpoint, a - abandon context, c - continue
+    p - previous step, n - next step
+    g - refresh
+
+    Context
+
+    main - hello.hs (stopped)
+
+    do putStrLn "Hello!"
+       putStrLn "World"
+
+    _result :: IO () = _
+
+       1 do putStrLn "Hello!" putStrLn "World"
+
+    Breakpoints
+
+    0 - Main (1:8)
+
+    Modules
+
+    Main - hello.hs
+@end example
+
+What we see here is the current expression being evaluated:
+
+@example
+do putStrLn "Hello!"
+   putStrLn "World"
+@end example
+
+And we see the type of it:
+
+@example
+_result :: IO () = _
+@end example
+
+And we see a backtrace of steps so far:
+
+@example
+1 do putStrLn "Hello!" putStrLn "World"
+@end example
+
+@subsection Continue stepping
+
+To continue stepping, just hit `s` again. Now the context will change
+to:
+
+@example
+main - hello.hs (stopped)
+
+putStrLn "Hello!"
+
+_result :: IO () = _
+
+   1 do putStrLn "Hello!" putStrLn "World"
+@end example
+
+
+Hitting `s` once more, we see the context change to:
+
+@example
+putStrLn "World"
+
+_result :: IO () = _
+
+   2 putStrLn "Hello!"
+   1 do putStrLn "Hello!" putStrLn "World"
+@end example
+
+Finally hitting `s` again will say "Computation finished". Hitting `s`
+a final time will change the display back to:
+
+@example
+    Debugging haskell
+
+    s - step into an expression, b - breakpoint
+    d - delete breakpoint, g - refresh
+
+    Context
+
+    Finished debugging.
+
+       2 putStrLn "Hello!"
+       1 do putStrLn "Hello!" putStrLn "World"
+
+    Breakpoints
+
+    1 - Main (1:8)
+
+    Modules
+
+    Main - hello.hs
+@end example
+
+And you're done debugging.
 
 
 @node Editing Cabal files
