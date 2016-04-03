@@ -50,7 +50,7 @@ interpreter (e.g. GHCi).
 
 @menu
 * Introduction::                         An introduction to Haskell Mode
-* Getting Started::                      How to get started
+* Installation::                         How to get started
 * Editing Haskell Code::                 How to edit code
 * Unicode support::                      How to use Unicode
 * Indentation::                          Notes about indentation
@@ -124,12 +124,31 @@ work.
 As of 2016 Haskell Mode is coordinated using Github at
 @uref{https://github.com/haskell/haskell-mode}.
 
-@node Getting Started
-@chapter Getting Started
+@node Installation
+@chapter Installation
 
-@section Quick Installation
+Haskell Mode is distributed as a package in
+@uref{https://melpa.org,MELPA repository}. To use MELPA as Emacs package
+archive do the following:
 
-Make sure you have this in your @uref{http://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html, init file} (usually `~/.emacs`). If you already have @code{custom-set-variables}, merge its contents:
+@enumerate
+@item
+Customize @code{package-archives} using @kbd{M-x} @code{customize-option} @kbd{RET} @code{package-archives} @kbd{RET}.
+@item
+Use @kbd{INS} to add new archive, use @code{Archive name: melpa-stable}
+and @code{URL or directory name: http://stable.melpa.org/packages/}.
+@item
+Fetch new packages using @kbd{M-x} @code{package-refresh-contents}.
+@item
+Install @code{haskell-mode} using @kbd{M-x} @code{package-install}
+@kbd{RET} @code{haskell-mode} @kbd{RET}.
+
+@end enumerate
+
+Voila! @code{haskell-mode} is installed! You should be able to edit Haskell
+source code in color now.
+
+The above steps should result in the following snippet in your @file{.emacs}:
 
 @lisp
 (require 'package)
@@ -144,16 +163,6 @@ Make sure you have this in your @uref{http://www.gnu.org/software/emacs/manual/h
      ("melpa-stable" . "http://stable.melpa.org/packages/")))))
 @end lisp
 
-Then run Emacs, and evaluate:
-
-    @kbd{M-x} @code{package-refresh-contents}
-
-and then follow by
-
-    @kbd{M-x} @code{package-install} @kbd{RET} @code{haskell-mode}
-
-Voila! @code{haskell-mode} is installed! You should be able to edit
-Haskell source code in color now.
 
 @section Installation - more information
 
