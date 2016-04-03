@@ -63,6 +63,7 @@ interpreter (e.g. GHCi).
 * Changing REPL target::                 Start REPL with selected target (i.e. test,bench,etc.)
 * Browsing Haddocks::                    Using @code{w3m} to browse documentation
 * Spell checking strings and comments::  Using @code{flyspell-prog-mode}
+* Aligning code::                        Aligning code using @code{align-regexp}
 * Concept index::                        Index of Haskell Mode concepts
 * Function index::                       Index of commands
 * Variable index::                       Index of options and types
@@ -1009,6 +1010,59 @@ To enable spell checking of strings and comments add this line to your
 @code{~/.emacs} file:
 
 @code{(add-hook 'haskell-mode-hook 'flyspell-prog-mode)}
+
+@node Aligning code
+@chapter Aligning code
+
+Select a region you want to align text within, @kbd{M-x}
+@code{align-regexp}, and type a regexp representing the alignment
+delimiter.
+
+For example, I often line up my Haddock comments:
+
+@example
+f :: a -- ^ does a
+  -> Foo b -- ^ and b
+  -> c -- ^ to c
+@end example
+
+Select the region, and let the regexp be @samp{--}:
+
+@example
+f :: a     -- ^ does a
+  -> Foo b -- ^ and b
+  -> c     -- ^ to c
+@end example
+
+Of course, this works for just about anything. Personally, I've globally
+bound it to @kbd{C-x a r}:
+
+@lisp
+(global-set-key (kbd "C-x a r") 'align-regexp)
+@end lisp
+
+Note that you can also just use the rules below for telling the aligner
+about Haskell. Once you evaluate this, you can just use @kbd{M-x}
+@code{align}, which I like to bind to @kbd{M-[}.
+
+@lisp
+(add-to-list 'align-rules-list
+             '(haskell-types
+               (regexp . "\\(\\s-+\\)\\(::\\|∷\\)\\s-+")
+               (modes quote (haskell-mode literate-haskell-mode))))
+(add-to-list 'align-rules-list
+             '(haskell-assignment
+               (regexp . "\\(\\s-+\\)=\\s-+")
+               (modes quote (haskell-mode literate-haskell-mode))))
+(add-to-list 'align-rules-list
+             '(haskell-arrows
+               (regexp . "\\(\\s-+\\)\\(->\\|→\\)\\s-+")
+               (modes quote (haskell-mode literate-haskell-mode))))
+(add-to-list 'align-rules-list
+             '(haskell-left-arrows
+               (regexp . "\\(\\s-+\\)\\(<-\\|←\\)\\s-+")
+               (modes quote (haskell-mode literate-haskell-mode))))
+@end lisp
 
 @node Concept index
 @unnumbered Concept index
