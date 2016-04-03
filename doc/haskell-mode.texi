@@ -56,6 +56,7 @@ interpreter (e.g. GHCi).
 * Unicode support::                      How to use Unicode
 * Indentation::                          Notes about indentation
 * External indentation::                 Other ways to indent code
+* Autoformating::                        Using external formatters
 * Declaration scanning::                 How to navigate in a source file
 * Compilation::                          How to compile
 * Inferior Haskell interpreter::         How to interact with GHCi (1)
@@ -504,6 +505,28 @@ Another alternative is to install
 which indents code by parsing the code with a full Haskell parser and
 deciding where to indent based on that.
 
+@node Autoformating
+@chapter Using external formatters
+
+You can enable @uref{https://github.com/jaspervdj/stylish-haskell,stylish-haskell} by
+installing it:
+
+@example
+$ cabal install stylish-haskell
+@end example
+
+And by enabling it with a customization
+
+@lisp
+(custom-set-variables
+ '(haskell-stylish-on-save t))
+@end lisp
+
+Now when you run @code{save-buffer} (or @kbd{C-x C-s}) the module will
+be automatically formatted.
+
+Alternatively, you can run the function directly on demand with
+@kbd{M-x} @code{haskell-mode-stylish-buffer}.
 
 @node Declaration scanning
 @chapter Declaration scannning
