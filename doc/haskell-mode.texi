@@ -61,6 +61,7 @@ interpreter (e.g. GHCi).
 * Interactive Haskell::                  How to interact with GHCi (2)
 * Editing Cabal files::                  Cabal support
 * Changing REPL target::                 Start REPL with selected target (i.e. test,bench,etc.)
+* Browsing Haddocks::                    Using @code{w3m} to browse documentation
 * Spell checking strings and comments::  Using @code{flyspell-prog-mode}
 * Concept index::                        Index of Haskell Mode concepts
 * Function index::                       Index of commands
@@ -876,6 +877,103 @@ Answer ``yes'' to restart the session and run your tests, benchmarks, executable
 
 
 TODO/WRITEME
+
+@node Browsing Haddocks
+@chapter Browsing Haddocks using @code{w3m}
+
+An experimental feature is use of the w3m browser to browse Haddock docs
+inside Emacs.
+
+@section Get w3m
+
+Most Linux distributions will have a package for the binary:
+
+@example
+$ sudo apt-get install w3m
+@end example
+
+Now grab @code{w3m.el} from:
+
+@itemize
+@item @url{http://emacs-w3m.namazu.org/}
+@item @kbd{M-x} @code{package-install} @kbd{RET} @code{w3m} @kbd{RET}
+@end itemize
+
+Confirm installation by trying @kbd{M-x} @code{w3m-browse-url} @kbd{RET}
+@code{haskell.org} @kbd{RET}.
+
+If this works, you're good to go.
+
+@section Configure w3m
+
+Now that you have w3m, you probably want to configure it to be more of a
+passive viewer than a full-fledged browser. For example:
+
+@lisp
+(setq w3m-mode-map (make-sparse-keymap))
+
+(define-key w3m-mode-map (kbd "RET") 'w3m-view-this-url)
+(define-key w3m-mode-map (kbd "q") 'bury-buffer)
+(define-key w3m-mode-map (kbd "<mouse-1>") 'w3m-maybe-url)
+(define-key w3m-mode-map [f5] 'w3m-reload-this-page)
+(define-key w3m-mode-map (kbd "C-c C-d") 'haskell-w3m-open-haddock)
+(define-key w3m-mode-map (kbd "M-<left>") 'w3m-view-previous-page)
+(define-key w3m-mode-map (kbd "M-<right>") 'w3m-view-next-page)
+(define-key w3m-mode-map (kbd "M-.") 'w3m-haddock-find-tag)
+
+(defun w3m-maybe-url ()
+  (interactive)
+  (if (or (equal '(w3m-anchor) (get-text-property (point) 'face))
+          (equal '(w3m-arrived-anchor) (get-text-property (point) 'face)))
+      (w3m-view-this-url)))
+@end lisp
+
+@section Import w3m-haddock
+
+It's not enabled by default in haskell-mode at present, so you need to
+import it manually:
+
+@lisp
+(require 'w3m-haddock)
+@end lisp
+
+@section Add a hook for w3m
+
+In order to make haddock pages a little more palatable (and add syntax
+highlighting to source view), you can add this hook:
+
+@lisp
+(add-hook 'w3m-display-hook 'w3m-haddock-display)
+@end lisp
+
+It's a little rough around the edges, but it's a start.
+
+@section Configure your package locations
+
+By default, the package locations is set to:
+
+@lisp
+(defcustom haskell-w3m-haddock-dirs
+  '("~/.cabal/share/doc/"))
+@end lisp
+
+If you are using an hsenv or a custom package directory, you should
+configure this variable with M-x customize-variable or by writing the
+custom-set-variables code for it.
+
+@section Finally
+
+You did all that! Now you're ready to bind a useful key:
+
+@lisp
+(define-key haskell-mode-map (kbd "C-c C-d") 'haskell-w3m-open-haddock)
+@end lisp
+
+Now when you press @kbd{C-c} @kbd{C-d} it will prompt for a package to
+browse to.
+
+This feature will be improved gradually as time goes on.
+
 
 @node Spell checking strings and comments
 @chapter Using with @code{flyspell-prog-mode}
