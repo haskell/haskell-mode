@@ -1559,6 +1559,94 @@ following command can dump the @code{haskell-process} state:
 
 The output can be copied from the `*Messages*` buffer.
 
+@section Haskell Interactive Mode Querying
+
+There a few ways GHCi lets you query information about your code.
+
+@subsection Get identifer type
+
+To print the type of the top-level identifier at point in the REPL and
+in the message buffer, run the following command:
+
+@example
+    M-x haskell-process-do-type
+@end example
+
+or @kbd{C-c C-t}.
+
+@subsection Insert identifier's type as type signature
+
+To print the type of the top-level identifier at point, run the
+following command:
+
+@example
+    C-u M-x haskell-process-do-type
+@end example
+
+or @kbd{C-u C-c C-t}.
+
+@subsection Get identifier info
+
+To print the info of the identifier at point, run the following
+command:
+
+@example
+    M-x haskell-process-do-info
+@end example
+
+or @kbd{C-c C-i}.
+
+@subsection Presentation mode
+
+When using @kbd{C-c C-i} or @kbd{C-c C-t} it will open a buffer in
+haskell-presentation-mode. You can hit `q` to close the buffer.
+
+But you can also continue to use @kbd{C-c C-i} inside the buffer to
+drill further down data types and classes.
+
+E.g. if you go to @code{Ord} in your code buffer and @kbd{C-c C-i}, it
+will popup a buffer containing
+
+@example
+class Eq a => Ord a where
+  compare :: a -> a -> Ordering
+  (<) :: a -> a -> Bool
+  (>=) :: a -> a -> Bool
+  (>) :: a -> a -> Bool
+  (<=) :: a -> a -> Bool
+  max :: a -> a -> a
+  min :: a -> a -> a
+  	-- Defined in `GHC.Classes'
+@end example
+
+And all the instances of that class. But then you can also move your
+cursor to `Ordering` and hit `C-c C-i` again to get another popup:
+
+@example
+data Ordering = LT | EQ | GT 	-- Defined in `GHC.Types'
+instance Bounded Ordering -- Defined in `GHC.Enum'
+instance Enum Ordering -- Defined in `GHC.Enum'
+instance Eq Ordering -- Defined in `GHC.Classes'
+instance Ord Ordering -- Defined in `GHC.Classes'
+instance Read Ordering -- Defined in `GHC.Read'
+instance Show Ordering -- Defined in `GHC.Show'
+@end example
+
+And so on. It's a very good way of exploring a new codebase.
+
+@subsection Browse import's module
+
+To print all exported identifiers of the module imported by the import
+line at point, run the following command:
+
+@example
+    M-x haskell-process-do-info
+@end example
+
+or @kbd{C-c C-i}. It will print all exports by running @code{:browse
+The.Module} in the GHCi process.
+
+
 
 @node Editing Cabal files
 @chapter Editing Cabal files
