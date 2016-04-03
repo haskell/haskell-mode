@@ -55,6 +55,7 @@ interpreter (e.g. GHCi).
 * Editing Haskell Code::                 How to edit code
 * Unicode support::                      How to use Unicode
 * Indentation::                          Notes about indentation
+* External indentation::                 Other ways to indent code
 * Declaration scanning::                 How to navigate in a source file
 * Compilation::                          How to compile
 * Inferior Haskell interpreter::         How to interact with GHCi (1)
@@ -485,6 +486,23 @@ to benefit from these enhanced rectangle commands; you can activate CUA
 selection mode (without redefining @kbd{C-x},@kbd{C-c},@kbd{C-v}, and
 @kbd{C-z}) by calling @kbd{M-x cua-selection-mode} (or adding
 @code{(cua-selection-mode nil)} to your @code{haskell-mode-hook}).
+
+@node External indentation
+@chapter Other ways to indent code
+
+@section Indentation with tabs, not spaces
+
+Some projects require indenting code with tabs and forbid indenting it
+with spaces.  For hacking on such projects, check out
+@uref{https://spwhitton.name/tech/code/haskell-tab-indent,haskell-tab-indent-mode}.
+
+@section Structured indentation
+
+Another alternative is to install
+@uref{https://github.com/chrisdone/structured-haskell-mode,structured-haskell-mode}.
+which indents code by parsing the code with a full Haskell parser and
+deciding where to indent based on that.
+
 
 @node Declaration scanning
 @chapter Declaration scannning
