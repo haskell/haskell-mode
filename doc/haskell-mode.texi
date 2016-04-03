@@ -49,22 +49,22 @@ interpreter (e.g. GHCi).
 @end ifnottex
 
 @menu
-* Introduction::                    An introduction to Haskell Mode
-* Getting Help and Reporting Bugs:: How to improve Haskell Mode
-* Getting Started::                 How to get started
-* Editing Haskell Code::            How to edit code
-* Unicode support::                 How to use Unicode
-* Indentation::                     Notes about indentation
-* Declaration scanning::            How to navigate in a source file
-* Compilation::                     How to compile
-* Inferior Haskell interpreter::    How to interact with GHCi (1)
-* Interactive Haskell::             How to interact with GHCi (2)
-* Editing Cabal files::             Cabal support
-* Changing REPL target::            Start REPL with selected target (i.e. test,bench,etc.)
-* Using with flyspell-prog-mode::   Spell check comments and strings
-* Concept index::                   Index of Haskell Mode concepts
-* Function index::                  index of commands
-* Variable index::                  Index of options and types
+* Introduction::                         An introduction to Haskell Mode
+* Getting Help and Reporting Bugs::      How to improve Haskell Mode
+* Getting Started::                      How to get started
+* Editing Haskell Code::                 How to edit code
+* Unicode support::                      How to use Unicode
+* Indentation::                          Notes about indentation
+* Declaration scanning::                 How to navigate in a source file
+* Compilation::                          How to compile
+* Inferior Haskell interpreter::         How to interact with GHCi (1)
+* Interactive Haskell::                  How to interact with GHCi (2)
+* Editing Cabal files::                  Cabal support
+* Changing REPL target::                 Start REPL with selected target (i.e. test,bench,etc.)
+* Spell checking strings and comments::  Using @code{flyspell-prog-mode}
+* Concept index::                        Index of Haskell Mode concepts
+* Function index::                       Index of commands
+* Variable index::                       Index of options and types
 @end menu
 
 @ifhtml
@@ -877,7 +877,7 @@ Answer ``yes'' to restart the session and run your tests, benchmarks, executable
 
 TODO/WRITEME
 
-@node Using with flyspell-prog-mode
+@node Spell checking strings and comments
 @chapter Using with @code{flyspell-prog-mode}
 
 Strings and comments can be checked for spelling mistakes. There is a
