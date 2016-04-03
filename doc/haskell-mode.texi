@@ -57,6 +57,7 @@ interpreter (e.g. GHCi).
 * Indentation::                          Notes about indentation
 * External indentation::                 Other ways to indent code
 * Autoformating::                        Using external formatters
+* Module templates::                     Module templates
 * Declaration scanning::                 How to navigate in a source file
 * Compilation::                          How to compile
 * Inferior Haskell interpreter::         How to interact with GHCi (1)
@@ -527,6 +528,25 @@ be automatically formatted.
 
 Alternatively, you can run the function directly on demand with
 @kbd{M-x} @code{haskell-mode-stylish-buffer}.
+
+@node Module templates
+@chapter Module templates
+
+To enable auto-insertion of module templates, enable:
+
+@lisp
+(add-hook 'haskell-mode-hook 'haskell-auto-insert-module-template)
+@end lisp
+
+When you open a file called @file{Foo.hs}, it will auto-insert
+
+@example
+-- |
+
+module Foo where
+@end example
+
+And put your cursor in the comment section.
 
 @node Declaration scanning
 @chapter Declaration scannning
