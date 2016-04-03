@@ -1008,6 +1008,91 @@ once you've setup and played with the above, you continue reading what
 other features are available in the [[Haskell Interactive Mode]]
 documentation.
 
+@section Haskell Interactive Mode Tags Using GHCi
+
+You can bind the following to use GHCi to find definitions of things:
+
+@lisp
+(define-key haskell-mode-map (kbd "M-.") 'haskell-mode-jump-to-def)
+@end lisp
+
+The one problem with this approach is that if your code doesn't compile,
+GHCi doesn't give any location info. So you need to make sure your code
+compiles and the modules you want to jump to are loaded byte-compiled.
+
+**Heads up**: I think that when you restart GHCi you lose location
+information, even if you have the .o and .hi files lying around. I'm not
+sure. But sometimes `:i foo` will give `foo is defined in Bar` rather
+than `foo is defined in /foo/Bar.hs:123:23`.
+
+Alternatively, you can use tags generation, which doesn't require a
+valid compile. Keep reading for that.
+
+@subsection Tags Setup
+
+Make sure to install hasktags.
+
+@example
+    $ cabal install hasktags
+@end example
+
+Then add the customization variable to enable tags generation on save:
+
+@lisp
+(custom-set-variables
+  '(haskell-tags-on-save t))
+@end lisp
+
+And make sure `hasktags` is in your [[PATH]] which Emacs can see.
+
+@subsection Generating tags
+
+Now, every time you run `save-buffer` (`C-x C-s`), there is a hook
+that will run and generate Emacs
+[tags](https://www.gnu.org/software/emacs/manual/html_node/emacs/Tags.html)
+for the whole project directory. The resulting file will be called
+`TAGS`.
+
+**WARNING**: You should be careful that your project root isn't your
+home directory or something, otherwise it will traverse all the way
+down and take an impossibly long time.
+
+@subsection Jumping to tags
+
+Bind the following keybinding:
+
+@lisp
+(define-key haskell-mode-map (kbd "M-.") 'haskell-mode-tag-find)
+@end lisp
+
+To jump to the location of the top-level identifier at point, run
+
+@example
+    M-x haskell-mode-tag-find
+@end example
+
+or @kbd{M-.}.
+
+@subsection Hybrid: GHCi and fallback to tags
+
+To use GHCi first and then if that fails to fallback to tags for jumping, use:
+
+@lisp
+(define-key haskell-mode-map (kbd "M-.") 'haskell-mode-jump-to-def-or-tag)
+@end lisp
+
+@subsection Troubleshooting tags
+
+Sometimes a `TAGS` file is deleted (by you or some other
+process). Emacs will complain that it doesn't exist anymore. To
+resolve this simply run the following:
+
+@example
+    M-x tags-reset-tags-tables
+@end example
+
+And you're done!
+
 
 @node Editing Cabal files
 @chapter Editing Cabal files
