@@ -99,6 +99,31 @@ interaction with inferior GHCi/Hugs instance, and
 scanning declarations and placing them in a menu.
 @end itemize
 
+@section Naming
+
+The name haskell-mode refers to the whole collection of modules in this
+package. There is specifically a file `haskell-mode.el` which defines a
+major mode called `haskell-mode`. Generally, in this documentation they
+will be distinguished by normal font (haskell-mode) and code font
+(`haskell-mode`).
+
+@section History
+
+@code{haskell-mode} has a long history. It goes all the way back
+to 1992. Since then, it has received many contributions in many
+forms. Some design choices that remain in haskell-mode today are
+historical. Some modules are outdated or no longer used, or are used
+by a few people.
+
+Historically there hasn't been a single individual or set of
+individuals directing the package's architecture for a long period of
+time, rather, patches and new modules were accepted in liberally and
+we are left with a box full of interesting toys that may or may not
+work.
+
+As of 2016 Haskell Mode is coordinated using Github at
+@uref{https://github.com/haskell/haskell-mode}.
+
 @node Getting Help and Reporting Bugs
 @chapter Getting Help and Reporting Bugs
 
