@@ -65,6 +65,7 @@ interpreter (e.g. GHCi).
 * Browsing Haddocks::                    Using @code{w3m} to browse documentation
 * Spell checking strings and comments::  Using @code{flyspell-prog-mode}
 * Aligning code::                        Aligning code using @code{align-regexp}
+* Rectangular commands::
 * Concept index::                        Index of Haskell Mode concepts
 * Function index::                       Index of commands
 * Variable index::                       Index of options and types
@@ -1086,6 +1087,51 @@ about Haskell. Once you evaluate this, you can just use @kbd{M-x}
                (regexp . "\\(\\s-+\\)\\(<-\\|←\\)\\s-+")
                (modes quote (haskell-mode literate-haskell-mode))))
 @end lisp
+
+@node Rectangular commands
+@chapter Using rectangular region commands
+
+Emacs has a set of commands which operate on the region as if it were
+rectangular. This turns out to be extremely useful when dealing with
+whitespace sensitive languages.
+
+@itemize
+@item @kbd{C-x r o} is "Open Rectangle".
+
+It will shift any text within the rectangle to the right side. Also see:
+
+@item @kbd{C-x r t} is "String Rectangle".
+
+It will replace any text within the rectangle with the given string on
+all the lines in the region. If comment-region didn't already exist, you
+could use this instead, for example.
+
+@item @kbd{C-x r d} is "Delete Rectangle".
+
+It will delete the contents of the rectangle and move anything on the
+right over.
+
+@item @kbd{C-x r r} is "Copy Rectangle to Register".
+
+It will prompt you for a register number so it can save it for later.
+
+@item @kbd{C-x r g} is "Insert register".
+
+This will insert the contents of the given register, overwriting
+whatever happens to be within the target rectangle. (So make room)
+
+@item @kbd{C-x r k} is "Kill rectangle".
+
+Delete rectangle and save contents for:
+
+@item @kbd{C-x r y} is "Yank rectangle".
+
+This will insert the contents of the last killed rectangle.
+@end itemize
+
+As with all Emacs modifier combos, you can type @kbd{C-x r C-h} to find
+out what keys are bound beginning with the @kbd{C-x r} prefix.
+
 
 @node Concept index
 @unnumbered Concept index
