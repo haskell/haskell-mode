@@ -427,40 +427,45 @@ via @kbd{M-x customize-variable}.
 @cindex layout rule
 @cindex off-side rule
 
-For general information about indentation support in GNU Emacs,
-@pxref{Indentation,,,emacs}.
-
 In Haskell, code indentation has semantic meaning as it defines the
-block structure@footnote{Haskell also supports braces and semicolons
+block structure. Haskell also supports braces and semicolons
 notation for conveying the block structure. However, most Haskell
-programs written by humans use indentation for block structuring.}.
+programs written by humans use indentation for block structuring.
 
-As GNU Emacs' default indentation function
-(i.e. @code{indent-relative}) is not designed for use with Haskell's
-layout rule, Haskell mode includes indentation rules adapted to
-Haskell.  @code{haskell-indentation-mode} binds @key{TAB} to cycle
-through possible indentation points based on some clever heuristics.
-@key{SHIFT-TAB} cycles in the reverse direction, and @key{RET} moves
-to a new line and indents to the first possible indentation level.
+Haskell Mode ships with two indentation modes:
 
-@section haskell-indent-mode
+@itemize
+@item @code{haskell-indentation-mode} (default).
 
-If you want to use the obsolete @code{haskell-indent-mode}, the
-recommended way is to load it in @code{haskell-mode-hook}. This can be
-done either by using @kbd{M-x customize-variable @key{RET}
-haskell-mode-hook} which provides a convenient user interface or by
-adding the following line to your @file{.emacs} file:
+This is a semi-intelligent indentation mode doing a decent job at
+recognizing Haskell syntactical constructs.  It is based on a recursive
+descent Haskell parser. @kbd{TAB} selects the next potential indentation
+position, @kbd{S-TAB} selects the previous one. If a block is selected
+you can use @kbd{TAB} to indent the block more and @kbd{S-TAB} to indent
+the block less.
+
+@item @code{haskell-indent-mode} (optional).
+
+This is a semi-intelligent indentation mode doing a decent job at
+recognizing Haskell syntactical constructs.  It is based on a decision
+table. Sadly it is no longer developed and does not recognize newer
+Haskell syntax. @kbd{TAB} cycles through all available indentation
+positions.
+
+To use @code{haskell-indent-mode}, add this to your @file{~/.emacs}
+file:
 
 @lisp
-(add-hook 'haskell-mode-hook 'haskell-indent-mode)
+(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 @end lisp
 
-This will turn off @code{haskell-indentation-mode}.
+Note that @code{turn-on-haskell-indent} will disable
+@code{haskell-indentation-mode}.
 
-@section Interactive Block Indentation
+@end itemize
 
-@code{haskell-indentation} can move whole blocks to the left or to the
-right. Just mark a block and then use @key{TAB} or @key{S-TAB}.
+For general information about indentation support in GNU Emacs,
+@pxref{Indentation,,,emacs}.
 
 @section Rectangle Commands
 
