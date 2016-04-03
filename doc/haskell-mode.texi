@@ -1336,6 +1336,229 @@ of those, prompting, too.
 
 Now you can rebuild with @kbd{C-c C-c} again.
 
+@section Haskell Interactive Mode REPL
+
+When GHCi has been launched, it works on a read-eval-print basis. So
+you will be presented with the prompt:
+
+@example
+    The lambdas must flow.
+    Changed directory: /path/to/your/project/
+    λ>
+@end example
+
+@subsection Bringing the REPL
+
+If you don't know where the REPL buffer is, you can always bring it
+with:
+
+@example
+    M-x haskell-interactive-bring
+@end example
+
+Or <code>C-`</code>, if you used the bindings in
+[[the setup|Haskell Interactive Mode Setup]].
+
+@subsection Evaluating expressions
+
+To evaluate expressions, simply type one out and hit `RET`.
+
+@example
+    λ> 123
+    123
+@end example
+
+@subsection Type of expressions
+
+You can use normal `:t` which is part of GHCi to get the type of
+something:
+
+@example
+    λ> :t id
+    id :: a -> a
+@end example
+
+But you can also just write out the value directly,
+
+@example
+    λ> id
+    id :: a -> a
+@end example
+
+and because there's no @code{Show} instance for @code{(a -> a)}. This would
+normally yield a compile error:
+
+@example
+    No instance for (Show (a0 -> a0))
+      arising from a use of `print'
+    Possible fix: add an instance declaration for (Show (a0 -> a0))
+    In a stmt of an interactive GHCi command: print it
+@end example
+
+It will run `:t id` in the background and print out the result. The
+same is true for ambiguous things:
+
+@example
+    λ> :t read "a"
+    read "a" :: Read a => a
+@end example
+
+Because this would normally be an ambiguous constraint:
+
+@example
+    Ambiguous type variable `a0' in the constraint:
+      (Read a0) arising from a use of `read'
+    Probable fix: add a type signature that fixes these type variable(s)
+    In the expression: read \"a\"
+    In an equation for `it': it = read \"a\"
+@end example
+
+Which is less useful than just printing the type out.
+
+You can disable this behaviour by disabling the customization option:
+
+@lisp
+(custom-set-variables
+  '(haskell-interactive-types-for-show-ambiguous nil))
+@end lisp
+
+@subsection Printing mode
+
+You can choose between printing modes used for the results of
+evaluating expressions. To do that, configure the variable
+@code{haskell-interactive-mode-eval-mode}. Example:
+
+@lisp
+(setq haskell-interactive-mode-eval-mode 'haskell-mode)
+@end lisp
+
+
+A handy function you can use is:
+
+@lisp
+(defun haskell-interactive-toggle-print-mode ()
+  (interactive)
+  (setq haskell-interactive-mode-eval-mode
+        (intern
+         (ido-completing-read "Eval result mode: "
+                              '("fundamental-mode"
+                                "haskell-mode"
+                                "espresso-mode"
+                                "ghc-core-mode"
+                                "org-mode")))))
+@end lisp
+
+(Add whichever modes you want to use.)
+
+And then run
+
+@example
+    M-x haskell-interactive-toggle-print-mode
+@end example
+
+Or @kbd{C-c C-v}:
+
+@lisp
+(define-key haskell-interactive-mode-map (kbd "C-c C-v") 'haskell-interactive-toggle-print-mode)
+@end lisp
+
+There you can choose `haskell-mode`, for example, to pretty print the
+output as Haskell.
+
+@subsection Presentations
+
+If you have the `present` package installed, you can use the following
+syntax to print anything which is an instance of `Data`:
+
+@example
+    λ> :present 123
+    123
+@end example
+
+It will print data structures lazily:
+
+@example
+    λ> :present [1..]
+    [1
+    ,[Integer]]
+@end example
+
+It shows types when there is an unevaluated field in a
+constructor. You can click the `[Integer]` or press `RET` on it to
+expand further:
+
+@example
+    λ> :present [1..]
+    [1
+    ,2
+    ,[Integer]]
+@end example
+
+Etc. Remember: this only works for instances of `Data.Data.Data`.
+
+@subsection History
+
+A history is maintained for the duration of the REPL buffer. To go up
+and down in the history, run `M-p` for previous and `M-n` for next.
+
+@subsection Cancelling commands
+
+To cancel a running REPL command, run @kbd{C-c C-c}.
+
+@subsection Clear the REPL
+
+Run @kbd{C-c C-k} to clear the REPL.
+
+
+@subsection Trick: Put Interactive REPL in Separate Frame
+
+
+The following @code{create-haskell-interactive-frame} is a quick hack to
+move the repl to a separate frame, for those that want a more
+predictable layout of windows in Emacs.
+
+@lisp
+(defun create-unfocused-frame ()
+  (let*
+    ((prv (window-frame))
+     (created (make-frame)))
+    (select-frame-set-input-focus prv) created))
+
+(defun create-haskell-interactive-frame ()
+  (interactive)
+  (haskell-interactive-bring)
+  (create-unfocused-frame)
+  (delete-window))
+
+@end lisp
+
+@subsection Troubleshooting
+
+If the REPL ever goes funny, you can clear the command queue via:
+
+@example
+    M-x haskell-process-clear
+@end example
+
+Alternatively, you can just restart the process:
+
+@example
+    M-x haskell-process-restart
+@end example
+
+You can also switch to the buffer @code{*haskell-process-log*}, which can
+be enabled and disabled with the customization variable
+`haskell-process-log`, to see what the cause of your troubles are.
+
+If the process fails and nothing unusual is in the process log, the
+following command can dump the @code{haskell-process} state:
+
+@example
+    M-: (haskell-process)
+@end example
+
+The output can be copied from the `*Messages*` buffer.
+
 
 @node Editing Cabal files
 @chapter Editing Cabal files
