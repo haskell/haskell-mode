@@ -50,7 +50,6 @@ interpreter (e.g. GHCi).
 
 @menu
 * Introduction::                         An introduction to Haskell Mode
-* Getting Help and Reporting Bugs::      How to improve Haskell Mode
 * Getting Started::                      How to get started
 * Editing Haskell Code::                 How to edit code
 * Unicode support::                      How to use Unicode
@@ -68,6 +67,7 @@ interpreter (e.g. GHCi).
 * Spell checking strings and comments::  Using @code{flyspell-prog-mode}
 * Aligning code::                        Aligning code using @code{align-regexp}
 * Rectangular commands::
+* Getting Help and Reporting Bugs::      How to improve Haskell Mode
 * Concept index::                        Index of Haskell Mode concepts
 * Function index::                       Index of commands
 * Variable index::                       Index of options and types
@@ -123,38 +123,6 @@ work.
 
 As of 2016 Haskell Mode is coordinated using Github at
 @uref{https://github.com/haskell/haskell-mode}.
-
-@node Getting Help and Reporting Bugs
-@chapter Getting Help and Reporting Bugs
-
-This Info manual is work in progress and incomplete. However, you can
-find more information at these locations in the meantime:
-
-@itemize
-@item
-@uref{https://github.com/haskell/haskell-mode,Haskell Mode's GitHub Home}
-@item
-@uref{http://www.haskell.org/haskellwiki/Haskell_mode_for_Emacs,Haskell Wiki Emacs Page}
-@end itemize
-
-If you have any questions or like to discuss something regarding Haskell
-Mode, please consider sending an email to the
-@uref{http://projects.haskell.org/cgi-bin/mailman/listinfo/haskellmode-emacs,
-Haskellmode-emacs mailing list}. The mailing list is also available on
-@uref{http://gmane.org/, Gmane} via the
-@uref{http://dir.gmane.org/gmane.comp.lang.haskell.emacs,
-gmane.comp.lang.haskell.emacs} newsgroup.
-
-If you have discovered a bug or wish to request a new feature, you can
-@uref{https://github.com/haskell/haskell-mode/issues/new, file a new
-issue} with Haskell Mode's issue tracker. When filing a bug, please
-state your currently used software version (@kbd{M-x}
-@code{haskell-version}, @kbd{M-x} @code{version}) and what steps to
-perform in order to reproduce the bug you're experiencing. Finally, if
-you happen to be proficient in @ref{Top,Emacs Lisp,,elisp} you are
-welcome to submit patches via
-@uref{https://help.github.com/articles/using-pull-requests, GitHub
-Pull Requests}.
 
 @node Getting Started
 @chapter Getting Started
@@ -1199,6 +1167,39 @@ This will insert the contents of the last killed rectangle.
 
 As with all Emacs modifier combos, you can type @kbd{C-x r C-h} to find
 out what keys are bound beginning with the @kbd{C-x r} prefix.
+
+@node Getting Help and Reporting Bugs
+@chapter Getting Help and Reporting Bugs
+
+This Info manual is work in progress and incomplete. However, you can
+find more information at these locations in the meantime:
+
+@itemize
+@item
+@uref{https://github.com/haskell/haskell-mode,Haskell Mode's GitHub Home}
+@item
+@uref{http://www.haskell.org/haskellwiki/Haskell_mode_for_Emacs,Haskell Wiki Emacs Page}
+@end itemize
+
+If you have any questions or like to discuss something regarding Haskell
+Mode, please consider sending an email to the
+@uref{http://projects.haskell.org/cgi-bin/mailman/listinfo/haskellmode-emacs,
+Haskellmode-emacs mailing list}. The mailing list is also available on
+@uref{http://gmane.org/, Gmane} via the
+@uref{http://dir.gmane.org/gmane.comp.lang.haskell.emacs,
+gmane.comp.lang.haskell.emacs} newsgroup.
+
+If you have discovered a bug or wish to request a new feature, you can
+@uref{https://github.com/haskell/haskell-mode/issues/new, file a new
+issue} with Haskell Mode's issue tracker. When filing a bug, please
+state your currently used software version (@kbd{M-x}
+@code{haskell-version}, @kbd{M-x} @code{version}) and what steps to
+perform in order to reproduce the bug you're experiencing. Finally, if
+you happen to be proficient in @ref{Top,Emacs Lisp,,elisp} you are
+welcome to submit patches via
+@uref{https://help.github.com/articles/using-pull-requests, GitHub
+Pull Requests}.
+
 
 
 @node Concept index
