@@ -324,7 +324,16 @@ Returns nil if no completions available."
   (let ((prefix-data (haskell-completions-grab-prefix)))
     (when prefix-data
       (cl-destructuring-bind (beg end pfx typ) prefix-data
-        (when (not (eql typ 'haskell-completions-general-prefix))
+        (when (and (not (eql typ 'haskell-completions-general-prefix))
+                   ;; GHCi prior to version 8.0.1 have bug in `:complete`
+                   ;; command: when completing operators it returns a list of
+                   ;; all imported identifiers (see Track ticket URL
+                   ;; `https://ghc.haskell.org/trac/ghc/ticket/10576').  This
+                   ;; leads to significant Emacs slowdown.  To aviod slowdown
+                   ;; operator completions are disabled for now.
+                   (not (save-excursion
+                          (goto-char (1- end))
+                          (haskell-mode--looking-at-varsym))))
           ;; do not complete things in comments
           (if (cl-member
                typ
