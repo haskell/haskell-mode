@@ -110,15 +110,21 @@ if all of its characters have syntax and face. See
   (with-haskell-test-buffer (or mode #'haskell-mode)
     (if (consp lines-or-contents)
         (dolist (line lines-or-contents)
-          (insert line)
-          (insert "\n"))
-      (insert lines-or-contents))
+          (let ((pos (point)))
+            (insert line "\n")
+            (save-excursion
+              ;; For some reason font-lock-fontify-region moves the
+              ;; point. I do not think it is guaranteed it should not,
+              ;; but then it might be our fault. Investigate later.
+              (font-lock-fontify-region pos (point)))))
+      (insert lines-or-contents)
+      (font-lock-fontify-buffer))
 
-    (font-lock-fontify-buffer)
     (goto-char (point-min))
     (dolist (prop props)
       (cl-destructuring-bind (string syntax face) prop
-        (search-forward string)
+        (let ((case-fold-search nil))
+          (search-forward string))
         (check-syntax-and-face-match-range (match-beginning 0) (match-end 0) syntax face)))))
 
 (provide 'haskell-test-utils)

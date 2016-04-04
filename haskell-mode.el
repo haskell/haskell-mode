@@ -820,7 +820,7 @@ Minor modes that work well with `haskell-mode':
           . haskell-syntactic-face-function)
          ;; Get help from font-lock-syntactic-keywords.
          (parse-sexp-lookup-properties . t)
-         (font-lock-extra-managed-props . (composition))))
+         (font-lock-extra-managed-props . (composition haskell-type))))
   ;; Haskell's layout rules mean that TABs have to be handled with extra care.
   ;; The safer option is to avoid TABs.  The second best is to make sure
   ;; TABs stops are 8 chars apart, as mandated by the Haskell Report.  --Stef
