@@ -300,8 +300,6 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
-
 (require 'haskell-mode)
 (require 'haskell-process)
 (require 'haskell)
@@ -1539,18 +1537,14 @@ If SYNC is non-nil, make the call synchronously instead."
       (if sync
           (let ((response (haskell-process-queue-sync-request process ghci-command)))
             (funcall callback (funcall process-response response)))
-        (lexical-let ((process process)
-                      (callback callback)
-                      (ghci-command ghci-command)
-                      (process-response process-response))
-          (haskell-process-queue-command
-           process
-           (make-haskell-command
-            :go (lambda (_) (haskell-process-send-string process ghci-command))
-            :complete
-            (lambda (_ response)
-              (funcall callback (funcall process-response response))))))
-        'async))))
+        (haskell-process-queue-command
+         process
+         (make-haskell-command
+          :go (lambda (_) (haskell-process-send-string process ghci-command))
+          :complete
+          (lambda (_ response)
+            (funcall callback (funcall process-response response))))))
+      'async)))
 
 (defun haskell-doc-sym-doc (sym)
   "Show the type of given symbol SYM.
