@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual is for Haskell mode, version 16.1-git
+
+Copyright (C) 2013-2016 Haskell Mode contributors.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the http://www.gnu.org/licenses/fdl.html (GNU
+Free Documentation License), Version 1.3 or any later version published
+by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts and no Back-Cover Texts. -->
+<!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>Haskell Mode 16.1-git: Browsing Haddocks</title>
+
+<meta name="description" content="Haskell Mode 16.1-git: Browsing Haddocks">
+<meta name="keywords" content="Haskell Mode 16.1-git: Browsing Haddocks">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="index.html#Top" rel="start" title="Top">
+<link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
+<link href="index.html#Top" rel="up" title="Top">
+<link href="Spell-checking-strings-and-comments.html#Spell-checking-strings-and-comments" rel="next" title="Spell checking strings and comments">
+<link href="Changing-REPL-target.html#Changing-REPL-target" rel="prev" title="Changing REPL target">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.indentedblock {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smallindentedblock {margin-left: 3.2em; font-size: smaller}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style:oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nocodebreak {white-space:nowrap}
+span.nolinebreak {white-space:nowrap}
+span.roman {font-family:serif; font-weight:normal}
+span.sansserif {font-family:sans-serif; font-weight:normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="haskell-mode.css">
+
+<link rel="shortcut icon" href="haskell-mode-32x32.png">
+<script src="../../index.js"> </script>
+</head>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+<div class="background"> </div><a name="Browsing-Haddocks"></a>
+<div class="header">
+<p>
+Next: <a href="Spell-checking-strings-and-comments.html#Spell-checking-strings-and-comments" accesskey="n" rel="next">Spell checking strings and comments</a>, Previous: <a href="Changing-REPL-target.html#Changing-REPL-target" accesskey="p" rel="prev">Changing REPL target</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<a name="Browsing-Haddocks-using-w3m"></a>
+<h2 class="chapter">15 Browsing Haddocks using <code>w3m</code></h2>
+
+<p>An experimental feature is use of the w3m browser to browse Haddock docs
+inside Emacs.
+</p>
+<a name="Get-w3m"></a>
+<h3 class="section">15.1 Get w3m</h3>
+
+<p>Most Linux distributions will have a package for the binary:
+</p>
+<div class="example">
+<pre class="example">$ sudo apt-get install w3m
+</pre></div>
+
+<p>Now grab <code>w3m.el</code> from:
+</p>
+<ul>
+<li> <a href="http://emacs-w3m.namazu.org/">http://emacs-w3m.namazu.org/</a>
+</li><li> <kbd>M-x</kbd> <code>package-install</code> <kbd>RET</kbd> <code>w3m</code> <kbd>RET</kbd>
+</li></ul>
+
+<p>Confirm installation by trying <kbd>M-x</kbd> <code>w3m-browse-url</code> <kbd>RET</kbd>
+<code>haskell.org</code> <kbd>RET</kbd>.
+</p>
+<p>If this works, you&rsquo;re good to go.
+</p>
+<a name="Configure-w3m"></a>
+<h3 class="section">15.2 Configure w3m</h3>
+
+<p>Now that you have w3m, you probably want to configure it to be more of a
+passive viewer than a full-fledged browser. For example:
+</p>
+<div class="lisp">
+<pre class="lisp">(setq w3m-mode-map (make-sparse-keymap))
+
+(define-key w3m-mode-map (kbd &quot;RET&quot;) 'w3m-view-this-url)
+(define-key w3m-mode-map (kbd &quot;q&quot;) 'bury-buffer)
+(define-key w3m-mode-map (kbd &quot;&lt;mouse-1&gt;&quot;) 'w3m-maybe-url)
+(define-key w3m-mode-map [f5] 'w3m-reload-this-page)
+(define-key w3m-mode-map (kbd &quot;C-c C-d&quot;) 'haskell-w3m-open-haddock)
+(define-key w3m-mode-map (kbd &quot;M-&lt;left&gt;&quot;) 'w3m-view-previous-page)
+(define-key w3m-mode-map (kbd &quot;M-&lt;right&gt;&quot;) 'w3m-view-next-page)
+(define-key w3m-mode-map (kbd &quot;M-.&quot;) 'w3m-haddock-find-tag)
+
+(defun w3m-maybe-url ()
+  (interactive)
+  (if (or (equal '(w3m-anchor) (get-text-property (point) 'face))
+          (equal '(w3m-arrived-anchor) (get-text-property (point) 'face)))
+      (w3m-view-this-url)))
+</pre></div>
+
+<a name="Import-w3m_002dhaddock"></a>
+<h3 class="section">15.3 Import w3m-haddock</h3>
+
+<p>It&rsquo;s not enabled by default in haskell-mode at present, so you need to
+import it manually:
+</p>
+<div class="lisp">
+<pre class="lisp">(require 'w3m-haddock)
+</pre></div>
+
+<a name="Add-a-hook-for-w3m"></a>
+<h3 class="section">15.4 Add a hook for w3m</h3>
+
+<p>In order to make haddock pages a little more palatable (and add syntax
+highlighting to source view), you can add this hook:
+</p>
+<div class="lisp">
+<pre class="lisp">(add-hook 'w3m-display-hook 'w3m-haddock-display)
+</pre></div>
+
+<p>It&rsquo;s a little rough around the edges, but it&rsquo;s a start.
+</p>
+<a name="Configure-your-package-locations"></a>
+<h3 class="section">15.5 Configure your package locations</h3>
+
+<p>By default, the package locations is set to:
+</p>
+<div class="lisp">
+<pre class="lisp">(defcustom haskell-w3m-haddock-dirs
+  '(&quot;~/.cabal/share/doc/&quot;))
+</pre></div>
+
+<p>If you are using an hsenv or a custom package directory, you should
+configure this variable with M-x customize-variable or by writing the
+custom-set-variables code for it.
+</p>
+<a name="Finally"></a>
+<h3 class="section">15.6 Finally</h3>
+
+<p>You did all that! Now you&rsquo;re ready to bind a useful key:
+</p>
+<div class="lisp">
+<pre class="lisp">(define-key haskell-mode-map (kbd &quot;C-c C-d&quot;) 'haskell-w3m-open-haddock)
+</pre></div>
+
+<p>Now when you press <kbd>C-c</kbd> <kbd>C-d</kbd> it will prompt for a package to
+browse to.
+</p>
+<p>This feature will be improved gradually as time goes on.
+</p>
+
+<hr>
+<div class="header">
+<p>
+Next: <a href="Spell-checking-strings-and-comments.html#Spell-checking-strings-and-comments" accesskey="n" rel="next">Spell checking strings and comments</a>, Previous: <a href="Changing-REPL-target.html#Changing-REPL-target" accesskey="p" rel="prev">Changing REPL target</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

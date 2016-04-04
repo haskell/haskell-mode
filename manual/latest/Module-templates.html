@@ -11,10 +11,10 @@ by the Free Software Foundation; with no Invariant Sections, no
 Front-Cover Texts and no Back-Cover Texts. -->
 <!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>Haskell Mode 16.1-git: Using with flyspell-prog-mode</title>
+<title>Haskell Mode 16.1-git: Module templates</title>
 
-<meta name="description" content="Haskell Mode 16.1-git: Using with flyspell-prog-mode">
-<meta name="keywords" content="Haskell Mode 16.1-git: Using with flyspell-prog-mode">
+<meta name="description" content="Haskell Mode 16.1-git: Module templates">
+<meta name="keywords" content="Haskell Mode 16.1-git: Module templates">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
@@ -22,8 +22,8 @@ Front-Cover Texts and no Back-Cover Texts. -->
 <link href="index.html#Top" rel="start" title="Top">
 <link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
 <link href="index.html#Top" rel="up" title="Top">
-<link href="Concept-index.html#Concept-index" rel="next" title="Concept index">
-<link href="Changing-REPL-target.html#Changing-REPL-target" rel="prev" title="Changing REPL target">
+<link href="Declaration-scanning.html#Declaration-scanning" rel="next" title="Declaration scanning">
+<link href="Autoformating.html#Autoformating" rel="prev" title="Autoformating">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
@@ -59,41 +59,30 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
-<div class="background"> </div><a name="Using-with-flyspell_002dprog_002dmode"></a>
+<div class="background"> </div><a name="Module-templates"></a>
 <div class="header">
 <p>
-Next: <a href="Concept-index.html#Concept-index" accesskey="n" rel="next">Concept index</a>, Previous: <a href="Changing-REPL-target.html#Changing-REPL-target" accesskey="p" rel="prev">Changing REPL target</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Declaration-scanning.html#Declaration-scanning" accesskey="n" rel="next">Declaration scanning</a>, Previous: <a href="Autoformating.html#Autoformating" accesskey="p" rel="prev">Autoformating</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="Using-with-flyspell_002dprog_002dmode-1"></a>
-<h2 class="chapter">13 Using with <code>flyspell-prog-mode</code></h2>
+<a name="Module-templates-1"></a>
+<h2 class="chapter">8 Module templates</h2>
 
-<p>Strings and comments can be checked for spelling mistakes. There is a
-standard Emacs mode for this purpose, <code>flyspell-prog-mode</code>, that
-can be enabled in Haskell buffers. Spelling errors are underlined using
-squiggly red lines.
+<p>To enable auto-insertion of module templates, enable:
 </p>
-<img width="519" height="182" src="anim/flyspell-prog-mode.gif" alt="anim/flyspell-prog-mode">
+<div class="lisp">
+<pre class="lisp">(add-hook 'haskell-mode-hook 'haskell-auto-insert-module-template)
+</pre></div>
 
-<p>Documentation for <code>flyspell-prog-mode</code> can be found in
-See <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Spelling.html#Spelling">(emacs)Spelling</a>. Here we point to a couple of useful
-keybindings:
+<p>When you open a file called <samp>Foo.hs</samp>, it will auto-insert
 </p>
-<ul>
-<li> <kbd>M-$</kbd> - Check and correct spelling of the word at point (<code>ispell-word</code>).
+<div class="example">
+<pre class="example">-- |
 
-</li><li> <kbd>digit</kbd> - Replace the word, just this time, with one of the
-displayed near-misses. Each near-miss is listed with a digit; type that
-digit to select it.
+module Foo where
+</pre></div>
 
-</li><li> <kbd>SPC</kbd> - Skip this word—continue to consider it incorrect, but don’t
-change it here.
-</li></ul>
-
-<p>To enable spell checking of strings and comments add this line to your
-<code>~/.emacs</code> file:
-</p>
-<p><code>(add-hook 'haskell-mode-hook 'flyspell-prog-mode)</code>
+<p>And put your cursor in the comment section.
 </p>
 
 

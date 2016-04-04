@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual is for Haskell mode, version 16.1-git
+
+Copyright (C) 2013-2016 Haskell Mode contributors.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the http://www.gnu.org/licenses/fdl.html (GNU
+Free Documentation License), Version 1.3 or any later version published
+by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts and no Back-Cover Texts. -->
+<!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>Haskell Mode 16.1-git: Aligning code</title>
+
+<meta name="description" content="Haskell Mode 16.1-git: Aligning code">
+<meta name="keywords" content="Haskell Mode 16.1-git: Aligning code">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="index.html#Top" rel="start" title="Top">
+<link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
+<link href="index.html#Top" rel="up" title="Top">
+<link href="Rectangular-commands.html#Rectangular-commands" rel="next" title="Rectangular commands">
+<link href="Spell-checking-strings-and-comments.html#Spell-checking-strings-and-comments" rel="prev" title="Spell checking strings and comments">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.indentedblock {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smallindentedblock {margin-left: 3.2em; font-size: smaller}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style:oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nocodebreak {white-space:nowrap}
+span.nolinebreak {white-space:nowrap}
+span.roman {font-family:serif; font-weight:normal}
+span.sansserif {font-family:sans-serif; font-weight:normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="haskell-mode.css">
+
+<link rel="shortcut icon" href="haskell-mode-32x32.png">
+<script src="../../index.js"> </script>
+</head>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+<div class="background"> </div><a name="Aligning-code"></a>
+<div class="header">
+<p>
+Next: <a href="Rectangular-commands.html#Rectangular-commands" accesskey="n" rel="next">Rectangular commands</a>, Previous: <a href="Spell-checking-strings-and-comments.html#Spell-checking-strings-and-comments" accesskey="p" rel="prev">Spell checking strings and comments</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<a name="Aligning-code-1"></a>
+<h2 class="chapter">17 Aligning code</h2>
+
+<p>Select a region you want to align text within, <kbd>M-x</kbd>
+<code>align-regexp</code>, and type a regexp representing the alignment
+delimiter.
+</p>
+<p>For example, I often line up my Haddock comments:
+</p>
+<div class="example">
+<pre class="example">f :: a -- ^ does a
+  -&gt; Foo b -- ^ and b
+  -&gt; c -- ^ to c
+</pre></div>
+
+<p>Select the region, and let the regexp be &lsquo;<samp>--</samp>&rsquo;:
+</p>
+<div class="example">
+<pre class="example">f :: a     -- ^ does a
+  -&gt; Foo b -- ^ and b
+  -&gt; c     -- ^ to c
+</pre></div>
+
+<p>Of course, this works for just about anything. Personally, I&rsquo;ve globally
+bound it to <kbd>C-x a r</kbd>:
+</p>
+<div class="lisp">
+<pre class="lisp">(global-set-key (kbd &quot;C-x a r&quot;) 'align-regexp)
+</pre></div>
+
+<p>Note that you can also just use the rules below for telling the aligner
+about Haskell. Once you evaluate this, you can just use <kbd>M-x</kbd>
+<code>align</code>, which I like to bind to <kbd>M-[</kbd>.
+</p>
+<div class="lisp">
+<pre class="lisp">(add-to-list 'align-rules-list
+             '(haskell-types
+               (regexp . &quot;\\(\\s-+\\)\\(::\\|∷\\)\\s-+&quot;)
+               (modes quote (haskell-mode literate-haskell-mode))))
+(add-to-list 'align-rules-list
+             '(haskell-assignment
+               (regexp . &quot;\\(\\s-+\\)=\\s-+&quot;)
+               (modes quote (haskell-mode literate-haskell-mode))))
+(add-to-list 'align-rules-list
+             '(haskell-arrows
+               (regexp . &quot;\\(\\s-+\\)\\(-&gt;\\|→\\)\\s-+&quot;)
+               (modes quote (haskell-mode literate-haskell-mode))))
+(add-to-list 'align-rules-list
+             '(haskell-left-arrows
+               (regexp . &quot;\\(\\s-+\\)\\(&lt;-\\|←\\)\\s-+&quot;)
+               (modes quote (haskell-mode literate-haskell-mode))))
+</pre></div>
+
+
+
+
+</body>
+</html>

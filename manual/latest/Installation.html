@@ -11,10 +11,10 @@ by the Free Software Foundation; with no Invariant Sections, no
 Front-Cover Texts and no Back-Cover Texts. -->
 <!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>Haskell Mode 16.1-git: Getting Started</title>
+<title>Haskell Mode 16.1-git: Installation</title>
 
-<meta name="description" content="Haskell Mode 16.1-git: Getting Started">
-<meta name="keywords" content="Haskell Mode 16.1-git: Getting Started">
+<meta name="description" content="Haskell Mode 16.1-git: Installation">
+<meta name="keywords" content="Haskell Mode 16.1-git: Installation">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
@@ -23,7 +23,7 @@ Front-Cover Texts and no Back-Cover Texts. -->
 <link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
 <link href="index.html#Top" rel="up" title="Top">
 <link href="Editing-Haskell-Code.html#Editing-Haskell-Code" rel="next" title="Editing Haskell Code">
-<link href="Getting-Help-and-Reporting-Bugs.html#Getting-Help-and-Reporting-Bugs" rel="prev" title="Getting Help and Reporting Bugs">
+<link href="Introduction.html#Introduction" rel="prev" title="Introduction">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
@@ -59,19 +59,33 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
-<div class="background"> </div><a name="Getting-Started"></a>
+<div class="background"> </div><a name="Installation"></a>
 <div class="header">
 <p>
-Next: <a href="Editing-Haskell-Code.html#Editing-Haskell-Code" accesskey="n" rel="next">Editing Haskell Code</a>, Previous: <a href="Getting-Help-and-Reporting-Bugs.html#Getting-Help-and-Reporting-Bugs" accesskey="p" rel="prev">Getting Help and Reporting Bugs</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Editing-Haskell-Code.html#Editing-Haskell-Code" accesskey="n" rel="next">Editing Haskell Code</a>, Previous: <a href="Introduction.html#Introduction" accesskey="p" rel="prev">Introduction</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="Getting-Started-1"></a>
-<h2 class="chapter">3 Getting Started</h2>
+<a name="Installation-1"></a>
+<h2 class="chapter">2 Installation</h2>
 
-<a name="Quick-Installation"></a>
-<h3 class="section">3.1 Quick Installation</h3>
+<p>Haskell Mode is distributed as a package in
+<a href="https://melpa.org">MELPA repository</a>. To use MELPA as Emacs package
+archive do the following:
+</p>
+<ol>
+<li> Customize <code>package-archives</code> using <kbd>M-x</kbd> <code>customize-option</code> <kbd>RET</kbd> <code>package-archives</code> <kbd>RET</kbd>.
+</li><li> Use <kbd>INS</kbd> to add new archive, use <code>Archive name: melpa-stable</code>
+and <code>URL or directory name: http://stable.melpa.org/packages/</code>.
+</li><li> Fetch new packages using <kbd>M-x</kbd> <code>package-refresh-contents</code>.
+</li><li> Install <code>haskell-mode</code> using <kbd>M-x</kbd> <code>package-install</code>
+<kbd>RET</kbd> <code>haskell-mode</code> <kbd>RET</kbd>.
 
-<p>Make sure you have this in your <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html">init file</a> (usually &lsquo;~/.emacs&lsquo;). If you already have <code>custom-set-variables</code>, merge its contents:
+</li></ol>
+
+<p>Voila! <code>haskell-mode</code> is installed! You should be able to edit Haskell
+source code in color now.
+</p>
+<p>The above steps should result in the following snippet in your <samp>.emacs</samp>:
 </p>
 <div class="lisp">
 <pre class="lisp">(require 'package)
@@ -86,19 +100,9 @@ Next: <a href="Editing-Haskell-Code.html#Editing-Haskell-Code" accesskey="n" rel
      (&quot;melpa-stable&quot; . &quot;http://stable.melpa.org/packages/&quot;)))))
 </pre></div>
 
-<p>Then run Emacs, and evaluate:
-</p>
-<p><kbd>M-x</kbd> <code>package-refresh-contents</code>
-</p>
-<p>and then follow by
-</p>
-<p><kbd>M-x</kbd> <code>package-install</code> <kbd>RET</kbd> <code>haskell-mode</code>
-</p>
-<p>Voila! <code>haskell-mode</code> is installed! You should be able to edit
-Haskell source code in color now.
-</p>
+
 <a name="Installation-_002d-more-information"></a>
-<h3 class="section">3.2 Installation - more information</h3>
+<h3 class="section">2.1 Installation - more information</h3>
 
 <p><code>haskell-mode</code> supports GNU Emacs versions 24 and upcoming 25
 (snapshot).
@@ -116,7 +120,7 @@ Haskell source code in color now.
 <a href="https://github.com/haskell/haskell-mode/releases/tag/v13.18">https://github.com/haskell/haskell-mode/releases/tag/v13.18</a>.
 </p>
 <a name="Customizing"></a>
-<h3 class="section">3.3 Customizing</h3>
+<h3 class="section">2.2 Customizing</h3>
 
 <a name="index-customizing"></a>
 <p>Most of <code>haskell-mode</code>&rsquo;s settings are configurable via customizable
@@ -133,6 +137,11 @@ buffer. You can customize <code>haskell-mode-hook</code> by <kbd>M-x
 customize-variable <span class="key">RET</span> haskell-mode-hook</kbd>.
 </p>
 
+<hr>
+<div class="header">
+<p>
+Next: <a href="Editing-Haskell-Code.html#Editing-Haskell-Code" accesskey="n" rel="next">Editing Haskell Code</a>, Previous: <a href="Introduction.html#Introduction" accesskey="p" rel="prev">Introduction</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
 
 
 

@@ -23,7 +23,7 @@ Front-Cover Texts and no Back-Cover Texts. -->
 <link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
 <link href="index.html#Top" rel="up" title="Top">
 <link href="Unicode-support.html#Unicode-support" rel="next" title="Unicode support">
-<link href="Getting-Started.html#Getting-Started" rel="prev" title="Getting Started">
+<link href="Installation.html#Installation" rel="prev" title="Installation">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
@@ -62,11 +62,11 @@ ul.no-bullet {list-style: none}
 <div class="background"> </div><a name="Editing-Haskell-Code"></a>
 <div class="header">
 <p>
-Next: <a href="Unicode-support.html#Unicode-support" accesskey="n" rel="next">Unicode support</a>, Previous: <a href="Getting-Started.html#Getting-Started" accesskey="p" rel="prev">Getting Started</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Unicode-support.html#Unicode-support" accesskey="n" rel="next">Unicode support</a>, Previous: <a href="Installation.html#Installation" accesskey="p" rel="prev">Installation</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
 <a name="Editing-Haskell-Code-1"></a>
-<h2 class="chapter">4 Editing Haskell Code</h2>
+<h2 class="chapter">3 Editing Haskell Code</h2>
 
 <a name="index-haskell_002dmode-1"></a>
 <a name="index-haskell_002dmode"></a>
@@ -114,7 +114,7 @@ is shown in the mode line (see <a href="http://www.gnu.org/software/emacs/manual
 &lsquo;<samp>LitHaskell/bird</samp>&rsquo; or &lsquo;<samp>LitHaskell/tex</samp>&rsquo;.
 </p>
 <a name="Font-Lock-Support"></a>
-<h3 class="section">4.1 Font Lock Support</h3>
+<h3 class="section">3.1 Font Lock Support</h3>
 
 <p><code>haskell-mode</code> supports <em>syntax highlighting</em> via Emacs&rsquo; Font
 Lock minor mode which should be enabled by default in current
@@ -130,12 +130,12 @@ and are able to highlight unrecognized constructs.
 
 
 <a name="Managing-imports"></a>
-<h3 class="section">4.2 Managing imports</h3>
+<h3 class="section">3.2 Managing imports</h3>
 
 <p>There are a few functions for managing imports.
 </p>
 <a name="Jump-to-imports"></a>
-<h4 class="subsection">4.2.1 Jump to imports</h4>
+<h4 class="subsection">3.2.1 Jump to imports</h4>
 
 <p>To jump to your import list, run
 </p>
@@ -151,7 +151,7 @@ and are able to highlight unrecognized constructs.
 cycle.
 </p>
 <a name="Format-imports"></a>
-<h4 class="subsection">4.2.2 Format imports</h4>
+<h4 class="subsection">3.2.2 Format imports</h4>
 
 <p>To generally format (sort, align) your imports, you can run
 </p>
@@ -160,21 +160,21 @@ cycle.
 <p>Or <kbd>C-c C-.</kbd>.
 </p>
 <a name="Sort-imports"></a>
-<h4 class="subsection">4.2.3 Sort imports</h4>
+<h4 class="subsection">3.2.3 Sort imports</h4>
 
 <p>To just sort imports, jump to an import section and run
 </p>
 <p><kbd>M-x</kbd> <code>haskell-sort-imports</code>
 </p>
 <a name="Align-imports"></a>
-<h4 class="subsection">4.2.4 Align imports</h4>
+<h4 class="subsection">3.2.4 Align imports</h4>
 
 <p>To just align imports, jump to an import section and run
 </p>
 <p><kbd>M-x</kbd> <code>haskell-align-imports</code>
 </p>
 <a name="stylish_002dhaskell"></a>
-<h4 class="subsection">4.2.5 stylish-haskell</h4>
+<h4 class="subsection">3.2.5 stylish-haskell</h4>
 
 <p>As an alternative to the elisp functions described above, haskell-mode
 can use the program
@@ -186,7 +186,7 @@ stylish-haskell</code>, or if you have not installed <code>stack</code>,
 <code>cabal install stylish-haskell</code>.
 </p>
 <a name="Haskell-Tags"></a>
-<h3 class="section">4.3 Haskell Tags</h3>
+<h3 class="section">3.3 Haskell Tags</h3>
 
 <p><code>haskell-mode</code> can generate tags when saving source files.  To
 generate tags <code>haskell-mode</code> uses external program —
@@ -199,7 +199,7 @@ automatically, this can be done by customizing
 Haskell buffers only).
 </p>
 <a name="Completion-support"></a>
-<h3 class="section">4.4 Completion support</h3>
+<h3 class="section">3.4 Completion support</h3>
 
 <p><code>haskell-mode</code> can complete symbols, pragma directives, language
 extensions, and language keywords out-of-box.  <code>haskell-mode</code>
@@ -240,7 +240,7 @@ example:
 </pre></div>
 
 <a name="Profiling-and-Debugging-support"></a>
-<h3 class="section">4.5 Profiling and Debugging support</h3>
+<h3 class="section">3.5 Profiling and Debugging support</h3>
 
 <p>When profiling code with GHC, it is often useful to add
 <a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/profiling.html#cost-centres">cost centres</a> by hand.  These allow finer-grained information about
@@ -266,7 +266,7 @@ file associations, see <a href="http://www.gnu.org/software/emacs/manual/html_no
 <hr>
 <div class="header">
 <p>
-Next: <a href="Unicode-support.html#Unicode-support" accesskey="n" rel="next">Unicode support</a>, Previous: <a href="Getting-Started.html#Getting-Started" accesskey="p" rel="prev">Getting Started</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Unicode-support.html#Unicode-support" accesskey="n" rel="next">Unicode support</a>, Previous: <a href="Installation.html#Installation" accesskey="p" rel="prev">Installation</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
 </div>
 
 

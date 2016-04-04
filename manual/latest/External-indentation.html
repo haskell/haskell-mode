@@ -11,10 +11,10 @@ by the Free Software Foundation; with no Invariant Sections, no
 Front-Cover Texts and no Back-Cover Texts. -->
 <!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>Haskell Mode 16.1-git: Changing REPL target</title>
+<title>Haskell Mode 16.1-git: External indentation</title>
 
-<meta name="description" content="Haskell Mode 16.1-git: Changing REPL target">
-<meta name="keywords" content="Haskell Mode 16.1-git: Changing REPL target">
+<meta name="description" content="Haskell Mode 16.1-git: External indentation">
+<meta name="keywords" content="Haskell Mode 16.1-git: External indentation">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
@@ -22,8 +22,8 @@ Front-Cover Texts and no Back-Cover Texts. -->
 <link href="index.html#Top" rel="start" title="Top">
 <link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
 <link href="index.html#Top" rel="up" title="Top">
-<link href="Browsing-Haddocks.html#Browsing-Haddocks" rel="next" title="Browsing Haddocks">
-<link href="Editing-Cabal-files.html#Editing-Cabal-files" rel="prev" title="Editing Cabal files">
+<link href="Autoformating.html#Autoformating" rel="next" title="Autoformating">
+<link href="Indentation.html#Indentation" rel="prev" title="Indentation">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
@@ -59,39 +59,29 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
-<div class="background"> </div><a name="Changing-REPL-target"></a>
+<div class="background"> </div><a name="External-indentation"></a>
 <div class="header">
 <p>
-Next: <a href="Browsing-Haddocks.html#Browsing-Haddocks" accesskey="n" rel="next">Browsing Haddocks</a>, Previous: <a href="Editing-Cabal-files.html#Editing-Cabal-files" accesskey="p" rel="prev">Editing Cabal files</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Autoformating.html#Autoformating" accesskey="n" rel="next">Autoformating</a>, Previous: <a href="Indentation.html#Indentation" accesskey="p" rel="prev">Indentation</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="Changing-REPL-target-1"></a>
-<h2 class="chapter">14 Changing REPL target</h2>
+<a name="Other-ways-to-indent-code"></a>
+<h2 class="chapter">6 Other ways to indent code</h2>
 
-<a name="index-haskell_002dsession_002dchange_002dtarget"></a>
-<a name="index-haskell_002dinteractive_002dmode_002dhook"></a>
+<a name="Indentation-with-tabs_002c-not-spaces"></a>
+<h3 class="section">6.1 Indentation with tabs, not spaces</h3>
 
-<p>With <code>haskell-session-change-target</code> you can change the target for
-REPL session.
+<p>Some projects require indenting code with tabs and forbid indenting it
+with spaces.  For hacking on such projects, check out
+<a href="https://spwhitton.name/tech/code/haskell-tab-indent">haskell-tab-indent-mode</a>.
 </p>
+<a name="Structured-indentation"></a>
+<h3 class="section">6.2 Structured indentation</h3>
 
-<p>After REPL session started, in <code>haskell-interactive-mode</code> buffer invoke the
-<code>haskell-session-change-target</code> and select from available targets for
-</p>
-<a name="index-testing"></a>
-<p>- Testing
-</p>
-<a name="index-benchmarking"></a>
-<p>- Benchmark
-</p>
-<p>- Executable
-</p>
-<p>- Library
-</p>
-<p>Answer &ldquo;yes&rdquo; to restart the session and run your tests, benchmarks, executables.
-</p>
-
-<p>TODO/WRITEME
+<p>Another alternative is to install
+<a href="https://github.com/chrisdone/structured-haskell-mode">structured-haskell-mode</a>.
+which indents code by parsing the code with a full Haskell parser and
+deciding where to indent based on that.
 </p>
 
 

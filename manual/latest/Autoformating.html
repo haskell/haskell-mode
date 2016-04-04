@@ -11,10 +11,10 @@ by the Free Software Foundation; with no Invariant Sections, no
 Front-Cover Texts and no Back-Cover Texts. -->
 <!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>Haskell Mode 16.1-git: Using with flyspell-prog-mode</title>
+<title>Haskell Mode 16.1-git: Autoformating</title>
 
-<meta name="description" content="Haskell Mode 16.1-git: Using with flyspell-prog-mode">
-<meta name="keywords" content="Haskell Mode 16.1-git: Using with flyspell-prog-mode">
+<meta name="description" content="Haskell Mode 16.1-git: Autoformating">
+<meta name="keywords" content="Haskell Mode 16.1-git: Autoformating">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
@@ -22,8 +22,8 @@ Front-Cover Texts and no Back-Cover Texts. -->
 <link href="index.html#Top" rel="start" title="Top">
 <link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
 <link href="index.html#Top" rel="up" title="Top">
-<link href="Concept-index.html#Concept-index" rel="next" title="Concept index">
-<link href="Changing-REPL-target.html#Changing-REPL-target" rel="prev" title="Changing REPL target">
+<link href="Module-templates.html#Module-templates" rel="next" title="Module templates">
+<link href="External-indentation.html#External-indentation" rel="prev" title="External indentation">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
@@ -55,44 +55,38 @@ ul.no-bullet {list-style: none}
 <link rel="stylesheet" type="text/css" href="haskell-mode.css">
 
 <link rel="shortcut icon" href="haskell-mode-32x32.png">
+<script src="../../index.js"> </script>
 </head>
 
 <body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
-<div class="background"> </div><a name="Using-with-flyspell_002dprog_002dmode"></a>
+<div class="background"> </div><a name="Autoformating"></a>
 <div class="header">
 <p>
-Next: <a href="Concept-index.html#Concept-index" accesskey="n" rel="next">Concept index</a>, Previous: <a href="Changing-REPL-target.html#Changing-REPL-target" accesskey="p" rel="prev">Changing REPL target</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Module-templates.html#Module-templates" accesskey="n" rel="next">Module templates</a>, Previous: <a href="External-indentation.html#External-indentation" accesskey="p" rel="prev">External indentation</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="Using-with-flyspell_002dprog_002dmode-1"></a>
-<h2 class="chapter">13 Using with <code>flyspell-prog-mode</code></h2>
+<a name="Using-external-formatters"></a>
+<h2 class="chapter">7 Using external formatters</h2>
 
-<p>Strings and comments can be checked for spelling mistakes. There is a
-standard Emacs mode for this purpose, <code>flyspell-prog-mode</code>, that
-can be enabled in Haskell buffers. Spelling errors are underlined using
-squiggly red lines.
+<p>You can enable <a href="https://github.com/jaspervdj/stylish-haskell">stylish-haskell</a> by
+installing it:
 </p>
-<img src="anim/flyspell-prog-mode.gif" alt="anim/flyspell-prog-mode">
+<div class="example">
+<pre class="example">$ cabal install stylish-haskell
+</pre></div>
 
-<p>Documentation for <code>flyspell-prog-mode</code> can be found in
-See <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Spelling.html#Spelling">(emacs)Spelling</a>. Here we point to a couple of useful
-keybindings:
+<p>And by enabling it with a customization
 </p>
-<ul>
-<li> <kbd>M-$</kbd> - Check and correct spelling of the word at point (<code>ispell-word</code>).
+<div class="lisp">
+<pre class="lisp">(custom-set-variables
+ '(haskell-stylish-on-save t))
+</pre></div>
 
-</li><li> <kbd>digit</kbd> - Replace the word, just this time, with one of the
-displayed near-misses. Each near-miss is listed with a digit; type that
-digit to select it.
-
-</li><li> <kbd>SPC</kbd> - Skip this word—continue to consider it incorrect, but don’t
-change it here.
-</li></ul>
-
-<p>To enable spell checking of strings and comments add this line to your
-<code>~/.emacs</code> file:
+<p>Now when you run <code>save-buffer</code> (or <kbd>C-x C-s</kbd>) the module will
+be automatically formatted.
 </p>
-<p><code>(add-hook 'haskell-mode-hook 'flyspell-prog-mode)</code>
+<p>Alternatively, you can run the function directly on demand with
+<kbd>M-x</kbd> <code>haskell-mode-stylish-buffer</code>.
 </p>
 
 

@@ -22,7 +22,7 @@ Front-Cover Texts and no Back-Cover Texts. -->
 <link href="index.html#Top" rel="start" title="Top">
 <link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
 <link href="index.html#Top" rel="up" title="Top">
-<link href="Declaration-scanning.html#Declaration-scanning" rel="next" title="Declaration scanning">
+<link href="External-indentation.html#External-indentation" rel="next" title="External indentation">
 <link href="Unicode-support.html#Unicode-support" rel="prev" title="Unicode support">
 <style type="text/css">
 <!--
@@ -62,53 +62,58 @@ ul.no-bullet {list-style: none}
 <div class="background"> </div><a name="Indentation"></a>
 <div class="header">
 <p>
-Next: <a href="Declaration-scanning.html#Declaration-scanning" accesskey="n" rel="next">Declaration scanning</a>, Previous: <a href="Unicode-support.html#Unicode-support" accesskey="p" rel="prev">Unicode support</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="External-indentation.html#External-indentation" accesskey="n" rel="next">External indentation</a>, Previous: <a href="Unicode-support.html#Unicode-support" accesskey="p" rel="prev">Unicode support</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
 <a name="Indentation-1"></a>
-<h2 class="chapter">6 Indentation</h2>
+<h2 class="chapter">5 Indentation</h2>
 
 <a name="index-indentation"></a>
 <a name="index-layout-rule"></a>
 <a name="index-off_002dside-rule"></a>
 
+<p>In Haskell, code indentation has semantic meaning as it defines the
+block structure. Haskell also supports braces and semicolons
+notation for conveying the block structure. However, most Haskell
+programs written by humans use indentation for block structuring.
+</p>
+<p>Haskell Mode ships with two indentation modes:
+</p>
+<ul>
+<li> <code>haskell-indentation-mode</code> (default).
+
+<p>This is a semi-intelligent indentation mode doing a decent job at
+recognizing Haskell syntactical constructs.  It is based on a recursive
+descent Haskell parser. <kbd>TAB</kbd> selects the next potential indentation
+position, <kbd>S-TAB</kbd> selects the previous one. If a block is selected
+you can use <kbd>TAB</kbd> to indent the block more and <kbd>S-TAB</kbd> to indent
+the block less.
+</p>
+</li><li> <code>haskell-indent-mode</code> (optional).
+
+<p>This is a semi-intelligent indentation mode doing a decent job at
+recognizing Haskell syntactical constructs.  It is based on a decision
+table. Sadly it is no longer developed and does not recognize newer
+Haskell syntax. <kbd>TAB</kbd> cycles through all available indentation
+positions.
+</p>
+<p>To use <code>haskell-indent-mode</code>, add this to your <samp>~/.emacs</samp>
+file:
+</p>
+<div class="lisp">
+<pre class="lisp">(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+</pre></div>
+
+<p>Note that <code>turn-on-haskell-indent</code> will disable
+<code>haskell-indentation-mode</code>.
+</p>
+</li></ul>
+
 <p>For general information about indentation support in GNU Emacs,
 see <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Indentation.html#Indentation">(emacs)Indentation</a>.
 </p>
-<p>In Haskell, code indentation has semantic meaning as it defines the
-block structure<a name="DOCF4" href="#FOOT4"><sup>4</sup></a>.
-</p>
-<p>As GNU Emacs&rsquo; default indentation function
-(i.e. <code>indent-relative</code>) is not designed for use with Haskell&rsquo;s
-layout rule, Haskell mode includes indentation rules adapted to
-Haskell.  <code>haskell-indentation-mode</code> binds <tt class="key">TAB</tt> to cycle
-through possible indentation points based on some clever heuristics.
-<tt class="key">SHIFT-TAB</tt> cycles in the reverse direction, and <tt class="key">RET</tt> moves
-to a new line and indents to the first possible indentation level.
-</p>
-<a name="haskell_002dindent_002dmode"></a>
-<h3 class="section">6.1 haskell-indent-mode</h3>
-
-<p>If you want to use the obsolete <code>haskell-indent-mode</code>, the
-recommended way is to load it in <code>haskell-mode-hook</code>. This can be
-done either by using <kbd>M-x customize-variable <span class="key">RET</span>
-haskell-mode-hook</kbd> which provides a convenient user interface or by
-adding the following line to your <samp>.emacs</samp> file:
-</p>
-<div class="lisp">
-<pre class="lisp">(add-hook 'haskell-mode-hook 'haskell-indent-mode)
-</pre></div>
-
-<p>This will turn off <code>haskell-indentation-mode</code>.
-</p>
-<a name="Interactive-Block-Indentation"></a>
-<h3 class="section">6.2 Interactive Block Indentation</h3>
-
-<p><code>haskell-indentation</code> can move whole blocks to the left or to the
-right. Just mark a block and then use <tt class="key">TAB</tt> or <tt class="key">S-TAB</tt>.
-</p>
 <a name="Rectangle-Commands"></a>
-<h3 class="section">6.3 Rectangle Commands</h3>
+<h3 class="section">5.1 Rectangle Commands</h3>
 
 <a name="index-rectangle"></a>
 <a name="index-CUA-mode"></a>
@@ -127,19 +132,10 @@ selection mode (without redefining <kbd>C-x</kbd>,<kbd>C-c</kbd>,<kbd>C-v</kbd>,
 <kbd>C-z</kbd>) by calling <kbd>M-x cua-selection-mode</kbd> (or adding
 <code>(cua-selection-mode nil)</code> to your <code>haskell-mode-hook</code>).
 </p>
-<div class="footnote">
-<hr>
-<h4 class="footnotes-heading">Footnotes</h4>
-
-<h3><a name="FOOT4" href="#DOCF4">(4)</a></h3>
-<p>Haskell also supports braces and semicolons
-notation for conveying the block structure. However, most Haskell
-programs written by humans use indentation for block structuring.</p>
-</div>
 <hr>
 <div class="header">
 <p>
-Next: <a href="Declaration-scanning.html#Declaration-scanning" accesskey="n" rel="next">Declaration scanning</a>, Previous: <a href="Unicode-support.html#Unicode-support" accesskey="p" rel="prev">Unicode support</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="External-indentation.html#External-indentation" accesskey="n" rel="next">External indentation</a>, Previous: <a href="Unicode-support.html#Unicode-support" accesskey="p" rel="prev">Unicode support</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
 </div>
 
 
