@@ -99,8 +99,8 @@ This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
 
 (defcustom haskell-font-lock-quasi-quote-modes
   `(("hsx" . xml-mode)
-    ("hamlet" . xml-mode)
-    ("shamlet" . xml-mode)
+    ("hamlet" . shakespeare-hamlet-mode)
+    ("shamlet" . shakespeare-hamlet-mode)
     ("xmlQQ" . xml-mode)
     ("xml" . xml-mode)
     ("cmd" . shell-mode)
