@@ -125,7 +125,7 @@ font faces assigned as if respective mode was enabled."
 
 ;;;###autoload
 (defface haskell-type-face
-  '((t :inherit font-lock-function-name-face))
+  '((t :inherit font-lock-type-face))
   "Face used to highlight Haskell types"
   :group 'haskell-appearance)
 
