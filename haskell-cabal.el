@@ -34,7 +34,6 @@
 
 ;; (defun haskell-cabal-extract-fields-from-doc ()
 ;;   (require 'xml)
-;;   (with-no-warnings (require 'cl))
 ;;   (let ((section (completing-read
 ;;                   "Section: "
 ;;                   '("general-fields" "library" "executable" "buildinfo"))))
@@ -43,8 +42,8 @@
 ;;   (let* ((xml (xml-parse-region
 ;;                (progn (search-forward "<variablelist>") (match-beginning 0))
 ;;                (progn (search-forward "</variablelist>") (point))))
-;;          (varlist (remove-if-not 'consp (cddar xml)))
-;;          (syms (mapcar (lambda (entry) (caddr (assq 'literal (assq 'term entry))))
+;;          (varlist (cl-remove-if-not 'consp (cl-cddar xml)))
+;;          (syms (mapcar (lambda (entry) (cl-caddr (assq 'literal (assq 'term entry))))
 ;;                        varlist))
 ;;          (fields (mapcar (lambda (sym) (substring-no-properties sym 0 -1)) syms)))
 ;;     fields))
