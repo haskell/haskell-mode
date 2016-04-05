@@ -268,6 +268,7 @@
      " 9.9'r'"                          ; (9.9,'r')
      " 's'12e-34"                       ; ('s',1.2e-33)
      " 't'56.78"                        ; ('t',56.78)
+     " ."
      )
    '(("'a'" t font-lock-string-face)
      ("'b'" t font-lock-string-face)
@@ -294,6 +295,7 @@
      ("12e-34" t nil)
      ("'t'" t font-lock-string-face)
      ("56.78" t nil)
+     ("." t haskell-operator-face)
      )))
 
 

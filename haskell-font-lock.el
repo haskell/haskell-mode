@@ -304,10 +304,8 @@ like ::, class, instance, data, newtype, type."
     (conid (if (get-text-property (match-beginning 0) 'haskell-type)
                'haskell-type-face
              'haskell-constructor-face))
-    (varsym (when (and (not (member (match-string 0) '("-" "+" ".")))
-                       (not (save-excursion
-                              (goto-char (match-beginning 1))
-                              (looking-at-p "\\sw"))))
+    (varsym (unless (and (member (match-string 0) '("-" "+" "."))
+                         (equal (string-to-syntax "w") (syntax-after (match-beginning 0))))
               ;; We need to protect against the case of
               ;; plus, minus or dot inside a floating
               ;; point number.
