@@ -4,33 +4,42 @@ dist: trusty
 
 env:
   matrix:
-    - EMACS=emacs24           TARGET=check
-    - EMACS=emacs-snapshot    TARGET=check
-    - EMACS=emacs24           TARGET=deploy-manual
+    - TARGET=emacs24
+    - TARGET=emacs-snapshot
+    - TARGET=deploy-manual
   global:
     - secure: "ejv1+ub/v+Hm/23fhp4zLAHT3HiCG+YdDHai57LDe4LfEZCeGz4i/6LazbPbwm58v2YuKvMcdNshebc1s4A293ARJryPyFfW/8kEe+3hQ+cDxunNdHfqcS8SyhcDG0mrv7dqiVAtMJqB8qZb0c161KeEM8nyhC0wyQ+EZ5qJnzM="
 
 matrix:
   allow_failures:
-    - env: EMACS=emacs-snapshot    TARGET=check
+    - env: TARGET=emacs-snapshot
 
 install:
-  - if [ "$EMACS" = "emacs24" ]; then
+  - if [ "$TARGET" = "emacs24" ]; then
         sudo apt-get update &&
         sudo apt-get install --no-install-suggests --no-install-recommends --assume-yes emacs24-nox;
     fi
-  - if [ "$EMACS" = "emacs-snapshot" ]; then
+  - if [ "$TARGET" = "emacs-snapshot" ]; then
         sudo add-apt-repository -y ppa:ubuntu-elisp/ppa &&
         sudo apt-get update &&
         sudo apt-get install --no-install-suggests --no-install-recommends --assume-yes emacs-snapshot;
     fi
   - if [ "$TARGET" = "deploy-manual" ]; then
         sudo apt-get update &&
-        sudo apt-get install --no-install-suggests --no-install-recommends --force-yes texinfo;
+        sudo apt-get install --no-install-suggests --no-install-recommends --force-yes texinfo emacs24-nox;
     fi
 
 script:
-  make $TARGET
+  - if [ "$TARGET" = "emacs24" ]; then
+        EMACS=emacs24 make check bench;
+    fi
+  - if [ "$TARGET" = "emacs-snapshot" ]; then
+        EMACS=emacs-snapshot make check;
+    fi
+  - if [ "$TARGET" = "deploy-manual" ]; then
+        EMACS=emacs24 make deploy-manual;
+    fi
+
 
 notifications:
   email: false
