@@ -439,8 +439,12 @@ like ::, class, instance, data, newtype, type."
       (while (setq next (next-single-property-change pos 'face))
         (put-text-property
          (+ start (1- pos)) (1- (+ start next)) 'face
-         (get-text-property pos 'face) org-buffer)
-        (setq pos next)))
+         (or (get-text-property pos 'face) 'default) org-buffer)
+        (setq pos next))
+      (unless (equal pos (point-max))
+        (put-text-property
+         (+ start (1- pos)) (1- (+ start (point-max))) 'face
+         'default org-buffer)))
     (add-text-properties
      start end
      '(font-lock-fontified t fontified t font-lock-multiline t))

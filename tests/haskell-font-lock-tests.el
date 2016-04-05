@@ -371,19 +371,18 @@
   (check-properties
    '("sql = [sql| SELECT title FROM books; |]")
    '(("SELECT" t font-lock-keyword-face)
-     ("title" t nil)
+     ("title" t default)
      ("FROM" t font-lock-keyword-face)
-     ("books" t nil))))
+     ("books" t default))))
 
 (ert-deftest haskell-syntactic-test-quasiquoter-sql-2 ()
   "Embedded SQL statements"
-  :expected-result :failed
   ;; for now we have this problem that connstructor faces are used,
   ;; org-mode knows how to get around this problem
   (check-properties
    '("sql = [sql| SELECT Title FROM Books; |]")
-   '(("Title" t nil)
-     ("Books" t nil))))
+   '(("Title" t default)
+     ("Books" t default))))
 
 
 (ert-deftest haskell-syntactic-test-special-not-redefined ()
