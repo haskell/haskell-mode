@@ -52,6 +52,8 @@ interpreter (e.g. GHCi).
 * Introduction::                         An introduction to Haskell Mode
 * Installation::                         How to get started
 * Editing Haskell Code::                 How to edit code
+* Font Lock Support::                    Haskell Mode has colors
+* Completion support::                   Autocomplete
 * Unicode support::                      How to use Unicode
 * Indentation::                          Notes about indentation
 * External indentation::                 Other ways to indent code
@@ -66,7 +68,7 @@ interpreter (e.g. GHCi).
 * Browsing Haddocks::                    Using @code{w3m} to browse documentation
 * Spell checking strings and comments::  Using @code{flyspell-prog-mode}
 * Aligning code::                        Aligning code using @code{align-regexp}
-* Rectangular commands::
+* Rectangular commands::                 Manage indentation manually
 * Getting Help and Reporting Bugs::      How to improve Haskell Mode
 * Concept index::                        Index of Haskell Mode concepts
 * Function index::                       Index of commands
@@ -250,24 +252,6 @@ literate Haskell files. The currently detected literate Haskell variant
 is shown in the mode line (@pxref{Mode Line,,,emacs}) as either
 @samp{LitHaskell/bird} or @samp{LitHaskell/tex}.
 
-@section Font Lock Support
-
-@code{haskell-mode} supports @dfn{syntax highlighting} via Emacs' Font
-Lock minor mode which should be enabled by default in current
-Emacsen. @xref{Font Lock,,,emacs}, for more information on how to
-control @code{font-lock-mode}.
-
-@ifhtml
-@image{anim/font-lock}
-@end ifhtml
-
-Syntax highlighting facilities parse strings and string escape sequences
-and are able to highlight unrecognized constructs.
-
-@ifhtml
-@image{anim/string-escape-highlight}
-@end ifhtml
-
 
 @section Managing imports
 
@@ -332,7 +316,52 @@ automatically, this can be done by customizing
 @code{tags-revert-without-query} variable (either globally or for
 Haskell buffers only).
 
-@section Completion support
+@section Profiling and Debugging support
+
+When profiling code with GHC, it is often useful to add
+@uref{https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/profiling.html#cost-centres,
+cost centres} by hand.  These allow finer-grained information about
+program behavior.  @code{haskell-mode} provides the function
+@code{haskell-mode-toggle-scc-at-point} to make this more convenient.
+It will remove an SCC annotation at point if one is present, or add
+one if point is over whitespace.  By default it is bound to @kbd{C-c C-s}.
+
+@node Font Lock Support
+@chapter Font Lock Support
+
+@code{haskell-mode} supports @dfn{syntax highlighting} via Emacs' Font
+Lock minor mode which should be enabled by default in current
+Emacsen. @xref{Font Lock,,,emacs}, for more information on how to
+control @code{font-lock-mode}.
+
+@ifhtml
+@image{anim/font-lock}
+@end ifhtml
+
+Syntax highlighting facilities parse strings and string escape sequences
+and are able to highlight unrecognized constructs.
+
+@ifhtml
+@image{anim/string-escape-highlight}
+@end ifhtml
+
+Haskell Mode shows keywords, identifiers, operators, constructors and
+types in different colors.
+
+@ifhtml
+@image{anim/font-lock-types}
+@end ifhtml
+
+There is also support to use mode-specific syntax highlighing for
+quasiquotes. Customize @code{haskell-font-lock-quasi-quote-modes} to
+make sure your quoters are supported.
+
+@ifhtml
+@image{anim/font-lock-quasi-quotes}
+@end ifhtml
+
+@node Completion support
+@chapter Completion support
 
 @code{haskell-mode} can complete symbols, pragma directives, language
 extensions, and language keywords out-of-box.  @code{haskell-mode}
@@ -375,16 +404,6 @@ example:
                  (append '((company-capf company-dabbrev-code))
                          company-backends))))
 @end lisp
-
-@section Profiling and Debugging support
-
-When profiling code with GHC, it is often useful to add
-@uref{https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/profiling.html#cost-centres,
-cost centres} by hand.  These allow finer-grained information about
-program behavior.  @code{haskell-mode} provides the function
-@code{haskell-mode-toggle-scc-at-point} to make this more convenient.
-It will remove an SCC annotation at point if one is present, or add
-one if point is over whitespace.  By default it is bound to @kbd{C-c C-s}.
 
 @node Unicode support
 @chapter Unicode support
