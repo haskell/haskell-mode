@@ -132,6 +132,25 @@ selection mode (without redefining <kbd>C-x</kbd>,<kbd>C-c</kbd>,<kbd>C-v</kbd>,
 <kbd>C-z</kbd>) by calling <kbd>M-x cua-selection-mode</kbd> (or adding
 <code>(cua-selection-mode nil)</code> to your <code>haskell-mode-hook</code>).
 </p>
+<a name="Region-indent-is-a-no_002dop"></a>
+<h3 class="section">7.2 Region indent is a no-op</h3>
+
+<p>There is a <code>indent-region</code> function that supposedly could be used
+to indent code region without changing its semantics. Sadly it does not
+work that way because usual use case for <code>indent-region</code> is:
+</p>
+<ol>
+<li> Alter first line of code in region.
+</li><li> Call <code>indent-region</code> to fix indentation for remaining lines.
+</li></ol>
+
+<p>Note that between 1 and 2 program is already semantically broken and
+knowing how to indent it preserving semantic from before step 1 would
+require time travel.
+</p>
+<p>To stay on the safe side <code>indent-region-function</code> is bound to a
+no-op in <code>haskell-mode</code>.
+</p>
 <hr>
 <div class="header">
 <p>
