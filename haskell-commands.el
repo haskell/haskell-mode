@@ -806,47 +806,33 @@ inferior GHCi process."
 Use buffer as input and replace the whole buffer with the
 output.  If CMD fails the buffer remains unchanged."
   (set-buffer-modified-p t)
-  (let* ((chomp (lambda (str)
-                  (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'" str)
-                    (setq str (replace-match "" t t str)))
-                  str))
-         (_errout (lambda (fmt &rest args)
-		    (let* ((warning-fill-prefix "    "))
-		      (display-warning cmd (apply 'format fmt args) :warning))))
-         (filename (buffer-file-name (current-buffer)))
-         (cmd-prefix (replace-regexp-in-string " .*" "" cmd))
-         (tmp-file (make-temp-file cmd-prefix))
-         (err-file (make-temp-file cmd-prefix))
+  (let* ((cmd-prefix (replace-regexp-in-string " .*" "" cmd))
+         (tmp-buf (generate-new-buffer cmd-prefix))
          (default-directory (if (and (boundp 'haskell-session)
                                      haskell-session)
                                 (haskell-session-cabal-dir haskell-session)
                               default-directory))
-         (_errcode (with-temp-file tmp-file
-		     (call-process cmd filename
-				   (list (current-buffer) err-file) nil)))
-         (stderr-output
-          (with-temp-buffer
-            (insert-file-contents err-file)
-            (funcall chomp (buffer-substring-no-properties (point-min) (point-max)))))
+         (_errcode
+            (call-process-region (point-min) (point-max) cmd nil tmp-buf nil))
          (stdout-output
           (with-temp-buffer
-            (insert-file-contents tmp-file)
+            (insert-buffer tmp-buf)
             (buffer-substring-no-properties (point-min) (point-max)))))
-    (if (string= "" stderr-output)
+    (if (zerop _errcode)
         (if (string= "" stdout-output)
             (message "Error: %s produced no output, leaving buffer alone" cmd)
           (save-restriction
             (widen)
             ;; command successful, insert file with replacement to preserve
             ;; markers.
-            (insert-file-contents tmp-file nil nil nil t)))
+            (erase-buffer)
+            (insert-buffer tmp-buf)))
       (progn
         ;; non-null stderr, command must have failed
         (message "Error: %s ended with errors, leaving buffer alone" cmd)
         ;; use (warning-minimum-level :debug) to see this
         (display-warning cmd stderr-output :debug)))
-    (delete-file tmp-file)
-    (delete-file err-file)))
+    (kill-buffer tmp-buf)))
 
 ;;;###autoload
 (defun haskell-mode-find-uses ()
