@@ -64,7 +64,6 @@ interpreter (e.g. GHCi).
 * Inferior Haskell interpreter::         How to interact with GHCi (1)
 * Interactive Haskell::                  How to interact with GHCi (2)
 * Editing Cabal files::                  Cabal support
-* Changing REPL target::                 Start REPL with selected target (i.e. test,bench,etc.)
 * Browsing Haddocks::                    Using @code{w3m} to browse documentation
 * Spell checking strings and comments::  Using @code{flyspell-prog-mode}
 * Aligning code::                        Aligning code using @code{align-regexp}
@@ -1367,6 +1366,34 @@ you will be presented with the prompt:
     λ>
 @end example
 
+@subsection Changing REPL target
+
+@findex haskell-session-change-target
+@vindex haskell-interactive-mode-hook
+
+With @code{haskell-session-change-target} you can change the target for
+REPL session.
+
+
+After REPL session started, in @code{haskell-interactive-mode} buffer invoke the
+@code{haskell-session-change-target} and select from available targets for
+
+@cindex testing
+- Testing
+
+@cindex benchmarking
+- Benchmark
+
+- Executable
+
+- Library
+
+Answer ``yes'' to restart the session and run your tests, benchmarks, executables.
+
+
+TODO/WRITEME
+
+
 @subsection Bringing the REPL
 
 If you don't know where the REPL buffer is, you can always bring it
@@ -1948,34 +1975,6 @@ a Haskell source buffer, you can use @kbd{M-x haskell-cabal-visit-file};
 with a prefix argument (i.e. @kbd{C-u}) @code{find-file-other-window} is
 used to visit the @file{.cabal} file.
 @code{haskell-cabal-visit-file} is bound to the key sequence @kbd{C-c v c}.
-
-TODO/WRITEME
-
-@node Changing REPL target
-@chapter Changing REPL target
-
-@findex haskell-session-change-target
-@vindex haskell-interactive-mode-hook
-
-With @code{haskell-session-change-target} you can change the target for
-REPL session.
-
-
-After REPL session started, in @code{haskell-interactive-mode} buffer invoke the
-@code{haskell-session-change-target} and select from available targets for
-
-@cindex testing
-- Testing
-
-@cindex benchmarking
-- Benchmark
-
-- Executable
-
-- Library
-
-Answer ``yes'' to restart the session and run your tests, benchmarks, executables.
-
 
 TODO/WRITEME
 
