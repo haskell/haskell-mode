@@ -66,7 +66,7 @@ Next: <a href="Editing-Cabal-files.html#Editing-Cabal-files" accesskey="n" rel="
 </div>
 <hr>
 <a name="Interactive-Haskell-1"></a>
-<h2 class="chapter">12 Interactive Haskell</h2>
+<h2 class="chapter">14 Interactive Haskell</h2>
 
 <p>An alternative mode providing a <acronym title="read–eval–print loop">REPL</acronym> (read–eval–print loop) via
 GHCi sessions is called <code>haskell-interactive-mode</code>, which
@@ -106,7 +106,7 @@ no session associated yet, you&rsquo;re asked which GHCi session to create or
 associate with.
 </p>
 <a name="Goto-Error"></a>
-<h3 class="section">12.1 Goto Error</h3>
+<h3 class="section">14.1 Goto Error</h3>
 
 <p>In a Haskell source buffer associated with a GHCi session, errors that
 prevent the file from loading are highlighted with
@@ -125,7 +125,7 @@ prevent the file from loading are highlighted with
 </dl>
 
 <a name="Using-GHCi_002dng"></a>
-<h3 class="section">12.2 Using GHCi-ng</h3>
+<h3 class="section">14.2 Using GHCi-ng</h3>
 
 <p>Put <code>:set +c</code> in your <code>.ghci</code> or run it in the REPL. Then use
 these keybindings:
@@ -139,7 +139,7 @@ these keybindings:
 for the current GHCi session.
 </p>
 <a name="Customizing-1"></a>
-<h3 class="section">12.3 Customizing</h3>
+<h3 class="section">14.3 Customizing</h3>
 
 <a name="index-customizing-1"></a>
 <p>What kind of Haskell REPL <code>haskell-interactive-mode</code> will start up
@@ -175,7 +175,7 @@ strings specifying (further) command-line arguments.
 <a name="index-haskell_002dprocess_002dargs_002dstack_002dghci"></a>
 
 <a name="Haskell-Interactive-Mode-Setup"></a>
-<h3 class="section">12.4 Haskell Interactive Mode Setup</h3>
+<h3 class="section">14.4 Haskell Interactive Mode Setup</h3>
 
 <p>The most straight-forward way to get setup with Interactive Mode is to
 bind the right keybindings and set some customizations. This page
@@ -190,7 +190,7 @@ contains a good base setup.
 </pre></div>
 
 <a name="Customizations"></a>
-<h4 class="subsection">12.4.1 Customizations</h4>
+<h4 class="subsection">14.4.1 Customizations</h4>
 
 <p>This enables some handy and benign features.
 </p>
@@ -203,7 +203,7 @@ contains a good base setup.
 
 
 <a name="Haskell_002dmode-bindings"></a>
-<h4 class="subsection">12.4.2 Haskell-mode bindings</h4>
+<h4 class="subsection">14.4.2 Haskell-mode bindings</h4>
 
 <p>This gives the basic ways to start a session. In a Haskell buffer:
 </p>
@@ -228,7 +228,7 @@ prompt to create one if there isn&rsquo;t one already for the current project.
 
 
 <a name="Cabal_002dmode-bindings"></a>
-<h4 class="subsection">12.4.3 Cabal-mode bindings</h4>
+<h4 class="subsection">14.4.3 Cabal-mode bindings</h4>
 
 <p>The below commands pretty much match the ones above, but are handy to
 have in cabal-mode, too:
@@ -241,7 +241,7 @@ have in cabal-mode, too:
 </pre></div>
 
 <a name="GHCi-process-type"></a>
-<h4 class="subsection">12.4.4 GHCi process type</h4>
+<h4 class="subsection">14.4.4 GHCi process type</h4>
 
 <p>By default <code>haskell-process-type</code> is set to <code>auto</code>. It is
 smart enough to pick the right type based on your project structure and
@@ -269,7 +269,7 @@ customize this setting by running <kbd>M-x</kbd> <code>customize-variable</code>
 the real type is guessed, when it&rsquo;s set to <code>auto</code>.
 </p>
 <a name="Troubleshooting"></a>
-<h4 class="subsection">12.4.5 Troubleshooting</h4>
+<h4 class="subsection">14.4.5 Troubleshooting</h4>
 
 <p>Launching your GHCi process can fail when you&rsquo;re first getting setup,
 depending on the type you choose. If it does fail to launch, switch to
@@ -277,7 +277,7 @@ the buffer <code>*haskell-process-log*</code> and see what&rsquo;s up. The buffe
 contains a log of incoming/outgoing messages to the GHCi process.
 </p>
 <a name="Haskell-Interactive-Mode-Tags-Using-GHCi"></a>
-<h3 class="section">12.5 Haskell Interactive Mode Tags Using GHCi</h3>
+<h3 class="section">14.5 Haskell Interactive Mode Tags Using GHCi</h3>
 
 <p>You can bind the following to use GHCi to find definitions of things:
 </p>
@@ -298,7 +298,7 @@ than <code>foo is defined in /foo/Bar.hs:123:23</code>.
 valid compile.
 </p>
 <a name="Tags-Setup"></a>
-<h4 class="subsection">12.5.1 Tags Setup</h4>
+<h4 class="subsection">14.5.1 Tags Setup</h4>
 
 <p>Make sure to install <samp>hasktags</samp>.
 </p>
@@ -316,7 +316,7 @@ valid compile.
 <p>And make sure <samp>hasktags</samp> is in your <code>$PATH</code> which Emacs can see.
 </p>
 <a name="Generating-tags"></a>
-<h4 class="subsection">12.5.2 Generating tags</h4>
+<h4 class="subsection">14.5.2 Generating tags</h4>
 
 <p>Now, every time you run <code>save-buffer</code> (<kbd>C-x C-s</kbd>), there is a
 hook that will run and generate Emacs See <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Tags.html#Tags">(emacs)Tags</a> for the whole
@@ -327,7 +327,7 @@ home directory or something, otherwise it will traverse all the way
 down and take an impossibly long time.
 </p>
 <a name="Jumping-to-tags"></a>
-<h4 class="subsection">12.5.3 Jumping to tags</h4>
+<h4 class="subsection">14.5.3 Jumping to tags</h4>
 
 <p>Bind the following keybinding:
 </p>
@@ -339,7 +339,7 @@ down and take an impossibly long time.
 <kbd>M-x</kbd> <code>haskell-mode-tag-find</code> or <kbd>M-.</kbd>.
 </p>
 <a name="Hybrid_003a-GHCi-and-fallback-to-tags"></a>
-<h4 class="subsection">12.5.4 Hybrid: GHCi and fallback to tags</h4>
+<h4 class="subsection">14.5.4 Hybrid: GHCi and fallback to tags</h4>
 
 <p>To use GHCi first and then if that fails to fallback to tags for jumping, use:
 </p>
@@ -348,21 +348,21 @@ down and take an impossibly long time.
 </pre></div>
 
 <a name="Troubleshooting-tags"></a>
-<h4 class="subsection">12.5.5 Troubleshooting tags</h4>
+<h4 class="subsection">14.5.5 Troubleshooting tags</h4>
 
 <p>Sometimes a <samp>TAGS</samp> file is deleted (by you or some other
 process). Emacs will complain that it doesn&rsquo;t exist anymore. To
 resolve this simply do <kbd>M-x</kbd> <code>tags-reset-tags-tables</code>.
 </p>
 <a name="Sessions"></a>
-<h3 class="section">12.6 Sessions</h3>
+<h3 class="section">14.6 Sessions</h3>
 
 <p>All commands in Haskell Interactive Mode work within a session. Consider
 it like a “project” or a “solution” in popular IDEs. It tracks the root
 of your project and an associated process and REPL.
 </p>
 <a name="Start-a-session"></a>
-<h4 class="subsection">12.6.1 Start a session</h4>
+<h4 class="subsection">14.6.1 Start a session</h4>
 
 <p>To start a session run the following steps:
 </p>
@@ -381,7 +381,7 @@ out where the cabal directory is and defaults for the current directory,
 so you should be able to just hit RET twice.
 </p>
 <a name="Switch-a-session"></a>
-<h4 class="subsection">12.6.2 Switch a session</h4>
+<h4 class="subsection">14.6.2 Switch a session</h4>
 
 <p>Sometimes a particular file is used in two different
 sessions/projects. You can run
@@ -394,7 +394,7 @@ sessions/projects. You can run
 bug). It will ask you to choose from a list of sessions.
 </p>
 <a name="Killing-a-session"></a>
-<h4 class="subsection">12.6.3 Killing a session</h4>
+<h4 class="subsection">14.6.3 Killing a session</h4>
 
 <p>To kill a session you can run
 </p>
@@ -417,7 +417,7 @@ kill the REPL buffer. You can bring it back with <kbd>M-x</kbd>
 <code>haskell-interactive-bring</code>.
 </p>
 <a name="Menu"></a>
-<h4 class="subsection">12.6.4 Menu</h4>
+<h4 class="subsection">14.6.4 Menu</h4>
 
 <p>To see a list of all sessions you have open with some simple
 statistics about memory usage, etc. run
@@ -436,13 +436,13 @@ statistics about memory usage, etc. run
 
 
 <a name="Compiling"></a>
-<h3 class="section">12.7 Compiling</h3>
+<h3 class="section">14.7 Compiling</h3>
 
 <p>There are a bunch of ways to compile Haskell modules. This page covers
 a few of them.
 </p>
 <a name="Load-into-GHCi"></a>
-<h4 class="subsection">12.7.1 Load into GHCi</h4>
+<h4 class="subsection">14.7.1 Load into GHCi</h4>
 
 <p>To compile and load a Haskell module into GHCi, run the following
 </p>
@@ -453,7 +453,7 @@ a few of them.
 <p>Or <kbd>C-c C-l</kbd>. You&rsquo;ll see any compile errors in the REPL window.
 </p>
 <a name="Build-the-Cabal-project"></a>
-<h4 class="subsection">12.7.2 Build the Cabal project</h4>
+<h4 class="subsection">14.7.2 Build the Cabal project</h4>
 
 <p>To compile the whole Cabal project, run the following
 </p>
@@ -464,7 +464,7 @@ a few of them.
 <p>Or <kbd>C-c C-c</kbd>. You&rsquo;ll see any compile errors in the REPL window.
 </p>
 <a name="Reloading-modules"></a>
-<h4 class="subsection">12.7.3 Reloading modules</h4>
+<h4 class="subsection">14.7.3 Reloading modules</h4>
 
 <p>To reload the current module, even when you&rsquo;re in other modules, you can
 run <kbd>C-u M-x</kbd> <code>haskell-process-load-or-reload</code> or <kbd>C-u C-c
@@ -473,7 +473,7 @@ the future from whatever module you&rsquo;re in. To disable this mode, just
 run <kbd>C-u C-c C-l</kbd> again.
 </p>
 <a name="Jumping-to-compile-errors"></a>
-<h4 class="subsection">12.7.4 Jumping to compile errors</h4>
+<h4 class="subsection">14.7.4 Jumping to compile errors</h4>
 
 <p>You can use the standard compile error navigation function <kbd>C-x `</kbd> —
 jump to the next error.
@@ -482,7 +482,7 @@ jump to the next error.
 jump to it.
 </p>
 <a name="Auto_002dremoving-imports"></a>
-<h4 class="subsection">12.7.5 Auto-removing imports</h4>
+<h4 class="subsection">14.7.5 Auto-removing imports</h4>
 
 <p>If the customization variable
 <code>haskell-process-suggest-remove-import-lines</code> is enabled.
@@ -517,7 +517,7 @@ want to temporarily hide an import).
 </li></ul>
 
 <a name="Auto_002dadding-of-modules-to-import"></a>
-<h4 class="subsection">12.7.6 Auto-adding of modules to import</h4>
+<h4 class="subsection">14.7.6 Auto-adding of modules to import</h4>
 
 <p>Enable the customization variable
 <code>haskell-process-suggest-hoogle-imports</code>.
@@ -534,7 +534,7 @@ from Hoogle&rsquo;s results.
 <p>You need to make sure you&rsquo;ve generated your Hoogle database properly.
 </p>
 <a name="Auto_002dadding-of-extensions"></a>
-<h4 class="subsection">12.7.7 Auto-adding of extensions</h4>
+<h4 class="subsection">14.7.7 Auto-adding of extensions</h4>
 
 <p>It you use an extension which is not enabled, GHC will often inform
 you. For example, if you write:
@@ -565,14 +565,14 @@ you. For example, if you write:
 the top of the file.
 </p>
 <a name="Orphan-instances"></a>
-<h4 class="subsection">12.7.8 Orphan instances</h4>
+<h4 class="subsection">14.7.8 Orphan instances</h4>
 
 <p>If GHC complains about orphan instances, you usually are doing it
 intentionally, so it prompts to add <code>-fno-warn-orphans</code> to the top of
 the file with an <kbd>OPTIONS</kbd> pragma.
 </p>
 <a name="Auto_002dadding-of-dependencies"></a>
-<h4 class="subsection">12.7.9 Auto-adding of dependencies</h4>
+<h4 class="subsection">14.7.9 Auto-adding of dependencies</h4>
 
 <p>When doing a build, you will sometimes get a message from GHC like:
 </p>
@@ -610,7 +610,7 @@ of those, prompting, too.
 <p>Now you can rebuild with <kbd>C-c C-c</kbd> again.
 </p>
 <a name="Haskell-Interactive-Mode-REPL"></a>
-<h3 class="section">12.8 Haskell Interactive Mode REPL</h3>
+<h3 class="section">14.8 Haskell Interactive Mode REPL</h3>
 
 <p>When GHCi has been launched, it works on a read-eval-print basis. So
 you will be presented with the prompt:
@@ -622,7 +622,7 @@ you will be presented with the prompt:
 </pre></div>
 
 <a name="Bringing-the-REPL"></a>
-<h4 class="subsection">12.8.1 Bringing the REPL</h4>
+<h4 class="subsection">14.8.1 Bringing the REPL</h4>
 
 <p>If you don&rsquo;t know where the REPL buffer is, you can always bring it
 with:
@@ -634,7 +634,7 @@ with:
 <p>Or <kbd>C-`</kbd>.
 </p>
 <a name="Evaluating-expressions"></a>
-<h4 class="subsection">12.8.2 Evaluating expressions</h4>
+<h4 class="subsection">14.8.2 Evaluating expressions</h4>
 
 <p>To evaluate expressions, simply type one out and hit &lsquo;RET&lsquo;.
 </p>
@@ -644,7 +644,7 @@ with:
 </pre></div>
 
 <a name="Type-of-expressions"></a>
-<h4 class="subsection">12.8.3 Type of expressions</h4>
+<h4 class="subsection">14.8.3 Type of expressions</h4>
 
 <p>You can use normal <code>:type</code> which is part of GHCi to get the type of
 something:
@@ -699,7 +699,7 @@ result. The same is true for ambiguous things:
 </pre></div>
 
 <a name="Printing-mode"></a>
-<h4 class="subsection">12.8.4 Printing mode</h4>
+<h4 class="subsection">14.8.4 Printing mode</h4>
 
 <p>You can choose between printing modes used for the results of
 evaluating expressions. To do that, configure the variable
@@ -744,7 +744,7 @@ evaluating expressions. To do that, configure the variable
 output as Haskell.
 </p>
 <a name="Presentations"></a>
-<h4 class="subsection">12.8.5 Presentations</h4>
+<h4 class="subsection">14.8.5 Presentations</h4>
 
 <p>If you have the <samp>present</samp> package installed, you can use the following
 syntax to print anything which is an instance of <code>Data</code>:
@@ -776,25 +776,25 @@ further:
 <p>Etc. Remember: this only works for instances of <code>Data.Data.Data</code>.
 </p>
 <a name="History-1"></a>
-<h4 class="subsection">12.8.6 History</h4>
+<h4 class="subsection">14.8.6 History</h4>
 
 <p>A history is maintained for the duration of the REPL buffer. To go up
 and down in the history, run <kbd>M-p</kbd> for previous and <kbd>M-n</kbd> for
 next.
 </p>
 <a name="Cancelling-commands"></a>
-<h4 class="subsection">12.8.7 Cancelling commands</h4>
+<h4 class="subsection">14.8.7 Cancelling commands</h4>
 
 <p>To cancel a running REPL command, run <kbd>C-c C-c</kbd>.
 </p>
 <a name="Clear-the-REPL"></a>
-<h4 class="subsection">12.8.8 Clear the REPL</h4>
+<h4 class="subsection">14.8.8 Clear the REPL</h4>
 
 <p>Run <kbd>C-c C-k</kbd> to clear the REPL.
 </p>
 
 <a name="Trick_003a-Put-Interactive-REPL-in-Separate-Frame"></a>
-<h4 class="subsection">12.8.9 Trick: Put Interactive REPL in Separate Frame</h4>
+<h4 class="subsection">14.8.9 Trick: Put Interactive REPL in Separate Frame</h4>
 
 
 <p>The following <code>create-haskell-interactive-frame</code> is a quick hack to
@@ -817,7 +817,7 @@ predictable layout of windows in Emacs.
 </pre></div>
 
 <a name="Troubleshooting-1"></a>
-<h4 class="subsection">12.8.10 Troubleshooting</h4>
+<h4 class="subsection">14.8.10 Troubleshooting</h4>
 
 <p>If the REPL ever goes funny, you can clear the command queue via:
 </p>
@@ -845,12 +845,12 @@ following command can dump the <code>haskell-process</code> state:
 <p>The output can be copied from the <code>*Messages*</code> buffer.
 </p>
 <a name="Haskell-Interactive-Mode-Querying"></a>
-<h3 class="section">12.9 Haskell Interactive Mode Querying</h3>
+<h3 class="section">14.9 Haskell Interactive Mode Querying</h3>
 
 <p>There a few ways GHCi lets you query information about your code.
 </p>
 <a name="Get-identifer-type"></a>
-<h4 class="subsection">12.9.1 Get identifer type</h4>
+<h4 class="subsection">14.9.1 Get identifer type</h4>
 
 <p>To print the type of the top-level identifier at point in the REPL and
 in the message buffer, run the following command:
@@ -862,7 +862,7 @@ in the message buffer, run the following command:
 <p>or <kbd>C-c C-t</kbd>.
 </p>
 <a name="Insert-identifier_0027s-type-as-type-signature"></a>
-<h4 class="subsection">12.9.2 Insert identifier&rsquo;s type as type signature</h4>
+<h4 class="subsection">14.9.2 Insert identifier&rsquo;s type as type signature</h4>
 
 <p>To print the type of the top-level identifier at point, run the
 following command:
@@ -874,7 +874,7 @@ following command:
 <p>or <kbd>C-u C-c C-t</kbd>.
 </p>
 <a name="Get-identifier-info"></a>
-<h4 class="subsection">12.9.3 Get identifier info</h4>
+<h4 class="subsection">14.9.3 Get identifier info</h4>
 
 <p>To print the info of the identifier at point, run the following
 command:
@@ -886,7 +886,7 @@ command:
 <p>or <kbd>C-c C-i</kbd>.
 </p>
 <a name="Presentation-mode"></a>
-<h4 class="subsection">12.9.4 Presentation mode</h4>
+<h4 class="subsection">14.9.4 Presentation mode</h4>
 
 <p>When using <kbd>C-c C-i</kbd> or <kbd>C-c C-t</kbd> it will open a buffer in
 haskell-presentation-mode. You can hit <kbd>q</kbd> to close the buffer.
@@ -926,7 +926,7 @@ instance Show Ordering -- Defined in `GHC.Show'
 <p>And so on. It&rsquo;s a very good way of exploring a new codebase.
 </p>
 <a name="Browse-import_0027s-module"></a>
-<h4 class="subsection">12.9.5 Browse import&rsquo;s module</h4>
+<h4 class="subsection">14.9.5 Browse import&rsquo;s module</h4>
 
 <p>To print all exported identifiers of the module imported by the import
 line at point, run the following command:
@@ -939,13 +939,13 @@ line at point, run the following command:
 The.Module</code> in the GHCi process.
 </p>
 <a name="Haskell-Interactive-Mode-Cabal-integration"></a>
-<h3 class="section">12.10 Haskell Interactive Mode Cabal integration</h3>
+<h3 class="section">14.10 Haskell Interactive Mode Cabal integration</h3>
 
 <p>There&rsquo;s some integration with Cabal in Haskell Interactive Mode. Once
 you&rsquo;ve started a session, the features below are available.
 </p>
 <a name="Cabal-building"></a>
-<h4 class="subsection">12.10.1 Cabal building</h4>
+<h4 class="subsection">14.10.1 Cabal building</h4>
 
 <p>The most common Cabal action is building, so that has a specific command:
 </p>
@@ -984,7 +984,7 @@ you&rsquo;ve started a session, the features below are available.
 <p>Which is considerably more verbose but rarely useful or interesting.
 </p>
 <a name="Arbitrary-cabal-commands"></a>
-<h4 class="subsection">12.10.2 Arbitrary cabal commands</h4>
+<h4 class="subsection">14.10.2 Arbitrary cabal commands</h4>
 
 <p>To run an arbitrary Cabal command:
 </p>
@@ -998,7 +998,7 @@ you&rsquo;ve started a session, the features below are available.
 for example.
 </p>
 <a name="Completing-cabal-commands"></a>
-<h4 class="subsection">12.10.3 Completing cabal commands</h4>
+<h4 class="subsection">14.10.3 Completing cabal commands</h4>
 
 <p>To run some common Cabal commands, just run:
 </p>
@@ -1010,13 +1010,13 @@ for example.
 <code>haddock</code>, <code>configure</code>, etc.
 </p>
 <a name="Haskell-Interactive-Mode-Debugger"></a>
-<h3 class="section">12.11 Haskell Interactive Mode Debugger</h3>
+<h3 class="section">14.11 Haskell Interactive Mode Debugger</h3>
 
 <p>There is limited support for debugging in GHCi. Haskell Interactive Mode
 provides an interface for interacting with this.
 </p>
 <a name="Opening-the-debug-buffer"></a>
-<h4 class="subsection">12.11.1 Opening the debug buffer</h4>
+<h4 class="subsection">14.11.1 Opening the debug buffer</h4>
 
 <p>To open the debug buffer run the following command from any buffer
 associated with a session:
@@ -1041,7 +1041,7 @@ associated with a session:
 
 
 <a name="Loading-modules"></a>
-<h4 class="subsection">12.11.2 Loading modules</h4>
+<h4 class="subsection">14.11.2 Loading modules</h4>
 
 <p>To debug anything you need to load something into GHCi. Switch to a
 normal file, for example:
@@ -1074,7 +1074,7 @@ normal file, for example:
 </pre></div>
 
 <a name="Setting-a-breakpoint"></a>
-<h4 class="subsection">12.11.3 Setting a breakpoint</h4>
+<h4 class="subsection">14.11.3 Setting a breakpoint</h4>
 
 <p>To set a breakpoint hit <kbd>b</kbd> in the debugger buffer. It will prompt
 for a name. Enter <code>main</code> and hit <kbd>RET</kbd>.
@@ -1101,7 +1101,7 @@ for a name. Enter <code>main</code> and hit <kbd>RET</kbd>.
 </pre></div>
 
 <a name="Start-stepping"></a>
-<h4 class="subsection">12.11.4 Start stepping</h4>
+<h4 class="subsection">14.11.4 Start stepping</h4>
 
 <p>Hit <kbd>s</kbd> to step through an expression: it will prompt for an
 expression to evaluate and step through. Enter <code>main</code> and hit
@@ -1155,7 +1155,7 @@ expression to evaluate and step through. Enter <code>main</code> and hit
 </pre></div>
 
 <a name="Continue-stepping"></a>
-<h4 class="subsection">12.11.5 Continue stepping</h4>
+<h4 class="subsection">14.11.5 Continue stepping</h4>
 
 <p>To continue stepping, just hit <kbd>s</kbd> again. Now the context will change
 to:

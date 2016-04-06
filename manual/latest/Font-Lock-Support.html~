@@ -11,10 +11,10 @@ by the Free Software Foundation; with no Invariant Sections, no
 Front-Cover Texts and no Back-Cover Texts. -->
 <!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>Haskell Mode 16.1-git: Spell checking strings and comments</title>
+<title>Haskell Mode 16.1-git: Font Lock Support</title>
 
-<meta name="description" content="Haskell Mode 16.1-git: Spell checking strings and comments">
-<meta name="keywords" content="Haskell Mode 16.1-git: Spell checking strings and comments">
+<meta name="description" content="Haskell Mode 16.1-git: Font Lock Support">
+<meta name="keywords" content="Haskell Mode 16.1-git: Font Lock Support">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
@@ -22,8 +22,8 @@ Front-Cover Texts and no Back-Cover Texts. -->
 <link href="index.html#Top" rel="start" title="Top">
 <link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
 <link href="index.html#Top" rel="up" title="Top">
-<link href="Aligning-code.html#Aligning-code" rel="next" title="Aligning code">
-<link href="Browsing-Haddocks.html#Browsing-Haddocks" rel="prev" title="Browsing Haddocks">
+<link href="Completion-support.html#Completion-support" rel="next" title="Completion support">
+<link href="Editing-Haskell-Code.html#Editing-Haskell-Code" rel="prev" title="Editing Haskell Code">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
@@ -55,46 +55,41 @@ ul.no-bullet {list-style: none}
 <link rel="stylesheet" type="text/css" href="haskell-mode.css">
 
 <link rel="shortcut icon" href="haskell-mode-32x32.png">
-<script src="../../index.js"> </script>
 </head>
 
 <body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
-<div class="background"> </div><a name="Spell-checking-strings-and-comments"></a>
+<div class="background"> </div><a name="Font-Lock-Support"></a>
 <div class="header">
 <p>
-Next: <a href="Aligning-code.html#Aligning-code" accesskey="n" rel="next">Aligning code</a>, Previous: <a href="Browsing-Haddocks.html#Browsing-Haddocks" accesskey="p" rel="prev">Browsing Haddocks</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Completion-support.html#Completion-support" accesskey="n" rel="next">Completion support</a>, Previous: <a href="Editing-Haskell-Code.html#Editing-Haskell-Code" accesskey="p" rel="prev">Editing Haskell Code</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="Using-with-flyspell_002dprog_002dmode"></a>
-<h2 class="chapter">18 Using with <code>flyspell-prog-mode</code></h2>
+<a name="Font-Lock-Support-1"></a>
+<h2 class="chapter">4 Font Lock Support</h2>
 
-<p>Strings and comments can be checked for spelling mistakes. There is a
-standard Emacs mode for this purpose, <code>flyspell-prog-mode</code>, that
-can be enabled in Haskell buffers. Spelling errors are underlined using
-squiggly red lines.
+<p><code>haskell-mode</code> supports <em>syntax highlighting</em> via Emacs&rsquo; Font
+Lock minor mode which should be enabled by default in current
+Emacsen. See <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Font-Lock.html#Font-Lock">(emacs)Font Lock</a>, for more information on how to
+control <code>font-lock-mode</code>.
 </p>
-<img width="519" height="182" src="anim/flyspell-prog-mode.gif" alt="anim/flyspell-prog-mode">
+<img src="anim/font-lock.gif" alt="anim/font-lock">
 
-<p>Documentation for <code>flyspell-prog-mode</code> can be found in
-See <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Spelling.html#Spelling">(emacs)Spelling</a>. Here we point to a couple of useful
-keybindings:
+<p>Syntax highlighting facilities parse strings and string escape sequences
+and are able to highlight unrecognized constructs.
 </p>
-<ul>
-<li> <kbd>M-$</kbd> - Check and correct spelling of the word at point (<code>ispell-word</code>).
+<img src="anim/string-escape-highlight.gif" alt="anim/string-escape-highlight">
 
-</li><li> <kbd>digit</kbd> - Replace the word, just this time, with one of the
-displayed near-misses. Each near-miss is listed with a digit; type that
-digit to select it.
-
-</li><li> <kbd>SPC</kbd> - Skip this word—continue to consider it incorrect, but don’t
-change it here.
-</li></ul>
-
-<p>To enable spell checking of strings and comments add this line to your
-<code>~/.emacs</code> file:
+<p>Haskell Mode shows keywords, identifiers, operators, constructors and
+types in different colors.
 </p>
-<p><code>(add-hook 'haskell-mode-hook 'flyspell-prog-mode)</code>
+<img src="anim/font-lock-types.gif" alt="anim/font-lock-types">
+
+<p>There is also support to use mode-specific syntax highlighing for
+quasiquotes. Customize <code>haskell-font-lock-quasi-quote-modes</code> to
+make sure your quoters are supported.
 </p>
+<img src="anim/font-lock-quasi-quotes.gif" alt="anim/font-lock-quasi-quotes">
+
 
 
 
