@@ -520,7 +520,6 @@ fixes up only indentation."
     ("type"    . haskell-indentation-data)
     ("newtype" . haskell-indentation-data)
     ("if"      . haskell-indentation-if)
-    ("case"    . haskell-indentation-case)
     ("let"     .
      ,(apply-partially 'haskell-indentation-phrase
                        '(haskell-indentation-declaration-layout
@@ -534,6 +533,10 @@ fixes up only indentation."
     ("rec"     .
      ,(apply-partially 'haskell-indentation-with-starter
                        'haskell-indentation-expression-layout))
+    ("case"    .
+     ,(apply-partially 'haskell-indentation-phrase
+                       '(haskell-indentation-expression
+                         "of" haskell-indentation-case-layout)))
     ("\\"      .
      ,(apply-partially 'haskell-indentation-with-starter
                        'haskell-indentation-lambda-maybe-lambdacase))
@@ -574,7 +577,7 @@ fixes up only indentation."
 
 (defun haskell-indentation-case-layout ()
   "Parse layout list with case expressions."
-  (haskell-indentation-layout #'haskell-indentation-case-item))
+  (haskell-indentation-layout #'haskell-indentation-case))
 
 (defun haskell-indentation-lambda-maybe-lambdacase ()
   "Parse lambda or lambda-case expression.
@@ -761,7 +764,7 @@ Skip the keyword or parenthesis." ; FIXME: better description needed
             ((equal current-token end)
              (haskell-indentation-read-next-token))))))
 
-(defun haskell-indentation-case-item-alternative ()
+(defun haskell-indentation-case-alternative ()
   "" ; FIXME
   (setq left-indent (current-column))
   (haskell-indentation-separated #'haskell-indentation-expression "," nil)
@@ -772,7 +775,7 @@ Skip the keyword or parenthesis." ; FIXME: better description needed
         ;; otherwise fallthrough
         ))
 
-(defun haskell-indentation-case-item ()
+(defun haskell-indentation-case ()
   "" ; FIXME
   (haskell-indentation-expression)
   (cond ((eq current-token 'end-tokens)
@@ -780,7 +783,7 @@ Skip the keyword or parenthesis." ; FIXME: better description needed
         ((string= current-token "|")
          (haskell-indentation-with-starter
           (apply-partially #'haskell-indentation-separated
-                           #'haskell-indentation-case-item-alternative "|" nil)
+                           #'haskell-indentation-case-alternative "|" nil)
           nil))
         ((string= current-token "->")
          (haskell-indentation-statement-right #'haskell-indentation-expression))
@@ -957,22 +960,12 @@ layout starts."
          (haskell-indentation-with-starter
           (lambda ()
             (haskell-indentation-separated
-             #'haskell-indentation-case-item-alternative "|" nil))
+             #'haskell-indentation-case-alternative "|" nil))
           nil)
        (haskell-indentation-phrase-rest
         '(haskell-indentation-expression
           "then" haskell-indentation-expression
           "else" haskell-indentation-expression))))
-   nil))
-
-(defun haskell-indentation-case ()
-  "" ; FIXME
-  (haskell-indentation-with-starter
-   (lambda ()
-     (haskell-indentation-expression)
-     (when (string= current-token "of")
-       (haskell-indentation-with-starter
-        #'haskell-indentation-case-layout)))
    nil))
 
 (defun haskell-indentation-phrase (phrase)
