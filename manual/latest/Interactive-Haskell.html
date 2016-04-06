@@ -621,8 +621,37 @@ you will be presented with the prompt:
     λ&gt;
 </pre></div>
 
+<a name="Changing-REPL-target"></a>
+<h4 class="subsection">14.8.1 Changing REPL target</h4>
+
+<a name="index-haskell_002dsession_002dchange_002dtarget"></a>
+<a name="index-haskell_002dinteractive_002dmode_002dhook"></a>
+
+<p>With <code>haskell-session-change-target</code> you can change the target for
+REPL session.
+</p>
+
+<p>After REPL session started, in <code>haskell-interactive-mode</code> buffer invoke the
+<code>haskell-session-change-target</code> and select from available targets for
+</p>
+<a name="index-testing"></a>
+<p>- Testing
+</p>
+<a name="index-benchmarking"></a>
+<p>- Benchmark
+</p>
+<p>- Executable
+</p>
+<p>- Library
+</p>
+<p>Answer &ldquo;yes&rdquo; to restart the session and run your tests, benchmarks, executables.
+</p>
+
+<p>TODO/WRITEME
+</p>
+
 <a name="Bringing-the-REPL"></a>
-<h4 class="subsection">14.8.1 Bringing the REPL</h4>
+<h4 class="subsection">14.8.2 Bringing the REPL</h4>
 
 <p>If you don&rsquo;t know where the REPL buffer is, you can always bring it
 with:
@@ -634,7 +663,7 @@ with:
 <p>Or <kbd>C-`</kbd>.
 </p>
 <a name="Evaluating-expressions"></a>
-<h4 class="subsection">14.8.2 Evaluating expressions</h4>
+<h4 class="subsection">14.8.3 Evaluating expressions</h4>
 
 <p>To evaluate expressions, simply type one out and hit &lsquo;RET&lsquo;.
 </p>
@@ -644,7 +673,7 @@ with:
 </pre></div>
 
 <a name="Type-of-expressions"></a>
-<h4 class="subsection">14.8.3 Type of expressions</h4>
+<h4 class="subsection">14.8.4 Type of expressions</h4>
 
 <p>You can use normal <code>:type</code> which is part of GHCi to get the type of
 something:
@@ -699,7 +728,7 @@ result. The same is true for ambiguous things:
 </pre></div>
 
 <a name="Printing-mode"></a>
-<h4 class="subsection">14.8.4 Printing mode</h4>
+<h4 class="subsection">14.8.5 Printing mode</h4>
 
 <p>You can choose between printing modes used for the results of
 evaluating expressions. To do that, configure the variable
@@ -744,7 +773,7 @@ evaluating expressions. To do that, configure the variable
 output as Haskell.
 </p>
 <a name="Presentations"></a>
-<h4 class="subsection">14.8.5 Presentations</h4>
+<h4 class="subsection">14.8.6 Presentations</h4>
 
 <p>If you have the <samp>present</samp> package installed, you can use the following
 syntax to print anything which is an instance of <code>Data</code>:
@@ -776,25 +805,25 @@ further:
 <p>Etc. Remember: this only works for instances of <code>Data.Data.Data</code>.
 </p>
 <a name="History-1"></a>
-<h4 class="subsection">14.8.6 History</h4>
+<h4 class="subsection">14.8.7 History</h4>
 
 <p>A history is maintained for the duration of the REPL buffer. To go up
 and down in the history, run <kbd>M-p</kbd> for previous and <kbd>M-n</kbd> for
 next.
 </p>
 <a name="Cancelling-commands"></a>
-<h4 class="subsection">14.8.7 Cancelling commands</h4>
+<h4 class="subsection">14.8.8 Cancelling commands</h4>
 
 <p>To cancel a running REPL command, run <kbd>C-c C-c</kbd>.
 </p>
 <a name="Clear-the-REPL"></a>
-<h4 class="subsection">14.8.8 Clear the REPL</h4>
+<h4 class="subsection">14.8.9 Clear the REPL</h4>
 
 <p>Run <kbd>C-c C-k</kbd> to clear the REPL.
 </p>
 
 <a name="Trick_003a-Put-Interactive-REPL-in-Separate-Frame"></a>
-<h4 class="subsection">14.8.9 Trick: Put Interactive REPL in Separate Frame</h4>
+<h4 class="subsection">14.8.10 Trick: Put Interactive REPL in Separate Frame</h4>
 
 
 <p>The following <code>create-haskell-interactive-frame</code> is a quick hack to
@@ -817,7 +846,7 @@ predictable layout of windows in Emacs.
 </pre></div>
 
 <a name="Troubleshooting-1"></a>
-<h4 class="subsection">14.8.10 Troubleshooting</h4>
+<h4 class="subsection">14.8.11 Troubleshooting</h4>
 
 <p>If the REPL ever goes funny, you can clear the command queue via:
 </p>
