@@ -14,31 +14,37 @@ matrix:
   allow_failures:
     - env: TARGET=emacs-snapshot
 
-install:
-  - if [ "$TARGET" = "emacs24" ]; then
+install: |
+    case "$TARGET" in
+      emacs24)
         sudo apt-get update &&
         sudo apt-get install --no-install-suggests --no-install-recommends --assume-yes emacs24-nox;
-    fi
-  - if [ "$TARGET" = "emacs-snapshot" ]; then
+        ;;
+      emacs-snapshot)
         sudo add-apt-repository -y ppa:ubuntu-elisp/ppa &&
         sudo apt-get update &&
         sudo apt-get install --no-install-suggests --no-install-recommends --assume-yes emacs-snapshot;
-    fi
-  - if [ "$TARGET" = "deploy-manual" ]; then
+        ;;
+      deploy-manual)
         sudo apt-get update &&
         sudo apt-get install --no-install-suggests --no-install-recommends --force-yes texinfo emacs24-nox;
-    fi
+        ;;
+      *)
+    esac
 
-script:
-  - if [ "$TARGET" = "emacs24" ]; then
+script: |
+    case "$TARGET" in
+      emacs24)
         EMACS=emacs24 make check bench;
-    fi
-  - if [ "$TARGET" = "emacs-snapshot" ]; then
+        ;;
+      emacs-snapshot)
         EMACS=emacs-snapshot make check;
-    fi
-  - if [ "$TARGET" = "deploy-manual" ]; then
+        ;;
+      deploy-manual)
         EMACS=emacs24 make deploy-manual;
-    fi
+        ;;
+      *)
+    esac
 
 
 notifications:
