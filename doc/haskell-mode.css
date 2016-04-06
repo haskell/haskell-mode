@@ -87,3 +87,8 @@ div.background {
     background-repeat: no-repeat;
     background-size: 256px 256px;
 }
+
+img {
+    /* same as div.smallexample in default rules */
+    margin-left: 3.2em;
+}
