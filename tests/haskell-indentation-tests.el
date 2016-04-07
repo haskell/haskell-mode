@@ -368,7 +368,7 @@ fun = \\x -> do"
 (hindent-test "16a A lambda""
 fun = \\x ->"
               (1 0)
-              (2 2))
+              (2 2 8))
 
 (hindent-test "16u Lambda and a do block""
 fun = \\x → do"
@@ -378,7 +378,7 @@ fun = \\x → do"
 (hindent-test "16au A lambda""
 fun = \\x →"
               (1 0)
-              (2 2))
+              (2 2 8))
 
 (hindent-test "17a* A type for a function""
 fun :: Int
@@ -514,7 +514,7 @@ x = let y
       z"
               (1 0)
               (2 4)
-              (3 6))
+              (3 2 6))
 
 (hindent-test "19c* \"let\" in a \"do\"""
 x = do
@@ -826,7 +826,7 @@ fact n = case n of
   _ | n > 0
     , True == True -> n * fact (n - 1)"
               (1 0)
-              (2 2)
+              (2 2 11)
               ;; returns (0 2 2 6), to investigate
               (3 0 2 6)
               (4 4)
