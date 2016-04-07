@@ -25,6 +25,25 @@ newtype NUMBERS = NUMBERS { unNUMBERS :: CInt }
  }
 ")
 
+(defvar fake-ghci "#!/usr/bin/awk -f
+
+BEGIN {
+    printf \"%s\", \"Your wish is my IO ().\\nChanged directory: /tmp/\\nPrelude> \"
+    fflush()
+}
+
+/^:t unNUMBERS rand_max$/ {
+    printf \"%s\", \"unNUMBERS rand_max :: CInt\\nPrelude> \"
+    fflush()
+    next
+}
+
+{
+    printf \"%s\", \"\\n<interactive>:\"NR\":1-\"length($0)\": Not in scope: ‘\"$0\"’\\nPrelude> \"
+    fflush()
+}
+" "Very stupid fake ghci specific to our tests")
+
 (defvar fake-hsc2hs "#!/usr/bin/awk -f
 
 /^#{/ {
@@ -85,6 +104,7 @@ Uses fake hsc2hs script from this directory."
          (delete-file hs)))))
 
 (ert-deftest hsc2hs-errors ()
+  (custom-set-variables '(haskell-process-wrapper-function #'identity)) ; altered by some earlier test
   (let ((error-hsc (concat default-hsc
                            "newtype FOO = FOO { unFOO :: CInt } deriving (Eq,Show)\n"
                            "#{enum FOO, FOO , a_typo = A_TYPO }\n")))
@@ -96,16 +116,18 @@ Uses fake hsc2hs script from this directory."
         (should (looking-at-p "A_TYPO. undeclared"))))))
 
 (ert-deftest hsc2hs-compile-and-load ()
-  (kill-buffer "*haskell*")
-  (with-hsc2hs default-hsc
-    (with-current-buffer "*haskell*" ; TODO: Where is this defined?
-      (goto-char (point-max))
-      (insert ":t unNUMBERS rand_max")
-      (goto-char (point-max))
-      (haskell-interactive-handle-expr)
-      (sit-for 1.0) ; TODO: can we wait until the prompt appears, with a timeout?
-      (forward-line -1)
-      (should (looking-at-p "unNUMBERS rand_max :: CInt")))))
+  (custom-set-variables '(haskell-process-wrapper-function #'identity)) ; altered by some earlier test
+  (with-script-path haskell-process-path-ghci fake-ghci 'keep
+    (custom-set-variables '(haskell-process-args-ghci '("-W" "interactive")))
+    (with-hsc2hs default-hsc
+      (with-current-buffer (haskell-session-interactive-buffer haskell-session)
+        (goto-char (point-max))
+        (insert ":t unNUMBERS rand_max")
+        (goto-char (point-max))
+        (haskell-interactive-handle-expr)
+        (sit-for 1.0) ; TODO: can we wait until the prompt appears, with a timeout?
+        (forward-line -1)
+        (should (looking-at-p "unNUMBERS rand_max :: CInt"))))
+    (delete-file haskell-process-path-ghci)))
 
 ;; haskell-hsc2hs-tests.el ends here
-
