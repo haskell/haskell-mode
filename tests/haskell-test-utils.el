@@ -99,6 +99,25 @@ after a test as this aids interactive debugging."
        (funcall ,mode)
        ,@body)))
 
+(defmacro with-script-path (path script keep &rest body)
+  "Run a script using a temporary file.
+
+Creates an executable temp file and sets the PATH variable to
+point to that, and inserts SCRIPT in the file and adds the
+executable bit.  Unless KEEP is non-nil, the script is deleted
+after BODY has run.  The variable PATH is available for use in
+BODY."
+  (declare (indent 3) (debug t))
+  `(let ((,path (make-temp-file "haskell-mode-tests-script")))
+     (with-current-buffer (find-file-noselect ,path)
+       (insert ,script)
+       (save-buffer)
+       (kill-buffer))
+     (set-file-modes ,path (string-to-number "700" 8))
+     (prog1 (progn ,@body)
+       (unless ,keep
+         (delete-file ,path)))))
+
 (defun check-properties (lines-or-contents props &optional mode)
   "Check if syntax properties and font-lock properties as set properly.
 
