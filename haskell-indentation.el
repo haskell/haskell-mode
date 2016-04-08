@@ -64,11 +64,6 @@
   :type 'integer
   :group 'haskell-indentation)
 
-(defcustom  haskell-indentation-ifte-offset 2
-  "Extra indentation after the keywords \"if\", \"then\", or \"else\"."
-  :type 'integer
-  :group 'haskell-indentation)
-
 (defcustom haskell-indentation-where-pre-offset 2
   "Extra indentation before the keyword \"where\"."
   :type 'integer
