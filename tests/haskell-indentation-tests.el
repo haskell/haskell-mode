@@ -320,18 +320,25 @@ fun = do { putStrLn \"X\";
               (2 9 11)
               (3 0))
 
-(hindent-test "13a* Deriving on new line""
+(hindent-test "13a Deriving on new line""
 data X = X | Y
 deriving (Eq, Ord, Show)"
               (1 0)
-              (2 2))
+              (2 0 2 7))
 
-(hindent-test "13b* Don't indent after deriving""
+(hindent-test "13b Don't indent after deriving""
 data X = X
   deriving (Eq, Ord, Show)"
               (1 0)
-              (2 2)
+              (2 0 2 7)
               (3 0))
+
+(hindent-test "13bb Don't indent after deriving""
+data X = X
+  deriving"
+              (1 0)
+              (2 0 2 7)
+              (3 4))
 
 (hindent-test "13c honour = on a separate line in data declaration" "
 data X a b
@@ -869,7 +876,7 @@ data Term a where
               (3 0 2 9)
               (4 0 2 10))
 
-(hindent-test "49b* data with GADT syntax and a deriving clause" "
+(hindent-test "49b data with GADT syntax and a deriving clause" "
 data G [a] b where
   G1 :: c -> G [Int] b
   deriving (Eq)"
@@ -877,14 +884,14 @@ data G [a] b where
               (2 2)
               (3 0 2))
 
-(hindent-test "50* standalone deriving" "
+(hindent-test "50 standalone deriving" "
 data Name = Name String
 deriving instance Eq Name"
               (1 0)
               ;; We accept position 2 here because we have just one
               ;; look-ahead token so we do not see 'instance'
               ;; following 'deriving'.
-              (2 0 2))
+              (2 0 2 10))
 
 (hindent-test "51 standalone deriving" "
 data family T a
@@ -950,7 +957,7 @@ data Foo = Bar
          deriving (Show)"
               (1 0)
               (2 9)
-              (3 9))
+              (3 0 2 9))
 
 (ert-deftest haskell-indentation-ret-indents ()
   (with-temp-switch-to-buffer
