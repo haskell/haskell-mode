@@ -952,6 +952,29 @@ data Foo = Bar
               (2 9)
               (3 9))
 
+(hindent-test "56 module name on next line" "
+module
+  X"
+              (1 0)
+              (2 2))
+
+(hindent-test "57* module continued" "
+module X"
+              (1 0)
+              (2 2))
+
+(hindent-test "58 module where same line" "
+module X where"
+              (1 0)
+              (2 0))
+
+(hindent-test "59* module where same line" "
+module X
+   where"
+              (1 0)
+              (2 0)
+              (3 0))
+
 (ert-deftest haskell-indentation-ret-indents ()
   (with-temp-switch-to-buffer
    (haskell-mode)
