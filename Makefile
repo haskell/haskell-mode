@@ -27,8 +27,6 @@ EMACS := $(shell which "$${EMACS}" || which "emacs")
 EMACS_VERSION := $(shell "$(EMACS)" -Q --batch --eval '(princ emacs-version)')
 
 EFLAGS = --eval "(add-to-list 'load-path (expand-file-name \"tests/compat\") 'append)" \
-	 --eval "(when (< emacs-major-version 24) \
-		    (setq byte-compile-warnings '(not cl-functions)))" \
 	 --eval '(setq byte-compile-error-on-warn t)' \
 	 --eval '(when (not (version< emacs-version "24.4")) (setq load-prefer-newer t))' \
 	 --eval '(defun byte-compile-dest-file (filename) \
@@ -50,8 +48,8 @@ PKG_DIST_FILES = $(ELFILES) logo.svg NEWS haskell-mode.info dir
 all: check-emacs-version compile $(AUTOLOADS) info
 
 check-emacs-version :
-	@$(BATCH) --eval "(when (< emacs-major-version 23)					\
-                            (message \"Error: haskell-mode requires Emacs 23 or later\")	\
+	@$(BATCH) --eval "(when (version< emacs-version \"24.3\")				\
+                            (message \"Error: haskell-mode requires Emacs 24.3 or later\")	\
                             (message \"Your version of Emacs is %s\" emacs-version)		\
                             (message \"Found as '$(EMACS)'\")					\
                             (message \"Use one of:\")						\
