@@ -106,8 +106,8 @@ format is supported, as well as info-locations within compile
 messages pointing to additional source locations.
 
 See Info node `(haskell-mode)compilation' for more details."
-  (set (make-local-variable 'compilation-error-regexp-alist)
-       haskell-compilation-error-regexp-alist)
+  (setq-local compilation-error-regexp-alist
+              haskell-compilation-error-regexp-alist)
 
   (add-hook 'compilation-filter-hook
             'haskell-compilation-filter-hook nil t)

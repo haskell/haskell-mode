@@ -145,16 +145,16 @@ it from list if one of the following conditions are hold:
 ;;;###autoload
 (define-derived-mode haskell-cabal-mode fundamental-mode "Haskell-Cabal"
   "Major mode for Cabal package description files."
-  (set (make-local-variable 'font-lock-defaults)
-       '(haskell-cabal-font-lock-keywords t t nil nil))
+  (setq-local font-lock-defaults
+              '(haskell-cabal-font-lock-keywords t t nil nil))
   (add-to-list 'haskell-cabal-buffers (current-buffer))
   (add-hook 'change-major-mode-hook 'haskell-cabal-unregister-buffer nil 'local)
   (add-hook 'kill-buffer-hook 'haskell-cabal-unregister-buffer nil 'local)
-  (set (make-local-variable 'comment-start) "-- ")
-  (set (make-local-variable 'comment-start-skip) "\\(^[ \t]*\\)--[ \t]*")
-  (set (make-local-variable 'comment-end) "")
-  (set (make-local-variable 'comment-end-skip) "[ \t]*\\(\\s>\\|\n\\)")
-  (set (make-local-variable 'indent-line-function) 'haskell-cabal-indent-line)
+  (setq-local comment-start "-- ")
+  (setq-local comment-start-skip "\\(^[ \t]*\\)--[ \t]*")
+  (setq-local comment-end "")
+  (setq-local comment-end-skip "[ \t]*\\(\\s>\\|\n\\)")
+  (setq-local indent-line-function 'haskell-cabal-indent-line)
   (setq indent-tabs-mode nil)
   )
 

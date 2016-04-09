@@ -154,12 +154,12 @@ name - user visible name for this mode"
 ;;;###autoload
        (define-compilation-mode ,(intern (concat nm "-mode")) ,name
          ,(concat "Mode to check Haskell source code using " name)
-         (set (make-local-variable 'compilation-process-setup-function)
-              ',(intern (concat nm "-process-setup")))
-         (set (make-local-variable 'compilation-disable-input) t)
-         (set (make-local-variable 'compilation-scroll-output) nil)
-         (set (make-local-variable 'compilation-finish-functions)
-              (list ',(intern (concat nm "-finish-hook")))))
+         (setq-local compilation-process-setup-function
+                     ',(intern (concat nm "-process-setup")))
+         (setq-local compilation-disable-input t)
+         (setq-local compilation-scroll-output nil)
+         (setq-local compilation-finish-functions
+                     (list ',(intern (concat nm "-finish-hook")))))
 ;;;###autoload
        (defun ,(intern nm) ()
          ,(concat "Run " name " for current buffer with haskell source")

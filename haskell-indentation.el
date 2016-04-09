@@ -111,10 +111,8 @@ set and deleted as if they were real tabs."
     (when (and (bound-and-true-p haskell-simple-indent-mode)
                (fboundp 'haskell-simple-indent-mode))
       (haskell-simple-indent-mode 0))
-    (set (make-local-variable 'indent-line-function)
-         'haskell-indentation-indent-line)
-    (set (make-local-variable 'indent-region-function)
-         'haskell-indentation-indent-region)))
+    (setq-local indent-line-function 'haskell-indentation-indent-line)
+    (setq-local indent-region-function 'haskell-indentation-indent-region)))
 
 ;;;###autoload
 (defun turn-on-haskell-indentation ()

@@ -42,16 +42,12 @@
 (require 'cl-lib)
 (require 'etags)
 
-(defvar haskell-interactive-mode-history-index)
-(make-variable-buffer-local 'haskell-interactive-mode-history-index)
+(defvar-local haskell-interactive-mode-history-index 0)
 
-(defvar haskell-interactive-mode-history (list))
-(make-variable-buffer-local 'haskell-interactive-mode-history)
+(defvar-local haskell-interactive-mode-history (list))
 
-(defvar haskell-interactive-mode-old-prompt-start
-  nil
+(defvar-local haskell-interactive-mode-old-prompt-start nil
   "Mark used for the old beginning of the prompt.")
-(make-variable-buffer-local 'haskell-interactive-mode-old-prompt-start)
 
 (defun haskell-interactive-prompt-regex ()
   "Generate a regex for searching for any occurence of the prompt\
@@ -111,11 +107,10 @@ Key bindings:
   "Mark used to figure out where the end of the current result output is.
 Used to distinguish betwen user input.")
 
-(defvar haskell-interactive-previous-buffer nil
+(defvar-local haskell-interactive-previous-buffer nil
   "Records the buffer to which `haskell-interactive-switch-back' should jump.
 This is set by `haskell-interactive-switch', and should otherwise
 be nil.")
-(make-variable-buffer-local 'haskell-interactive-previous-buffer)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Hooks
@@ -327,8 +322,7 @@ SESSION, otherwise operate on the current buffer."
       (insert (substring prompt 0 1)
               (propertize (substring prompt 1)
                           'front-sticky t)))
-    (let ((marker (set (make-local-variable 'haskell-interactive-mode-prompt-start)
-                       (make-marker))))
+    (let ((marker (setq-local haskell-interactive-mode-prompt-start (make-marker))))
       (set-marker marker (point)))
     (when haskell-interactive-mode-scroll-to-bottom
       (haskell-interactive-mode-scroll-to-bottom))))
@@ -346,8 +340,7 @@ SESSION, otherwise operate on the current buffer."
                          'rear-nonsticky t
                          'result t)))
     (haskell-interactive-mode-handle-h)
-    (let ((marker (set (make-local-variable 'haskell-interactive-mode-result-end)
-                       (make-marker))))
+    (let ((marker (setq-local haskell-interactive-mode-result-end (make-marker))))
       (set-marker marker
                   (point)
                   (current-buffer)))

@@ -119,27 +119,26 @@ This will either look for a Cabal file or a \"module\" statement in the file."
 (define-derived-mode inferior-haskell-mode comint-mode "Inf-Haskell"
   "Major mode for interacting with an inferior Haskell process."
   :group 'inferior-haskell
-  (set (make-local-variable 'comint-prompt-regexp)
-       ;; Whay the backslash in [\\._[:alnum:]]?
-       "^\\*?[[:upper:]][\\._[:alnum:]]*\\(?: \\*?[[:upper:]][\\._[:alnum:]]*\\)*\\( λ\\)?> \\|^λ?> $")
-  (set (make-local-variable 'comint-input-autoexpand) nil)
+  (setq-local comint-prompt-regexp
+              ;; Why the backslash in [\\._[:alnum:]]?
+              "^\\*?[[:upper:]][\\._[:alnum:]]*\\(?: \\*?[[:upper:]][\\._[:alnum:]]*\\)*\\( λ\\)?> \\|^λ?> $")
+  (setq-local comint-input-autoexpand nil)
   (add-hook 'comint-preoutput-filter-functions
             'inferior-haskell-send-decl-post-filter)
   (add-hook 'comint-output-filter-functions 'inferior-haskell-spot-prompt nil t)
 
   ;; Setup directory tracking.
-  (set (make-local-variable 'shell-cd-regexp) ":cd")
+  (setq-local shell-cd-regexp ":cd")
   (condition-case nil
       (shell-dirtrack-mode 1)
     (error      ;The minor mode function may not exist or not accept an arg.
-     (set (make-local-variable 'shell-dirtrackp) t)
+     (setq-local shell-dirtrackp t)
      (add-hook 'comint-input-filter-functions 'shell-directory-tracker
                nil 'local)))
 
   ;; Setup `compile' support so you can just use C-x ` and friends.
-  (set (make-local-variable 'compilation-error-regexp-alist)
-       inferior-haskell-error-regexp-alist)
-  (set (make-local-variable 'compilation-first-column) 0) ;GHCI counts from 0.
+  (setq-local compilation-error-regexp-alist inferior-haskell-error-regexp-alist)
+  (setq-local compilation-first-column 0) ;GHCI counts from 0.
   (if (and (not (boundp 'minor-mode-overriding-map-alist))
            (fboundp 'compilation-shell-minor-mode))
       ;; If we can't remove compilation-minor-mode bindings, at least try to
@@ -210,8 +209,7 @@ setting up the inferior-haskell buffer."
   :type 'boolean
   :group 'inferior-haskell)
 
-(defvar inferior-haskell-send-decl-post-filter-on nil)
-(make-variable-buffer-local 'inferior-haskell-send-decl-post-filter-on)
+(defvar-local inferior-haskell-send-decl-post-filter-on nil)
 
 (defun inferior-haskell-send-decl-post-filter (string)
   (when (and inferior-haskell-send-decl-post-filter-on
@@ -225,8 +223,7 @@ setting up the inferior-haskell buffer."
           inferior-haskell-send-decl-post-filter-on nil))
   string)
 
-(defvar inferior-haskell-seen-prompt nil)
-(make-variable-buffer-local 'inferior-haskell-seen-prompt)
+(defvar-local inferior-haskell-seen-prompt nil)
 
 (defun inferior-haskell-spot-prompt (_string)
   (let ((proc (get-buffer-process (current-buffer))))
@@ -260,8 +257,7 @@ The process PROC should be associated to a comint buffer."
                               ;; XEmacs needs this argument.
                               (current-buffer))
             inferior-haskell-cabal-buffer
-          (set (make-local-variable 'inferior-haskell-cabal-buffer)
-               (haskell-cabal-find-file))))))
+          (setq-local inferior-haskell-cabal-buffer (haskell-cabal-find-file))))))
 
 (defun inferior-haskell-find-project-root (buf)
   (with-current-buffer buf

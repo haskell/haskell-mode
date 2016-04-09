@@ -1489,9 +1489,8 @@ One indentation cycle is used."
 
 ;;; haskell-indent-mode
 
-(defvar haskell-indent-mode nil
+(defvar-local haskell-indent-mode nil
   "Non-nil if the semi-intelligent Haskell indentation mode is in effect.")
-(make-variable-buffer-local 'haskell-indent-mode)
 
 (defvar haskell-indent-map
   (let ((map (make-sparse-keymap)))
@@ -1517,8 +1516,8 @@ One indentation cycle is used."
              (fboundp 'haskell-indentation-mode))
     (haskell-indentation-mode 0))
 
-  (set (make-local-variable 'indent-line-function) 'haskell-indent-cycle)
-  (set (make-local-variable 'indent-region-function) 'haskell-indent-region)
+  (setq-local indent-line-function 'haskell-indent-cycle)
+  (setq-local indent-region-function 'haskell-indent-region)
   (setq haskell-indent-mode t)
   ;; Activate our keymap.
   (let ((map (current-local-map)))

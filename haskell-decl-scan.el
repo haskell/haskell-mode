@@ -604,10 +604,8 @@ Invokes `haskell-decl-scan-mode-hook' on activation."
       (local-set-key [menu-bar index] nil)))
 
   (when haskell-decl-scan-mode
-    (set (make-local-variable 'beginning-of-defun-function)
-         'haskell-ds-backward-decl)
-    (set (make-local-variable 'end-of-defun-function)
-         'haskell-ds-forward-decl)
+    (setq-local beginning-of-defun-function 'haskell-ds-backward-decl)
+    (setq-local end-of-defun-function 'haskell-ds-forward-decl)
     (haskell-ds-imenu)))
 
 
