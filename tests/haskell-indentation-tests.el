@@ -905,7 +905,7 @@ newtype instance T Char = TC Bool"
               (3 0)
               (4 0 26))
 
-(hindent-test "52a* module simplest case two lines" "
+(hindent-test "52a module simplest case two lines" "
 module A.B
 where"
               (1 0)
@@ -917,7 +917,7 @@ module A.B where"
               (1 0)
               (2 0))
 
-(hindent-test "52c* module with exports" "
+(hindent-test "52c module with exports" "
 module A.B
   ( x
   , y
@@ -958,6 +958,29 @@ data Foo = Bar
               (1 0)
               (2 9)
               (3 0 2 9))
+
+(hindent-test "56 module name on next line" "
+module
+  X"
+              (1 0)
+              (2 2))
+
+(hindent-test "57 module continued" "
+module X"
+              (1 0)
+              (2 2))
+
+(hindent-test "58 module where same line" "
+module X where"
+              (1 0)
+              (2 0))
+
+(hindent-test "59 module where same line" "
+module X
+   where"
+              (1 0)
+              (2 0)
+              (3 0))
 
 (ert-deftest haskell-indentation-ret-indents ()
   (with-temp-switch-to-buffer

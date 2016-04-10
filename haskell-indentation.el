@@ -493,6 +493,7 @@ fixes up only indentation."
     ("type"     . haskell-indentation-data)
     ("newtype"  . haskell-indentation-data)
     ("import"   . haskell-indentation-import)
+    ("where"    . haskell-indentation-toplevel-where)
     ("class"    . haskell-indentation-class-declaration)
     ("instance" . haskell-indentation-class-declaration)
     ("deriving" . haskell-indentation-deriving))
@@ -732,21 +733,32 @@ For example
   "Parse module declaration."
   (haskell-indentation-with-starter
    (lambda ()
-     (let ((current-indent (current-column)))
-       (haskell-indentation-read-next-token)
-       (when (string= current-token "(")
-         (haskell-indentation-list
-          #'haskell-indentation-module-export
-          ")" ","))
-       (when (eq current-token 'end-tokens)
-         (haskell-indentation-add-indentation current-indent)
-         (throw 'parse-end nil))
-       (when (string= current-token "where")
+     (haskell-indentation-read-next-token)
+     (when (string= current-token "(")
+       (haskell-indentation-list
+        #'haskell-indentation-module-export
+        ")" ","))
+     (if (string= current-token "where")
          (haskell-indentation-read-next-token)
-         (when (eq current-token 'end-tokens)
-           (haskell-indentation-add-layout-indent)
+
+       (when (eq current-token 'end-tokens)
+         (when (member following-token '(value no-following-token "("))
+           (haskell-indentation-add-indentation
+            (+ starter-indent haskell-indentation-starter-offset))
+           (haskell-indentation-add-indentation
+            (+ left-indent haskell-indentation-starter-offset))
            (throw 'parse-end nil))
-         (haskell-indentation-layout #'haskell-indentation-toplevel))))))
+         (haskell-indentation-add-layout-indent)
+         (throw 'parse-end nil))))))
+
+(defun haskell-indentation-toplevel-where ()
+  "Parse 'where' that we may hit as a standalone in module
+declaration."
+  (haskell-indentation-read-next-token)
+
+  (when (eq current-token 'end-tokens)
+    (haskell-indentation-add-layout-indent)
+    (throw 'parse-end nil)))
 
 (defun haskell-indentation-module-export ()
   "Parse export list."
@@ -986,7 +998,8 @@ layout starts."
                           (haskell-indentation-expression-token-p following-token))
                          (string= following-token ";")
                          (and (equal layout-indent 0)
-                              (member following-token (mapcar #'car haskell-indentation-toplevel-list))))
+                              (member following-token (mapcar #'car haskell-indentation-toplevel-list))
+                              (not (string= following-token "where"))))
                  (haskell-indentation-add-layout-indent))
                (throw 'return nil))
               (t (throw 'return nil))))))
