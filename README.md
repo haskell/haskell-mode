@@ -67,7 +67,7 @@ for setup and user guide.
 
 ## Installation - more information
 
-`haskell-mode` supports GNU Emacs version 24 or later.
+`haskell-mode` supports GNU Emacs version 24.3 or later.
 
 `haskell-mode` is available from [melpa-stable](http://stable.melpa.org) (releases) and [melpa](http://melpa.org)
 (git snapshots).

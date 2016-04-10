@@ -44,9 +44,8 @@
 
 (eval-when-compile (require 'cl-lib))
 
-(defvar haskell-utils-async-post-command-flag nil
+(defvar-local haskell-utils-async-post-command-flag nil
   "Non-nil means some commands were triggered during async function execution.")
-(make-variable-buffer-local 'haskell-utils-async-post-command-flag)
 
 (defvar haskell-mode-interactive-prompt-state nil
   "Special variable indicating a state of user input waiting.")

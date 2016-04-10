@@ -42,7 +42,7 @@ Front-Cover Texts and no Back-Cover Texts.
 @top Haskell Mode
 
 Haskell Mode is an Haskell development Environment for GNU Emacs version
-24 or later.  It provides syntax-based indentation, font locking,
+24.3 or later.  It provides syntax-based indentation, font locking,
 editing cabal files, and supports running an inferior Haskell
 interpreter (e.g. GHCi).
 
@@ -167,7 +167,7 @@ The above steps should result in the following snippet in your @file{.emacs}:
 
 @section Installation - more information
 
-@code{haskell-mode} supports GNU Emacs versions 24 and upcoming 25
+@code{haskell-mode} supports GNU Emacs versions 24.3+, including 25
 (snapshot).
 
 @code{haskell-mode} is available from
@@ -178,9 +178,9 @@ Other means of obtaining @code{haskell-mode} include
 @uref{https://github.com/dimitri/el-get, el-get},
 @uref{https://github.com/bbatsov/prelude, Emacs Prelude} and @uref{https://packages.debian.org/search?keywords=haskell-mode, Debian package}.
 
-Last version of @code{haskell-mode} that supported Emacs 23 is
-@code{haskell-mode} 13.18 available at
-@uref{https://github.com/haskell/haskell-mode/releases/tag/v13.18}.
+Last version of @code{haskell-mode} that supported Emacs 23, 24.1, and 24.2 is
+@code{haskell-mode} 13.16 available at
+@uref{https://github.com/haskell/haskell-mode/releases/tag/v13.16}.
 
 @section Customizing
 

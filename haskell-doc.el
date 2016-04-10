@@ -315,7 +315,7 @@
   :prefix "haskell-doc-")
 
 
-(defvar haskell-doc-mode nil
+(defvar-local haskell-doc-mode nil
   "*If non-nil, show the type of the function near point or a related comment.
 
 If the identifier near point is a Haskell keyword and the variable
@@ -343,17 +343,15 @@ in the alist `haskell-doc-user-defined-ids' and the variable
 `haskell-doc-show-user-defined' is non-nil show the type of the function.
 
 This variable is buffer-local.")
-(make-variable-buffer-local 'haskell-doc-mode)
 
 (defvar haskell-doc-mode-hook nil
   "Hook invoked when entering `haskell-doc-mode'.")
 
-(defvar haskell-doc-index nil
+(defvar-local haskell-doc-index nil
   "Variable holding an alist matching file names to fct-type alists.
 The function `haskell-doc-make-global-fct-index' rebuilds this variables
 \(similar to an `imenu' rescan\).
 This variable is buffer-local.")
-(make-variable-buffer-local 'haskell-doc-index)
 
 (defcustom haskell-doc-show-global-types nil
   "If non-nil, search for the types of global functions by loading the files.

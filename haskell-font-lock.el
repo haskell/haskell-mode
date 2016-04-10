@@ -544,14 +544,14 @@ like ::, class, instance, data, newtype, type."
 
 (defun haskell-font-lock-defaults-create ()
   "Locally set `font-lock-defaults' for Haskell."
-  (set (make-local-variable 'font-lock-defaults)
-       '((haskell-font-lock-keywords)
-         nil nil nil nil
-         (font-lock-syntactic-face-function
-          . haskell-syntactic-face-function)
-         ;; Get help from font-lock-syntactic-keywords.
-         (parse-sexp-lookup-properties . t)
-         (font-lock-extra-managed-props . (composition)))))
+  (setq-local font-lock-defaults
+              '((haskell-font-lock-keywords)
+                nil nil nil nil
+                (font-lock-syntactic-face-function
+                 . haskell-syntactic-face-function)
+                ;; Get help from font-lock-syntactic-keywords.
+                (parse-sexp-lookup-properties . t)
+                (font-lock-extra-managed-props . (composition)))))
 
 (defun haskell-fontify-as-mode (text mode)
   "Fontify TEXT as MODE, returning the fontified text."

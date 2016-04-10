@@ -85,7 +85,7 @@ buffer before presenting message."
     (with-current-buffer buffer
 
       (when (boundp 'shm-display-quarantine)
-        (set (make-local-variable 'shm-display-quarantine) nil))
+        (setq-local shm-display-quarantine nil))
 
       (when clear (haskell-presentation-clear))
       (haskell-session-assign session)

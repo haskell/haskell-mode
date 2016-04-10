@@ -177,7 +177,7 @@ With prefix argument HERE, insert it at point."
     (outline-show-subtree)))
 
 ;; Are we looking at a literate script?
-(defvar haskell-literate nil
+(defvar-local haskell-literate nil
   "If not nil, the current buffer contains a literate Haskell script.
 Possible values are: `bird' and `tex', for Bird-style and LaTeX-style
 literate scripts respectively.  Set by `haskell-mode' and
@@ -185,7 +185,6 @@ literate scripts respectively.  Set by `haskell-mode' and
 not contain either \"\\begin{code}\" or \"\\end{code}\" on a line on
 its own, nor does it contain \">\" at the start of a line -- the value
 of `haskell-literate-default' is used.")
-(make-variable-buffer-local 'haskell-literate)
 (put 'haskell-literate 'safe-local-variable 'symbolp)
 
 ;; Default literate style for ambiguous literate buffers.
@@ -786,47 +785,43 @@ Minor modes that work well with `haskell-mode':
 - `smerge-mode': show and work with diff3 conflict markers used
   by git, svn and other version control systems."
   :group 'haskell
-  (when (< emacs-major-version 24)
-    (error "haskell-mode requires at least Emacs 24"))
+  (when (version< emacs-version "24.3")
+    (error "haskell-mode requires at least Emacs 24.3"))
 
   ;; paragraph-{start,separate} should treat comments as paragraphs as well.
-  (set (make-local-variable 'paragraph-start)
-       (concat " *{-\\| *-- |\\|" page-delimiter))
-  (set (make-local-variable 'paragraph-separate)
-       (concat " *$\\| *\\({-\\|-}\\) *$\\|" page-delimiter))
-  (set (make-local-variable 'fill-paragraph-function) 'haskell-fill-paragraph)
-  ;; (set (make-local-variable 'adaptive-fill-function) 'haskell-adaptive-fill)
-  (set (make-local-variable 'adaptive-fill-mode) nil)
-  (set (make-local-variable 'comment-start) "-- ")
-  (set (make-local-variable 'comment-padding) 0)
-  (set (make-local-variable 'comment-start-skip) "[-{]-[ \t]*")
-  (set (make-local-variable 'comment-end) "")
-  (set (make-local-variable 'comment-end-skip) "[ \t]*\\(-}\\|\\s>\\)")
-  (set (make-local-variable 'forward-sexp-function) #'haskell-forward-sexp)
-  (set (make-local-variable 'parse-sexp-ignore-comments) nil)
-  (set (make-local-variable 'syntax-propertize-function) #'haskell-syntax-propertize)
+  (setq-local paragraph-start (concat " *{-\\| *-- |\\|" page-delimiter))
+  (setq-local paragraph-separate (concat " *$\\| *\\({-\\|-}\\) *$\\|" page-delimiter))
+  (setq-local fill-paragraph-function 'haskell-fill-paragraph)
+  ;; (setq-local adaptive-fill-function 'haskell-adaptive-fill)
+  (setq-local adaptive-fill-mode nil)
+  (setq-local comment-start "-- ")
+  (setq-local comment-padding 0)
+  (setq-local comment-start-skip "[-{]-[ \t]*")
+  (setq-local comment-end "")
+  (setq-local comment-end-skip "[ \t]*\\(-}\\|\\s>\\)")
+  (setq-local forward-sexp-function #'haskell-forward-sexp)
+  (setq-local parse-sexp-ignore-comments nil)
+  (setq-local syntax-propertize-function #'haskell-syntax-propertize)
 
   ;; Set things up for eldoc-mode.
-  (set (make-local-variable 'eldoc-documentation-function)
-       'haskell-doc-current-info)
+  (setq-local eldoc-documentation-function 'haskell-doc-current-info)
   ;; Set things up for imenu.
-  (set (make-local-variable 'imenu-create-index-function)
-       'haskell-ds-create-imenu-index)
+  (setq-local imenu-create-index-function 'haskell-ds-create-imenu-index)
   ;; Set things up for font-lock.
-  (set (make-local-variable 'font-lock-defaults)
-       '((haskell-font-lock-keywords)
-         nil nil nil nil
-         (font-lock-syntactic-face-function
-          . haskell-syntactic-face-function)
-         ;; Get help from font-lock-syntactic-keywords.
-         (parse-sexp-lookup-properties . t)
-         (font-lock-extra-managed-props . (composition haskell-type))))
+  (setq-local font-lock-defaults
+              '((haskell-font-lock-keywords)
+                nil nil nil nil
+                (font-lock-syntactic-face-function
+                 . haskell-syntactic-face-function)
+                ;; Get help from font-lock-syntactic-keywords.
+                (parse-sexp-lookup-properties . t)
+                (font-lock-extra-managed-props . (composition haskell-type))))
   ;; Haskell's layout rules mean that TABs have to be handled with extra care.
   ;; The safer option is to avoid TABs.  The second best is to make sure
   ;; TABs stops are 8 chars apart, as mandated by the Haskell Report.  --Stef
-  (set (make-local-variable 'indent-tabs-mode) nil)
-  (set (make-local-variable 'tab-width) 8)
-  (set (make-local-variable 'comment-auto-fill-only-comments) t)
+  (setq-local indent-tabs-mode nil)
+  (setq-local tab-width 8)
+  (setq-local comment-auto-fill-only-comments t)
   ;; Haskell is not generally suitable for electric indentation, since
   ;; there is no unambiguously correct indent level for any given line.
   (when (boundp 'electric-indent-inhibit)
@@ -834,10 +829,10 @@ Minor modes that work well with `haskell-mode':
 
   ;; dynamic abbrev support: recognize Haskell identifiers
   ;; Haskell is case-sensitive language
-  (set (make-local-variable 'dabbrev-case-fold-search) nil)
-  (set (make-local-variable 'dabbrev-case-distinction) nil)
-  (set (make-local-variable 'dabbrev-case-replace) nil)
-  (set (make-local-variable 'dabbrev-abbrev-char-regexp) "\\sw\\|[.]")
+  (setq-local dabbrev-case-fold-search nil)
+  (setq-local dabbrev-case-distinction nil)
+  (setq-local dabbrev-case-replace nil)
+  (setq-local dabbrev-abbrev-char-regexp "\\sw\\|[.]")
   (setq haskell-literate nil)
   (add-hook 'before-save-hook 'haskell-mode-before-save-handler nil t)
   (add-hook 'after-save-hook 'haskell-mode-after-save-handler nil t)
@@ -963,9 +958,8 @@ list marker of some kind), and end of the obstacle."
       ;; fill-comment-paragraph isn't much use there, and even gets confused
       ;; by the syntax-table text-properties we add to mark the first char
       ;; of each line as a comment-starter.
-      (set (make-local-variable 'fill-paragraph-handle-comment) nil))
-  (set (make-local-variable 'mode-line-process)
-       '("/" (:eval (symbol-name haskell-literate)))))
+      (setq-local fill-paragraph-handle-comment nil))
+  (setq-local mode-line-process '("/" (:eval (symbol-name haskell-literate)))))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist        '("\\.[gh]s\\'" . haskell-mode))
