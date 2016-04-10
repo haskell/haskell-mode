@@ -49,15 +49,6 @@
   :group 'haskell
   :prefix "haskell-indentation-")
 
-(defcustom haskell-indentation-indent-leftmost t
-  "Indent to the left margin after certain keywords.
-For example after \"let .. in\", \"case .. of\").  If set to t it
-will only indent to the left.  If nil only relative to the
-containing expression.  If set to the symbol 'both then both
-positions are allowed."
-  :type 'symbol
-  :group 'haskell-indentation)
-
 (defcustom haskell-indentation-layout-offset 2
   "Extra indentation to add before expressions in a Haskell layout list."
   :type 'integer
@@ -70,11 +61,6 @@ positions are allowed."
 
 (defcustom haskell-indentation-left-offset 2
   "Extra indentation after an indentation to the left (e.g. after \"do\")."
-  :type 'integer
-  :group 'haskell-indentation)
-
-(defcustom  haskell-indentation-ifte-offset 2
-  "Extra indentation after the keywords \"if\", \"then\", or \"else\"."
   :type 'integer
   :group 'haskell-indentation)
 
@@ -520,7 +506,6 @@ fixes up only indentation."
     ("type"    . haskell-indentation-data)
     ("newtype" . haskell-indentation-data)
     ("if"      . haskell-indentation-if)
-    ("case"    . haskell-indentation-case)
     ("let"     .
      ,(apply-partially 'haskell-indentation-phrase
                        '(haskell-indentation-declaration-layout
@@ -534,6 +519,10 @@ fixes up only indentation."
     ("rec"     .
      ,(apply-partially 'haskell-indentation-with-starter
                        'haskell-indentation-expression-layout))
+    ("case"    .
+     ,(apply-partially 'haskell-indentation-phrase
+                       '(haskell-indentation-expression
+                         "of" haskell-indentation-case-layout)))
     ("\\"      .
      ,(apply-partially 'haskell-indentation-with-starter
                        'haskell-indentation-lambda-maybe-lambdacase))
@@ -574,7 +563,7 @@ fixes up only indentation."
 
 (defun haskell-indentation-case-layout ()
   "Parse layout list with case expressions."
-  (haskell-indentation-layout #'haskell-indentation-case-item))
+  (haskell-indentation-layout #'haskell-indentation-case))
 
 (defun haskell-indentation-lambda-maybe-lambdacase ()
   "Parse lambda or lambda-case expression.
@@ -821,7 +810,7 @@ Skip the keyword or parenthesis." ; FIXME: better description needed
             ((equal current-token end)
              (haskell-indentation-read-next-token))))))
 
-(defun haskell-indentation-case-item-alternative ()
+(defun haskell-indentation-case-alternative ()
   "" ; FIXME
   (setq left-indent (current-column))
   (haskell-indentation-separated #'haskell-indentation-expression "," nil)
@@ -832,7 +821,7 @@ Skip the keyword or parenthesis." ; FIXME: better description needed
         ;; otherwise fallthrough
         ))
 
-(defun haskell-indentation-case-item ()
+(defun haskell-indentation-case ()
   "" ; FIXME
   (haskell-indentation-expression)
   (cond ((eq current-token 'end-tokens)
@@ -840,7 +829,7 @@ Skip the keyword or parenthesis." ; FIXME: better description needed
         ((string= current-token "|")
          (haskell-indentation-with-starter
           (apply-partially #'haskell-indentation-separated
-                           #'haskell-indentation-case-item-alternative "|" nil)
+                           #'haskell-indentation-case-alternative "|" nil)
           nil))
         ((string= current-token "->")
          (haskell-indentation-statement-right #'haskell-indentation-expression))
@@ -1018,22 +1007,12 @@ layout starts."
          (haskell-indentation-with-starter
           (lambda ()
             (haskell-indentation-separated
-             #'haskell-indentation-case-item-alternative "|" nil))
+             #'haskell-indentation-case-alternative "|" nil))
           nil)
        (haskell-indentation-phrase-rest
         '(haskell-indentation-expression
           "then" haskell-indentation-expression
           "else" haskell-indentation-expression))))
-   nil))
-
-(defun haskell-indentation-case ()
-  "" ; FIXME
-  (haskell-indentation-with-starter
-   (lambda ()
-     (haskell-indentation-expression)
-     (when (string= current-token "of")
-       (haskell-indentation-with-starter
-        #'haskell-indentation-case-layout)))
    nil))
 
 (defun haskell-indentation-phrase (phrase)
@@ -1063,41 +1042,14 @@ layout starts."
               (t (throw 'parse-end nil))))
        ((null (cdr phrase)))
        ((equal (cadr phrase) current-token)
-        (let* ((on-new-line (= (current-column)
-                               (haskell-indentation-current-indentation)))
-               (lines-between (- parse-line-number starter-line))
-               (left-indent (if (<= lines-between 0)
-                                left-indent
-                              starter-indent)))
-          (haskell-indentation-read-next-token)
-          (when (eq current-token 'end-tokens)
-            (cond ((member (cadr phrase) '("then" "else"))
-                   (haskell-indentation-add-indentation
-                    (+ starter-indent haskell-indentation-ifte-offset)))
-
-                  ((member (cadr phrase) '("in" "->"))
-                   ;; expression ending in another expression
-                   (when (or (not haskell-indentation-indent-leftmost)
-                             (eq haskell-indentation-indent-leftmost 'both))
-                     (haskell-indentation-add-indentation
-                      (+ starter-indent haskell-indentation-starter-offset)))
-                   (when haskell-indentation-indent-leftmost
-                     (haskell-indentation-add-indentation
-                      (if on-new-line
-                          (+ left-indent haskell-indentation-starter-offset)
-                        left-indent))))
-                  (t
-                   (when (or (not haskell-indentation-indent-leftmost)
-                             (eq haskell-indentation-indent-leftmost 'both))
-                     (haskell-indentation-add-indentation
-                      (+ starter-indent haskell-indentation-starter-offset)))
-                   (when haskell-indentation-indent-leftmost
-                     (haskell-indentation-add-indentation
-                      (if on-new-line
-                          (+ left-indent haskell-indentation-starter-offset)
-                        left-indent)))))
-            (throw 'parse-end nil))
-          (setq phrase1 (cddr phrase))))
+        (haskell-indentation-read-next-token)
+        (when (eq current-token 'end-tokens)
+          (haskell-indentation-add-indentation
+           (+ starter-indent haskell-indentation-starter-offset))
+          (haskell-indentation-add-indentation
+           (+ left-indent haskell-indentation-starter-offset))
+          (throw 'parse-end nil))
+        (setq phrase1 (cddr phrase)))
        ((string= (cadr phrase) "in"))))))
 
 (defun haskell-indentation-add-indentation (indent)
