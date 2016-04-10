@@ -36,6 +36,11 @@
      ("_f" "w" haskell-symbol-face)
      ("_'''" "w" haskell-symbol-face))))
 
+(ert-deftest haskell-syntactic-test-character-literal-escapes ()
+  (check-properties
+   '("'\\000' '\\x01'")
+   '(("'\\000'" t font-lock-string-face)
+     ("'\\x01'" t font-lock-string-face))))
 
 (ert-deftest haskell-syntactic-test-7 ()
   "Take quotes and double quotes under control."
