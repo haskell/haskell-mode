@@ -494,7 +494,8 @@ fixes up only indentation."
     ("newtype"  . haskell-indentation-data)
     ("import"   . haskell-indentation-import)
     ("class"    . haskell-indentation-class-declaration)
-    ("instance" . haskell-indentation-class-declaration))
+    ("instance" . haskell-indentation-class-declaration)
+    ("deriving" . haskell-indentation-deriving))
   "Alist of toplevel keywords with associated parsers.")
 
 (defconst haskell-indentation-type-list
@@ -633,6 +634,25 @@ After a lambda (backslash) there are two possible cases:
                   (throw 'return nil)
                 (funcall (cdr parser))))))))))
 
+(defun haskell-indentation-type-1 ()
+  "Parse a single type declaration."
+  (let ((current-indent (current-column)))
+    (catch 'return
+      (cond
+       ((member current-token '(value operator "->"))
+        (haskell-indentation-read-next-token))
+
+       ((eq current-token 'end-tokens)
+        (when (member following-token
+                      '(value operator no-following-token
+                              "->" "(" "[" "{" "::"))
+          (haskell-indentation-add-indentation current-indent))
+        (throw 'return nil))
+       (t (let ((parser (assoc current-token haskell-indentation-type-list)))
+            (if (not parser)
+                (throw 'return nil)
+              (funcall (cdr parser)))))))))
+
 (defun haskell-indentation-scoped-type ()
   "Parse scoped type declaration.
 
@@ -655,13 +675,30 @@ For example
            (haskell-indentation-add-indentation current-indent)
            (throw 'parse-end nil)))
         ((string= current-token "=")
-         (haskell-indentation-with-starter
-          (lambda ()
-            (haskell-indentation-separated
-             #'haskell-indentation-expression "|" "deriving"))))
+         (let ((starter-indent-inside (current-column)))
+           (haskell-indentation-with-starter
+            (lambda ()
+              (haskell-indentation-separated
+               #'haskell-indentation-expression "|")))
+           (cond
+            ((equal current-token 'end-tokens)
+             (when (string= following-token "deriving")
+               (haskell-indentation-push-indentation starter-indent-inside)
+               (haskell-indentation-add-left-indent)))
+            ((equal current-token "deriving")
+             (haskell-indentation-with-starter
+              #'haskell-indentation-type-1)))))
         ((string= current-token "where")
-         (haskell-indentation-with-starter
-          #'haskell-indentation-expression-layout nil))))
+         (let ((starter-indent-inside (current-column)))
+           (haskell-indentation-with-starter
+            #'haskell-indentation-expression-layout nil)
+           (cond
+            ((equal current-token 'end-tokens)
+             (when (string= following-token "deriving")
+               (haskell-indentation-add-left-indent)))
+            ((equal current-token "deriving")
+             (haskell-indentation-with-starter
+              #'haskell-indentation-type-1)))))))
 
 (defun haskell-indentation-import ()
   "Parse import declaration."
@@ -677,6 +714,19 @@ For example
      (when (string= current-token "where")
        (haskell-indentation-with-starter
         #'haskell-indentation-declaration-layout nil)))))
+
+(defun haskell-indentation-deriving ()
+  "Parse standalone declaration."
+  (haskell-indentation-with-starter
+   (lambda ()
+     (when (string= "instance" current-token)
+       (haskell-indentation-read-next-token))
+     (when (equal current-token 'end-tokens)
+       (haskell-indentation-add-left-indent)
+       (throw 'parse-end nil))
+     (haskell-indentation-type)
+     (when (string= current-token "|")
+       (haskell-indentation-fundep)))))
 
 (defun haskell-indentation-module ()
   "Parse module declaration."
