@@ -982,6 +982,14 @@ module X
               (2 0)
               (3 0))
 
+(hindent-test "60* must continue indentation after a vertical bar" "
+data X = X |
+         Y"
+              (1 0)
+              (2 9)
+              (3 0 9))
+
+
 (ert-deftest haskell-indentation-ret-indents ()
   (with-temp-switch-to-buffer
    (haskell-mode)
