@@ -847,24 +847,6 @@ Navigatable error overlays
 @file{haskell-interactive-mode.el}.
 @end itemize
 
-In order to use @code{haskell-interactive-mode} instead of the default
-@code{inferior-haskell-mode}, you need to replace some of the default
-keybindings in the @code{haskell-mode-map} keymap with the respective
-@code{haskell-interactive-mode} counterparts:
-
-@lisp
-(eval-after-load "haskell-mode"
-  '(progn
-    (define-key haskell-mode-map (kbd "C-x C-d") nil)
-    (define-key haskell-mode-map (kbd "C-c C-z") 'haskell-interactive-switch)
-    (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-file)
-    (define-key haskell-mode-map (kbd "C-c C-b") 'haskell-interactive-switch)
-    (define-key haskell-mode-map (kbd "C-c C-t") 'haskell-process-do-type)
-    (define-key haskell-mode-map (kbd "C-c C-i") 'haskell-process-do-info)
-    (define-key haskell-mode-map (kbd "C-c M-.") nil)
-    (define-key haskell-mode-map (kbd "C-c C-d") nil)))
-@end lisp
-
 With @code{haskell-interactive-mode}, each Haskell source buffer is
 associated with at most one GHCi session, so when you call
 @code{haskell-process-load-file} for a Haskell source buffer which has
