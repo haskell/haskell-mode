@@ -615,7 +615,8 @@ After a lambda (backslash) there are two possible cases:
           (when (member following-token
                         '(value operator no-following-token
                                 "(" "[" "{" "::"))
-            (haskell-indentation-add-indentation current-indent))
+            (haskell-indentation-add-indentation current-indent)
+            (haskell-indentation-add-indentation left-indent))
           (throw 'return nil))
          (t (let ((parser (assoc current-token haskell-indentation-type-list)))
               (if (not parser)

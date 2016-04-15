@@ -561,7 +561,7 @@ let foo = Foo {
       bar = 0
       , baz = 0"
               (1 0)
-              (2 0 8)
+              (2 0 2 8)
               (3 2)
               (4 6)
               (5 6)
@@ -574,14 +574,14 @@ data Foo = Foo {
               (1 0)
               (2 2)
               (3 2)
-              (4 11))
+              (4 4 11))
 
-(hindent-test "21c* \"data\" declaration open on next line" "
+(hindent-test "21c \"data\" declaration open on next line" "
 data Foo = Foo
   { bar :: Int
   , baz :: Int"
               (1 0)
-              (2 2)
+              (2 2 11)
               (3 2)
               (4 4 11))
 
@@ -594,7 +594,7 @@ func = 1234
               (1 0)
               (2 2)
               (3 4)
-              (4 0 4 11)
+              (4 0 4 6 11)
               (5 6))
 
 (hindent-test "23* should not fail when seeing comments" "
@@ -865,7 +865,7 @@ class X a b | a -> b
               (1 0)
               (2 2 12)
               (3 2)
-              (4 0 2 9))
+              (4 0 2 4 9))
 
 (hindent-test "49 data with GADT syntax" "
 data Term a where
@@ -873,8 +873,8 @@ data Term a where
   Pair :: Term a -> Term b -> Term (a,b)"
               (1 0)
               (2 2)
-              (3 0 2 9)
-              (4 0 2 10))
+              (3 0 2 4 9)
+              (4 0 2 4 10))
 
 (hindent-test "49b data with GADT syntax and a deriving clause" "
 data G [a] b where
