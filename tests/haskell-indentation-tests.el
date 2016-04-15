@@ -176,24 +176,24 @@ import Control.Concurrent
        ( forkIO,
          killThread )"
               (1 0)
-              (2 0 7)
+              (2 0 2 7)
               (3 9)
-              (4 0 7))
+              (4 0 2 7))
 
 (hindent-test "4 Import statememnt symbol list 2""
 import Control.Concurrent
        ( forkIO
        , killThread )"
               (1 0)
-              (2 0 7)
+              (2 0 2 7)
               (3 7)
-              (4 0 7))
+              (4 0 2 7))
 
 (hindent-test "5 List comprehension""
 fun = [ x | y
           , z ]"
               (1 0)
-              (2 10)
+              (2 8 10)
               (3 0 2))
 
 (hindent-test "5a* List comprehension""
@@ -244,7 +244,7 @@ fun = [ f | x ← xs
               (4 10)
               (5 0))
 
-(hindent-test "6b \"let\" in do""
+(hindent-test "6bx \"let\" in do""
 fact n = do
   let g = 7
   z <- let x = 5
@@ -252,8 +252,8 @@ fact n = do
               (1 0)
               (2 2)
               (3 2 6 8)
-              (4 7)
-              (5 2 10))
+              (4 4 7)
+              (5 2 4 10))
 
 
 (hindent-test "7a \"data\" after \"data\"""
@@ -267,7 +267,7 @@ import ABC
 import DEF"
               (1 0)
               (2 0)
-              (3 0 7))
+              (3 0 2 7))
 
 (hindent-test "7b* declaration after declaration" "
 fun1 = undefined
@@ -459,9 +459,9 @@ x = if flag
     then 1
     else 0"
               (1 0)
-              (2 4)
-              (3 4)
-              (4 0 9))
+              (2 2 4)
+              (3 2 4)
+              (4 0 2 9))
 
 (hindent-test "18c* \"do\" and \"if-then-else\" indentation: \"then\"""
 x = do
@@ -520,7 +520,7 @@ x = let y
     in
       z"
               (1 0)
-              (2 4)
+              (2 2 4)
               (3 2 6))
 
 (hindent-test "19c* \"let\" in a \"do\"""
@@ -620,7 +620,7 @@ foo = do
     <- undefined"
               (1 0)
               (2 2)
-              (3 6 9)
+              (3 4 6 9)
               ;; here it brakes, it would like to put '<-' on same line with 'bar'
               ;; the culprit is the 'do' keyword
               (4 4))
@@ -632,7 +632,7 @@ foo = let
     = undefined"
               (1 0)
               (2 2)
-              (3 6 9)
+              (3 4 6 9)
               (4 4))
 
 (hindent-test "26 should parse unindented where-clause properly" "
@@ -713,7 +713,7 @@ instance Bar Int
 (hindent-test "32 allow type operators" "
 data (:.) a b = a :. b
 "
-              (2 0 16))
+              (2 0 2 16))
 
 (hindent-test "33* parse #else in CPP" "
 #ifdef FLAG
@@ -730,7 +730,7 @@ data T = T {
 }
 
 "
-              (5 0 9))
+              (5 0 2 9))
 
 (hindent-test "35 baroque construct which causes parse error" "
 az = Projection
@@ -813,7 +813,7 @@ x = asum [ mzero
 function = abc
        def
        xyz"
-              (3 0 7))
+              (3 0 2 7))
 
 (hindent-test "46 case expression with paths on their own lines" "
 fact n =
@@ -863,7 +863,7 @@ class X a b | a -> b
             , b -> a where
   fun :: a -> b"
               (1 0)
-              (2 12)
+              (2 2 12)
               (3 2)
               (4 0 2 9))
 
@@ -903,7 +903,7 @@ newtype instance T Char = TC Bool"
               (1 0)
               (2 0)
               (3 0)
-              (4 0 26))
+              (4 0 2 26))
 
 (hindent-test "52a module simplest case two lines" "
 module A.B
@@ -949,14 +949,14 @@ foo x
 data Foo = Bar
          | Baz"
               (1 0)
-              (2 9))
+              (2 2 9))
 
 (hindent-test "55a deriving below aligned data constructors" "
 data Foo = Bar
          | Baz
          deriving (Show)"
               (1 0)
-              (2 9)
+              (2 2 9)
               (3 0 2 9))
 
 (hindent-test "56 module name on next line" "
