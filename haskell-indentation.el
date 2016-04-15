@@ -890,8 +890,12 @@ parser.  If parsing ends here, set indentation to left-indent."
         (cond ((string= following-token "where")
                (haskell-indentation-add-where-pre-indent)) ; before a where
               ((haskell-indentation-expression-token-p following-token)
+               ;; a normal expression can be either continued or have
+               ;; left indent
                (haskell-indentation-add-indentation
-                current-indent))) ; a normal expression
+                current-indent)
+               (haskell-indentation-add-indentation
+                left-indent)))
         (throw 'return nil))
        (t (let ((parser (assoc current-token
                                haskell-indentation-expression-list)))
@@ -916,7 +920,7 @@ If STMT-SEPARATOR is not NIL, it will be used to set a new starter-indent.
 
 For example:
 
-[ i | i <- [1..10]
+   [ i | i <- [1..10]
     ,"
   (catch 'return
     (unless (listp separator)
@@ -939,6 +943,7 @@ For example:
                     ;;  [ 1   or   [ 1 | a
                     ;;  , 2            , 20
                     (haskell-indentation-add-indentation starter-indent)
+                    (haskell-indentation-add-indentation left-indent)
                     (throw 'parse-end nil)))
              (throw 'return nil))
             (t (throw 'return nil))))))
@@ -1031,6 +1036,9 @@ layout starts."
         (cond ((null (cdr phrase))) ;; fallthrough
               ((equal following-token (cadr phrase))
                (haskell-indentation-add-indentation starter-indent)
+               (unless (member following-token '("," ";"))
+                 ;; we want to keep comma and semicolon aligned always
+                 (haskell-indentation-add-indentation left-indent))
                (throw 'parse-end nil))
               ((string= (cadr phrase) "in")
                (when (= left-indent layout-indent)
