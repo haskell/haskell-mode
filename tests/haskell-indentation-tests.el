@@ -632,7 +632,7 @@ foo = let
     = undefined"
               (1 0)
               (2 2)
-              (3 4 6 9)
+              (3 4 6)
               (4 4))
 
 (hindent-test "26 should parse unindented where-clause properly" "
