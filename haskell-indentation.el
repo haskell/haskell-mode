@@ -355,7 +355,6 @@ fixes up only indentation."
 (defvar starter-indent)         ;; column at a keyword
 (defvar current-indent)         ;; the most right indentation
 (defvar layout-indent)          ;; the column of the layout list
-(defvar parse-line-number)      ;; the number of lines parsed
 (defvar possible-indentations)  ;; the return value of the indentations
 (defvar indentation-point)      ;; where to stop parsing
 (defvar implicit-layout-active) ;; is "off-side" rule active?
@@ -409,7 +408,6 @@ fixes up only indentation."
     (skip-syntax-forward "-")
     (let ((indentation-point (point))
           (layout-indent 0)
-          (parse-line-number 0)
           (current-indent haskell-indentation-layout-offset)
           (starter-indent haskell-indentation-layout-offset)
           (left-indent haskell-indentation-layout-offset)
@@ -1024,8 +1022,7 @@ layout starts."
 (defun haskell-indentation-phrase-rest (phrase1)
   "" ; FIXME
   (while phrase1
-    (let ((starter-line parse-line-number)
-          (phrase phrase1))
+    (let ((phrase phrase1))
       (setq phrase1 nil)
       (let ((current-indent (current-column)))
         (funcall (car phrase)))
@@ -1137,8 +1134,7 @@ line."
                (setq current-token 'end-tokens))
            (when (= (current-column) (haskell-indentation-current-indentation))
              ;; on a new line
-             (setq current-indent (current-column))
-             (setq parse-line-number (+ parse-line-number 1)))
+             (setq current-indent (current-column)))
            (cond ((and implicit-layout-active
                        (> layout-indent (current-column)))
                   (setq current-token 'layout-end))
