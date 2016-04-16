@@ -883,37 +883,38 @@ parser.  If parsing ends here, set indentation to left-indent."
 (defun haskell-indentation-expression ()
   "Parse an expression until an unknown token is encountered."
   (catch 'return
-    (while t
-      (cond
-       ((memq current-token '(value operator))
-        (haskell-indentation-read-next-token))
-       ((eq current-token 'end-tokens)
-        (cond ((string= following-token "where")
-               (haskell-indentation-add-where-pre-indent)) ; before a where
-              ((haskell-indentation-expression-token-p following-token)
-               ;; a normal expression can be either continued or have
-               ;; left indent
-               (haskell-indentation-add-indentation
-                current-indent)
-               (haskell-indentation-add-indentation
-                left-indent)))
-        (throw 'return nil))
-       (t (let ((parser (assoc current-token
-                               haskell-indentation-expression-list)))
-            (when (null parser)
-              (throw 'return nil)) ; not expression token, so exit
-            (funcall (cdr parser)) ; run parser
-            (when (and (eq current-token 'end-tokens)
-                       (string= (car parser) "let")
-                       (= haskell-indentation-layout-offset current-indent)
-                       (haskell-indentation-expression-token-p following-token))
-              ;; inside a layout, after a let construct
-              ;; for example: "do let a = 20"
-              (haskell-indentation-add-layout-indent)
-              (throw 'parse-end nil))
-            ;; after an 'open' expression such as 'if', exit
-            (unless (member (car parser) '("(" "[" "{" "case"))
-              (throw 'return nil))))))))
+    (let ((current-indent (current-column)))
+      (while t
+        (cond
+         ((memq current-token '(value operator))
+          (haskell-indentation-read-next-token))
+         ((eq current-token 'end-tokens)
+          (cond ((string= following-token "where")
+                 (haskell-indentation-add-where-pre-indent)) ; before a where
+                ((haskell-indentation-expression-token-p following-token)
+                 ;; a normal expression can be either continued or have
+                 ;; left indent
+                 (haskell-indentation-add-indentation
+                  current-indent)
+                 (haskell-indentation-add-indentation
+                  left-indent)))
+          (throw 'return nil))
+         (t (let ((parser (assoc current-token
+                                 haskell-indentation-expression-list)))
+              (when (null parser)
+                (throw 'return nil)) ; not expression token, so exit
+              (funcall (cdr parser)) ; run parser
+              (when (and (eq current-token 'end-tokens)
+                         (string= (car parser) "let")
+                         (= haskell-indentation-layout-offset current-indent)
+                         (haskell-indentation-expression-token-p following-token))
+                ;; inside a layout, after a let construct
+                ;; for example: "do let a = 20"
+                (haskell-indentation-add-layout-indent)
+                (throw 'parse-end nil))
+              ;; after an 'open' expression such as 'if', exit
+              (unless (member (car parser) '("(" "[" "{" "case"))
+                (throw 'return nil)))))))))
 
 (defun haskell-indentation-separated (parser separator &optional stmt-separator)
   "Evaluate PARSER separated by SEPARATOR and STMT-SEPARATOR.
@@ -938,14 +939,21 @@ For example:
              (haskell-indentation-at-separator))
 
             ((eq current-token 'end-tokens)
-             (cond ((or (member following-token separator)
-                        (member following-token stmt-separator))
-                    ;; Set an indentation before a separator, for example:
-                    ;;  [ 1   or   [ 1 | a
-                    ;;  , 2            , 20
-                    (haskell-indentation-add-indentation starter-indent)
-                    (haskell-indentation-add-indentation left-indent)
-                    (throw 'parse-end nil)))
+             (when (or (member following-token separator)
+                       (member following-token stmt-separator))
+               ;; Set an indentation before a separator, for example:
+               ;;  [ 1   or   [ 1 | a
+               ;;  , 2            , 20
+               (haskell-indentation-add-indentation starter-indent)
+               (when (< left-indent starter-indent)
+                 (haskell-indentation-add-indentation left-indent))
+               (throw 'parse-end nil))
+             (when (equal following-token 'no-following-token)
+               ;; Set an indentation before a separator, for example:
+               ;;  [ 1   or   [ 1 | a
+               ;;  , 2            , 20
+               (haskell-indentation-add-indentation starter-indent)
+               (haskell-indentation-add-indentation left-indent))
              (throw 'return nil))
             (t (throw 'return nil))))))
 
@@ -964,6 +972,7 @@ l = [  1
     (haskell-indentation-read-next-token)
     (cond ((eq current-token 'end-tokens)
            (haskell-indentation-add-indentation current-indent)
+           (haskell-indentation-add-indentation left-indent)
            (throw 'return nil))
           (separator-column ; on the beginning of the line
            (setq current-indent (current-column))
@@ -1030,7 +1039,9 @@ layout starts."
   (while phrase1
     (let ((phrase phrase1))
       (setq phrase1 nil)
-      (let ((current-indent (current-column)))
+      (let ((current-indent (current-column))
+            (left-indent left-indent)
+            (layout-indent layout-indent))
         (funcall (car phrase)))
       (cond
        ((eq current-token 'end-tokens)
@@ -1088,11 +1099,13 @@ layout starts."
    (+ left-indent haskell-indentation-left-offset)))
 
 (defun haskell-indentation-push-indentation (indent)
-  "" ; FIXME
-  (when (or (null possible-indentations)
-            (< indent (car possible-indentations)))
+  "Add INDENT to list of possible indentations.
+
+Add INDENT to `possible-indentations' if it is not there
+yet. Keep the list in ascending order."
+  (unless (member indent possible-indentations)
     (setq possible-indentations
-          (cons indent possible-indentations))))
+          (sort (cons indent possible-indentations) #'<))))
 
 (defun haskell-indentation-read-next-token ()
   "Go to the next token and set current-token to the next token.
