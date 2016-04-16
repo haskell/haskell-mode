@@ -1137,7 +1137,8 @@ line."
          (if (>= (point) indentation-point)
              (progn
                (setq following-token
-                     (if (= (point) indentation-point)
+                     (if (and (not (eobp))
+                              (= (point) indentation-point))
                          (haskell-indentation-peek-token)
                        'no-following-token))
                (setq current-token 'end-tokens))
