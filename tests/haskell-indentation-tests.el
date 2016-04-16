@@ -137,7 +137,7 @@ macro quotes them for you."
 function = Record
        { field = 123 }"
               (1 0)
-              (2 2))
+              (2 2 11))
 
 (hindent-test "2 Handle underscore in identifiers""
 function = do
@@ -145,7 +145,7 @@ function = do
  z"
               (1 0)
               (2 2)
-              (3 0 2 4))
+              (3 0 2 4 10))
 
 (hindent-test "2u Handle underscore in identifiers""
 function = do
@@ -153,7 +153,7 @@ function = do
  z"
               (1 0)
               (2 2)
-              (3 0 2 4))
+              (3 0 2 4 9))
 
 (hindent-test "2a Handle apostrophe in identifiers""
 function = do
@@ -161,7 +161,7 @@ function = do
  z"
               (1 0)
               (2 2)
-              (3 0 2 4))
+              (3 0 2 4 12))
 
 (hindent-test "2au Handle apostrophe in identifiers""
 function = do
@@ -169,7 +169,7 @@ function = do
  z"
               (1 0)
               (2 2)
-              (3 0 2 4))
+              (3 0 2 4 11))
 
 (hindent-test "3 Import statememnt symbol list 1""
 import Control.Concurrent
@@ -194,7 +194,7 @@ fun = [ x | y
           , z ]"
               (1 0)
               (2 8 10)
-              (3 0 2))
+              (3 0 2 6))
 
 (hindent-test "5a* List comprehension""
 fun = [ x | y,
@@ -251,9 +251,9 @@ fact n = do
        in return (x + 4)"
               (1 0)
               (2 2)
-              (3 2 6 8)
+              (3 2 6 8 10)
               (4 4 7)
-              (5 2 4 10))
+              (5 0 2 4 10))
 
 
 (hindent-test "7a \"data\" after \"data\"""
@@ -293,7 +293,7 @@ fun = x ++"
 fun = x
       ++ z"
               (1 0)
-              (2 0 2))
+              (2 0 2 6))
 
 (hindent-test "11 Guards with commas""
 clunky env var1 var2
@@ -302,7 +302,7 @@ clunky env var1 var2
               (1 0)
               (2 2)
               (3 2)
-              (4 0 4))
+              (4 0 2 4 17))
 
 (hindent-test "11u Guards with commas""
 clunky env var1 var2
@@ -311,14 +311,14 @@ clunky env var1 var2
               (1 0)
               (2 2)
               (3 2)
-              (4 0 4))
+              (4 0 2 4 16))
 
 (hindent-test "12 \"do\" as expression""
 fun = do { putStrLn \"X\";
          }"
               (1 0)
               (2 9 11)
-              (3 0))
+              (3 0 2))
 
 (hindent-test "13a Deriving on new line""
 data X = X | Y
@@ -565,7 +565,7 @@ let foo = Foo {
               (3 2)
               (4 6)
               (5 6)
-              (6 8))
+              (6 6 8 14))
 
 (hindent-test "21b fix named fields in \"data\" declaration""
 data Foo = Foo {
@@ -574,7 +574,7 @@ data Foo = Foo {
               (1 0)
               (2 2)
               (3 2)
-              (4 4 11))
+              (4 2 4 8 11))
 
 (hindent-test "21c \"data\" declaration open on next line" "
 data Foo = Foo
@@ -583,7 +583,7 @@ data Foo = Foo
               (1 0)
               (2 2 11)
               (3 2)
-              (4 4 11))
+              (4 2 4 8 11))
 
 (hindent-test "22 should obey layout only outside parentheses" "
 func = 1234
@@ -610,8 +610,8 @@ foo = do
   return ()"
               (1 0)
               (2 2)
-              (3 0 2 4)
-              (4 0 2 4))
+              (3 0 2 4 17)
+              (4 0 2 4 17))
 
 (hindent-test "25a* support scoped type declarations" "
 foo = do
@@ -653,13 +653,23 @@ foo = do
 f = a (a 'A)
     (a 'A)
 "
-              (2 0 2))
+              (2 0 2 4))
+
+(hindent-test "28g continue expression after value" "
+f = a
+       a"
+              (3 0 2 7))
+
+(hindent-test "28h continue expression after parentheses" "
+f = a
+       (a)"
+              (3 0 2 7))
 
 (hindent-test "28b character literal (escape sequence)" "
 f = '\\\\'
 
 "
-              (2 0 2))
+              (2 0 2 4))
 
 
 (hindent-test "28c name starting with a quote" "
@@ -672,7 +682,7 @@ function (Operation 'Init) = do
 test = [randomQQ| This is a quasiquote with the word in |]
 
 "
-              (2 0 2))
+              (2 0 2 7))
 
 (hindent-test "29b quasiquote multiple lines" "
 test = [randomQQ| This is
@@ -680,7 +690,7 @@ test = [randomQQ| This is
           with the word in |]
 
 "
-              (4 0 2))
+              (4 0 2 7))
 
 (hindent-test "29c quasiquote with quotes in it and a string outside" "
 foo = do
@@ -711,9 +721,16 @@ instance Bar Int
               (2 0))
 
 (hindent-test "32 allow type operators" "
-data (:.) a b = a :. b
-"
-              (2 0 2 16))
+data (:.) a b = a :. b"
+              (2 0 2 14 16))
+
+(hindent-test "32b next line after data" "
+data X = X | Y"
+              (2 0 2 7 13))
+
+(hindent-test "32c* next line after unfinished data" "
+data X = X | Y |"
+              (2 2 9))
 
 (hindent-test "33* parse #else in CPP" "
 #ifdef FLAG
@@ -730,7 +747,7 @@ data T = T {
 }
 
 "
-              (5 0 2 9))
+              (5 0 2 7 9))
 
 (hindent-test "35 baroque construct which causes parse error" "
 az = Projection
@@ -769,7 +786,7 @@ s = do
   a <- \"multiline\\
        \\ line 2\"
 "
-              (4 0 2 4))
+              (4 0 2 4 7))
 
 (hindent-test "39 do not crash after two multiline literals in do block" "
 servePost = do
@@ -778,13 +795,13 @@ servePost = do
   b <- queryT \"comma is important: , \\
              \\ line 2 \"
 "
-              (6 0 2 4))
+              (6 0 2 4 7))
 
 (hindent-test "40 parse error in multiline tuple" "
 a = ( 1
 , "
               (2 4)
-              (3 2))
+              (3 6))
 
 (hindent-test "41 open do inside a list" "
 x = asum [ withX $ do
@@ -824,8 +841,8 @@ fact n =
               (1 0)
               (2 2)
               (3 4)
-              (4 0 2 4 6)
-              (5 0 2 4 6))
+              (4 0 2 4 6 9)
+              (5 0 2 4 6 9))
 
 (hindent-test "46b case expression with guards" "
 fact n = case n of
@@ -834,10 +851,9 @@ fact n = case n of
     , True == True -> n * fact (n - 1)"
               (1 0)
               (2 2 11)
-              ;; returns (0 2 2 6), to investigate
-              (3 0 2 6)
+              (3 0 2 6 9 16)
               (4 4)
-              (5 0 2 6))
+              (5 0 2 4 6 9 22))
 
 (hindent-test "47a multiline strings" "
 fact n = \"\\
@@ -846,7 +862,7 @@ fact n = \"\\
               ;; we want to offer both a continuation style and the
               ;; align to left column style (like in lisp)
               (2 0 9)
-              (3 0 2))
+              (3 0 2 9))
 
 (hindent-test "47b multiline strings" "
 fact n = \"\\
@@ -865,7 +881,7 @@ class X a b | a -> b
               (1 0)
               (2 2 12)
               (3 2)
-              (4 0 2 4 9))
+              (4 0 2 4 6 9))
 
 (hindent-test "49 data with GADT syntax" "
 data Term a where
@@ -874,7 +890,7 @@ data Term a where
               (1 0)
               (2 2)
               (3 0 2 4 9)
-              (4 0 2 4 10))
+              (4 0 2 4 7 10))
 
 (hindent-test "49b data with GADT syntax and a deriving clause" "
 data G [a] b where
@@ -903,7 +919,7 @@ newtype instance T Char = TC Bool"
               (1 0)
               (2 0)
               (3 0)
-              (4 0 2 26))
+              (4 0 2 24 26))
 
 (hindent-test "52a module simplest case two lines" "
 module A.B
@@ -935,7 +951,7 @@ fun = if | guard1 -> expr1
          | guardN -> exprN"
               (1 0)
               (2 9)
-              (3 0 11))
+              (3 0 2 9 11 21))
 
 (hindent-test "54 equal after guards on separate line" "
 foo x
