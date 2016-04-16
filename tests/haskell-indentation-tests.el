@@ -269,31 +269,31 @@ import DEF"
               (2 0)
               (3 0 2 7))
 
-(hindent-test "7b* declaration after declaration" "
+(hindent-test "7b declaration after declaration" "
 fun1 = undefined
 fun2 = undefined"
               (1 0)
-              (2 0))
+              (2 0 2 7))
 
-(hindent-test "8* Guards in function definition""
+(hindent-test "8 Guards in function definition""
 resolve (amount, max) number
   | number > max = (1, number)
   | number == max = (amount + 1, number)"
               (1 0)
               (2 2)
-              (3 0 2)
-              (4 0 2))
+              (3 2)
+              (4 0 2 4 20))
 
 (hindent-test "9* Operator last on line""
 fun = x ++"
               (1 0)
               (2 6))
 
-(hindent-test "10 Operator first on line""
+(hindent-test "10* Operator first on line""
 fun = x
       ++ z"
               (1 0)
-              (2 0 2 6))
+              (2 2 6))
 
 (hindent-test "11 Guards with commas""
 clunky env var1 var2
@@ -387,19 +387,19 @@ fun = \\x →"
               (1 0)
               (2 2 8))
 
-(hindent-test "17a* A type for a function""
+(hindent-test "17a A type for a function""
 fun :: Int
     -> Int"
               (1 0)
-              (2 4)
-              (3 0 4))
+              (2 2 4)
+              (3 0 2 4))
 
-(hindent-test "17au* A type for a function""
+(hindent-test "17au A type for a function""
 fun :: Int
     → Int"
               (1 0)
-              (2 4)
-              (3 0 4))
+              (2 2 4)
+              (3 0 2 4))
 
 (hindent-test "17b* A type for a function with context""
 fun :: Monad m
@@ -508,12 +508,12 @@ x = do
               (6 4)
               (7 0 2 4))
 
-(hindent-test "19a* \"let\" and \"in\"""
+(hindent-test "19a \"let\" and \"in\"""
 x = let
   y"
               (1 0)
               (2 2)
-              (3 2))
+              (3 0 2 4))
 
 (hindent-test "19b \"let\" and \"in\"" "
 x = let y
@@ -523,36 +523,36 @@ x = let y
               (2 2 4)
               (3 2 6))
 
-(hindent-test "19c* \"let\" in a \"do\"""
+(hindent-test "19c \"let\" in a \"do\"""
 x = do
   thing
   let
     z = 5"
               (1 0)
               (2 2)
-              (3 2)
+              (3 0 2 4)
               (4 4))
 
-(hindent-test "20a* \"instance\" declaration""
+(hindent-test "20a \"instance\" declaration""
 instance C a where
   c = undefined"
               (1 0)
               (2 2)
-              (3 0 2))
+              (3 0 2 4 6))
 
-(hindent-test "20b* \"instance\" declaration""
+(hindent-test "20b \"instance\" declaration""
 instance (Monad m) => C m a where
   c = undefined"
               (1 0)
               (2 2)
-              (3 0 2))
+              (3 0 2 4 6))
 
-(hindent-test "20bu* \"instance\" declaration""
+(hindent-test "20bu \"instance\" declaration""
 instance (Monad m) ⇒ C m a where
   c = undefined"
               (1 0)
               (2 2)
-              (3 0 2))
+              (3 0 2 4 6))
 
 (hindent-test "21a fix \"let\" statement in \"do\" block""
 main :: IO ()
@@ -597,11 +597,11 @@ func = 1234
               (4 0 4 6 11)
               (5 6))
 
-(hindent-test "23* should not fail when seeing comments" "
+(hindent-test "23 should not fail when seeing comments" "
 -- important non-empty line
 {-
 -}"
-              ((3 2) 0))
+              (3 0))
 
 (hindent-test "24 should parse inline type signatures properly" "
 foo = do
@@ -709,10 +709,10 @@ foo = [|forever $ do
 "
               (2 10))
 
-(hindent-test "30* parse '[] identifier correctly" "
-instance Callable '[]
+(hindent-test "30 parse '[] identifier correctly" "
+instance Callable '[] where
 "
-              (1 2))
+              (2 2))
 
 (hindent-test "31* allow type class declaration without methods" "
 class Foo a where
@@ -776,10 +776,10 @@ tokOpenTag =
        ]
 "
               (4 7))
-(hindent-test "37* Indent continuation lines in multiline string literal" "
+(hindent-test "37 Indent continuation lines in multiline string literal" "
 a = \"multiline\\
 "
-              (2 4))
+              (2 0 4))
 
 (hindent-test "38 Indent in do block after multiline string literal" "
 s = do
@@ -1002,8 +1002,8 @@ module X
 data X = X |
          Y"
               (1 0)
-              (2 9)
-              (3 0 9))
+              (2 2 9)
+              (3 0 7 9))
 
 
 (ert-deftest haskell-indentation-ret-indents ()
