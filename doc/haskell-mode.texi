@@ -91,22 +91,22 @@ Some of its major features are:
 @item
 Syntax highlighting (font lock),
 @item
-automatic indentation,
+automatic semi-intelligent indentation,
 @item
 on-the-fly documentation,
 @item
-interaction with inferior GHCi/Hugs instance, and
+interaction with inferior GHCi/Hugs instance,
+@item
+project building with cabal and stack
 @item
 scanning declarations and placing them in a menu.
 @end itemize
 
-@section Naming
-
-The name haskell-mode refers to the whole collection of modules in this
-package. There is specifically a file `haskell-mode.el` which defines a
-major mode called `haskell-mode`. Generally, in this documentation they
-will be distinguished by normal font (haskell-mode) and code font
-(`haskell-mode`).
+The name Haskell Mode refers to the whole collection of modules in this
+package. There is specifically a file @file{haskell-mode.el} which
+defines a major mode called @code{haskell-mode}. Generally, in this
+documentation they will be distinguished by normal font and title case
+(Haskell Mode) and code font (@code{haskell-mode}).
 
 @section History
 
@@ -134,16 +134,26 @@ archive do the following:
 
 @enumerate
 @item
-Customize @code{package-archives} using @kbd{M-x} @code{customize-option} @kbd{RET} @code{package-archives} @kbd{RET}.
+Customize @code{package-archives} using
+@example
+M-x customize-option RET package-archives
+@end example
 @item
-Use @kbd{INS} to add new archive, use @code{Archive name: melpa-stable}
-and @code{URL or directory name: http://stable.melpa.org/packages/}.
+Use @kbd{INS} to add new archive, use:
+@example
+Archive name:          melpa-stable
+URL or directory name: http://stable.melpa.org/packages
+@end example
 @item
-Fetch new packages using @kbd{M-x} @code{package-refresh-contents}.
+Fetch new packages using:
+@example
+M-x package-refresh-contents
+@end example
 @item
-Install @code{haskell-mode} using @kbd{M-x} @code{package-install}
-@kbd{RET} @code{haskell-mode} @kbd{RET}.
-
+Install Haskell Mode using:
+@example
+M-x package-install RET haskell-mode RET
+@end example
 @end enumerate
 
 Voila! @code{haskell-mode} is installed! You should be able to edit Haskell
@@ -165,18 +175,17 @@ The above steps should result in the following snippet in your @file{.emacs}:
 @end lisp
 
 
-@section Installation - more information
-
-@code{haskell-mode} supports GNU Emacs versions 24.3+, including 25
+Haskell Mode supports GNU Emacs versions 24.3+, including 25
 (snapshot).
 
-@code{haskell-mode} is available from
+Haskell Mode is available from
 @uref{http://stable.melpa.org,melpa-stable (releases)} and
 @uref{http://melpa.org, melpa (git snapshots)}.
 
 Other means of obtaining @code{haskell-mode} include
 @uref{https://github.com/dimitri/el-get, el-get},
-@uref{https://github.com/bbatsov/prelude, Emacs Prelude} and @uref{https://packages.debian.org/search?keywords=haskell-mode, Debian package}.
+@uref{https://github.com/bbatsov/prelude, Emacs Prelude} and
+@uref{https://packages.debian.org/search?keywords=haskell-mode, Debian package}.
 
 Last version of @code{haskell-mode} that supported Emacs 23, 24.1, and 24.2 is
 @code{haskell-mode} 13.16 available at
@@ -185,18 +194,17 @@ Last version of @code{haskell-mode} that supported Emacs 23, 24.1, and 24.2 is
 @section Customizing
 
 @cindex customizing
-Most of @code{haskell-mode}'s settings are configurable via customizable
+Most of Haskell Mode's settings are configurable via customizable
 variables (@pxref{Easy Customization,,,emacs}, for details). You can use
-
 @kbd{M-x customize-group @key{RET} haskell} to browse the @code{haskell}
 customization sub-tree.
 
-@vindex haskell-mode-hook
-One of the important setting you should customize is the
-@code{haskell-mode-hook} variable (@pxref{Hooks,,,emacs}) which gets run
-right after the @code{haskell-mode} major mode is initialized for a
-buffer. You can customize @code{haskell-mode-hook} by @kbd{M-x
-customize-variable @key{RET} haskell-mode-hook}.
+@c @vindex haskell-mode-hook
+@c One of the important setting you should customize is the
+@c @code{haskell-mode-hook} variable (@pxref{Hooks,,,emacs}) which gets run
+@c right after the @code{haskell-mode} major mode is initialized for a
+@c buffer. You can customize @code{haskell-mode-hook} by @kbd{M-x
+@c customize-variable @key{RET} haskell-mode-hook}.
 
 @c TODO:
 @c provide basic instructions to get up and running with haskell-mode
@@ -208,49 +216,34 @@ customize-variable @key{RET} haskell-mode-hook}.
 @findex haskell-mode
 @cindex @code{haskell-mode}
 
-@dfn{Haskell Mode} is actually a collection of so-called major
-modes@footnote{for more information about the concept of @dfn{major
-modes} @pxref{Major Modes,,,emacs}} one of which is called
-@code{haskell-mode}.  To avoid confusion, when referring to this
-package the name ``Haskell mode'' is written in a normal font, whereas
-when referring the major mode of the same name @code{haskell-mode}
-written with a dash in-between in a typewriter font is used.
+Haskell Mode as one of its components provides a major mode for editing
+Haskell source code called @code{haskell-mode}, which gave the name to
+the whole project. There is a derived mode provided called
+@code{literate-haskell-mode} that support Literate Haskell source code
+both in Bird and in Latex forms.
 
-As one might guess, @code{haskell-mode} is the (programming
-language@footnote{@code{haskell-mode} is derived from
-@code{prog-mode}}) major mode for editing (non-literate) Haskell
-source code. @code{haskell-mode} is associated with the file
-extensions listed below by default@footnote{for more information about
-file associations, @pxref{Choosing Modes,,,emacs}}.
+Haskell Mode supports files with the following extensions:
 
 @table @file
 @item .hs
-official file extension for (non-literate) Haskell 98/2010 files
+official file extension for Haskell files. Haskell Mode out of the box
+supports most of GHC extensions.
+@item .lhs
+official file extension for Literate Haskell files. Both Bird and Latex
+styles are supported.
 @item .hsc
-``almost-Haskell'' input file for the
-@uref{http://www.haskell.org/ghc/docs/latest/html/users_guide/hsc2hs.html,hsc2hs}
-pre-processor
+Haskell interfaces to C code used by @uref{http://www.haskell.org/ghc/docs/latest/html/users_guide/hsc2hs.html,hsc2hs}
+pre-processor.
 @item .cpphs
-input file for the @uref{http://projects.haskell.org/cpphs/,cpphs}
-pre-processor
+Haskell source with CPP pragmas used with @uref{http://projects.haskell.org/cpphs,cpphs}
+pre-processor.
+@item .c2hs
+Haskell FFI bindings to C libraries used with @uref{https://github.com/haskell/c2hs,c2hs}
+pre-processor.
 @end table
 
-@cindex literate programming
-@findex literate-haskell-mode
-
-@noindent
-The major mode @code{literate-haskell-mode} (which is derived from
-@code{haskell-mode} and thus transitively from @code{prog-mode})
-provides support for
-@uref{http://www.haskell.org/haskellwiki/Literate_programming,literate
-Haskell programs} and is associated with the @file{.lhs} file extension
-by default.
-
-@code{literate-haskell-mode} supports Bird-style as well as @TeX{}-style
-literate Haskell files. The currently detected literate Haskell variant
-is shown in the mode line (@pxref{Mode Line,,,emacs}) as either
-@samp{LitHaskell/bird} or @samp{LitHaskell/tex}.
-
+Haskell Mode offers many productivity tools described in following
+chapters in this manual.
 
 @section Managing imports
 
