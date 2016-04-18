@@ -530,7 +530,7 @@ and indent when all of the following are true:
   `(("::" .
      ,(apply-partially 'haskell-indentation-with-starter
                        (apply-partially 'haskell-indentation-separated
-                                        'haskell-indentation-type "->")))
+                                        'haskell-indentation-type '("->" "=>"))))
     ("("  .
      ,(apply-partially 'haskell-indentation-list
                        'haskell-indentation-type ")" ","))
@@ -651,14 +651,16 @@ After a lambda (backslash) there are two possible cases:
     (catch 'return
       (while t
         (cond
-         ((member current-token '(value operator "->"))
+         ((member current-token '(value operator "->" "=>"))
           (haskell-indentation-read-next-token))
 
          ((eq current-token 'end-tokens)
           (when (member following-token
                         '(value operator no-following-token
                                 "(" "[" "{" "::"))
-            (haskell-indentation-add-indentation current-indent)
+            (if (equal following-token "=>")
+                (haskell-indentation-add-indentation starter-indent)
+              (haskell-indentation-add-indentation current-indent))
             (haskell-indentation-add-indentation left-indent))
           (throw 'return nil))
          (t (let ((parser (assoc current-token haskell-indentation-type-list)))
@@ -671,13 +673,13 @@ After a lambda (backslash) there are two possible cases:
   (let ((current-indent (current-column)))
     (catch 'return
       (cond
-       ((member current-token '(value operator "->"))
+       ((member current-token '(value operator "->" "=>"))
         (haskell-indentation-read-next-token))
 
        ((eq current-token 'end-tokens)
         (when (member following-token
                       '(value operator no-following-token
-                              "->" "(" "[" "{" "::"))
+                              "->" "=>" "(" "[" "{" "::"))
           (haskell-indentation-add-indentation current-indent))
         (throw 'return nil))
        (t (let ((parser (assoc current-token haskell-indentation-type-list)))
@@ -692,7 +694,7 @@ For example
    let x :: Int = 12
    do x :: Int <- return 12"
   (haskell-indentation-with-starter
-   (apply-partially #'haskell-indentation-separated #'haskell-indentation-type "->"))
+   (apply-partially #'haskell-indentation-separated #'haskell-indentation-type '("->" "=>")))
   (when (member current-token '("<-" "="))
     (haskell-indentation-statement-right #'haskell-indentation-expression)))
 
@@ -1206,9 +1208,9 @@ line."
          (match-string-no-properties 1))
         ((looking-at "[][(){}[,;]")
          (match-string-no-properties 0))
-        ((looking-at "\\(\\\\\\|->\\|<-\\|::\\|=\\||\\)\\([^-:!#$%&*+./<=>?@\\\\^|~]\\|$\\)")
+        ((looking-at "\\(\\\\\\|->\\|<-\\|::\\|=\\||\\|=>\\)\\([^-:!#$%&*+./<=>?@\\\\^|~]\\|$\\)")
          (match-string-no-properties 1))
-        ((looking-at "\\(→\\|←\\|∷\\)\\([^-:!#$%&*+./<=>?@\\\\^|~]\\|$\\)")
+        ((looking-at "\\(→\\|←\\|∷\\|⇒\\)\\([^-:!#$%&*+./<=>?@\\\\^|~]\\|$\\)")
          (let ((tok (match-string-no-properties 1)))
            (or (cdr (assoc tok haskell-indentation-unicode-tokens)) tok)))
         ((looking-at"[-:!#$%&*+./<=>?@\\\\^|~`]" )
