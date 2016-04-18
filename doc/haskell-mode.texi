@@ -5,6 +5,12 @@
 @settitle Haskell Mode 16.1-git
 @c %**end of header
 
+@c Macro used to mark references of defcustom variables
+@macro defcustom{var}
+@vrindex \var\
+@code{\var\}
+@end macro
+
 @dircategory Emacs
 @direntry
 * Haskell Mode: (haskell-mode).             Haskell Development Environment for Emacs(en)
@@ -52,7 +58,7 @@ interpreter (e.g. GHCi).
 * Introduction::                         An introduction to Haskell Mode
 * Installation::                         How to get started
 * Editing Haskell Code::                 How to edit code
-* Font Lock Support::                    Haskell Mode has colors
+* Syntax highlighting::                  Haskell Mode has colors
 * Completion support::                   Autocomplete
 * Unicode support::                      How to use Unicode
 * Indentation::                          Notes about indentation
@@ -318,8 +324,8 @@ program behavior.  @code{haskell-mode} provides the function
 It will remove an SCC annotation at point if one is present, or add
 one if point is over whitespace.  By default it is bound to @kbd{C-c C-s}.
 
-@node Font Lock Support
-@chapter Font Lock Support
+@node Syntax highlighting
+@chapter Syntax highlighting
 
 @code{haskell-mode} supports @dfn{syntax highlighting} via Emacs' Font
 Lock minor mode which should be enabled by default in current
@@ -345,12 +351,52 @@ types in different colors.
 @end ifhtml
 
 There is also support to use mode-specific syntax highlighing for
-quasiquotes. Customize @code{haskell-font-lock-quasi-quote-modes} to
-make sure your quoters are supported.
+quasiquotes.
 
 @ifhtml
 @image{anim/font-lock-quasi-quotes}
 @end ifhtml
+
+At this point quasi quotes for HTML, XML, shell scripts, Hamlet
+templates and SQL are supported out of the box. Customize
+@code{haskell-font-lock-quasi-quote-modes} to make sure your quoters are
+supported.
+
+The following customization variables are responsible for faces applied:
+
+@itemize @code
+@item @defcustom{haskell-keyword-face}: for keywords
+@item @defcustom{haskell-type-face}: for type names and type class names
+@item @defcustom{haskell-constructor-face}: for constructors
+@item @defcustom{haskell-definition-face}: function and operator name at the definition place
+@item @defcustom{haskell-operator-face}: operators
+@item @defcustom{haskell-pragma-face}: GHC pragmas
+@item @defcustom{haskell-literate-comment-face}: literate comments
+@item @defcustom{haskell-quasi-quote-face}: quasi quotes unless using mode specific highlighting
+@item @defcustom{haskell-c2hs-hook-pair-face}: c2hs hooks
+@item @defcustom{haskell-c2hs-hook-name-face}: c2hs hook names
+@end itemize
+
+All the above are available for customization.
+
+GHC quasi quote syntax is ambiguous with list comprehension therefore
+syntax highlighting might get confused with situations like these:
+
+@example
+result = [html| html <- htmlList]
+result = [html| <html><body>...</body></html> |]
+@end example
+
+Please use spaces around a list comprehension variable to make this
+unambiguous. Any of the following will work:
+
+@example
+result = [ html| html <- htmlList]
+result = [html | html <- htmlList]
+@end example
+
+GHC's ambiguity is an accident of the past but it is unlikely to be
+fixed due to backward compatibility baggage.
 
 @node Completion support
 @chapter Completion support
