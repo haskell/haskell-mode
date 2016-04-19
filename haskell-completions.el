@@ -296,7 +296,7 @@ PREFIX should be a list such one returned by
                ('haskell-completions-language-extension-prefix
                 haskell-ghc-supported-extensions)
                (otherwise
-                (append (tags-completion-table)
+                (append tags-completion-table
                         haskell-completions--keywords)))))
         (list beg end candidates)))))
 
