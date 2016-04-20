@@ -205,16 +205,18 @@ variables (@pxref{Easy Customization,,,emacs}, for details). You can use
 @kbd{M-x customize-group @key{RET} haskell} to browse the @code{haskell}
 customization sub-tree.
 
-@c @vindex haskell-mode-hook
-@c One of the important setting you should customize is the
-@c @code{haskell-mode-hook} variable (@pxref{Hooks,,,emacs}) which gets run
-@c right after the @code{haskell-mode} major mode is initialized for a
-@c buffer. You can customize @code{haskell-mode-hook} by @kbd{M-x
-@c customize-variable @key{RET} haskell-mode-hook}.
+@vindex haskell-mode-hook
+One of the important setting you should customize is the
+@code{haskell-mode-hook} variable (@pxref{Hooks,,,emacs}) which gets run
+right after the @code{haskell-mode} major mode is initialized for a
+buffer. You can customize @code{haskell-mode-hook} by
 
-@c TODO:
-@c provide basic instructions to get up and running with haskell-mode
-@c tell about the most important commands
+@example
+M-x customize-variable RET haskell-mode-hook
+@end example
+
+There you can enable or disable a couple of predefined options or add
+any function to the list.
 
 @node Editing Haskell Code
 @chapter Editing Haskell Code
