@@ -2543,36 +2543,26 @@ out what keys are bound beginning with the @kbd{C-x r} prefix.
 @node Getting Help and Reporting Bugs
 @chapter Getting Help and Reporting Bugs
 
-This Info manual is work in progress and incomplete. However, you can
-find more information at these locations in the meantime:
+Work on Haskell Mode is organized with Github @code{haskell-mode}
+project.  To understand how the project is run please read the
+information in the
+@uref{https://github.com/haskell/haskell-mode/wiki,project wiki pages}.
 
-@itemize
-@item
-@uref{https://github.com/haskell/haskell-mode,Haskell Mode's GitHub Home}
-@item
-@uref{http://www.haskell.org/haskellwiki/Haskell_mode_for_Emacs,Haskell Wiki Emacs Page}
-@end itemize
+To report any issues please use the Github's issue mechanism available from
+@uref{https://github.com/haskell/haskell-mode,Haskell Mode's GitHub Home}.
 
-If you have any questions or like to discuss something regarding Haskell
-Mode, please consider sending an email to the
+For a quick question visit @code{#haskell-emacs} channel on IRC
+@code{irc.freenode.net}.
+
+There is also a (now defunct)
 @uref{http://projects.haskell.org/cgi-bin/mailman/listinfo/haskellmode-emacs,
-Haskellmode-emacs mailing list}. The mailing list is also available on
+Haskellmode-emacs mailing list}, also available on
 @uref{http://gmane.org/, Gmane} via the
 @uref{http://dir.gmane.org/gmane.comp.lang.haskell.emacs,
 gmane.comp.lang.haskell.emacs} newsgroup.
 
-If you have discovered a bug or wish to request a new feature, you can
-@uref{https://github.com/haskell/haskell-mode/issues/new, file a new
-issue} with Haskell Mode's issue tracker. When filing a bug, please
-state your currently used software version (@kbd{M-x}
-@code{haskell-version}, @kbd{M-x} @code{version}) and what steps to
-perform in order to reproduce the bug you're experiencing. Finally, if
-you happen to be proficient in @ref{Top,Emacs Lisp,,elisp} you are
-welcome to submit patches via
-@uref{https://help.github.com/articles/using-pull-requests, GitHub
-Pull Requests}.
-
-
+We welcome code and non-code contributions so that we can all enjoy
+coding Haskell even more.
 
 @node Concept index
 @unnumbered Concept index
