@@ -22,15 +22,13 @@
 
 (defun haskell-interactive-handle-expr ()
   "Handle an inputted expression at the REPL."
-  (let ((expr (haskell-interactive-mode-input))
-        (at-prompt-line (>= (line-end-position)
-                            haskell-interactive-mode-prompt-start)))
-    (if (and at-prompt-line
-             (string= "" (replace-regexp-in-string " " "" expr)))
+  (let ((expr (haskell-interactive-mode-input)))
+    (if (string= "" (replace-regexp-in-string " " "" expr))
+        ;; Just make a new prompt on space-only input
         (progn
-            (goto-char (point-max))
-            (insert "\n")
-            (haskell-interactive-mode-prompt))
+          (goto-char (point-max))
+          (insert "\n")
+          (haskell-interactive-mode-prompt))
       (when (haskell-interactive-at-prompt)
         (cond
          ;; If already evaluating, then the user is trying to send
