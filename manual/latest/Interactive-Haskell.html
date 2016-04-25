@@ -81,24 +81,6 @@ different set of features:
 <samp>haskell-interactive-mode.el</samp>.
 </li></ul>
 
-<p>In order to use <code>haskell-interactive-mode</code> instead of the default
-<code>inferior-haskell-mode</code>, you need to replace some of the default
-keybindings in the <code>haskell-mode-map</code> keymap with the respective
-<code>haskell-interactive-mode</code> counterparts:
-</p>
-<div class="lisp">
-<pre class="lisp">(eval-after-load &quot;haskell-mode&quot;
-  '(progn
-    (define-key haskell-mode-map (kbd &quot;C-x C-d&quot;) nil)
-    (define-key haskell-mode-map (kbd &quot;C-c C-z&quot;) 'haskell-interactive-switch)
-    (define-key haskell-mode-map (kbd &quot;C-c C-l&quot;) 'haskell-process-load-file)
-    (define-key haskell-mode-map (kbd &quot;C-c C-b&quot;) 'haskell-interactive-switch)
-    (define-key haskell-mode-map (kbd &quot;C-c C-t&quot;) 'haskell-process-do-type)
-    (define-key haskell-mode-map (kbd &quot;C-c C-i&quot;) 'haskell-process-do-info)
-    (define-key haskell-mode-map (kbd &quot;C-c M-.&quot;) nil)
-    (define-key haskell-mode-map (kbd &quot;C-c C-d&quot;) nil)))
-</pre></div>
-
 <p>With <code>haskell-interactive-mode</code>, each Haskell source buffer is
 associated with at most one GHCi session, so when you call
 <code>haskell-process-load-file</code> for a Haskell source buffer which has

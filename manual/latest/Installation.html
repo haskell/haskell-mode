@@ -73,13 +73,23 @@ Next: <a href="Editing-Haskell-Code.html#Editing-Haskell-Code" accesskey="n" rel
 archive do the following:
 </p>
 <ol>
-<li> Customize <code>package-archives</code> using <kbd>M-x</kbd> <code>customize-option</code> <kbd>RET</kbd> <code>package-archives</code> <kbd>RET</kbd>.
-</li><li> Use <kbd>INS</kbd> to add new archive, use <code>Archive name: melpa-stable</code>
-and <code>URL or directory name: http://stable.melpa.org/packages/</code>.
-</li><li> Fetch new packages using <kbd>M-x</kbd> <code>package-refresh-contents</code>.
-</li><li> Install <code>haskell-mode</code> using <kbd>M-x</kbd> <code>package-install</code>
-<kbd>RET</kbd> <code>haskell-mode</code> <kbd>RET</kbd>.
-
+<li> Customize <code>package-archives</code> using
+<div class="example">
+<pre class="example">M-x customize-option RET package-archives
+</pre></div>
+</li><li> Use <kbd>INS</kbd> to add new archive, use:
+<div class="example">
+<pre class="example">Archive name:          melpa-stable
+URL or directory name: http://stable.melpa.org/packages
+</pre></div>
+</li><li> Fetch new packages using:
+<div class="example">
+<pre class="example">M-x package-refresh-contents
+</pre></div>
+</li><li> Install Haskell Mode using:
+<div class="example">
+<pre class="example">M-x package-install RET haskell-mode RET
+</pre></div>
 </li></ol>
 
 <p>Voila! <code>haskell-mode</code> is installed! You should be able to edit Haskell
@@ -101,42 +111,44 @@ source code in color now.
 </pre></div>
 
 
-<a name="Installation-_002d-more-information"></a>
-<h3 class="section">2.1 Installation - more information</h3>
-
-<p><code>haskell-mode</code> supports GNU Emacs versions 24.3+, including 25
+<p>Haskell Mode supports GNU Emacs versions 24.3+, including 25
 (snapshot).
 </p>
-<p><code>haskell-mode</code> is available from
+<p>Haskell Mode is available from
 <a href="http://stable.melpa.org">melpa-stable (releases)</a> and
 <a href="http://melpa.org">melpa (git snapshots)</a>.
 </p>
 <p>Other means of obtaining <code>haskell-mode</code> include
 <a href="https://github.com/dimitri/el-get">el-get</a>,
-<a href="https://github.com/bbatsov/prelude">Emacs Prelude</a> and <a href="https://packages.debian.org/search?keywords=haskell-mode">Debian package</a>.
+<a href="https://github.com/bbatsov/prelude">Emacs Prelude</a> and
+<a href="https://packages.debian.org/search?keywords=haskell-mode">Debian package</a>.
 </p>
 <p>Last version of <code>haskell-mode</code> that supported Emacs 23, 24.1, and 24.2 is
 <code>haskell-mode</code> 13.16 available at
 <a href="https://github.com/haskell/haskell-mode/releases/tag/v13.16">https://github.com/haskell/haskell-mode/releases/tag/v13.16</a>.
 </p>
 <a name="Customizing"></a>
-<h3 class="section">2.2 Customizing</h3>
+<h3 class="section">2.1 Customizing</h3>
 
 <a name="index-customizing"></a>
-<p>Most of <code>haskell-mode</code>&rsquo;s settings are configurable via customizable
+<p>Most of Haskell Mode&rsquo;s settings are configurable via customizable
 variables (see <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html#Easy-Customization">(emacs)Easy Customization</a>, for details). You can use
-</p>
-<p><kbd>M-x customize-group <span class="key">RET</span> haskell</kbd> to browse the <code>haskell</code>
+<kbd>M-x customize-group <span class="key">RET</span> haskell</kbd> to browse the <code>haskell</code>
 customization sub-tree.
 </p>
 <a name="index-haskell_002dmode_002dhook"></a>
 <p>One of the important setting you should customize is the
 <code>haskell-mode-hook</code> variable (see <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Hooks.html#Hooks">(emacs)Hooks</a>) which gets run
 right after the <code>haskell-mode</code> major mode is initialized for a
-buffer. You can customize <code>haskell-mode-hook</code> by <kbd>M-x
-customize-variable <span class="key">RET</span> haskell-mode-hook</kbd>.
+buffer. You can customize <code>haskell-mode-hook</code> by
 </p>
+<div class="example">
+<pre class="example">M-x customize-variable RET haskell-mode-hook
+</pre></div>
 
+<p>There you can enable or disable a couple of predefined options or add
+any function to the list.
+</p>
 <hr>
 <div class="header">
 <p>
