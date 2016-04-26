@@ -1126,6 +1126,20 @@ successful, nil otherwise."
     (goto-char (point-min))
     (end-of-line)))
 
+(defvar haskell-auto-insert-unicode-format-string
+  "{-# LANGUAGE UnicodeSyntax #-}\n\nmodule %s where\n\n"
+  "Template string that will be inserted in new haskell buffers via `haskell-auto-insert-unicode-template'.")
+
+(defun haskell-auto-insert-unicode-template ()
+  "Insert a module template with Unicode input method for the newly created buffer."
+  (interactive)
+  (when (and (= (point-min)
+                (point-max))
+             (buffer-file-name))
+    (insert (format haskell-auto-insert-unicode-format-string (haskell-guess-module-name)))
+    (goto-char (point-min))
+    (end-of-line)))
+
 ;;;###autoload
 (defun haskell-mode-generate-tags (&optional and-then-find-this-tag)
   "Generate tags using Hasktags.  This is synchronous function.
