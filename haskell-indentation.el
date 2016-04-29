@@ -679,16 +679,15 @@ For example
              (haskell-indentation-with-starter
               #'haskell-indentation-type-1)))))
         ((string= current-token "where")
-         (let ((starter-indent-inside (current-column)))
+         (haskell-indentation-with-starter
+          #'haskell-indentation-expression-layout nil)
+         (cond
+          ((equal current-token 'end-tokens)
+           (when (string= following-token "deriving")
+             (haskell-indentation-add-left-indent)))
+          ((equal current-token "deriving")
            (haskell-indentation-with-starter
-            #'haskell-indentation-expression-layout nil)
-           (cond
-            ((equal current-token 'end-tokens)
-             (when (string= following-token "deriving")
-               (haskell-indentation-add-left-indent)))
-            ((equal current-token "deriving")
-             (haskell-indentation-with-starter
-              #'haskell-indentation-type-1)))))))
+            #'haskell-indentation-type-1))))))
 
 (defun haskell-indentation-import ()
   "Parse import declaration."
