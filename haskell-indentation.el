@@ -74,10 +74,23 @@
   :type 'integer
   :group 'haskell-indentation)
 
-(defconst haskell-indentation-mode-map
+(defcustom haskell-indentation-electric-flag nil
+  "Non-nil means insertion of some characters may auto reindent the line.
+If the variable `electric-indent-mode' is non-nil then this variable is
+overridden."
+  :type 'symbol
+  :group 'haskell-indentation)
+(make-variable-buffer-local 'haskell-indentation-electric-flag)
+
+(defvar haskell-indentation-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "RET") 'haskell-indentation-newline-and-indent)
-    (define-key map (kbd "<backtab>") 'haskell-indentation-indent-backwards)
+    (define-key map (kbd "RET") #'haskell-indentation-newline-and-indent)
+    (define-key map (kbd "<backtab>") #'haskell-indentation-indent-backwards)
+    (define-key map (kbd ",") #'haskell-indentation-common-electric-command)
+    (define-key map (kbd ";") #'haskell-indentation-common-electric-command)
+    (define-key map (kbd ")") #'haskell-indentation-common-electric-command)
+    (define-key map (kbd "}") #'haskell-indentation-common-electric-command)
+    (define-key map (kbd "]") #'haskell-indentation-common-electric-command)
     map)
   "Keymap for `haskell-indentation-mode'.")
 
@@ -94,11 +107,8 @@ set and deleted as if they were real tabs."
     (when (and (bound-and-true-p haskell-indent-mode)
                (fboundp 'turn-off-haskell-indent))
       (turn-off-haskell-indent))
-    (when (and (bound-and-true-p haskell-simple-indent-mode)
-               (fboundp 'haskell-simple-indent-mode))
-      (haskell-simple-indent-mode 0))
-    (setq-local indent-line-function 'haskell-indentation-indent-line)
-    (setq-local indent-region-function 'haskell-indentation-indent-region)))
+    (setq-local indent-line-function #'haskell-indentation-indent-line)
+    (setq-local indent-region-function #'haskell-indentation-indent-region)))
 
 ;;;###autoload
 (defun turn-on-haskell-indentation ()
@@ -135,7 +145,7 @@ set and deleted as if they were real tabs."
 Called from a program, takes three arguments, START, END and ARG.
 You can remove all indentation from a region by giving a large
 negative ARG.  Handles bird style literate Haskell too."
-  (interactive "r\np")
+  (interactive "*r\np")
   (save-excursion
     (goto-char end)
     (let ((end-marker (point-marker)))
@@ -171,7 +181,7 @@ negative ARG.  Handles bird style literate Haskell too."
 
 (defun haskell-indentation-newline-and-indent ()
   "Insert newline and indent."
-  (interactive)
+  (interactive "*")
   ;; On RET (or C-j), we:
   ;;   - just jump to the next line if literate haskell, but outside code
   (if (haskell-indentation-bird-outside-code-p)
@@ -224,7 +234,7 @@ Do nothing inside multiline comments and multiline strings.
 Start enumerating the indentation points to the right.  The user
 can continue by repeatedly pressing TAB.  When there is no more
 indentation points to the right, we switch going to the left."
-  (interactive)
+  (interactive "*")
   ;; try to repeat
   (when (not (haskell-indentation-indent-line-repeat))
     (setq haskell-indentation-dyn-last-direction nil)
@@ -296,7 +306,7 @@ fixes up only indentation."
 
 (defun haskell-indentation-indent-backwards ()
   "Indent the current line to the previous indentation point."
-  (interactive)
+  (interactive "*")
   (cond
    ((and (memq last-command
                '(indent-for-tab-command haskell-indentation-indent-backwards))
@@ -323,7 +333,30 @@ fixes up only indentation."
            (car (haskell-indentation-first-indentation)) cursor-in-whitespace)
         (haskell-indentation-reindent-to pi cursor-in-whitespace))))))
 
+(defun haskell-indentation-common-electric-command (arg)
+  "Call `self-insert-command' to insert the character typed ARG times
+and indent when all of the following are true:
+1) The character is the first non-whitespace character on the line.
+2) There is only one possible indentation position.
+3) The variable `electric-indent-mode' or `haskell-indentation-electric-flag'
+   is non-nil.
+4) The point is not in a comment, string, or quasiquote."
+  (interactive "*p")
+  (let ((col (current-column))
+        ind)
+    (self-insert-command arg)
+    (when (and (or haskell-indentation-electric-flag
+                   electric-indent-mode)
+               (= (haskell-indentation-current-indentation)
+                  col)
+               (> arg 0)
+               (not (nth 8 (syntax-ppss)))
+               (= 1 (save-excursion
+                      (move-to-column col)
+                      (length (setq ind (haskell-indentation-find-indentations))))))
+      (haskell-indentation-reindent-to (car ind)))))
 
+
 ;;----------------------------------------------------------------------------
 ;; Parser Starts Here
 
@@ -740,8 +773,7 @@ For example
          (throw 'parse-end nil))))))
 
 (defun haskell-indentation-toplevel-where ()
-  "Parse 'where' that we may hit as a standalone in module
-declaration."
+  "Parse 'where' that we may hit as a standalone in module declaration."
   (haskell-indentation-read-next-token)
 
   (when (eq current-token 'end-tokens)
