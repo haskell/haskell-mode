@@ -843,6 +843,28 @@ Minor modes that work well with `haskell-mode':
             t)
   (haskell-indentation-mode))
 
+(defcustom haskell-mode-hook '(haskell-indentation-mode interactive-haskell-mode)
+  "List of functions to run after `haskell-mode' is enabled.
+
+Use to enable minor modes coming with `haskell-mode' or run an
+arbitrary function.
+
+Note that `inf-haskell-mode' should not be enabled at the same
+time as `haskell-interactive-mode', same exclusion principle
+applies to `haskell-indentation-mode' and `haskell-indent-mode'."
+  :group 'haskell
+  :type 'hook
+  :options '(capitalized-words-mode
+             flyspell-prog-mode
+             haskell-decl-scan-mode
+             haskell-indent-mode
+             haskell-indentation-mode
+             highlight-uses-mode
+             imenu-add-menubar-index
+             inf-haskell-mode
+             interactive-haskell-mode
+             turn-on-haskell-unicode-input-method))
+
 (defun haskell-fill-paragraph (justify)
   (save-excursion
     ;; Fill paragraph should only work in comments.
