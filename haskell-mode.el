@@ -146,6 +146,7 @@
 (require 'haskell-indentation)
 (require 'haskell-font-lock)
 (require 'haskell-cabal)
+(require 'haskell-analytics)
 
 ;; All functions/variables start with `(literate-)haskell-'.
 
@@ -827,6 +828,10 @@ Minor modes that work well with `haskell-mode':
             'haskell-completions-completion-at-point
             nil
             t)
+  ;; suggest haskell-analytics
+  (unless (or haskell-analytics--cid noninteractive
+              (not (fboundp 'advice-add)))
+    (message "Enable haskell-analytics with M-x haskell-analytics-enable"))
   (haskell-indentation-mode))
 
 (defcustom haskell-mode-hook '(haskell-indentation-mode interactive-haskell-mode)
