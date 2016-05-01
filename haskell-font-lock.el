@@ -431,8 +431,11 @@ like ::, class, instance, data, newtype, type."
          (concat " haskell-font-lock-fontify-block:" (symbol-name lang-mode)))
       (delete-region (point-min) (point-max))
       (insert string " ") ;; so there's a final property change
-      (unless (eq major-mode lang-mode) (funcall lang-mode))
-      (font-lock-ensure)
+      (cl-letf (((symbol-function 'message)
+                 (lambda (fmt &rest args))))
+        ;; silence messages
+        (unless (eq major-mode lang-mode) (funcall lang-mode))
+        (font-lock-ensure))
       (setq pos (point-min))
       (while (setq next (next-single-property-change pos 'face))
         (put-text-property
