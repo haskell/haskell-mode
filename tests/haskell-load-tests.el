@@ -2,6 +2,7 @@
 
 ;;; Code:
 
+(require 'cl)
 (require 'ert)
 (require 'haskell-test-utils)
 
@@ -83,3 +84,14 @@
    (search-forward "import Data.String")
    (haskell-goto-prev-error)
    (should (looking-at-p "Data.Mayb"))))
+
+(ert-deftest do-cabal-no-process ()
+  "Ensure that haskell-process-do-cabal can call cabal directly.
+
+Redefine `shell-command' to just capture the command it's asked
+to execute, and make sure it matches what we expected."
+  (let (shell-call)
+    (flet ((shell-command (command &optional input-buffer output-buffer)
+                          (setq shell-call command)))
+      (haskell-process-do-cabal "help")
+      (should (equal shell-call "cabal help")))))
