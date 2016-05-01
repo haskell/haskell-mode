@@ -301,7 +301,7 @@ PREFIX should be a list such one returned by
                         haskell-completions--keywords)))))
         (list beg end candidates)))))
 
-
+;;;###autoload
 (defun haskell-completions-completion-at-point ()
   "Provide completion list for thing at point.
 This function is used in non-interactive `haskell-mode'.  It
