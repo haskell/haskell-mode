@@ -838,7 +838,7 @@ Minor modes that work well with `haskell-mode':
   (add-hook 'after-save-hook 'haskell-mode-after-save-handler nil t)
   ;; provide non-interactive completion function
   (add-hook 'completion-at-point-functions
-            #'haskell-completions-completion-at-point
+            'haskell-completions-completion-at-point
             nil
             t)
   (haskell-indentation-mode))
