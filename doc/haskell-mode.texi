@@ -74,6 +74,7 @@ interpreter (e.g. GHCi).
 * Spell checking strings and comments::  Using @code{flyspell-prog-mode}
 * Aligning code::                        Aligning code using @code{align-regexp}
 * Rectangular commands::                 Manage indentation manually
+* Telemetry support::                    Help out by doing nothing (almost)
 * Getting Help and Reporting Bugs::      How to improve Haskell Mode
 * Concept index::                        Index of Haskell Mode concepts
 * Function index::                       Index of commands
@@ -2586,6 +2587,36 @@ This will insert the contents of the last killed rectangle.
 
 As with all Emacs modifier combos, you can type @kbd{C-x r C-h} to find
 out what keys are bound beginning with the @kbd{C-x r} prefix.
+
+@node Telemetry support
+@chapter Telemetry support
+
+Most of Haskell Mode users have little time to help with the
+development. There is a way to help while doing almost nothing.
+
+Usage information could help us with time and effort allocation so that
+heavily used parts of Haskell Mode receive proper attention.
+
+Haskell Mode optionally can sample usage statistics and report them back
+to a central server. Samples track function call counts, variable access
+count, key bindings, modes used alongside with @code{haskell-mode},
+exception information, some customization selections used, versions of
+Emacs, @code{haskell-mode} and basic operating system information.
+
+@itemize
+@item @kbd{M-x} @code{haskell-analytics-enable}
+Enables telemetry support.
+@item @kbd{M-x} @code{haskell-analytics-disable}
+Disables telemetry support.
+@end itemize
+
+Telemetry support should not degrade normal experience with Haskell
+Mode.
+
+Samples tracked pertain only to Haskell Mode buffers and do not contain
+any personal information. As analytics provider Haskell Mode uses Google
+Analytics. Privacy concerns are handled in the same manner as analytics
+for web pages.
 
 @node Getting Help and Reporting Bugs
 @chapter Getting Help and Reporting Bugs
