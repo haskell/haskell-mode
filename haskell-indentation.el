@@ -904,14 +904,7 @@ parser.  If parsing ends here, set indentation to left-indent."
               (when (null parser)
                 (throw 'return nil)) ; not expression token, so exit
               (funcall (cdr parser)) ; run parser
-              (when (and (eq current-token 'end-tokens)
-                         (string= (car parser) "let")
-                         (= haskell-indentation-layout-offset current-indent)
-                         (haskell-indentation-expression-token-p following-token))
-                ;; inside a layout, after a let construct
-                ;; for example: "do let a = 20"
-                (haskell-indentation-add-layout-indent)
-                (throw 'parse-end nil))
+
               ;; after an 'open' expression such as 'if', exit
               (unless (member (car parser) '("(" "[" "{" "case"))
                 (throw 'return nil)))))))))
