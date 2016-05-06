@@ -35,9 +35,9 @@
 (unless (fboundp 'xref-push-marker-stack)
   (defalias 'xref-pop-marker-stack 'pop-tag-mark)
 
-  (defun xref-push-marker-stack ()
-    "Add point to the marker stack."
-    (ring-insert find-tag-marker-ring (point-marker))))
+  (defun xref-push-marker-stack (&optional m)
+    "Add point M (defaults to `point-marker') to the marker stack."
+    (ring-insert find-tag-marker-ring (or m (point-marker)))))
 
 (unless (fboundp 'outline-hide-sublevels)
   (defalias 'outline-hide-sublevels 'hide-sublevels))
