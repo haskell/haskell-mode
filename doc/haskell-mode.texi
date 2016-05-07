@@ -819,6 +819,13 @@ position, @kbd{S-TAB} selects the previous one. If a block is selected
 you can use @kbd{TAB} to indent the block more and @kbd{S-TAB} to indent
 the block less.
 
+When @code{electric-indent-mode} is enabled or the variable
+@code{haskell-indentation-electric-flag} is non-nil, the insertion of
+some characters (by default @kbd{,} @kbd{;} @kbd{)} @kbd{@}} @kbd{]})
+may trigger auto reindentation under appropriate conditions. See the
+documentation of @code{haskell-indentation-common-electric-command} for
+more details.
+
 @item @code{haskell-indent-mode} (optional).
 
 This is a semi-intelligent indentation mode doing a decent job at
