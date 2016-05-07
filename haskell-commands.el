@@ -352,13 +352,11 @@ position with `xref-pop-marker-stack'."
   (interactive "P")
   (let ((initial-loc (point-marker))
         (loc (haskell-mode-find-def (haskell-ident-at-point))))
-    (if loc
-        (haskell-mode-handle-generic-loc loc)
-      (call-interactively 'haskell-mode-tag-find))
-    (unless (equal initial-loc (point-marker))
-      (save-excursion
-        (goto-char initial-loc)
-        (xref-push-marker-stack)))))
+    (if (not loc)
+        (call-interactively 'haskell-mode-tag-find)
+      (haskell-mode-handle-generic-loc loc)
+      (unless (equal initial-loc (point-marker))
+        (xref-push-marker-stack initial-loc)))))
 
 ;;;###autoload
 (defun haskell-mode-goto-loc ()
@@ -379,7 +377,7 @@ Requires the :loc-at command from GHCi."
   (forward-char (plist-get span :start-col)))
 
 (defun haskell-process-insert-type ()
-  "Get the identifer at the point and insert its type.
+  "Get the identifier at the point and insert its type.
 Use GHCi's :type if it's possible."
   (let ((ident (haskell-ident-at-point)))
     (when ident
