@@ -802,23 +802,26 @@ inferior GHCi process."
 Use buffer as input and replace the whole buffer with the
 output.  If CMD fails the buffer remains unchanged."
   (set-buffer-modified-p t)
-  (let* ((tmp-buf (generate-new-buffer " output"))
-         (err-buf (generate-new-buffer " error"))
+  (let* ((tmp-buf (generate-new-buffer "stylish-output"))
+         (err-file (make-temp-file "stylish-error"))
          (default-directory (if (and (boundp 'haskell-session)
                                      haskell-session)
                                 (haskell-session-cabal-dir haskell-session)
-                              default-directory))
-         (_errcode
-            (call-process-region (point-min) (point-max) cmd nil (list (buffer-name tmp-buf) (buffer-name err-buf)) nil))
+                              default-directory)))
+    (unwind-protect
+      (let* ((_errcode
+          (call-process-region (point-min) (point-max) cmd nil
+                               (list (buffer-name tmp-buf) err-file)
+                               nil))
          (stderr-output
           (with-temp-buffer
-            (insert-buffer err-buf)
+            (insert-file-contents err-file)
             (buffer-substring-no-properties (point-min) (point-max))))
          (stdout-output
           (with-temp-buffer
-            (insert-buffer tmp-buf)
+            (insert-buffer-substring tmp-buf)
             (buffer-substring-no-properties (point-min) (point-max)))))
-    (if (string= "" stderr-output)
+      (if (string= "" stderr-output)
         (if (string= "" stdout-output)
             (message "Error: %s produced no output, leaving buffer alone" cmd)
           (save-restriction
@@ -826,14 +829,16 @@ output.  If CMD fails the buffer remains unchanged."
             ;; command successful, insert file with replacement to preserve
             ;; markers.
             (erase-buffer)
-            (insert-buffer tmp-buf)))
-      (progn
-        ;; non-null stderr, command must have failed
-        (message "Error: %s ended with errors, leaving buffer alone" cmd)
-        ;; use (warning-minimum-level :debug) to see this
-        (display-warning cmd stderr-output :debug)))
-    (kill-buffer err-buf)
-    (kill-buffer tmp-buf)))
+            (insert-buffer-substring tmp-buf)))
+        (progn
+          ;; non-null stderr, command must have failed
+          (message "Error: %s ended with errors, leaving buffer alone" cmd)
+          ;; use (warning-minimum-level :debug) to see this
+          (display-warning cmd stderr-output :debug))))
+      (ignore-errors
+        (delete-file err-file))
+      (ignore-errors
+        (kill-buffer tmp-buf)))))
 
 ;;;###autoload
 (defun haskell-mode-find-uses ()
