@@ -793,7 +793,6 @@ Minor modes that work well with `haskell-mode':
   (setq-local paragraph-separate (concat " *$\\| *\\({-\\|-}\\) *$\\|" page-delimiter))
   (setq-local fill-paragraph-function 'haskell-fill-paragraph)
   ;; (setq-local adaptive-fill-function 'haskell-adaptive-fill)
-  (setq-local adaptive-fill-mode nil)
   (setq-local comment-start "-- ")
   (setq-local comment-padding 0)
   (setq-local comment-start-skip "[-{]-[ \t]*")
