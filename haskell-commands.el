@@ -808,37 +808,37 @@ output.  If CMD fails the buffer remains unchanged."
                                      haskell-session)
                                 (haskell-session-cabal-dir haskell-session)
                               default-directory)))
-    (unwind-protect
-      (let* ((_errcode
-          (call-process-region (point-min) (point-max) cmd nil
-                               (list (buffer-name tmp-buf) err-file)
-                               nil))
-         (stderr-output
-          (with-temp-buffer
-            (insert-file-contents err-file)
-            (buffer-substring-no-properties (point-min) (point-max))))
-         (stdout-output
-          (with-temp-buffer
-            (insert-buffer-substring tmp-buf)
-            (buffer-substring-no-properties (point-min) (point-max)))))
-      (if (string= "" stderr-output)
-        (if (string= "" stdout-output)
-            (message "Error: %s produced no output, leaving buffer alone" cmd)
-          (save-restriction
-            (widen)
-            ;; command successful, insert file with replacement to preserve
-            ;; markers.
-            (erase-buffer)
-            (insert-buffer-substring tmp-buf)))
-        (progn
-          ;; non-null stderr, command must have failed
-          (message "Error: %s ended with errors, leaving buffer alone" cmd)
-          ;; use (warning-minimum-level :debug) to see this
-          (display-warning cmd stderr-output :debug))))
-      (ignore-errors
-        (delete-file err-file))
-      (ignore-errors
-        (kill-buffer tmp-buf)))))
+        (unwind-protect
+          (let* ((_errcode
+                  (call-process-region (point-min) (point-max) cmd nil
+                                       (list (buffer-name tmp-buf) err-file)
+                                       nil))
+                 (stderr-output
+                  (with-temp-buffer
+                    (insert-file-contents err-file)
+                    (buffer-substring-no-properties (point-min) (point-max))))
+                 (stdout-output
+                  (with-temp-buffer
+                    (insert-buffer-substring tmp-buf)
+                    (buffer-substring-no-properties (point-min) (point-max)))))
+            (if (string= "" stderr-output)
+                (if (string= "" stdout-output)
+                    (message "Error: %s produced no output, leaving buffer alone" cmd)
+                  (save-restriction
+                    (widen)
+                    ;; command successful, insert file with replacement to preserve
+                    ;; markers.
+                    (erase-buffer)
+                    (insert-buffer-substring tmp-buf)))
+              (progn
+                ;; non-null stderr, command must have failed
+                (message "Error: %s ended with errors, leaving buffer alone" cmd)
+                ;; use (warning-minimum-level :debug) to see this
+                (display-warning cmd stderr-output :debug))))
+          (ignore-errors
+            (delete-file err-file))
+          (ignore-errors
+            (kill-buffer tmp-buf)))))
 
 ;;;###autoload
 (defun haskell-mode-find-uses ()
