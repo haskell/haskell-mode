@@ -297,8 +297,8 @@ the beginning of the buffer.
 
 (ert-deftest fill-comment-2 ()
   (check-fill '("{- a b c d e"
-                "f g h i j"
-                "k -}")
+                " f g h i j"
+                " k -}")
               '("{- @a b c d e f g h i j k -}")))
 
 (ert-deftest fill-comment-3 ()
@@ -322,7 +322,7 @@ the beginning of the buffer.
 (ert-deftest fill-comment-5 ()
   (check-fill '("    {-"
                 " a b c d e"
-                "f g h i"
+                " f g h i"
                 "    -}")
               '("    {-" " @a b c d e f g h i" "    -}")))
 
@@ -398,7 +398,6 @@ Also should respect 10 column fill."
 as defined, just the content should move properly.
 
 Also should respect 10 column fill."
-  :expected-result :failed
   (check-fill '("  --  a b"
                 "  -- c d e"
                 "  -- f g h"
@@ -412,7 +411,6 @@ as defined, just the content should move properly. Following
 lines should take position from second line.
 
 Also should respect 10 column fill."
-  :expected-result :failed
   (check-fill '("  --  a b"
                 "  -- c d e"
                 "  -- f g h"
