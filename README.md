@@ -1,13 +1,12 @@
 <img src="https://rawgithub.com/haskell/haskell-mode/master/images/haskell-mode.svg" width="35" height="35" /> Haskell Mode for Emacs
 ======================
 
-This is an Emacs mode for editing, debugging and developing Haskell programs.
+This is an Emacs mode for editing, debugging and developing Haskell programs. [Home page](http://haskell.github.io/haskell-mode/).
 
 [![Coverage Status](https://coveralls.io/repos/haskell/haskell-mode/badge.svg?branch=master&service=github)](https://coveralls.io/github/haskell/haskell-mode?branch=master)
 [![Build Status](https://travis-ci.org/haskell/haskell-mode.svg?branch=master)](https://travis-ci.org/haskell/haskell-mode)
 [![Melpa Status](http://melpa.org/packages/haskell-mode-badge.svg)](http://melpa.org/#/haskell-mode)
 [![Melpa Stable Status](http://stable.melpa.org/packages/haskell-mode-badge.svg)](http://stable.melpa.org/#/haskell-mode)
-[![Latest Docs](http://img.shields.io/badge/docs-latest-fc1e5e.svg)](http://haskell.github.io/haskell-mode/manual/latest/)
 [![License GPL3](https://img.shields.io/badge/license-GPL3-blue.svg)](https://github.com/haskell/haskell-mode/blob/master/COPYING)
 [![Twitter Follow](https://img.shields.io/twitter/follow/HaskellMode.svg?style=social)](https://twitter.com/HaskellMode)
 
@@ -20,6 +19,8 @@ This is an Emacs mode for editing, debugging and developing Haskell programs.
 
 > This sounds wonderful. Does anything similar exist for Vim?
 > -- [earldouglas, 2015-07-02](https://www.reddit.com/r/haskell/comments/3bsa0f/month_in_haskell_mode_june_2015/cspdbb6)
+
+Users manual: [latest version](http://haskell.github.io/haskell-mode/manual/latest/), older versions: [13.12](http://haskell.github.io/haskell-mode/manual/13.12/), [13.14](http://haskell.github.io/haskell-mode/manual/13.14/), [13.16](http://haskell.github.io/haskell-mode/manual/13.16/), [13.18](http://haskell.github.io/haskell-mode/manual/13.18/), [13.20](http://haskell.github.io/haskell-mode/manual/13.20/).
 
 
 ## Quick Installation
