@@ -155,7 +155,13 @@ font faces assigned as if respective mode was enabled."
 ;;;###autoload
 (defface haskell-pragma-face
   '((t :inherit font-lock-preprocessor-face))
-  "Face used to highlight Haskell pragmas."
+  "Face used to highlight Haskell pragmas ({-# ... #-})."
+  :group 'haskell-appearance)
+
+;;;###autoload
+(defface haskell-liquid-haskell-annotation-face
+  '((t :inherit haskell-pragma-face))
+  "Face used to highlight LiquidHaskell annotations ({-@ ... @-})."
   :group 'haskell-appearance)
 
 ;;;###autoload
@@ -512,7 +518,7 @@ like ::, class, instance, data, newtype, type."
       (equal (string-to-syntax "<") (syntax-after (point))))
     'haskell-literate-comment-face)
    ;; Detect pragmas. A pragma is enclosed in special comment
-   ;; delimeters {-# .. #-}.
+   ;; delimiters {-# .. #-}.
    ((save-excursion
       (goto-char (nth 8 state))
       (and (looking-at-p "{-#")
@@ -520,6 +526,15 @@ like ::, class, instance, data, newtype, type."
            (goto-char (- (point) 3))
            (looking-at-p "#-}")))
     'haskell-pragma-face)
+   ;; Detect Liquid Haskell annotations enclosed in special comment
+   ;; delimiters {-@ .. @-}.
+   ((save-excursion
+      (goto-char (nth 8 state))
+      (and (looking-at-p "{-@")
+           (forward-comment 1)
+           (goto-char (- (point) 3))
+           (looking-at-p "@-}")))
+    'haskell-liquid-haskell-annotation-face)
    ;; Haddock comment start with either "-- [|^*$]" or "{- ?[|^*$]"
    ;; (note space optional for nested comments and mandatory for
    ;; double dash comments).

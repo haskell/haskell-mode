@@ -155,6 +155,9 @@
      "{-# pragma1 #-}"
      "{-# non_pragma2 -}"
      "{- non_pragma3 #-}"
+     "{-@ liquid_haskell @-}"
+     "{-@ non_liquid_haskell_2 -}"
+     "{- non_liquid_haskell_3 @-}"
      )
    '(("Cons0" "w" haskell-constructor-face)
      ("Comm1" "w" font-lock-comment-face)
@@ -168,7 +171,11 @@
      ("pragma1"  "w" haskell-pragma-face)
      ("non_pragma2"  "w" font-lock-comment-face)
 
-     ("non_pragma3" "w" font-lock-comment-face))))
+     ("non_pragma3" "w" font-lock-comment-face)
+     ("liquid_haskell"  "w" haskell-liquid-haskell-annotation-face)
+     ("non_liquid_haskell_2"  "w" font-lock-comment-face)
+
+     ("non_liquid_haskell_3" "w" font-lock-comment-face))))
 
 
 (ert-deftest haskell-syntactic-string-vs-comment-escape ()
