@@ -169,13 +169,13 @@
      ("Comm6" "w" font-lock-comment-face)
      ("Cons7"  "w" haskell-constructor-face)
      ("pragma1"  "w" haskell-pragma-face)
-     ("non_pragma2"  "w" font-lock-comment-face)
+     ("non_pragma2"  "w_" font-lock-comment-face)
 
-     ("non_pragma3" "w" font-lock-comment-face)
-     ("liquid_haskell"  "w" haskell-liquid-haskell-annotation-face)
-     ("non_liquid_haskell_2"  "w" font-lock-comment-face)
+     ("non_pragma3" "w_" font-lock-comment-face)
+     ("liquid_haskell"  "w_" haskell-liquid-haskell-annotation-face)
+     ("non_liquid_haskell_2"  "w_" font-lock-comment-face)
 
-     ("non_liquid_haskell_3" "w" font-lock-comment-face))))
+     ("non_liquid_haskell_3" "w_" font-lock-comment-face))))
 
 
 (ert-deftest haskell-syntactic-string-vs-comment-escape ()

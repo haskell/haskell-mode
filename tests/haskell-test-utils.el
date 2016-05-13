@@ -64,14 +64,15 @@ If SYNTAX or FACE are set to t then any syntex respective face is
 not checked."
   (let (all-syntaxes
         all-faces
+        (syntax-classes "-.w_()'\"$\\/<>@!|")
         (text (buffer-substring-no-properties beg end)))
     (while (< beg end)
-      (add-to-list 'all-syntaxes (syntax-class (syntax-after beg)))
+      (add-to-list 'all-syntaxes (char-to-string (aref syntax-classes (syntax-class (syntax-after beg)))))
       (add-to-list 'all-faces (get-text-property beg 'face))
       (setq beg (1+ beg)))
     (unless (eq syntax t)
-      (should (equal (list text (list (syntax-class (string-to-syntax syntax))))
-                     (list text all-syntaxes))))
+      (should (equal (list text (mapconcat #'identity (sort (mapcar (lambda (syn) (char-to-string syn)) syntax) #'string<) ""))
+                     (list text (mapconcat #'identity (sort all-syntaxes #'string<) "")))))
     (unless (eq face t)
       (should (equal (list text (list face))
                      (list text all-faces))))))

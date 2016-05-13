@@ -199,7 +199,7 @@
     '(("{#" t haskell-c2hs-hook-pair-face)
       ("set" "w" haskell-c2hs-hook-name-face)
       ("#}" t haskell-c2hs-hook-pair-face)
-      ("AF_NET" "w" haskell-constructor-face))
+      ("AF_NET" "w_" haskell-constructor-face))
     'haskell-c2hs-mode))
 
 (ert-deftest haskell-c2hs-pointer-hook-1 ()
