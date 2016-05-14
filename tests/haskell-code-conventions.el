@@ -16,7 +16,7 @@
      warning (or `(shell-command . ,_) `(shell-command-to-string . ,_))
      "Do not use (shell-command[-to-string] ...) use (call-process ...) or (start-process ...) instead")
     (message-non-const
-     warning (and `(message ,msg . ,_) (guard (not (stringp `,msg))))
+     error (and `(message ,msg . ,_) (guard (not (stringp `,msg))))
      "First argument to (message ...) should be a string literal")
     (add-to-list
      warning (and `(add-to-list (quote ,var) . ,_)
