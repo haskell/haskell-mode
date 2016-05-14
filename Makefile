@@ -27,11 +27,7 @@ EMACS := $(shell which "$${EMACS}" 2> /dev/null || which "emacs")
 EMACS_VERSION := $(shell "$(EMACS)" -Q --batch --eval '(princ emacs-version)')
 
 EFLAGS = --eval "(add-to-list 'load-path (expand-file-name \"tests/compat\") 'append)" \
-	 --eval '(setq byte-compile-error-on-warn t)' \
-	 --eval '(when (not (version< emacs-version "24.4")) (setq load-prefer-newer t))' \
-	 --eval '(defun byte-compile-dest-file (filename) \
-                    (concat (file-name-directory filename) "build-" emacs-version "/" \
-                            (file-name-nondirectory filename) "c"))'
+	 --eval '(when (not (version< emacs-version "24.4")) (setq load-prefer-newer t))'
 
 BATCH = $(EMACS) $(EFLAGS) --batch -Q -L .
 
@@ -62,7 +58,11 @@ compile: build-$(EMACS_VERSION)
 
 build-$(EMACS_VERSION) : $(ELFILES)
 	if [ ! -d $@ ]; then mkdir $@; fi
-	$(BATCH) -f batch-byte-compile-if-not-done $^
+	$(BATCH) --eval '(setq byte-compile-error-on-warn t)'					\
+		 --eval "(defun byte-compile-dest-file (filename)				\
+	               	  (concat (file-name-directory filename) \"build-\" emacs-version \"/\"	\
+	                      	    (file-name-nondirectory filename) \"c\"))'"			\
+		 -f batch-byte-compile-if-not-done $^
 
 check-%: tests/%-tests.el
 	$(BATCH) -l "$<" -f ert-run-tests-batch-and-exit;
