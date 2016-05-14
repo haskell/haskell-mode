@@ -76,6 +76,26 @@
             (message "%s:%d:%d: Warning: First argument to (message ...) must be constant string"
                      (buffer-file-name) (line-number-at-pos)
                      (current-column)))
+          (el-search--skip-expression nil t))
+
+        ;; check against non-toplevel add-to-list that has issues working with lexical variables
+        (goto-char (point-min))
+        (while (el-search--search-pattern '(and `(add-to-list (quote ,var) . ,_)
+                                                (guard (not (member `,var '(completion-ignored-extensions
+                                                                            auto-mode-alist
+                                                                            interpreter-mode-alist
+                                                                            minor-mode-overriding-map-alist
+                                                                            haskell-sessions
+                                                                            flymake-allowed-file-name-masks
+                                                                            haskell-cabal-buffers))))) t)
+          (unless (save-excursion
+                    (goto-char (line-beginning-position))
+                    (re-search-forward "el-search--search-pattern" (line-end-position) t))
+            (message "%s" (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+            (message "%s:%d:%d: Error: add-to-list is only allowed on whitelisted variables because it does not work with lexical-binding, use cl-pushnew with :test #'equal"
+                     (buffer-file-name) (line-number-at-pos)
+                     (current-column))
+            (setq fail-flag t))
           (el-search--skip-expression nil t))))
     fail-flag))
 
