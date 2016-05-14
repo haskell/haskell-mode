@@ -303,8 +303,7 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
                   (?n))))
             ;; unwind
             (haskell-mode-toggle-interactive-prompt-state t)))
-      (message
-       (format "The Haskell process `%s' is dearly departed." process-name)))))
+      (message "The Haskell process `%s' is dearly departed." process-name))))
 
 (defun haskell-process ()
   "Get the current process from the current session."

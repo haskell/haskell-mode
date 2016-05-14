@@ -1168,7 +1168,7 @@ generated."
   "Echo STR in mini-buffer.
 Given string is shrinken to single line, multiple lines just
 disturbs the programmer."
-  (message (haskell-mode-one-line str (frame-width))))
+  (message "%s" (haskell-mode-one-line str (frame-width))))
 
 (defun haskell-mode-one-line (str width)
   "Try to fit STR as much as possible on one line according to given WIDTH."
