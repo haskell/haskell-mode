@@ -19,7 +19,7 @@
      error (and `(message ,msg . ,_) (guard (not (stringp `,msg))))
      "First argument to (message ...) should be a string literal")
     (add-to-list
-     warning (and `(add-to-list (quote ,var) . ,_)
+     error (and `(add-to-list (quote ,var) . ,_)
                   (guard (not (member `,var '(completion-ignored-extensions
                                               auto-mode-alist
                                               interpreter-mode-alist
