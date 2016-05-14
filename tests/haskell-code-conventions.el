@@ -64,6 +64,18 @@
             (message "%s:%d:%d: Warning: Do not use (shell-command[-to-string] ...) use (call-process ...) or (start-process ...) instead"
                      (buffer-file-name) (line-number-at-pos)
                      (current-column)))
+          (el-search--skip-expression nil t))
+
+        ;; check against message with non-constant first argument
+        (goto-char (point-min))
+        (while (el-search--search-pattern '(and `(message ,msg . ,_) (guard (not (stringp `,msg)))) t)
+          (unless (save-excursion
+                    (goto-char (line-beginning-position))
+                    (re-search-forward "el-search--search-pattern" (line-end-position) t))
+            ;; for now this is a warning
+            (message "%s:%d:%d: Warning: First argument to (message ...) must be constant string"
+                     (buffer-file-name) (line-number-at-pos)
+                     (current-column)))
           (el-search--skip-expression nil t))))
     fail-flag))
 
