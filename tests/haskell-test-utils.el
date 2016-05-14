@@ -27,6 +27,8 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
 (defun insert-lines (&rest lines)
   "Insert all LINES in current buffer."
   (let ((ls lines)
@@ -67,8 +69,8 @@ not checked."
         (syntax-classes "-.w_()'\"$\\/<>@!|")
         (text (buffer-substring-no-properties beg end)))
     (while (< beg end)
-      (add-to-list 'all-syntaxes (char-to-string (aref syntax-classes (syntax-class (syntax-after beg)))))
-      (add-to-list 'all-faces (get-text-property beg 'face))
+      (cl-pushnew (char-to-string (aref syntax-classes (syntax-class (syntax-after beg)))) all-syntaxes :test #'equal)
+      (cl-pushnew (get-text-property beg 'face) all-faces :test #'equal)
       (setq beg (1+ beg)))
     (unless (eq syntax t)
       (should (equal (list text (mapconcat #'identity (sort (mapcar (lambda (syn) (char-to-string syn)) syntax) #'string<) ""))
