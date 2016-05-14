@@ -1,4 +1,4 @@
-;;; haskell-test-utils.el --- Utilities for Haskell Mode tests.
+;;; haskell-test-utils.el --- Utilities for Haskell Mode tests.  -*- lexical-binding: t -*-
 
 ;; Copyright © 2016 Arthur Fayzrakhmanov. All rights reserved.
 

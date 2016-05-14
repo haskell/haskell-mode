@@ -1,4 +1,4 @@
-;;; haskell-cabal-tests.el
+;;; haskell-cabal-tests.el -*- lexical-binding: t -*-
 ;;; Code:
 
 (require 'ert)

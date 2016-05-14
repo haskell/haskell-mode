@@ -1,4 +1,4 @@
-
+;;  -*- lexical-binding: t -*-
 
 ;; require 'el-search only on Emacs 25 or above
 (when (>= emacs-major-version 25)

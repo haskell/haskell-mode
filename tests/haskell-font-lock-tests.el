@@ -1,3 +1,4 @@
+;;  -*- lexical-binding: t -*-
 (require 'ert)
 (require 'haskell-test-utils)
 (require 'haskell-font-lock)

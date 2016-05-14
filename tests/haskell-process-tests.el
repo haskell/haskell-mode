@@ -1,4 +1,4 @@
-;;; haskell-process-tests.el
+;;; haskell-process-tests.el  -*- lexical-binding: t -*-
 
 ;;; Code:
 
