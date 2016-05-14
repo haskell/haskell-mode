@@ -14,6 +14,14 @@
 
   (let (fail-flag)
     (save-excursion
+      ;; check lexical binding
+      (goto-char (point-min))
+      (unless (re-search-forward "lexical-binding: t" (line-end-position) t)
+        (unless (member (file-name-nondirectory (buffer-file-name))
+                        '("haskell-wy.el" "haskell-mode-pkg.el" "haskell-mode-autoloads.el"))
+          (message "%s:1:0: Error: Use `lexical-binding: t` on the first line of file"
+                   (buffer-file-name))
+          (setq fail-flag t)))
       ;; check TABS
       (goto-char (point-min))
       (while (re-search-forward "\t" nil t)
