@@ -398,7 +398,7 @@ Use GHCi's :type if it's possible."
                        ;; TODO: Generalize this into a function.
                        ((or (string-match "^Top level" response)
                             (string-match "^<interactive>" response))
-                        (message response))
+                        (message "%s" response))
                        (t
                         (with-current-buffer (nth 2 state)
                           (goto-char (line-beginning-position))
@@ -648,17 +648,9 @@ happened since function invocation)."
             ;; neither popup presentation buffer
             ;; nor insert response in error case
             ('unknown-command
-             (message
-              (concat
-               "This command requires GHCi-ng. "
-               "Please read command description for details.")))
+             (message "This command requires GHCi-ng. Please read command description for details."))
             ('option-missing
-             (message
-              (concat
-               "Could not infer type signature. "
-               "You need to load file first. "
-               "Also :set +c is required. "
-               "Please read command description for details.")))
+             (message "Could not infer type signature. You need to load file first. Also :set +c is required. Please read command description for details."))
             ('interactive-error (message "Wrong REPL response: %s" sig))
             (otherwise
              (if insert-value
@@ -675,13 +667,8 @@ happened since function invocation)."
                        ;; Non-region cases
                        (haskell-command-insert-type-signature sig))
                    ;; Some commands registered, prevent insertion
-                   (let* ((rev (reverse haskell-utils-async-post-command-flag))
-                          (cs (format "%s" (cdr rev))))
-                     (message
-                      (concat
-                       "Type signature insertion was prevented. "
-                       "These commands were registered:"
-                       cs))))
+                   (message "Type signature insertion was prevented. These commands were registered: %s"
+                            (cdr (reverse haskell-utils-async-post-command-flag))))
                ;; Present the result only when response is valid and not asked
                ;; to insert result
                (haskell-command-echo-or-present response)))
@@ -922,7 +909,7 @@ modified message MSG to echo area."
       (let ((session (haskell-process-session (haskell-interactive-process))))
         (haskell-presentation-present session msg))
     (let ((m (haskell-utils-reduce-string msg)))
-      (message m))))
+      (message "%s" m))))
 
 (defun haskell-command-capture-expr-bounds ()
   "Capture position bounds of expression at point.
