@@ -1097,26 +1097,7 @@ recursively avoiding visiting unnecessary heavy directories like
 cabal-install, stack, etc and passes list of found files to Hasktags."
   (if (eq system-type 'windows-nt)
       (format "hasktags --output=\"%s\\TAGS\" -x -e \"%s\"" dir dir)
-    (format "cd %s && %s | %s"
-            dir
-            (concat "find . "
-                    "-type d \\( "
-                    "-path ./.git "
-                    "-o -path ./.svn "
-                    "-o -path ./_darcs "
-                    "-o -path ./.stack-work "
-                    "-o -path ./dist "
-                    "-o -path ./.cabal-sandbox "
-                    "\\) -prune "
-                    "-o -type f \\( "
-                    "-name '*.hs' "
-                    "-or -name '*.lhs' "
-                    "-or -name '*.hsc' "
-                    "\\) -not \\( "
-                    "-name '#*' "
-                    "-or -name '.*' "
-                    "\\) -print0")
-            "xargs -0 hasktags -e -x")))
+    (format "cd %s && hasktags . -e -x" dir)))
 
 (provide 'haskell-cabal)
 ;;; haskell-cabal.el ends here
