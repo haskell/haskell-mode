@@ -13,7 +13,8 @@
      error `(require 'cl)
      "Do not use (require 'cl) use (require 'cl-lib) instead")
     (shell-command
-     warning (or `(shell-command . ,_) `(shell-command-to-string . ,_))
+     ;; requires thought put into this
+     disabled (or `(shell-command . ,_) `(shell-command-to-string . ,_))
      "Do not use (shell-command[-to-string] ...) use (call-process ...) or (start-process ...) instead")
     (message-non-const
      error (and `(message ,msg . ,_) (guard (not (stringp `,msg))))
@@ -28,16 +29,21 @@
                                               flymake-allowed-file-name-masks
                                               haskell-cabal-buffers)))))
      "Use add-to-list only with dynamically scoped variables, whitelist is in `haskell-code-conventions.el'")
-    (when-not
-     warning `(when (not . ,_) . ,_)
+    (when-not ;; noisy
+     disabled `(when (not . ,_) . ,_)
      "Use (unless ...) instead of (when (not ...))")
-    (unless-not
-     warning `(unless (not . ,_) . ,_)
+    (unless-not ;; noisy
+     disabled `(unless (not . ,_) . ,_)
      "Use (when ...) instead of (unless (not ...))")
-    (nested-when-or-unless
-     warning ;;`(,(or `unless `when) `(,(or `unless `when) . ,_))
-     `(,(or `when `unless) ,_ (,(or `when `unless) . ,_))
-     "Nested when/unless, consider using logical operators instead of nesting")))
+    (nested-when-or-unless ;; noisy
+     disabled `(,(or `when `unless) ,_ (,(or `when `unless) . ,_))
+     "Nested when/unless, consider using logical operators instead of nesting")
+    (if-progn-one-branch
+     disabled `(if ,_ (progn . ,_))
+     "Use `when` for `if+progn` with one branch only")
+    (add-hook-function
+     disabled `(add-hook ,_ (function ,_) . ,_)
+     "Use `add-hook` without #-notation, just symbols because those should be autoloaded")))
 
 (defun haskell-check-char-conventions-in-current-buffer ()
   "Check elisp convention suitable for haskell-mode in current buffer."
