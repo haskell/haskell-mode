@@ -642,7 +642,7 @@ comment.  May return a qualified name."
         ;; First, skip whitespace if we're on it, moving point to last
         ;; identifier char.  That way, if we're at "map ", we'll see the word
         ;; "map".
-        (when (and (looking-at (rx eol))
+        (when (and (eolp)
                    (not (bolp)))
           (backward-char))
         (when (and (not (eobp))
