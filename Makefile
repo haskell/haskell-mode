@@ -27,7 +27,7 @@ EMACS := $(shell which "$${EMACS}" 2> /dev/null || which "emacs")
 EMACS_VERSION := $(shell "$(EMACS)" -Q --batch --eval '(princ emacs-version)')
 
 EFLAGS = --eval "(add-to-list 'load-path (expand-file-name \"tests/compat\") 'append)" \
-	 --eval '(when (not (version< emacs-version "24.4")) (setq load-prefer-newer t))'
+	 --eval "(when (boundp 'load-prefer-newer) (setq load-prefer-newer t))"
 
 BATCH = $(EMACS) $(EFLAGS) --batch -Q -L .
 
@@ -54,20 +54,21 @@ check-emacs-version :
                             (message \"   3.  make EMACS=/path/to/emacs\")			\
                             (kill-emacs 2))"
 
-compile: build-$(EMACS_VERSION)
+compile: build-$(EMACS_VERSION)/build-flag
 
-build-$(EMACS_VERSION) : $(ELFILES)
-	if [ ! -d $@ ]; then mkdir $@; fi
+build-$(EMACS_VERSION)/build-flag : $(ELFILES)
+	if [ ! -d $$(dirname $@) ]; then mkdir $$(dirname $@); fi
 	$(BATCH) --eval '(setq byte-compile-error-on-warn t)'					\
 		 --eval "(defun byte-compile-dest-file (filename)				\
 	               	  (concat (file-name-directory filename) \"build-\" emacs-version \"/\"	\
 	                      	    (file-name-nondirectory filename) \"c\"))'"			\
-		 -f batch-byte-compile-if-not-done $^
+		 -f batch-byte-compile $^
+	touch $@
 
 check-%: tests/%-tests.el
 	$(BATCH) -l "$<" -f ert-run-tests-batch-and-exit;
 
-check: build-$(EMACS_VERSION) $(AUTOLOADS) check-ert check-conventions
+check: compile $(AUTOLOADS) check-ert check-conventions
 
 check-conventions :
 	$(BATCH) -l tests/haskell-code-conventions.el                                           \
