@@ -642,7 +642,7 @@ comment.  May return a qualified name."
         ;; First, skip whitespace if we're on it, moving point to last
         ;; identifier char.  That way, if we're at "map ", we'll see the word
         ;; "map".
-        (when (and (looking-at (rx eol))
+        (when (and (eolp)
                    (not (bolp)))
           (backward-char))
         (when (and (not (eobp))
@@ -1168,7 +1168,7 @@ generated."
   "Echo STR in mini-buffer.
 Given string is shrinken to single line, multiple lines just
 disturbs the programmer."
-  (message (haskell-mode-one-line str (frame-width))))
+  (message "%s" (haskell-mode-one-line str (frame-width))))
 
 (defun haskell-mode-one-line (str width)
   "Try to fit STR as much as possible on one line according to given WIDTH."

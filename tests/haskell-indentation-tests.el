@@ -1,4 +1,4 @@
-;;; haskell-indentation-tests.el --- tests for indentation module
+;;; haskell-indentation-tests.el --- tests for indentation module  -*- lexical-binding: t -*-
 
 ;; Copyright © 2015 Haskell Mode contributors. All rights reserved.
 ;;             2016 Arthur Fayzrakhmanov.

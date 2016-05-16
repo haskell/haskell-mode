@@ -27,11 +27,7 @@ EMACS := $(shell which "$${EMACS}" 2> /dev/null || which "emacs")
 EMACS_VERSION := $(shell "$(EMACS)" -Q --batch --eval '(princ emacs-version)')
 
 EFLAGS = --eval "(add-to-list 'load-path (expand-file-name \"tests/compat\") 'append)" \
-	 --eval '(setq byte-compile-error-on-warn t)' \
-	 --eval '(when (not (version< emacs-version "24.4")) (setq load-prefer-newer t))' \
-	 --eval '(defun byte-compile-dest-file (filename) \
-                    (concat (file-name-directory filename) "build-" emacs-version "/" \
-                            (file-name-nondirectory filename) "c"))'
+	 --eval "(when (boundp 'load-prefer-newer) (setq load-prefer-newer t))"
 
 BATCH = $(EMACS) $(EFLAGS) --batch -Q -L .
 
@@ -58,16 +54,28 @@ check-emacs-version :
                             (message \"   3.  make EMACS=/path/to/emacs\")			\
                             (kill-emacs 2))"
 
-compile: build-$(EMACS_VERSION)
+compile: build-$(EMACS_VERSION)/build-flag
 
-build-$(EMACS_VERSION) : $(ELFILES)
-	if [ ! -d $@ ]; then mkdir $@; fi
-	$(BATCH) -f batch-byte-compile-if-not-done $^
+build-$(EMACS_VERSION)/build-flag : $(ELFILES)
+	if [ ! -d $$(dirname $@) ]; then mkdir $$(dirname $@); fi
+	$(BATCH) --eval '(setq byte-compile-error-on-warn t)'					\
+		 --eval "(defun byte-compile-dest-file (filename)				\
+	               	  (concat (file-name-directory filename) \"build-\" emacs-version \"/\"	\
+	                      	    (file-name-nondirectory filename) \"c\"))'"			\
+		 -f batch-byte-compile $^
+	touch $@
 
 check-%: tests/%-tests.el
 	$(BATCH) -l "$<" -f ert-run-tests-batch-and-exit;
 
-check: $(ELCHECKS) build-$(EMACS_VERSION)
+check: compile $(AUTOLOADS) check-ert check-conventions
+
+check-conventions :
+	$(BATCH) -l tests/haskell-code-conventions.el                                           \
+                 -f haskell-check-conventions-batch-and-exit
+	@echo "conventions are okay"
+
+check-ert: $(ELCHECKS)
 	$(BATCH) --eval "(when (= emacs-major-version 24)					\
                            (require 'undercover)						\
                            (undercover \"*.el\"							\
@@ -75,15 +83,6 @@ check: $(ELCHECKS) build-$(EMACS_VERSION)
                  -L tests									\
                  $(patsubst %,-l %,$(ELCHECKS))							\
                  -f ert-run-tests-batch-and-exit
-	@TAB=$$(echo "\t"); \
-	if grep -Hn "[ $${TAB}]\+\$$" *.el tests/*.el; then \
-	    echo "Error: Files contain whitespace at the end of lines" >&2; \
-	    exit 3; \
-	fi; \
-	if grep -Hn "[$${TAB}]" *.el tests/*.el; then \
-	    echo "Error: Tab character is not allowed" >&2; \
-	    exit 3; \
-	fi
 	@echo "checks passed!"
 
 clean:

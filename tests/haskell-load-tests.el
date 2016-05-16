@@ -1,8 +1,8 @@
-;;; haskell-load-tests.el
+;;; haskell-load-tests.el  -*- lexical-binding: t -*-
 
 ;;; Code:
 
-(require 'cl)
+(require 'cl-lib)
 (require 'ert)
 (require 'haskell-test-utils)
 
@@ -91,7 +91,7 @@
 Redefine `shell-command' to just capture the command it's asked
 to execute, and make sure it matches what we expected."
   (let (shell-call)
-    (flet ((shell-command (command &optional input-buffer output-buffer)
-                          (setq shell-call command)))
+    (cl-letf (((symbol-function 'shell-command) (lambda (command &optional input-buffer output-buffer)
+                                                  (setq shell-call command))))
       (haskell-process-do-cabal "help")
       (should (equal shell-call "cabal help")))))

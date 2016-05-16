@@ -1,4 +1,4 @@
-;;; haskell-completions-tests.el --- Tests for Haskell Completion package
+;;; haskell-completions-tests.el --- Tests for Haskell Completion package -*- lexical-binding: t -*-
 
 ;; Copyright © 2015 Athur Fayzrakhmanov. All rights reserved.
 

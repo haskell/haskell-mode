@@ -1,4 +1,4 @@
-;;; haskell-mode-tests.el ---
+;;; haskell-mode-tests.el ---  -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2014 Chris Done. All rights reserved.
 
