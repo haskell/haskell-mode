@@ -1541,8 +1541,8 @@ If SYNC is non-nil, make the call synchronously instead."
           :go (lambda (_) (haskell-process-send-string process ghci-command))
           :complete
           (lambda (_ response)
-            (funcall callback (funcall process-response response))))))
-      'async)))
+            (funcall callback (funcall process-response response)))))
+        'async))))
 
 (defun haskell-doc-sym-doc (sym)
   "Show the type of given symbol SYM.
