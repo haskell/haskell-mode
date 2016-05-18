@@ -187,6 +187,47 @@ it will be used as exit code for `kill-emacs' function, otherwise
          (progn ,@body)
        (delete-file ,cmdvar))))
 
-(provide 'haskell-test-utils)
+(defun create-directory-structure (entries)
+  (dolist (entry entries)
+    (cond
+     ((stringp (cdr entry))
+      (with-current-buffer (find-file-noselect (car entry))
+        (insert (cdr entry))
+        (basic-save-buffer)
+        (kill-buffer)))
+     ((bufferp (cdr entry))
+      (with-current-buffer (find-file-noselect (car entry))
+        (insert (with-current-buffer (cdr entry)
+                  (buffer-substring-no-properties (point-min) (point-max))))
+        (basic-save-buffer)
+        (kill-buffer)))
+     (t
+      (make-directory (car entry))
+      (let ((default-directory (concat default-directory (car entry) "/")))
+        (create-directory-structure (cdr entry)))))))
 
+(defmacro with-temp-dir-structure (entries &rest body)
+  "Create a temporary directory structure.
+
+ENTRIES is an alist with file or directory names as keys. If
+associated value is a string or buffer then a file is created, if
+value is an association list then a directory is created
+recursively.
+
+Throughout BODY `default-directory' is set to the root of the
+hierarchy created.
+
+Whole hierarchy is removed after BODY finishes and value of
+`default-directory' is restored."
+  (declare (indent 2) (debug t))
+  `(let ((tmpdir (make-temp-name "haskell-mode-test-dir")))
+     (make-directory tmpdir)
+     (unwind-protect
+         (let ((default-directory (concat default-directory tmpdir "/")))
+           (create-directory-structure ',entries)
+           ,@body)
+       (delete-directory tmpdir t))))
+
+
+(provide 'haskell-test-utils)
 ;;; haskell-test-utils.el ends here
