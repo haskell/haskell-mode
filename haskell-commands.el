@@ -37,6 +37,11 @@
 (require 'highlight-uses-mode)
 (require 'haskell-cabal)
 
+(defcustom haskell-mode-stylish-haskell-path "stylish-haskell"
+  "Path to `stylish-haskell' executable."
+  :group 'haskell
+  :type 'string)
+
 ;;;###autoload
 (defun haskell-process-restart ()
   "Restart the inferior Haskell process."
@@ -779,7 +784,7 @@ inferior GHCi process."
   (interactive)
   (let ((column (current-column))
         (line (line-number-at-pos)))
-    (haskell-mode-buffer-apply-command "stylish-haskell")
+    (haskell-mode-buffer-apply-command haskell-mode-stylish-haskell-path)
     (goto-char (point-min))
     (forward-line (1- line))
     (goto-char (+ column (point)))))
