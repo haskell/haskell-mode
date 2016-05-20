@@ -795,11 +795,7 @@ Use buffer as input and replace the whole buffer with the
 output.  If CMD fails the buffer remains unchanged."
   (set-buffer-modified-p t)
   (let* ((tmp-buf (generate-new-buffer "stylish-output"))
-         (err-file (make-temp-file "stylish-error"))
-         (default-directory (if (and (boundp 'haskell-session)
-                                     haskell-session)
-                                (haskell-session-cabal-dir haskell-session)
-                              default-directory)))
+         (err-file (make-temp-file "stylish-error")))
         (unwind-protect
           (let* ((_errcode
                   (call-process-region (point-min) (point-max) cmd nil
