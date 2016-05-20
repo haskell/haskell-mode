@@ -556,4 +556,74 @@ moves over sexps."
        (should (equal "-e\n-x\n./T1.hs\n./src/T2.hs\n"
                       (buffer-substring (point-min) (point-max))))))))
 
+(defun haskell-stylish-haskell-add-first-line ()
+  (message-stdout "-- HEADER")
+  (let (line)
+    (while (setq line (read-stdin))
+      (message-stdout line))))
+
+(defun haskell-stylish-haskell-no-change ()
+  (let (line)
+    (while (setq line (read-stdin))
+      (message-stdout line))))
+
+(defun haskell-stylish-haskell-bad-exit-code ()
+  (when noninteractive
+    (kill-emacs 34)))
+
+(defun haskell-stylish-haskell-error-message ()
+  (message-stderr "Something wrong"))
+
+(ert-deftest haskell-stylish-on-save-add-first-line ()
+  (with-temp-dir-structure
+   (("T.hs" . "main :: IO ()"))
+    (with-script-path
+     haskell-mode-stylish-haskell-path
+     haskell-stylish-haskell-add-first-line
+     (let ((haskell-stylish-on-save t))
+       (with-current-buffer (find-file-noselect "T.hs")
+         (insert "main = return ()\n")
+         (save-buffer)
+         (goto-char (point-min))
+         (should (looking-at-p "-- HEADER")))))))
+
+(ert-deftest haskell-stylish-on-save-no-change ()
+  (with-temp-dir-structure
+   (("T.hs" . "main :: IO ()"))
+    (with-script-path
+     haskell-mode-stylish-haskell-path
+     haskell-stylish-haskell-no-change
+     (let ((haskell-stylish-on-save t))
+       (with-current-buffer (find-file-noselect "T.hs")
+         (insert "main = return ()\n")
+         (save-buffer)
+         (goto-char (point-min))
+         (should (looking-at-p "main = return")))))))
+
+(ert-deftest haskell-stylish-on-save-bad-exit-code ()
+  (with-temp-dir-structure
+   (("T.hs" . "main :: IO ()"))
+    (with-script-path
+     haskell-mode-stylish-haskell-path
+     haskell-stylish-haskell-bad-exit-code
+     (let ((haskell-stylish-on-save t))
+       (with-current-buffer (find-file-noselect "T.hs")
+         (insert "main = return ()\n")
+         (save-buffer)
+         (goto-char (point-min))
+         (should (looking-at-p "main = return ()")))))))
+
+(ert-deftest haskell-stylish-on-save-error-message ()
+  (with-temp-dir-structure
+   (("T.hs" . "main :: IO ()"))
+    (with-script-path
+     haskell-mode-stylish-haskell-path
+     haskell-stylish-haskell-error-message
+     (let ((haskell-stylish-on-save t))
+       (with-current-buffer (find-file-noselect "T.hs")
+         (insert "main = return ()\n")
+         (save-buffer)
+         (goto-char (point-min))
+         (should (looking-at-p "main = return ()")))))))
+
 (provide 'haskell-mode-tests)
