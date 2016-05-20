@@ -19,6 +19,7 @@
 
 (require 'ert)
 (require 'haskell-mode)
+(require 'haskell-test-utils)
 
 (ert-deftest haskell-mode-ident-at-point-empty ()
   (should (with-temp-buffer
@@ -532,5 +533,27 @@ moves over sexps."
             (goto-char 15)
             (haskell-forward-sexp -4)
             (eq (point) 3))))
+
+(defun haskell-generate-tags-test-helper ()
+  (with-current-buffer (find-file-noselect "TAGS-test-format")
+    (erase-buffer)
+    (dolist (arg (sort argv #'string<))
+      (insert arg "\n"))
+    (save-buffer)
+    (kill-buffer)))
+
+(ert-deftest haskell-generate-tags ()
+  (with-temp-dir-structure
+   (("xxx.cabal" . "")
+    ("T1.hs" . "i1 :: Int")
+    ("src" . (("T2.hs" . "i2 :: Int")))
+    (".git" . (("Tx.hs" . "should_not_see_me :: Int"))))
+    (with-script-path
+     haskell-hasktags-path
+     haskell-generate-tags-test-helper
+     (haskell-mode-generate-tags)
+     (with-current-buffer (find-file-noselect "TAGS-test-format")
+       (should (equal "-e\n-x\n./T1.hs\n./src/T2.hs\n"
+                      (buffer-substring (point-min) (point-max))))))))
 
 (provide 'haskell-mode-tests)

@@ -130,5 +130,104 @@ if all of its characters have syntax and face. See
           (search-forward string))
         (check-syntax-and-face-match-range (match-beginning 0) (match-end 0) syntax face)))))
 
+
+(defun message-stderr (&rest args)
+  "Output a message to stderr in batch mode.
+
+ARGS are formatted according to `format'. A newline is automatically appended."
+  (apply #'message args))
+
+(defun message-stdout (&rest args)
+  "Output a message to stdout in batch mode.
+
+ARGS are formatted according to `format'. A newline is automatically appended."
+  (princ (apply #'format args))
+  (terpri))
+
+(defun read-stdin ()
+  "Read a line from stdin in batch mode.
+
+A line is read and returned. End of input is signalled by
+nil. Newlines are stripped. Last line is returned even if there
+is no final newline."
+  (condition-case nil
+      (read-from-minibuffer "")
+    (error nil)))
+
+(defmacro with-script-path (cmdvar func &rest body)
+  "Temporarily substitute a command line executable.
+
+Creates a temporary executable script and sets CMDVAR to point to
+the script. When the script is run it spawns another Emacs
+instance and executes function FUNC. Substitution is in effect
+throughout BODY.
+
+In FUNC variable `argv' is a list of all arguments that the
+script received when invoked. If the FUNC returns a number then
+it will be used as exit code for `kill-emacs' function, otherwise
+0 will be used."
+  (declare (indent 2) (debug t))
+  `(let ((,cmdvar (make-temp-file "haskell-mode-tests-script")))
+     (with-current-buffer (find-file-noselect ,cmdvar)
+
+       (insert "#!/bin/sh\n")
+       (insert "\":\"; exec \"" invocation-directory invocation-name "\" -Q --batch -l \"$0\" -- \"$@\"\n")
+       (insert "(setq debug-on-error t)\n")
+       (insert "(pop argv)\n")
+       (insert "(setq load-path '" (format "%S" load-path) ")\n")
+       (insert "(load \"" (symbol-file ',func) "\" nil t)\n")
+       (insert "(let ((return-value (" (symbol-name ',func) ")))\n")
+       (insert " (if (numberp return-value)\n")
+       (insert "    (kill-emacs return-value)\n")
+       (insert "    (kill-emacs 0)))\n")
+       (basic-save-buffer)
+       (kill-buffer))
+     (set-file-modes ,cmdvar (string-to-number "700" 8))
+     (unwind-protect
+         (progn ,@body)
+       (delete-file ,cmdvar))))
+
+(defun create-directory-structure (entries)
+  (dolist (entry entries)
+    (cond
+     ((stringp (cdr entry))
+      (with-current-buffer (find-file-noselect (car entry))
+        (insert (cdr entry))
+        (basic-save-buffer)
+        (kill-buffer)))
+     ((bufferp (cdr entry))
+      (with-current-buffer (find-file-noselect (car entry))
+        (insert (with-current-buffer (cdr entry)
+                  (buffer-substring-no-properties (point-min) (point-max))))
+        (basic-save-buffer)
+        (kill-buffer)))
+     (t
+      (make-directory (car entry))
+      (let ((default-directory (concat default-directory (car entry) "/")))
+        (create-directory-structure (cdr entry)))))))
+
+(defmacro with-temp-dir-structure (entries &rest body)
+  "Create a temporary directory structure.
+
+ENTRIES is an alist with file or directory names as keys. If
+associated value is a string or buffer then a file is created, if
+value is an association list then a directory is created
+recursively.
+
+Throughout BODY `default-directory' is set to the root of the
+hierarchy created.
+
+Whole hierarchy is removed after BODY finishes and value of
+`default-directory' is restored."
+  (declare (indent 2) (debug t))
+  `(let ((tmpdir (make-temp-name "haskell-mode-test-dir")))
+     (make-directory tmpdir)
+     (unwind-protect
+         (let ((default-directory (concat default-directory tmpdir "/")))
+           (create-directory-structure ',entries)
+           ,@body)
+       (delete-directory tmpdir t))))
+
+
 (provide 'haskell-test-utils)
 ;;; haskell-test-utils.el ends here

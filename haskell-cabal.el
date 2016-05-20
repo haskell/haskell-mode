@@ -51,6 +51,11 @@
 (require 'cl-lib)
 (require 'haskell-utils)
 
+(defcustom haskell-hasktags-path "hasktags"
+  "Path to `hasktags' executable."
+  :group 'haskell
+  :type 'string)
+
 (defconst haskell-cabal-general-fields
   ;; Extracted with (haskell-cabal-extract-fields-from-doc "general-fields")
   '("name" "version" "cabal-version" "license" "license-file" "copyright"
@@ -1096,7 +1101,7 @@ recursively avoiding visiting unnecessary heavy directories like
 .git, .svn, _darcs and build directories created by
 cabal-install, stack, etc and passes list of found files to Hasktags."
   (if (eq system-type 'windows-nt)
-      (format "hasktags --output=\"%s\\TAGS\" -x -e \"%s\"" dir dir)
+      (format "%s --output=\"%s\\TAGS\" -x -e \"%s\"" haskell-hasktags-path dir dir)
     (format "cd %s && %s | %s"
             dir
             (concat "find . "
@@ -1116,7 +1121,7 @@ cabal-install, stack, etc and passes list of found files to Hasktags."
                     "-name '#*' "
                     "-or -name '.*' "
                     "\\) -print0")
-            "xargs -0 hasktags -e -x")))
+            (format "xargs -0 %s -e -x" haskell-hasktags-path))))
 
 (provide 'haskell-cabal)
 ;;; haskell-cabal.el ends here
