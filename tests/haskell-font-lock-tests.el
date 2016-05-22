@@ -883,22 +883,20 @@
      "pattern A :: (C a) => () => a -> B"
      "pattern A :: (C a) => (C a) => a -> B"
      "pattern A :: (C a) => (C a) => a -> B")
-   '(("pattern"  t haskell-keyword-face)
-     ("where"    t haskell-keyword-face)
-     ("module"   t haskell-keyword-face)
-     ("A"        t haskell-constructor-face)
-     ("B"        t haskell-type-face)
-     ("C"        t haskell-type-face)
-     ("<-"       t haskell-operator-face)
-     ("←"        t haskell-operator-face)
-     ("=>"       t haskell-operator-face)
-     ("::"       t haskell-operator-face)
-     ("+"        t nil)
-     ("1"        t nil)
-     ("("        t nil)
-     (")"        t nil)
-     ("a"        t nil)
-     ("subtract" t nil))))
+   '(("pattern" t haskell-keyword-face)
+     ("pattern" t haskell-keyword-face)
+     ("pattern" t haskell-keyword-face)
+     ("pattern" t haskell-keyword-face)
+     ("module"  t haskell-keyword-face)
+     ("pattern" t haskell-keyword-face)
+     ("where"   t haskell-keyword-face)
+     ("pattern" t haskell-keyword-face)
+     ("pattern" t haskell-keyword-face)
+     ("pattern" t haskell-keyword-face)
+     ("pattern" t haskell-keyword-face)
+     ("pattern" t haskell-keyword-face)
+     ("pattern" t haskell-keyword-face)
+     ("pattern" t haskell-keyword-face))))
 
 (ert-deftest haskell-no-pattern-1 ()
   "Don't fontify \"pattern\" in contexts unrelated to pattern synonyms."
@@ -907,7 +905,8 @@
   (check-properties
    '("pattern :: Int"
      "pattern = 3")
-   '(("pattern" t haskell-definition-face))))
+   '(("pattern" t haskell-definition-face)
+     ("pattern" t haskell-definition-face))))
 
 (ert-deftest haskell-no-pattern-2 ()
   "Don't fontify \"pattern\" in contexts unrelated to pattern synonyms."
@@ -917,4 +916,9 @@
    '("foo :: (a -> pattern) -> a -> pattern"
      "foo pattern x = pattern x"
      "bar = pattern where pattern = 5")
-   '(("pattern" t nil))))
+   '(("pattern" t nil)
+     ("pattern" t nil)
+     ("pattern" t nil)
+     ("pattern" t nil)
+     ("pattern" t nil)
+     ("pattern" t nil))))
