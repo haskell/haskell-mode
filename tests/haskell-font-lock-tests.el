@@ -866,3 +866,55 @@
      ("Y" t haskell-constructor-face)
      ("Z" t haskell-type-face)
      ("C" t haskell-constructor-face))))
+
+(ert-deftest haskell-pattern ()
+  "Fontify the \"pattern\" keyword in contexts related to pattern synonyms."
+  :expected-result :failed
+  (check-properties
+   '("pattern A = B"
+     "pattern A <- B"
+     "pattern A ← B"
+     "pattern A n <- (subtract 1 -> n) where A n = n + 1"
+     "module Main (pattern A) where"
+     "pattern A :: a -> B"
+     "pattern A :: (C a) => a -> B"
+     "pattern A :: (C a) => a -> B"
+     "pattern A :: (C a) => () => a -> B"
+     "pattern A :: (C a) => () => a -> B"
+     "pattern A :: (C a) => (C a) => a -> B"
+     "pattern A :: (C a) => (C a) => a -> B")
+   '(("pattern"  t haskell-keyword-face)
+     ("where"    t haskell-keyword-face)
+     ("module"   t haskell-keyword-face)
+     ("A"        t haskell-constructor-face)
+     ("B"        t haskell-type-face)
+     ("C"        t haskell-type-face)
+     ("<-"       t haskell-operator-face)
+     ("←"        t haskell-operator-face)
+     ("=>"       t haskell-operator-face)
+     ("::"       t haskell-operator-face)
+     ("+"        t nil)
+     ("1"        t nil)
+     ("("        t nil)
+     (")"        t nil)
+     ("a"        t nil)
+     ("subtract" t nil))))
+
+(ert-deftest haskell-no-pattern-1 ()
+  "Don't fontify \"pattern\" in contexts unrelated to pattern synonyms."
+  ;; This already works properly
+  ;;:expected-result :failed
+  (check-properties
+   '("pattern :: Int"
+     "pattern = 3")
+   '(("pattern" t haskell-definition-face))))
+
+(ert-deftest haskell-no-pattern-2 ()
+  "Don't fontify \"pattern\" in contexts unrelated to pattern synonyms."
+  ;; This already works properly
+  ;;:expected-result :failed
+  (check-properties
+   '("foo :: (a -> pattern) -> a -> pattern"
+     "foo pattern x = pattern x"
+     "bar = pattern where pattern = 5")
+   '(("pattern" t nil))))
