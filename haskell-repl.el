@@ -101,8 +101,7 @@
   "Print the result of evaluating the expression."
   (let ((response
          (with-temp-buffer
-           (insert (haskell-interactive-mode-cleanup-response
-                    (cl-caddr state) response))
+           (insert response)
            (haskell-interactive-mode-handle-h)
            (buffer-string))))
     (when haskell-interactive-mode-eval-mode
