@@ -95,7 +95,9 @@ You can create new session using function `haskell-session-make'."
           ;; whole produces only one prompt marker as a response.
           (haskell-process-send-string process "Prelude.putStrLn \"\"")
           (haskell-process-send-string process ":set -v1")
-          (haskell-process-send-string process ":set prompt \"\\4\""))
+          (haskell-process-send-string process ":set prompt \"\\4\"")
+          (haskell-process-send-string process (format ":set prompt2 \"%s\""
+                                                       haskell-interactive-prompt2)))
 
     :live (lambda (process buffer)
             (when (haskell-process-consume

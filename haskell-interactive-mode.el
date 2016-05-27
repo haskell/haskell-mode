@@ -131,6 +131,12 @@ be nil.")
   :group 'haskell-interactive)
 
 ;;;###autoload
+(defface haskell-interactive-face-prompt2
+  '((t :inherit font-lock-keyword-face))
+  "Face for the prompt2 in multi-line mode."
+  :group 'haskell-interactive)
+
+;;;###autoload
 (defface haskell-interactive-face-compile-error
   '((t :inherit compilation-error))
   "Face for compile errors."
@@ -331,21 +337,27 @@ SESSION, otherwise operate on the current buffer."
   "Insert the result of an eval as plain text."
   (with-current-buffer (haskell-session-interactive-buffer session)
     (goto-char (point-max))
-    (insert (ansi-color-apply
-             (propertize text
-                         'font-lock-face 'haskell-interactive-face-result
-                         'front-sticky t
-                         'prompt t
-                         'read-only t
-                         'rear-nonsticky t
-                         'result t)))
-    (haskell-interactive-mode-handle-h)
-    (let ((marker (setq-local haskell-interactive-mode-result-end (make-marker))))
-      (set-marker marker
-                  (point)
-                  (current-buffer)))
-    (when haskell-interactive-mode-scroll-to-bottom
-      (haskell-interactive-mode-scroll-to-bottom))))
+    (let ((prop-text (propertize text
+                                 'font-lock-face 'haskell-interactive-face-result
+                                 'front-sticky t
+                                 'prompt t
+                                 'read-only t
+                                 'rear-nonsticky t
+                                 'result t)))
+      (when (string= text haskell-interactive-prompt2)
+        (put-text-property 0
+                           (length haskell-interactive-prompt2)
+                           'font-lock-face
+                           'haskell-interactive-face-prompt2
+                           prop-text))
+      (insert (ansi-color-apply prop-text))
+      (haskell-interactive-mode-handle-h)
+      (let ((marker (setq-local haskell-interactive-mode-result-end (make-marker))))
+        (set-marker marker
+                    (point)
+                    (current-buffer)))
+      (when haskell-interactive-mode-scroll-to-bottom
+        (haskell-interactive-mode-scroll-to-bottom)))))
 
 (defun haskell-interactive-mode-scroll-to-bottom ()
   "Scroll to bottom."
