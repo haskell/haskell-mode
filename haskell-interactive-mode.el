@@ -131,6 +131,12 @@ be nil.")
   :group 'haskell-interactive)
 
 ;;;###autoload
+(defface haskell-interactive-face-prompt2
+  '((t :inherit font-lock-keyword-face))
+  "Face for the prompt2 in multi-line mode."
+  :group 'haskell-interactive)
+
+;;;###autoload
 (defface haskell-interactive-face-compile-error
   '((t :inherit compilation-error))
   "Face for compile errors."
@@ -161,7 +167,8 @@ be nil.")
   "Make newline and indent."
   (interactive)
   (newline)
-  (indent-according-to-mode))
+  (indent-to (length haskell-interactive-prompt))
+  (indent-relative))
 
 (defun haskell-interactive-mode-kill-whole-line ()
   "Kill the whole REPL line."
@@ -230,22 +237,6 @@ be nil.")
                                   (point-min))
                              end))))))))
 
-(defun haskell-interactive-mode-cleanup-response (expr response)
-  "Ignore the mess that GHCi outputs on multi-line input."
-  (if (not (string-match "\n" expr))
-      response
-    (let ((i 0)
-          (out "")
-          (lines (length (split-string expr "\n"))))
-      (cl-loop for part in (split-string response "| ")
-               do (setq out
-                        (concat out
-                                (if (> i lines)
-                                    (concat (if (or (= i 0) (= i (1+ lines))) "" "| ") part)
-                                  "")))
-               do (setq i (1+ i)))
-      out)))
-
 (defun haskell-interactive-mode-multi-line (expr)
   "If a multi-line expression EXPR has been entered, then reformat it to be:
 
@@ -254,21 +245,18 @@ do the
    multi-liner
    expr
 :}"
-  (if (not (string-match "\n" expr))
+  (if (not (string-match-p "\n" expr))
       expr
-    (let* ((i 0)
-           (lines (split-string expr "\n"))
-           (len (length lines)))
-      (mapconcat 'identity
-                 (cl-loop for line in lines
-                          collect (cond ((= i 0)
-                                         (concat ":{" "\n" line))
-                                        ((= i (1- len))
-                                         (concat line "\n" ":}"))
-                                        (t
-                                         line))
-                          do (setq i (1+ i)))
-                 "\n"))))
+    (let ((len (length haskell-interactive-prompt))
+          (lines (split-string expr "\n")))
+      (cl-loop for elt on (cdr lines) do
+               (setcar elt (substring (car elt) len)))
+      ;; Temporarily set prompt2 to be empty to avoid unwanted output
+      (concat ":set prompt2 \"\"\n"
+              ":{\n"
+              (mapconcat #'identity lines "\n")
+              "\n:}\n"
+              (format ":set prompt2 \"%s\"" haskell-interactive-prompt2)))))
 
 (defun haskell-interactive-trim (line)
   "Trim indentation off of LINE in the REPL."
@@ -331,21 +319,27 @@ SESSION, otherwise operate on the current buffer."
   "Insert the result of an eval as plain text."
   (with-current-buffer (haskell-session-interactive-buffer session)
     (goto-char (point-max))
-    (insert (ansi-color-apply
-             (propertize text
-                         'font-lock-face 'haskell-interactive-face-result
-                         'front-sticky t
-                         'prompt t
-                         'read-only t
-                         'rear-nonsticky t
-                         'result t)))
-    (haskell-interactive-mode-handle-h)
-    (let ((marker (setq-local haskell-interactive-mode-result-end (make-marker))))
-      (set-marker marker
-                  (point)
-                  (current-buffer)))
-    (when haskell-interactive-mode-scroll-to-bottom
-      (haskell-interactive-mode-scroll-to-bottom))))
+    (let ((prop-text (propertize text
+                                 'font-lock-face 'haskell-interactive-face-result
+                                 'front-sticky t
+                                 'prompt t
+                                 'read-only t
+                                 'rear-nonsticky t
+                                 'result t)))
+      (when (string= text haskell-interactive-prompt2)
+        (put-text-property 0
+                           (length haskell-interactive-prompt2)
+                           'font-lock-face
+                           'haskell-interactive-face-prompt2
+                           prop-text))
+      (insert (ansi-color-apply prop-text))
+      (haskell-interactive-mode-handle-h)
+      (let ((marker (setq-local haskell-interactive-mode-result-end (make-marker))))
+        (set-marker marker
+                    (point)
+                    (current-buffer)))
+      (when haskell-interactive-mode-scroll-to-bottom
+        (haskell-interactive-mode-scroll-to-bottom)))))
 
 (defun haskell-interactive-mode-scroll-to-bottom ()
   "Scroll to bottom."
