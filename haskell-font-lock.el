@@ -240,7 +240,8 @@ like ::, class, instance, data, newtype, type."
         (token nil)
         ;; we are starting right after ::
         (last-token-was-operator t)
-        (last-token-was-newline nil))
+        (last-token-was-newline nil)
+        (open-parens 0))
     (while cont
       (setq token (haskell-lexeme-looking-at-token 'newline))
 
@@ -251,9 +252,26 @@ like ::, class, instance, data, newtype, type."
         (setq last-token-was-newline (not last-token-was-operator))
         (setq end (match-end 0))
         (goto-char (match-end 0)))
+       ((member (match-string-no-properties 0)
+                    '(")" "]" "}"))
+        (setq open-parens (1- open-parens))
+        (if (< open-parens 0)
+            ;; unmatched closing parenthesis closes type declaration
+            (setq cont nil)
+          (setq end (match-end 0))
+          (goto-char end))
+        (setq last-token-was-newline nil))
+       ((and (member (match-string-no-properties 0)
+                     '("," ";" "|"))
+             (not (member (match-string-no-properties 0) ignore)))
+        (if (equal 0 open-parens)
+            (setq cont nil)
+          (setq last-token-was-operator t)
+          (setq end (match-end 0))
+          (goto-char end))
+        (setq last-token-was-newline nil))
        ((and (or (member (match-string-no-properties 0)
-                         '("<-" "=" "<-" "←"  "," ";"
-                           ")" "]" "}" "|"))
+                         '("<-" "=" "←"))
                  (member (match-string-no-properties 0) haskell-font-lock--reverved-ids))
              (not (member (match-string-no-properties 0) ignore)))
         (setq cont nil)
@@ -262,11 +280,9 @@ like ::, class, instance, data, newtype, type."
                 '("(" "[" "{"))
         (if last-token-was-newline
             (setq cont nil)
-          (goto-char (match-beginning 0))
-          (condition-case err
-                (forward-sexp)
-              (scan-error (goto-char (nth 3 err))))
-          (setq end (point))
+          (setq open-parens (1+ open-parens))
+          (setq end (match-end 0))
+          (goto-char end)
           (setq last-token-was-newline nil)))
        ((member token '(qsymid char string number template-haskell-quote template-haskell-quasi-quote))
         (setq last-token-was-operator (member (haskell-lexeme-classify-by-first-char (char-after (match-beginning 1)))
