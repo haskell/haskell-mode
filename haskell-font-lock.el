@@ -335,16 +335,16 @@ like ::, class, instance, data, newtype, type."
          ;; "^>", otherwise a line of code starts with "^".
          (line-prefix "^\\(?:> ?\\)?")
 
-         (varid "\\b[[:lower:]_][[:alnum:]'_]*\\b")
+         (varid "[[:lower:]_][[:alnum:]'_]*")
          ;; We allow ' preceding conids because of DataKinds/PolyKinds
-         (conid "\\b'?[[:upper:]][[:alnum:]'_]*\\b")
+         (conid "'?[[:upper:]][[:alnum:]'_]*")
          (sym "\\s.+")
 
          ;; Top-level declarations
          (topdecl-var
-          (concat line-prefix "\\(" varid "\\(?:\\s-*,\\s-*" varid "\\)*" "\\)\\s-*"
+          (concat line-prefix "\\(" varid "\\(?:\\s-*,\\s-*" varid "\\)*" "\\)"
                   ;; optionally allow for a single newline after identifier
-                  "\\([\n]\\s-+\\)?"
+                  "\\(\\s-+\\|\\s-*[\n]\\s-+\\)"
                   ;; A toplevel declaration can be followed by a definition
                   ;; (=), a type (::) or (∷), a guard, or a pattern which can
                   ;; either be a variable, a constructor, a parenthesized
