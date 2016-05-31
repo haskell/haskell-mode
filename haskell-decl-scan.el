@@ -2,6 +2,7 @@
 
 ;; Copyright (C) 2004, 2005, 2007, 2009  Free Software Foundation, Inc.
 ;; Copyright (C) 1997-1998  Graeme E Moss
+;; Copyright (C) 2016  Chris Gregory
 
 ;; Author: 1997-1998 Graeme E Moss <gem@cs.york.ac.uk>
 ;; Maintainer: Stefan Monnier <monnier@gnu.org>
@@ -354,7 +355,38 @@ there."
   "Move forward to the first character that starts a top-level
 declaration.  As `haskell-ds-backward-decl' but forward."
   (interactive)
-  (haskell-ds-move-to-decl t (haskell-ds-bird-p) nil))
+  (let ((p (point)) b e empty was-at-bob)
+    ;; Go back to beginning of defun, then go to beginning of next
+    (haskell-ds-move-to-decl nil (haskell-ds-bird-p) nil)
+    (setq b (point))
+    (haskell-ds-move-to-decl t (haskell-ds-bird-p) nil)
+    (setq e (point))
+    ;; tests if line is empty
+    (setq empty (and (<= (point) p)
+                     (not (eolp))))
+    (setq was-at-bob (and (= (point-min) b)
+                          (= b p)
+                          (< p e)))
+    ;; this conditional allows for when empty lines at end, first
+    ;; `C-M-e' will go to end of defun, next will go to end of file.
+    (when (or was-at-bob
+              empty)
+      (if (or (and was-at-bob
+                   (= ?\n
+                      (save-excursion
+                        (goto-char (point-min))
+                        (following-char))))
+              empty)
+          (haskell-ds-move-to-decl t (haskell-ds-bird-p) nil))
+      ;; Then go back to end of current
+      (forward-line -1)
+      (while (and (eolp)
+                  ;; prevent infinite loop
+                  (not (= (point)
+                          (point-min))))
+        (forward-line -1))
+      (forward-line 1)))
+  (point))
 
 (defun haskell-ds-generic-find-next-decl (bird-literate)
   "Find the name, position and type of the declaration at or after point.
