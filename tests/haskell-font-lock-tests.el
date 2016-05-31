@@ -878,6 +878,16 @@
      ("Z" t haskell-type-face)
      ("C" t haskell-constructor-face))))
 
+(ert-deftest haskell-type-colors-31 ()
+  (check-properties
+   ;; open parentheses do not keep type decl open because there might
+   ;; be an unclosed parenthesis stretching to the end of file and
+   ;; that is very costly to check
+   '("x :: (OpenParen"
+     "   NotType)")
+   '(("OpenParen" t haskell-type-face)
+     ("NotType" t haskell-constructor-face))))
+
 (ert-deftest haskell-pattern ()
   "Fontify the \"pattern\" keyword in contexts related to pattern synonyms."
   :expected-result :failed
