@@ -654,8 +654,44 @@ with:
     123
 </pre></div>
 
+<a name="Evaluating-multiline-expressions"></a>
+<h4 class="subsection">14.8.4 Evaluating multiline expressions</h4>
+
+<p>GHCi features two ways to evaluate multiline expressions. You can use
+<code>:set +m</code> to
+enable <a href="https://www.haskell.org/ghc/docs/latest/html/users_guide/ghci.html#multiline-input">multiline input</a> for all expressions, or you can wrap your expression in
+<code>:{</code> and <code>:}</code> (they have to be on their own lines).
+</p>
+<p>The prompt will change to indicate that you&rsquo;re inputting a multiline
+expression:
+</p>
+<div class="example">
+<pre class="example">λ&gt; :{
+λ| let a = 10
+λ|     b = 20
+λ|     c = 30
+λ| :}
+</pre></div>
+
+<p>You can also simulate multiline mode by having your input contain
+newline characters. You can input a literal newline character with
+<kbd>C-q C-j</kbd>, or you can use:
+</p>
+<div class="example">
+<pre class="example">    M-x haskell-interactive-mode-newline-indent
+</pre></div>
+
+<p>which is bound to <kbd>C-j</kbd>. This command indents after the newline. You
+can simulate the above example like so:
+</p>
+<div class="example">
+<pre class="example">λ&gt; let a = 10
+       b = 20
+       c = 30
+</pre></div>
+
 <a name="Type-of-expressions"></a>
-<h4 class="subsection">14.8.4 Type of expressions</h4>
+<h4 class="subsection">14.8.5 Type of expressions</h4>
 
 <p>You can use normal <code>:type</code> which is part of GHCi to get the type of
 something:
@@ -710,7 +746,7 @@ result. The same is true for ambiguous things:
 </pre></div>
 
 <a name="Printing-mode"></a>
-<h4 class="subsection">14.8.5 Printing mode</h4>
+<h4 class="subsection">14.8.6 Printing mode</h4>
 
 <p>You can choose between printing modes used for the results of
 evaluating expressions. To do that, configure the variable
@@ -755,7 +791,7 @@ evaluating expressions. To do that, configure the variable
 output as Haskell.
 </p>
 <a name="Presentations"></a>
-<h4 class="subsection">14.8.6 Presentations</h4>
+<h4 class="subsection">14.8.7 Presentations</h4>
 
 <p>If you have the <samp>present</samp> package installed, you can use the following
 syntax to print anything which is an instance of <code>Data</code>:
@@ -787,25 +823,25 @@ further:
 <p>Etc. Remember: this only works for instances of <code>Data.Data.Data</code>.
 </p>
 <a name="History-1"></a>
-<h4 class="subsection">14.8.7 History</h4>
+<h4 class="subsection">14.8.8 History</h4>
 
 <p>A history is maintained for the duration of the REPL buffer. To go up
 and down in the history, run <kbd>M-p</kbd> for previous and <kbd>M-n</kbd> for
 next.
 </p>
 <a name="Cancelling-commands"></a>
-<h4 class="subsection">14.8.8 Cancelling commands</h4>
+<h4 class="subsection">14.8.9 Cancelling commands</h4>
 
 <p>To cancel a running REPL command, run <kbd>C-c C-c</kbd>.
 </p>
 <a name="Clear-the-REPL"></a>
-<h4 class="subsection">14.8.9 Clear the REPL</h4>
+<h4 class="subsection">14.8.10 Clear the REPL</h4>
 
 <p>Run <kbd>C-c C-k</kbd> to clear the REPL.
 </p>
 
 <a name="Trick_003a-Put-Interactive-REPL-in-Separate-Frame"></a>
-<h4 class="subsection">14.8.10 Trick: Put Interactive REPL in Separate Frame</h4>
+<h4 class="subsection">14.8.11 Trick: Put Interactive REPL in Separate Frame</h4>
 
 
 <p>The following <code>create-haskell-interactive-frame</code> is a quick hack to
@@ -828,7 +864,7 @@ predictable layout of windows in Emacs.
 </pre></div>
 
 <a name="Troubleshooting-1"></a>
-<h4 class="subsection">14.8.11 Troubleshooting</h4>
+<h4 class="subsection">14.8.12 Troubleshooting</h4>
 
 <p>If the REPL ever goes funny, you can clear the command queue via:
 </p>
