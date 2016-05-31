@@ -1754,6 +1754,42 @@ To evaluate expressions, simply type one out and hit `RET`.
     123
 @end example
 
+@subsection Evaluating multiline expressions
+
+GHCi features two ways to evaluate multiline expressions. You can use
+@code{:set +m} to
+enable @uref{https://www.haskell.org/ghc/docs/latest/html/users_guide/ghci.html#multiline-input,
+multiline input} for all expressions, or you can wrap your expression in
+@code{:@{} and @code{:@}} (they have to be on their own lines).
+
+The prompt will change to indicate that you're inputting a multiline
+expression:
+
+@example
+λ> :@{
+λ| let a = 10
+λ|     b = 20
+λ|     c = 30
+λ| :@}
+@end example
+
+You can also simulate multiline mode by having your input contain
+newline characters. You can input a literal newline character with
+@kbd{C-q C-j}, or you can use:
+
+@example
+    M-x haskell-interactive-mode-newline-indent
+@end example
+
+which is bound to @kbd{C-j}. This command indents after the newline. You
+can simulate the above example like so:
+
+@example
+λ> let a = 10
+       b = 20
+       c = 30
+@end example
+
 @subsection Type of expressions
 
 You can use normal @code{:type} which is part of GHCi to get the type of
