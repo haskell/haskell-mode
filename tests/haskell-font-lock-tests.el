@@ -443,6 +443,17 @@
    '("Q +++ 12.12")
    '(("+++" t haskell-definition-face))))
 
+(ert-deftest haskell-syntactic-definition-face-4 ()
+  (check-properties
+   '("_test'")
+   '(("_test'" t nil))))
+
+(ert-deftest haskell-syntactic-definition-face-5 ()
+  (check-properties
+   '("_test' _")
+   '(("_test'" t haskell-definition-face))))
+
+
 (ert-deftest haskell-literate-bird-1 ()
   (check-properties
    '("Comment1"
