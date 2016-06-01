@@ -93,8 +93,12 @@ You can create new session using function `haskell-session-make'."
     :go (lambda (process)
           ;; We must set the prompt last, so that this command as a
           ;; whole produces only one prompt marker as a response.
-          (haskell-process-send-string process "Prelude.putStrLn \"\"")
-          (haskell-process-send-string process ":set -v1")
+          (haskell-process-send-string process
+                                       (mapconcat #'identity
+                                                  '("Prelude.putStrLn \"\""
+                                                    ":set -v1"
+                                                    ":set +c") ; :type-at in GHC 8+
+                                                  "\n"))
           (haskell-process-send-string process ":set prompt \"\\4\"")
           (haskell-process-send-string process (format ":set prompt2 \"%s\""
                                                        haskell-interactive-prompt2)))
@@ -607,9 +611,7 @@ Query PROCESS to `:cd` to directory DIR."
 ;;;###autoload
 (defun haskell-mode-show-type-at (&optional insert-value)
   "Show type of the thing at point or within active region asynchronously.
-This function requires GHCi-ng and `:set +c` option enabled by
-default (please follow GHCi-ng README available at URL
-`https://github.com/chrisdone/ghci-ng').
+This function requires GHCi 8+ or GHCi-ng.
 
 \\<haskell-interactive-mode-map>
 To make this function works sometimes you need to load the file in REPL
@@ -650,7 +652,7 @@ happened since function invocation)."
             ;; neither popup presentation buffer
             ;; nor insert response in error case
             ('unknown-command
-             (message "This command requires GHCi-ng. Please read command description for details."))
+             (message "This command requires GHCi 8+ or GHCi-ng. Please read command description for details."))
             ('option-missing
              (message "Could not infer type signature. You need to load file first. Also :set +c is required. Please read command description for details."))
             ('interactive-error (message "Wrong REPL response: %s" sig))
