@@ -1226,10 +1226,9 @@ is bound to @code{haskell-goto-prev-error}
 is bound to @code{haskell-goto-first-error}
 @end table
 
-@section Using GHCi-ng
+@section Using GHCi 8+ or GHCi-ng
 
-Put @code{:set +c} in your @code{.ghci} or run it in the REPL. Then use
-these keybindings:
+If you use either of the above, then you can use these functions:
 
 @lisp
 (define-key interactive-haskell-mode-map (kbd "M-.") 'haskell-mode-goto-loc)
