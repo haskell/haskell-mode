@@ -37,6 +37,11 @@
 (require 'highlight-uses-mode)
 (require 'haskell-cabal)
 
+(defcustom haskell-mode-stylish-haskell-path "stylish-haskell"
+  "Path to `stylish-haskell' executable."
+  :group 'haskell
+  :type 'string)
+
 ;;;###autoload
 (defun haskell-process-restart ()
   "Restart the inferior Haskell process."
@@ -783,7 +788,7 @@ inferior GHCi process."
   (interactive)
   (let ((column (current-column))
         (line (line-number-at-pos)))
-    (haskell-mode-buffer-apply-command "stylish-haskell")
+    (haskell-mode-buffer-apply-command haskell-mode-stylish-haskell-path)
     (goto-char (point-min))
     (forward-line (1- line))
     (goto-char (+ column (point)))))
@@ -793,47 +798,39 @@ inferior GHCi process."
 Use buffer as input and replace the whole buffer with the
 output.  If CMD fails the buffer remains unchanged."
   (set-buffer-modified-p t)
-  (let* ((chomp (lambda (str)
-                  (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'" str)
-                    (setq str (replace-match "" t t str)))
-                  str))
-         (_errout (lambda (fmt &rest args)
-                    (let* ((warning-fill-prefix "    "))
-                      (display-warning cmd (apply 'format fmt args) :warning))))
-         (filename (buffer-file-name (current-buffer)))
-         (cmd-prefix (replace-regexp-in-string " .*" "" cmd))
-         (tmp-file (make-temp-file cmd-prefix))
-         (err-file (make-temp-file cmd-prefix))
-         (default-directory (if (and (boundp 'haskell-session)
-                                     haskell-session)
-                                (haskell-session-cabal-dir haskell-session)
-                              default-directory))
-         (_errcode (with-temp-file tmp-file
-                     (call-process cmd filename
-                                   (list (current-buffer) err-file) nil)))
-         (stderr-output
-          (with-temp-buffer
-            (insert-file-contents err-file)
-            (funcall chomp (buffer-substring-no-properties (point-min) (point-max)))))
-         (stdout-output
-          (with-temp-buffer
-            (insert-file-contents tmp-file)
-            (buffer-substring-no-properties (point-min) (point-max)))))
-    (if (string= "" stderr-output)
-        (if (string= "" stdout-output)
-            (message "Error: %s produced no output, leaving buffer alone" cmd)
-          (save-restriction
-            (widen)
-            ;; command successful, insert file with replacement to preserve
-            ;; markers.
-            (insert-file-contents tmp-file nil nil nil t)))
-      (progn
-        ;; non-null stderr, command must have failed
-        (message "Error: %s ended with errors, leaving buffer alone" cmd)
-        ;; use (warning-minimum-level :debug) to see this
-        (display-warning cmd stderr-output :debug)))
-    (delete-file tmp-file)
-    (delete-file err-file)))
+  (let* ((tmp-buf (generate-new-buffer "stylish-output"))
+         (err-file (make-temp-file "stylish-error")))
+        (unwind-protect
+          (let* ((_errcode
+                  (call-process-region (point-min) (point-max) cmd nil
+                                       (list (buffer-name tmp-buf) err-file)
+                                       nil))
+                 (stderr-output
+                  (with-temp-buffer
+                    (insert-file-contents err-file)
+                    (buffer-substring-no-properties (point-min) (point-max))))
+                 (stdout-output
+                  (with-temp-buffer
+                    (insert-buffer-substring tmp-buf)
+                    (buffer-substring-no-properties (point-min) (point-max)))))
+            (if (string= "" stderr-output)
+                (if (string= "" stdout-output)
+                    (message "Error: %s produced no output, leaving buffer alone" cmd)
+                  (save-restriction
+                    (widen)
+                    ;; command successful, insert file with replacement to preserve
+                    ;; markers.
+                    (erase-buffer)
+                    (insert-buffer-substring tmp-buf)))
+              (progn
+                ;; non-null stderr, command must have failed
+                (message "Error: %s ended with errors, leaving buffer alone" cmd)
+                ;; use (warning-minimum-level :debug) to see this
+                (display-warning cmd stderr-output :debug))))
+          (ignore-errors
+            (delete-file err-file))
+          (ignore-errors
+            (kill-buffer tmp-buf)))))
 
 ;;;###autoload
 (defun haskell-mode-find-uses ()

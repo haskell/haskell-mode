@@ -361,12 +361,8 @@ Give optional NEXT-P parameter to override value of
 ;;;###autoload
 (defun haskell-mode-after-save-handler ()
   "Function that will be called after buffer's saving."
-  (when haskell-tags-on-save (ignore-errors (haskell-mode-generate-tags)))
-  (when haskell-stylish-on-save
-    (ignore-errors (haskell-mode-stylish-buffer))
-    (let ((before-save-hook '())
-          (after-save-hook '()))
-      (basic-save-buffer))))
+  (when haskell-tags-on-save
+    (ignore-errors (haskell-mode-generate-tags))))
 
 ;;;###autoload
 (defun haskell-mode-tag-find (&optional _next-p)
