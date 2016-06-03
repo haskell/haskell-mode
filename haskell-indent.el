@@ -1579,6 +1579,9 @@ these functions also align the guards and rhs of the current definition
     \\[haskell-indent-put-region-in-literate]
       makes the region a piece of literate code in a literate script
 
+If `ARG' is falsey, toggle `haskell-indent-mode'.  Else sets
+`haskell-indent-mode' to whether `ARG' is greater than 0.
+
 Invokes `haskell-indent-hook' if not nil."
   (interactive "P")
   (setq haskell-indent-mode
