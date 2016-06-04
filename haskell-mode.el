@@ -1040,6 +1040,7 @@ To be added to `flymake-init-create-temp-buffer-copy'."
     (goto-char (+ (line-beginning-position)
                   col))))
 
+(declare-function haskell-mode-stylish-buffer "haskell-commands")
 (defun haskell-mode-before-save-handler ()
   "Function that will be called before buffer's saving."
   (when haskell-stylish-on-save
