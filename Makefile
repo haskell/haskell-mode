@@ -33,6 +33,10 @@ BATCH = @echo EMACS $@; $(EMACS) $(EFLAGS) --batch -Q -L .
 
 ELFILES := $(filter-out haskell-mode-autoloads.el haskell-mode-pkg.el,$(wildcard *.el))
 
+# fix
+ELFILES := $(filter-out haskell-mode.el,$(ELFILES))
+ELFILES += haskell-mode.el
+
 ELCHECKS := $(wildcard tests/*-tests.el)
 
 AUTOLOADS = haskell-mode-autoloads.el
