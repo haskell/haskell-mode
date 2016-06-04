@@ -454,7 +454,7 @@ like ::, class, instance, data, newtype, type."
       (delete-region (point-min) (point-max))
       (insert string " ") ;; so there's a final property change
       (cl-letf (((symbol-function 'message)
-                 (lambda (fmt &rest args))))
+                 (lambda (_fmt &rest _args))))
         ;; silence messages
         (unless (eq major-mode lang-mode) (funcall lang-mode))
         (font-lock-ensure))
