@@ -40,6 +40,12 @@
 (require 'haskell-process)
 (require 'haskell-interactive-mode)
 
+;;;###autoload
+(defgroup haskell-completions nil
+  "Settings for completions provided by `haskell-mode'"
+  :link '(custom-manual "(haskell-mode)Completion support")
+  :group 'haskell)
+
 (defvar haskell-completions--pragma-names
   (list "DEPRECATED"
         "INCLUDE"
