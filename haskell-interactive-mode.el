@@ -247,7 +247,12 @@ do the
 :}"
   (if (not (string-match-p "\n" expr))
       expr
-    (let ((len (length haskell-interactive-prompt))
+    (let ((len (if (or haskell-interactive-use-interactive-prompt
+                       (not (string-match "\n.*\\'" haskell-interactive-prompt)))
+                   (length haskell-interactive-prompt)
+                 (- (match-end 0)
+                    (match-beginning 0)
+                    1)))
           (lines (split-string expr "\n")))
       (cl-loop for elt on (cdr lines) do
                (setcar elt (substring (car elt) len)))
@@ -295,21 +300,30 @@ do the
 (defun haskell-interactive-mode-prompt (&optional session)
   "Show a prompt at the end of the REPL buffer.
 If SESSION is non-nil, use the REPL buffer associated with
-SESSION, otherwise operate on the current buffer."
+SESSION, otherwise operate on the current buffer. The prompt
+inserted is specified by `haskell-interactive-prompt'.
+When `haskell-interactive-use-interactive-prompt' is non-nil,
+the prompt is inserted in this function. Otherwise it was already
+set in the `haskell-process-send-startup' and has already been
+inserted in the buffer by the process."
   (with-current-buffer (if session
                            (haskell-session-interactive-buffer session)
                          (current-buffer))
     (goto-char (point-max))
-    (let ((prompt (propertize haskell-interactive-prompt
-                              'font-lock-face 'haskell-interactive-face-prompt
-                              'prompt t
-                              'read-only t
-                              'rear-nonsticky t)))
-      ;; At the time of writing, front-stickying the first char gives an error
-      ;; Has unfortunate side-effect of being able to insert before the prompt
-      (insert (substring prompt 0 1)
-              (propertize (substring prompt 1)
-                          'front-sticky t)))
+    (if haskell-interactive-use-interactive-prompt
+        (let ((prompt (propertize haskell-interactive-prompt
+                                  'font-lock-face 'haskell-interactive-face-prompt
+                                  'prompt t
+                                  'read-only t
+                                  'rear-nonsticky t)))
+          ;; At the time of writing, front-stickying the first char gives an error
+          ;; Has unfortunate side-effect of being able to insert before the prompt
+          (insert (substring prompt 0 1)
+                  (propertize (substring prompt 1)
+                              'front-sticky t)))
+      (let ((inhibit-read-only t))
+        (unless (= (point) (point-min))
+          (put-text-property (1- (point)) (point) 'prompt t))))
     (let ((marker (setq-local haskell-interactive-mode-prompt-start (make-marker))))
       (set-marker marker (point)))
     (when haskell-interactive-mode-scroll-to-bottom
@@ -322,16 +336,13 @@ SESSION, otherwise operate on the current buffer."
     (let ((prop-text (propertize text
                                  'font-lock-face 'haskell-interactive-face-result
                                  'front-sticky t
-                                 'prompt t
                                  'read-only t
                                  'rear-nonsticky t
                                  'result t)))
       (when (string= text haskell-interactive-prompt2)
-        (put-text-property 0
-                           (length haskell-interactive-prompt2)
-                           'font-lock-face
-                           'haskell-interactive-face-prompt2
-                           prop-text))
+        (setq prop-text (propertize prop-text
+                                    'font-lock-face 'haskell-interactive-face-prompt2
+                                    'prompt2 t)))
       (insert (ansi-color-apply prop-text))
       (haskell-interactive-mode-handle-h)
       (let ((marker (setq-local haskell-interactive-mode-result-end (make-marker))))
@@ -973,20 +984,34 @@ don't care when the thing completes as long as it's soonish."
       (setq haskell-interactive-mode-history-index 0)
       (haskell-interactive-mode-history-toggle -1))))
 
-(defun haskell-interactive-mode-prompt-previous ()
-  "Jump to the previous prompt."
-  (interactive)
-  (let ((prev-prompt-pos
-         (save-excursion
-           (beginning-of-line) ;; otherwise prompt at current line matches
-           (and (search-backward-regexp (haskell-interactive-prompt-regex) nil t)
-                (match-end 0)))))
-    (when prev-prompt-pos (goto-char prev-prompt-pos))))
+(defun haskell-interactive-mode-prompt-previous (&optional arg)
+  "Jump to the ARGth previous prompt."
+  (interactive "p")
+  (if (< arg 0)
+      (haskell-interactive-mode-prompt-next (- arg))
+    (end-of-line 1)
+    (unless (or (get-text-property (1- (point)) 'prompt)
+                (zerop arg))
+      (cl-incf arg 0.5)) ; do it an extra time if not at a prompt
+    (dotimes (_ (* 2 arg))
+      (goto-char (or (previous-single-property-change (point) 'prompt)
+                     (point))))
+    (when (get-text-property (point) 'prompt)
+      ;; went too far (at first prompt)
+      (goto-char (next-single-property-change (point) 'prompt)))))
 
-(defun haskell-interactive-mode-prompt-next ()
-  "Jump to the next prompt."
-  (interactive)
-  (search-forward-regexp (haskell-interactive-prompt-regex) nil t))
+(defun haskell-interactive-mode-prompt-next (&optional arg)
+  "Jump to the ARGth next prompt."
+  (interactive "p")
+  (if (< arg 0)
+      (haskell-interactive-mode-prompt-previous (- arg))
+    (when (and (get-text-property (point) 'prompt)
+               (not (zerop arg)))
+      ;; don't start on a prompt
+      (haskell-interactive-mode-prompt-previous 1))
+    (dotimes (_ (* 2 arg))
+      (goto-char (or (next-single-property-change (point) 'prompt)
+                     (point-max))))))
 
 (defun haskell-interactive-mode-clear ()
   "Clear the screen and put any current input into the history."
@@ -1054,14 +1079,15 @@ If there is one, pop that up in a buffer, similar to `debug-on-error'."
   (with-current-buffer (haskell-session-interactive-buffer session)
     (save-excursion
       (haskell-interactive-mode-goto-end-point)
-      (insert (if mode
-                  (haskell-fontify-as-mode
-                   (concat message "\n")
-                   mode)
-                (propertize (concat message "\n")
-                            'front-sticky t
-                            'read-only t
-                            'rear-nonsticky t))))))
+      (let ((inhibit-read-only t))
+        (insert (if mode
+                    (haskell-fontify-as-mode
+                     (concat message "\n")
+                     mode)
+                  (propertize (concat message "\n")
+                              'front-sticky t
+                              'read-only t
+                              'rear-nonsticky t)))))))
 
 (defun haskell-interactive-mode-splices-buffer (session)
   "Get the splices buffer for the current SESSION."

@@ -104,9 +104,9 @@ You can create new session using function `haskell-session-make'."
                                                     ":set -v1"
                                                     ":set +c") ; :type-at in GHC 8+
                                                   "\n"))
-          (haskell-process-send-string process ":set prompt \"\\4\"")
           (haskell-process-send-string process (format ":set prompt2 \"%s\""
-                                                       haskell-interactive-prompt2)))
+                                                       haskell-interactive-prompt2))
+          (haskell-process-send-string process ":set prompt \"\\4\""))
 
     :live (lambda (process buffer)
             (when (haskell-process-consume
@@ -134,8 +134,20 @@ If I break, you can:
   1. Restart:           M-x haskell-process-restart
   2. Configure logging: C-h v haskell-process-log (useful for debugging)
   3. General config:    M-x customize-mode
-  4. Hide these tips:   C-h v haskell-process-show-debug-tips")))))))
-
+  4. Hide these tips:   C-h v haskell-process-show-debug-tips")))
+                (unless haskell-interactive-use-interactive-prompt
+                  (with-current-buffer (haskell-session-interactive-buffer
+                                        (haskell-process-session process))
+                    (setq-local haskell-interactive-mode-prompt-start (point-max-marker)))
+                  ;; Now it's safe to set the prompt
+                  ;; Make sure to double escape any newlines
+                  (haskell-interactive-mode-run-expr
+                   (format ":set prompt \"%s\\4\""
+                           (replace-regexp-in-string "\n"
+                                                     "\\n"
+                                                     haskell-interactive-prompt
+                                                     nil
+                                                     t))))))))
 (defun haskell-commands-process ()
   "Get the Haskell session, throws an error if not available."
   (or (haskell-session-process (haskell-session-maybe))
