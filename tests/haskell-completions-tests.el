@@ -392,32 +392,26 @@ identifiers and module identifiers."
 on `haskell-completions-sync-repl-completion-at-point'."
 
   ;; Mock `haskell-completions-sync-complete-repl'
-  (defun haskell-completions-sync-complete-repl-mock (prefix &optional import)
+  (defadvice haskell-completions-sync-complete-repl-mock (around haskell-completions-sync-complete-repl
+                                                                 (prefix &optional import))
     nil)
-  (advice-add #'haskell-completions-sync-complete-repl
-              :override
-              #'haskell-completions-sync-complete-repl-mock)
+  (ad-activate 'haskell-completions-sync-complete-repl-mock)
 
   ;; Mock `haskell-session-maybe'
-  (defun haskell-session-maybe-mock ()
+  (defadvice haskell-session-maybe-mock (around haskell-session-maybe)
     t)
-  (advice-add #'haskell-session-maybe
-              :override
-              #'haskell-session-maybe-mock)
+  (ad-activate 'haskell-session-maybe-mock)
 
   ;; Mock `haskell-process-cmd'
-  (defun haskell-process-cmd-mock (P)
+  (defadvice haskell-process-cmd-mock (around haskell-process-cmd
+                                          (P))
     nil)
-  (advice-add #'haskell-process-cmd
-              :override
-              #'haskell-process-cmd-mock)
+  (ad-activate 'haskell-process-cmd-mock)
 
   ;; Mock `haskell-interactive-process'
-  (defun haskell-interactive-process-mock ()
+  (defadvice haskell-interactive-process-mock (around haskell-interactive-process)
     nil)
-  (advice-add #'haskell-interactive-process
-              :override
-              #'haskell-interactive-process-mock)
+  (ad-activate 'haskell-interactive-process-mock)
 
   ;;; Tests
   (unwind-protect
@@ -443,14 +437,10 @@ on `haskell-completions-sync-repl-completion-at-point'."
             (should expected))))
     (progn
       ;; Remove mocks
-      (advice-remove #'haskell-completions-sync-complete-repl
-                     #'haskell-completions-sync-complete-repl-mock)
-      (advice-remove #'haskell-session-maybe
-                     #'haskell-session-maybe-mock)
-      (advice-remove #'haskell-process-cmd
-                     #'haskell-process-cmd-mock)
-      (advice-remove #'haskell-interactive-process
-                     #'haskell-interactive-process-mock))))
+      (ad-deactivate 'haskell-completions-sync-complete-repl-mock)
+      (ad-deactivate 'haskell-session-maybe-mock)
+      (ad-deactivate 'haskell-process-cmd-mock)
+      (ad-deactivate 'haskell-interactive-process-mock))))
 
 
 (provide 'haskell-completions-tests)
