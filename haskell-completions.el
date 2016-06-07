@@ -40,6 +40,25 @@
 (require 'haskell-process)
 (require 'haskell-interactive-mode)
 
+;;;###autoload
+(defgroup haskell-completions nil
+  "Settings for completions provided by `haskell-mode'"
+  :link '(custom-manual "(haskell-mode)Completion support")
+  :group 'haskell)
+
+(defcustom haskell-completions-complete-operators
+  t
+  "Should `haskell-completions-sync-repl-completion-at-point' complete operators.
+
+Note: GHCi prior to version 8.0.1 have bug in `:complete`
+ command: when completing operators it returns a list of all
+ imported identifiers (see Track ticket URL
+ `https://ghc.haskell.org/trac/ghc/ticket/10576'). This leads to
+ significant Emacs slowdown. To aviod slowdown you should set
+ this variable to `nil'."
+  :group 'haskell-completions
+  :type 'boolean)
+
 (defvar haskell-completions--pragma-names
   (list "DEPRECATED"
         "INCLUDE"
@@ -326,15 +345,10 @@ Returns nil if no completions available."
     (when prefix-data
       (cl-destructuring-bind (beg end pfx typ) prefix-data
         (when (and (not (eql typ 'haskell-completions-general-prefix))
-                   ;; GHCi prior to version 8.0.1 have bug in `:complete`
-                   ;; command: when completing operators it returns a list of
-                   ;; all imported identifiers (see Track ticket URL
-                   ;; `https://ghc.haskell.org/trac/ghc/ticket/10576').  This
-                   ;; leads to significant Emacs slowdown.  To aviod slowdown
-                   ;; operator completions are disabled for now.
-                   (not (save-excursion
-                          (goto-char (1- end))
-                          (haskell-mode--looking-at-varsym))))
+                   (or haskell-completions-complete-operators
+                       (not (save-excursion
+                              (goto-char (1- end))
+                              (haskell-mode--looking-at-varsym)))))
           ;; do not complete things in comments
           (if (cl-member
                typ

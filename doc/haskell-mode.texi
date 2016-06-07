@@ -445,6 +445,11 @@ example:
                          company-backends))))
 @end lisp
 
+If you use a GHCi version prior to 8.0.1 you might want to set
+@code{haskell-completions-complete-operators} to @code{nil}, if you
+experience major slowdown while trying to complete after an Haskell
+operator (See @url{https://ghc.haskell.org/trac/ghc/ticket/10576, GHC-Bug 10576}).
+
 @node Unicode support
 @chapter Unicode support
 
