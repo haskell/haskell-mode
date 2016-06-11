@@ -69,7 +69,8 @@ build-$(EMACS_VERSION)/%.elc : %.el $(ELFILES)
 	         --eval "(defun byte-compile-dest-file (filename)					\
 	               	       (concat (file-name-directory filename) \"build-\" emacs-version \"/\"	\
 	                      	    (file-name-nondirectory filename) \"c\"))'"				\
-	         -f batch-byte-compile $<;								\
+	         --eval "(when (check-declare-file \"$<\") (kill-emacs 2))" \
+	         -f batch-byte-compile $<								\
 
 build-$(EMACS_VERSION)/build-flag : build-$(EMACS_VERSION) $(patsubst %.el,build-$(EMACS_VERSION)/%.elc,$(ELFILES))
 	touch $@
