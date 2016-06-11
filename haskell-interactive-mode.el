@@ -58,6 +58,8 @@ interference with prompts that look like haskell expressions."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Globals used internally
 
+(declare-function haskell-interactive-kill "haskell")
+
 (defvar haskell-interactive-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "RET") 'haskell-interactive-mode-return)
@@ -500,6 +502,8 @@ FILE-NAME only."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc
+
+(declare-function haskell-interactive-switch "haskell")
 
 (defun haskell-session-interactive-buffer (s)
   "Get the session interactive buffer."

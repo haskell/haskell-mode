@@ -56,13 +56,23 @@ check-emacs-version :
 
 compile: build-$(EMACS_VERSION)/build-flag
 
-build-$(EMACS_VERSION)/build-flag : $(ELFILES)
-	if [ ! -d $$(dirname $@) ]; then mkdir $$(dirname $@); fi
-	$(BATCH) --eval '(setq byte-compile-error-on-warn t)'					\
-		 --eval "(defun byte-compile-dest-file (filename)				\
-	               	  (concat (file-name-directory filename) \"build-\" emacs-version \"/\"	\
-	                      	    (file-name-nondirectory filename) \"c\"))'"			\
-		 -f batch-byte-compile $^
+build-$(EMACS_VERSION) :
+	mkdir $@
+
+# Emacs byte compilation state leaks from file to file if multiple
+# files are requested to be build at the same time. We have to
+# workaround this issue on Makefile level. Note also that we consider
+# an .el file to be dependent on all other files because we do not do
+# proper dependency tracking (yet).
+build-$(EMACS_VERSION)/%.elc : %.el $(ELFILES)
+	$(BATCH) --eval '(setq byte-compile-error-on-warn t)'						\
+	         --eval "(defun byte-compile-dest-file (filename)					\
+	               	       (concat (file-name-directory filename) \"build-\" emacs-version \"/\"	\
+	                      	    (file-name-nondirectory filename) \"c\"))'"				\
+	         --eval "(when (check-declare-file \"$<\") (kill-emacs 2))" \
+	         -f batch-byte-compile $<								\
+
+build-$(EMACS_VERSION)/build-flag : build-$(EMACS_VERSION) $(patsubst %.el,build-$(EMACS_VERSION)/%.elc,$(ELFILES))
 	touch $@
 
 check-%: tests/%-tests.el

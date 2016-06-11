@@ -26,8 +26,8 @@
 (require 'haskell-mode)
 (require 'haskell-font-lock)
 
-(declare-function w3m-buffer-title "w3m")
-(declare-function w3m-browse-url "w3m")
+(declare-function w3m-buffer-title "ext:w3m")
+(declare-function w3m-browse-url "ext:w3m")
 (defvar w3m-current-url)
 
 (add-hook 'w3m-display-hook 'w3m-haddock-display)
