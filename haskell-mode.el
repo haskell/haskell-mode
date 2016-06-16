@@ -1144,6 +1144,7 @@ successful, nil otherwise."
 If optional AND-THEN-FIND-THIS-TAG argument is present it is used
 with function `xref-find-definitions' after new table was
 generated."
+  (interactive)
   (let* ((dir (haskell-cabal--find-tags-dir))
          (command (haskell-cabal--compose-hasktags-command dir)))
     (if (not command)
