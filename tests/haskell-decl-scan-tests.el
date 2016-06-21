@@ -42,7 +42,7 @@
     (should (haskell-ds-backward-decl))
     (should (looking-at-p "fun :: Int -> Int"))
     (should-not (haskell-ds-backward-decl))
-    (should (= (point-min) (point)))))
+    (should (bobp))))
 
 (ert-deftest haskell-ds-backward-decl-2 ()
   "Test running haskell-ds-backward-decl"
@@ -72,7 +72,8 @@
     (should (= (point) (save-excursion (goto-line 4) (point))))
     (should (haskell-ds-forward-decl))
     (should (looking-at-p "f2 :: Int"))
-    (should (= (point-max) (haskell-ds-forward-decl)))))
+    (should (= (point-max) (haskell-ds-forward-decl)))
+    (should (eobp))))
 
 (ert-deftest haskell-ds-forward-decl-2 ()
   "Test running haskell-ds-backward-decl"
@@ -90,7 +91,8 @@
     (should (looking-at-p "f2 :: Int"))
     (should (haskell-ds-forward-decl))
     (should (= (point) (save-excursion (goto-line 13) (point))))
-    (should (= (point-max) (progn (haskell-ds-forward-decl) (point))))))
+    (should (= (point-max) (progn (haskell-ds-forward-decl) (point))))
+    (should (eobp))))
 
 (provide 'haskell-decl-scan-tests)
 
