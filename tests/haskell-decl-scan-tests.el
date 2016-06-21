@@ -31,6 +31,30 @@
 (require 'haskell-decl-scan)
 (require 'haskell-test-utils)
 
+(ert-deftest haskell-ds-line-commented-p-1 ()
+  "All lines in this buffer should count as comments"
+  (with-temp-buffer
+    (haskell-mode)
+    (insert-lines "" "--hi" "  -- hi\t " "" "{-hi-}" " \t{-hi-}  ")
+    (font-lock-fontify-buffer)
+    (goto-char (point-min))
+
+    (while (not (eobp))
+      (should (haskell-ds-line-commented-p))
+      (forward-line))))
+
+(ert-deftest haskell-ds-comment-p-1 ()
+  "All characters in this buffer should count as comments"
+  (with-temp-buffer
+    (haskell-mode)
+    (insert-lines "" "--hi" "  -- hi\t " "" "{-hi-}" " \t{-hi-}  ")
+    (font-lock-fontify-buffer)
+    (goto-char (point-min))
+
+    (while (not (bobp))
+      (should (haskell-ds-comment-p))
+      (forward-char))))
+
 (ert-deftest haskell-ds-backward-decl-1 ()
   "Test running haskell-ds-backward-decl"
   (with-temp-buffer
@@ -43,6 +67,27 @@
     (should (looking-at-p "fun :: Int -> Int"))
     (should-not (haskell-ds-backward-decl))
     (should (= (point-min) (point)))))
+
+(ert-deftest haskell-ds-backward-decl-2-commented ()
+  "Test running haskell-ds-backward-decl"
+  (with-temp-buffer
+    (haskell-mode)
+    (insert-lines "" "-- documentation" "fun :: Int -> Int"
+                  "" "{- comment -}" "fun = id"
+                  "" "  -- space comment" "f2 :: Int"
+                  "" " {- trailing -} \t" "f2 = 3"
+                  "" "" "")
+    (font-lock-fontify-buffer)
+    (goto-char (point-max))
+
+    (should (haskell-ds-backward-decl))
+    (should (looking-at-p "f2 :: Int"))
+
+    (should (haskell-ds-backward-decl))
+    (should (looking-at-p "fun :: Int -> Int"))
+
+    (should-not (haskell-ds-backward-decl))
+    (should (bobp))))
 
 (ert-deftest haskell-ds-backward-decl-2 ()
   "Test running haskell-ds-backward-decl"
@@ -91,6 +136,31 @@
     (should (haskell-ds-forward-decl))
     (should (= (point) (save-excursion (goto-line 13) (point))))
     (should (= (point-max) (progn (haskell-ds-forward-decl) (point))))))
+
+(ert-deftest haskell-ds-forward-decl-2-commented ()
+  "Test running haskell-ds-backward-decl"
+  (with-temp-buffer
+    (haskell-mode)
+    (insert-lines "" "-- documentation" "fun :: Int -> Int"
+                  "" "{- comment -}" "fun = id"
+                  "" "  -- space comment" "f2 :: Int"
+                  "" " {- trailing -} \t" "f2 = 3"
+                  "" "" "")
+    (font-lock-fontify-buffer)
+    (goto-char (point-min))
+
+    (should (haskell-ds-forward-decl))
+    (should (looking-at-p "$"))
+    (should (= (point) (save-excursion (goto-line 7) (point))))
+
+    (should (haskell-ds-forward-decl))
+    (should (looking-at-p "f2 :: Int"))
+
+    (should (haskell-ds-forward-decl))
+    (should (= (point) (save-excursion (goto-line 13) (point))))
+
+    (should (= (point-max) (progn (haskell-ds-forward-decl) (point))))
+    (should (eobp))))
 
 (provide 'haskell-decl-scan-tests)
 
