@@ -61,7 +61,7 @@
     (should (= (point-min) (point)))))
 
 (ert-deftest haskell-ds-forward-decl-1 ()
-  "Test running haskell-ds-backward-decl"
+  "Test running haskell-ds-forward-decl"
   (with-temp-buffer
     (insert-lines "" "fun :: Int -> Int" "fun = id"
                   "" "f2 :: Int" "f2 = 3"
@@ -75,7 +75,7 @@
     (should (= (point-max) (haskell-ds-forward-decl)))))
 
 (ert-deftest haskell-ds-forward-decl-2 ()
-  "Test running haskell-ds-backward-decl"
+  "Test running haskell-ds-forward-decl"
   (with-temp-buffer
     (insert-lines "" "" "fun :: Int -> Int"
                   "" "" "fun = id"
