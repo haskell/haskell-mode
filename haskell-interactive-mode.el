@@ -249,10 +249,10 @@ do the
 :}"
   (if (not (string-match-p "\n" expr))
       expr
-    (let ((len (length haskell-interactive-prompt))
+    (let ((pre (format "^%s" (regexp-quote haskell-interactive-prompt)))
           (lines (split-string expr "\n")))
       (cl-loop for elt on (cdr lines) do
-               (setcar elt (substring (car elt) len)))
+               (setcar elt (replace-regexp-in-string pre "" (car elt))))
       ;; Temporarily set prompt2 to be empty to avoid unwanted output
       (concat ":set prompt2 \"\"\n"
               ":{\n"
