@@ -23,7 +23,8 @@
 (defun haskell-interactive-handle-expr ()
   "Handle an inputted expression at the REPL."
   (let ((expr (haskell-interactive-mode-input)))
-    (if (string= "" (replace-regexp-in-string " " "" expr))
+    (if (and (string= "" (replace-regexp-in-string " " "" expr))
+             haskell-interactive-use-interactive-prompt)
         ;; Just make a new prompt on space-only input
         (progn
           (goto-char (point-max))
@@ -116,8 +117,9 @@
       (delete-region (1+ haskell-interactive-mode-prompt-start) (point))
       (goto-char (point-max))
       (let ((start (point)))
-        (insert (haskell-fontify-as-mode text
-                                         haskell-interactive-mode-eval-mode))
+        (insert (ansi-color-apply (haskell-fontify-as-mode
+                                   text
+                                   haskell-interactive-mode-eval-mode)))
         (when haskell-interactive-mode-collapse
           (haskell-collapse start (point)))))))
 

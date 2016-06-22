@@ -1517,6 +1517,12 @@ If SYNC is non-nil, make the call synchronously instead."
                (setq response nil)
              ;; Remove a newline at the end
              (setq response (replace-regexp-in-string "\n\\'" "" response))
+             (unless haskell-interactive-use-interactive-prompt
+               ;; Remove the extra prompt (may span multiple lines)
+               (setq response (mapconcat #'identity
+                                         (nbutlast (split-string response "\n")
+                                                   (1+ (cl-count ?\n haskell-interactive-prompt)))
+                                         "\n")))
              ;; Propertize for eldoc
              (save-match-data
                (when (string-match " :: " response)

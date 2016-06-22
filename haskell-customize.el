@@ -324,6 +324,17 @@ The default is `haskell-interactive-prompt' with the last > replaced with |."
   :type 'string
   :group 'haskell-interactive)
 
+(defcustom haskell-interactive-use-interactive-prompt t
+  "Non-nil means that haskell-interactive uses its prompt at the
+Emacs side rather than setting it in GHCi directly.
+
+This is only useful to disable when you want a prompt containing
+your modules (as GHCi does by default), or if you apply extra
+properties (colours, etc.) to your prompt through GHCi."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+
 (defcustom haskell-interactive-mode-eval-mode
   nil
   "Use the given mode's font-locking to render some text."
