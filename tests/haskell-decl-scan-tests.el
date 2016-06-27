@@ -61,10 +61,13 @@
     (insert-lines "" "fun :: Int -> Int" "fun = id"
                   "" "f2 :: Int" "f2 = 3" "")
     (goto-char (point-max))
+
     (should (haskell-ds-backward-decl))
     (should (looking-at-p "f2 :: Int"))
+
     (should (haskell-ds-backward-decl))
     (should (looking-at-p "fun :: Int -> Int"))
+
     (should-not (haskell-ds-backward-decl))
     (should (bobp))))
 
@@ -98,10 +101,13 @@
                   "" "" "f2 = 3"
                   "" "" "")
     (goto-char (point-max))
+
     (should (haskell-ds-backward-decl))
     (should (looking-at-p "f2 :: Int"))
+
     (should (haskell-ds-backward-decl))
     (should (looking-at-p "fun :: Int -> Int"))
+
     (should-not (haskell-ds-backward-decl))
     (should (= (point-min) (point)))))
 
@@ -112,11 +118,14 @@
                   "" "f2 :: Int" "f2 = 3"
                   "")
     (goto-char (point-min))
+
     (should (haskell-ds-forward-decl))
     (should (looking-at-p "$"))
     (should (= (point) (save-excursion (goto-line 4) (point))))
+
     (should (haskell-ds-forward-decl))
     (should (looking-at-p "f2 :: Int"))
+
     (should (= (point-max) (haskell-ds-forward-decl)))
     (should (eobp))))
 
@@ -129,13 +138,17 @@
                   "" "" "f2 = 3"
                   "" "" "")
     (goto-char (point-min))
+
     (should (haskell-ds-forward-decl))
     (should (looking-at-p "$"))
     (should (= (point) (save-excursion (goto-line 7) (point))))
+
     (should (haskell-ds-forward-decl))
     (should (looking-at-p "f2 :: Int"))
+
     (should (haskell-ds-forward-decl))
     (should (= (point) (save-excursion (goto-line 13) (point))))
+
     (should (= (point-max) (progn (haskell-ds-forward-decl) (point))))
     (should (eobp))))
 
