@@ -35,6 +35,8 @@ ELFILES := $(filter-out haskell-mode-autoloads.el haskell-mode-pkg.el,$(wildcard
 
 ELCHECKS := $(wildcard tests/*-tests.el)
 
+ELBENCHMARKS := $(wildcard tests/*-benchmarks.el)
+
 AUTOLOADS = haskell-mode-autoloads.el
 
 PKG_DIST_FILES = $(ELFILES) logo.svg NEWS haskell-mode.info dir
@@ -94,6 +96,12 @@ check-ert: $(ELCHECKS)
                  $(patsubst %,-l %,$(ELCHECKS))							\
                  -f ert-run-tests-batch-and-exit
 	@echo "checks passed!"
+
+bench: $(ELBENCHMARKS) compile $(AUTOLOADS)
+	$(BATCH) -L tests									\
+                 $(patsubst %,-l %,$(ELBENCHMARKS))						\
+                 -f ert-run-tests-batch-and-exit
+	@echo "benchmarks passed!"
 
 clean:
 	$(RM) -r build-$(EMACS_VERSION) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) haskell-mode.info dir
