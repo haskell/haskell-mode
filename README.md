@@ -5,6 +5,7 @@ This is an Emacs mode for editing, debugging and developing Haskell programs. [H
 
 [![Coverage Status](https://coveralls.io/repos/haskell/haskell-mode/badge.svg?branch=master&service=github)](https://coveralls.io/github/haskell/haskell-mode?branch=master)
 [![Build Status](https://travis-ci.org/haskell/haskell-mode.svg?branch=master)](https://travis-ci.org/haskell/haskell-mode)
+[![Build status](https://ci.appveyor.com/api/projects/status/g0t3s9bwal8g3041/branch/master?svg=true)](https://ci.appveyor.com/project/gracjan/haskell-mode/branch/master)
 [![Melpa Status](http://melpa.org/packages/haskell-mode-badge.svg)](http://melpa.org/#/haskell-mode)
 [![Melpa Stable Status](http://stable.melpa.org/packages/haskell-mode-badge.svg)](http://stable.melpa.org/#/haskell-mode)
 [![License GPL3](https://img.shields.io/badge/license-GPL3-blue.svg)](https://github.com/haskell/haskell-mode/blob/master/COPYING)
