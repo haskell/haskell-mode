@@ -543,6 +543,11 @@ moves over sexps."
     (kill-buffer)))
 
 (ert-deftest haskell-generate-tags ()
+  ;; this test is special for Unix because under Windows the
+  ;; invocation is different
+  :expected-result (if (equal system-type 'windows-nt)
+                       :failed
+                     :passed)
   (with-temp-dir-structure
    (("xxx.cabal" . "")
     ("T1.hs" . "i1 :: Int")
