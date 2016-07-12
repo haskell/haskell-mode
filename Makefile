@@ -142,7 +142,7 @@ deploy-manual : doc/html
 $(AUTOLOADS): $(ELFILES)
 	$(BATCH) \
 		--eval '(setq make-backup-files nil)' \
-		--eval "(setq generated-autoload-file \"$${PWD}/$@\")" \
+		--eval "(setq generated-autoload-file (concat command-line-default-directory \"/\" \"$@\"))" \
 		-f batch-update-autoloads "."
 	# check if autoloads will really load
 	$(BATCH) -l "$@"

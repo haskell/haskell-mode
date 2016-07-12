@@ -154,7 +154,7 @@ is no final newline."
       (read-from-minibuffer "")
     (error nil)))
 
-(defmacro with-script-path (cmdvar func &rest body)
+(defmacro with-script-path-unix (cmdvar func &rest body)
   "Temporarily substitute a command line executable.
 
 Creates a temporary executable script and sets CMDVAR to point to
@@ -186,6 +186,47 @@ it will be used as exit code for `kill-emacs' function, otherwise
      (unwind-protect
          (progn ,@body)
        (delete-file ,cmdvar))))
+
+(defmacro with-script-path-windows (cmdvar func &rest body)
+  "Temporarily substitute a command line executable.
+
+Creates a temporary executable script and sets CMDVAR to point to
+the script. When the script is run it spawns another Emacs
+instance and executes function FUNC. Substitution is in effect
+throughout BODY.
+
+In FUNC variable `argv' is a list of all arguments that the
+script received when invoked. If the FUNC returns a number then
+it will be used as exit code for `kill-emacs' function, otherwise
+0 will be used."
+  (declare (indent 2) (debug t))
+  `(let* ((,cmdvar (make-temp-file "haskell-mode-tests-script" nil ".bat"))
+          (el (concat (file-name-sans-extension ,cmdvar) ".el")))
+     (with-current-buffer (find-file-noselect ,cmdvar)
+       (insert "@\"" invocation-directory invocation-name "\" -Q --batch -l \"%~dpn0.el\" -- %*\n")
+       (basic-save-buffer)
+       (kill-buffer))
+
+     (with-current-buffer (find-file-noselect el)
+
+       (insert "(setq debug-on-error t)\n")
+       (insert "(pop argv)\n")
+       (insert "(setq load-path '" (format "%S" load-path) ")\n")
+       (insert "(load \"" (symbol-file ',func) "\" nil t)\n")
+       (insert "(let ((return-value (" (symbol-name ',func) ")))\n")
+       (insert " (if (numberp return-value)\n")
+       (insert "    (kill-emacs return-value)\n")
+       (insert "    (kill-emacs 0)))\n")
+       (basic-save-buffer)
+       (kill-buffer))
+     (unwind-protect
+         (progn ,@body)
+       (delete-file ,cmdvar)
+       (delete-file el))))
+
+(if (equal system-type 'windows-nt)
+      (defalias 'with-script-path 'with-script-path-windows)
+  (defalias 'with-script-path 'with-script-path-unix))
 
 (defun create-directory-structure (entries)
   (dolist (entry entries)
