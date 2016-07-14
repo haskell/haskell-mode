@@ -534,6 +534,17 @@ moves over sexps."
             (haskell-forward-sexp -4)
             (eq (point) 3))))
 
+(ert-deftest haskell-guess-module-name ()
+  "Check if `haskell-guess-module-name'."
+  (should (equal "Mod" (haskell-guess-module-name-from-file-name "Mod.hs")))
+  (should (equal "Żółw" (haskell-guess-module-name-from-file-name "Żółw.hs")))
+  (should (equal "Mod" (haskell-guess-module-name-from-file-name "żółw/Mod.hs")))
+  (should (equal "Module" (haskell-guess-module-name-from-file-name "Juicy-pixels/Module.lhs")))
+  (should (equal "Mod.Mod.Mod" (haskell-guess-module-name-from-file-name "src/Mod/Mod/Mod.hs")))
+  (should (equal "Żółw1.Żółw2.Żółw3" (haskell-guess-module-name-from-file-name "Żółw1/Żółw2/Żółw3.lhs")))
+  (should (equal "Mod'X.Mod" (haskell-guess-module-name-from-file-name "c:/Mod'X/Mod.lhs")))
+  (should (equal "Mod" (haskell-guess-module-name-from-file-name "Mod.xx/Mod.hs"))))
+
 (defun haskell-generate-tags-test-helper ()
   (with-current-buffer (find-file-noselect "TAGS-test-format")
     (erase-buffer)
