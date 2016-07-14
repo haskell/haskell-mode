@@ -502,7 +502,7 @@ for various things, but is optional."
   (insert-file-contents-literally
    (concat (haskell-session-current-dir (haskell-session))
            "/"
-           (haskell-guess-module-name)
+           (haskell-guess-module-name-from-file-name (buffer-file-name))
            ".imports")))
 
 (defun haskell-interactive-jump-to-error-line ()

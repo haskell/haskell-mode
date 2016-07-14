@@ -1113,14 +1113,28 @@ successful, nil otherwise."
       (if (not (haskell-mode-try-insert-scc-at-point))
           (error "Could not insert or remove SCC"))))
 
-(defun haskell-guess-module-name ()
-  "Guess the current module name of the buffer."
-  (interactive)
-  (let ((components (cl-loop for part
-                             in (reverse (split-string (buffer-file-name) "/"))
+(defun haskell-guess-module-name-from-file-name (file-name)
+  "Guess the module name from FILE-NAME.
+
+Based on given FILE-NAME this function tries to find path
+components that look like module identifiers and composes full
+module path using this information. For example:
+
+    /Abc/Def/Xyz.lhs => Abc.Def.Xyz
+    /Ab-c/Def/Xyz.lhs => Def.Xyz
+    src/Abc/Def/Xyz.hs => Abc.Def.Xyz
+    c:\\src\\Abc\\Def\\Xyz.hs => Abc.Def.Xyz
+
+This function usually will be used with `buffer-file-name':
+
+    (haskell-guess-module-name-from-file-name (buffer-file-name))"
+
+  (let* ((file-name-sans-ext (file-name-sans-extension file-name))
+         (components (cl-loop for part
+                             in (reverse (split-string file-name-sans-ext "/"))
                              while (let ((case-fold-search nil))
-                                     (string-match "^[A-Z]+" part))
-                             collect (replace-regexp-in-string "\\.l?hs$" "" part))))
+                                     (string-match (concat "^" haskell-lexeme-modid "$") part))
+                             collect part)))
     (mapconcat 'identity (reverse components) ".")))
 
 (defvar haskell-auto-insert-module-format-string
@@ -1133,7 +1147,7 @@ successful, nil otherwise."
   (when (and (= (point-min)
                 (point-max))
              (buffer-file-name))
-    (insert (format haskell-auto-insert-module-format-string (haskell-guess-module-name)))
+    (insert (format haskell-auto-insert-module-format-string (haskell-guess-module-name-from-file-name (buffer-file-name))))
     (goto-char (point-min))
     (end-of-line)))
 
