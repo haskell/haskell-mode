@@ -1137,6 +1137,11 @@ This function usually will be used with `buffer-file-name':
                              collect part)))
     (mapconcat 'identity (reverse components) ".")))
 
+(defun haskell-guess-module-name ()
+  "Guess the current module name of the buffer.
+Uses `haskell-guess-module-name-from-file-name'."
+  (haskell-guess-module-name-from-file-name (buffer-file-name)))
+
 (defvar haskell-auto-insert-module-format-string
   "-- | \n\nmodule %s where\n\n"
   "Template string that will be inserted in new haskell buffers via `haskell-auto-insert-module-template'.")
