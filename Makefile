@@ -29,7 +29,7 @@ EMACS_VERSION := $(shell "$(EMACS)" -Q --batch --eval '(princ emacs-version)')
 EFLAGS = --eval "(add-to-list 'load-path (expand-file-name \"tests/compat\") 'append)" \
 	 --eval "(when (boundp 'load-prefer-newer) (setq load-prefer-newer t))"
 
-BATCH = $(EMACS) $(EFLAGS) --batch -Q -L .
+BATCH = @echo EMACS $@; $(EMACS) $(EFLAGS) --batch -Q -L .
 
 ELFILES := $(filter-out haskell-mode-autoloads.el haskell-mode-pkg.el,$(wildcard *.el))
 
@@ -44,7 +44,7 @@ PKG_DIST_FILES = $(ELFILES) logo.svg NEWS haskell-mode.info dir
 all: check-emacs-version compile $(AUTOLOADS) info
 
 check-emacs-version :
-	@$(BATCH) --eval "(when (version< emacs-version \"24.3\")				\
+	$(BATCH) --eval "(when (version< emacs-version \"24.3\")				\
                             (message \"Error: haskell-mode requires Emacs 24.3 or later\")	\
                             (message \"Your version of Emacs is %s\" emacs-version)		\
                             (message \"Found as '$(EMACS)'\")					\
@@ -53,6 +53,7 @@ check-emacs-version :
                             (message \"   2.  EMACS=/path/to/emacs make\")			\
                             (message \"   3.  make EMACS=/path/to/emacs\")			\
                             (kill-emacs 2))"
+	@echo Using EMACS = $(EMACS), version = $(EMACS_VERSION)
 
 compile: build-$(EMACS_VERSION)/build-flag
 
