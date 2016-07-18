@@ -592,16 +592,39 @@ moves over sexps."
 
 (ert-deftest haskell-stylish-on-save-add-first-line ()
   (with-temp-dir-structure
-   (("T.hs" . "main :: IO ()"))
+   (("T.hs" . "main :: IO ()\n"))
     (with-script-path
      haskell-mode-stylish-haskell-path
      haskell-stylish-haskell-add-first-line
      (let ((haskell-stylish-on-save t))
        (with-current-buffer (find-file-noselect "T.hs")
-         (insert "main = return ()\n")
+         (goto-char (point-max))
+         (save-excursion
+           (insert "main = return ()\n"))
          (save-buffer)
+         ;; should have header added
          (goto-char (point-min))
          (should (looking-at-p "-- HEADER")))))))
+
+(ert-deftest haskell-stylish-on-save-keep-point ()
+  ;; Looks like insert-file-contents under Windows does not keep the
+  ;; point as it should.
+  :expected-result (if (equal system-type 'windows-nt)
+                       :failed
+                     :passed)
+  (with-temp-dir-structure
+   (("T.hs" . "main :: IO ()\n"))
+    (with-script-path
+     haskell-mode-stylish-haskell-path
+     haskell-stylish-haskell-add-first-line
+     (let ((haskell-stylish-on-save t))
+       (with-current-buffer (find-file-noselect "T.hs")
+         (goto-char (point-max))
+         (save-excursion
+           (insert "main = return ()\n"))
+         (save-buffer)
+         ;; should keep pointer in place
+         (should (looking-at-p "main = return")))))))
 
 (ert-deftest haskell-stylish-on-save-no-change ()
   (with-temp-dir-structure
