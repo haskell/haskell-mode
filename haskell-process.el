@@ -164,23 +164,11 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
            (windows (get-buffer-window-list append-to t t))
            move-point-in-windows)
       (with-current-buffer append-to
+        ;; point should follow insertion so that it stays at the end
+        ;; of the buffer
+        (setq-local window-point-insertion-type t)
         (let ((buffer-read-only nil))
-          ;; record in which windows we should keep point at eob.
-          (dolist (window windows)
-            (when (= (window-point window) (point-max))
-              (push window move-point-in-windows)))
-          (let (return-to-position)
-            ;; decide whether we should reset point to return-to-position
-            ;; or leave it at eob.
-            (unless (= (point) (point-max))
-              (setq return-to-position (point))
-              (goto-char (point-max)))
-            (insert msg "\n")
-            (when return-to-position
-              (goto-char return-to-position)))
-          ;; advance to point-max in windows where it is needed
-          (dolist (window move-point-in-windows)
-            (set-window-point window (point-max))))))))
+          (insert msg "\n"))))))
 
 (defun haskell-process-project-by-proc (proc)
   "Find project by process."
