@@ -137,7 +137,7 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
                        'face '((:weight bold))))
           (haskell-process-log
            (propertize "Process reset.\n"
-                       'face font-lock-comment-face))
+                       'face 'font-lock-comment-face))
           (run-hook-with-args 'haskell-process-ended-functions process))))))
 
 (defun haskell-process-filter (proc response)
@@ -146,7 +146,7 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
     (cl-loop for line in (split-string response "\n")
              do (haskell-process-log
                  (concat (if (= i 0)
-                             (propertize "<- " 'face font-lock-comment-face)
+                             (propertize "<- " 'face 'font-lock-comment-face)
                            "   ")
                          (propertize line 'face 'haskell-interactive-face-compile-warning)))
              do (setq i (1+ i))))
@@ -155,9 +155,7 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
       (if (haskell-process-cmd (haskell-session-process session))
           (haskell-process-collect session
                                    response
-                                   (haskell-session-process session))
-        (haskell-process-log
-         (replace-regexp-in-string "\4" "" response))))))
+                                   (haskell-session-process session))))))
 
 (defun haskell-process-log (msg)
   "Effective append MSG to the process log (if enabled)."
@@ -166,24 +164,23 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
            (windows (get-buffer-window-list append-to t t))
            move-point-in-windows)
       (with-current-buffer append-to
-        (setq buffer-read-only nil)
-        ;; record in which windows we should keep point at eob.
-        (dolist (window windows)
-          (when (= (window-point window) (point-max))
-            (push window move-point-in-windows)))
-        (let (return-to-position)
-          ;; decide whether we should reset point to return-to-position
-          ;; or leave it at eob.
-          (unless (= (point) (point-max))
-            (setq return-to-position (point))
-            (goto-char (point-max)))
-          (insert "\n" msg "\n")
-          (when return-to-position
-          (goto-char return-to-position)))
-        ;; advance to point-max in windows where it is needed
-        (dolist (window move-point-in-windows)
-          (set-window-point window (point-max)))
-        (setq buffer-read-only t)))))
+        (let ((buffer-read-only nil))
+          ;; record in which windows we should keep point at eob.
+          (dolist (window windows)
+            (when (= (window-point window) (point-max))
+              (push window move-point-in-windows)))
+          (let (return-to-position)
+            ;; decide whether we should reset point to return-to-position
+            ;; or leave it at eob.
+            (unless (= (point) (point-max))
+              (setq return-to-position (point))
+              (goto-char (point-max)))
+            (insert msg "\n")
+            (when return-to-position
+              (goto-char return-to-position)))
+          ;; advance to point-max in windows where it is needed
+          (dolist (window move-point-in-windows)
+            (set-window-point window (point-max))))))))
 
 (defun haskell-process-project-by-proc (proc)
   "Find project by process."
@@ -227,10 +224,15 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
   (let ((child (haskell-process-process process)))
     (if (equal 'run (process-status child))
         (let ((out (concat string "\n")))
-          (haskell-process-log
-           (propertize (concat (propertize "-> " 'face font-lock-comment-face)
-                               (propertize string 'face font-lock-string-face))
-                       'face '((:weight bold))))
+          (let ((i 0))
+            (cl-loop for line in (split-string out "\n")
+                     do (unless (string-equal "" line)
+                          (haskell-process-log
+                           (concat (if (= i 0)
+                                       (propertize "-> " 'face 'font-lock-comment-face)
+                                     "   ")
+                                   (propertize line 'face 'font-lock-string-face))))
+                     do (setq i (1+ i))))
           (process-send-string child out))
       (unless (haskell-process-restarting process)
         (run-hook-with-args 'haskell-process-ended-functions process)))))
