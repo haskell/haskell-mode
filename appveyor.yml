@@ -11,6 +11,6 @@ install:
 
 
 build_script:
-  - C:\msys64\usr\bin\bash -l -c "cd ${APPVEYOR_BUILD_FOLDER} && make check compile EMACS=bin/emacs.exe"
+  - C:\msys64\usr\bin\bash -l -c "cd ${APPVEYOR_BUILD_FOLDER} && make check compile EMACS=./bin/emacs.exe"
 
 test_script:
