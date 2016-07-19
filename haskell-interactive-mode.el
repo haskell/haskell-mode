@@ -85,9 +85,6 @@ interference with prompts that look like haskell expressions."
 (define-derived-mode haskell-interactive-mode fundamental-mode "Interactive-Haskell"
   "Interactive mode for Haskell.
 
-See Info node `(haskell-mode)haskell-interactive-mode' for more
-information.
-
 Key bindings:
 \\{haskell-interactive-mode-map}"
   :group 'haskell-interactive

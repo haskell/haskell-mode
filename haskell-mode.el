@@ -717,8 +717,6 @@ Returns beginning position of qualified part or nil if no qualified part found."
 (define-derived-mode haskell-mode prog-mode "Haskell"
   "Major mode for editing Haskell programs.
 
-For more information see also Info node `(haskell-mode)Getting Started'.
-
 \\<haskell-mode-map>
 
 Literate Haskell scripts are supported via `literate-haskell-mode'.
@@ -764,8 +762,6 @@ your Emacs configuration. To do that you can customize
 example, to enable `interactive-haskell-mode', use the following:
 
     (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
-
-For more details see Info node `(haskell-mode)haskell-mode-hook'.
 
 Minor modes that work well with `haskell-mode':
 
