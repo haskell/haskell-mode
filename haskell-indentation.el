@@ -189,17 +189,20 @@ negative ARG.  Handles bird style literate Haskell too."
         (delete-horizontal-space)
         (newline))
     ;;  - save the current column
-    (let* ((ci (haskell-indentation-current-indentation))
-           (indentations (or (haskell-indentation-find-indentations)
-                             '(0))))
+    (let ((ci (haskell-indentation-current-indentation)))
       ;; - jump to the next line and reindent to at the least same level
       (delete-horizontal-space)
       (newline)
-      (when (haskell-indentation-bird-p)
-        (insert "> "))
-      (haskell-indentation-reindent-to
-       (haskell-indentation-next-indentation (- ci 1) indentations 'nofail)
-       'move))))
+      ;; calculate indentation after newline is inserted because if we
+      ;; break an identifier we might create a keyword, for example
+      ;; "dowhere" => "do where"
+      (let ((indentations (or (haskell-indentation-find-indentations)
+                              '(0))))
+        (when (haskell-indentation-bird-p)
+          (insert "> "))
+        (haskell-indentation-reindent-to
+         (haskell-indentation-next-indentation (- ci 1) indentations 'nofail)
+         'move)))))
 
 (defun haskell-indentation-next-indentation (col indentations &optional nofail)
   "Find the leftmost indentation which is greater than COL.
