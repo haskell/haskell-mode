@@ -27,8 +27,7 @@
 
 ;;;###autoload
 (defun turn-on-haskell-unicode-input-method ()
-  "Set input method `haskell-unicode'.
-See Info node `Unicode(haskell-mode)' for more details."
+  "Set input method `haskell-unicode'."
   (interactive)
   (set-input-method "haskell-unicode"))
 
