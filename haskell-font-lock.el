@@ -97,6 +97,15 @@ This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
               (string= " " (string (char-after start)))
               (string= " " (string (char-before start))))))))
 
+(defvar haskell-yesod-parse-routes-mode-keywords
+  '(("^\\([^ \t\n]+\\)\\(?:[ \t]+\\([^ \t\n]+\\)\\)?"
+     (1 'font-lock-string-face)
+     (2 'haskell-constructor-face nil lax))))
+
+(define-derived-mode haskell-yesod-parse-routes-mode text-mode "Yesod parseRoutes mode"
+  "Mode for parseRoutes from Yesod."
+  (setq-local font-lock-defaults '(haskell-yesod-parse-routes-mode-keywords t t nil nil)))
+
 (defcustom haskell-font-lock-quasi-quote-modes
   `(("hsx" . xml-mode)
     ("hamlet" . shakespeare-hamlet-mode)
@@ -109,7 +118,8 @@ This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
     ("jmacroE" . javascript-mode)
     ("r" . ess-mode)
     ("rChan" . ess-mode)
-    ("sql" . sql-mode))
+    ("sql" . sql-mode)
+    ("parseRoutes" . haskell-yesod-parse-routes-mode))
   "Mapping from quasi quoter token to fontification mode.
 
 If a quasi quote is seen in Haskell code its contents will have
