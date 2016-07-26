@@ -389,7 +389,7 @@ like ::, class, instance, data, newtype, type."
     (setq keywords
           `(;; NOTICE the ordering below is significant
             ;;
-            ("^#.*$" 0 'font-lock-preprocessor-face t)
+            ("^#\\(?:[^\\\n]\\|\\\\\\(?:.\\|\n\\|\\'\\)\\)*\\(?:\n\\|\\'\\)" 0 'font-lock-preprocessor-face t)
 
             ,@(haskell-font-lock-symbols-keywords)
 

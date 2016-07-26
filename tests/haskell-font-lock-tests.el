@@ -311,6 +311,25 @@
      ("." t haskell-operator-face)
      )))
 
+(ert-deftest haskell-syntactic-preprocessor-01 ()
+  (check-properties
+   '("  # NoPreproc"
+     "#preproc"
+     "#prep1    \\"
+     "    Prep2"
+     "Cons")
+   '(("NoPreproc" t haskell-constructor-face)
+     ("preproc" t font-lock-preprocessor-face)
+     ("prep1" t font-lock-preprocessor-face)
+     ("Prep2" t font-lock-preprocessor-face)
+     ("Cons" t haskell-constructor-face))))
+
+(ert-deftest haskell-syntactic-preprocessor-02 ()
+  (check-properties
+   '"#preproc\\\ncont\\" ;; backslash is last char in buffer
+   '(("preproc" t font-lock-preprocessor-face)
+     ("cont" t font-lock-preprocessor-face)
+     ("\\" t font-lock-preprocessor-face))))
 
 (ert-deftest haskell-syntactic-test-quasiquoter-1 ()
   "Basic syntax for QuasiQuote"
