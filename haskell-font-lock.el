@@ -110,6 +110,7 @@ This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
   `(("hsx" . xml-mode)
     ("hamlet" . shakespeare-hamlet-mode)
     ("shamlet" . shakespeare-hamlet-mode)
+    ("whamlet" . shakespeare-hamlet-mode)
     ("xmlQQ" . xml-mode)
     ("xml" . xml-mode)
     ("cmd" . shell-mode)
