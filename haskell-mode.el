@@ -1122,6 +1122,7 @@ module path using this information. For example:
     /Ab-c/Def/Xyz.lhs => Def.Xyz
     src/Abc/Def/Xyz.hs => Abc.Def.Xyz
     c:\\src\\Abc\\Def\\Xyz.hs => Abc.Def.Xyz
+    nonmodule.txt => nil
 
 This function usually will be used with `buffer-file-name':
 
@@ -1133,7 +1134,8 @@ This function usually will be used with `buffer-file-name':
                              while (let ((case-fold-search nil))
                                      (string-match (concat "^" haskell-lexeme-modid "$") part))
                              collect part)))
-    (mapconcat 'identity (reverse components) ".")))
+    (when components
+      (mapconcat 'identity (reverse components) "."))))
 
 (defun haskell-guess-module-name ()
   "Guess the current module name of the buffer.

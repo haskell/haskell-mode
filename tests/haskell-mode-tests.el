@@ -536,6 +536,7 @@ moves over sexps."
 
 (ert-deftest haskell-guess-module-name ()
   "Check if `haskell-guess-module-name'."
+  (should (equal nil (haskell-guess-module-name-from-file-name "nonmodule.hs")))
   (should (equal "Mod" (haskell-guess-module-name-from-file-name "Mod.hs")))
   (should (equal "Żółw" (haskell-guess-module-name-from-file-name "Żółw.hs")))
   (should (equal "Mod" (haskell-guess-module-name-from-file-name "żółw/Mod.hs")))
