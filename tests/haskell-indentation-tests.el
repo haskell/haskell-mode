@@ -679,18 +679,14 @@ function (Operation 'Init) = do
               (2 2))
 
 (hindent-test "29a quasiquote single line" "
-test = [randomQQ| This is a quasiquote with the word in |]
-
-"
-              (2 0 2 7))
+test = [randomQQ| This is a quasiquote with the word in |]"
+              (2 2))
 
 (hindent-test "29b quasiquote multiple lines" "
 test = [randomQQ| This is
           a quasiquote
-          with the word in |]
-
-"
-              (4 0 2 7))
+          with the word in |]"
+              (4 2))
 
 (hindent-test "29c quasiquote with quotes in it and a string outside" "
 foo = do
@@ -1009,7 +1005,7 @@ data X = X |
 func = \"unterminated
            where"
               (1 0)
-              (2 9))
+              (2 2))
 
 
 (ert-deftest haskell-indentation-ret-indents ()
