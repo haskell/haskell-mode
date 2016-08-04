@@ -41,6 +41,7 @@
 ;; version
 
 (require 'cl-lib)
+(require 'haskell-lexeme)
 
 ;;;###autoload
 (defgroup haskell-indentation nil
@@ -420,8 +421,14 @@ and indent when all of the following are true:
     ;; not bird style
     (catch 'return
       (while (not (bobp))
-        (forward-comment (- (buffer-size)))
-        (beginning-of-line)
+        (let ((point (point)))
+          ;; (forward-comment -1) gets lost if there are unterminated
+          ;; string constants and does not move point anywhere. We fix
+          ;; that case with (forward-line -1)
+          (forward-comment (- (buffer-size)))
+          (if (equal (point) point)
+              (forward-line -1)
+            (beginning-of-line)))
         (let* ((ps (syntax-ppss))
               (start-of-comment-or-string (nth 8 ps))
               (start-of-list-expression (nth 1 ps)))
@@ -1210,30 +1217,18 @@ line."
 
 (defun haskell-indentation-skip-token ()
   "Skip to the next token."
-  (let ((case-fold-search nil))
-    (if (or (looking-at "'\\([^\\']\\|\\\\.\\)'")
-            (looking-at "'\\\\\\([^\\']\\|\\\\.\\)*'")
-            (looking-at "\"\\([^\\\"]\\|\\\\.\\)*\"")
-            ;; QuasiQuotes, with help of propertize buffer and string delimeters
-            (looking-at "\\s\"\\S\"*\\s\"")
-            ;; Hierarchical names always start with uppercase
-            (looking-at
-             "[[:upper:]]\\(\\s_\\|\\sw\\|'\\)*\\(\\.\\(\\s_\\|\\sw\\|'\\)+\\)*")
-            ;; Only unqualified vars can start with lowercase.
-            (looking-at "\\(\\s_\\|\\sw\\)\\(\\s_\\|\\sw\\|'\\)*")
-            (looking-at "[0-9][0-9oOxXeE+-]*")
-            (looking-at "[-:!#$%&*+./<=>?@\\\\^|~]+")
-            (looking-at "[](){}[,;]")
-            (looking-at "`[[:alnum:]']*`"))
-        (goto-char (match-end 0))
-      ;; otherwise skip until space found
-      (skip-syntax-forward "^-"))
-    (forward-comment (buffer-size))
-    (while (and (haskell-indentation-bird-p)
-                (bolp)
-                (eq (char-after) ?>))
-      (forward-char)
-      (forward-comment (buffer-size)))))
+  (if (haskell-lexeme-looking-at-token)
+      (goto-char (match-end 0))
+    ;; otherwise skip until space found
+    (skip-syntax-forward "^-"))
+  ;; we have to skip unterminated string fence at the end of line
+  (skip-chars-forward "\n")
+  (forward-comment (buffer-size))
+  (while (and (haskell-indentation-bird-p)
+              (bolp)
+              (eq (char-after) ?>))
+    (forward-char)
+    (forward-comment (buffer-size))))
 
 (provide 'haskell-indentation)
 
