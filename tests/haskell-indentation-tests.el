@@ -1005,6 +1005,12 @@ data X = X |
               (2 2 9)
               (3 0 7 9))
 
+(hindent-test "61 unterminated/multiline strings whose line doesn't end in backslash" "
+func = \"unterminated
+           where"
+              (1 0)
+              (2 9))
+
 
 (ert-deftest haskell-indentation-ret-indents ()
   (with-temp-switch-to-buffer
