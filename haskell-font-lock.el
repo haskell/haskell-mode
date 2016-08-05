@@ -449,7 +449,8 @@ like ::, class, instance, data, newtype, type."
             (,(concat "`" haskell-lexeme-qid-or-qsym "`") 0 'haskell-operator-face)
 
             (,haskell-lexeme-qid-or-qsym
-             (0 (haskell-font-lock--put-face-on-type-or-constructor)))))
+             (0 (unless (or (elt (syntax-ppss) 3) (elt (syntax-ppss) 4))
+                  (haskell-font-lock--put-face-on-type-or-constructor))))))
     keywords))
 
 
