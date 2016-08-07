@@ -907,6 +907,17 @@
    '(("OpenParen" t haskell-type-face)
      ("NotType" t haskell-constructor-face))))
 
+(ert-deftest haskell-type-colors-32 ()
+  (check-properties
+   ;; keywords in comments or strings should not create problems
+   '("flagSpec \"partial-type-signatures\"     Opt_WarnPartialTypeSignatures,"
+     "{- class -} Cons2"
+     "-- type"
+     " Cons3")
+   '(("Opt_WarnPartialTypeSignatures" t haskell-constructor-face)
+     ("Cons2" t haskell-constructor-face)
+     ("Cons3" t haskell-constructor-face))))
+
 (ert-deftest haskell-pattern ()
   "Fontify the \"pattern\" keyword in contexts related to pattern synonyms."
   :expected-result :failed
