@@ -573,19 +573,65 @@ like ::, class, instance, data, newtype, type."
    ;; - there is only whitespace between
    ;;
    ;; We recognize double dash haddock comments by property
-   ;; 'font-lock-doc-face attached to newline. In case of bounded
+   ;; 'font-lock-doc-face attached to newline. In case of {- -}
    ;; comments newline is outside of comment.
    ((save-excursion
       (goto-char (nth 8 state))
       (or (looking-at-p "\\(?:{- ?\\|-- \\)[|^*$]")
-          (and (looking-at-p "--")              ; are we at double dash comment
+          (and (looking-at-p "--")            ; are we at double dash comment
                (forward-line -1)              ; this is nil on first line
                (eq (get-text-property (line-end-position) 'face)
-                   'font-lock-doc-face)              ; is a doc face
+                   'font-lock-doc-face)       ; is a doc face
                (forward-line)
                (skip-syntax-forward "-")      ; see if there is only whitespace
                (eq (point) (nth 8 state)))))  ; we are back in position
-    'font-lock-doc-face)
+    ;; Here we look inside the comment to see if there are substrings
+    ;; worth marking inside we try to emulate as much of haddock as
+    ;; possible.  First we add comment face all over the comment, then
+    ;; we add special features.
+    (let ((beg (nth 8 state))
+          (end (save-excursion
+                 (parse-partial-sexp (point) (point-max) nil nil state
+                                     'syntax-table)
+                 (point)))
+          (emphasis-open-point nil)
+          (strong-open-point nil))
+      (put-text-property beg end 'face 'font-lock-doc-face)
+
+      (when (fboundp 'add-face-text-property)
+        ;; `add-face-text-property' is not defined in Emacs 23
+
+        ;; iterate over chars, take escaped chars unconditionally
+        ;; mark when a construct is opened, close and face it when
+        ;; it is closed
+
+        (save-excursion
+          (while (< (point) end)
+            (if (looking-at "__\\|\\\\.\\|\\\n\\|[/]")
+                (progn
+                  (cond
+                   ((equal (match-string 0) "/")
+                    (if emphasis-open-point
+                        (progn
+                          (add-face-text-property emphasis-open-point (match-end 0)
+                                                  '(:slant italic))
+                          (setq emphasis-open-point nil))
+                      (setq emphasis-open-point (point))))
+                   ((equal (match-string 0) "__")
+                    (if strong-open-point
+                        (progn
+                          (add-face-text-property strong-open-point (match-end 0)
+                                                  '(:weight bold))
+                          (setq strong-open-point nil))
+                      (setq strong-open-point (point))))
+                   (t
+                    ;; this is a backslash escape sequence, skip over it
+                    ))
+                  (goto-char (match-end 0)))
+              ;; skip chars that are not interesting
+              (goto-char (1+ (point)))
+              (skip-chars-forward "^_\\\\/" end))))))
+    nil)
    (t 'font-lock-comment-face)))
 
 (defun haskell-font-lock-defaults-create ()

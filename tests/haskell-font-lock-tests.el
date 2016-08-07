@@ -217,7 +217,7 @@
    '(("1" "w" nil)
      ("Cons2" "w" haskell-constructor-face))))
 
-(ert-deftest haskell-syntactic-test-11a ()
+(ert-deftest haskell-haddock-01 ()
   "Syntax for haddock comments"
   (check-properties
    '(" -- | Dcom1"                      ; haddocks
@@ -261,6 +261,31 @@
      ("Dcom16" "w" font-lock-doc-face)
      ("Dcom17" "w" font-lock-doc-face)
      )))
+
+(ert-deftest haskell-haddock-02 ()
+  "Syntax for italic and bold in haddock comments"
+
+  ;; Emacs 23 does not have `add-face-text-property'
+  :expected-result (if (fboundp 'add-face-text-property)
+                       :passed
+                     :failed)
+  (check-properties
+   '("-- | haddock"
+     "-- /it1/ nonit2 /it3/"
+     "-- /it\\/4/ nonit5"
+     "-- __/boldit1/__"
+     "-- /__boldit2__/"
+     "-- __bold_bold_bold__"
+     "-- __/unfinished")
+   '(("/it1/" t ((:slant italic) font-lock-doc-face))
+     ("nonit2" t font-lock-doc-face)
+     ("/it3/" t ((:slant italic) font-lock-doc-face))
+     ("/it\\/4/" t ((:slant italic) font-lock-doc-face))
+     ("nonit5" t font-lock-doc-face)
+     ("boldit1" t ((:weight bold) (:slant italic) font-lock-doc-face))
+     ("boldit2" t ((:slant italic) (:weight bold) font-lock-doc-face))
+     ("__bold_bold_bold__" t ((:weight bold) font-lock-doc-face))
+     ("unfinished" t font-lock-doc-face))))
 
 (ert-deftest haskell-syntactic-test-11b ()
   "Syntax for haddock comments"
