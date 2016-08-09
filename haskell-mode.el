@@ -567,13 +567,14 @@ be set to the preferred literate style."
               ;; when a generic delimiter is not closed so in case
               ;; string ends at the end of the buffer we will use
               ;; plain string
-              (when (and (equal (match-beginning 3) (match-end 3))
-                         (not (equal (match-beginning 3) (point-max))))
+              (when (and (not (match-beginning 3))
+                         (not (equal (match-end 2) (point-max))))
                 (put-text-property (match-beginning 1) (match-end 1) 'syntax-table (string-to-syntax "|"))
-                (put-text-property (match-beginning 3) (1+ (match-end 3)) 'syntax-table (string-to-syntax "|")))))
+                (put-text-property (match-end 2 ) (1+ (match-end 2)) 'syntax-table (string-to-syntax "|")))))
            ((equal token-kind 'template-haskell-quasi-quote)
             (put-text-property (match-beginning 2) (match-end 2) 'syntax-table (string-to-syntax "\""))
-            (put-text-property (match-beginning 4) (match-end 4) 'syntax-table (string-to-syntax "\""))
+            (when (match-beginning 4)
+              (put-text-property (match-beginning 4) (match-end 4) 'syntax-table (string-to-syntax "\"")))
             (save-excursion
               (goto-char (match-beginning 3))
               (let ((limit (match-end 3)))

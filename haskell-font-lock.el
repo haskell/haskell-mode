@@ -314,9 +314,9 @@ like ::, class, instance, data, newtype, type."
     (goto-char end)))
 
 
-(defun haskell-font-lock--put-face-on-type-or-constructor ()
-  "Private function used to put either type or constructor face
-  on an uppercase identifier."
+(defun haskell-font-lock--select-face-on-type-or-constructor ()
+  "Private function used to select either type or constructor face
+on an uppercase identifier."
   (cl-case (haskell-lexeme-classify-by-first-char (char-after (match-beginning 1)))
     (varid (when (member (match-string 0) haskell-font-lock--reverved-ids)
              ;; Note: keywords parse as keywords only when not qualified.
@@ -353,6 +353,15 @@ like ::, class, instance, data, newtype, type."
                   (haskell-font-lock--forward-type))
                 (add-text-properties (match-end 0) (point) '(font-lock-multiline t haskell-type t)))
               'haskell-operator-face))))
+
+(defun haskell-font-lock--put-face-on-type-or-constructor ()
+  "Private function used to put either type or constructor face
+on an uppercase identifier."
+  (let ((face (haskell-font-lock--select-face-on-type-or-constructor)))
+    (when (and face
+               (not (text-property-not-all (match-beginning 0) (match-end 0) 'face nil)))
+      (put-text-property (match-beginning 0) (match-end 0) 'face face))))
+
 
 (defun haskell-font-lock-keywords ()
   ;; this has to be a function because it depends on global value of
@@ -448,9 +457,15 @@ like ::, class, instance, data, newtype, type."
 
             (,(concat "`" haskell-lexeme-qid-or-qsym "`") 0 'haskell-operator-face)
 
-            (,haskell-lexeme-qid-or-qsym
+            (,haskell-lexeme-idsym-first-char
              (0 (unless (or (elt (syntax-ppss) 3) (elt (syntax-ppss) 4))
-                  (haskell-font-lock--put-face-on-type-or-constructor))))))
+                  (when (save-excursion
+                          (goto-char (match-beginning 0))
+                          (haskell-lexeme-looking-at-qidsym))
+                    (goto-char (match-end 0))
+                    ;; note that we have to put face ourselves here because font-lock
+                    ;; will use match data from the original matcher
+                    (haskell-font-lock--put-face-on-type-or-constructor)))))))
     keywords))
 
 
