@@ -507,13 +507,18 @@ FILE-NAME only."
   (let ((buffer (haskell-session-get s 'interactive-buffer)))
     (if (and buffer (buffer-live-p buffer))
         buffer
-      (let ((buffer (get-buffer-create (format "*%s*" (haskell-session-name s)))))
-        (haskell-session-set-interactive-buffer s buffer)
-        (with-current-buffer buffer
-          (haskell-interactive-mode)
-          (haskell-session-assign s))
-        (haskell-interactive-switch)
-        buffer))))
+      (let ((buffer-name (format "*%s*" (haskell-session-name s)))
+            index)
+        (while (get-buffer buffer-name)
+          (setq buffer-name (format "*%s <%d>*" (haskell-session-name s) index))
+          (setq index (1+ index)))
+        (let ((buffer (get-buffer-create buffer-name)))
+          (haskell-session-set-interactive-buffer s buffer)
+          (with-current-buffer buffer
+            (haskell-interactive-mode)
+            (haskell-session-assign s))
+          (haskell-interactive-switch)
+          buffer)))))
 
 (defun haskell-process-cabal-live (state buffer)
   "Do live updates for Cabal processes."
