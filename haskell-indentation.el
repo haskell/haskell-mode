@@ -388,6 +388,7 @@ and indent when all of the following are true:
 ;; the token at the current parser point or a pseudo-token (see
 ;; `haskell-indentation-read-next-token')
 (defvar current-token)
+(defvar previous-token)
 (defvar left-indent)            ;; most left possible indentation
 (defvar starter-indent)         ;; column at a keyword
 (defvar current-indent)         ;; the most right indentation
@@ -456,6 +457,7 @@ and indent when all of the following are true:
           (left-indent haskell-indentation-layout-offset)
           (case-fold-search nil)
           current-token
+          previous-token
           following-token
           possible-indentations
           implicit-layout-active)
@@ -1030,7 +1032,8 @@ layout starts."
                (haskell-indentation-read-next-token))
               ((eq current-token 'end-tokens)
                (when (or (and
-                          (not (string= following-token "{"))
+                          (not (member following-token '("{" operator)))
+                          (not (member previous-token '(operator)))
                           (haskell-indentation-expression-token-p following-token))
                          (string= following-token ";")
                          (and (equal layout-indent 0)
@@ -1180,6 +1183,7 @@ line."
               (> layout-indent (current-column)))
          (setq current-token 'layout-end))
         (t
+         (setq previous-token (haskell-indentation-peek-token))
          (haskell-indentation-skip-token)
          (if (>= (point) indentation-point)
              (progn

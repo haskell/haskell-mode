@@ -284,12 +284,12 @@ resolve (amount, max) number
               (3 2)
               (4 0 2 4 20))
 
-(hindent-test "9* Operator last on line""
+(hindent-test "9 Operator last on line""
 fun = x ++"
               (1 0)
-              (2 6))
+              (2 2 6))
 
-(hindent-test "10* Operator first on line""
+(hindent-test "10 Operator first on line""
 fun = x
       ++ z"
               (1 0)
