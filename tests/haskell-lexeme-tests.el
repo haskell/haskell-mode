@@ -63,6 +63,16 @@ buffer."
           (insert "\n"))
       (insert lines-or-contents))
 
+    (when (fboundp 'jit-lock-debug-mode)
+      ;; to see stack traces from inside font-lock
+      (jit-lock-debug-mode))
+
+    ;; Note that all of this should work both in haskell-mode and
+    ;; outside of it. Currently we test only haskell-mode setup.
+    (if literate
+        (literate-haskell-mode)
+      (haskell-mode))
+
     (font-lock-fontify-buffer)
 
     ;; here we check only if tokenization did not end in exception thrown
@@ -314,7 +324,7 @@ buffer."
   (check-lexemes-nocheck
    (concat "x = " "\""
            (let ((result "\\x01\\&,..\\NUL"))
-             (dotimes (i 17)
+             (dotimes (i 10)
                (setq result (concat result result)))
              result)
            "\"")))
@@ -348,3 +358,12 @@ buffer."
                (setq result (concat result result)))
              result)
            "++")))
+
+(ert-deftest haskell-lexeme-big-09-backticks-long-id()
+  (check-lexemes-nocheck
+   (concat "x = `"
+           (let ((result "xx"))
+             (dotimes (i 20)
+               (setq result (concat result result)))
+             result)
+           "id`")))

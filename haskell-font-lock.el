@@ -455,7 +455,21 @@ on an uppercase identifier."
             ("(\\(,*\\|->\\))" 0 'haskell-constructor-face)
             ("\\[\\]" 0 'haskell-constructor-face)
 
-            (,(concat "`" haskell-lexeme-qid-or-qsym "`") 0 'haskell-operator-face)
+            ("`"
+             (0 (unless (or (elt (syntax-ppss) 3) (elt (syntax-ppss) 4))
+                  (when (save-excursion
+                          (goto-char (match-beginning 0))
+                          (haskell-lexeme-looking-at-backtick))
+                    (goto-char (match-end 0))
+                    (unless (text-property-not-all (match-beginning 1) (match-end 1) 'face nil)
+                      (put-text-property (match-beginning 1) (match-end 1) 'face 'haskell-operator-face))
+                    (unless (text-property-not-all (match-beginning 2) (match-end 2) 'face nil)
+                      (put-text-property (match-beginning 2) (match-end 2) 'face 'haskell-operator-face))
+                    (unless (text-property-not-all (match-beginning 4) (match-end 4) 'face nil)
+                      (put-text-property (match-beginning 4) (match-end 4) 'face 'haskell-operator-face))
+                    (add-text-properties
+                     (match-beginning 0) (match-end 0)
+                     '(font-lock-fontified t fontified t font-lock-multiline t))))))
 
             (,haskell-lexeme-idsym-first-char
              (0 (unless (or (elt (syntax-ppss) 3) (elt (syntax-ppss) 4))

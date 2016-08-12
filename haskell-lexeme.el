@@ -130,6 +130,50 @@ the unqualified part (if any)."
                nil nil))
         'qprefix)))))
 
+(defun haskell-lexeme-looking-at-backtick ()
+  "Non-nil when point is just in front of an identifier quoted with backticks.
+
+When match is successful, match-data will contain:
+  (match-text 1) - opening backtick
+  (match-text 2) - whole qualified identifier
+  (match-text 3) - unqualified part of identifier
+  (match-text 4) - closing backtick"
+  (let ((begin (point))
+        (match-data-old (match-data))
+        first-backtick-start
+        last-backtick-start
+        qid-start
+        id-start
+        id-end
+        result)
+    (save-excursion
+      (when (looking-at "`")
+        (setq first-backtick-start (match-beginning 0))
+        (goto-char (match-end 0))
+        (forward-comment (buffer-size))
+        (when (haskell-lexeme-looking-at-qidsym)
+          (setq qid-start (match-beginning 0))
+          (setq id-start (match-beginning 1))
+          (setq id-end (match-end 1))
+          (goto-char (match-end 0))
+          (forward-comment (buffer-size))
+          (when (looking-at "`")
+            (setq last-backtick-start (match-beginning 0))
+            (set-match-data
+             (mapcar
+              (lambda (p)
+                (set-marker (make-marker) p))
+              (list
+               first-backtick-start (1+ last-backtick-start)
+               first-backtick-start (1+ first-backtick-start)
+               qid-start id-end
+               id-start id-end
+               last-backtick-start (1+ last-backtick-start))))
+            (setq result t)))))
+    (unless result
+      (set-match-data match-data-old))
+    result))
+
 (defconst haskell-lexeme-qid
   (rx-to-string `(: (regexp "'*")
                     (regexp ,haskell-lexeme-modid-opt-prefix)

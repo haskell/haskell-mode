@@ -111,6 +111,38 @@
 
      ("<=<" "." haskell-operator-face))))
 
+(ert-deftest haskell-syntactic-test-18 ()
+  "Backtick operators"
+  (check-properties
+   '(" `fmap1`"
+     " ` fmap2 `"
+     " ` {- C1 -} M.fmap3 {- C2 -} `")
+   '(("`" t haskell-operator-face)
+     ("fmap1" t haskell-operator-face)
+     ("`" t haskell-operator-face)
+
+     ("`" t haskell-operator-face)
+     ("fmap2" t haskell-operator-face)
+     ("`" t haskell-operator-face)
+
+     ("`" t haskell-operator-face)
+     ("C1" t font-lock-comment-face)
+     ("fmap3" t haskell-operator-face)
+     ("C2" t font-lock-comment-face)
+     ("`" t haskell-operator-face))))
+
+(ert-deftest haskell-syntactic-test-18a-multiline ()
+  "Backtick operators multiline"
+  ;; strangely thins works in interactive session
+  :expected-result :failed
+  (check-properties
+   '(" `"
+     " fmap "
+     "   `")
+   '(("`" t haskell-operator-face)
+     ("fmap" t haskell-operator-face)
+     ("`" t haskell-operator-face))))
+
 (ert-deftest haskell-syntactic-test-9a ()
   "Syntax for hierarchical modules when on the first line."
   ;; note that quite many things here are not consistent but for now
