@@ -456,7 +456,9 @@ on an uppercase identifier."
             ("\\[\\]" 0 'haskell-constructor-face)
 
             ("`"
-             (0 (unless (or (elt (syntax-ppss) 3) (elt (syntax-ppss) 4))
+             (0 (if (or (elt (syntax-ppss) 3) (elt (syntax-ppss) 4))
+                    (parse-partial-sexp (point) (point-max) nil nil (syntax-ppss)
+                                        'syntax-table)
                   (when (save-excursion
                           (goto-char (match-beginning 0))
                           (haskell-lexeme-looking-at-backtick))
@@ -472,7 +474,9 @@ on an uppercase identifier."
                      '(font-lock-fontified t fontified t font-lock-multiline t))))))
 
             (,haskell-lexeme-idsym-first-char
-             (0 (unless (or (elt (syntax-ppss) 3) (elt (syntax-ppss) 4))
+             (0 (if (or (elt (syntax-ppss) 3) (elt (syntax-ppss) 4))
+                    (parse-partial-sexp (point) (point-max) nil nil (syntax-ppss)
+                                        'syntax-table)
                   (when (save-excursion
                           (goto-char (match-beginning 0))
                           (haskell-lexeme-looking-at-qidsym))

@@ -530,6 +530,12 @@ be set to the preferred literate style."
 
     (goto-char begin)
     (let ((ppss (syntax-ppss)))
+      (when (nth 4 ppss)
+        ;; go to the end of a comment, there is nothing to see inside
+        ;; a comment so we might as well just skip over it
+        ;; immediatelly
+        (setq ppss (parse-partial-sexp (point) (point-max) nil nil ppss
+                                       'syntax-table)))
       (when (nth 8 ppss)
         ;; go to the beginning of a comment or string
         (goto-char (nth 8 ppss))
