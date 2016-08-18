@@ -88,6 +88,8 @@ interference with prompts that look like haskell expressions."
 Key bindings:
 \\{haskell-interactive-mode-map}"
   :group 'haskell-interactive
+  :syntax-table haskell-mode-syntax-table
+
   (setq haskell-interactive-mode-history (list))
   (setq haskell-interactive-mode-history-index 0)
 
