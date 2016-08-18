@@ -200,7 +200,7 @@ be set to the preferred literate style."
   (let ((map (make-sparse-keymap)))
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;; Editing-specific commands
-    (define-key map (kbd "C-c C-.") 'haskell-mode-format-imports)
+    (define-key map (kbd "C-c C-,") 'haskell-mode-format-imports)
     (define-key map [remap delete-indentation] 'haskell-delete-indentation)
     (define-key map (kbd "C-c C-l") 'haskell-mode-enable-process-minor-mode)
     (define-key map (kbd "C-c C-b") 'haskell-mode-enable-process-minor-mode)
