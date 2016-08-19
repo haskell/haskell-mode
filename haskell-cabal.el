@@ -627,7 +627,8 @@ nil: no commas, e.g.
     Foo Bar
 
 If the styles are mixed, the position of the first comma
-determines the style."
+determines the style. If there is only one element then `after'
+style is assumed."
   (let (comma-style)
     ;; split list items on single line
     (goto-char (point-min))
@@ -647,6 +648,13 @@ determines the style."
       (unless (eq comma-style 'before)
         (setq comma-style 'after))
       (replace-match "" nil nil))
+
+    ;; if there is just one line then set default as 'after
+    (unless comma-style
+      (goto-char (point-min))
+      (forward-line)
+      (when (eobp)
+        (setq comma-style 'after)))
     (goto-char (point-min))
 
     (haskell-cabal-each-line (haskell-cabal-chomp-line))
@@ -668,9 +676,8 @@ styles."
         (insert ", "))))
     ('after
      (goto-char (point-max))
-     (while (not (bobp))
+     (while (equal 0 (forward-line -1))
        (unless (haskell-cabal-ignore-line-p)
-         (forward-line -1)
          (end-of-line)
          (insert ",")
          (beginning-of-line))))
