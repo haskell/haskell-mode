@@ -69,7 +69,7 @@ build-$(EMACS_VERSION)/%.elc : %.el $(ELFILES)
 	$(BATCH) --eval '(setq byte-compile-error-on-warn t)'						\
 	         --eval "(defun byte-compile-dest-file (filename)					\
 	               	       (concat (file-name-directory filename) \"build-\" emacs-version \"/\"	\
-	                      	    (file-name-nondirectory filename) \"c\"))'"				\
+	                      	    (file-name-nondirectory filename) \"c\"))"				\
 	         --eval "(when (check-declare-file \"$<\") (kill-emacs 2))" \
 	         -f batch-byte-compile $<								\
 
