@@ -147,3 +147,8 @@ $(AUTOLOADS): $(ELFILES)
 		-f batch-update-autoloads "."
 	# check if autoloads will really load
 	$(BATCH) -l "$@"
+
+check-external : check-emacs-version $(AUTOLOADS)
+	$(BATCH) -l tests/haskell-external.el                                           \
+                 -f haskell-check-external-batch-and-exit
+	@echo "external packages okay"
