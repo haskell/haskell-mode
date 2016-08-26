@@ -81,7 +81,7 @@ The command can include arguments."
   ;; The format of error messages used by Hugs.
   `(("^ERROR \"\\(.+?\\)\"\\(:\\| line \\)\\([0-9]+\\) - " 1 3)
     ;; Format of error messages used by GHCi.
-    ("^\\(.+?\\):\\([0-9]+\\):\\(\\([0-9]+\\):\\)?\\( \\|\n *\\)\\(Warning\\)?"
+    ("^\\(.+?\\):\\([0-9]+\\):\\(\\([0-9]+\\):\\)?\\( \\|\n *\\)\\(.arning\\)?"
      1 2 4 ,@(if (fboundp 'compilation-fake-loc)
                  '((6) nil (5 '(face nil font-lock-multiline t)))))
     ;; Runtime exceptions, from ghci.
