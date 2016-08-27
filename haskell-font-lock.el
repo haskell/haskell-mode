@@ -86,6 +86,19 @@ be disabled at that position."
   :type '(alist string string)
   :group 'haskell-appearance)
 
+(defcustom haskell-font-lock-keywords
+  ;; `as', `hiding', and `qualified' are part of the import
+  ;; spec syntax, but they are not reserved.
+  ;; `_' can go in here since it has temporary word syntax.
+  '("case" "class" "data" "default" "deriving" "do"
+    "else" "if" "import" "in" "infix" "infixl"
+    "infixr" "instance" "let" "module" "mdo" "newtype" "of"
+    "rec" "pattern" "proc" "then" "type" "where" "_")
+  "Identifiers treated as reserved keywords in Haskell."
+  :group 'haskell-appearance
+  :type '(repeat string))
+
+
 (defun haskell-font-lock-dot-is-not-composition (start)
   "Return non-nil if the \".\" at START is not a composition operator.
 This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
@@ -229,16 +242,6 @@ Regexp match data 0 points to the chars."
           ;; no face.  So force evaluation by using `keep'.
           keep)))))
 
-(defconst haskell-font-lock--reverved-ids
-  ;; `as', `hiding', and `qualified' are part of the import
-  ;; spec syntax, but they are not reserved.
-  ;; `_' can go in here since it has temporary word syntax.
-  '("case" "class" "data" "default" "deriving" "do"
-    "else" "if" "import" "in" "infix" "infixl"
-    "infixr" "instance" "let" "module" "mdo" "newtype" "of"
-    "rec" "proc" "then" "type" "where" "_")
-  "Identifiers treated as reserved keywords in Haskell.")
-
 (defun haskell-font-lock--forward-type (&optional ignore)
   "Find where does this type declaration end.
 
@@ -283,7 +286,7 @@ like ::, class, instance, data, newtype, type."
         (setq last-token-was-newline nil))
        ((and (or (member (match-string-no-properties 0)
                          '("<-" "=" "←"))
-                 (member (match-string-no-properties 0) haskell-font-lock--reverved-ids))
+                 (member (match-string-no-properties 0) haskell-font-lock-keywords))
              (not (member (match-string-no-properties 0) ignore)))
         (setq cont nil)
         (setq last-token-was-newline nil))
@@ -318,7 +321,7 @@ like ::, class, instance, data, newtype, type."
   "Private function used to select either type or constructor face
 on an uppercase identifier."
   (cl-case (haskell-lexeme-classify-by-first-char (char-after (match-beginning 1)))
-    (varid (when (member (match-string 0) haskell-font-lock--reverved-ids)
+    (varid (when (member (match-string 0) haskell-font-lock-keywords)
              ;; Note: keywords parse as keywords only when not qualified.
              ;; GHC parses Control.let as a single but illegal lexeme.
              (when (member (match-string 0) '("class" "instance" "type" "data" "newtype"))
@@ -440,11 +443,11 @@ on an uppercase identifier."
 
             ;; Toplevel Declarations.
             ;; Place them *before* generic id-and-op highlighting.
-            (,topdecl-var  (1 (unless (member (match-string 1) haskell-font-lock--reverved-ids)
+            (,topdecl-var  (1 (unless (member (match-string 1) haskell-font-lock-keywords)
                                 'haskell-definition-face)))
-            (,topdecl-var2 (2 (unless (member (match-string 2) haskell-font-lock--reverved-ids)
+            (,topdecl-var2 (2 (unless (member (match-string 2) haskell-font-lock-keywords)
                                 'haskell-definition-face)))
-            (,topdecl-bangpat  (1 (unless (member (match-string 1) haskell-font-lock--reverved-ids)
+            (,topdecl-bangpat  (1 (unless (member (match-string 1) haskell-font-lock-keywords)
                                 'haskell-definition-face)))
             (,topdecl-sym  (2 (unless (member (match-string 2) '("\\" "=" "->" "→" "<-" "←" "::" "∷" "," ";" "`"))
                                 'haskell-definition-face)))
