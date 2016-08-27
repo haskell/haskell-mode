@@ -975,9 +975,8 @@
      ("Cons2" t haskell-constructor-face)
      ("Cons3" t haskell-constructor-face))))
 
-(ert-deftest haskell-pattern ()
+(ert-deftest haskell-pattern-1 ()
   "Fontify the \"pattern\" keyword in contexts related to pattern synonyms."
-  :expected-result :failed
   (check-properties
    '("pattern A = B"
      "pattern A <- B"
@@ -1006,27 +1005,21 @@
      ("pattern" t haskell-keyword-face)
      ("pattern" t haskell-keyword-face))))
 
-(ert-deftest haskell-no-pattern-1 ()
-  "Don't fontify \"pattern\" in contexts unrelated to pattern synonyms."
-  ;; This already works properly
-  ;;:expected-result :failed
+(ert-deftest haskell-pattern-2 ()
   (check-properties
    '("pattern :: Int"
      "pattern = 3")
-   '(("pattern" t haskell-definition-face)
-     ("pattern" t haskell-definition-face))))
+   '(("pattern" t haskell-keyword-face)
+     ("pattern" t haskell-keyword-face))))
 
-(ert-deftest haskell-no-pattern-2 ()
-  "Don't fontify \"pattern\" in contexts unrelated to pattern synonyms."
-  ;; This already works properly
-  ;;:expected-result :failed
+(ert-deftest haskell-pattern-3 ()
   (check-properties
    '("foo :: (a -> pattern) -> a -> pattern"
      "foo pattern x = pattern x"
      "bar = pattern where pattern = 5")
-   '(("pattern" t nil)
-     ("pattern" t nil)
-     ("pattern" t nil)
-     ("pattern" t nil)
-     ("pattern" t nil)
-     ("pattern" t nil))))
+   '(("pattern" t haskell-keyword-face)
+     ("pattern" t haskell-keyword-face)
+     ("pattern" t haskell-keyword-face)
+     ("pattern" t haskell-keyword-face)
+     ("pattern" t haskell-keyword-face)
+     ("pattern" t haskell-keyword-face))))
