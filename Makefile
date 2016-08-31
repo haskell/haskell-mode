@@ -1,6 +1,6 @@
 #
 # Note: Due to MELPA distributing directly from github source version
-# needs to be embedded in files as is without proprocessing.
+# needs to be embedded in files as is without preprocessing.
 #
 # Version string is present in:
 # - Makefile
