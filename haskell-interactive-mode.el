@@ -259,15 +259,6 @@ do the
               "\n:}\n"
               (format ":set prompt2 \"%s\"" haskell-interactive-prompt2)))))
 
-(defun haskell-interactive-trim (line)
-  "Trim indentation off of LINE in the REPL."
-  (if (and (string-match "^[ ]+" line)
-           (> (length line)
-              (length haskell-interactive-prompt)))
-      (substring line
-                 (length haskell-interactive-prompt))
-    line))
-
 (defun haskell-interactive-mode-line-is-query (line)
   "Is LINE actually a :t/:k/:i?"
   (and (string-match "^:[itk] " line)
