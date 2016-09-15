@@ -6,6 +6,30 @@ This file uses Org mode. Some useful (default) key-bindings:
  - Use "<backtab>" to cycle visibility of all nodes
  - Use "C-c C-o" to open links
 
+* Changes in 13.18
+
+- Removed haskell-bot
+
+- Implement shallow indentation
+
+- Removed haskell-simple-indent
+
+- Removed haskell-indentation show dynamic positions
+
+- Improved indentation inside multiline strings
+
+- Implemented font-lock for quasi quoted XML, HTML and JavaScript
+
+- Added '{type|data} family' to font-lock-keywords-create
+
+- Started using undercover.el for emacs lisp coverage
+
+- Added keybinding for `haskell-cabal-visit-file`
+
+- Added type role to font lock
+
+- Detect and respect the comma style of a section in cabal files
+
 * Changes in 13.16
 
 - Improved parsing of comma lists in haskell indentation
