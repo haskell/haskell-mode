@@ -6,6 +6,38 @@ This file uses Org mode. Some useful (default) key-bindings:
  - Use "<backtab>" to cycle visibility of all nodes
  - Use "C-c C-o" to open links
 
+* Changes in 13.20
+
+- Require at least Emacs 24.1
+
+- Honor equals on its own line in data decl
+
+- Honor equals on separate line after guards
+
+- Allow haskell-process-path-* to be lists
+
+- Fontify True/False in cabal mode
+
+- Align | with = in data declarations
+
+- Remove haskell-package.el
+
+- Run stylish-haskell before save
+
+- Improved lexeme parsing in haskell-lexeme
+
+- Add haskell-interactive-copy-to-prompt
+
+- Remove haskell-mode-contextual-space and related var
+
+- Make haskell-indent-region do nothing
+
+- Add c2hs mode
+
+- Improve hasktags handling
+
+- Move documentation from wiki to haskell-mode manual
+
 * Changes in 13.18
 
 - Removed haskell-bot
