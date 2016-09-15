@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual is for Haskell mode, version 16.1-git
+
+Copyright (C) 2013-2016 Haskell Mode contributors.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the http://www.gnu.org/licenses/fdl.html (GNU
+Free Documentation License), Version 1.3 or any later version published
+by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts and no Back-Cover Texts. -->
+<!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>Haskell Mode 16.1-git: Indentation</title>
+
+<meta name="description" content="Haskell Mode 16.1-git: Indentation">
+<meta name="keywords" content="Haskell Mode 16.1-git: Indentation">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="index.html#Top" rel="start" title="Top">
+<link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
+<link href="index.html#Top" rel="up" title="Top">
+<link href="External-indentation.html#External-indentation" rel="next" title="External indentation">
+<link href="Unicode-support.html#Unicode-support" rel="prev" title="Unicode support">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.indentedblock {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smallindentedblock {margin-left: 3.2em; font-size: smaller}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style:oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nocodebreak {white-space:nowrap}
+span.nolinebreak {white-space:nowrap}
+span.roman {font-family:serif; font-weight:normal}
+span.sansserif {font-family:sans-serif; font-weight:normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="haskell-mode.css">
+
+<link rel="shortcut icon" href="haskell-mode-32x32.png">
+<script src="../../index.js"> </script>
+</head>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+<div class="background"> </div><a name="Indentation"></a>
+<div class="header">
+<p>
+Next: <a href="External-indentation.html#External-indentation" accesskey="n" rel="next">External indentation</a>, Previous: <a href="Unicode-support.html#Unicode-support" accesskey="p" rel="prev">Unicode support</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<a name="Indentation-1"></a>
+<h2 class="chapter">7 Indentation</h2>
+
+<a name="index-indentation"></a>
+<a name="index-layout-rule"></a>
+<a name="index-off_002dside-rule"></a>
+
+<p>In Haskell, code indentation has semantic meaning as it defines the
+block structure. Haskell also supports braces and semicolons
+notation for conveying the block structure. However, most Haskell
+programs written by humans use indentation for block structuring.
+</p>
+<p>Haskell Mode ships with two indentation modes:
+</p>
+<ul>
+<li> <code>haskell-indentation-mode</code> (default).
+
+<p>This is a semi-intelligent indentation mode doing a decent job at
+recognizing Haskell syntactical constructs.  It is based on a recursive
+descent Haskell parser. <kbd>TAB</kbd> selects the next potential indentation
+position, <kbd>S-TAB</kbd> selects the previous one. If a block is selected
+you can use <kbd>TAB</kbd> to indent the block more and <kbd>S-TAB</kbd> to indent
+the block less.
+</p>
+<p>When <code>electric-indent-mode</code> is enabled or the variable
+<code>haskell-indentation-electric-flag</code> is non-nil, the insertion of
+some characters (by default <kbd>,</kbd> <kbd>;</kbd> <kbd>)</kbd> <kbd>}</kbd> <kbd>]</kbd>)
+may trigger auto reindentation under appropriate conditions. See the
+documentation of <code>haskell-indentation-common-electric-command</code> for
+more details.
+</p>
+</li><li> <code>haskell-indent-mode</code> (optional).
+
+<p>This is a semi-intelligent indentation mode doing a decent job at
+recognizing Haskell syntactical constructs.  It is based on a decision
+table. Sadly it is no longer developed and does not recognize newer
+Haskell syntax. <kbd>TAB</kbd> cycles through all available indentation
+positions.
+</p>
+<p>To use <code>haskell-indent-mode</code>, add this to your <samp>~/.emacs</samp>
+file:
+</p>
+<div class="lisp">
+<pre class="lisp">(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+</pre></div>
+
+<p>Note that <code>turn-on-haskell-indent</code> will disable
+<code>haskell-indentation-mode</code>.
+</p>
+</li></ul>
+
+<p>For general information about indentation support in GNU Emacs,
+see <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Indentation.html#Indentation">(emacs)Indentation</a>.
+</p>
+<a name="Rectangle-Commands"></a>
+<h3 class="section">7.1 Rectangle Commands</h3>
+
+<a name="index-rectangle"></a>
+<a name="index-CUA-mode"></a>
+
+<p>GNU Emacs provides so-called <em>rectangle commands</em> which operate on
+rectangular areas of text, which are particularly useful for languages
+with a layout rule such as Haskell. See <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Rectangles.html#Rectangles">(emacs)Rectangles</a>, to learn
+more about rectangle commands.
+</p>
+<p>Moreover, CUA mode (see <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/CUA-Bindings.html#CUA-Bindings">(emacs)CUA Bindings</a>) provides enhanced
+rectangle support with visible rectangle highlighting. When CUA mode is
+active, you can initiate a rectangle selection by <kbd>C-RET</kbd> and extend
+it simply by movement commands. You don&rsquo;t have to enable full CUA mode
+to benefit from these enhanced rectangle commands; you can activate CUA
+selection mode (without redefining <kbd>C-x</kbd>,<kbd>C-c</kbd>,<kbd>C-v</kbd>, and
+<kbd>C-z</kbd>) by calling <kbd>M-x cua-selection-mode</kbd> (or adding
+<code>(cua-selection-mode nil)</code> to your <code>haskell-mode-hook</code>).
+</p>
+<a name="Region-indent-is-a-no_002dop"></a>
+<h3 class="section">7.2 Region indent is a no-op</h3>
+
+<p>There is a <code>indent-region</code> function that supposedly could be used
+to indent code region without changing its semantics. Sadly it does not
+work that way because usual use case for <code>indent-region</code> is:
+</p>
+<ol>
+<li> Alter first line of code in region.
+</li><li> Call <code>indent-region</code> to fix indentation for remaining lines.
+</li></ol>
+
+<p>Note that between 1 and 2 program is already semantically broken and
+knowing how to indent it preserving semantic from before step 1 would
+require time travel.
+</p>
+<p>To stay on the safe side <code>indent-region-function</code> is bound to a
+no-op in <code>haskell-mode</code>.
+</p>
+<hr>
+<div class="header">
+<p>
+Next: <a href="External-indentation.html#External-indentation" accesskey="n" rel="next">External indentation</a>, Previous: <a href="Unicode-support.html#Unicode-support" accesskey="p" rel="prev">Unicode support</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>
