@@ -6,6 +6,34 @@ This file uses Org mode. Some useful (default) key-bindings:
  - Use "<backtab>" to cycle visibility of all nodes
  - Use "C-c C-o" to open links
 
+* Changes in 13.16
+
+- Improved parsing of comma lists in haskell indentation
+
+- Declared turn-on-haskell-indentation as obsolete
+
+- Improved QuasiQuote font lock
+
+- Fixed indentation for Unicode symbols
+
+- Improved completion engine
+
+- Added support for interaction with stack ghci
+
+- Added haskell-forward-sexp
+
+- Added overlays to haskell load
+
+- Made use of lexical binding for all emacs lisp sources
+
+- Improved indentation of guards with commas
+
+- Made three indentation modes mutually turn each other off
+
+- Added an additional trigger for pragma suggestions
+
+- Improved and documented `toggle-scc-at-point` in manual
+
 * Changes in 13.14
 
 - Add official Haskell Mode logo
