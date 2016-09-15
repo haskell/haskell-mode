@@ -6,6 +6,50 @@ This file uses Org mode. Some useful (default) key-bindings:
  - Use "<backtab>" to cycle visibility of all nodes
  - Use "C-c C-o" to open links
 
+* Changes in 16.1
+
+- Require at least Emacs 24.3
+
+- Implemented standalone deriving indentation
+
+- Removed haskell-indentation-ifte-offset
+
+- Implemented electric characters
+
+- Added LiquidHaskell annotation highlight
+
+- Introduced haskell-hasktags-path defcustom
+
+- Added font lock tests for pattern synonyms
+
+- Hardcoded haskell-ghc-supported-extensions/options
+
+- Added multi-line input in haskell-interactive
+
+- Added haskell-mode-stylish-haskell-path
+
+- Added Windows CI builds
+
+- Added syntax highlight to Yesod rules quasi quote
+
+- Added support for line continuation in #define's
+
+- Added support unterminated strings in indentation
+
+- Implemented /italic/ and *bold* for haddock
+
+- Added significant speedups in font-lock engine
+
+- Added support for full complexity of backtick syntax
+
+- Operators at the end or beggining of line force expression continuation in indentation
+
+- Map haskell-mode-format-imports to C-c C-, to avoid conflict with haskell-indent
+
+- Improve auto add dependencies in cabal
+
+- Fix inferior-haskell warning font lock for GHC 8.0
+
 * Changes in 13.20
 
 - Require at least Emacs 24.1
