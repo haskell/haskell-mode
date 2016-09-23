@@ -138,8 +138,7 @@ When match is successful, match-data will contain:
   (match-text 2) - whole qualified identifier
   (match-text 3) - unqualified part of identifier
   (match-text 4) - closing backtick"
-  (let ((begin (point))
-        (match-data-old (match-data))
+  (let ((match-data-old (match-data))
         first-backtick-start
         last-backtick-start
         qid-start
