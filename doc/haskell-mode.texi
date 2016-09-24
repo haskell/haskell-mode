@@ -278,7 +278,7 @@ To generally format (sort, align) your imports, you can run
 
     @kbd{M-x} @code{haskell-mode-format-imports}
 
-Or @kbd{C-c C-.}.
+Or @kbd{C-c C-,}.
 
 @subsection Sort imports
 
