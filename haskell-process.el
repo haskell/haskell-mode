@@ -160,9 +160,7 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
 (defun haskell-process-log (msg)
   "Effective append MSG to the process log (if enabled)."
   (when haskell-process-log
-    (let* ((append-to (get-buffer-create "*haskell-process-log*"))
-           (windows (get-buffer-window-list append-to t t))
-           move-point-in-windows)
+    (let* ((append-to (get-buffer-create "*haskell-process-log*")))
       (with-current-buffer append-to
         ;; point should follow insertion so that it stays at the end
         ;; of the buffer
