@@ -768,6 +768,8 @@ For example
   (haskell-indentation-with-starter
    (lambda ()
      (haskell-indentation-read-next-token)
+     (when (equal current-token 'layout-item)
+       (haskell-indentation-read-next-token))
      (when (string= current-token "(")
        (haskell-indentation-list
         #'haskell-indentation-module-export
