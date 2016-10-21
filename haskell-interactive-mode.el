@@ -498,6 +498,7 @@ FILE-NAME only."
 ;; Misc
 
 (declare-function haskell-interactive-switch "haskell")
+(declare-function haskell-session "haskell")
 
 (defun haskell-session-interactive-buffer (s)
   "Get the session interactive buffer."
@@ -516,6 +517,10 @@ FILE-NAME only."
             (haskell-session-assign s))
           (haskell-interactive-switch)
           buffer)))))
+
+(defun haskell-interactive-buffer ()
+  "Get the interactive buffer of the session."
+  (haskell-session-interactive-buffer (haskell-session)))
 
 (defun haskell-process-cabal-live (state buffer)
   "Do live updates for Cabal processes."
