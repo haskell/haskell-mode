@@ -291,54 +291,56 @@ SESSION, otherwise operate on the current buffer."
   (with-current-buffer (if session
                            (haskell-session-interactive-buffer session)
                          (current-buffer))
-    (goto-char (point-max))
-    (let ((prompt (propertize haskell-interactive-prompt
-                              'font-lock-face 'haskell-interactive-face-prompt
-                              'prompt t
-                              'read-only t
-                              'rear-nonsticky t)))
-      ;; At the time of writing, front-stickying the first char gives an error
-      ;; Has unfortunate side-effect of being able to insert before the prompt
-      (insert (substring prompt 0 1)
-              (propertize (substring prompt 1)
-                          'front-sticky t)))
-    (let ((marker (setq-local haskell-interactive-mode-prompt-start (make-marker))))
-      (set-marker marker (point)))
+    (save-excursion
+      (goto-char (point-max))
+      (let ((prompt (propertize haskell-interactive-prompt
+                                'font-lock-face 'haskell-interactive-face-prompt
+                                'prompt t
+                                'read-only t
+                                'rear-nonsticky t)))
+        ;; At the time of writing, front-stickying the first char gives an error
+        ;; Has unfortunate side-effect of being able to insert before the prompt
+        (insert (substring prompt 0 1)
+                (propertize (substring prompt 1)
+                            'front-sticky t)))
+      (let ((marker (setq-local haskell-interactive-mode-prompt-start (make-marker))))
+        (set-marker marker (point))))
     (when haskell-interactive-mode-scroll-to-bottom
       (haskell-interactive-mode-scroll-to-bottom))))
 
 (defun haskell-interactive-mode-eval-result (session text)
   "Insert the result of an eval as plain text."
   (with-current-buffer (haskell-session-interactive-buffer session)
-    (goto-char (point-max))
-    (let ((prop-text (propertize text
-                                 'font-lock-face 'haskell-interactive-face-result
-                                 'front-sticky t
-                                 'prompt t
-                                 'read-only t
-                                 'rear-nonsticky t
-                                 'result t)))
-      (when (string= text haskell-interactive-prompt2)
-        (put-text-property 0
-                           (length haskell-interactive-prompt2)
-                           'font-lock-face
-                           'haskell-interactive-face-prompt2
-                           prop-text))
-      (insert (ansi-color-apply prop-text))
-      (haskell-interactive-mode-handle-h)
-      (let ((marker (setq-local haskell-interactive-mode-result-end (make-marker))))
-        (set-marker marker
-                    (point)
-                    (current-buffer)))
-      (when haskell-interactive-mode-scroll-to-bottom
-        (haskell-interactive-mode-scroll-to-bottom)))))
+    (save-excursion
+      (goto-char (point-max))
+      (let ((prop-text (propertize text
+                                   'font-lock-face 'haskell-interactive-face-result
+                                   'front-sticky t
+                                   'prompt t
+                                   'read-only t
+                                   'rear-nonsticky t
+                                   'result t)))
+        (when (string= text haskell-interactive-prompt2)
+          (put-text-property 0
+                             (length haskell-interactive-prompt2)
+                             'font-lock-face
+                             'haskell-interactive-face-prompt2
+                             prop-text))
+        (insert (ansi-color-apply prop-text))
+        (haskell-interactive-mode-handle-h)
+        (let ((marker (setq-local haskell-interactive-mode-result-end (make-marker))))
+          (set-marker marker
+                      (point)
+                      (current-buffer)))))
+    (when haskell-interactive-mode-scroll-to-bottom
+      (haskell-interactive-mode-scroll-to-bottom))))
 
 (defun haskell-interactive-mode-scroll-to-bottom ()
   "Scroll to bottom."
   (let ((w (get-buffer-window (current-buffer))))
     (when w
       (goto-char (point-max))
-      (set-window-point w (point-max)))))
+      (set-window-point w (point)))))
 
 (defun haskell-interactive-mode-compile-error (session message)
   "Echo an error."
