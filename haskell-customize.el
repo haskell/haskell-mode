@@ -286,7 +286,7 @@ imports become available?"
   :group 'haskell-interactive)
 
 (defcustom haskell-interactive-mode-scroll-to-bottom
-  nil
+  t
   "Scroll to bottom in the REPL always."
   :type 'boolean
   :group 'haskell-interactive)
