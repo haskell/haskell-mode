@@ -208,9 +208,11 @@ be nil.")
         (next-error-no-select 0)
       (self-insert-command n))))
 
-(defun haskell-interactive-at-prompt ()
-  "If at prompt, return start position of user-input, otherwise return nil."
-  (if (>= (point)
+(defun haskell-interactive-at-prompt (&optional end-line)
+  "If at prompt, return start position of user-input, otherwise return nil.
+If END-LINE is non-nil, then return non-nil when the end of line
+is at the prompt."
+  (if (>= (if end-line (line-end-position) (point))
           haskell-interactive-mode-prompt-start)
       haskell-interactive-mode-prompt-start
     nil))
