@@ -307,8 +307,7 @@ SESSION, otherwise operate on the current buffer."
                             'front-sticky t)))
       (let ((marker (setq-local haskell-interactive-mode-prompt-start (make-marker))))
         (set-marker marker (point))))
-    (when (or haskell-interactive-mode-scroll-to-bottom
-              (haskell-interactive-at-prompt t))
+    (when (haskell-interactive-at-prompt t)
       (haskell-interactive-mode-scroll-to-bottom))))
 
 (defun haskell-interactive-mode-eval-result (session text)
@@ -334,8 +333,7 @@ SESSION, otherwise operate on the current buffer."
         (haskell-interactive-mode-handle-h)
         (let ((marker (setq-local haskell-interactive-mode-result-end (make-marker))))
           (set-marker marker (point))))
-      (when (or haskell-interactive-mode-scroll-to-bottom
-                at-end)
+      (when at-end
         (haskell-interactive-mode-scroll-to-bottom)))))
 
 (defun haskell-interactive-mode-scroll-to-bottom ()
