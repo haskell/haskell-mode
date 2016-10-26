@@ -89,10 +89,10 @@ Restarts the SESSION's process if that is the case."
     (let ((msg (format "Building: %s" (match-string 1 buffer))))
       (haskell-interactive-mode-echo (haskell-process-session process) msg)
       (haskell-mode-message-line msg)))
-   ((string-match "\\(Collecting type info for [[:digit:]]+ module(s) ...\\)"
+   ((string-match "Collecting type info for [[:digit:]]+ module(s) \\.\\.\\."
                   (haskell-process-response process)
                   (haskell-process-response-cursor process))
-    (haskell-mode-message-line (match-string 1 buffer))
+    (haskell-mode-message-line (match-string 0 buffer))
     ;; Do not consume "Ok, modules loaded" that goes before
     ;; "Collecting type info...", just exit.
     nil)))
