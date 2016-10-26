@@ -208,9 +208,11 @@ be nil.")
         (next-error-no-select 0)
       (self-insert-command n))))
 
-(defun haskell-interactive-at-prompt ()
-  "If at prompt, return start position of user-input, otherwise return nil."
-  (if (>= (point)
+(defun haskell-interactive-at-prompt (&optional end-line)
+  "If at prompt, return start position of user-input, otherwise return nil.
+If END-LINE is non-nil, then return non-nil when the end of line
+is at the prompt."
+  (if (>= (if end-line (line-end-position) (point))
           haskell-interactive-mode-prompt-start)
       haskell-interactive-mode-prompt-start
     nil))
@@ -305,21 +307,22 @@ SESSION, otherwise operate on the current buffer."
                             'front-sticky t)))
       (let ((marker (setq-local haskell-interactive-mode-prompt-start (make-marker))))
         (set-marker marker (point))))
-    (when haskell-interactive-mode-scroll-to-bottom
+    (when (haskell-interactive-at-prompt t)
       (haskell-interactive-mode-scroll-to-bottom))))
 
 (defun haskell-interactive-mode-eval-result (session text)
   "Insert the result of an eval as plain text."
   (with-current-buffer (haskell-session-interactive-buffer session)
-    (save-excursion
-      (goto-char (point-max))
-      (let ((prop-text (propertize text
-                                   'font-lock-face 'haskell-interactive-face-result
-                                   'front-sticky t
-                                   'prompt t
-                                   'read-only t
-                                   'rear-nonsticky t
-                                   'result t)))
+    (let ((at-end (eobp))
+          (prop-text (propertize text
+                                 'font-lock-face 'haskell-interactive-face-result
+                                 'front-sticky t
+                                 'prompt t
+                                 'read-only t
+                                 'rear-nonsticky t
+                                 'result t)))
+      (save-excursion
+        (goto-char (point-max))
         (when (string= text haskell-interactive-prompt2)
           (put-text-property 0
                              (length haskell-interactive-prompt2)
@@ -329,11 +332,9 @@ SESSION, otherwise operate on the current buffer."
         (insert (ansi-color-apply prop-text))
         (haskell-interactive-mode-handle-h)
         (let ((marker (setq-local haskell-interactive-mode-result-end (make-marker))))
-          (set-marker marker
-                      (point)
-                      (current-buffer)))))
-    (when haskell-interactive-mode-scroll-to-bottom
-      (haskell-interactive-mode-scroll-to-bottom))))
+          (set-marker marker (point))))
+      (when at-end
+        (haskell-interactive-mode-scroll-to-bottom)))))
 
 (defun haskell-interactive-mode-scroll-to-bottom ()
   "Scroll to bottom."
@@ -496,6 +497,7 @@ FILE-NAME only."
 ;; Misc
 
 (declare-function haskell-interactive-switch "haskell")
+(declare-function haskell-session "haskell")
 
 (defun haskell-session-interactive-buffer (s)
   "Get the session interactive buffer."
@@ -514,6 +516,10 @@ FILE-NAME only."
             (haskell-session-assign s))
           (haskell-interactive-switch)
           buffer)))))
+
+(defun haskell-interactive-buffer ()
+  "Get the interactive buffer of the session."
+  (haskell-session-interactive-buffer (haskell-session)))
 
 (defun haskell-process-cabal-live (state buffer)
   "Do live updates for Cabal processes."

@@ -134,7 +134,9 @@ If I break, you can:
   1. Restart:           M-x haskell-process-restart
   2. Configure logging: C-h v haskell-process-log (useful for debugging)
   3. General config:    M-x customize-mode
-  4. Hide these tips:   C-h v haskell-process-show-debug-tips")))))))
+  4. Hide these tips:   C-h v haskell-process-show-debug-tips")))
+                (with-current-buffer (haskell-interactive-buffer)
+                  (goto-char haskell-interactive-mode-prompt-start))))))
 
 (defun haskell-commands-process ()
   "Get the Haskell session, throws an error if not available."

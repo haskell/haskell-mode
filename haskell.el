@@ -306,10 +306,6 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
   "Get the current process from the current session."
   (haskell-session-process (haskell-session)))
 
-(defun haskell-interactive-buffer ()
-  "Get the interactive buffer of the session."
-  (haskell-session-interactive-buffer (haskell-session)))
-
 ;;;###autoload
 (defun haskell-kill-session-process (&optional session)
   "Kill the process."

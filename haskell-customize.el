@@ -285,12 +285,6 @@ imports become available?"
   :type 'boolean
   :group 'haskell-interactive)
 
-(defcustom haskell-interactive-mode-scroll-to-bottom
-  t
-  "Scroll to bottom in the REPL always."
-  :type 'boolean
-  :group 'haskell-interactive)
-
 (defcustom haskell-interactive-popup-errors
   t
   "Popup errors in a separate buffer."
