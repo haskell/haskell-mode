@@ -343,6 +343,21 @@ printing compilation messages."
   :type 'boolean
   :group 'haskell-interactive)
 
+(defcustom haskell-interactive-mode-read-only
+  t
+  "Non-nil means most GHCi/haskell-interactive-mode output is read-only.
+This does not include the prompt.  Configure
+`haskell-interactive-prompt-read-only' to change the prompt's
+read-only property."
+  :type 'boolean
+  :group 'haskell-interactive)
+
+(defcustom haskell-interactive-prompt-read-only
+  haskell-interactive-mode-read-only
+  "Non-nil means the prompt (and prompt2) is read-only."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defcustom haskell-import-mapping
   '()
   "Support a mapping from module to import lines.
