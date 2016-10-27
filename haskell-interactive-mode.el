@@ -298,7 +298,7 @@ SESSION, otherwise operate on the current buffer."
       (let ((prompt (propertize haskell-interactive-prompt
                                 'font-lock-face 'haskell-interactive-face-prompt
                                 'prompt t
-                                'read-only t
+                                'read-only haskell-interactive-prompt-read-only
                                 'rear-nonsticky t)))
         ;; At the time of writing, front-stickying the first char gives an error
         ;; Has unfortunate side-effect of being able to insert before the prompt
@@ -318,17 +318,16 @@ SESSION, otherwise operate on the current buffer."
                                  'font-lock-face 'haskell-interactive-face-result
                                  'front-sticky t
                                  'prompt t
-                                 'read-only t
+                                 'read-only haskell-interactive-mode-read-only
                                  'rear-nonsticky t
                                  'result t)))
       (save-excursion
         (goto-char (point-max))
         (when (string= text haskell-interactive-prompt2)
-          (put-text-property 0
-                             (length haskell-interactive-prompt2)
-                             'font-lock-face
-                             'haskell-interactive-face-prompt2
-                             prop-text))
+          (setq prop-text
+                (propertize prop-text
+                            'font-lock-face 'haskell-interactive-face-prompt2
+                            'read-only haskell-interactive-prompt-read-only)))
         (insert (ansi-color-apply prop-text))
         (haskell-interactive-mode-handle-h)
         (let ((marker (setq-local haskell-interactive-mode-result-end (make-marker))))
@@ -366,7 +365,7 @@ SESSION, otherwise operate on the current buffer."
                                   'expandable t
                                   'font-lock-face type
                                   'front-sticky t
-                                  'read-only t
+                                  'read-only haskell-interactive-mode-read-only
                                   'rear-nonsticky t))
               (insert (propertize (concat (match-string 2 message) "\n")
                                   'collapsible t
@@ -374,12 +373,12 @@ SESSION, otherwise operate on the current buffer."
                                   'front-sticky t
                                   'invisible haskell-interactive-mode-hide-multi-line-errors
                                   'message-length (length (match-string 2 message))
-                                  'read-only t
+                                  'read-only haskell-interactive-mode-read-only
                                   'rear-nonsticky t)))
           (insert (propertize (concat message "\n")
                               'font-lock-face type
                               'front-sticky t
-                              'read-only t
+                              'read-only haskell-interactive-mode-read-only
                               'rear-nonsticky t)))))))
 
 (defun haskell-interactive-mode-insert (session message)
