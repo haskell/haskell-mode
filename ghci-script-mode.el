@@ -36,7 +36,6 @@
   (setq-local comment-start-skip "[-{]-[ \t]*")
   (setq-local comment-end "")
   (setq-local comment-end-skip "[ \t]*\\(-}\\|\\s>\\)")
-  (setq-local indent-line-function 'haskell-mode-suggest-indent-choice)
   (setq-local font-lock-defaults '(ghci-script-mode-keywords t t nil nil))
   (setq-local indent-tabs-mode nil)
   (setq-local tab-width 8)
