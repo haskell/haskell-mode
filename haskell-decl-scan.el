@@ -372,8 +372,9 @@ there."
            (setf fontfaces (list fontfaces)))
          (delq nil (mapcar
                     #'(lambda (f)
-                        (or (eq f 'font-lock-comment-face)
-                            (eq f 'font-lock-comment-delimiter-face)))
+                        (member f '(font-lock-comment-face
+                                    font-lock-doc-face
+                                    font-lock-comment-delimiter-face)))
                     fontfaces))))
       t
     nil))
