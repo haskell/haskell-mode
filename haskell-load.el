@@ -180,6 +180,7 @@ list of modules where missed IDENT was found."
                  (not (string-match "\\([A-Z][A-Za-z]+\\) is deprecated" msg)))
             (string-match "Use \\([A-Z][A-Za-z]+\\) to permit this" msg)
             (string-match "Use \\([A-Z][A-Za-z]+\\) to allow" msg)
+            (string-match "Use \\([A-Z][A-Za-z]+\\) to enable" msg)
             (string-match
              "Use \\([A-Z][A-Za-z]+\\) if you want to disable this"
              msg)
