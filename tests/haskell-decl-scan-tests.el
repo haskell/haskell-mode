@@ -35,7 +35,8 @@
   "All lines in this buffer should count as comments"
   (with-temp-buffer
     (haskell-mode)
-    (insert-lines "" "--hi" "  -- hi\t " "" "{-hi-}" " \t{-hi-}  ")
+    (insert-lines "" "--hi" "  -- hi\t " "" "{-hi-}" " \t{-hi-}  "
+                  "-- | hi" "{-| hi -}")
     (font-lock-fontify-buffer)
     (goto-char (point-min))
 
