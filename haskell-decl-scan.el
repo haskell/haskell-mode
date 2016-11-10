@@ -219,7 +219,8 @@ only for `imenu' support.")
 
 (defun haskell-ds-whitespace-p (char)
   "Test if CHAR is a whitespace character."
-  (member char '(?\t ?\n ?\ )))
+  ;; the nil is a bob/eob test
+  (member char '(nil ?\t ?\n ?\ )))
 
 (defun haskell-ds-move-to-decl (direction bird-literate fix)
   "General function for moving to the start of a declaration,
