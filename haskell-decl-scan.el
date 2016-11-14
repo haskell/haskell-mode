@@ -357,20 +357,15 @@ there."
   (interactive)
   (haskell-ds-move-to-decl nil (haskell-ds-bird-p) nil))
 
-(defun haskell-ds-comment-p
-    (&optional
-     pt)
-  "Test if the cursor is on whitespace or a comment.
-
-`PT' defaults to `(point)'"
+(defun haskell-ds-comment-p ()
+  "Test if the cursor is on whitespace or a comment."
   ;; ensure result is `t' or `nil' instead of just truthy
   (if (or
        ;; is cursor on whitespace
-       (haskell-ds-whitespace-p (following-char))
+       (haskell-ds-whitespace-p)
        ;; http://emacs.stackexchange.com/questions/14269/how-to-detect-if-the-point-is-within-a-comment-area
        ;; is cursor at begging, inside, or end of comment
-       (let ((fontfaces (get-text-property (or pt
-                                               (point)) 'face)))
+       (let ((fontfaces (get-text-property (point) 'face)))
          (when (not (listp fontfaces))
            (setf fontfaces (list fontfaces)))
          (delq nil (mapcar
