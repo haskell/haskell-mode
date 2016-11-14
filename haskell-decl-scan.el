@@ -217,10 +217,10 @@ only for `imenu' support.")
   (concat literate-haskell-ds-line-prefix haskell-ds-start-decl-re)
   "The regexp that starts a Bird-style literate Haskell declaration.")
 
-(defun haskell-ds-whitespace-p (char)
-  "Test if CHAR is a whitespace character."
-  ;; the nil is a bob/eob test
-  (member char '(nil ?\t ?\n ?\ )))
+(defun haskell-ds-whitespace-p ()
+  "Test if PT is at a whitespace character."
+  (or (eolp)
+      (equal (string-to-syntax " ") (syntax-after (point)))))
 
 (defun haskell-ds-move-to-decl (direction bird-literate fix)
   "General function for moving to the start of a declaration,
