@@ -194,8 +194,7 @@ current line that starts with REGEXP and is not in `font-lock-comment-face'."
                       'font-lock-comment-face)))))
 
 (defun haskell-ds-move-to-start-regexp-skipping-comments (inc regexp)
-  "Like haskell-ds-move-to-start-regexp, but uses syntax-ppss to
-  skip comments"
+  "Like haskell-ds-move-to-start-regexp, but uses syntax-ppss to skip comments."
   (let (p)
     (cl-loop
      do (setq p (point))
@@ -205,6 +204,7 @@ current line that starts with REGEXP and is not in `font-lock-comment-face'."
 
 (defvar literate-haskell-ds-line-prefix "> ?"
   "Regexp matching start of a line of Bird-style literate code.
+
 Current value is \"> \" as we assume top-level declarations start
 at column 3.  Must not contain the special \"^\" regexp as we may
 not use the regexp at the start of a regexp string.  Note this is
@@ -382,8 +382,7 @@ there."
     nil))
 
 (defun haskell-ds-line-commented-p ()
-  "Tests if all characters from `point' to `end-of-line' pass
-`haskell-ds-comment-p'"
+  "Test if all characters from `point' to `end-of-line' pass `haskell-ds-comment-p'."
   (let ((r t))
     (while (and r (not (eolp)))
       (if (not (haskell-ds-comment-p))
@@ -392,8 +391,7 @@ there."
     r))
 
 (defun haskell-ds-forward-decl ()
-  "Move forward to the first character that starts a top-level
-declaration.  As `haskell-ds-backward-decl' but forward."
+  "Move forward to the end of the top-level declaration."
   (interactive)
   (let ((p (point)) b e empty was-at-bob)
     ;; Go back to beginning of defun, then go to beginning of next
