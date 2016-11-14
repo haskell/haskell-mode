@@ -194,12 +194,13 @@ current line that starts with REGEXP and is not in `font-lock-comment-face'."
                       'font-lock-comment-face)))))
 
 (defun haskell-ds-move-to-start-regexp-skipping-comments (inc regexp)
-  "Like haskell-ds-move-to-start-regexp, but uses syntax-ppss to skip comments."
+  "Like haskell-ds-move-to-start-regexp, but skips comments."
   (let (p)
     (cl-loop
      do (setq p (point))
      (haskell-ds-move-to-start-regexp inc regexp)
-     while (and (nth 4 (syntax-ppss))
+     while (and (not (haskell-ds-whitespace-p))
+                (haskell-ds-comment-p)
                 (/= p (point))))))
 
 (defvar literate-haskell-ds-line-prefix "> ?"
