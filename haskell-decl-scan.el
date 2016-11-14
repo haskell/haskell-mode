@@ -379,12 +379,13 @@ there."
 
 (defun haskell-ds-line-commented-p ()
   "Test if all characters from `point' to `end-of-line' pass `haskell-ds-comment-p'."
-  (let ((r t))
-    (while (and r (not (eolp)))
-      (if (not (haskell-ds-comment-p))
-          (setq r nil))
-      (forward-char))
-    r))
+  (save-excursion
+    (let ((r t))
+      (while (and r (not (eolp)))
+        (if (not (haskell-ds-comment-p))
+            (setq r nil))
+        (forward-char))
+      r)))
 
 (defun haskell-ds-forward-decl ()
   "Move forward to the end of the top-level declaration."
