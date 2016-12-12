@@ -148,7 +148,7 @@ M-x customize-option RET package-archives
 Use @kbd{INS} to add new archive, use:
 @example
 Archive name:          melpa-stable
-URL or directory name: http://stable.melpa.org/packages
+URL or directory name: http://stable.melpa.org/packages/
 @end example
 @item
 Fetch new packages using:
