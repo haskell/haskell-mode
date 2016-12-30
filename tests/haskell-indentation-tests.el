@@ -1007,6 +1007,11 @@ func = \"unterminated
               (1 0)
               (2 2))
 
+(hindent-test "62 foreign import""
+import javascript unsafe
+  \"$2[$1]\" js_getProp :: S.JSString -> O.Object -> T.JSVal"
+              (1 0)
+              (2 0 2 7))
 
 (ert-deftest haskell-indentation-ret-indents ()
   (with-temp-switch-to-buffer
