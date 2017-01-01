@@ -159,7 +159,7 @@ pass additional flags to `ghc'."
   :type '(repeat (string :tag "Argument")))
 
 (defcustom haskell-process-args-stack-ghci
-  '("--ghc-options=-ferror-spans")
+  '("--ghci-options=-ferror-spans")
   "Additional arguments for `stack ghci' invocation."
   :group 'haskell-interactive
   :type '(repeat (string :tag "Argument")))
