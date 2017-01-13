@@ -89,10 +89,10 @@ buffer before presenting message."
 
       (when clear (haskell-presentation-clear))
       (haskell-session-assign session)
+      (goto-char (point-min))
+      (forward-line 2)
       (save-excursion
         (let ((buffer-read-only nil))
-          (goto-char (point-min))
-          (forward-line 2)
           (insert code "\n\n"))))
 
     (if (eq major-mode 'haskell-presentation-mode)
