@@ -735,7 +735,7 @@ Respect the comma style."
     (point)))
 
 (defun haskell-cabal-beginning-of-subsection ()
-  "go to the beginniing of the current subsection"
+  "go to the beginning of the current subsection"
   (interactive)
   (goto-char (haskell-cabal-subsection-beginning)))
 
