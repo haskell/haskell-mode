@@ -82,9 +82,9 @@
   (let ((st (make-syntax-table)))
     ;; The comment syntax can't be described simply in syntax-table.
     ;; We could use font-lock-syntactic-keywords, but is it worth it?
-    ;; (modify-syntax-entry ?-  ". 12" st)
+    ;; (modify-syntax-entry ?- ". 12" st)
     (modify-syntax-entry ?\n ">" st)
-    (modify-syntax-entry ?- "w"  st)
+    (modify-syntax-entry ?- "w" st)
     st))
 
 (defvar haskell-cabal-font-lock-keywords
@@ -388,9 +388,9 @@ OTHER-WINDOW use `find-file-other-window'."
   "Find the end of the current section"
   (interactive)
   (save-excursion
-    (if  (re-search-forward "\n\\([ \t]*\n\\)*[[:alnum:]]" nil t)
-         (match-beginning 0)
-         (point-max))))
+    (if (re-search-forward "\n\\([ \t]*\n\\)*[[:alnum:]]" nil t)
+        (match-beginning 0)
+        (point-max))))
 
 (defun haskell-cabal-end-of-section ()
   "go to the end of the section"
@@ -420,7 +420,7 @@ OTHER-WINDOW use `find-file-other-window'."
                 (member (haskell-cabal-classify-line) '(empty section-data)))
       (forward-line))
     (unless (eobp) (forward-line -1))
-    (while (and (equal  (haskell-cabal-classify-line) 'empty)
+    (while (and (equal (haskell-cabal-classify-line) 'empty)
                 (not (bobp)))
       (forward-line -1))
     (end-of-line)
@@ -447,7 +447,7 @@ OTHER-WINDOW use `find-file-other-window'."
   "Get the name and bounds of of the current subsection"
   (save-excursion
     (haskell-cabal-beginning-of-subsection)
-    (when  (looking-at "\\([ \t]*\\(\\w*\\):\\)[ \t]*")
+    (when (looking-at "\\([ \t]*\\(\\w*\\):\\)[ \t]*")
       (list :name (match-string-no-properties 2)
             :beginning (match-end 0)
             :end (save-match-data (haskell-cabal-subsection-end))
@@ -505,8 +505,8 @@ resulting buffer-content"
         (section-data (make-symbol "section-data")))
     `(let* ((,section ,subsection)
             (,beg (plist-get ,section :beginning))
-            (,end (plist-get  ,section :end))
-            (,start-col (plist-get  ,section :data-start-column))
+            (,end (plist-get ,section :end))
+            (,start-col (plist-get ,section :data-start-column))
             (,section-data (buffer-substring ,beg ,end)))
        (save-excursion
          (prog1
@@ -633,7 +633,7 @@ style is assumed."
     ;; split list items on single line
     (goto-char (point-min))
     (while (re-search-forward
-            "\\([^ \t,\n]\\)[ \t]*\\(,\\)[ \t]*\\([^ \t,\n]\\)"  nil t)
+            "\\([^ \t,\n]\\)[ \t]*\\(,\\)[ \t]*\\([^ \t,\n]\\)" nil t)
       (when (haskell-cabal-comma-separatorp (match-beginning 2))
         (setq comma-style 'single)
         (replace-match "\\1\n\\3" nil nil)))
@@ -856,7 +856,7 @@ resulting buffer-content.  Unmark line at the end."
                                     (line-end-position)))))
 
 (defun haskell-cabal-module-to-filename (module)
-  (concat  (replace-regexp-in-string "[.]" "/" module ) ".hs"))
+  (concat (replace-regexp-in-string "[.]" "/" module ) ".hs"))
 
 (defconst haskell-cabal-module-sections '("exposed-modules" "other-modules")
   "List of sections that contain module names"
@@ -872,8 +872,8 @@ resulting buffer-content.  Unmark line at the end."
   '("library" "executable" "test-suite" "benchmark"))
 
 (defun haskell-cabal-source-section-p (section)
-  (not (not  (member (downcase (haskell-cabal-section-name section))
-                      haskell-cabal-source-bearing-sections))))
+  (not (not (member (downcase (haskell-cabal-section-name section))
+                    haskell-cabal-source-bearing-sections))))
 
 (defun haskell-cabal-line-filename ()
   "Expand filename in current line according to the subsection type
@@ -940,7 +940,7 @@ Source names from main-is and c-sources sections are left untouched
           (eobp)
           (string=
            (downcase type)
-           (downcase  (haskell-cabal-section-name (haskell-cabal-section))))))
+           (downcase (haskell-cabal-section-name (haskell-cabal-section))))))
       (haskell-cabal-next-section))
     (if (eobp)
       (if wrap (progn
@@ -949,7 +949,7 @@ Source names from main-is and c-sources sections are left untouched
         nil)
       (point))))
 
-(defun haskell-cabal-goto-section-type  (type)
+(defun haskell-cabal-goto-section-type (type)
   (let ((section (haskell-cabal-find-section-type type t)))
     (if section (goto-char section)
       (message "No %s section found" type))))
@@ -978,7 +978,7 @@ Source names from main-is and c-sources sections are left untouched
     (cl-case (haskell-cabal-classify-line)
       (section-data (beginning-of-line)
                     (when (looking-at "[ ]*\\(?:,[ ]*\\)?")
-                      (goto-char  (match-end 0))
+                      (goto-char (match-end 0))
                       (current-column)))
       (subsection-header
        (haskell-cabal-section-data-start-column (haskell-cabal-subsection))))))
@@ -1016,7 +1016,7 @@ Source names from main-is and c-sources sections are left untouched
                  (result (and section (funcall fun (haskell-cabal-section)))))
             (when section (setq results (cons result results))))
           (haskell-cabal-next-section))
-        (nreverse  results))))
+        (nreverse results))))
 
 (defun haskell-cabal-section-add-build-dependency (dependency &optional sort sec)
   "Add a build dependency to the build-depends section"
@@ -1045,10 +1045,10 @@ Pass SILENT argument to update all sections without asking user."
            (progn
              (when
                  (or silent
-                     (y-or-n-p (format  "Add dependency %s to %s section %s?"
-                                        dependency
-                                        (haskell-cabal-section-name section)
-                                        (haskell-cabal-section-value section))))
+                     (y-or-n-p (format "Add dependency %s to %s section %s?"
+                                       dependency
+                                       (haskell-cabal-section-name section)
+                                       (haskell-cabal-section-value section))))
                (haskell-cabal-section-add-build-dependency dependency
                                                            sort
                                                            section))
