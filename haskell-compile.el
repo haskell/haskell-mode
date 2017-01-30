@@ -70,7 +70,7 @@ The `%s' placeholder is replaced by the current buffer's filename."
        "\\|"
        "(\\(?2:[0-9]+\\),\\(?4:[0-9]+\\))-(\\(?3:[0-9]+\\),\\(?5:[0-9]+\\))" ;; "(289,5)-(291,36)"
        "\\)"
-       ":\\(?6: Warning:\\)?")
+       ":\\(?6:\n?[ \t]+[Ww]arning:\\)?")
      1 (2 . 3) (4 . 5) (6 . nil)) ;; error/warning locus
 
     ;; multiple declarations
