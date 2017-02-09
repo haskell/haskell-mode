@@ -504,7 +504,7 @@ FILE-NAME only."
     (if (and buffer (buffer-live-p buffer))
         buffer
       (let ((buffer-name (format "*%s*" (haskell-session-name s)))
-            index)
+            (index 0))
         (while (get-buffer buffer-name)
           (setq buffer-name (format "*%s <%d>*" (haskell-session-name s) index))
           (setq index (1+ index)))
