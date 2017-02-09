@@ -662,6 +662,13 @@
     '(("foo" "w" haskell-definition-face)
       ("role" "w" nil))))
 
+(ert-deftest haskell-forall-in-type ()
+  (check-properties
+   '("forall = 23"
+     "zonk :: forall x . x -> x")
+   '(("forall" "w" haskell-definition-face)
+     ("forall" "w" haskell-keyword-face))))
+
 (ert-deftest haskell-unterminated-string-1 ()
   (check-properties
    '("foo = \"zonk"

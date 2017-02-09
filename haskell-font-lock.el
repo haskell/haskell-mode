@@ -321,22 +321,27 @@ like ::, class, instance, data, newtype, type."
   "Private function used to select either type or constructor face
 on an uppercase identifier."
   (cl-case (haskell-lexeme-classify-by-first-char (char-after (match-beginning 1)))
-    (varid (when (member (match-string 0) haskell-font-lock-keywords)
-             ;; Note: keywords parse as keywords only when not qualified.
-             ;; GHC parses Control.let as a single but illegal lexeme.
-             (when (member (match-string 0) '("class" "instance" "type" "data" "newtype"))
-               (save-excursion
-                 (goto-char (match-end 0))
-                 (save-match-data
-                   (haskell-font-lock--forward-type
-                    (cond
-                     ((member (match-string 0) '("class" "instance"))
-                      '("|"))
-                     ((member (match-string 0) '("type"))
-                      ;; Need to support 'type instance'
-                      '("=" "instance")))))
-                 (add-text-properties (match-end 0) (point) '(font-lock-multiline t haskell-type t))))
-             'haskell-keyword-face))
+    (varid (let ((word (match-string-no-properties 0)))
+             (cond
+              ((member word haskell-font-lock-keywords)
+               ;; Note: keywords parse as keywords only when not qualified.
+               ;; GHC parses Control.let as a single but illegal lexeme.
+               (when (member word '("class" "instance" "type" "data" "newtype"))
+                 (save-excursion
+                   (goto-char (match-end 0))
+                   (save-match-data
+                     (haskell-font-lock--forward-type
+                      (cond
+                       ((member word '("class" "instance"))
+                        '("|"))
+                       ((member word '("type"))
+                        ;; Need to support 'type instance'
+                        '("=" "instance")))))
+                   (add-text-properties (match-end 0) (point) '(font-lock-multiline t haskell-type t))))
+               'haskell-keyword-face)
+              ((member word '("forall"))
+               (when (get-text-property (match-beginning 0) 'haskell-type)
+                 'haskell-keyword-face)))))
     (conid (if (get-text-property (match-beginning 0) 'haskell-type)
                'haskell-type-face
              'haskell-constructor-face))
