@@ -370,7 +370,7 @@ names according to Template Haskell specification."
 
 CHAR is a chararacter that is assumed to be the first character
 of a token."
-  (let ((category (get-char-code-property char 'general-category)))
+  (let ((category (get-char-code-property (or char ?\ ) 'general-category)))
 
     (cond
      ((or (member char '(?! ?# ?$ ?% ?& ?* ?+ ?. ?/ ?< ?= ?> ?? ?@ ?^ ?| ?~ ?\\ ?-))
