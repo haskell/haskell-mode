@@ -211,11 +211,53 @@ Note that negative sign char is not part of a number.")
                (: "x" (regexp "[0-9a-fA-F]+"))
                (: "o" (regexp "[0-7]+"))
                (: "^" (regexp "[]A-Z@^_\\[]"))))))
-  "Regexp matching an inside of a character literal.")
+  "Regexp matching an inside of a character literal.
 
-(defconst haskell-lexeme-char-literal
-  (rx-to-string `(: "'" (regexp ,haskell-lexeme-char-literal-inside) "'"))
-  "Regexp matching a character literal.")
+Note that `haskell-lexeme-char-literal-inside' matches strictly
+only escape sequences defined in Haskell Report.")
+
+(defconst haskell-lexeme--char-literal-rx
+  (rx-to-string `(: (group "'")
+                    (| (: (group (regexp "[[:alpha:]_([]")) (group "'")) ; exactly one char
+                       (: (group (| (regexp "\\\\[^\n][^'\n]*") ; allow quote just after first backslash
+                                    (regexp "[^[:alpha:]_(['\n][^'\n]*")))
+                          (| (group "'") "\n" (regexp "\\'"))))))
+  "Regexp matching a character literal lookalike.
+
+Note that `haskell-lexeme--char-literal-rx' matches more than
+Haskell Report specifies because we want to support also code
+under edit.
+
+Character literals end with a quote or a newline or end of
+buffer.
+
+Regexp has subgroup expressions:
+ (match-text 1) matches the opening quote.
+ (match-text 2) matches the inside of the character literal.
+ (match-text 3) matches the closing quote or an empty string
+                at the end of line or the end buffer.")
+
+(defun haskell-lexeme-looking-at-char-literal ()
+  "Non-nil when point is at a char literal lookalike.
+
+Note that this function matches more than Haskell Report
+specifies because we want to support also code under edit.
+
+Char literals end with a quote or an unescaped newline or end
+of buffer.
+
+After successful match:
+ (match-text 1) matches the opening quote.
+ (match-text 2) matches the inside of the char literla.
+ (match-text 3) matches the closing quote, or a closing
+                newline or is nil when at the end of the buffer."
+  (when (looking-at haskell-lexeme--char-literal-rx)
+    (set-match-data
+     (list (match-beginning 0) (match-end 0)
+           (match-beginning 1) (match-end 1)
+           (or (match-beginning 2) (match-beginning 4)) (or (match-end 2) (match-end 4))
+           (or (match-beginning 3) (match-beginning 5)) (or (match-end 3) (match-end 5))))
+    t))
 
 (defconst haskell-lexeme-string-literal-inside-item
   (rx (| (not (any "\n\"\\"))
@@ -254,10 +296,10 @@ String literals end with double quote or unescaped newline or end
 of buffer.
 
 Regexp has subgroup expressions:
- (match-text 1) matches the opening doublequote.
+ (match-text 1) matches the opening double quote.
  (match-text 2) matches the inside of the string.
- (match-text 3) matches the closing quote, or a closing
-                newline or empty string at the end of the buffer.")
+ (match-text 3) matches the closing double quote or an empty string
+                at the end of line or the end buffer.")
 
 (defun haskell-lexeme-looking-at-string-literal ()
   "Non-nil when point is at a string literal lookalike.
@@ -444,7 +486,7 @@ See `haskell-lexeme-classify-by-first-char' for details."
             (forward-comment 1)
             (set-match-data (list point (point-marker)))
             'nested-comment))
-     (and (looking-at haskell-lexeme-char-literal)
+     (and (haskell-lexeme-looking-at-char-literal)
           'char)
      (and (haskell-lexeme-looking-at-string-literal)
           'string)
