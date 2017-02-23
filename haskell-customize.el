@@ -85,7 +85,8 @@ a per-project basis."
   :group 'haskell-interactive
   :type '(choice
           (function-item :tag "None" :value identity)
-          (function :tag "Custom function")))
+          (function :tag "Custom function"))
+  :safe 'functionp)
 
 (defcustom haskell-ask-also-kill-buffers
   t
