@@ -1247,21 +1247,24 @@ for the current GHCi session.
 
 @cindex customizing
 What kind of Haskell REPL @code{haskell-interactive-mode} will start up
-depends on the value of @code{haskell-process-type}.  This can be one of
-the symbols @code{auto}, @code{ghci}, @code{cabal-repl}, or
-@code{stack-ghci}.  If it's @code{auto}, the directory contents and
-available programs will be used to make a best guess at the
-process type.  The actual process type will then determine which
-variables @code{haskell-interactive-mode} will access to determine the
-program to start and its arguments:
+depends on the value of @code{haskell-process-type}. This can be one of the
+symbols @code{auto}, @code{ghci}, @code{cabal-repl}, @code{cabal-new-repl}, or
+@code{stack-ghci}. If it's @code{auto}, the directory contents and available
+programs will be used to make a best guess at the process type. The actual
+process type will then determine which variables
+@code{haskell-interactive-mode} will access to determine the program to start
+and its arguments:
 
 @itemize
 @item
 If it's @code{ghci}, @code{haskell-process-path-ghci} and
 @code{haskell-process-args-ghci} will be used.
 @item
-If it's @code{cabal-repl}, @code{haskell-process-path-ghci} and
-@code{haskell-process-args-ghci}.
+If it's @code{cabal-repl}, @code{haskell-process-path-cabal} and
+@code{haskell-process-args-cabal-repl}.
+@item
+If it's @code{cabal-new-repl}, @code{haskell-process-path-cabal} and
+@code{haskell-process-args-cabal-new-repl}.
 @item
 If it's @code{stack-ghci}, @code{haskell-process-path-stack} and
 @code{haskell-process-args-stack-ghci} will be used.
@@ -1279,6 +1282,7 @@ strings specifying (further) command-line arguments.
 @vindex haskell-process-path-stack
 @vindex haskell-process-args-ghci
 @vindex haskell-process-args-cabal-repl
+@vindex haskell-process-args-cabal-new-repl
 @vindex haskell-process-args-stack-ghci
 
 @section Haskell Interactive Mode Setup
@@ -1365,6 +1369,7 @@ Here is a list of available process types:
 @itemize
 @item ghci
 @item cabal-repl
+@item cabal-new-repl
 @item cabal-dev
 @item cabal-ghci
 @item stack-ghci

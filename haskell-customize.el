@@ -159,6 +159,18 @@ pass additional flags to `ghc'."
   :group 'haskell-interactive
   :type '(repeat (string :tag "Argument")))
 
+(defcustom haskell-process-args-cabal-new-repl
+  '("--ghc-option=-ferror-spans")
+  "Additional arguments for `cabal new-repl' invocation.
+Note: The settings in `haskell-process-path-ghci' and
+`haskell-process-args-ghci' are not automatically reused as
+`cabal new-repl' currently invokes `ghc --interactive'. Use
+`--with-ghc=<path-to-executable>' if you want to use a different
+interactive GHC frontend; use `--ghc-option=<ghc-argument>' to
+pass additional flags to `ghc'."
+  :group 'haskell-interactive
+  :type '(repeat (string :tag "Argument")))
+
 (defcustom haskell-process-args-stack-ghci
   '("--ghci-options=-ferror-spans" "--no-build" "--no-load")
   "Additional arguments for `stack ghci' invocation."
