@@ -124,19 +124,21 @@ for the current GHCi session.
 
 <a name="index-customizing-1"></a>
 <p>What kind of Haskell REPL <code>haskell-interactive-mode</code> will start up
-depends on the value of <code>haskell-process-type</code>.  This can be one of
-the symbols <code>auto</code>, <code>ghci</code>, <code>cabal-repl</code>, or
-<code>stack-ghci</code>.  If it&rsquo;s <code>auto</code>, the directory contents and
-available programs will be used to make a best guess at the
-process type.  The actual process type will then determine which
-variables <code>haskell-interactive-mode</code> will access to determine the
-program to start and its arguments:
+depends on the value of <code>haskell-process-type</code>. This can be one of the
+symbols <code>auto</code>, <code>ghci</code>, <code>cabal-repl</code>, <code>cabal-new-repl</code>, or
+<code>stack-ghci</code>. If it&rsquo;s <code>auto</code>, the directory contents and available
+programs will be used to make a best guess at the process type. The actual
+process type will then determine which variables
+<code>haskell-interactive-mode</code> will access to determine the program to start
+and its arguments:
 </p>
 <ul>
 <li> If it&rsquo;s <code>ghci</code>, <code>haskell-process-path-ghci</code> and
 <code>haskell-process-args-ghci</code> will be used.
-</li><li> If it&rsquo;s <code>cabal-repl</code>, <code>haskell-process-path-ghci</code> and
-<code>haskell-process-args-ghci</code>.
+</li><li> If it&rsquo;s <code>cabal-repl</code>, <code>haskell-process-path-cabal</code> and
+<code>haskell-process-args-cabal-repl</code>.
+</li><li> If it&rsquo;s <code>cabal-new-repl</code>, <code>haskell-process-path-cabal</code> and
+<code>haskell-process-args-cabal-new-repl</code>.
 </li><li> If it&rsquo;s <code>stack-ghci</code>, <code>haskell-process-path-stack</code> and
 <code>haskell-process-args-stack-ghci</code> will be used.
 </li></ul>
@@ -153,6 +155,7 @@ strings specifying (further) command-line arguments.
 <a name="index-haskell_002dprocess_002dpath_002dstack"></a>
 <a name="index-haskell_002dprocess_002dargs_002dghci"></a>
 <a name="index-haskell_002dprocess_002dargs_002dcabal_002drepl"></a>
+<a name="index-haskell_002dprocess_002dargs_002dcabal_002dnew_002drepl"></a>
 <a name="index-haskell_002dprocess_002dargs_002dstack_002dghci"></a>
 
 <a name="Haskell-Interactive-Mode-Setup"></a>
@@ -241,6 +244,7 @@ customize this setting by running <kbd>M-x</kbd> <code>customize-variable</code>
 <ul>
 <li> ghci
 </li><li> cabal-repl
+</li><li> cabal-new-repl
 </li><li> cabal-dev
 </li><li> cabal-ghci
 </li><li> stack-ghci
