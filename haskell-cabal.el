@@ -468,9 +468,10 @@ OTHER-WINDOW use `find-file-other-window'."
 (defun haskell-cabal-section-data-start-column (section)
   (plist-get section :data-start-column))
 
-(defun haskell-cabal-enum-targets ()
-  "Enumerate .cabal targets."
-  (let ((cabal-file (haskell-cabal-find-file)))
+(defun haskell-cabal-enum-targets (&optional process-type)
+  "Enumerate .cabal targets. PROCESS-TYPE determines the format of the returned target."
+  (let ((cabal-file (haskell-cabal-find-file))
+        (process-type (if process-type process-type 'ghci)))
     (when (and cabal-file (file-readable-p cabal-file))
       (with-temp-buffer
         (insert-file-contents cabal-file)
@@ -488,7 +489,10 @@ OTHER-WINDOW use `find-file-other-window'."
                           (string= val "{")
                           (not val))
                       (push projectName matches)
-                    (push val matches))))
+                    (push (if (eq 'stack-ghci process-type)
+                              (concat projectName ":" val)
+                            val)
+                          matches))))
             (haskell-cabal-next-section))
           (reverse matches))))))
 

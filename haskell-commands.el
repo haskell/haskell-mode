@@ -770,7 +770,7 @@ inferior GHCi process."
   (interactive
    (list
     (completing-read "New build target: "
-                     (haskell-cabal-enum-targets)
+                     (haskell-cabal-enum-targets (haskell-process-type))
                      nil
                      nil
                      nil
