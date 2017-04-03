@@ -1011,6 +1011,28 @@ don't care when the thing completes as long as it's soonish."
         (delete-region (point-min) (point-max)))
       (remove-overlays))))
 
+(defun haskell-interactive-mode-flush-output ()
+  "Delete all output from interpreter since last input.
+Does not delete the prompt. This command doesn't handle
+multi-line commands."
+  (interactive)
+  (let ((session (haskell-interactive-session)))
+    (with-current-buffer (haskell-session-interactive-buffer session)
+      (let ((inhibit-read-only t)
+            (pmark
+             (save-excursion
+               (haskell-interactive-mode-prompt-previous)
+               (forward-line 1) (point)))
+            (prompt (save-excursion
+                      (search-backward-regexp (haskell-interactive-prompt-regex) nil t))))
+        (let ((orig (point)))
+          (goto-char pmark)
+          (delete-region pmark prompt)
+          (insert "*** output flushed ***\n")
+          (forward-line -1)
+          (put-text-property (point-at-bol) (point-at-eol) 'read-only t)
+          (goto-char orig))))))
+
 (defun haskell-interactive-mode-completion-at-point-function ()
   "Offer completions for partial expression between prompt and point.
 This completion function is used in interactive REPL buffer itself."
