@@ -468,6 +468,13 @@ OTHER-WINDOW use `find-file-other-window'."
 (defun haskell-cabal-section-data-start-column (section)
   (plist-get section :data-start-column))
 
+(defun haskell-cabal-map-component-type (component-type)
+  "Map from cabal file COMPONENT-TYPE to build command component-type."
+  (let ((component-type (downcase component-type)))
+    (cond ((equal component-type "executable") "exe")
+          ((equal component-type "test-suite") "test")
+          ((equal component-type "benchmark")  "bench"))))
+
 (defun haskell-cabal-enum-targets (&optional process-type)
   "Enumerate .cabal targets. PROCESS-TYPE determines the format of the returned target."
   (let ((cabal-file (haskell-cabal-find-file))
@@ -478,20 +485,23 @@ OTHER-WINDOW use `find-file-other-window'."
         (haskell-cabal-mode)
         (goto-char (point-min))
         (let ((matches)
-              (projectName (haskell-cabal--get-field "name")))
+              (package-name (haskell-cabal--get-field "name")))
           (haskell-cabal-next-section)
           (while (not (eobp))
             (if (haskell-cabal-source-section-p (haskell-cabal-section))
-                (let ((val (car (split-string
-                                 (haskell-cabal-section-value
-                                  (haskell-cabal-section))))))
+                (let* ((section (haskell-cabal-section))
+                       (component-type (haskell-cabal-section-name section))
+                       (val (car (split-string
+                                  (haskell-cabal-section-value section)))))
                   (if (or (string= val "")
                           (string= val "{")
                           (not val))
-                      (push projectName matches)
-                    (push (if (eq 'stack-ghci process-type)
-                              (concat projectName ":" val)
-                            val)
+                      (push package-name matches)
+                    (push (concat  (when (eq 'stack-ghci process-type)
+                                     (concat package-name ":"))
+                                   (haskell-cabal-map-component-type component-type)
+                                   ":"
+                                   val)
                           matches))))
             (haskell-cabal-next-section))
           (reverse matches))))))
