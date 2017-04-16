@@ -393,6 +393,11 @@ Give optional NEXT-P parameter to override value of
 (defun haskell-process-load-file ()
   "Load the current buffer file."
   (interactive)
+  (when (not (buffer-file-name))
+    (setq buffer-file-name (make-temp-file "haskell-temp" nil ".hs"))
+    (setq buffer-read-only nil)
+    (set-buffer-modified-p t)
+    (message "haskell-process loading a buffer backed by a temporary file"))
   (save-buffer)
   (haskell-interactive-mode-reset-error (haskell-session))
   (haskell-process-file-loadish (format "load \"%s\"" (replace-regexp-in-string
