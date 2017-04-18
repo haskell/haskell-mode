@@ -242,9 +242,9 @@ indentation points to the right, we switch going to the left."
   ;; try to repeat
   (when (not (haskell-indentation-indent-line-repeat))
     (setq haskell-indentation-dyn-last-direction nil)
-    ;; parse error is intentionally not cought here, it may come from
+    ;; parse error is intentionally not caught here, it may come from
     ;; `haskell-indentation-find-indentations', but escapes the scope
-    ;; and aborts the opertaion before any moving happens
+    ;; and aborts the operation before any moving happens
     (let* ((cc (current-column))
            (ci (haskell-indentation-current-indentation))
            (inds (save-excursion
@@ -252,14 +252,30 @@ indentation points to the right, we switch going to the left."
                    (or (haskell-indentation-find-indentations)
                        '(0))))
            (valid (memq ci inds))
-           (cursor-in-whitespace (< cc ci)))
-
+           (cursor-in-whitespace (< cc ci))
+           ;; certain evil commands need the behaviour seen in
+           ;; `haskell-indentation-newline-and-indent'
+           (evil-special-command (and (bound-and-true-p evil-mode)
+                                      (memq this-command '(evil-open-above
+                                                           evil-open-below
+                                                           evil-replace))))
+           (on-last-indent (eq ci (car (last inds)))))
       (if (and valid cursor-in-whitespace)
           (move-to-column ci)
         (haskell-indentation-reindent-to
-         (haskell-indentation-next-indentation ci inds 'nofail)
+         (funcall
+          (if on-last-indent
+              #'haskell-indentation-previous-indentation
+            #'haskell-indentation-next-indentation)
+          (if evil-special-command
+              (save-excursion
+                (end-of-line 0)
+                (1- (haskell-indentation-current-indentation)))
+            ci)
+          inds
+          'nofail)
          cursor-in-whitespace))
-      (setq haskell-indentation-dyn-last-direction 'right
+      (setq haskell-indentation-dyn-last-direction (if on-last-indent 'left 'right)
             haskell-indentation-dyn-last-indentations inds))))
 
 (defun haskell-indentation-indent-line-repeat ()
