@@ -37,7 +37,7 @@
 ;;; Code:
 
 (require 'haskell-mode)
-(require 'haskell-process)
+(require 'haskell-session)
 (require 'haskell-interactive-mode)
 
 ;;;###autoload
