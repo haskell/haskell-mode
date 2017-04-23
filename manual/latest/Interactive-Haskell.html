@@ -74,8 +74,7 @@ effectively replaces <code>inferior-haskell-mode</code>, but comes with a
 different set of features:
 </p>
 <ul>
-<li> Separate sessions per Cabal project <samp>haskell-session.el</samp>.
-</li><li> A new inferior Haskell process handling code <samp>haskell-process.el</samp>.
+<li> Separate sessions per Cabal project, creates a new background inferior Haskell process <samp>haskell-session.el</samp>.
 </li><li> New REPL implementation similiar to SLIME/IELM
 </li><li> Navigatable error overlays
 <samp>haskell-interactive-mode.el</samp>.
@@ -169,7 +168,7 @@ contains a good base setup.
 </p>
 <div class="lisp">
 <pre class="lisp">(require 'haskell-interactive-mode)
-(require 'haskell-process)
+(require 'haskell-session)
 (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
 </pre></div>
 
