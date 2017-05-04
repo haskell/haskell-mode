@@ -60,7 +60,7 @@ going!
 ## Advanced configuration
 
 For setup instructions, please consult the integrated `haskell-mode`
-[Info](https://www.gnu.org/software/texinfo/manual/info/info.html)
+[Info](https://www.gnu.org/software/texinfo/manual/texinfo/texinfo.html)
 manual which can be accessed after installation via `M-x
 info-display-manual [RET] haskell-mode`.  Alternatively, you can also
 direct your browser to the
