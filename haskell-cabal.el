@@ -728,6 +728,15 @@ Respect the comma style."
      (haskell-cabal-goto-mark)
      (haskell-cabal-remove-mark)))
 
+(defun haskell-cabal-sort-lines-predicate (key1 key2)
+  (let* ((key1str (buffer-substring (car key1) (cdr key1)))
+         (key2str (buffer-substring (car key2) (cdr key2)))
+         (base-regex "^[ \t]*base\\($\\|[^[:alnum:]-]\\)"))
+    (cond
+     ((string-match base-regex key1str) t)
+     ((string-match base-regex key2str) nil)
+     (t (string< key1str key2str)))))
+
 (defun haskell-cabal-subsection-arrange-lines ()
   "Sort lines of current subsection"
   (interactive)
@@ -736,8 +745,10 @@ Respect the comma style."
     (haskell-cabal-subsection) t
     (haskell-cabal-with-cs-list
      (sort-subr nil 'forward-line 'end-of-line
-                'haskell-cabal-sort-lines-key-fun)
-     ))))
+                'haskell-cabal-sort-lines-key-fun
+                'end-of-line
+                'haskell-cabal-sort-lines-predicate
+                )))))
 
 (defun haskell-cabal-subsection-beginning ()
   "find the beginning of the current subsection"
