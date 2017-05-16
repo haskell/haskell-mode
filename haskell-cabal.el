@@ -728,7 +728,7 @@ Respect the comma style."
      (haskell-cabal-goto-mark)
      (haskell-cabal-remove-mark)))
 
-(defun haskell-cabal-sort-lines-predicate (key1 key2)
+(defun haskell-cabal-sort-lines-depends-compare (key1 key2)
   (let* ((key1str (buffer-substring (car key1) (cdr key1)))
          (key2str (buffer-substring (car key2) (cdr key2)))
          (base-regex "^[ \t]*base\\($\\|[^[:alnum:]-]\\)"))
@@ -741,14 +741,18 @@ Respect the comma style."
   "Sort lines of current subsection"
   (interactive)
   (haskell-cabal-save-position
-   (haskell-cabal-with-subsection
-    (haskell-cabal-subsection) t
-    (haskell-cabal-with-cs-list
-     (sort-subr nil 'forward-line 'end-of-line
-                'haskell-cabal-sort-lines-key-fun
-                'end-of-line
-                'haskell-cabal-sort-lines-predicate
-                )))))
+   (let* ((subsection (haskell-cabal-section-name (haskell-cabal-subsection)))
+          (compare-lines (if (string= (downcase subsection) "build-depends")
+                            'haskell-cabal-sort-lines-depends-compare
+                          nil)))
+     (haskell-cabal-with-subsection
+      (haskell-cabal-subsection) t
+      (haskell-cabal-with-cs-list
+       (sort-subr nil 'forward-line 'end-of-line
+                  'haskell-cabal-sort-lines-key-fun
+                  'end-of-line
+                  compare-lines
+                  ))))))
 
 (defun haskell-cabal-subsection-beginning ()
   "find the beginning of the current subsection"

@@ -316,6 +316,33 @@ Executable bin-1
                       -- Foo, bar
 "))))
 
+(ert-deftest haskell-cabal-subsection-arrange-lines-dependencies ()
+  (with-temp-buffer
+    (insert "
+Executable bin-1
+    Main-Is:          TestParsing.hs
+    Build-Depends: aeson
+                 , text
+                 , base >= 4.8 && < 5
+                 , base64
+                 , bytestring
+                 , base-compat
+")
+    (haskell-cabal-mode)
+    (goto-char (point-min))
+    (search-forward "build-depends:")
+    (haskell-cabal-subsection-arrange-lines)
+    (should (string= (buffer-string) "
+Executable bin-1
+    Main-Is:          TestParsing.hs
+    Build-Depends: base >= 4.8 && < 5
+                 , aeson
+                 , base-compat
+                 , base64
+                 , bytestring
+                 , text
+"))))
+
 (ert-deftest haskell-cabal-add-dependency-01 ()
   ;; cannot add dependency when there is no 'Build-depends' section already
   :expected-result :failed
