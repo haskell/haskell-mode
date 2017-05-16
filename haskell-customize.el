@@ -64,7 +64,7 @@ be located, then stack-ghci will be used.
 Otherwise if there's a *.cabal file, cabal-repl will be used.
 
 If none of the above apply, ghci will be used."
-  :type '(choice (const auto) (const ghci) (const cabal-repl) (const stack-ghci))
+  :type '(choice (const auto) (const ghci) (const cabal-repl) (const stack-ghci) (const cabal-new-repl))
   :group 'haskell-interactive)
 
 (defcustom haskell-process-wrapper-function
