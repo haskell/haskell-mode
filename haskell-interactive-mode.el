@@ -548,7 +548,7 @@ FILE-NAME only."
     span))
 
 (defun haskell-process-suggest-add-package (session msg)
-  "Add tthe (matched) module to your cabal file.
+  "Add the (matched) module to your cabal file.
 Cabal file is selected using SESSION's name, module matching is done in MSG."
   (let* ((suggested-package (match-string 1 msg))
          (package-name (replace-regexp-in-string "-[^-]+$" "" suggested-package))
