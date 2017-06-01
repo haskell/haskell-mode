@@ -42,6 +42,12 @@
   :group 'haskell
   :type 'string)
 
+(defcustom haskell-interactive-set-+c
+  t
+  "Issue ':set +c' in interactive session to support type introspection."
+  :group 'haskell-interactive
+  :type 'boolean)
+
 ;;;###autoload
 (defun haskell-process-restart ()
   "Restart the inferior Haskell process."
@@ -101,9 +107,10 @@ You can create new session using function `haskell-session-make'."
           ;; whole produces only one prompt marker as a response.
           (haskell-process-send-string process
                                        (mapconcat #'identity
-                                                  '("Prelude.putStrLn \"\""
-                                                    ":set -v1"
-                                                    ":set +c") ; :type-at in GHC 8+
+                                                  (append '("Prelude.putStrLn \"\""
+                                                            ":set -v1")
+                                                          (when haskell-interactive-set-+c
+                                                            '(":set +c"))) ; :type-at in GHC 8+
                                                   "\n"))
           (haskell-process-send-string process ":set prompt \"\\4\"")
           (haskell-process-send-string process (format ":set prompt2 \"%s\""
@@ -662,7 +669,7 @@ happened since function invocation)."
             ('unknown-command
              (message "This command requires GHCi 8+ or GHCi-ng. Please read command description for details."))
             ('option-missing
-             (message "Could not infer type signature. You need to load file first. Also :set +c is required. Please read command description for details."))
+             (message "Could not infer type signature. You need to load file first. Also :set +c is required, see customization `haskell-interactive-set-+c'. Please read command description for details."))
             ('interactive-error (message "Wrong REPL response: %s" sig))
             (otherwise
              (if insert-value
