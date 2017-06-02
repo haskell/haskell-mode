@@ -23,7 +23,7 @@
 (require 'cl-lib)
 (require 'haskell-mode)
 (require 'haskell-hoogle)
-(require 'haskell-process)
+(require 'haskell-session)
 (require 'haskell-debug)
 (require 'haskell-interactive-mode)
 (require 'haskell-repl)

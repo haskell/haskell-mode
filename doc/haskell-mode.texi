@@ -424,7 +424,7 @@ candidate list also includes symbols from imported modules.
 @image{anim/company-mode-import-statement}
 @end ifhtml
 
-Unfortunatelly, it is not possible to provide candidates for
+Unfortunately, it is not possible to provide candidates for
 identifiers defined locally in @code{let} and @code{where} blocks even
 in interactive mode.  But if you're using
 @url{http://company-mode.github.io/, company-mode} you can override
@@ -1200,9 +1200,7 @@ different set of features:
 
 @itemize
 @item
-Separate sessions per Cabal project @file{haskell-session.el}.
-@item
-A new inferior Haskell process handling code @file{haskell-process.el}.
+Separate sessions per Cabal project, creates a new background inferior Haskell process @file{haskell-session.el}.
 @item
 New REPL implementation similiar to SLIME/IELM
 @item
@@ -1295,7 +1293,7 @@ To enable the minor mode which activates keybindings associated with interactive
 
 @lisp
 (require 'haskell-interactive-mode)
-(require 'haskell-process)
+(require 'haskell-session)
 (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
 @end lisp
 

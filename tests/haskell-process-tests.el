@@ -4,7 +4,7 @@
 
 (require 'ert)
 (require 'cl-lib)
-(require 'haskell-process)
+(require 'haskell-session)
 
 (ert-deftest haskell-process-wrapper-command-function-identity ()
   "No wrapper, return directly the command."
