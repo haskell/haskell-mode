@@ -389,18 +389,61 @@ Give optional NEXT-P parameter to override value of
          (buffer (haskell-session-interactive-buffer session)))
     (pop-to-buffer buffer)))
 
+
+(defun haskell--file-name-to-load-string (file-name)
+  "Create a GHCi repl load statement from FILE-NAME."
+  (format "load \"%s\"" (replace-regexp-in-string
+                         "\""
+                         "\\\\\""
+                         file-name)))
+
+(defcustom haskell-process-path-hsc2hs
+  "hsc2hs"
+  "The path for running hsc2hs.
+This should be a single string."
+  :group 'haskell-interactive
+  :type 'string)
+
+(defun haskell--process-hsc2hs-load ()
+  "Run hsc2hs and load the resulting file (unless hsc2hs failed)."
+  ;; assumes lexical-binding
+  (let* ((hwin (get-buffer-window (current-buffer)))
+         (hs (replace-regexp-in-string "\\.hsc\\'" ".hs" (buffer-file-name)))
+         (cbuf (compilation-start (format "%s %s"
+                                          haskell-process-path-hsc2hs
+                                          (buffer-file-name))
+                                  nil
+                                  (lambda (_) "*hsc2hs*")))
+         (proc (get-buffer-process cbuf)))
+    (set-process-sentinel proc (lambda (p m)
+                                 (haskell--hsc2hs-sentinel hs hwin p m)))))
+
+(defun haskell--hsc2hs-sentinel (hs hwin proc msg)
+  "Load compiled .hs (and hide compilation) on hsc2hs success.
+Argument HS is the generated hsc source file name; HWIN is the
+window of the hsc source file; PROC is the hsc2hs process (MSG is
+currently ignored)."
+  (when (and (memq (process-status proc) '(exit signal))
+             (equal 0 (process-exit-status proc)))
+    (let ((cbuf (process-buffer proc)))
+      (select-window (get-buffer-window cbuf))
+      (bury-buffer)
+      (select-window hwin)
+      (haskell-process-file-loadish (haskell--file-name-to-load-string hs)
+                                    nil
+                                    (window-buffer hwin)))))
+
 ;;;###autoload
 (defun haskell-process-load-file ()
   "Load the current buffer file."
   (interactive)
   (save-buffer)
   (haskell-interactive-mode-reset-error (haskell-session))
-  (haskell-process-file-loadish (format "load \"%s\"" (replace-regexp-in-string
-                                                       "\""
-                                                       "\\\\\""
-                                                       (buffer-file-name)))
-                                nil
-                                (current-buffer)))
+  (if (equal "hsc" (file-name-extension (buffer-file-name)))
+      (haskell--process-hsc2hs-load)
+    (haskell-process-file-loadish (haskell--file-name-to-load-string (buffer-file-name))
+                                  nil
+                                  (current-buffer))))
 
 ;;;###autoload
 (defun haskell-process-reload ()
