@@ -597,7 +597,8 @@ Query PROCESS to `:cd` to directory DIR."
       :go (lambda (state)
             (haskell-process-send-string
              (car state)
-             (if (string-match "^[A-Za-z_]" (cdr state))
+             (if (and (stringp (cdr state))
+                      (string-match "^[A-Za-z_]" (cdr state)))
                  (format ":info %s" (cdr state))
                (format ":info (%s)" (cdr state)))))
       :complete (lambda (_state response)
@@ -615,7 +616,8 @@ Query PROCESS to `:cd` to directory DIR."
       :go (lambda (state)
             (haskell-process-send-string
              (car state)
-             (if (string-match "^[A-Za-z_]" (cdr state))
+             (if (and (stringp (cdr state))
+                      (string-match "^[A-Za-z_]" (cdr state)))
                  (format ":type %s" (cdr state))
                (format ":type (%s)" (cdr state)))))
       :complete (lambda (_state response)
