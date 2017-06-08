@@ -548,7 +548,7 @@ FILE-NAME only."
     span))
 
 (defun haskell-process-suggest-add-package (session msg)
-  "Add tthe (matched) module to your cabal file.
+  "Add the (matched) module to your cabal file.
 Cabal file is selected using SESSION's name, module matching is done in MSG."
   (let* ((suggested-package (match-string 1 msg))
          (package-name (replace-regexp-in-string "-[^-]+$" "" suggested-package))
@@ -1029,7 +1029,7 @@ This completion function is used in interactive REPL buffer itself."
 If there is one, pop that up in a buffer, similar to `debug-on-error'."
   (when (and haskell-interactive-types-for-show-ambiguous
              (string-match "^\n<interactive>:[-0-9]+:[-0-9]+:" response)
-             (not (string-match "^\n<interactive>:[-0-9]+:[-0-9]+:[\n ]+Warning:" response)))
+             (not (string-match "^\n<interactive>:[-0-9]+:[-0-9]+:[\n ]+[Ww]arning:" response)))
     (let ((inhibit-read-only t))
       (delete-region haskell-interactive-mode-prompt-start (point))
       (set-marker haskell-interactive-mode-prompt-start

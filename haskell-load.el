@@ -201,7 +201,7 @@ list of modules where missed IDENT was found."
             file
             (match-string 2 msg)
             line)))
-        ((string-match "Warning: orphan instance: " msg)
+        ((string-match "[Ww]arning: orphan instance: " msg)
          (when haskell-process-suggest-no-warn-orphans
            (haskell-process-suggest-pragma
             session
@@ -395,7 +395,7 @@ correspondingly-named overlay properties of OVL."
    (cond
     ((not (eq haskell-msg-type 'warning))
      haskell-msg)
-    ((string-prefix-p "Warning:\n    " haskell-msg)
+    ((string-prefix-p "[Ww]arning:\n    " haskell-msg)
      (cl-subseq haskell-msg 13))
     (t
      (error
@@ -518,7 +518,7 @@ When MODULE-BUFFER is non-NIL, paint error overlays."
              (file (match-string 1 buffer))
              (location-raw (match-string 2 buffer))
              (error-msg (match-string 3 buffer))
-             (type (cond ((string-match "^Warning:" error-msg)  'warning)
+             (type (cond ((string-match "^[Ww]arning:" error-msg)  'warning)
                          ((string-match "^Splicing " error-msg) 'splice)
                          (t                                     'error)))
              (critical (not (eq type 'warning)))
