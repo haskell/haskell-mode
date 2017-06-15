@@ -17,49 +17,72 @@
 
 ;;; Code:
 
-(define-button-type 'haskell-collapse-toggle-button
-  'action 'haskell-collapse-toggle-button-callback
-  'follow-link t
-  'help-echo "Click to expand…")
 
-(defun haskell-collapse (beg end)
-  "Collapse."
-  (interactive "r")
-  (goto-char end)
-  (let ((break nil))
-    (while (and (not break)
-                (search-backward-regexp "[[({]" beg t 1))
-      (unless (elt (syntax-ppss) 3)
-        (let ((orig (point)))
-          (haskell-collapse-sexp)
-          (goto-char orig)
-          (forward-char -1)
-          (when (= (point) orig)
-            (setq break t)))))))
+(defun haskell-hide-toggle ()
+  "Toggle visibility of existing forms at point. "
+  (hs-minor-mode 1)
+  (interactive)
+  (save-excursion
+    (let* ((modified (buffer-modified-p))
+           (inhibit-read-only t)
+	   (position (indented-block))
+	   (beg (car position))
+	   (end (cdr position)))
+      (if (and beg end)
+          (if (overlays-in beg end)
+              (hs-discard-overlays beg end)
+            (hs-make-overlay beg end 'code)))
+      (set-buffer-modified-p modified))))
 
-(defun haskell-collapse-sexp ()
-  "Collapse the sexp starting at point."
-  (let ((beg (point)))
-    (forward-sexp)
-    (let ((end (point)))
-      (let ((o (make-overlay beg end)))
-        (overlay-put o 'invisible t)
-        (let ((start (point)))
-          (insert "…")
-          (let ((button (make-text-button start (point)
-                                          :type 'haskell-collapse-toggle-button)))
-            (button-put button 'overlay o)
-            (button-put button 'hide-on-click t)))))))
+(defun blank-line-p (&optional pos)
+  "Returns `t' if line (optionally, line at POS) is empty or
+composed only of whitespace."
+  (save-excursion
+    (goto-char (or pos (point)))
+    (beginning-of-line)
+    (= (point-at-eol)
+       (progn (skip-syntax-forward " ") (point)))))
 
-(defun haskell-collapse-toggle-button-callback (btn)
-  "The callback to toggle the overlay visibility."
-  (let ((overlay (button-get btn 'overlay)))
-    (when overlay
-      (overlay-put overlay
-                   'invisible
-                   (not (overlay-get overlay
-                                     'invisible)))))
-  (button-put btn 'invisible t)
-  (delete-region (button-start btn) (button-end btn)))
+(defun indented-block ()
+  "return (start-of-indentation . end-of-indentation)"
+  (interactive "P")
+  (let ((cur-indent (current-indentation))
+	(nxt-line-indent (next-line-indentation))
+	(prev-line-indent (prev-line-indentation))
+	(beg-of-line (save-excursion (beginning-of-line)
+				     (point))))
+    (cond ((> nxt-line-indent cur-indent)
+	   (cons beg-of-line
+		 (find-line-with-indentation '/= 1)))
+	  ((or (= nxt-line-indent cur-indent)
+	       (= prev-line-indent cur-indent))
+	   (cons (find-line-with-indentation '>= 1)
+		 (find-line-with-indentation '>= -1)))
+	  (t (error "Undefined behaviour")))))
+
+(defun next-line-indentation ()
+  (save-excursion
+    (forward-line 1)
+    (current-indentation)))
+
+(defun prev-line-indentation ()
+  (save-excursion
+    (forward-line -1)
+    (current-indentation)))
+
+(defun find-line-with-indentation (comparison direction)
+  "comparison is >= or =, direction if 1 finds forward, if -1 finds backward"
+  (interactive)
+  (save-excursion
+    (let ((start-indent (current-indentation))
+	  (stmt (cond ((= direction 1) 'back-to-indentation)
+		      ((= direction -1) 'point-at-eol))))
+      (progn
+	(while (or (blank-line-p)
+		   (and (zerop (forward-line direction))
+			(funcall comparison (current-indentation) start-indent))))
+	(funcall stmt)
+	(point)))))
+
 
 (provide 'haskell-collapse)
