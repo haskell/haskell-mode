@@ -53,9 +53,10 @@ composed only of whitespace."
 	(beg-of-line (save-excursion (end-of-line)
 				     (point))))
     (cond ((= cur-indent nxt-line-indent 0) nil)
+	  ((blank-line-p) nil)
 	  ((> nxt-line-indent cur-indent)
 	   (cons beg-of-line
-		 (find-line-with-indentation '/= 1)))
+		 (find-line-with-indentation '> 1)))
 	  ((or (= nxt-line-indent cur-indent)
 	       (= prev-line-indent cur-indent))
 	   (cons (find-line-with-indentation '>= 1)
