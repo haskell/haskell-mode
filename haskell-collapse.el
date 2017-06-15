@@ -1,6 +1,7 @@
 ;;; haskell-collapse.el --- Collapse expressions -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2014 Chris Done. All rights reserved.
+;; Copyright (c) 2017 Vasantha Ganesh Kanniappan <vasanthaganesh.k@tuta.io>.
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -83,6 +84,5 @@ composed only of whitespace."
 		    (or (blank-line-p) (funcall comparison (current-indentation) start-indent))))
 	(funcall stmt)
 	(point)))))
-
 
 (provide 'haskell-collapse)
