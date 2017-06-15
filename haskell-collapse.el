@@ -47,13 +47,13 @@ composed only of whitespace."
 
 (defun indented-block ()
   "return (start-of-indentation . end-of-indentation)"
-  (interactive "P")
   (let ((cur-indent (current-indentation))
 	(nxt-line-indent (next-line-indentation))
 	(prev-line-indent (prev-line-indentation))
 	(beg-of-line (save-excursion (end-of-line)
 				     (point))))
-    (cond ((> nxt-line-indent cur-indent)
+    (cond ((= cur-indent nxt-line-indent 0) nil)
+	  ((> nxt-line-indent cur-indent)
 	   (cons beg-of-line
 		 (find-line-with-indentation '/= 1)))
 	  ((or (= nxt-line-indent cur-indent)
@@ -74,13 +74,13 @@ composed only of whitespace."
 
 (defun find-line-with-indentation (comparison direction)
   "comparison is >= or =, direction if 1 finds forward, if -1 finds backward"
-  (interactive)
   (save-excursion
     (let ((start-indent (current-indentation)))
       (progn
 	(while (and (zerop (forward-line direction))
 		    (or (blank-line-p) (funcall comparison (current-indentation) start-indent))))
-	(point-at-eol)
+	(when (= direction 1) (forward-line -1))
+	(end-of-line)
 	(point)))))
 
 (provide 'haskell-collapse)
