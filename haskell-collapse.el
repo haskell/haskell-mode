@@ -51,7 +51,7 @@ composed only of whitespace."
   (let ((cur-indent (current-indentation))
 	(nxt-line-indent (next-line-indentation))
 	(prev-line-indent (prev-line-indentation))
-	(beg-of-line (save-excursion (beginning-of-line)
+	(beg-of-line (save-excursion (end-of-line)
 				     (point))))
     (cond ((> nxt-line-indent cur-indent)
 	   (cons beg-of-line
@@ -76,13 +76,11 @@ composed only of whitespace."
   "comparison is >= or =, direction if 1 finds forward, if -1 finds backward"
   (interactive)
   (save-excursion
-    (let ((start-indent (current-indentation))
-	  (stmt (cond ((= direction 1) 'back-to-indentation)
-		      ((= direction -1) 'point-at-eol))))
+    (let ((start-indent (current-indentation)))
       (progn
 	(while (and (zerop (forward-line direction))
 		    (or (blank-line-p) (funcall comparison (current-indentation) start-indent))))
-	(funcall stmt)
+	(point-at-eol)
 	(point)))))
 
 (provide 'haskell-collapse)
