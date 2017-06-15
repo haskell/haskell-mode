@@ -17,11 +17,12 @@
 
 ;;; Code:
 
+(require 'hideshow)
 
 (defun haskell-hide-toggle ()
   "Toggle visibility of existing forms at point. "
-  (hs-minor-mode 1)
   (interactive)
+  (hs-minor-mode 1)
   (save-excursion
     (let* ((modified (buffer-modified-p))
            (inhibit-read-only t)
@@ -78,9 +79,8 @@ composed only of whitespace."
 	  (stmt (cond ((= direction 1) 'back-to-indentation)
 		      ((= direction -1) 'point-at-eol))))
       (progn
-	(while (or (blank-line-p)
-		   (and (zerop (forward-line direction))
-			(funcall comparison (current-indentation) start-indent))))
+	(while (and (zerop (forward-line direction))
+		    (or (blank-line-p) (funcall comparison (current-indentation) start-indent))))
 	(funcall stmt)
 	(point)))))
 

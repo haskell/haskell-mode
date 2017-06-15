@@ -119,6 +119,6 @@
         (insert (haskell-fontify-as-mode text
                                          haskell-interactive-mode-eval-mode))
         (when haskell-interactive-mode-collapse
-          (haskell-collapse start (point)))))))
+          (haskell-hide-toggle))))))
 
 (provide 'haskell-repl)
