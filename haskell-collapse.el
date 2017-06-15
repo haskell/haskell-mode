@@ -58,7 +58,7 @@ composed only of whitespace."
 	   (cons beg-of-line
 		 (find-line-with-indentation '> 1)))
 	  ((or (= nxt-line-indent cur-indent)
-	       (= prev-line-indent cur-indent))
+	       (<= prev-line-indent cur-indent))
 	   (cons (find-line-with-indentation '>= 1)
 		 (find-line-with-indentation '>= -1)))
 	  (t (error "Undefined behaviour")))))
