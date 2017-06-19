@@ -20,6 +20,9 @@
 
 (require 'hideshow)
 
+;;; TODO:
+;;; -> Make it work for braces
+
 (defun haskell-hide-toggle ()
   "Toggle visibility of existing forms at point. "
   (interactive)
