@@ -62,8 +62,8 @@ composed only of whitespace."
 		 (haskell-find-line-with-indentation '> 1)))
 	  ((or (= nxt-line-indent cur-indent)
 	       (<= prev-line-indent cur-indent))
-	   (cons (haskell-find-line-with-indentation '>= 1)
-		 (haskell-find-line-with-indentation '>= -1)))
+	   (cons (haskell-find-line-with-indentation '>= -1)
+		 (haskell-find-line-with-indentation '>= 1)))
 	  (t (error "Undefined behaviour")))))
 
 (defun haskell-next-line-indentation (dir)
