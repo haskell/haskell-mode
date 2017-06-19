@@ -48,8 +48,8 @@ composed only of whitespace."
 (defun haskell-indented-block ()
   "return (start-of-indentation . end-of-indentation)"
   (let ((cur-indent (current-indentation))
-	(nxt-line-indent (haskell-next-line-indentation))
-	(prev-line-indent (haskell-prev-line-indentation))
+	(nxt-line-indent (haskell-next-line-indentation 1))
+	(prev-line-indent (haskell-next-line-indentation -1))
 	(beg-of-line (save-excursion (end-of-line)
 				     (point))))
     (cond ((= cur-indent nxt-line-indent 0) nil)
@@ -63,17 +63,14 @@ composed only of whitespace."
 		 (haskell-find-line-with-indentation '>= -1)))
 	  (t (error "Undefined behaviour")))))
 
-(defun haskell-next-line-indentation ()
-  "returns (integer) indentation of the next line"
+(defun haskell-next-line-indentation (dir)
+  "returns (integer) indentation of the next if dir=1, previous line 
+indentation if dir=-1"
   (save-excursion
-    (forward-line 1)
-    (current-indentation)))
-
-(defun haskell-prev-line-indentation ()
-    "returns (integer) indentation of the previous line"
-  (save-excursion
-    (forward-line -1)
-    (current-indentation)))
+    (progn
+      (while (and (zerop (forward-line dir))
+		  (haskell-blank-line-p)))
+      (current-indentation))))
 
 (defun haskell-find-line-with-indentation (comparison direction)
   "comparison is >= or >, direction if 1 finds forward, if -1 finds backward"
