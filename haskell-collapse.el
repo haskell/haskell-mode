@@ -54,7 +54,7 @@
         (beg-of-line (save-excursion (end-of-line)
                                      (point))))
     (cond ((and (= cur-indent 0)
-                (= nxt-line-indent 0) nil))
+                (= nxt-line-indent 0)) nil)
           ((haskell-blank-line-p) nil)
           ((> nxt-line-indent cur-indent)
            (cons beg-of-line
