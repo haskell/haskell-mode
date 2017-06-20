@@ -41,15 +41,15 @@ indexCtx posts blogconfig =  listField \"posts\" (postCtx blogconfig) (return (t
 
 (defun test-haskell-collapse-start-end (start end)
   (let ((start (save-excursion
-		 (beginning-of-buffer)
-		 (forward-line start)
-		 (end-of-line)
-		 (point)))
-	(end (save-excursion
-	       (beginning-of-buffer)
-	       (forward-line end)
-	       (end-of-line)
-	       (point))))
+                 (beginning-of-buffer)
+                 (forward-line start)
+                 (end-of-line)
+                 (point)))
+        (end (save-excursion
+               (beginning-of-buffer)
+               (forward-line end)
+               (end-of-line)
+               (point))))
     (cons start end)))
 
 (defun test-haskell-indented-block (source lines result)
@@ -59,47 +59,47 @@ indexCtx posts blogconfig =  listField \"posts\" (postCtx blogconfig) (return (t
     (beginning-of-buffer)
     (forward-line lines)
     (equal (funcall result)
-   	   (haskell-indented-block))))
+           (haskell-indented-block))))
 
 (ert-deftest test-haskell-indented-block-1 ()
   (should (test-haskell-indented-block
-	   haskell-code-block-1
-	   1
-	   (lambda () (test-haskell-collapse-start-end 1 9)))))
+           haskell-code-block-1
+           1
+           (lambda () (test-haskell-collapse-start-end 1 9)))))
 
 (ert-deftest test-haskell-indented-block-2 ()
   (should (test-haskell-indented-block
-	   haskell-code-block-1
-	   0
-	   (lambda () (test-haskell-collapse-start-end 0 11)))))
+           haskell-code-block-1
+           0
+           (lambda () (test-haskell-collapse-start-end 0 11)))))
 
 
 (ert-deftest test-haskell-indented-block-3 ()
   (should (test-haskell-indented-block
-	   haskell-code-block-1
-	   2
-	   (lambda () (test-haskell-collapse-start-end 1 9)))))
+           haskell-code-block-1
+           2
+           (lambda () (test-haskell-collapse-start-end 1 9)))))
 
 (ert-deftest test-haskell-indented-block-4 ()
   (should (test-haskell-indented-block
-	   haskell-code-block-2
-	   0
-	   (lambda () nil))))
-	   
+           haskell-code-block-2
+           0
+           (lambda () nil))))
+           
 (ert-deftest test-haskell-indented-block-5 ()
   (should (test-haskell-indented-block
-	   haskell-code-block-2
-	   1
-	   (lambda () nil))))
+           haskell-code-block-2
+           1
+           (lambda () nil))))
 
 (ert-deftest test-haskell-indented-block-6 ()
   (should (test-haskell-indented-block
-	   haskell-code-block-2
-	   3
-	   (lambda () nil))))
+           haskell-code-block-2
+           3
+           (lambda () nil))))
 
 (ert-deftest test-haskell-indented-block-7 ()
   (should (test-haskell-indented-block
-	   haskell-code-block-3
-	   0
-	   (lambda () (test-haskell-collapse-start-end 0 5)))))
+           haskell-code-block-3
+           0
+           (lambda () (test-haskell-collapse-start-end 0 5)))))

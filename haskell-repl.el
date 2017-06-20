@@ -116,8 +116,8 @@
       (delete-region (1+ haskell-interactive-mode-prompt-start) (point))
       (goto-char (point-max))
       (insert (haskell-fontify-as-mode text
-				       haskell-interactive-mode-eval-mode))
+                                       haskell-interactive-mode-eval-mode))
       (when haskell-interactive-mode-collapse
-	(haskell-hide-toggle)))))
+        (haskell-hide-toggle)))))
 
 (provide 'haskell-repl)
