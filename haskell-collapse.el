@@ -40,13 +40,12 @@
       (set-buffer-modified-p modified))))
 
 (defun haskell-blank-line-p (&optional pos)
-  "Returns `t' if line (optionally, line at POS) is empty or
-composed only of whitespace."
+  "Returns `t' if line is empty or composed only of whitespace."
   (save-excursion
     (goto-char (or pos (point)))
     (beginning-of-line)
     (= (point-at-eol)
-       (progn (skip-syntax-forward " ") (point)))))
+       (progn (skip-chars-forward "[:blank:]") (point)))))
 
 (defun haskell-indented-block ()
   "return (start-of-indentation . end-of-indentation)"

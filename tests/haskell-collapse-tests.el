@@ -32,6 +32,8 @@ import qualified Data.ByteString.Char8 as BS
                                constField \"title\" \"Archive\"                          <>
                                defaultCTX blogconfig
 
+
+
 indexCtx posts blogconfig =  listField \"posts\" (postCtx blogconfig) (return (take 5 posts)) <>
                              constField \"title\" \"Posts\"                                     <>
                              defaultCTX blogconfig
@@ -56,7 +58,7 @@ indexCtx posts blogconfig =  listField \"posts\" (postCtx blogconfig) (return (t
     (insert source)
     (beginning-of-buffer)
     (forward-line lines)
-   (equal (funcall result)
+    (equal (funcall result)
    	   (haskell-indented-block))))
 
 (ert-deftest test-haskell-indented-block-1 ()
@@ -100,4 +102,4 @@ indexCtx posts blogconfig =  listField \"posts\" (postCtx blogconfig) (return (t
   (should (test-haskell-indented-block
 	   haskell-code-block-3
 	   0
-	   (lambda () (test-haskell-collapse-start-end 0 2)))))
+	   (lambda () (test-haskell-collapse-start-end 0 5)))))
