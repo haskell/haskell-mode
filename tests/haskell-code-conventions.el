@@ -1,12 +1,20 @@
 ;;  -*- lexical-binding: t -*-
 
+;; FIXME
 ;; require 'el-search only on Emacs 25 or above
+;; This file NEEDS REFACTORING. The new el-search as of 20th June 2017
+;; does not have el-search--search-pattern-1. Thus `make check-conventions'
+;; fails. Code from (https://elpa.gnu.org/packages/el-search-0.2.el) has been
+;; copied and pasted for `el-search--search-pattern-1' and `el-search--matcher'
+
+
 (when (>= emacs-major-version 25)
   (package-initialize)
   (unless (package-installed-p 'el-search)
     (package-refresh-contents)
     (package-install 'el-search))
   (require 'el-search))
+(require 'cl-lib)
 
 (defconst haskell-code-conventions
   '((require-cl
@@ -161,3 +169,26 @@ Return non-zero exit code when conventions were violated in any of the files."
   (if (haskell-check-conventions)
       (kill-emacs 2)
     (kill-emacs 0)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Code from older version of el-search
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun el-search--search-pattern (pattern &optional noerror)
+  "Search elisp buffer with `pcase' PATTERN.
+Set point to the beginning of the occurrence found and return
+point.  Optional second argument, if non-nil, means if fail just
+return nil (no error)."
+  (el-search--search-pattern-1 (el-search--matcher pattern) noerror))
+
+(defun el-search--matcher (pattern &rest body)
+  (eval ;use `eval' to allow for user defined pattern types at run time
+   (let ((expression (make-symbol "expression")))
+     `(el-search--with-additional-pcase-macros
+       (let ((byte-compile-debug t) ;make undefined pattern types raise an error
+             (warning-suppress-log-types '((bytecomp)))
+             (pcase--dontwarn-upats (cons '_ pcase--dontwarn-upats)))
+         (byte-compile (lambda (,expression)
+                         (pcase ,expression
+                           (,pattern ,@(or body (list t)))
+                           (_        nil)))))))))

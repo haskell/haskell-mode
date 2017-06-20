@@ -39,10 +39,9 @@
             (hs-make-overlay beg end 'code)))
       (set-buffer-modified-p modified))))
 
-(defun haskell-blank-line-p (&optional pos)
+(defun haskell-blank-line-p ()
   "Returns `t' if line is empty or composed only of whitespace."
   (save-excursion
-    (goto-char (or pos (point)))
     (beginning-of-line)
     (= (point-at-eol)
        (progn (skip-chars-forward "[:blank:]") (point)))))
@@ -54,7 +53,8 @@
         (prev-line-indent (haskell-next-line-indentation -1))
         (beg-of-line (save-excursion (end-of-line)
                                      (point))))
-    (cond ((= cur-indent nxt-line-indent 0) nil)
+    (cond ((and (= cur-indent 0)
+                (= nxt-line-indent 0) nil))
           ((haskell-blank-line-p) nil)
           ((> nxt-line-indent cur-indent)
            (cons beg-of-line
