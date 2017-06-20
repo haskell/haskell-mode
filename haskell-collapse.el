@@ -30,9 +30,9 @@
   (save-excursion
     (let* ((modified (buffer-modified-p))
            (inhibit-read-only t)
-	   (position (haskell-indented-block))
-	   (beg (car position))
-	   (end (cdr position)))
+           (position (haskell-indented-block))
+           (beg (car position))
+           (end (cdr position)))
       (if (and beg end)
           (if (overlays-in beg end)
               (hs-discard-overlays beg end)
@@ -50,28 +50,28 @@
 (defun haskell-indented-block ()
   "return (start-of-indentation . end-of-indentation)"
   (let ((cur-indent (current-indentation))
-	(nxt-line-indent (haskell-next-line-indentation 1))
-	(prev-line-indent (haskell-next-line-indentation -1))
-	(beg-of-line (save-excursion (end-of-line)
-				     (point))))
+        (nxt-line-indent (haskell-next-line-indentation 1))
+        (prev-line-indent (haskell-next-line-indentation -1))
+        (beg-of-line (save-excursion (end-of-line)
+                                     (point))))
     (cond ((= cur-indent nxt-line-indent 0) nil)
-	  ((haskell-blank-line-p) nil)
-	  ((> nxt-line-indent cur-indent)
-	   (cons beg-of-line
-		 (haskell-find-line-with-indentation '> 1)))
-	  ((or (= nxt-line-indent cur-indent)
-	       (<= prev-line-indent cur-indent))
-	   (cons (haskell-find-line-with-indentation '>= -1)
-		 (haskell-find-line-with-indentation '>= 1)))
-	  (t (error "Undefined behaviour")))))
+          ((haskell-blank-line-p) nil)
+          ((> nxt-line-indent cur-indent)
+           (cons beg-of-line
+                 (haskell-find-line-with-indentation '> 1)))
+          ((or (= nxt-line-indent cur-indent)
+               (<= prev-line-indent cur-indent))
+           (cons (haskell-find-line-with-indentation '>= -1)
+                 (haskell-find-line-with-indentation '>= 1)))
+          (t (error "Undefined behaviour")))))
 
 (defun haskell-next-line-indentation (dir)
-  "returns (integer) indentation of the next if dir=1, previous line 
+  "returns (integer) indentation of the next if dir=1, previous line
 indentation if dir=-1"
   (save-excursion
     (progn
       (while (and (zerop (forward-line dir))
-		  (haskell-blank-line-p)))
+                  (haskell-blank-line-p)))
       (current-indentation))))
 
 (defun haskell-find-line-with-indentation (comparison direction)
@@ -79,11 +79,11 @@ indentation if dir=-1"
   (save-excursion
     (let ((start-indent (current-indentation)))
       (progn
-	(while (and (zerop (forward-line direction))
-		    (or (haskell-blank-line-p)
-			(funcall comparison (current-indentation) start-indent))))
-	(when (= direction 1) (forward-line -1))
-	(end-of-line)
-	(point)))))
+        (while (and (zerop (forward-line direction))
+                    (or (haskell-blank-line-p)
+                        (funcall comparison (current-indentation) start-indent))))
+        (when (= direction 1) (forward-line -1))
+        (end-of-line)
+        (point)))))
 
 (provide 'haskell-collapse)
