@@ -86,4 +86,17 @@ indentation if dir=-1"
         (end-of-line)
         (point)))))
 
+(defvar haskell-collapse-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c @ C-c") 'haskell-hide-toggle)
+    map)
+  "Keymap for using `haskell-collapse-mode'.")
+
+;;;###autoload
+(define-minor-mode haskell-collapse-mode
+  "Minor mode to collapse and expand haskell expressions"
+  :init-value nil
+  :lighter " Haskell-Collapse"
+  :keymap haskell-collapse-mode-map)
+
 (provide 'haskell-collapse)
