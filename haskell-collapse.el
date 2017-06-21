@@ -63,7 +63,7 @@
                (<= prev-line-indent cur-indent))
            (cons (haskell-find-line-with-indentation '>= -1)
                  (haskell-find-line-with-indentation '>= 1)))
-          (t (error "Undefined behaviour")))))
+          (t nil))))
 
 (defun haskell-next-line-indentation (dir)
   "returns (integer) indentation of the next if dir=1, previous line
@@ -86,9 +86,19 @@ indentation if dir=-1"
         (end-of-line)
         (point)))))
 
+(defun haskell-hide-toggle-all ()
+  "hides all top level functions"
+  (interactive)
+  (save-excursion
+    (goto-char (point-max))
+    (while (zerop (forward-line -1))
+      (goto-char (point-at-bol))
+      (when (= (current-indentation) 0) (haskell-hide-toggle)))))
+
 (defvar haskell-collapse-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c @ C-c") 'haskell-hide-toggle)
+    (define-key map (kbd "C-c @ C-M-c") 'haskell-hide-toggle-all)
     map)
   "Keymap for using `haskell-collapse-mode'.")
 
