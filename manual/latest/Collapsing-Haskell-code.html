@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual is for Haskell mode, version 16.1-git
+
+Copyright (C) 2013-2017 Haskell Mode contributors.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the http://www.gnu.org/licenses/fdl.html (GNU
+Free Documentation License), Version 1.3 or any later version published
+by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts and no Back-Cover Texts. -->
+<!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>Haskell Mode 16.1-git: Collapsing Haskell code</title>
+
+<meta name="description" content="Haskell Mode 16.1-git: Collapsing Haskell code">
+<meta name="keywords" content="Haskell Mode 16.1-git: Collapsing Haskell code">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="index.html#Top" rel="start" title="Top">
+<link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
+<link href="index.html#Top" rel="up" title="Top">
+<link href="Getting-Help-and-Reporting-Bugs.html#Getting-Help-and-Reporting-Bugs" rel="next" title="Getting Help and Reporting Bugs">
+<link href="Rectangular-commands.html#Rectangular-commands" rel="prev" title="Rectangular commands">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.indentedblock {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smallindentedblock {margin-left: 3.2em; font-size: smaller}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style:oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nocodebreak {white-space:nowrap}
+span.nolinebreak {white-space:nowrap}
+span.roman {font-family:serif; font-weight:normal}
+span.sansserif {font-family:sans-serif; font-weight:normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="haskell-mode.css">
+
+<link rel="shortcut icon" href="haskell-mode-32x32.png">
+<script src="../../index.js"> </script>
+</head>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+<div class="background"> </div><a name="Collapsing-Haskell-code"></a>
+<div class="header">
+<p>
+Next: <a href="Getting-Help-and-Reporting-Bugs.html#Getting-Help-and-Reporting-Bugs" accesskey="n" rel="next">Getting Help and Reporting Bugs</a>, Previous: <a href="Rectangular-commands.html#Rectangular-commands" accesskey="p" rel="prev">Rectangular commands</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<a name="Collapsing-Haskell-code-1"></a>
+<h2 class="chapter">20 Collapsing Haskell code</h2>
+
+<p>This is <code>hs-minor-mode</code> for <code>haskell-mode</code>. This module uses
+hideshow module.
+</p>
+<p>To activate this minor mode (haskell-collapse-mode)
+</p><ul>
+<li> <kbd>M-x haskell-collapse-mode</kbd> is &quot;To start haskell-collapse-mode&quot;.
+</li></ul>
+<p>This minor mode works with indentation.
+</p>
+<p>In a quick glance:
+</p>
+<dl compact="compact">
+<dt><kbd>C-c &nbsp;C-c</kbd></dt>
+<dd><p>is bound to <code>haskell-hide-toggle</code>
+</p></dd>
+<dt><kbd>C-c &nbsp;C-M-c</kbd></dt>
+<dt><kbd>C-c &nbsp;C-M-h</kbd></dt>
+<dt><kbd>C-c &nbsp;C-M-s</kbd></dt>
+<dd><p>are all bound to <code>haskell-hide-toggle-all</code>
+</p></dd>
+</dl>
+
+<p>How to use <code>M-x haskell-hide-toggle</code>?
+</p>
+<p>Place your point on the code block that you want to collapse and hit the
+keybinding. Now the code collapses and you can see the first line of the
+block and elipsis.
+</p>
+<p>Take this example code (example usage of <code>M-x haskell-hide-toggle</code>):
+when you place the cursor here, like this (notice the thick block in the
+first line):
+</p>
+<p><code>
+f█x
+  | rem i 3 == 0 = if i == 0 &amp;&amp; (k /= 0) then (c k) else (h j)
+  | otherwise = 0
+  where i = sum x
+        j = g x (div i 3) 0 0 []
+        k = zeroes x 0
+</code>
+</p>
+<p>or
+</p>
+<p><code>
+f x
+  | rem i 3 == 0 = if i == 0 &amp;&amp; (k /= 0) then (c k) else (h j)
+█ | otherwise = 0
+  where i = sum x
+        j = g x (div i 3) 0 0 []
+        k = zeroes x 0
+</code>
+</p>
+<p>then when you collapse it becomes something like this:
+</p>
+<p><code>
+f█x&hellip;
+</code>
+</p>
+<p>It works in terms of (indentation) blocks.
+</p>
+<p>One more example:
+</p>
+<p><code>
+f x
+  | rem i 3 == 0 = if i == 0 &amp;&amp; (k /= 0) then (c k) else (h j)
+  | otherwise = 0
+  w█ere i = sum x
+        j = g x (div i 3) 0 0 []
+        k = zeroes x 0
+</code>
+</p>
+<p>or
+</p>
+<p><code>
+f x
+  | rem i 3 == 0 = if i == 0 &amp;&amp; (k /= 0) then (c k) else (h j)
+  | otherwise = 0
+  where i = sum x
+        j = g x (div i 3) 0 0 []
+     █  k = zeroes x 0
+</code>
+</p>
+<p>this, will result in something like:
+</p>
+<p><code>
+f x
+  | rem i 3 == 0 = if i == 0 &amp;&amp; (k /= 0) then (c k) else (h j)
+  | otherwise = 0
+  where i = sum █&hellip;
+</code>
+</p>
+<p>The other functionality <code>M-x haskell-hide-toggle-all</code> also
+works only for indentation and it collapses all toplevel functions.
+</p>
+<p>So a file that looks like this:
+</p>
+<div class="example">
+<pre class="example">main = interact $ show.f. map read .words
+f (x:xs) = dp x xs
+
+dp money a | money &lt; 0 || null a = [1..1000]
+dp 0 a = []
+dp money a @ (coin:coins)
+  | (length i) &lt;= length j = i
+  | otherwise = j
+  where i = (coin:(dp (money-coin) a))
+        j = (dp money coins)
+</pre></div>
+
+<p>will turn into this:
+</p>
+<div class="example">
+<pre class="example">main = interact $ show.f. map read .words
+f (x:xs) = dp x xs
+
+dp money a | money &lt; 0 || null a = [1..1000]
+dp 0 a = []
+dp money a @ (coin:coins)&hellip;
+</pre></div>
+
+<hr>
+<div class="header">
+<p>
+Next: <a href="Getting-Help-and-Reporting-Bugs.html#Getting-Help-and-Reporting-Bugs" accesskey="n" rel="next">Getting Help and Reporting Bugs</a>, Previous: <a href="Rectangular-commands.html#Rectangular-commands" accesskey="p" rel="prev">Rectangular commands</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>
