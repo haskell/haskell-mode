@@ -19,7 +19,7 @@
 @copying
 This manual is for Haskell mode, version 16.1-git
 
-Copyright @copyright{} 2013-2016 Haskell Mode contributors.
+Copyright @copyright{} 2013-2017 Haskell Mode contributors.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -74,6 +74,7 @@ interpreter (e.g. GHCi).
 * Spell checking strings and comments::  Using @code{flyspell-prog-mode}
 * Aligning code::                        Aligning code using @code{align-regexp}
 * Rectangular commands::                 Manage indentation manually
+* Collapsing Haskell code::              View more code on screen
 * Getting Help and Reporting Bugs::      How to improve Haskell Mode
 * Concept index::                        Index of Haskell Mode concepts
 * Function index::                       Index of commands
@@ -2591,6 +2592,127 @@ This will insert the contents of the last killed rectangle.
 
 As with all Emacs modifier combos, you can type @kbd{C-x r C-h} to find
 out what keys are bound beginning with the @kbd{C-x r} prefix.
+
+@node Collapsing Haskell code
+@chapter Collapsing Haskell code
+
+This is @code{hs-minor-mode} for @code{haskell-mode}. This module uses
+hideshow module.
+
+To activate this minor mode (haskell-collapse-mode)
+@itemize
+@item @kbd{M-x haskell-collapse-mode} is "To start haskell-collapse-mode".
+@end itemize
+This minor mode works with indentation.
+
+In a quick glance:
+
+@table @kbd
+@item C-c @ C-c
+is bound to @code{haskell-hide-toggle}
+@item C-c @ C-M-c
+@item C-c @ C-M-h
+@item C-c @ C-M-s
+are all bound to @code{haskell-hide-toggle-all}
+@end table
+
+How to use @code{M-x haskell-hide-toggle}?
+
+Place your point on the code block that you want to collapse and hit the
+keybinding. Now the code collapses and you can see the first line of the
+block and elipsis.
+
+Take this example code (example usage of @code{M-x haskell-hide-toggle}):
+when you place the cursor here, like this (notice the thick block in the
+first line):
+
+@code{
+f█x
+  | rem i 3 == 0 = if i == 0 && (k /= 0) then (c k) else (h j)
+  | otherwise = 0
+  where i = sum x
+        j = g x (div i 3) 0 0 []
+        k = zeroes x 0
+}
+
+or
+
+@code{
+f x
+  | rem i 3 == 0 = if i == 0 && (k /= 0) then (c k) else (h j)
+█ | otherwise = 0
+  where i = sum x
+        j = g x (div i 3) 0 0 []
+        k = zeroes x 0
+}
+
+then when you collapse it becomes something like this:
+
+@code{
+f█x@dots{}
+}
+
+It works in terms of (indentation) blocks.
+
+One more example:
+
+@code{
+f x
+  | rem i 3 == 0 = if i == 0 && (k /= 0) then (c k) else (h j)
+  | otherwise = 0
+  w█ere i = sum x
+        j = g x (div i 3) 0 0 []
+        k = zeroes x 0
+}
+
+or
+
+@code{
+f x
+  | rem i 3 == 0 = if i == 0 && (k /= 0) then (c k) else (h j)
+  | otherwise = 0
+  where i = sum x
+        j = g x (div i 3) 0 0 []
+     █  k = zeroes x 0
+}
+
+this, will result in something like:
+
+@code{
+f x
+  | rem i 3 == 0 = if i == 0 && (k /= 0) then (c k) else (h j)
+  | otherwise = 0
+  where i = sum █@dots{}
+}
+
+The other functionality @code{M-x haskell-hide-toggle-all} also
+works only for indentation and it collapses all toplevel functions.
+
+So a file that looks like this:
+
+@example
+main = interact $ show.f. map read .words
+f (x:xs) = dp x xs
+
+dp money a | money < 0 || null a = [1..1000]
+dp 0 a = []
+dp money a @atchar{} (coin:coins)
+  | (length i) <= length j = i
+  | otherwise = j
+  where i = (coin:(dp (money-coin) a))
+        j = (dp money coins)
+@end example
+
+will turn into this:
+
+@example
+main = interact $ show.f. map read .words
+f (x:xs) = dp x xs
+
+dp money a | money < 0 || null a = [1..1000]
+dp 0 a = []
+dp money a @atchar{} (coin:coins)@dots{}
+@end example
 
 @node Getting Help and Reporting Bugs
 @chapter Getting Help and Reporting Bugs

@@ -99,6 +99,8 @@ indentation if dir=-1"
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c @ C-c") 'haskell-hide-toggle)
     (define-key map (kbd "C-c @ C-M-c") 'haskell-hide-toggle-all)
+    (define-key map (kbd "C-c @ C-M-s") 'haskell-hide-toggle-all)
+    (define-key map (kbd "C-c @ C-M-h") 'haskell-hide-toggle-all)
     map)
   "Keymap for using `haskell-collapse-mode'.")
 

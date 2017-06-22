@@ -145,7 +145,7 @@ $(AUTOLOADS): $(ELFILES)
 		--eval '(setq make-backup-files nil)' \
 		--eval "(setq generated-autoload-file (concat command-line-default-directory \"/\" \"$@\"))" \
 		-f batch-update-autoloads "."
-	# check if autoloads will really load
+# check if autoloads will really load
 	$(BATCH) -l "$@"
 
 check-external : check-emacs-version $(AUTOLOADS)
