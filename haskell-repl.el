@@ -19,6 +19,7 @@
 
 (require 'cl-lib)
 (require 'haskell-interactive-mode)
+(require 'haskell-collapse)
 
 (defun haskell-interactive-handle-expr ()
   "Handle an inputted expression at the REPL."

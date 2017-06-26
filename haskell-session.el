@@ -29,7 +29,6 @@
 
 (require 'cl-lib)
 (require 'haskell-cabal)
-(require 'haskell-string)
 (require 'haskell-customize)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
