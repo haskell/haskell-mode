@@ -21,7 +21,8 @@ install: |
         ;;
       doc)
         sudo apt-get update &&
-        sudo apt-get install --force-yes python-sphinx;
+        sudo apt-get install -y python-pip &&
+        sudo pip install sphinx;
         ;;
       *)
     esac
