@@ -6,40 +6,22 @@ env:
   matrix:
     - TARGET=emacs24
     - TARGET=emacs-snapshot
-    - TARGET=deploy-manual
-    - TARGET=check-external
-  global:
-    - secure: "ejv1+ub/v+Hm/23fhp4zLAHT3HiCG+YdDHai57LDe4LfEZCeGz4i/6LazbPbwm58v2YuKvMcdNshebc1s4A293ARJryPyFfW/8kEe+3hQ+cDxunNdHfqcS8SyhcDG0mrv7dqiVAtMJqB8qZb0c161KeEM8nyhC0wyQ+EZ5qJnzM="
-
-matrix:
-  allow_failures:
-    - env: TARGET=emacs-snapshot
-    - env: TARGET=check-external
+    - TARGET=doc
 
 install: |
     case "$TARGET" in
       emacs24)
-        sudo apt-get install python-sphinx
         sudo apt-get update &&
         sudo apt-get install --no-install-suggests --no-install-recommends --force-yes emacs24-nox;
         ;;
       emacs-snapshot)
-        sudo apt-get install python-sphinx
         sudo add-apt-repository -y ppa:ubuntu-elisp/ppa &&
         sudo apt-get update &&
         sudo apt-get install --no-install-suggests --no-install-recommends --force-yes emacs-snapshot;
         ;;
-      deploy-manual)
-        sudo apt-get install python-sphinx
+      doc)
         sudo apt-get update &&
-        sudo apt-get install --no-install-suggests --no-install-recommends --force-yes texinfo emacs24-nox;
-        ;;
-      check-external)
-        sudo apt-get install python-sphinx
-        sudo add-apt-repository -y ppa:andreas-h/emacs &&
-        sudo apt-get update &&
-        sudo apt-get install --no-install-suggests --no-install-recommends --force-yes emacs24;
-        ;;
+        sudo apt-get install python-sphinx;
       *)
     esac
 
@@ -51,11 +33,8 @@ script: |
       emacs-snapshot)
         EMACS=emacs-snapshot make check;
         ;;
-      deploy-manual)
-        EMACS=emacs24 make deploy-manual;
-        ;;
-      check-external)
-        EMACS=emacs24 make check-external;
+      doc)
+        make doc
         ;;
       *)
     esac

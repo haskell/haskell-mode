@@ -45,7 +45,7 @@ BUILDDIR = doc/build
 
 .PHONY: all compile clean check check-emacs-version doc html
 
-all: check-emacs-version compile $(AUTOLOADS)
+all: check-emacs-version compile doc $(AUTOLOADS)
 
 check-emacs-version :
 	$(BATCH) --eval "(when (version< emacs-version \"24.3\")				\
@@ -59,7 +59,7 @@ check-emacs-version :
                             (kill-emacs 2))"
 	@echo Using EMACS = $(EMACS), version = $(EMACS_VERSION)
 
-compile: build-$(EMACS_VERSION)/build-flag doc
+compile: build-$(EMACS_VERSION)/build-flag
 
 build-$(EMACS_VERSION) :
 	mkdir $@
@@ -105,11 +105,6 @@ $(AUTOLOADS): $(ELFILES)
 		-f batch-update-autoloads "."
 # check if autoloads will really load
 	$(BATCH) -l "$@"
-
-check-external : check-emacs-version $(AUTOLOADS)
-	$(BATCH) -l tests/haskell-external.el                                           \
-                 -f haskell-check-external-batch-and-exit
-	@echo "external packages okay"
 
 doc: html
 
