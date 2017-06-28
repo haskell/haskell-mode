@@ -21,7 +21,8 @@ install: |
         ;;
       doc)
         sudo apt-get update &&
-        sudo apt-get install python-sphinx;
+        sudo apt-get install --force-yes python-sphinx;
+        ;;
       *)
     esac
 
@@ -34,7 +35,7 @@ script: |
         EMACS=emacs-snapshot make check;
         ;;
       doc)
-        make doc
+        make doc;
         ;;
       *)
     esac
