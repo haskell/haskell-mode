@@ -79,12 +79,7 @@ build-$(EMACS_VERSION)/build-flag : build-$(EMACS_VERSION) $(patsubst %.el,build
 check-%: tests/%-tests.el
 	$(BATCH) -l "$<" -f ert-run-tests-batch-and-exit;
 
-check: compile $(AUTOLOADS) check-ert check-conventions
-
-check-conventions :
-	$(BATCH) -l tests/haskell-code-conventions.el                                           \
-                 -f haskell-check-conventions-batch-and-exit
-	@echo "conventions are okay"
+check: compile $(AUTOLOADS) check-ert
 
 check-ert: $(ELCHECKS)
 	$(BATCH) --eval "(when (= emacs-major-version 24)					\
@@ -145,7 +140,7 @@ $(AUTOLOADS): $(ELFILES)
 		--eval '(setq make-backup-files nil)' \
 		--eval "(setq generated-autoload-file (concat command-line-default-directory \"/\" \"$@\"))" \
 		-f batch-update-autoloads "."
-	# check if autoloads will really load
+# check if autoloads will really load
 	$(BATCH) -l "$@"
 
 check-external : check-emacs-version $(AUTOLOADS)
