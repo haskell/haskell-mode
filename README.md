@@ -3,7 +3,7 @@
 This is an Emacs minor mode that complements `haskell-mode` for interactive editing.
 Haskell interactive mode was a part of `haskell-mode` (it still is).
 
-[![Build Status](https://travis-ci.org/haskell/haskell-mode.svg?branch=master)](https://travis-ci.org/vasanthaganeshk/haskell-interactive-mode)
+[![Build Status](https://travis-ci.org/vasanthaganeshk/haskell-interactive-mode.svg?branch=master)](https://travis-ci.org/vasanthaganeshk/haskell-interactive-mode)
 [![Build status](https://ci.appveyor.com/api/projects/status/g0t3s9bwal8g3041/branch/master?svg=true)](https://ci.appveyor.com/project/vasanthaganeshk/haskell-interactive-mode/branch/master)
 [![License GPL3](https://img.shields.io/badge/license-GPL3-blue.svg)](https://github.com/haskell/haskell-mode/blob/master/COPYING)
 [![Documentation Status](https://readthedocs.org/projects/haskell-interactive-mode/badge/?version=latest)](http://haskell-interactive-mode.readthedocs.io/en/latest/?badge=latest)
