@@ -37,7 +37,13 @@ ELCHECKS := $(wildcard tests/*-tests.el)
 
 AUTOLOADS = haskell-mode-autoloads.el
 
-.PHONY: all compile clean check check-emacs-version
+SPHINX-BUILD = sphinx-build
+SPHINXFLAGS =
+
+SOURCEDIR = doc/source
+BUILDDIR = doc/build
+
+.PHONY: all compile clean check check-emacs-version doc html
 
 all: check-emacs-version compile $(AUTOLOADS)
 
@@ -53,7 +59,7 @@ check-emacs-version :
                             (kill-emacs 2))"
 	@echo Using EMACS = $(EMACS), version = $(EMACS_VERSION)
 
-compile: build-$(EMACS_VERSION)/build-flag
+compile: build-$(EMACS_VERSION)/build-flag doc
 
 build-$(EMACS_VERSION) :
 	mkdir $@
@@ -90,7 +96,7 @@ check-ert: $(ELCHECKS)
 	@echo "checks passed!"
 
 clean:
-	$(RM) -r build-$(EMACS_VERSION) $(AUTOLOADS) $(AUTOLOADS:.el=.elc)
+	$(RM) -r build-$(EMACS_VERSION) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) $(BUILDDIR)
 
 $(AUTOLOADS): $(ELFILES)
 	$(BATCH) \
@@ -104,3 +110,8 @@ check-external : check-emacs-version $(AUTOLOADS)
 	$(BATCH) -l tests/haskell-external.el                                           \
                  -f haskell-check-external-batch-and-exit
 	@echo "external packages okay"
+
+doc: html
+
+html:
+	$(SPHINX-BUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(0)
