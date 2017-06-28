@@ -19,19 +19,23 @@ matrix:
 install: |
     case "$TARGET" in
       emacs24)
+        sudo apt-get install python-sphinx
         sudo apt-get update &&
         sudo apt-get install --no-install-suggests --no-install-recommends --force-yes emacs24-nox;
         ;;
       emacs-snapshot)
+        sudo apt-get install python-sphinx
         sudo add-apt-repository -y ppa:ubuntu-elisp/ppa &&
         sudo apt-get update &&
         sudo apt-get install --no-install-suggests --no-install-recommends --force-yes emacs-snapshot;
         ;;
       deploy-manual)
+        sudo apt-get install python-sphinx
         sudo apt-get update &&
         sudo apt-get install --no-install-suggests --no-install-recommends --force-yes texinfo emacs24-nox;
         ;;
       check-external)
+        sudo apt-get install python-sphinx
         sudo add-apt-repository -y ppa:andreas-h/emacs &&
         sudo apt-get update &&
         sudo apt-get install --no-install-suggests --no-install-recommends --force-yes emacs24;
