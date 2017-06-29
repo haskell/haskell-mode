@@ -1,20 +1,27 @@
-.. haskell-interactive-mode documentation master file, created by
-   sphinx-quickstart on Wed Jun 28 19:21:08 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Documentation of haskell-interactive-mode
-=========================================
+Documentation for haskell-interactive-mode
+==========================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+             Code completion
+             Inferior Haskell interpreter
+             haskell interactive mode
+
+Index
+=====
+The index provides a sorted list of all symbols, variables and concepts
+explained throughout ``haskell-interactive-mode``'s documentation
+
++ :ref:`genindex`
 
 
+Copyright 2013-2017 Haskell Mode contributors.
 
-Indices and tables
-==================
+Copyright 2017 Vasantha Ganesh Kanniappan.
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the `GNU Free Documentation License
+<http://www.gnu.org/licenses/fdl.html>`_ Version 1.3 or any later version
+published by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts and no Back-Cover Texts.
