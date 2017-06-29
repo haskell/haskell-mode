@@ -3,10 +3,10 @@ Documentation for haskell-interactive-mode
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
-             Code completion
-             Inferior Haskell interpreter
-             haskell interactive mode
+
+   code-completion
+   inferior-haskell-interpreter
+   haskell-interactive-mode
 
 Index
 =====
