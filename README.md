@@ -11,6 +11,10 @@ Haskell interactive mode was a part of `haskell-mode` (it still is).
 
 **This project is under active development**
 
+## Documentation
+
+The documentation is hosted on [readthedocs.io](https://readthedocs.io). Click [here](https://haskell-interactive-mode.readthedocs.io) to go to the the documentation.
+
 ## Contributing
 
 We need contributors for `haskell-interactive-mode`. Come to the IRC channel and just introduce yourselves.
