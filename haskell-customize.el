@@ -133,7 +133,7 @@ which will be prepended to `haskell-process-args-cabal-repl'."
   :type '(choice string (repeat string)))
 
 (defcustom haskell-process-path-stack
-  "stack"
+  "stack ghci"
   "The path for starting stack.
 This can either be a single string or a list of strings, where the
 first elements is a string and the remaining elements are arguments,

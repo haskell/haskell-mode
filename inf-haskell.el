@@ -37,6 +37,8 @@
 (require 'haskell-mode)
 (require 'haskell-decl-scan)
 (require 'haskell-cabal)
+(require 'haskell-customize)
+(require 'cl-lib)
 
 ;; Dynamically scoped variables.
 (defvar find-tag-marker-ring)
@@ -49,21 +51,16 @@
   :prefix "haskell-"
   :group 'haskell)
 
-;; Here I depart from the inferior-haskell- prefix.
-;; Not sure if it's a good idea.
-(defcustom haskell-program-name
-  ;; Arbitrarily give preference to hugs over ghci.
-  (or (cond
-       ((executable-find "hugs") "hugs \"+.\"")
-       ((executable-find "ghci") "ghci"))
-      "hugs \"+.\"")
-  "The name of the command to start the inferior Haskell process.
-The command can include arguments."
-  ;; Custom only supports the :options keyword for a few types, e.g. not
-  ;; for string.
-  ;; :options '("hugs \"+.\"" "ghci")
-  :group 'inferior-haskell
-  :type '(choice string (repeat string)))
+;; (defun haskell-program-name ()
+;;   "stack ghci")
+
+(defun haskell-program-name ()
+  (cl-ecase (haskell-process-type)
+    ('ghci haskell-process-path-cabal)
+    ('cabal-repl haskell-process-path-cabal)
+    ('cabal-new-repl haskell-process-path-cabal)
+    ('cabal-ghci haskell-process-path-cabal)
+    ('stack-ghci haskell-process-path-stack)))
 
 (defconst inferior-haskell-info-xref-re
   "\t-- Defined at \\(.+\\):\\([0-9]+\\):\\([0-9]+\\)\\(?:-\\([0-9]+\\)\\)?$")
@@ -166,8 +163,8 @@ This will either look for a Cabal file or a \"module\" statement in the file."
 
 (defun inferior-haskell-command (arg)
   (inferior-haskell-string-to-strings
-   (if (null arg) haskell-program-name
-     (read-string "Command to run haskell: " haskell-program-name))))
+   (if (null arg) (haskell-program-name)
+     (read-string "Command to run haskell: " (haskell-program-name)))))
 
 (defvar inferior-haskell-buffer nil
   "The buffer in which the inferior process is running.")
