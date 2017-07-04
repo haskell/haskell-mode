@@ -29,7 +29,6 @@
 (require 'haskell-repl)
 (require 'haskell-load)
 (require 'haskell-commands)
-(require 'haskell-sandbox)
 (require 'haskell-modules)
 (require 'haskell-string)
 (require 'haskell-completions)

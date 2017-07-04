@@ -30,9 +30,7 @@
 
 (require 'haskell-mode)
 (require 'haskell-compile)
-(require 'haskell-navigate-imports)
 (require 'haskell-process)
-(require 'haskell-collapse)
 (require 'haskell-session)
 (require 'haskell-font-lock)
 (require 'haskell-presentation-mode)
