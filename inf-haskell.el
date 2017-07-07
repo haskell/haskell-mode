@@ -51,16 +51,18 @@
   :prefix "haskell-"
   :group 'haskell)
 
-;; (defun haskell-program-name ()
-;;   "stack ghci")
-
-(defun haskell-program-name ()
+(defun haskell-program-name-with-args ()
+  "returns what command to run based on the situation with the arguments
+for repl"
   (cl-ecase (haskell-process-type)
-    ('ghci haskell-process-path-cabal)
-    ('cabal-repl haskell-process-path-cabal)
-    ('cabal-new-repl haskell-process-path-cabal)
-    ('cabal-ghci haskell-process-path-cabal)
-    ('stack-ghci haskell-process-path-stack)))
+    ('ghci       (nconc `(,haskell-process-path-ghci)
+                        haskell-process-args-ghci))
+    ('cabal-repl (nconc `(,haskell-process-path-cabal
+                          "repl")
+                        haskell-process-args-cabal-repl))
+    ('stack-ghci (nconc `(,haskell-process-path-stack
+                          "ghci")
+                        haskell-process-args-stack-ghci))))
 
 (defconst inferior-haskell-info-xref-re
   "\t-- Defined at \\(.+\\):\\([0-9]+\\):\\([0-9]+\\)\\(?:-\\([0-9]+\\)\\)?$")
@@ -161,10 +163,12 @@ This will either look for a Cabal file or a \"module\" statement in the file."
                       (inferior-haskell-string-to-strings
                        (substring string (cdr rfs)))))))))
 
+;; (defun inferior-haskell-command (arg)
+;;    (if (null arg) (haskell-program-name-with-args)
+;;      (read-string "Command to run haskell: " (haskell-program-name-with-args))))
+
 (defun inferior-haskell-command (arg)
-  (inferior-haskell-string-to-strings
-   (if (null arg) (haskell-program-name)
-     (read-string "Command to run haskell: " (haskell-program-name)))))
+  (haskell-program-name-with-args))
 
 (defvar inferior-haskell-buffer nil
   "The buffer in which the inferior process is running.")
@@ -172,10 +176,11 @@ This will either look for a Cabal file or a \"module\" statement in the file."
 (defun inferior-haskell-start-process (command)
   "Start an inferior haskell process.
 With universal prefix \\[universal-argument], prompts for a COMMAND,
-otherwise uses `haskell-program-name'.
+otherwise uses `haskell-program-name-with-args'.
 It runs the hook `inferior-haskell-hook' after starting the process and
 setting up the inferior-haskell buffer."
   (interactive (list (inferior-haskell-command current-prefix-arg)))
+  (message (prin1-to-string command))
   (setq inferior-haskell-buffer
         (apply 'make-comint "haskell" (car command) nil (cdr command)))
   (with-current-buffer inferior-haskell-buffer
