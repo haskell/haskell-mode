@@ -153,16 +153,6 @@ This will either look for a Cabal file or a \"module\" statement in the file."
       (add-to-list 'minor-mode-overriding-map-alist
                    (cons 'compilation-minor-mode map)))))
 
-(defun inferior-haskell-string-to-strings (string)
-  "Split the STRING into a list of strings."
-  (let ((i (string-match "[\"]" string)))
-    (if (null i) (split-string string) ; no quoting:  easy
-      (append (unless (eq i 0) (split-string (substring string 0 i)))
-              (let ((rfs (read-from-string string i)))
-                (cons (car rfs)
-                      (inferior-haskell-string-to-strings
-                       (substring string (cdr rfs)))))))))
-
 (defun inferior-haskell-command (arg)
   (haskell-program-name-with-args))
 
@@ -194,10 +184,10 @@ setting up the inferior-haskell buffer."
 ;;;###autoload
 (defalias 'run-haskell 'switch-to-haskell)
 ;;;###autoload
-(defun switch-to-haskell (&optional arg)
+(defun switch-to-haskell ()
   "Show the inferior-haskell buffer.  Start the process if needed."
-  (interactive "P")
-  (let ((proc (inferior-haskell-process arg)))
+  (interactive)
+  (let ((proc (inferior-haskell-process)))
     (pop-to-buffer-same-window (process-buffer proc))))
 
 (defcustom inferior-haskell-wait-and-jump nil
