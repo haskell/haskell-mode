@@ -175,6 +175,81 @@ we load it."
          (url (concat url "#v:" sym)))
     (if url (browse-url url) (error "Local file doesn't exist"))))
 
+;;;###autoload
+(defun inferior-haskell-load-and-run (command)
+  "Pass the current buffer's file to haskell and then run a COMMAND."
+  (interactive
+   (list
+    (if (and inferior-haskell-run-command (not current-prefix-arg))
+        inferior-haskell-run-command
+      (read-string "Command to run: " nil nil inferior-haskell-run-command))))
+  (setq inferior-haskell-run-command command)
+  (let* ((inferior-haskell-errors nil)
+         (neh (lambda () (setq inferior-haskell-errors t))))
+    (unwind-protect
+        (let ((inferior-haskell-wait-and-jump t))
+          (add-hook 'next-error-hook neh)
+          (inferior-haskell-load-file))
+      (remove-hook 'next-error-hook neh))
+    (unless inferior-haskell-errors
+      (inferior-haskell-send-command (inferior-haskell-process) command)
+      (switch-to-haskell))))
+
+;;;###autoload
+(defun inferior-haskell-load-file (&optional reload)
+  "Pass the current buffer's file to the inferior haskell process.
+If prefix arg \\[universal-argument] is given, just reload the previous file."
+  (interactive "P")
+  ;; Save first, so we're sure that `buffer-file-name' is non-nil afterward.
+  (save-buffer)
+  (let ((buf (current-buffer))
+        (file buffer-file-name)
+        (proc (inferior-haskell-process)))
+    (if file
+        (with-current-buffer (process-buffer proc)
+          (compilation-forget-errors)
+          (let ((parsing-end (marker-position (process-mark proc)))
+                root)
+            ;; Go to the root of the Cabal project, if applicable.
+            (when (and inferior-haskell-find-project-root
+                       (setq root (inferior-haskell-find-project-root buf)))
+              ;; Not sure if it's useful/needed and if it actually works.
+              (unless (equal default-directory root)
+                (setq default-directory root)
+                (inferior-haskell-send-command
+                 proc (concat ":cd " default-directory)))
+              (setq file (file-relative-name file)))
+            (inferior-haskell-send-command
+             proc (if reload ":reload"
+                    (concat ":load \""
+                            ;; Espace the backslashes that may occur in file names.
+                            (replace-regexp-in-string "[\\\"]" "\\\\\&" file)
+                            "\"")))
+            ;; Move the parsing-end marker *after* sending the command so
+            ;; that it doesn't point just to the insertion point.
+            ;; Otherwise insertion may move the marker (if done with
+            ;; insert-before-markers) and we'd then miss some errors.
+            (if (boundp 'compilation-parsing-end)
+                (if (markerp compilation-parsing-end)
+                    (set-marker compilation-parsing-end parsing-end)
+                  (setq compilation-parsing-end parsing-end))))
+          (with-selected-window (display-buffer (current-buffer) nil 'visible)
+            (goto-char (point-max)))
+          ;; Use compilation-auto-jump-to-first-error if available.
+          ;; (if (and (boundp 'compilation-auto-jump-to-first-error)
+          ;;          compilation-auto-jump-to-first-error
+          ;;          (boundp 'compilation-auto-jump-to-next))
+          ;;     (setq compilation-auto-jump-to-next t)
+          (when inferior-haskell-wait-and-jump
+            (inferior-haskell-wait-for-prompt proc)
+            (ignore-errors                  ;Don't beep if there were no errors.
+              (next-error))))
+      (error "No file associated with buffer"))))
+
+(defun inferior-haskell-reload-file ()
+  "Tell the inferior haskell process to reread the current buffer's file."
+  (interactive)
+  (inferior-haskell-load-file 'reload))
 
 (defvar inf-haskell-mode-map
   (let ((map (make-sparse-keymap)))

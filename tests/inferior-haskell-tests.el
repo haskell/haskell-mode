@@ -24,4 +24,6 @@
 (ert-deftest test-run-haskell ()
   (with-temp-buffer
     (run-haskell)
-    (should (eq "hello" (inferior-haskell-get-result "print \"hello\" ")))))
+    (should (eq (inferior-haskell-get-result "print \"hello\"")
+                "Prelude> print \"hello\" 
+\"hello\""))))
