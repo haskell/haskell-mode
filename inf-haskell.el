@@ -163,10 +163,6 @@ This will either look for a Cabal file or a \"module\" statement in the file."
                       (inferior-haskell-string-to-strings
                        (substring string (cdr rfs)))))))))
 
-;; (defun inferior-haskell-command (arg)
-;;    (if (null arg) (haskell-program-name-with-args)
-;;      (read-string "Command to run haskell: " (haskell-program-name-with-args))))
-
 (defun inferior-haskell-command (arg)
   (haskell-program-name-with-args))
 
@@ -180,7 +176,6 @@ otherwise uses `haskell-program-name-with-args'.
 It runs the hook `inferior-haskell-hook' after starting the process and
 setting up the inferior-haskell buffer."
   (interactive (list (inferior-haskell-command current-prefix-arg)))
-  (message (prin1-to-string command))
   (setq inferior-haskell-buffer
         (apply 'make-comint "haskell" (car command) nil (cdr command)))
   (with-current-buffer inferior-haskell-buffer
