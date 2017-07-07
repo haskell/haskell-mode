@@ -153,33 +153,28 @@ This will either look for a Cabal file or a \"module\" statement in the file."
       (add-to-list 'minor-mode-overriding-map-alist
                    (cons 'compilation-minor-mode map)))))
 
-(defun inferior-haskell-command (arg)
-  (haskell-program-name-with-args))
-
 (defvar inferior-haskell-buffer nil
   "The buffer in which the inferior process is running.")
 
-(defun inferior-haskell-start-process (command)
+(defun inferior-haskell-start-process ()
   "Start an inferior haskell process.
 With universal prefix \\[universal-argument], prompts for a COMMAND,
 otherwise uses `haskell-program-name-with-args'.
 It runs the hook `inferior-haskell-hook' after starting the process and
 setting up the inferior-haskell buffer."
-  (interactive (list (inferior-haskell-command current-prefix-arg)))
-  (setq inferior-haskell-buffer
-        (apply 'make-comint "haskell" (car command) nil (cdr command)))
-  (with-current-buffer inferior-haskell-buffer
-    (inferior-haskell-mode)
-    (run-hooks 'inferior-haskell-hook)))
+  (let ((command (haskell-program-name-with-args)))
+    (setq inferior-haskell-buffer
+          (apply 'make-comint "haskell" (car command) nil (cdr command)))
+    (with-current-buffer inferior-haskell-buffer
+      (inferior-haskell-mode)
+      (run-hooks 'inferior-haskell-hook))))
 
-(defun inferior-haskell-process (&optional arg)
-  (or (if (buffer-live-p inferior-haskell-buffer)
-          (get-buffer-process inferior-haskell-buffer))
-      (progn
-        (let ((current-prefix-arg arg))
-          (call-interactively 'inferior-haskell-start-process))
-        ;; Try again.
-        (inferior-haskell-process arg))))
+(defun inferior-haskell-process ()
+  "restart if not present"
+  (cond ((buffer-live-p inferior-haskell-buffer)
+         (get-buffer-process inferior-haskell-buffer))
+        (t (inferior-haskell-start-process)
+           (inferior-haskell-process))))
 
 ;;;###autoload
 (defalias 'run-haskell 'switch-to-haskell)
