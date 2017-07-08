@@ -25,6 +25,64 @@
 (require 'inf-haskell)
 (require 'haskell-mode)
 
+
+(defcustom inferior-haskell-find-project-root t
+  "If non-nil, try and find the project root directory of this file.
+This will either look for a Cabal file or a \"module\" statement in the file."
+  :group 'inferior-haskell
+  :type 'boolean)
+
+(defun inferior-haskell-find-project-root (buf)
+  (with-current-buffer buf
+    (let* (
+           (cabal-file (inferior-haskell-cabal-of-buf buf))
+           (cabal (when cabal-file
+                    (find-file-noselect cabal-file)))
+           )
+      (or (when cabal
+            (with-current-buffer cabal
+              (let ((hsd (haskell-cabal--get-field "hs-source-dirs")))
+                (if (null hsd)
+                    ;; If there's a Cabal file with no Hs-Source-Dirs, then
+                    ;; just use the Cabal file's directory.
+                    default-directory
+                  ;; If there is an HSD, then check that it's an existing
+                  ;; dir (otherwise, it may be a list of dirs and we don't
+                  ;; know what to do with those).  If it doesn't exist, then
+                  ;; give up.
+                  (if (file-directory-p hsd) (expand-file-name hsd))))))
+          ;; If there's no Cabal file or it's not helpful, try to look for
+          ;; a "module" statement and count the number of "." in the
+          ;; module name.
+          (save-excursion
+            (goto-char (point-min))
+            (let ((case-fold-search nil))
+              (when (re-search-forward
+                     "^module[ \t]+\\(\\(?:\\sw\\|[.]\\)+\\)" nil t)
+                (let* ((dir default-directory)
+                       (module (match-string 1))
+                       (pos 0))
+                  (while (string-match "\\." module pos)
+                    (setq pos (match-end 0))
+                    (setq dir (expand-file-name ".." dir)))
+                  ;; Let's check that the module name matches the file name,
+                  ;; otherwise the project root is probably not what we think.
+                  (if (eq t (compare-strings
+                             (file-name-sans-extension buffer-file-name)
+                             nil nil
+                             (expand-file-name
+                              (replace-regexp-in-string "\\." "/" module)
+                              dir)
+                             nil nil t))
+                      dir
+                    ;; If they're not equal, it means the local directory
+                    ;; hierarchy doesn't match the module name.  This seems
+                    ;; odd, so let's warn the user about it.  May help us
+                    ;; debug this code as well.
+                    (message "Ignoring inconsistent `module' info: %s in %s"
+                             module buffer-file-name)
+                    nil)))))))))
+
 ;;;###autoload
 (defun inferior-haskell-send-decl ()
   "Send current declaration to inferior-haskell process."
