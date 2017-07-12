@@ -11,8 +11,7 @@ install:
   - 7z x emacs-24.5-bin-i686-mingw32.zip
   - 7z x ghc-8.0.2-i386-unknown-mingw32-win10.tar.xz
 
-
 build_script:
-  - C:\msys64\usr\bin\bash -l -c "cd ${APPVEYOR_BUILD_FOLDER} && make check compile EMACS=./bin/emacs.exe"
+  - C:\msys64\usr\bin\bash -l -c "cd ${APPVEYOR_BUILD_FOLDER} && make check compile PATH=%PATH%;./bin/emacs.exe;./bin/ghc;./bin/ghci"
 
 test_script:
