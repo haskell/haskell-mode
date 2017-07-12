@@ -112,12 +112,15 @@ The format should be the same as for `compilation-error-regexp-alist'.")
   ;; Why the backslash in [\\._[:alnum:]]?
   "^\\*?[[:upper:]][\\._[:alnum:]]*\\(?: \\*?[[:upper:]][\\._[:alnum:]]*\\)*\\( λ\\)?> \\|^λ?> $")
 
+;;; TODO
+;;; -> Make font lock work for strings, directories, hyperlinks
+;;; -> Make font lock work for key words???
+
 (define-derived-mode inferior-haskell-mode comint-mode "Inf-Haskell"
   "Major mode for interacting with an inferior Haskell process."
   :group 'inferior-haskell
   (setq-local comint-prompt-regexp haskell-prompt-regexp)
 
-  (setq-local font-lock-defaults '(haskell-font-lock-keywords t))
   (setq-local paragraph-start haskell-prompt-regexp)
 
   (setq-local comint-input-autoexpand nil)
