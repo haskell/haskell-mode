@@ -1,9 +1,7 @@
-# For Emacs 24.x
+# For Emacs snapshot
 FROM ubuntu:xenial
 
 USER root
-
-WORKDIR /opt/haskell-interactive-mode
 
 RUN apt-get update \
     && apt-get install -y software-properties-common \
@@ -13,5 +11,7 @@ RUN apt-get update \
     && sudo apt-get install -y ghc \
     && apt-get install -y git \
     && git clone https://github.com/vasanthaganeshk/haskell-interactive-mode
+
+WORKDIR ./haskell-interactive-mode
 
 CMD [ "make", "check" ]
