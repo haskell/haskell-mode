@@ -37,13 +37,14 @@ ELCHECKS := $(wildcard tests/*-tests.el)
 
 AUTOLOADS = haskell-mode-autoloads.el
 
+GHCI = ghci
 SPHINX-BUILD = sphinx-build
 SPHINXFLAGS =
 
 SOURCEDIR = doc/source
 BUILDDIR = doc/build
 
-.PHONY: all compile clean check check-emacs-version doc html
+.PHONY: all compile clean check check-emacs-version doc html ghciworks
 
 all: check-emacs-version compile doc $(AUTOLOADS)
 
@@ -83,7 +84,7 @@ build-$(EMACS_VERSION)/build-flag : build-$(EMACS_VERSION) $(patsubst %.el,build
 check-%: tests/%-tests.el
 	$(BATCH) -l "$<" -f ert-run-tests-batch-and-exit;
 
-check: compile $(AUTOLOADS) check-ert
+check:	ghciworks compile $(AUTOLOADS) check-ert
 
 check-ert: $(ELCHECKS)
 	$(BATCH) --eval "(when (= emacs-major-version 24)					\
@@ -110,3 +111,6 @@ doc: html
 
 html:
 	$(SPHINX-BUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(0)
+
+ghciworks:
+	$(GHCI) --version
