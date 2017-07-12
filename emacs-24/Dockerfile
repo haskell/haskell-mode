@@ -4,6 +4,7 @@ FROM ubuntu:xenial
 USER root
 
 RUN apt-get update \
+    && apt-get install -y build-essential \
     && apt-get install --no-install-suggests --no-install-recommends -y emacs24-nox \
     && apt-get install -y ghc \
     && apt-get install -y git \
