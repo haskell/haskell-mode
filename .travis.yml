@@ -12,12 +12,14 @@ install: |
     case "$TARGET" in
       emacs24)
         sudo apt-get update &&
-        sudo apt-get install --no-install-suggests --no-install-recommends --force-yes emacs24-nox;
+        sudo apt-get install --no-install-suggests --no-install-recommends --force-yes emacs24-nox &&
+        sudo apt-get install ghc;
         ;;
       emacs-snapshot)
         sudo add-apt-repository -y ppa:ubuntu-elisp/ppa &&
         sudo apt-get update &&
-        sudo apt-get install --no-install-suggests --no-install-recommends --force-yes emacs-snapshot;
+        sudo apt-get install --no-install-suggests --no-install-recommends --force-yes emacs-snapshot &&
+        sudo apt-get install ghc;
         ;;
       doc)
         sudo apt-get update &&
