@@ -1,5 +1,5 @@
 # For Emacs snapshot
-FROM ubuntu:xenial
+FROM phusion/baseimage
 
 USER root
 

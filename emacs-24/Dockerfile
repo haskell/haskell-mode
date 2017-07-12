@@ -1,5 +1,5 @@
 # For Emacs 24.x
-FROM ubuntu:xenial
+FROM phusion/baseimage
 
 USER root
 
