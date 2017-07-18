@@ -6,12 +6,13 @@ clone_depth: 1
 init:
 
 install:
-  - ps: Invoke-WebRequest "https://ftp.gnu.org/gnu/emacs/windows/emacs-24.5-bin-i686-mingw32.zip" -OutFile "emacs-24.5-bin-i686-mingw32.zip"
-  - ps: Invoke-WebRequest "https://downloads.haskell.org/~ghc/8.0.2/ghc-8.0.2-i386-unknown-mingw32-win10.tar.xz" -OutFile "ghc-8.0.2-i386-unknown-mingw32-win10.tar.xz"
-  - 7z x emacs-24.5-bin-i686-mingw32.zip
-  - 7z x ghc-8.0.2-i386-unknown-mingw32-win10.tar.xz
+  - choco install emacs
+  - choco install ghc
+  - refreshenv
+  - ps: emacs --version
+  - ps: ghci --version
 
 build_script:
-  - C:\msys64\usr\bin\bash -l -c "cd ${APPVEYOR_BUILD_FOLDER} && make check compile EMACS=./bin/emacs.exe GHCI=./bin/ghci.exe"
+  - C:\msys64\usr\bin\bash -l -c "cd ${APPVEYOR_BUILD_FOLDER} && make check"
 
 test_script:

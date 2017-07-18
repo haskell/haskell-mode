@@ -10,6 +10,7 @@ The comint based shell can be started using
 
 +-------------------------+
 |``M-x run-haskell``      |
++-------------------------+
 |``M-x switch-to-haskell``|
 +-------------------------+
 
