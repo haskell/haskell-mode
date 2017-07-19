@@ -61,56 +61,6 @@
             nil
             t))
 
-(make-obsolete 'haskell-process-completions-at-point
-               'haskell-completions-sync-repl-completion-at-point
-               "June 19, 2015")
-
-(defun haskell-process-completions-at-point ()
-  "A `completion-at-point' function using the current haskell process."
-  (when (haskell-session-maybe)
-    (let ((process (haskell-process))
-          symbol-bounds)
-      (cond
-       ;; ghci can complete module names, but it needs the "import "
-       ;; string at the beginning
-       ((looking-back (rx line-start
-                          "import" (1+ space)
-                          (? "qualified" (1+ space))
-                          (group (? (char upper) ; modid
-                                    (* (char alnum ?' ?.)))))
-                      (line-beginning-position))
-        (let ((text (match-string-no-properties 0))
-              (start (match-beginning 1))
-              (end (match-end 1)))
-          (list start end
-                (haskell-process-get-repl-completions process text))))
-       ;; Complete OPTIONS, a completion list comes from variable
-       ;; `haskell-ghc-supported-options'
-       ((and (nth 4 (syntax-ppss))
-           (save-excursion
-             (let ((p (point)))
-               (and (search-backward "{-#" nil t)
-                  (search-forward-regexp "\\_<OPTIONS\\(?:_GHC\\)?\\_>" p t))))
-           (looking-back
-            (rx symbol-start "-" (* (char alnum ?-)))
-            (line-beginning-position)))
-        (list (match-beginning 0) (match-end 0) haskell-ghc-supported-options))
-       ;; Complete LANGUAGE, a list of completions comes from variable
-       ;; `haskell-ghc-supported-extensions'
-       ((and (nth 4 (syntax-ppss))
-           (save-excursion
-             (let ((p (point)))
-               (and (search-backward "{-#" nil t)
-                  (search-forward-regexp "\\_<LANGUAGE\\_>" p t))))
-           (setq symbol-bounds (bounds-of-thing-at-point 'symbol)))
-        (list (car symbol-bounds) (cdr symbol-bounds)
-              haskell-ghc-supported-extensions))
-       ((setq symbol-bounds (haskell-ident-pos-at-point))
-        (cl-destructuring-bind (start . end) symbol-bounds
-          (list start end
-                (haskell-process-get-repl-completions
-                 process (buffer-substring-no-properties start end)))))))))
-
 ;;;###autoload
 (defun haskell-interactive-mode-return ()
   "Handle the return key."
