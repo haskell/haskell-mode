@@ -20,19 +20,9 @@
 
 (require 'ert)
 (require 'inf-haskell)
-(require 'cl-lib)
-
-(defun haskell-str-chomp (str)
-  "Chomp leading and tailing whitespace from STR."
-  (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'"
-                       str)
-    (setq str (replace-match "" t t str)))
-  str)
-
-(defun haskell-split-to-lines (str)
-  (cl-mapcar #'haskell-str-chomp (split-string str "\n")))
+(require 'haskell-string)
 
 (ert-deftest test-run-haskell ()
   (run-haskell)
-  (should (equal (haskell-split-to-lines (inferior-haskell-get-result "1 + 1"))
+  (should (equal (haskell-string-split-to-lines (inferior-haskell-get-result "1 + 1"))
               '("Prelude> 1 + 1" "2"))))

@@ -39,6 +39,7 @@
 (require 'haskell-mode)
 (require 'haskell-process)
 (require 'haskell-interactive-mode)
+(require 'inf-haskell)
 
 ;;;###autoload
 (defgroup haskell-completions nil
@@ -353,24 +354,17 @@ Returns nil if no completions available."
           (if (cl-member
                typ
                '(haskell-completions-pragma-name-prefix
-                 haskell-completions-ghc-option-prefix
-                 haskell-completions-language-extension-prefix))
+                   haskell-completions-ghc-option-prefix
+                   haskell-completions-language-extension-prefix))
               ;; provide simple completions
               (haskell-completions--simple-completions prefix-data)
             ;; only two cases left: haskell-completions-module-name-prefix
             ;; and haskell-completions-identifier-prefix
             (let* ((is-import (eql typ 'haskell-completions-module-name-prefix))
                    (candidates
-                    (when (and (haskell-session-maybe)
-                               (not (haskell-process-cmd
-                                     (haskell-interactive-process)))
-                               ;; few possible extra checks would be:
-                               ;; (haskell-process-get 'is-restarting)
-                               ;; (haskell-process-get 'evaluating)
-                               )
-                      ;; if REPL is available and not busy try to query it for
-                      ;; completions list in case of module name or identifier
-                      ;; prefixes
+                    (progn
+                      (if (not inferior-haskell-buffer)
+                          (switch-to-haskell))
                       (haskell-completions-sync-complete-repl pfx is-import))))
               ;; append candidates with keywords
               (list beg end (append
@@ -382,11 +376,10 @@ Returns nil if no completions available."
 When optional IMPORT argument is non-nil complete PREFIX
 prepending \"import \" keyword (useful for module names).  This
 function is supposed for internal use."
-  (haskell-process-get-repl-completions
-   (haskell-interactive-process)
-   (if import
-       (concat "import " prefix)
-     prefix)))
+  (inferior-haskell-get-completions
+         (if import
+             (concat "import " prefix)
+           prefix)))
 
 (provide 'haskell-completions)
 ;;; haskell-completions.el ends here

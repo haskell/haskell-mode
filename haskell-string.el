@@ -27,6 +27,8 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
 (defun haskell-string-trim (string)
   "Remove whitespace around STRING.
 
@@ -161,6 +163,16 @@ See also `haskell-string-take'."
    ((<= (length string) n) string) ;; no truncation needed
    ((< n 1) "")
    (t (concat (substring string 0 (1- n)) "…"))))
+
+(defun haskell-string-chomp (str)
+  "Chomp leading and tailing whitespace from STR."
+  (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'"
+                       str)
+    (setq str (replace-match "" t t str)))
+  str)
+
+(defun haskell-string-split-to-lines (str)
+  (cl-mapcar #'haskell-string-chomp (split-string str "\n")))
 
 (provide 'haskell-string)
 
