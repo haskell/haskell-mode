@@ -24,5 +24,5 @@
 
 (ert-deftest test-run-haskell ()
   (run-haskell)
-  (should (equal (haskell-string-split-to-lines (inferior-haskell-get-result "1 + 1"))
-              '("Prelude> 1 + 1" "2"))))
+  (should (equal (inferior-haskell-get-result "1 + 1")
+                 "2")))

@@ -46,8 +46,8 @@
     (define-key map (kbd "C-c C-c") 'haskell-process-cabal-build)
     (define-key map (kbd "C-c v c") 'haskell-cabal-visit-file)
     (define-key map (kbd "C-c C-x") 'haskell-process-cabal)
-    (define-key map (kbd "C-c C-b") 'haskell-interactive-switch)
-    (define-key map (kbd "C-c C-z") 'haskell-interactive-switch)
+    (define-key map (kbd "C-c C-b") 'switch-to-haskell)
+    (define-key map (kbd "C-c C-z") 'switch-to-haskell)
     map)
   "Keymap for using `interactive-haskell-mode'.")
 
@@ -358,12 +358,6 @@ Give optional NEXT-P parameter to override value of
   (save-buffer)
   (haskell-interactive-mode-reset-error (haskell-session))
   (haskell-process-file-loadish "reload" t (current-buffer)))
-
-;;;###autoload
-(defun haskell-process-reload-file () (haskell-process-reload))
-
-(make-obsolete 'haskell-process-reload-file 'haskell-process-reload
-               "2015-11-14")
 
 ;;;###autoload
 (defun haskell-process-load-or-reload (&optional toggle)
