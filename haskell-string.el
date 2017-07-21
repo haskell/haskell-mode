@@ -174,6 +174,16 @@ See also `haskell-string-take'."
 (defun haskell-string-split-to-lines (str)
   (cl-mapcar #'haskell-string-chomp (split-string str "\n")))
 
+(defun haskell-string-trim-prefix (prefix str)
+  "if prefix is present in string, the string is trimmed"
+  (if (string-prefix-p prefix str)
+      (substring str (string-width prefix))))
+
+(defun haskell-string-trim-suffix (suffix str)
+  "if suffix is present, the string is trimmed"
+  (if (string-suffix-p suffix str)
+      (substring str nil (* -1 (string-width suffix)))))
+
 (provide 'haskell-string)
 
 ;;; haskell-string.el ends here

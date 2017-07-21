@@ -329,7 +329,7 @@ is meta data so we remove it"
 \"SomeCompletion1\"
 \"SomeCompletion2\"
 etc. So we trim the double quotes from the completion to get the string"
-  (substring txt 1 -1))
+  (haskell-string-trim-prefix "\"" (haskell-string-trim-suffix "\"" txt)))
 
 ;;;###autoload
 (defun inferior-haskell-info (sym)

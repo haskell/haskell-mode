@@ -47,5 +47,4 @@
                                 "Test.hs:9:5: Not in scope: ‘c’")))
   (should (eq nil (string-match-p haskell-interactive-mode-error-regexp
                                   ;; leading space
-                                  " Test.hs:8:9:")))
-  )
+                                  " Test.hs:8:9:"))))
