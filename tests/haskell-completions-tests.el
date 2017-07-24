@@ -397,28 +397,12 @@ on `haskell-completions-sync-repl-completion-at-point'."
     nil)
   (ad-activate 'haskell-completions-sync-complete-repl-mock)
 
-  ;; Mock `haskell-session-maybe'
-  (defadvice haskell-session-maybe-mock (around haskell-session-maybe)
-    t)
-  (ad-activate 'haskell-session-maybe-mock)
-
-  ;; Mock `haskell-process-cmd'
-  (defadvice haskell-process-cmd-mock (around haskell-process-cmd
-                                          (P))
-    nil)
-  (ad-activate 'haskell-process-cmd-mock)
-
-  ;; Mock `haskell-interactive-process'
-  (defadvice haskell-interactive-process-mock (around haskell-interactive-process)
-    nil)
-  (ad-activate 'haskell-interactive-process-mock)
-
   ;;; Tests
   (unwind-protect
       (let (expected)
+        (switch-to-haskell)
         (with-temp-buffer
           (haskell-mode)
-
           (insert "import qualified Data.List as L\n\n")
           (insert "test = L")
           (let* ((haskell-completions-complete-operators nil))
@@ -437,11 +421,7 @@ on `haskell-completions-sync-repl-completion-at-point'."
             (should expected))))
     (progn
       ;; Remove mocks
-      (ad-deactivate 'haskell-completions-sync-complete-repl-mock)
-      (ad-deactivate 'haskell-session-maybe-mock)
-      (ad-deactivate 'haskell-process-cmd-mock)
-      (ad-deactivate 'haskell-interactive-process-mock))))
-
+      (ad-deactivate 'haskell-completions-sync-complete-repl-mock))))
 
 (provide 'haskell-completions-tests)
 ;;; haskell-completions-tests.el ends here
