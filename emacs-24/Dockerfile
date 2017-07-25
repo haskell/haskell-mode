@@ -1,5 +1,5 @@
 # For Emacs 24.x
-FROM ubuntu/rolling
+FROM ubuntu:latest
 
 USER root
 
