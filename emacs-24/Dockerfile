@@ -1,5 +1,5 @@
 # For Emacs 24.x
-FROM phusion/baseimage
+FROM ubuntu/rolling
 
 USER root
 
