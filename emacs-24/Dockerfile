@@ -8,6 +8,7 @@ RUN apt-get update \
     && apt-get install --no-install-suggests --no-install-recommends -y emacs24-nox \
     && sudo add-apt-repository ppa:hvr/ghc \
     && sudo apt-get update \
+    && sudo apt-get install ghc-8.0.2 \
     && apt-get install -y git \
     && git clone https://github.com/vasanthaganeshk/haskell-interactive-mode
 
