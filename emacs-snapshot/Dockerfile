@@ -1,5 +1,5 @@
 # For Emacs snapshot
-FROM phusion/baseimage
+FROM ubuntu:latest
 
 USER root
 
@@ -9,7 +9,8 @@ RUN apt-get update \
     && add-apt-repository -y ppa:ubuntu-elisp/ppa \
     && apt-get update \
     && apt-get install --no-install-suggests --no-install-recommends -y emacs-snapshot \
-    && apt-get install -y ghc \
+    && sudo add-apt-repository ppa:hvr/ghc \
+    && sudo apt-get update \
     && apt-get install -y git \
     && git clone https://github.com/vasanthaganeshk/haskell-interactive-mode
 

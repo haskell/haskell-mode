@@ -6,7 +6,8 @@ USER root
 RUN apt-get update \
     && apt-get install -y build-essential \
     && apt-get install --no-install-suggests --no-install-recommends -y emacs24-nox \
-    && apt-get install -y ghc \
+    && sudo add-apt-repository ppa:hvr/ghc \
+    && sudo apt-get update \
     && apt-get install -y git \
     && git clone https://github.com/vasanthaganeshk/haskell-interactive-mode
 
