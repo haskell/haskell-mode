@@ -9,9 +9,9 @@ RUN apt-get update \
     && add-apt-repository -y ppa:ubuntu-elisp/ppa \
     && apt-get update \
     && apt-get install --no-install-suggests --no-install-recommends -y emacs-snapshot \
-    && sudo add-apt-repository ppa:hvr/ghc \
-    && sudo apt-get install ghc-8.0.2 \
-    && sudo apt-get update \
+    && add-apt-repository ppa:hvr/ghc \
+    && apt-get install ghc-8.0.2 \
+    && apt-get update \
     && apt-get install -y git \
     && git clone https://github.com/vasanthaganeshk/haskell-interactive-mode
 
