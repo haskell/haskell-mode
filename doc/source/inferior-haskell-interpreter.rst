@@ -1,7 +1,7 @@
 Inferior Haskell interpreter
 ============================
 
-The major mode ``inferior-haskell-mode`` provides support for
+The major mode ``Inf-Haskell`` provides support for
 interacting with an inferior Haskell process based on ``comint-mode``.
 So you can use most of the default shortcuts that come with the
 comint based modes. For example ``M-x shell`` and ``M-x ielm``.
@@ -16,15 +16,15 @@ The comint based shell can be started using
 
 By default the ``haskell-mode-map`` keymap is setup to use this mode:
 
-===========  ==============================
+===========  ==============================================
 Key Binding  Function
-===========  ==============================
+===========  ==============================================
 ``C-c C-z``  ``switch-to-haskell``
 ``C-c C-b``  ``switch-to-haskell``
-``C-c C-l``  ``inferior-haskell-load-file``
 ``C-c C-t``  ``inferior-haskell-type``
 ``C-c C-i``  ``inferior-haskell-info``
-===========  ==============================
+``C-c M-o``  ``comint-clear-buffer`` (comes with Emacs 25+)
+===========  ==============================================
 
 + The first preference is given to stack.
 + The second preferece is given to cabal.
@@ -41,7 +41,9 @@ Interpreter (defcustom)                 Default Value      Default commandline a
 ``haskell-process-path-cabal``          ``cabal``          ``--ghc-option=-ferror-spans``
 
 ``haskell-process-path-stack``          ``stack``          ``--ghci-options=-ferror-spans``
+
                                                            ``--no-build``
+
                                                            ``--no-load``
 ======================================= ================== =========================================
 
@@ -51,3 +53,6 @@ How do I use a different interpreter?
 If you are going to use a different interpreter (other than ghci) then set
 the haskell-process-path-ghci to whatever you want (maybe hugs?). Also set
 the commandline arguments to ``null`` or something based on your choice.
+
+Note it is not advisable to use interpreters other than ``ghci``,
+``interactive-haskell-mode`` is completely dependent of ``ghci``
