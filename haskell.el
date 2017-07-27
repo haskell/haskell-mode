@@ -356,15 +356,20 @@ Give optional NEXT-P parameter to override value of
 
 ;;;###autoload
 (defun haskell-process-load-file ()
-  "Load the current buffer file."
+  "Load or reload the current buffer file based on comint, just loads the file
+just like `M-x load-file', does not do anything about errors that might arise
+while loading. This is done with the help of `:load' and `:reload' functionality
+that comes with ghci"
   (interactive)
   (save-buffer)
   (let ((filename (buffer-file-name)))
     (cond ((in-set-p interactive-haskell-loaded-files filename)
-           (inferior-haskell-get-result (format ":reload" (buffer-file-name))))
+           (inferior-haskell-get-result ":reload!")
+           (message (format "Reloading %s" filename)))
           (t
            (inferior-haskell-get-result (format ":load \"%s\"" (buffer-file-name)))
-           (add-to-set interactive-haskell-loaded-files filename)))))
+           (add-to-set interactive-haskell-loaded-files filename)
+           (message (format "Loading %s" filename))))))
 
 ;;;###autoload
 (defun haskell-process-reload ()
