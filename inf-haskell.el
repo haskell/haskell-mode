@@ -115,6 +115,21 @@ The format should be the same as for `compilation-error-regexp-alist'.")
   ;; Why the backslash in [\\._[:alnum:]]?
   "^\\*?[[:upper:]][\\._[:alnum:]]*\\(?: \\*?[[:upper:]][\\._[:alnum:]]*\\)*\\( λ\\)?> \\|^λ?> $")
 
+(defvar-local inferior-haskell-send-decl-post-filter-on nil)
+
+(defun inferior-haskell-send-decl-post-filter (string)
+  "Detect multiline prompt"
+  (when (and inferior-haskell-send-decl-post-filter-on
+             (string-match inferior-haskell-multiline-prompt-re string))
+    ;; deleting sequence of `%s|' multiline promts
+    (while (string-match inferior-haskell-multiline-prompt-re string)
+      (setq string (substring string (match-end 0))))
+    ;; deleting regular prompts
+    (setq string (replace-regexp-in-string comint-prompt-regexp "" string)
+          ;; turning off this post-filter
+          inferior-haskell-send-decl-post-filter-on nil))
+  string)
+
 ;;; TODO
 ;;; -> Make font lock work for strings, directories, hyperlinks
 ;;; -> Make font lock work for key words???

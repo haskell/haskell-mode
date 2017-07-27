@@ -38,7 +38,7 @@
 (defvar interactive-haskell-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-l") 'haskell-process-load-file)
-    (define-key map (kbd "C-c C-r") 'haskell-process-reload)
+    (define-key map (kbd "C-c C-r") 'haskell-process-load-file)
     (define-key map (kbd "C-c C-t") 'haskell-process-do-type)
     (define-key map (kbd "C-c C-i") 'haskell-process-do-info)
     (define-key map (kbd "M-.") 'haskell-mode-jump-to-def-or-tag)
@@ -338,18 +338,33 @@ Give optional NEXT-P parameter to override value of
          (buffer (haskell-session-interactive-buffer session)))
     (pop-to-buffer buffer)))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Set functionalities
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun make-set ()
+  (make-hash-table))
+(defun add-to-set (set element)
+  (puthash element t set))
+(defun in-set-p (set element)
+  (gethash element set nil))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defvar interactive-haskell-loaded-files (make-set))
+
 ;;;###autoload
 (defun haskell-process-load-file ()
   "Load the current buffer file."
   (interactive)
   (save-buffer)
-  (haskell-interactive-mode-reset-error (haskell-session))
-  (haskell-process-file-loadish (format "load \"%s\"" (replace-regexp-in-string
-                                                       "\""
-                                                       "\\\\\""
-                                                       (buffer-file-name)))
-                                nil
-                                (current-buffer)))
+  (let ((filename (buffer-file-name)))
+    (cond ((in-set-p interactive-haskell-loaded-files filename)
+           (inferior-haskell-get-result (format ":reload" (buffer-file-name))))
+          (t
+           (inferior-haskell-get-result (format ":load \"%s\"" (buffer-file-name)))
+           (add-to-set interactive-haskell-loaded-files filename)))))
 
 ;;;###autoload
 (defun haskell-process-reload ()
@@ -398,28 +413,35 @@ Give optional NEXT-P parameter to override value of
 and things like that.  RELOAD-P indicates whether the notification
 should say 'reloaded' or 'loaded'.  MODULE-BUFFER may be used
 for various things, but is optional."
-  (let ((session (haskell-session)))
-    (haskell-session-current-dir session)
-    (when haskell-process-check-cabal-config-on-load
-      (haskell-process-look-config-changes session))
-    (let ((process (haskell-process)))
-      (haskell-process-queue-command
-       process
-       (make-haskell-command
-        :state (list session process command reload-p module-buffer)
-        :go (lambda (state)
-              (haskell-process-send-string
-               (cadr state) (format ":%s" (cl-caddr state))))
-        :live (lambda (state buffer)
-                (haskell-process-live-build
-                 (cadr state) buffer nil))
-        :complete (lambda (state response)
-                    (haskell-process-load-complete
-                     (car state)
-                     (cadr state)
-                     response
-                     (cl-cadddr state)
-                     (cl-cadddr (cdr state)))))))))
+  (message (prin1-to-string command)))
+
+;; (defun haskell-process-file-loadish (command reload-p module-buffer)
+;;   "Run a loading-ish COMMAND that wants to pick up type errors\
+;; and things like that.  RELOAD-P indicates whether the notification
+;; should say 'reloaded' or 'loaded'.  MODULE-BUFFER may be used
+;; for various things, but is optional."
+;;   (let ((session (haskell-session)))
+;;     (haskell-session-current-dir session)
+;;     (when haskell-process-check-cabal-config-on-load
+;;       (haskell-process-look-config-changes session))
+;;     (let ((process (haskell-process)))
+;;       (haskell-process-queue-command
+;;        process
+;;        (make-haskell-command
+;;         :state (list session process command reload-p module-buffer)
+;;         :go (lambda (state)
+;;               (haskell-process-send-string
+;;                (cadr state) (format ":%s" (cl-caddr state))))
+;;         :live (lambda (state buffer)
+;;                 (haskell-process-live-build
+;;                  (cadr state) buffer nil))
+;;         :complete (lambda (state response)
+;;                     (haskell-process-load-complete
+;;                      (car state)
+;;                      (cadr state)
+;;                      response
+;;                      (cl-cadddr state)
+;;                      (cl-cadddr (cdr state)))))))))
 
 ;;;###autoload
 (defun haskell-process-minimal-imports ()
