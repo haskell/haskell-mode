@@ -36,6 +36,7 @@
 (require 'haskell-utils)
 (require 'highlight-uses-mode)
 (require 'haskell-cabal)
+(require 'inf-haskell)
 
 (defcustom haskell-mode-stylish-haskell-path "stylish-haskell"
   "Path to `stylish-haskell' executable."
@@ -317,18 +318,19 @@ If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
                        at-point)))
              (modname (unless prompt-value
                         (haskell-utils-parse-import-statement-at-point)))
-             (command (cond
-                       (modname
-                        (format ":browse! %s" modname))
-                       ((string= ident "") ; For the minibuffer input case
-                        nil)
-                       (t (format (if (string-match "^[a-zA-Z_]" ident)
-                                      ":info %s"
-                                    ":info (%s)")
-                                  (or ident
-                                      at-point))))))
-        (when command
-          (haskell-process-show-repl-response command))))))
+             (ghci-response
+              (cond
+               (modname (inferior-haskell-get-result
+                         (format ":browse! %s" modname)))
+               ((string= ident "") nil)
+               (t (inferior-haskell-get-result
+                   (format (if (string-match "^[a-zA-Z_]" ident)
+                               ":info %s"
+                             ":info (%s)")
+                           (or ident
+                               at-point)))))))
+        (when ghci-response
+          (haskell-mode-message-line ghci-response))))))
 
 ;;;###autoload
 (defun haskell-process-do-type (&optional insert-value)
@@ -349,13 +351,13 @@ should be inserted."
       ;; No newlines in expressions, and surround with parens if it
       ;; might be a slice expression
       (when expr-okay
-        (haskell-process-show-repl-response
-         (format
-          (if (or (string-match-p "\\`(" expr)
-                  (string-match-p "\\`[_[:alpha:]]" expr))
-              ":type %s"
-            ":type (%s)")
-          expr))))))
+        (haskell-mode-message-line
+         (inferior-haskell-get-result
+          (format (if (or (string-match-p "\\`(" expr)
+                          (string-match-p "\\`[_[:alpha:]]" expr))
+                      ":type %s"
+                    ":type (%s)")
+                  expr)))))))
 
 ;;;###autoload
 (defun haskell-mode-jump-to-def-or-tag (&optional _next-p)
