@@ -992,23 +992,6 @@ don't care when the thing completes as long as it's soonish."
   (interactive)
   (search-forward-regexp (haskell-interactive-prompt-regex) nil t))
 
-(defun haskell-interactive-mode-clear ()
-  "Clear the screen and put any current input into the history."
-  (interactive)
-  (let ((session (haskell-interactive-session)))
-    (with-current-buffer (haskell-session-interactive-buffer session)
-      (let ((inhibit-read-only t))
-        (set-text-properties (point-min) (point-max) nil))
-      (delete-region (point-min) (point-max))
-      (remove-overlays)
-      (haskell-interactive-mode-prompt session)
-      (haskell-session-set session 'next-error-region nil)
-      (haskell-session-set session 'next-error-locus nil))
-    (with-current-buffer (get-buffer-create "*haskell-process-log*")
-      (let ((inhibit-read-only t))
-        (delete-region (point-min) (point-max)))
-      (remove-overlays))))
-
 (defun haskell-interactive-mode-completion-at-point-function ()
   "Offer completions for partial expression between prompt and point.
 This completion function is used in interactive REPL buffer itself."

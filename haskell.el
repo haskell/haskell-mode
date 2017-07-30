@@ -42,7 +42,6 @@
     (define-key map (kbd "C-c C-t") 'haskell-process-do-type)
     (define-key map (kbd "C-c C-i") 'haskell-process-do-info)
     (define-key map (kbd "M-.") 'haskell-mode-jump-to-def-or-tag)
-    (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
     (define-key map (kbd "C-c C-c") 'haskell-process-cabal-build)
     (define-key map (kbd "C-c v c") 'haskell-cabal-visit-file)
     (define-key map (kbd "C-c C-x") 'haskell-process-cabal)
@@ -412,41 +411,6 @@ that comes with ghci"
      (funcall haskell-completing-read-function "Cabal command: "
               (append haskell-cabal-commands
                       (list "build --ghc-options=-fforce-recomp"))))))
-
-(defun haskell-process-file-loadish (command reload-p module-buffer)
-  "Run a loading-ish COMMAND that wants to pick up type errors\
-and things like that.  RELOAD-P indicates whether the notification
-should say 'reloaded' or 'loaded'.  MODULE-BUFFER may be used
-for various things, but is optional."
-  (message (prin1-to-string command)))
-
-;; (defun haskell-process-file-loadish (command reload-p module-buffer)
-;;   "Run a loading-ish COMMAND that wants to pick up type errors\
-;; and things like that.  RELOAD-P indicates whether the notification
-;; should say 'reloaded' or 'loaded'.  MODULE-BUFFER may be used
-;; for various things, but is optional."
-;;   (let ((session (haskell-session)))
-;;     (haskell-session-current-dir session)
-;;     (when haskell-process-check-cabal-config-on-load
-;;       (haskell-process-look-config-changes session))
-;;     (let ((process (haskell-process)))
-;;       (haskell-process-queue-command
-;;        process
-;;        (make-haskell-command
-;;         :state (list session process command reload-p module-buffer)
-;;         :go (lambda (state)
-;;               (haskell-process-send-string
-;;                (cadr state) (format ":%s" (cl-caddr state))))
-;;         :live (lambda (state buffer)
-;;                 (haskell-process-live-build
-;;                  (cadr state) buffer nil))
-;;         :complete (lambda (state response)
-;;                     (haskell-process-load-complete
-;;                      (car state)
-;;                      (cadr state)
-;;                      response
-;;                      (cl-cadddr state)
-;;                      (cl-cadddr (cdr state)))))))))
 
 ;;;###autoload
 (defun haskell-process-minimal-imports ()

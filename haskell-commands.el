@@ -373,7 +373,7 @@ If the definition or tag is found, the location from which you jumped
 will be pushed onto `xref--marker-ring', so you can return to that
 position with `xref-pop-marker-stack'."
   (interactive "P")
-  (if (haskell-session-maybe)
+  (if inferior-haskell-buffer
         (let ((initial-loc (point-marker))
             (loc (haskell-mode-find-def (haskell-ident-at-point))))
           (haskell-mode-handle-generic-loc loc)
@@ -440,8 +440,7 @@ Returns:
     (module <name>)
     nil"
   (when (stringp ident)
-    (let ((reply (haskell-process-queue-sync-request
-                  (haskell-interactive-process)
+    (let ((reply (inferior-haskell-get-result
                   (format (if (string-match "^[a-zA-Z_]" ident)
                               ":info %s"
                             ":info (%s)")
