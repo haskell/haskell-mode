@@ -370,26 +370,6 @@ that comes with ghci"
            (add-to-set interactive-haskell-loaded-files filename)
            (message (format "Loading %s" filename))))))
 
-;;;###autoload
-(defun haskell-process-reload ()
-  "Re-load the current buffer file."
-  (interactive)
-  (save-buffer)
-  (haskell-interactive-mode-reset-error (haskell-session))
-  (haskell-process-file-loadish "reload" t (current-buffer)))
-
-;;;###autoload
-(defun haskell-process-load-or-reload (&optional toggle)
-  "Load or reload. Universal argument toggles which."
-  (interactive "P")
-  (if toggle
-      (progn (setq haskell-reload-p (not haskell-reload-p))
-             (message "%s (No action taken this time)"
-                      (if haskell-reload-p
-                          "Now running :reload."
-                        "Now running :load <buffer-filename>.")))
-    (if haskell-reload-p (haskell-process-reload) (haskell-process-load-file))))
-
 (make-obsolete 'haskell-process-load-or-reload 'haskell-process-load-file
                "2015-11-14")
 
