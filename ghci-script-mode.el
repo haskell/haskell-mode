@@ -17,7 +17,7 @@
 
 ;;; Code:
 
-(require 'haskell)
+(require 'inf-haskell)
 
 (defvar ghci-script-mode-keywords
   ;; The comment syntax can't be described simply in syntax-table.
@@ -55,12 +55,9 @@
 (defun ghci-script-mode-load ()
   "Load the current script file into the GHCi session."
   (interactive)
-  (let ((buffer (haskell-session-interactive-buffer (haskell-session)))
-        (filename (buffer-file-name)))
+  (let ((filename (buffer-file-name)))
     (save-buffer)
-    (with-current-buffer buffer
-      (set-marker haskell-interactive-mode-prompt-start (point-max))
-      (haskell-interactive-mode-run-expr
-       (concat ":script " filename)))))
+    (inferior-haskell-get-result (concat ":script " filename))
+    (message (format "Loaded %s" filename))))
 
 (provide 'ghci-script-mode)
