@@ -453,7 +453,7 @@ Returns:
                (match
                 (list 'file
                       (expand-file-name (match-string 1 defined)
-                                        (haskell-session-current-dir (haskell-interactive-session)))
+                                        inferior-haskell-root-dir)
                       (string-to-number (match-string 2 defined))
                       (string-to-number (match-string 3 defined))))
                (t
