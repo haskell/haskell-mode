@@ -52,12 +52,47 @@
   :prefix "haskell-"
   :group 'haskell)
 
+(defvar inferior-haskell-root-dir nil
+  "The path which is considered as project root, this is determined by the
+presence of a *.cabal file or stack.yaml file or something similar.")
+
+(defun haskell-process-type ()
+  "Return `haskell-process-type', or a guess if that variable is 'auto.
+This function also sets the `inferior-haskell-root-dir'"
+  (let ((cabal-sandbox (locate-dominating-file default-directory
+                                               "cabal.sandbox.config"))
+        (stack         (locate-dominating-file default-directory
+                                               "stack.yaml"))
+        (cabal         (locate-dominating-file default-directory
+                                               (lambda (d)
+                                                 (cl-find-if
+                                                  (lambda (f)
+                                                    (string-match-p ".\\.cabal\\'" f))
+                                                  (directory-files d))))))
+    (if (eq 'auto haskell-process-type)
+        (cond
+         ;; User has explicitly initialized this project with cabal
+         (cabal-sandbox
+          (setq inferior-haskell-root-dir cabal-sandbox)
+          'cabal-repl)
+         ((and stack
+               (executable-find "stack"))
+          (setq inferior-haskell-root-dir stack)
+          'stack-ghci)
+         (cabal
+          (setq inferior-haskell-root-dir cabal)
+          'cabal-repl)
+         (t
+          (setq inferior-haskell-root-dir default-directory)
+          'ghci))
+      haskell-process-type)))
+
 (defun haskell-program-name-with-args ()
   "returns what command to run based on the situation with the arguments
 for repl"
   (cl-ecase (haskell-process-type)
     ('ghci       (cond ((eq system-type 'cygwin) (nconc "ghcii.sh"
-                                                     haskell-process-args-ghci))
+                                                        haskell-process-args-ghci))
                        (t (nconc `(,haskell-process-path-ghci)
                                  haskell-process-args-ghci))))
     ('cabal-repl (nconc `(,haskell-process-path-cabal
@@ -177,10 +212,6 @@ The format should be the same as for `compilation-error-regexp-alist'.")
 
 (defvar inferior-haskell-buffer nil
   "The buffer in which the inferior process is running.")
-
-(defvar inferior-haskell-root-dir nil
-  "The path which is considered as project root, this is determined by the
-presence of a *.cabal file or stack.yaml file or something similar.")
 
 (defun inferior-haskell-start-process ()
   "Start an inferior haskell process.

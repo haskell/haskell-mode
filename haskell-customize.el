@@ -412,35 +412,4 @@ imports."
   :group 'haskell
   :type 'boolean)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Accessor functions
-
-(defun haskell-process-type ()
-  "Return `haskell-process-type', or a guess if that variable is 'auto.
-This function also sets the `inferior-haskell-root-dir'"
-  (let ((cabal-sandbox (locate-dominating-file default-directory
-                                               "cabal.sandbox.config"))
-        (stack         (locate-dominating-file default-directory
-                                               "stack.yaml"))
-        (cabal         (locate-dominating-file default-directory
-                                               (lambda (d)
-                                                 (cl-find-if
-                                                  (lambda (f)
-                                                    (string-match-p ".\\.cabal\\'" f))
-                                                  (directory-files d))))))
-    (if (eq 'auto haskell-process-type)
-      (cond
-       ;; User has explicitly initialized this project with cabal
-       (cabal-sandbox
-        (setq inferior-haskell-root-dir cabal-sandbox)
-        'cabal-repl)
-       ((and stack
-             (executable-find "stack"))
-        (setq inferior-haskell-root-dir stack)
-        'stack-ghci)
-       (cabal
-        (setq inferior-haskell-root-dir cabal)
-        'cabal-repl)
-       (t 'ghci)))))
-
 (provide 'haskell-customize)
