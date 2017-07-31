@@ -37,7 +37,6 @@
 ;;; Code:
 
 (require 'haskell-mode)
-(require 'haskell-interactive-mode)
 (require 'inf-haskell)
 
 ;;;###autoload
