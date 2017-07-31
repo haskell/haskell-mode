@@ -162,6 +162,14 @@ See also `haskell-string-take'."
    ((< n 1) "")
    (t (concat (substring string 0 (1- n)) "…"))))
 
+(defun haskell-string-drop-qualifier (ident)
+  "Drop qualifier from given identifier IDENT.
+
+If the identifier is not qualified return it unchanged."
+  (or (and (string-match "^\\([^.]*\\.\\)*\\(?1:[^.]+\\)$" ident)
+           (match-string 1 ident))
+      ident))
+
 (provide 'haskell-string)
 
 ;;; haskell-string.el ends here
