@@ -25,6 +25,19 @@
 (require 'inf-haskell)
 (require 'haskell-mode)
 
+;;;###autoload
+(defun inferior-haskell-info (sym)
+  "Query the haskell process for the info of the given expression."
+  (interactive
+   (let ((sym (haskell-ident-at-point)))
+     (list (read-string (if sym
+                            (format "Show info of (default %s): " sym)
+                          "Show info of: ")
+                        nil nil sym))))
+  (let ((result (inferior-haskell-get-result (concat ":info " sym))))
+    (if (called-interactively-p 'any) (message "%s" result))
+    result))
+
 (defvar inferior-haskell-cabal-buffer nil)
 
 (defun inferior-haskell-cabal-of-buf (buf)

@@ -178,6 +178,10 @@ The format should be the same as for `compilation-error-regexp-alist'.")
 (defvar inferior-haskell-buffer nil
   "The buffer in which the inferior process is running.")
 
+(defvar inferior-haskell-root-dir nil
+  "The path which is considered as project root, this is determined by the
+presence of a *.cabal file or stack.yaml file or something similar.")
+
 (defun inferior-haskell-start-process ()
   "Start an inferior haskell process.
 With universal prefix \\[universal-argument], prompts for a COMMAND,
@@ -185,6 +189,7 @@ otherwise uses `haskell-program-name-with-args'.
 It runs the hook `inferior-haskell-hook' after starting the process and
 setting up the inferior-haskell buffer."
   (let ((command (haskell-program-name-with-args)))
+    (setq default-directory inferior-haskell-root-dir)
     (setq inferior-haskell-buffer
           (apply 'make-comint "haskell" (car command) nil (cdr command)))
     (with-current-buffer inferior-haskell-buffer
@@ -279,19 +284,6 @@ is meta data so we remove it"
 \"SomeCompletion2\"
 etc. So we trim the double quotes from the completion to get the string"
   (haskell-string-trim-prefix "\"" (haskell-string-trim-suffix "\"" txt)))
-
-;;;###autoload
-(defun inferior-haskell-info (sym)
-  "Query the haskell process for the info of the given expression."
-  (interactive
-   (let ((sym (haskell-ident-at-point)))
-     (list (read-string (if sym
-                            (format "Show info of (default %s): " sym)
-                          "Show info of: ")
-                        nil nil sym))))
-  (let ((result (inferior-haskell-get-result (concat ":info " sym))))
-    (if (called-interactively-p 'any) (message "%s" result))
-    result))
 
 (provide 'inf-haskell)
 
