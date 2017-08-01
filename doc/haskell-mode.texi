@@ -2626,64 +2626,64 @@ Take this example code (example usage of @code{M-x haskell-hide-toggle}):
 when you place the cursor here, like this (notice the thick block in the
 first line):
 
-@code{
+@example
 f█x
   | rem i 3 == 0 = if i == 0 && (k /= 0) then (c k) else (h j)
   | otherwise = 0
   where i = sum x
         j = g x (div i 3) 0 0 []
         k = zeroes x 0
-}
+@end example
 
 or
 
-@code{
+@example
 f x
   | rem i 3 == 0 = if i == 0 && (k /= 0) then (c k) else (h j)
 █ | otherwise = 0
   where i = sum x
         j = g x (div i 3) 0 0 []
         k = zeroes x 0
-}
+@end example
 
 then when you collapse it becomes something like this:
 
-@code{
+@example
 f█x@dots{}
-}
+@end example
 
 It works in terms of (indentation) blocks.
 
 One more example:
 
-@code{
+@example
 f x
   | rem i 3 == 0 = if i == 0 && (k /= 0) then (c k) else (h j)
   | otherwise = 0
   w█ere i = sum x
         j = g x (div i 3) 0 0 []
         k = zeroes x 0
-}
+@end example
 
 or
 
-@code{
+@example
 f x
   | rem i 3 == 0 = if i == 0 && (k /= 0) then (c k) else (h j)
   | otherwise = 0
   where i = sum x
         j = g x (div i 3) 0 0 []
      █  k = zeroes x 0
-}
+@end example
 
 this, will result in something like:
 
-@code{
+@example
 f x
   | rem i 3 == 0 = if i == 0 && (k /= 0) then (c k) else (h j)
   | otherwise = 0
   where i = sum █@dots{}
-}
+@end example
 
 The other functionality @code{M-x haskell-hide-toggle-all} also
 works only for indentation and it collapses all toplevel functions.
