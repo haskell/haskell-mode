@@ -1,6 +1,9 @@
 language: generic
 sudo: required
 
+services:
+  - docker
+
 env:
   matrix:
     - TARGET=emacs24
