@@ -2,6 +2,7 @@
 
 ;; Copyright © 2014 Chris Done.  All rights reserved.
 ;;             2016 Arthur Fayzrakhmanov
+;;             2017 Vasantha Ganesh Kanniappan <vasanthaganesh.k@tuta.io>
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
