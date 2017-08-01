@@ -1,14 +1,19 @@
 language: generic
 sudo: required
 
-services:
-  - docker
-
 env:
   matrix:
     - TARGET=emacs24
     - TARGET=emacs-snapshot
-    - TARGET=doc
+    - TARGET=deploy-manual
+    - TARGET=check-external
+  global:
+    - secure: "ejv1+ub/v+Hm/23fhp4zLAHT3HiCG+YdDHai57LDe4LfEZCeGz4i/6LazbPbwm58v2YuKvMcdNshebc1s4A293ARJryPyFfW/8kEe+3hQ+cDxunNdHfqcS8SyhcDG0mrv7dqiVAtMJqB8qZb0c161KeEM8nyhC0wyQ+EZ5qJnzM="
+
+matrix:
+  allow_failures:
+    - env: TARGET=emacs-snapshot
+    - env: TARGET=check-external
 
 install: |
     case "$TARGET" in
@@ -18,10 +23,14 @@ install: |
       emacs-snapshot)
         docker build -t haskell-interactive-mode:snapshot ./emacs-snapshot;
         ;;
-      doc)
+      deploy-manual)
         sudo apt-get update &&
-        sudo apt-get install -y python-pip &&
-        sudo pip install sphinx;
+        sudo apt-get install --no-install-suggests --no-install-recommends --force-yes texinfo emacs24-nox;
+        ;;
+      check-external)
+        sudo add-apt-repository -y ppa:andreas-h/emacs &&
+        sudo apt-get update &&
+        sudo apt-get install --no-install-suggests --no-install-recommends --force-yes emacs24;
         ;;
       *)
     esac
@@ -34,8 +43,11 @@ script: |
       emacs-snapshot)
         docker run -it haskell-interactive-mode:snapshot;
         ;;
-      doc)
-        make doc;
+      deploy-manual)
+        EMACS=emacs24 make deploy-manual;
+        ;;
+      check-external)
+        EMACS=emacs24 make check-external;
         ;;
       *)
     esac
