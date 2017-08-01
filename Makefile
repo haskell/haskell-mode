@@ -37,16 +37,11 @@ ELCHECKS := $(wildcard tests/*-tests.el)
 
 AUTOLOADS = haskell-mode-autoloads.el
 
-GHCI = ghci
-SPHINX-BUILD = sphinx-build
-SPHINXFLAGS =
+PKG_DIST_FILES = $(ELFILES) logo.svg NEWS haskell-mode.info dir
 
-SOURCEDIR = doc/source
-BUILDDIR = doc/build
+.PHONY: all compile info clean check check-emacs-version
 
-.PHONY: all compile clean check check-emacs-version doc html ghciworks
-
-all: check-emacs-version compile doc $(AUTOLOADS)
+all: check-emacs-version compile $(AUTOLOADS) info
 
 check-emacs-version :
 	$(BATCH) --eval "(when (version< emacs-version \"24.3\")				\
@@ -84,7 +79,7 @@ build-$(EMACS_VERSION)/build-flag : build-$(EMACS_VERSION) $(patsubst %.el,build
 check-%: tests/%-tests.el
 	$(BATCH) -l "$<" -f ert-run-tests-batch-and-exit;
 
-check:	ghciworks compile $(AUTOLOADS) check-ert
+check: compile $(AUTOLOADS) check-ert
 
 check-ert: $(ELCHECKS)
 	$(BATCH) --eval "(when (= emacs-major-version 24)					\
@@ -97,7 +92,48 @@ check-ert: $(ELCHECKS)
 	@echo "checks passed!"
 
 clean:
-	$(RM) -r build-$(EMACS_VERSION) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) $(BUILDDIR)
+	$(RM) -r build-$(EMACS_VERSION) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) haskell-mode.info dir
+
+info: haskell-mode.info dir
+
+dir: haskell-mode.info
+	$(INSTALL_INFO) --dir=$@ $<
+
+haskell-mode.info: doc/haskell-mode.texi
+	LANG=en_US.UTF-8 $(MAKEINFO) $(MAKEINFO_FLAGS) -o $@ $<
+
+doc/haskell-mode.html: doc/haskell-mode.texi doc/haskell-mode.css
+	LANG=en_US.UTF-8 $(MAKEINFO) $(MAKEINFO_FLAGS) --html --css-include=doc/haskell-mode.css --no-split -o $@ $<
+	$(BATCH) -l doc/haskell-manual-fixups.el -f haskell-manual-fixups-batch-and-exit $@
+
+doc/html/index.html : doc/haskell-mode.texi
+	if [ -e doc/html ]; then rm -r doc/html; fi
+	mkdir doc/html
+	cp -r doc/anim doc/html/anim
+	LANG=en_US.UTF-8 $(MAKEINFO) $(MAKEINFO_FLAGS) --html				\
+	    --css-ref=haskell-mode.css							\
+	    -c AFTER_BODY_OPEN='<div class="background"> </div>'			\
+	    -c EXTRA_HEAD='<link rel="shortcut icon" href="haskell-mode-32x32.png">'	\
+	    -c SHOW_TITLE=0								\
+	    -o doc/html $<
+	$(BATCH) -l doc/haskell-manual-fixups.el -f haskell-manual-fixups-batch-and-exit doc/html/*.html
+
+doc/html/haskell-mode.css : doc/haskell-mode.css doc/html/index.html
+	cp $< $@
+
+doc/html/haskell-mode.svg : images/haskell-mode.svg doc/html/index.html
+	cp $< $@
+
+doc/html/haskell-mode-32x32.png : images/haskell-mode-32x32.png doc/html/index.html
+	cp $< $@
+
+doc/html : doc/html/index.html			\
+           doc/html/haskell-mode.css		\
+           doc/html/haskell-mode.svg		\
+           doc/html/haskell-mode-32x32.png
+
+deploy-manual : doc/html
+	cd doc && ./deploy-manual.sh
 
 $(AUTOLOADS): $(ELFILES)
 	$(BATCH) \
@@ -107,10 +143,7 @@ $(AUTOLOADS): $(ELFILES)
 # check if autoloads will really load
 	$(BATCH) -l "$@"
 
-doc: html
-
-html:
-	$(SPHINX-BUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(0)
-
-ghciworks:
-	$(GHCI) --version
+check-external : check-emacs-version $(AUTOLOADS)
+	$(BATCH) -l tests/haskell-external.el                                           \
+                 -f haskell-check-external-batch-and-exit
+	@echo "external packages okay"
