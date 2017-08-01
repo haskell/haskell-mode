@@ -20,6 +20,9 @@ install: |
       emacs24)
         docker build -t haskell-interactive-mode:24 ./emacs-24;
         ;;
+      emacs25)
+        docker build -t haskell-interactive-mode:25 ./emacs-25;
+        ;;
       emacs-snapshot)
         docker build -t haskell-interactive-mode:snapshot ./emacs-snapshot;
         ;;
@@ -39,6 +42,9 @@ script: |
     case "$TARGET" in
       emacs24)
         docker run -it haskell-interactive-mode:24;
+        ;;
+      emacs25)
+        docker run -it haskell-interactive-mode:25;
         ;;
       emacs-snapshot)
         docker run -it haskell-interactive-mode:snapshot;
