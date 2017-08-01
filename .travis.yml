@@ -5,6 +5,7 @@ env:
   matrix:
     - TARGET=emacs24
     - TARGET=emacs-snapshot
+    - TARGET=emacs25
     - TARGET=deploy-manual
     - TARGET=check-external
   global:
@@ -18,13 +19,13 @@ matrix:
 install: |
     case "$TARGET" in
       emacs24)
-        docker build -t haskell-interactive-mode:24 ./emacs-24;
+        docker build -t haskell-mode:24 ./emacs-24;
         ;;
       emacs25)
-        docker build -t haskell-interactive-mode:25 ./emacs-25;
+        docker build -t haskell-mode:25 ./emacs-25;
         ;;
       emacs-snapshot)
-        docker build -t haskell-interactive-mode:snapshot ./emacs-snapshot;
+        docker build -t haskell-mode:snapshot ./emacs-snapshot;
         ;;
       deploy-manual)
         sudo apt-get update &&
@@ -41,13 +42,13 @@ install: |
 script: |
     case "$TARGET" in
       emacs24)
-        docker run -it haskell-interactive-mode:24;
+        docker run -it haskell-mode:24;
         ;;
       emacs25)
-        docker run -it haskell-interactive-mode:25;
+        docker run -it haskell-mode:25;
         ;;
       emacs-snapshot)
-        docker run -it haskell-interactive-mode:snapshot;
+        docker run -it haskell-mode:snapshot;
         ;;
       deploy-manual)
         EMACS=emacs24 make deploy-manual;
