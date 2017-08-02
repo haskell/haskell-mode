@@ -1002,6 +1002,7 @@ More relevant defcustoms:
 @item haskell-process-path-ghci @tab ghci @tab -ferror-spans
 @item haskell-process-path-cabal @tab cabal @tab --ghc-option=-ferror-spans
 @item haskell-process-path-stack @tab stack @tab --ghci-options=-ferror-spans --no-build --no-load
+@end multitable
 
 @node External indentation
 @chapter Other ways to indent code
