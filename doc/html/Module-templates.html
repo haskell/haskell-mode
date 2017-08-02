@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual is for Haskell mode, version 16.1-git
+
+Copyright (C) 2013-2017 Haskell Mode contributors.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the http://www.gnu.org/licenses/fdl.html (GNU
+Free Documentation License), Version 1.3 or any later version published
+by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts and no Back-Cover Texts. -->
+<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>Haskell Mode 16.1-git: Module templates</title>
+
+<meta name="description" content="Haskell Mode 16.1-git: Module templates">
+<meta name="keywords" content="Haskell Mode 16.1-git: Module templates">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="index.html#Top" rel="start" title="Top">
+<link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
+<link href="index.html#Top" rel="up" title="Top">
+<link href="Declaration-scanning.html#Declaration-scanning" rel="next" title="Declaration scanning">
+<link href="Autoformating.html#Autoformating" rel="prev" title="Autoformating">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="haskell-mode.css">
+
+<link rel="shortcut icon" href="haskell-mode-32x32.png">
+</head>
+
+<body lang="en">
+<div class="background"> </div><a name="Module-templates"></a>
+<div class="header">
+<p>
+Next: <a href="Declaration-scanning.html#Declaration-scanning" accesskey="n" rel="next">Declaration scanning</a>, Previous: <a href="Autoformating.html#Autoformating" accesskey="p" rel="prev">Autoformating</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<a name="Module-templates-1"></a>
+<h2 class="chapter">11 Module templates</h2>
+
+<p>To enable auto-insertion of module templates, enable:
+</p>
+<div class="lisp">
+<pre class="lisp">(add-hook 'haskell-mode-hook 'haskell-auto-insert-module-template)
+</pre></div>
+
+<p>When you open a file called <samp>Foo.hs</samp>, it will auto-insert
+</p>
+<div class="example">
+<pre class="example">-- |
+
+module Foo where
+</pre></div>
+
+<p>And put your cursor in the comment section.
+</p>
+
+
+
+</body>
+</html>

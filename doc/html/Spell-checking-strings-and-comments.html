@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual is for Haskell mode, version 16.1-git
+
+Copyright (C) 2013-2017 Haskell Mode contributors.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the http://www.gnu.org/licenses/fdl.html (GNU
+Free Documentation License), Version 1.3 or any later version published
+by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts and no Back-Cover Texts. -->
+<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>Haskell Mode 16.1-git: Spell checking strings and comments</title>
+
+<meta name="description" content="Haskell Mode 16.1-git: Spell checking strings and comments">
+<meta name="keywords" content="Haskell Mode 16.1-git: Spell checking strings and comments">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="index.html#Top" rel="start" title="Top">
+<link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
+<link href="index.html#Top" rel="up" title="Top">
+<link href="Aligning-code.html#Aligning-code" rel="next" title="Aligning code">
+<link href="Browsing-Haddocks.html#Browsing-Haddocks" rel="prev" title="Browsing Haddocks">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="haskell-mode.css">
+
+<link rel="shortcut icon" href="haskell-mode-32x32.png">
+</head>
+
+<body lang="en">
+<div class="background"> </div><a name="Spell-checking-strings-and-comments"></a>
+<div class="header">
+<p>
+Next: <a href="Aligning-code.html#Aligning-code" accesskey="n" rel="next">Aligning code</a>, Previous: <a href="Browsing-Haddocks.html#Browsing-Haddocks" accesskey="p" rel="prev">Browsing Haddocks</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<a name="Using-with-flyspell_002dprog_002dmode"></a>
+<h2 class="chapter">18 Using with <code>flyspell-prog-mode</code></h2>
+
+<p>Strings and comments can be checked for spelling mistakes. There is a
+standard Emacs mode for this purpose, <code>flyspell-prog-mode</code>, that
+can be enabled in Haskell buffers. Spelling errors are underlined using
+squiggly red lines.
+</p>
+<img width="519" height="182" src="anim/flyspell-prog-mode.gif" alt="anim/flyspell-prog-mode">
+
+<p>Documentation for <code>flyspell-prog-mode</code> can be found in
+See <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Spelling.html#Spelling">(emacs)Spelling</a>. Here we point to a couple of useful
+keybindings:
+</p>
+<ul>
+<li> <kbd>M-$</kbd> - Check and correct spelling of the word at point (<code>ispell-word</code>).
+
+</li><li> <kbd>digit</kbd> - Replace the word, just this time, with one of the
+displayed near-misses. Each near-miss is listed with a digit; type that
+digit to select it.
+
+</li><li> <kbd>SPC</kbd> - Skip this word—continue to consider it incorrect, but don’t
+change it here.
+</li></ul>
+
+<p>To enable spell checking of strings and comments add this line to your
+<code>~/.emacs</code> file:
+</p>
+<p><code>(add-hook 'haskell-mode-hook 'flyspell-prog-mode)</code>
+</p>
+
+
+
+</body>
+</html>

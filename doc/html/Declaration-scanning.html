@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual is for Haskell mode, version 16.1-git
+
+Copyright (C) 2013-2017 Haskell Mode contributors.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the http://www.gnu.org/licenses/fdl.html (GNU
+Free Documentation License), Version 1.3 or any later version published
+by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts and no Back-Cover Texts. -->
+<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>Haskell Mode 16.1-git: Declaration scanning</title>
+
+<meta name="description" content="Haskell Mode 16.1-git: Declaration scanning">
+<meta name="keywords" content="Haskell Mode 16.1-git: Declaration scanning">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="index.html#Top" rel="start" title="Top">
+<link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
+<link href="index.html#Top" rel="up" title="Top">
+<link href="Compilation.html#Compilation" rel="next" title="Compilation">
+<link href="Module-templates.html#Module-templates" rel="prev" title="Module templates">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="haskell-mode.css">
+
+<link rel="shortcut icon" href="haskell-mode-32x32.png">
+</head>
+
+<body lang="en">
+<div class="background"> </div><a name="Declaration-scanning"></a>
+<div class="header">
+<p>
+Next: <a href="Compilation.html#Compilation" accesskey="n" rel="next">Compilation</a>, Previous: <a href="Module-templates.html#Module-templates" accesskey="p" rel="prev">Module templates</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<a name="Declaration-scannning"></a>
+<h2 class="chapter">12 Declaration scannning</h2>
+
+<a name="index-haskell_002ddecl_002dscan_002dmode"></a>
+<a name="index-haskell_002ddecl_002dscan_002dmode_002dhook"></a>
+
+<p><code>haskell-decl-scan-mode</code> is a minor mode which performs declaration
+scanning and provides <kbd>M-x imenu</kbd> support (see <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Imenu.html#Imenu">(emacs)Imenu</a> for
+more information).
+</p>
+<p>For non-literate and TeX-style literate scripts, the common
+convention that top-level declarations start at the first column is
+assumed.  For Bird-style literate scripts, the common convention that
+top-level declarations start at the third column, ie. after &lsquo;<samp>&gt; </samp>&rsquo;,
+is assumed.
+</p>
+<p>When <code>haskell-decl-scan-mode</code> is active, the standard Emacs
+top-level definition movement commands (see <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Moving-by-Defuns.html#Moving-by-Defuns">(emacs)Moving by
+Defuns</a>) are enabled to operate on Haskell declarations:
+</p>
+<dl compact="compact">
+<dt><kbd>C-M-a</kbd></dt>
+<dd><p>Move to beginning of current or preceding declaration
+(<code>beginning-of-defun</code>).
+</p>
+</dd>
+<dt><kbd>C-M-e</kbd></dt>
+<dd><p>Move to end of current or following declaration (<code>end-of-defun</code>).
+</p>
+</dd>
+<dt><kbd>C-M-h</kbd></dt>
+<dd><p>Select whole current or following declaration (<code>mark-defun</code>).
+</p></dd>
+</dl>
+
+<p>Moreover, if enabled via the option
+<code>haskell-decl-scan-add-to-menubar</code>, a menu item &ldquo;Declarations&rdquo; is
+added to the menu bar listing the scanned declarations and allowing to
+jump to declarations in the source buffer.
+</p>
+<p>It&rsquo;s recommended to have font lock mode enabled (see <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Font-Lock.html#Font-Lock">(emacs)Font
+Lock</a>) as <code>haskell-decl-scan-mode</code> ignores text highlighted
+with <code>font-lock-comment-face</code>.
+</p>
+<p>As usual, in order to activate <code>haskell-decl-scan-mode</code>
+automatically for Haskell buffers, add <code>haskell-decl-scan-mode</code>
+to <code>haskell-mode-hook</code>:
+</p>
+<div class="lisp">
+<pre class="lisp">(add-hook 'haskell-mode-hook 'haskell-decl-scan-mode)
+</pre></div>
+
+<p><code>haskell-decl-scan-mode</code> enables the use of features that build
+upon <code>imenu</code> support such as Speedbar Frames
+(see <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Speedbar.html#Speedbar">(emacs)Speedbar</a>) or the global &ldquo;Which Function&rdquo; minor mode
+(see <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Which-Function.html#Which-Function">(emacs)Which Function</a>).
+</p>
+<p>In order to enable <code>which-function-mode</code> for Haskell buffers you
+need to add the following to your Emacs initialization:
+</p>
+<div class="lisp">
+<pre class="lisp">(eval-after-load &quot;which-func&quot;
+  '(add-to-list 'which-func-modes 'haskell-mode))
+</pre></div>
+
+<a name="Speedbar"></a>
+<h3 class="section">12.1 Speedbar</h3>
+
+<p>Haskell-mode comes with declaration scanning support. This means that if you enable Haskell support for speedbar:
+</p>
+<div class="lisp">
+<pre class="lisp">(speedbar-add-supported-extension &quot;.hs&quot;)
+</pre></div>
+
+<p>And open speedbar with
+</p>
+<p><code>M-x speedbar</code>
+</p>
+<p>It gives a listing of each module and under each module:
+</p>
+<div class="example">
+<pre class="example">    Imports
+    Instances
+    Data types
+    Classes
+    Bindings
+</pre></div>
+
+<p>You will get a bar that looks like this:
+</p>
+<pre class="verbatim">~/Projects/ace/src/ACE/
+0:&lt;+&gt; Types
+0:[+] Combinators.hs
+0:[-] Datalog.hs
+1:   {-} Classes
+2:      &gt; ToTerm
+1:   {-} Imports
+2:      &gt; ACE.Types.Syntax
+2:      &gt; Database.Datalog
+1:   {-} Instances
+2:    {+} ToTerm A
+2:    {+} ToTerm Co to ToTerm Gen
+2:    {+} ToTerm Intransitive to ToTerm N
+2:    {+} ToTerm P
+2:    {+} ToTerm Quotation to ToTerm Un
+2:    {+} ToTerm V
+0:[-] Html.hs
+1:   {+} Imports
+1:   {+} Instances
+1:     &gt; mtoMarkup
+1:     &gt; toMarkupm
+1:     &gt; wrap
+0:[-] Parsers.hs
+1:   {+} Imports
+1:   {-} Datatypes
+2:      &gt; ACEParser
+0:[+] Pretty.hs
+0:[+] Tokenizer.hs
+</pre>
+<p>The hierarchy is expandable/collapsible and each entry will jump to the
+line in the right file when clicked/selected.
+</p>
+<hr>
+<div class="header">
+<p>
+Next: <a href="Compilation.html#Compilation" accesskey="n" rel="next">Compilation</a>, Previous: <a href="Module-templates.html#Module-templates" accesskey="p" rel="prev">Module templates</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

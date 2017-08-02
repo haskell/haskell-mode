@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual is for Haskell mode, version 16.1-git
+
+Copyright (C) 2013-2017 Haskell Mode contributors.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the http://www.gnu.org/licenses/fdl.html (GNU
+Free Documentation License), Version 1.3 or any later version published
+by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts and no Back-Cover Texts. -->
+<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>Haskell Mode 16.1-git: Unicode support</title>
+
+<meta name="description" content="Haskell Mode 16.1-git: Unicode support">
+<meta name="keywords" content="Haskell Mode 16.1-git: Unicode support">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="index.html#Top" rel="start" title="Top">
+<link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
+<link href="index.html#Top" rel="up" title="Top">
+<link href="Indentation.html#Indentation" rel="next" title="Indentation">
+<link href="Completion-support.html#Completion-support" rel="prev" title="Completion support">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="haskell-mode.css">
+
+<link rel="shortcut icon" href="haskell-mode-32x32.png">
+</head>
+
+<body lang="en">
+<div class="background"> </div><a name="Unicode-support"></a>
+<div class="header">
+<p>
+Next: <a href="Indentation.html#Indentation" accesskey="n" rel="next">Indentation</a>, Previous: <a href="Completion-support.html#Completion-support" accesskey="p" rel="prev">Completion support</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<a name="Unicode-support-1"></a>
+<h2 class="chapter">6 Unicode support</h2>
+
+<a name="index-Unicode"></a>
+
+<p>See the Haskell Wiki&rsquo;s entry on
+<a href="http://www.haskell.org/haskellwiki/Unicode-symbols">Unicode
+Symbols</a> for general information about Unicode support in Haskell.
+</p>
+<p>As Emacs supports editing files containing Unicode out of the box, so
+does Haskell Mode. As an add-on, Haskell Mode includes the
+<code>haskell-unicode</code> input method which allows you to easily type a
+number of Unicode symbols that are useful when writing Haskell code;
+See <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Input-Methods.html#Input-Methods">(emacs)Input Methods</a>, for more details.
+</p>
+<p>To automatically enable the <code>haskell-unicode</code> input method in
+haskell-mode buffers use <kbd>M-x customize-variable <span class="key">RET</span>
+haskell-mode-hook</kbd> or put the following code in your <samp>.emacs</samp> file:
+</p>
+<div class="lisp">
+<pre class="lisp">(add-hook 'haskell-mode-hook 'turn-on-haskell-unicode-input-method)
+</pre></div>
+
+<p>To temporarily enable this input method for a single buffer you can use
+<kbd>M-x turn-on-haskell-unicode-input-method</kbd>.
+</p>
+<p>When the <code>haskell-unicode</code> input method is active, you can simply
+type &lsquo;<samp>-&gt;</samp>&rsquo; and it is immediately replaced with &lsquo;<samp>→</samp>&rsquo;. Use
+<kbd>C-\</kbd> to toggle the input method. To see a table of all key
+sequences use <kbd>M-x describe-input-method <span class="key">RET</span>
+haskell-unicode</kbd>. A sequence like &lsquo;<samp>&lt;=</samp>&rsquo; is ambiguous and can mean
+either &lsquo;<samp>⇐</samp>&rsquo; or &lsquo;<samp>≤</samp>&rsquo;. Typing it presents you with a choice. Type
+<kbd>1</kbd> or <kbd>2</kbd> to select an option or keep typing to use the default
+option.
+</p>
+<p>Currently defined sequences are listed in the following table:
+</p>
+<table>
+<thead><tr><th width="8%">Sequence</th><th width="15%">Unicode</th><th width="8%">Sequence</th><th width="15%">Unicode</th><th width="8%">Sequence</th><th width="15%">Unicode</th><th width="8%">Sequence</th><th width="15%">Unicode</th></tr></thead>
+<tr><td width="8%">alpha</td><td width="15%">α</td><td width="8%">Alpha</td><td width="15%">Α</td><td width="8%">beta</td><td width="15%">β</td><td width="8%">Beta</td><td width="15%">Β</td></tr>
+<tr><td width="8%">gamma</td><td width="15%">γ</td><td width="8%">Gamma</td><td width="15%">Γ</td><td width="8%">delta</td><td width="15%">δ</td><td width="8%">Delta</td><td width="15%">Δ</td></tr>
+<tr><td width="8%">epsilon</td><td width="15%">ε</td><td width="8%">Epsilon</td><td width="15%">Ε</td><td width="8%">zeta</td><td width="15%">ζ</td><td width="8%">Zeta</td><td width="15%">Ζ</td></tr>
+<tr><td width="8%">eta</td><td width="15%">η</td><td width="8%">Eta</td><td width="15%">Η</td><td width="8%">theta</td><td width="15%">θ</td><td width="8%">Theta</td><td width="15%">Θ</td></tr>
+<tr><td width="8%">iota</td><td width="15%">ι</td><td width="8%">Iota</td><td width="15%">Ι</td><td width="8%">kappa</td><td width="15%">κ</td><td width="8%">Kappa</td><td width="15%">Κ</td></tr>
+<tr><td width="8%">lambda</td><td width="15%">λ</td><td width="8%">Lambda</td><td width="15%">Λ</td><td width="8%">lamda</td><td width="15%">λ</td><td width="8%">Lamda</td><td width="15%">Λ</td></tr>
+<tr><td width="8%">mu</td><td width="15%">μ</td><td width="8%">Mu</td><td width="15%">Μ</td><td width="8%">nu</td><td width="15%">ν</td><td width="8%">Nu</td><td width="15%">Ν</td></tr>
+<tr><td width="8%">xi</td><td width="15%">ξ</td><td width="8%">Xi</td><td width="15%">Ξ</td><td width="8%">omicron</td><td width="15%">ο</td><td width="8%">Omicron</td><td width="15%">Ο</td></tr>
+<tr><td width="8%">pi</td><td width="15%">π</td><td width="8%">Pi</td><td width="15%">Π</td><td width="8%">rho</td><td width="15%">ρ</td><td width="8%">Rho</td><td width="15%">Ρ</td></tr>
+<tr><td width="8%">sigma</td><td width="15%">σ</td><td width="8%">Sigma</td><td width="15%">Σ</td><td width="8%">tau</td><td width="15%">τ</td><td width="8%">Tau</td><td width="15%">Τ</td></tr>
+<tr><td width="8%">upsilon</td><td width="15%">υ</td><td width="8%">Upsilon</td><td width="15%">Υ</td><td width="8%">phi</td><td width="15%">φ</td><td width="8%">Phi</td><td width="15%">Φ</td></tr>
+<tr><td width="8%">chi</td><td width="15%">χ</td><td width="8%">Chi</td><td width="15%">Χ</td><td width="8%">psi</td><td width="15%">ψ</td><td width="8%">Psi</td><td width="15%">Ψ</td></tr>
+<tr><td width="8%">omega</td><td width="15%">ω</td><td width="8%">Omega</td><td width="15%">Ω</td><td width="8%">digamma</td><td width="15%">ϝ</td><td width="8%">Digamma</td><td width="15%">Ϝ</td></tr>
+<tr><td width="8%">san</td><td width="15%">ϻ</td><td width="8%">San</td><td width="15%">Ϻ</td><td width="8%">qoppa</td><td width="15%">ϙ</td><td width="8%">Qoppa</td><td width="15%">Ϙ</td></tr>
+<tr><td width="8%">sampi</td><td width="15%">ϡ</td><td width="8%">Sampi</td><td width="15%">Ϡ</td><td width="8%">stigma</td><td width="15%">ϛ</td><td width="8%">Stigma</td><td width="15%">Ϛ</td></tr>
+<tr><td width="8%">heta</td><td width="15%">ͱ</td><td width="8%">Heta</td><td width="15%">Ͱ</td><td width="8%">sho</td><td width="15%">ϸ</td><td width="8%">Sho</td><td width="15%">Ϸ</td></tr>
+<tr><td width="8%">|A|</td><td width="15%">𝔸</td><td width="8%">|B|</td><td width="15%">𝔹</td><td width="8%">|C|</td><td width="15%">ℂ</td><td width="8%">|D|</td><td width="15%">𝔻</td></tr>
+<tr><td width="8%">|E|</td><td width="15%">𝔼</td><td width="8%">|F|</td><td width="15%">𝔽</td><td width="8%">|G|</td><td width="15%">𝔾</td><td width="8%">|H|</td><td width="15%">ℍ</td></tr>
+<tr><td width="8%">|I|</td><td width="15%">𝕀</td><td width="8%">|J|</td><td width="15%">𝕁</td><td width="8%">|K|</td><td width="15%">𝕂</td><td width="8%">|L|</td><td width="15%">𝕃</td></tr>
+<tr><td width="8%">|M|</td><td width="15%">𝕄</td><td width="8%">|N|</td><td width="15%">ℕ</td><td width="8%">|O|</td><td width="15%">𝕆</td><td width="8%">|P|</td><td width="15%">ℙ</td></tr>
+<tr><td width="8%">|Q|</td><td width="15%">ℚ</td><td width="8%">|R|</td><td width="15%">ℝ</td><td width="8%">|S|</td><td width="15%">𝕊</td><td width="8%">|T|</td><td width="15%">𝕋</td></tr>
+<tr><td width="8%">|U|</td><td width="15%">𝕌</td><td width="8%">|V|</td><td width="15%">𝕍</td><td width="8%">|W|</td><td width="15%">𝕎</td><td width="8%">|X|</td><td width="15%">𝕏</td></tr>
+<tr><td width="8%">|Y|</td><td width="15%">𝕐</td><td width="8%">|Z|</td><td width="15%">ℤ</td><td width="8%">|gamma|</td><td width="15%">ℽ</td><td width="8%">|Gamma|</td><td width="15%">ℾ</td></tr>
+<tr><td width="8%">|pi|</td><td width="15%">ℼ</td><td width="8%">|Pi|</td><td width="15%">ℿ</td><td width="8%">::</td><td width="15%">∷</td><td width="8%">forall</td><td width="15%">∀</td></tr>
+<tr><td width="8%">exists</td><td width="15%">∃</td><td width="8%">-&gt;</td><td width="15%">→</td><td width="8%">&lt;-</td><td width="15%">←</td><td width="8%">=&gt;</td><td width="15%">⇒</td></tr>
+<tr><td width="8%">~&gt;</td><td width="15%">⇝</td><td width="8%">&lt;~</td><td width="15%">⇜</td><td width="8%">&amp;&amp;</td><td width="15%">∧</td><td width="8%">||</td><td width="15%">∨</td></tr>
+<tr><td width="8%">==</td><td width="15%">≡</td><td width="8%">/=</td><td width="15%">≢, ≠</td><td width="8%">&lt;=</td><td width="15%">≤</td><td width="8%">&gt;=</td><td width="15%">≥</td></tr>
+<tr><td width="8%">/&lt;</td><td width="15%">≮</td><td width="8%">/&gt;</td><td width="15%">≯</td><td width="8%">*</td><td width="15%">⋅</td><td width="8%">elem</td><td width="15%">∈</td></tr>
+<tr><td width="8%">notElem</td><td width="15%">∉</td><td width="8%">member</td><td width="15%">∈</td><td width="8%">notMember</td><td width="15%">∉</td><td width="8%">union</td><td width="15%">∪</td></tr>
+<tr><td width="8%">intersection</td><td width="15%">∩</td><td width="8%">isSubsetOf</td><td width="15%">⊆</td><td width="8%">isProperSubsetOf</td><td width="15%">⊂</td><td width="8%">&lt;&lt;&lt;</td><td width="15%">⋘</td></tr>
+<tr><td width="8%">&gt;&gt;&gt;</td><td width="15%">⋙</td><td width="8%">&lt;|</td><td width="15%">⊲</td><td width="8%">|&gt;</td><td width="15%">⊳</td><td width="8%">&gt;&lt;</td><td width="15%">⋈</td></tr>
+<tr><td width="8%">mappend</td><td width="15%">⊕</td><td width="8%">.</td><td width="15%">∘</td><td width="8%">undefined</td><td width="15%">⊥</td><td width="8%">:=</td><td width="15%">≔</td></tr>
+<tr><td width="8%">=:</td><td width="15%">≕</td><td width="8%">=def</td><td width="15%">≝</td><td width="8%">=?</td><td width="15%">≟</td><td width="8%">...</td><td width="15%">…</td></tr>
+<tr><td width="8%">_0</td><td width="15%">₀</td><td width="8%">_1</td><td width="15%">₁</td><td width="8%">_2</td><td width="15%">₂</td><td width="8%">_3</td><td width="15%">₃</td></tr>
+<tr><td width="8%">_4</td><td width="15%">₄</td><td width="8%">_5</td><td width="15%">₅</td><td width="8%">_6</td><td width="15%">₆</td><td width="8%">_7</td><td width="15%">₇</td></tr>
+<tr><td width="8%">_8</td><td width="15%">₈</td><td width="8%">_9</td><td width="15%">₉</td><td width="8%">^0</td><td width="15%">⁰</td><td width="8%">^1</td><td width="15%">¹</td></tr>
+<tr><td width="8%">^2</td><td width="15%">²</td><td width="8%">^3</td><td width="15%">³</td><td width="8%">^4</td><td width="15%">⁴</td><td width="8%">^5</td><td width="15%">⁵</td></tr>
+<tr><td width="8%">^6</td><td width="15%">⁶</td><td width="8%">^7</td><td width="15%">⁷</td><td width="8%">^8</td><td width="15%">⁸</td><td width="8%">^9</td><td width="15%">⁹</td></tr>
+</table>
+
+<p>If you don&rsquo;t like the highlighting of partially matching tokens you can
+turn it off by setting <code>input-method-highlight-flag</code> to <code>nil</code>
+via <kbd>M-x customize-variable</kbd>.
+</p>
+<hr>
+<div class="header">
+<p>
+Next: <a href="Indentation.html#Indentation" accesskey="n" rel="next">Indentation</a>, Previous: <a href="Completion-support.html#Completion-support" accesskey="p" rel="prev">Completion support</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>

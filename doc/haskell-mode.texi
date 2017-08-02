@@ -913,7 +913,7 @@ So you will find this to be very familiar if you are already using @kbd{M-x Shel
 
 Important key bindings in @code{Inf-haskell}:
 
-@table
+@table @kbd
 @item RET
 invokes @kbd{comint-send-input}. Sends the input to the GHCi process, evaluates
 the line and returns the output.
@@ -999,9 +999,9 @@ More relevant defcustoms:
 
 @multitable @columnfractions .30 .20 .50
 @headitem Interpreter (defcustom) @tab Default Value @tab Default commandline arguments (defcustom)
-@item haskell-process-path-ghci @tab ghci @tab -ferror-spans
-@item haskell-process-path-cabal @tab cabal @tab --ghc-option=-ferror-spans
-@item haskell-process-path-stack @tab stack @tab --ghci-options=-ferror-spans --no-build --no-load
+@item @code{haskell-process-path-ghci} @tab @code{ghci} @tab @code{-ferror-spans}
+@item @code{haskell-process-path-cabal} @tab @code{cabal} @tab @code{--ghc-option=-ferror-spans}
+@item @code{haskell-process-path-stack} @tab @code{stack} @tab @code{--ghci-options=-ferror-spans --no-build --no-load}
 @end multitable
 
 @node External indentation

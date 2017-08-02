@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual is for Haskell mode, version 16.1-git
+
+Copyright (C) 2013-2017 Haskell Mode contributors.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the http://www.gnu.org/licenses/fdl.html (GNU
+Free Documentation License), Version 1.3 or any later version published
+by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts and no Back-Cover Texts. -->
+<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>Haskell Mode 16.1-git: Rectangular commands</title>
+
+<meta name="description" content="Haskell Mode 16.1-git: Rectangular commands">
+<meta name="keywords" content="Haskell Mode 16.1-git: Rectangular commands">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="index.html#Top" rel="start" title="Top">
+<link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
+<link href="index.html#Top" rel="up" title="Top">
+<link href="Collapsing-Haskell-code.html#Collapsing-Haskell-code" rel="next" title="Collapsing Haskell code">
+<link href="Aligning-code.html#Aligning-code" rel="prev" title="Aligning code">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="haskell-mode.css">
+
+<link rel="shortcut icon" href="haskell-mode-32x32.png">
+</head>
+
+<body lang="en">
+<div class="background"> </div><a name="Rectangular-commands"></a>
+<div class="header">
+<p>
+Next: <a href="Collapsing-Haskell-code.html#Collapsing-Haskell-code" accesskey="n" rel="next">Collapsing Haskell code</a>, Previous: <a href="Aligning-code.html#Aligning-code" accesskey="p" rel="prev">Aligning code</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<a name="Using-rectangular-region-commands"></a>
+<h2 class="chapter">20 Using rectangular region commands</h2>
+
+<p>Emacs has a set of commands which operate on the region as if it were
+rectangular. This turns out to be extremely useful when dealing with
+whitespace sensitive languages.
+</p>
+<ul>
+<li> <kbd>C-x r o</kbd> is &quot;Open Rectangle&quot;.
+
+<p>It will shift any text within the rectangle to the right side. Also see:
+</p>
+</li><li> <kbd>C-x r t</kbd> is &quot;String Rectangle&quot;.
+
+<p>It will replace any text within the rectangle with the given string on
+all the lines in the region. If comment-region didn&rsquo;t already exist, you
+could use this instead, for example.
+</p>
+</li><li> <kbd>C-x r d</kbd> is &quot;Delete Rectangle&quot;.
+
+<p>It will delete the contents of the rectangle and move anything on the
+right over.
+</p>
+</li><li> <kbd>C-x r r</kbd> is &quot;Copy Rectangle to Register&quot;.
+
+<p>It will prompt you for a register number so it can save it for later.
+</p>
+</li><li> <kbd>C-x r g</kbd> is &quot;Insert register&quot;.
+
+<p>This will insert the contents of the given register, overwriting
+whatever happens to be within the target rectangle. (So make room)
+</p>
+</li><li> <kbd>C-x r k</kbd> is &quot;Kill rectangle&quot;.
+
+<p>Delete rectangle and save contents for:
+</p>
+</li><li> <kbd>C-x r y</kbd> is &quot;Yank rectangle&quot;.
+
+<p>This will insert the contents of the last killed rectangle.
+</p></li></ul>
+
+<p>As with all Emacs modifier combos, you can type <kbd>C-x r C-h</kbd> to find
+out what keys are bound beginning with the <kbd>C-x r</kbd> prefix.
+</p>
+
+
+
+</body>
+</html>

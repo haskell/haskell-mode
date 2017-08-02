@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual is for Haskell mode, version 16.1-git
+
+Copyright (C) 2013-2017 Haskell Mode contributors.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the http://www.gnu.org/licenses/fdl.html (GNU
+Free Documentation License), Version 1.3 or any later version published
+by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts and no Back-Cover Texts. -->
+<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>Haskell Mode 16.1-git: REPL</title>
+
+<meta name="description" content="Haskell Mode 16.1-git: REPL">
+<meta name="keywords" content="Haskell Mode 16.1-git: REPL">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="index.html#Top" rel="start" title="Top">
+<link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
+<link href="index.html#Top" rel="up" title="Top">
+<link href="External-indentation.html#External-indentation" rel="next" title="External indentation">
+<link href="Indentation.html#Indentation" rel="prev" title="Indentation">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="haskell-mode.css">
+
+<link rel="shortcut icon" href="haskell-mode-32x32.png">
+</head>
+
+<body lang="en">
+<div class="background"> </div><a name="REPL"></a>
+<div class="header">
+<p>
+Next: <a href="External-indentation.html#External-indentation" accesskey="n" rel="next">External indentation</a>, Previous: <a href="Indentation.html#Indentation" accesskey="p" rel="prev">Indentation</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<a name="Using-GHCi-REPL-within-Emacs"></a>
+<h2 class="chapter">8 Using GHCi REPL within Emacs</h2>
+
+<p>To start the REPL you can run one of the following:
+</p>
+<ul>
+<li> <kbd>M-x run-haskell</kbd>
+</li><li> <kbd>M-x switch-to-haskell</kbd>
+</li></ul>
+
+<p>This repl works with <a href="https://www.emacswiki.org/emacs/ComintMode">Comint</a>.
+So you will find this to be very familiar if you are already using <kbd>M-x Shell</kbd> or
+<kbd>M-x ielm</kbd>.
+</p>
+<p><code>Inf-Haskell</code> is a Major mode for running GHCi, with comint.
+</p>
+<p>Important key bindings in <code>Inf-haskell</code>:
+</p>
+<dl compact="compact">
+<dt><kbd>RET</kbd></dt>
+<dd><p>invokes <kbd>comint-send-input</kbd>. Sends the input to the GHCi process, evaluates
+the line and returns the output.
+</p>
+</dd>
+<dt><kbd>C-d or &lt;delete&gt;</kbd></dt>
+<dd><p>deletes the forward character
+</p>
+</dd>
+<dt><kbd>&lt;C-up&gt; or M-p</kbd></dt>
+<dd><p>invokes <kbd>comint-previous-input</kbd>. Cycle backwards through input history,
+saving input.
+</p>
+</dd>
+<dt><kbd>&lt;C-down&gt; or M-n</kbd></dt>
+<dd><p>invokes <kbd>comint-next-input</kbd>. Cycle forwards through input history.
+</p>
+</dd>
+<dt><kbd>C-c C-c</kbd></dt>
+<dd><p>invokes <kbd>comint-interrupt-subjob</kbd>. Sends KeyboardInterrupt signal.
+</p>
+</dd>
+<dt><kbd>C-c C-\</kbd></dt>
+<dd><p>invokes <kbd>comint-quit-subjob</kbd>. Sends KeyboardInterrupt signal.
+</p>
+</dd>
+<dt><kbd>C-c C-z</kbd></dt>
+<dd><p>invokes <kbd>comint-stop-subjob</kbd>. Kills the GHCi process.
+</p>
+</dd>
+<dt><kbd>C-c M-r</kbd></dt>
+<dd><p>invokes <kbd>comint-previous-matching-input-from-input</kbd>. If you are familiar
+with <kbd>C-r</kbd> in bash. This is the same as that. Searches backwards through
+input history for match for current input.
+</p>
+</dd>
+<dt><kbd>C-c M-s</kbd></dt>
+<dd><p>invokes <kbd>comint-next-matching-input-from-input</kbd>. Searches forwards through
+input history for match for current input.
+</p>
+</dd>
+<dt><kbd>C-c C-l</kbd></dt>
+<dd><p>invokes <kbd>comint-dynamic-list-input-ring</kbd>. Displays a list of recent inputs
+entered into the current buffer.
+</p>
+</dd>
+<dt><kbd>C-c M-o</kbd></dt>
+<dd><p>invokes <kbd>comint-clear-buffer</kbd>. Clears the buffer (Only with Emacs 25.X and above)
+</p>
+</dd>
+<dt><kbd>C-c C-n</kbd></dt>
+<dd><p>invokes <kbd>comint-next-prompt</kbd>. Goes to the start of the previous REPL prompt.
+</p>
+</dd>
+<dt><kbd>C-c C-p</kbd></dt>
+<dd><p>invokes <kbd>comint-previous-prompt</kbd>. Goes to the start of the next REPL prompt.
+</p>
+</dd>
+<dt><kbd>C-c C-o</kbd></dt>
+<dd><p>invokes <kbd>comint-delete-output</kbd>. Clears the output of the most recently evaluated
+expression.
+</p>
+</dd>
+<dt><kbd>C-c C-e</kbd></dt>
+<dd><p>invokes <kbd>comint-show-maximum-output</kbd>. Moves the point to the end of the buffer.
+</p>
+</dd>
+<dt><kbd>C-c C-u</kbd></dt>
+<dd><p>invokes <kbd>comint-kill-input</kbd>. Kills backward, the line at point. (Use this when you have typed in an expression into the prompt
+but you dont want to evaluate it.)
+</p>
+</dd>
+<dt><kbd>C-c C-w</kbd></dt>
+<dd><p>invokes <kbd>backward-kill-word</kbd>. Kills backward, the word at point
+</p>
+</dd>
+<dt><kbd>C-c C-s</kbd></dt>
+<dd><p>invokes <kbd>comint-write-output</kbd>. Write output from interpreter since last
+input to FILENAME. Any prompt at the end of the output is not written.
+</p></dd>
+</dl>
+
+
+<p>The Haskell interpreter used by <code>Inf-Haskell</code> is auto-detected by default,
+but is customizable with defcustom <code>haskell-process-type</code>. The values
+recognized by it are (default is auto):
+</p>
+<ul>
+<li> <code>stack-ghci</code>
+</li><li> <code>cabal-rel</code>
+</li><li> <code>ghci</code>
+</li></ul>
+
+<p>if the <code>haskell-process-type</code> is <code>auto</code>, the directories are searched for
+<code>cabal.sandbox.config</code> or <code>stack.yaml</code> or  <code>*.cabal</code> file.
+If the file is present, then appropriate process is started.
+</p>
+<p>preference <code>cabal.sandbox.config</code> &gt; <code>stack.yaml</code> &gt;  <code>*.cabal</code>
+</p>
+<p>More relevant defcustoms:
+</p>
+<table>
+<thead><tr><th width="30%">Interpreter (defcustom)</th><th width="20%">Default Value</th><th width="50%">Default commandline arguments (defcustom)</th></tr></thead>
+<tr><td width="30%"><code>haskell-process-path-ghci</code></td><td width="20%"><code>ghci</code></td><td width="50%"><code>-ferror-spans</code></td></tr>
+<tr><td width="30%"><code>haskell-process-path-cabal</code></td><td width="20%"><code>cabal</code></td><td width="50%"><code>--ghc-option=-ferror-spans</code></td></tr>
+<tr><td width="30%"><code>haskell-process-path-stack</code></td><td width="20%"><code>stack</code></td><td width="50%"><code>--ghci-options=-ferror-spans --no-build --no-load</code></td></tr>
+</table>
+
+<hr>
+<div class="header">
+<p>
+Next: <a href="External-indentation.html#External-indentation" accesskey="n" rel="next">External indentation</a>, Previous: <a href="Indentation.html#Indentation" accesskey="p" rel="prev">Indentation</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>
