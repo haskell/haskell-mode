@@ -987,7 +987,7 @@ recognized by it are (default is auto):
 @item @code{stack-ghci}
 @item @code{cabal-rel}
 @item @code{ghci}
-@itemize
+@end itemize
 
 if the @code{haskell-process-type} is @code{auto}, the directories are searched for
 @code{cabal.sandbox.config} or @code{stack.yaml} or  @code{*.cabal} file.
