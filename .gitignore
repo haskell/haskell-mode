@@ -5,3 +5,4 @@ haskell-mode.info
 haskell-mode.tmp.texi
 dir
 build-*
+doc/html
