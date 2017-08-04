@@ -40,10 +40,10 @@
 (ert-deftest test-inferior-haskell-buffer ()
   "Check if the inferior haskell buffer has been started"
   (run-haskell)
-  (should inferior-haskell-buffer))
+  (should (buffer-live-p inferior-haskell-buffer)))
 
 (ert-deftest test-inferior-haskell-root-dir ()
   "Check if the root dir of the loaded file/project is not nil
 This way we test is the file is loaded or not"
   (run-haskell)
-  (should inferior-haskell-root-dir))
+  (should (file-directory-p inferior-haskell-root-dir)))
