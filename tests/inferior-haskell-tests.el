@@ -36,3 +36,14 @@
   (run-haskell)
   (should (equal (haskell-split-to-lines (inferior-haskell-get-result "1 + 1"))
               '("Prelude> 1 + 1" "2"))))
+
+(ert-deftest test-inferior-haskell-buffer ()
+  "Check if the inferior haskell buffer has been started"
+  (run-haskell)
+  (should inferior-haskell-buffer))
+
+(ert-deftest test-inferior-haskell-root-dir ()
+  "Check if the root dir of the loaded file/project is not nil
+This way we test is the file is loaded or not"
+  (run-haskell)
+  (should inferior-haskell-root-dir))
