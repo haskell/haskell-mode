@@ -103,10 +103,10 @@ for repl"
                         haskell-process-args-stack-ghci))))
 
 (defconst inferior-haskell-info-xref-re
-  "\t-- Defined at \\(.+\\):\\([0-9]+\\):\\([0-9]+\\)\\(?:-\\([0-9]+\\)\\)?$")
+  "-- Defined at \\(.+\\):\\([0-9]+\\):\\([0-9]+\\)\\(?:-\\([0-9]+\\)\\)?$")
 
 (defconst inferior-haskell-module-re
-  "\t-- Defined in \\(.+\\)$"
+  "-- Defined in \\(.+\\)$"
   "Regular expression for matching module names in :info.")
 
 (defvar inferior-haskell-multiline-prompt-re
@@ -114,9 +114,7 @@ for repl"
   "Regular expression for matching multiline prompt (the one inside :{ ... :} blocks).")
 
 (defconst inferior-haskell-error-regexp-alist
-  ;; The format of error messages used by Hugs.
-  `(("^ERROR \"\\(.+?\\)\"\\(:\\| line \\)\\([0-9]+\\) - " 1 3)
-    ;; Format of error messages used by GHCi.
+  `(;; Format of error messages used by GHCi.
     ("^\\(.+?\\):\\([0-9]+\\):\\(\\([0-9]+\\):\\)?\\( \\|\n *\\)\\([Ww]arning\\)?"
      1 2 4 ,@(if (fboundp 'compilation-fake-loc)
                  '((6) nil (5 '(face nil font-lock-multiline t)))))

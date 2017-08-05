@@ -695,34 +695,6 @@ happened since function invocation)."
 
             (haskell-utils-async-stop-watching-changes init-buffer))))))))
 
-(make-obsolete 'haskell-process-generate-tags
-               'haskell-mode-generate-tags
-               "2016-03-14")
-(defun haskell-process-generate-tags (&optional and-then-find-this-tag)
-  "Regenerate the TAGS table.
-If optional AND-THEN-FIND-THIS-TAG argument is present it is used with
-function `xref-find-definitions' after new table was generated."
-  (interactive)
-  (let ((process (haskell-interactive-process)))
-    (haskell-process-queue-command
-     process
-     (make-haskell-command
-      :state (cons process and-then-find-this-tag)
-      :go
-      (lambda (state)
-        (let* ((process (car state))
-               (cabal-dir (haskell-session-cabal-dir
-                           (haskell-process-session process)))
-               (command (haskell-cabal--compose-hasktags-command cabal-dir)))
-          (haskell-process-send-string process command)))
-      :complete (lambda (state _response)
-                  (when (cdr state)
-                    (let ((tags-file-name
-                           (haskell-session-tags-filename
-                            (haskell-process-session (car state)))))
-                      (xref-find-definitions (cdr state))))
-                  (haskell-mode-message-line "Tags generated."))))))
-
 (defun haskell-process-add-cabal-autogen ()
   "Add cabal's autogen dir to the GHCi search path.
 Add <cabal-project-dir>/dist/build/autogen/ to GHCi seatch path.
