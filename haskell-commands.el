@@ -333,31 +333,7 @@ If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
           (haskell-mode-message-line ghci-response))))))
 
 ;;;###autoload
-(defun haskell-process-do-type (&optional insert-value)
-  "Print the type of the given expression.
 
-Given INSERT-VALUE prefix indicates that result type signature
-should be inserted."
-  (interactive "P")
-  (if insert-value
-      (haskell-process-insert-type)
-    (let* ((expr
-            (if (use-region-p)
-                (buffer-substring-no-properties (region-beginning) (region-end))
-              (haskell-ident-at-point)))
-           (expr-okay (and expr
-                         (not (string-match-p "\\`[[:space:]]*\\'" expr))
-                         (not (string-match-p "\n" expr)))))
-      ;; No newlines in expressions, and surround with parens if it
-      ;; might be a slice expression
-      (when expr-okay
-        (haskell-mode-message-line
-         (inferior-haskell-get-result
-          (format (if (or (string-match-p "\\`(" expr)
-                          (string-match-p "\\`[_[:alpha:]]" expr))
-                      ":type %s"
-                    ":type (%s)")
-                  expr)))))))
 
 ;;;###autoload
 (defun haskell-mode-jump-to-def-or-tag (&optional _next-p)
