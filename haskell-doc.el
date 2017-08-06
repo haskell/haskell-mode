@@ -301,11 +301,8 @@
 ;;; Code:
 
 (require 'haskell-mode)
-(require 'haskell-process)
-(require 'haskell)
 (require 'haskell-utils)
 (require 'inf-haskell)
-(require 'inf-haskell-mode)
 (require 'imenu)
 (require 'eldoc)
 
