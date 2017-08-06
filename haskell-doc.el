@@ -1408,7 +1408,10 @@ Meant for `eldoc-documentation-function'."
     (let ((msg (or
                 (haskell-doc-current-info--interaction)
                 (haskell-doc-sym-doc (haskell-ident-at-point)))))
-      (unless (symbolp msg) msg))))
+      (unless (symbolp msg)
+        (if haskell-doc-prettify-types
+            (haskell-doc-prettify-types msg)
+          msg)))))
 
 (defun haskell-doc-ask-mouse-for-type (event)
   "Read the identifier under the mouse and echo its type.
@@ -1440,13 +1443,16 @@ current buffer."
   ;; if printed before do not print it again
   (unless (string= sym (car haskell-doc-last-data))
     (let ((doc (or (haskell-doc-current-info--interaction)
-                  (haskell-doc-sym-doc sym))))
+                   (haskell-doc-sym-doc sym))))
       (when (and doc (haskell-doc-in-code-p))
         ;; In Emacs 19.29 and later, and XEmacs 19.13 and later, all
         ;; messages are recorded in a log.  Do not put haskell-doc messages
         ;; in that log since they are legion.
         (let ((message-log-max nil))
-          (haskell-mode-message-line (format "%s" doc)))))))
+          (haskell-mode-message-line
+           (format "%s" (if haskell-doc-prettify-types
+                            (haskell-doc-prettify-types doc)
+                          doc))))))))
 
 (defun haskell-doc-current-info--interaction ()
   "call will be synchronous, and, the result
@@ -1503,9 +1509,7 @@ will be returned directly."
 EXPR-STRING should be an expression passed to `:type' in ghci.
 prettifies the type output if `haskell-doc-prettify-types' is set"
   (if inferior-haskell-buffer
-      (cond (haskell-doc-prettify-types (haskell-doc-prettify-types
-                                         (haskell-process-do-type expr-string)))
-            (t (haskell-process-do-type expr-string)))))
+      (haskell-process-do-type expr-string)))
 
 (defun haskell-doc-sym-doc (sym)
   "Show the type of given symbol SYM.
