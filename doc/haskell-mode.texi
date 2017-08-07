@@ -2556,7 +2556,7 @@ about Haskell. Once you evaluate this, you can just use @kbd{M-x}
 This mode is by default hooked to @code{Haskell-mode}. This mode
 shows the Type of an identifier at point (if it exists). The type
 of functions/operators in Prelude are shown by default. Other information
-such as the structure of @code{import}, @code{if}, do etc. is also shown.
+such as the structure of @code{import}, @code{if}, @code{do} etc. is also shown.
 
 If you want this to work with other imported modules as well, then
 load the file into the repl. This can be done by pressing @kbd{C-c C-l}
