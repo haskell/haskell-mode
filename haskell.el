@@ -25,7 +25,6 @@
 (require 'haskell-mode)
 (require 'haskell-hoogle)
 (require 'haskell-process)
-(require 'haskell-debug)
 (require 'haskell-interactive-mode)
 (require 'haskell-repl)
 (require 'haskell-load)
