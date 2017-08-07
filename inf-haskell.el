@@ -256,7 +256,7 @@ setting up the inferior-haskell buffer."
   "Wait until PROC sends us a prompt.
 The process PROC should be associated to a comint buffer."
   (with-current-buffer (process-buffer proc)
-    (while (progn
+    (while (with-local-quit
              (goto-char comint-last-input-end)
              (not (or inferior-haskell-seen-prompt
                       (setq inferior-haskell-seen-prompt

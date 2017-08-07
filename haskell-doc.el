@@ -1405,7 +1405,8 @@ Meant for `eldoc-documentation-function'."
   (when (haskell-doc-in-code-p)
     (let* ((msg (or (haskell-doc-sym-doc (haskell-ident-at-point))
                     (haskell-doc-current-info--interaction)))
-           (sanitized-msg (haskell-mode-one-line msg (string-width msg))))
+           (sanitized-msg (if (stringp msg)
+                              (haskell-mode-one-line msg (string-width msg)))))
       (unless (symbolp sanitized-msg)
         (if haskell-doc-prettify-types
             (haskell-doc-prettify-types sanitized-msg)
@@ -1508,7 +1509,11 @@ will be returned directly."
 EXPR-STRING should be an expression passed to `:type' in ghci.
 prettifies the type output if `haskell-doc-prettify-types' is set"
   (if inferior-haskell-buffer
-      (haskell-process-do-type expr-string)))
+      (let ((response (haskell-process-do-type expr-string)))
+        ;; usually when ghci throws an error, the first line is empty/blank (temporary hack)
+        ;; TODO: identify if (response) is actually an error message
+        (unless (string-prefix-p "\n" response)
+          response))))
 
 (defun haskell-doc-sym-doc (sym)
   "Show the type of given symbol SYM.
