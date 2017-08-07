@@ -3,6 +3,7 @@
 ;; Copyright © 2004, 2005, 2006, 2007, 2009, 2016  Free Software Foundation, Inc.
 ;; Copyright © 1997  Hans-Wolfgang Loidl
 ;;             2016  Arthur Fayzrakhmanov
+;; Copyright © 2017 Vasantha Ganesh Kanniappan <vasanthaganesh.k@tuta.io>
 
 ;; Author: Hans-Wolfgang Loidl <hwloidl@dcs.glasgow.ac.uk>
 ;; Temporary Maintainer and Hacker: Graeme E Moss <gem@cs.york.ac.uk>
@@ -1402,9 +1403,8 @@ Meant for `eldoc-documentation-function'."
   ;; There are a number of possible documentation functions.
   ;; Some of them are asynchronous.
   (when (haskell-doc-in-code-p)
-    (let ((msg (or
-                (haskell-doc-current-info--interaction)
-                (haskell-doc-sym-doc (haskell-ident-at-point)))))
+    (let ((msg (or (haskell-doc-sym-doc (haskell-ident-at-point))
+                   (haskell-doc-current-info--interaction))))
       (unless (symbolp msg)
         (if haskell-doc-prettify-types
             (haskell-doc-prettify-types msg)
@@ -1439,8 +1439,8 @@ current buffer."
   (unless sym (setq sym (haskell-ident-at-point)))
   ;; if printed before do not print it again
   (unless (string= sym (car haskell-doc-last-data))
-    (let ((doc (or (haskell-doc-current-info--interaction)
-                   (haskell-doc-sym-doc sym))))
+    (let ((doc (or (haskell-doc-sym-doc sym)
+                   (haskell-doc-current-info--interaction))))
       (when (and doc (haskell-doc-in-code-p))
         ;; In Emacs 19.29 and later, and XEmacs 19.13 and later, all
         ;; messages are recorded in a log.  Do not put haskell-doc messages
