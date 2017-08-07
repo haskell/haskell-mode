@@ -1403,12 +1403,13 @@ Meant for `eldoc-documentation-function'."
   ;; There are a number of possible documentation functions.
   ;; Some of them are asynchronous.
   (when (haskell-doc-in-code-p)
-    (let ((msg (or (haskell-doc-sym-doc (haskell-ident-at-point))
-                   (haskell-doc-current-info--interaction))))
-      (unless (symbolp msg)
+    (let* ((msg (or (haskell-doc-sym-doc (haskell-ident-at-point))
+                    (haskell-doc-current-info--interaction)))
+           (sanitized-msg (haskell-mode-one-line msg (string-width msg))))
+      (unless (symbolp sanitized-msg)
         (if haskell-doc-prettify-types
-            (haskell-doc-prettify-types msg)
-          msg)))))
+            (haskell-doc-prettify-types sanitized-msg)
+          sanitized-msg)))))
 
 (defun haskell-doc-ask-mouse-for-type (event)
   "Read the identifier under the mouse and echo its type.
@@ -1439,17 +1440,18 @@ current buffer."
   (unless sym (setq sym (haskell-ident-at-point)))
   ;; if printed before do not print it again
   (unless (string= sym (car haskell-doc-last-data))
-    (let ((doc (or (haskell-doc-sym-doc sym)
-                   (haskell-doc-current-info--interaction))))
+    (let* ((doc (or (haskell-doc-sym-doc sym)
+                    (haskell-doc-current-info--interaction)))
+           (sanitized-doc (haskell-mode-one-line doc (string-width doc))))
       (when (and doc (haskell-doc-in-code-p))
         ;; In Emacs 19.29 and later, and XEmacs 19.13 and later, all
         ;; messages are recorded in a log.  Do not put haskell-doc messages
         ;; in that log since they are legion.
         (let ((message-log-max nil))
-          (haskell-mode-message-line
+          (message
            (format "%s" (if haskell-doc-prettify-types
-                            (haskell-doc-prettify-types doc)
-                          doc))))))))
+                            (haskell-doc-prettify-types sanitized-doc)
+                          sanitized-doc))))))))
 
 (defun haskell-doc-current-info--interaction ()
   "call will be synchronous, and, the result
