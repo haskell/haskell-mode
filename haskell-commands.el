@@ -301,7 +301,7 @@ Prompts for an arbitrary regexp given a prefix arg PROMPT."
                (haskell-ident-at-point))))
     (rgrep sym
            "*.hs *.lhs *.hsc *.chs *.hs-boot *.lhs-boot"
-           (haskell-session-current-dir (haskell-interactive-session)))))
+           inferior-haskell-root-dir)))
 
 ;;;###autoload
 (defun haskell-process-do-info (&optional prompt-value)
@@ -331,9 +331,6 @@ If PROMPT-VALUE is non-nil, request identifier via mini-buffer."
                                at-point)))))))
         (when ghci-response
           (haskell-mode-message-line ghci-response))))))
-
-;;;###autoload
-
 
 ;;;###autoload
 (defun haskell-mode-jump-to-def-or-tag (&optional _next-p)
