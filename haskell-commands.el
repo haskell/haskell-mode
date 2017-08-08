@@ -32,6 +32,7 @@
 (require 'haskell-font-lock)
 (require 'haskell-interactive-mode)
 (require 'haskell-session)
+(require 'haskell-string)
 (require 'haskell-presentation-mode)
 (require 'haskell-utils)
 (require 'highlight-uses-mode)
@@ -443,7 +444,10 @@ Returns:
 ;;;###autoload
 (defun haskell-mode-jump-to-def (ident)
   "Jump to definition of identifier IDENT at point."
-  (interactive (list (haskell-ident-at-point)))
+  (interactive
+   (list
+    (haskell-string-drop-qualifier
+     (haskell-ident-at-point))))
   (let ((loc (haskell-mode-find-def ident)))
     (when loc
       (haskell-mode-handle-generic-loc loc))))

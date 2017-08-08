@@ -30,33 +30,10 @@
 (ert-deftest test-inferior-haskell-buffer ()
   "Check if the inferior haskell buffer has been started"
   (run-haskell)
-  (should inferior-haskell-buffer))
+  (should (buffer-live-p inferior-haskell-buffer)))
 
 (ert-deftest test-inferior-haskell-root-dir ()
   "Check if the root dir of the loaded file/project is not nil
 This way we test is the file is loaded or not"
   (run-haskell)
-  (should inferior-haskell-root-dir))
-
-;; (ert-deftest test-load-haskell ()
-;;   (run-haskell)
-;;   (with-temp-file "abc.hs"
-;;     (insert "
-;; import Data.Array
-
-;; main = interact $ show.fib.read
-
-;; fib n = memo ! n
-;;   where memo = listArray (1, n) (map myfib [1..n])
-;;         myfib n
-;;           | n <= 2 = 1
-;;           | otherwise = memo ! (n-1) + memo ! (n-2)
-;; ")
-;;     (save-buffer)
-;;     (inferior-haskell-load-file))
-;;   (with-temp-buffer
-;;       (set-buffer "*Messages*")
-;;       (let ((load-str (car (last (haskell-string-split-to-lines (haskell-string-chomp (buffer-string)))))))
-;;         (message (prin1-to-string load-str))
-;;         (should (and (string-prefix-p "Loading" load-str)
-;;                      (string-suffix-p "abc.hs" load-str))))))
+  (should (file-directory-p inferior-haskell-root-dir)))

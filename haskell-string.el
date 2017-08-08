@@ -184,6 +184,14 @@ See also `haskell-string-take'."
   (if (string-suffix-p suffix str)
       (substring str nil (* -1 (string-width suffix)))))
 
+(defun haskell-string-drop-qualifier (ident)
+  "Drop qualifier from given identifier IDENT.
+
+If the identifier is not qualified return it unchanged."
+  (or (and (string-match "^\\([^.]*\\.\\)*\\(?1:[^.]+\\)$" ident)
+           (match-string 1 ident))
+      ident))
+
 (provide 'haskell-string)
 
 ;;; haskell-string.el ends here
