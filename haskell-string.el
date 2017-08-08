@@ -192,6 +192,19 @@ If the identifier is not qualified return it unchanged."
            (match-string 1 ident))
       ident))
 
+(defun haskell-mode-message-line (str)
+  "Echo STR in mini-buffer.
+Given string is shrinken to single line, multiple lines just
+disturbs the programmer."
+  (message "%s" (haskell-mode-one-line str (frame-width))))
+
+(defun haskell-mode-one-line (str width)
+  "Try to fit STR as much as possible on one line according to given WIDTH."
+  (let* ((long-line (replace-regexp-in-string "\n" " " str))
+         (condensed  (replace-regexp-in-string
+                      " +" " " (haskell-string-trim long-line))))
+    (truncate-string-to-width condensed width nil nil "…")))
+
 (provide 'haskell-string)
 
 ;;; haskell-string.el ends here
