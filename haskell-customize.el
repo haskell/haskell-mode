@@ -64,7 +64,7 @@ be located, then stack-ghci will be used.
 Otherwise if there's a *.cabal file, cabal-repl will be used.
 
 If none of the above apply, ghci will be used."
-  :type '(choice (const auto) (const ghci) (const cabal-repl) (const stack-ghci) (const cabal-new-repl))
+  :type '(choice (const auto) (const ghc) (const cabal) (const stack))
   :group 'haskell-interactive)
 
 (defcustom haskell-process-wrapper-function
@@ -159,23 +159,27 @@ pass additional flags to `ghc'."
   :group 'haskell-interactive
   :type '(repeat (string :tag "Argument")))
 
-(defcustom haskell-process-args-cabal-new-repl
-  '("--ghc-option=-ferror-spans")
-  "Additional arguments for `cabal new-repl' invocation.
-Note: The settings in `haskell-process-path-ghci' and
-`haskell-process-args-ghci' are not automatically reused as
-`cabal new-repl' currently invokes `ghc --interactive'. Use
-`--with-ghc=<path-to-executable>' if you want to use a different
-interactive GHC frontend; use `--ghc-option=<ghc-argument>' to
-pass additional flags to `ghc'."
-  :group 'haskell-interactive
-  :type '(repeat (string :tag "Argument")))
-
 (defcustom haskell-process-args-stack-ghci
   '("--ghci-options=-ferror-spans" "--no-build" "--no-load")
   "Additional arguments for `stack ghci' invocation."
   :group 'haskell-interactive
   :type '(repeat (string :tag "Argument")))
+
+(defcustom haskell-process-path-ghc
+  "ghc"
+  "Path for The Glorious Glasgow Haskell Compiler")
+
+(defcustom haskell-process-args-ghc
+  '("--make -ferror-spans -Wall -fforce-recomp")
+  "Any arguments for starting ghc.")
+
+(defcustom haskell-process-args-cabal-build
+  '("--ghc-options=\"-ferror-spans -Wall -fforce-recomp\"")
+  "Arguments while doing cabal build.")
+
+(defcustom haskell-process-args-stack-build
+  '("--ghc-options=-ferror-spans" "-Wall")
+  "Additional arguments for `stack build' invocation.")
 
 (defcustom haskell-process-do-cabal-format-string
   ":!cd %s && %s"
@@ -437,17 +441,17 @@ This function also sets the `inferior-haskell-root-dir'"
          ;; User has explicitly initialized this project with cabal
          (cabal-sandbox
           (setq inferior-haskell-root-dir cabal-sandbox)
-          'cabal-repl)
+          'cabal)
          ((and stack
                (executable-find "stack"))
           (setq inferior-haskell-root-dir stack)
-          'stack-ghci)
+          'stack)
          (cabal
           (setq inferior-haskell-root-dir cabal)
-          'cabal-repl)
+          'cabal)
          (t
           (setq inferior-haskell-root-dir default-directory)
-          'ghci))
+          'ghc))
       haskell-process-type)))
 
 (provide 'haskell-customize)

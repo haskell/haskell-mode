@@ -56,16 +56,16 @@
   "returns what command to run based on the situation with the arguments
 for repl"
   (cl-ecase (haskell-process-type)
-    ('ghci       (cond ((eq system-type 'cygwin) (nconc "ghcii.sh"
-                                                        haskell-process-args-ghci))
-                       (t (nconc `(,haskell-process-path-ghci)
-                                 haskell-process-args-ghci))))
-    ('cabal-repl (nconc `(,haskell-process-path-cabal
-                          "repl")
-                        haskell-process-args-cabal-repl))
-    ('stack-ghci (nconc `(,haskell-process-path-stack
-                          "ghci")
-                        haskell-process-args-stack-ghci))))
+    ('ghc       (cond ((eq system-type 'cygwin) (nconc "ghcii.sh"
+                                                       haskell-process-args-ghci))
+                      (t (nconc `(,haskell-process-path-ghci)
+                                haskell-process-args-ghci))))
+    ('cabal (nconc `(,haskell-process-path-cabal
+                     "repl")
+                   haskell-process-args-cabal-repl))
+    ('stack (nconc `(,haskell-process-path-stack
+                     "ghci")
+                   haskell-process-args-stack-ghci))))
 
 (defconst inferior-haskell-info-xref-re
   "-- Defined at \\(.+\\):\\([0-9]+\\):\\([0-9]+\\)\\(?:-\\([0-9]+\\)\\)?$")

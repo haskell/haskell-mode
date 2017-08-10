@@ -27,7 +27,7 @@
 ;;; Code:
 
 (require 'compile)
-(require 'haskell-cabal)
+(require 'haskell-customize)
 
 ;;;###autoload
 (defgroup haskell-compile nil
@@ -36,7 +36,7 @@
   :group 'haskell)
 
 (defcustom haskell-compile-cabal-build-command
-  "cd %s && cabal build --ghc-option=-ferror-spans"
+  "cd %s && cabal build --ghc-options=\"-ferror-spans -Wall -fforce-recomp\""
   "Default build command to use for `haskell-cabal-build' when a cabal file is detected.
 The `%s' placeholder is replaced by the cabal package top folder."
   :group 'haskell-compile
@@ -112,7 +112,7 @@ messages pointing to additional source locations."
   )
 
 ;;;###autoload
-(defun haskell-compile (&optional edit-command)
+(defun haskell-compile ()
   "Compile the Haskell program including the current buffer.
 Tries to locate the next cabal description in current or parent
 folders via `haskell-cabal-find-dir' and if found, invoke
@@ -132,22 +132,21 @@ detected.
 `haskell-compile' uses `haskell-compilation-mode' which is
 derived from `compilation-mode'. See Info
 node `(haskell-mode)compilation' for more details."
-  (interactive "P")
+  (interactive)
   (save-some-buffers (not compilation-ask-about-save)
-                         compilation-save-buffers-predicate)
-  (let* ((cabdir (haskell-cabal-find-dir))
-         (command1 (if (eq edit-command '-)
-                       haskell-compile-cabal-build-alt-command
-                     haskell-compile-cabal-build-command))
-         (srcname (buffer-file-name))
-         (command (if cabdir
-                      (format command1 cabdir)
-                    (if (and srcname (derived-mode-p 'haskell-mode))
-                        (format haskell-compile-command srcname)
-                      command1))))
-    (when (and edit-command (not (eq edit-command '-)))
-      (setq command (compilation-read-command command)))
-
+                     compilation-save-buffers-predicate)
+  (let* ((commandl (cl-ecase (haskell-process-type)
+                     ('ghc `(,haskell-process-path-ghc
+                             ,(buffer-file-name)
+                             ,haskell-process-args-ghc))
+                     ('cabal `(,haskell-process-path-cabal
+                               "build"
+                               ,haskell-process-args-cabal-build))
+                    ('stack `(,haskell-process-path-stack
+                              "build"
+                              ,haskell-process-args-stack-build))))
+         (command (mapconcat #'concat commandl " ")))
+    (message command)
     (compilation-start command 'haskell-compilation-mode)))
 
 (provide 'haskell-compile)

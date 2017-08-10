@@ -97,7 +97,7 @@ HPTYPE is the result of calling `'haskell-process-type`' function."
                        (append
                         (haskell-process-path-to-list haskell-process-path-cabal)
                         (list "new-repl")
-                        haskell-process-args-cabal-new-repl
+                        haskell-process-args-cabal-repl
                         (let ((target (haskell-session-target session)))
                           (if target (list target) nil)))))))
       ('cabal-repl
