@@ -170,15 +170,15 @@ pass additional flags to `ghc'."
   "Path for The Glorious Glasgow Haskell Compiler")
 
 (defcustom haskell-process-args-ghc
-  '("--make -ferror-spans -Wall -fforce-recomp")
+  "--make -ferror-spans -Wall -fforce-recomp"
   "Any arguments for starting ghc.")
 
 (defcustom haskell-process-args-cabal-build
-  '("--ghc-options=\"-ferror-spans -Wall -fforce-recomp\"")
+  "--ghc-options=\"-ferror-spans -Wall -fforce-recomp\""
   "Arguments while doing cabal build.")
 
 (defcustom haskell-process-args-stack-build
-  '("--ghc-options=-ferror-spans" "-Wall")
+  "--ghc-options=\"-ferror-spans -Wall\""
   "Additional arguments for `stack build' invocation.")
 
 (defcustom haskell-process-do-cabal-format-string

@@ -142,9 +142,9 @@ node `(haskell-mode)compilation' for more details."
                      ('cabal `(,haskell-process-path-cabal
                                "build"
                                ,haskell-process-args-cabal-build))
-                    ('stack `(,haskell-process-path-stack
-                              "build"
-                              ,haskell-process-args-stack-build))))
+                     ('stack `(,haskell-process-path-stack
+                               "build"
+                               ,haskell-process-args-stack-build))))
          (command (mapconcat #'concat commandl " ")))
     (message command)
     (compilation-start command 'haskell-compilation-mode)))
