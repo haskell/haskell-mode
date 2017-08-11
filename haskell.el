@@ -369,9 +369,16 @@ just like `M-x load-file',  errors that might arise are put in the
            (add-to-set interactive-haskell-loaded-files filename)
            (message (format "Loaded %s" filename))))))
 
+(defun haskell-compile-error-p ()
+  "Returns `t' if an error (ghci's) is found in the buffer"
+  (search-forward-regexp "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:"
+                         nil
+                         (lambda () nil)
+                         1))
+
 (defun haskell-compile-load (haskell-load-traceback)
-  "In *haskell-compilation* buffer exists, the traceback from GHCi
-while loading is displayed, else the buffer is created"
+  "`*haskell-compilation*' buffer is created if it does not exist,
+then the traceback from GHCi is displayed"
   (pop-to-buffer "*haskell-compilation*")
   (with-current-buffer "*haskell-compilation*"
     (setq inhibit-read-only t)
@@ -380,10 +387,7 @@ while loading is displayed, else the buffer is created"
     (haskell-compilation-mode)
     (save-excursion
       (goto-char (point-min))
-      (cond ((search-forward-regexp "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:"
-                                                     nil
-                                                     (lambda () nil)
-                                                     1) (compilation-handle-exit 'exit 1 "failed"))
+      (cond ((haskell-compile-error-p) (compilation-handle-exit 'exit 1 "failed"))
             (t (compilation-handle-exit 'exit 0 "finished"))))))
 
 (make-obsolete 'haskell-process-load-or-reload 'haskell-process-load-file
