@@ -305,6 +305,7 @@
 (require 'haskell)
 (require 'haskell-utils)
 (require 'inf-haskell)
+(require 'inf-haskell-mode)
 (require 'imenu)
 (require 'eldoc)
 
@@ -313,7 +314,6 @@
   "Show Haskell function types in echo area."
   :group 'haskell
   :prefix "haskell-doc-")
-
 
 (defvar-local haskell-doc-mode nil
   "*If non-nil, show the type of the function near point or a related comment.
