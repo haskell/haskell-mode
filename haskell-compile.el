@@ -1,6 +1,7 @@
 ;;; haskell-compile.el --- Haskell/GHC compilation sub-mode -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013  Herbert Valerio Riedel
+;; Copyright (C) 2017  Vasantha Ganesh Kanniappan <vasanthaganesh.k@tuta.io>
 
 ;; Author: Herbert Valerio Riedel <hvr@gnu.org>
 
@@ -34,27 +35,6 @@
   "Settings for Haskell compilation mode"
   :link '(custom-manual "(haskell-mode)compilation")
   :group 'haskell)
-
-(defcustom haskell-compile-cabal-build-command
-  "cd %s && cabal build --ghc-options=\"-ferror-spans -Wall -fforce-recomp\""
-  "Default build command to use for `haskell-cabal-build' when a cabal file is detected.
-The `%s' placeholder is replaced by the cabal package top folder."
-  :group 'haskell-compile
-  :type 'string)
-
-(defcustom haskell-compile-cabal-build-alt-command
-  "cd %s && cabal clean -s && cabal build --ghc-option=-ferror-spans"
-  "Alternative build command to use when `haskell-cabal-build' is called with a negative prefix argument.
-The `%s' placeholder is replaced by the cabal package top folder."
-  :group 'haskell-compile
-  :type 'string)
-
-(defcustom haskell-compile-command
-  "ghc -Wall -ferror-spans -fforce-recomp -c %s"
-  "Default build command to use for `haskell-cabal-build' when no cabal file is detected.
-The `%s' placeholder is replaced by the current buffer's filename."
-  :group 'haskell-compile
-  :type 'string)
 
 (defcustom haskell-compile-ghc-filter-linker-messages
   t
@@ -108,26 +88,15 @@ messages pointing to additional source locations."
               haskell-compilation-error-regexp-alist)
 
   (add-hook 'compilation-filter-hook
-            'haskell-compilation-filter-hook nil t)
-  )
+            'haskell-compilation-filter-hook nil t))
 
 ;;;###autoload
 (defun haskell-compile ()
   "Compile the Haskell program including the current buffer.
 Tries to locate the next cabal description in current or parent
-folders via `haskell-cabal-find-dir' and if found, invoke
-`haskell-compile-cabal-build-command' from the cabal package root
-folder. If no cabal package could be detected,
-`haskell-compile-command' is used instead.
-
-If prefix argument EDIT-COMMAND is non-nil (and not a negative
-prefix `-'), `haskell-compile' prompts for custom compile
-command.
-
-If EDIT-COMMAND contains the negative prefix argument `-',
-`haskell-compile' calls the alternative command defined in
-`haskell-compile-cabal-build-alt-command' if a cabal package was
-detected.
+folders, `stack.yaml' file via `locate-dominating-file'. If they
+are not found, then the haskell file in the currebt buffer is
+executed.
 
 `haskell-compile' uses `haskell-compilation-mode' which is
 derived from `compilation-mode'. See Info
