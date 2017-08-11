@@ -359,7 +359,8 @@ just like `M-x load-file',  errors that might arise are put in the
 `*haskell-compilation*' buffer. This is done with the help of
 `:load' and `:reload' functionality that comes with ghci"
   (interactive)
-  (save-buffer)
+  (save-some-buffers (not compilation-ask-about-save)
+                     compilation-save-buffers-predicate)
   (let ((filename (buffer-file-name)))
     (cond ((in-set-p interactive-haskell-loaded-files filename)
            (haskell-compile-load (inferior-haskell-get-result ":reload!"))
