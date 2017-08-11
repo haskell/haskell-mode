@@ -33,6 +33,7 @@
 (require 'haskell-completions)
 (require 'haskell-utils)
 (require 'haskell-customize)
+(require 'haskell-compile)
 
 (defvar interactive-haskell-mode-map
   (let ((map (make-sparse-keymap)))
@@ -353,20 +354,30 @@ Give optional NEXT-P parameter to override value of
 
 ;;;###autoload
 (defun haskell-process-load-file ()
-  "Load or reload the current buffer file based on comint, just loads the file
-just like `M-x load-file', does not do anything about errors that might arise
-while loading. This is done with the help of `:load' and `:reload' functionality
-that comes with ghci"
+  "Load or reload the current buffer file based on comint,
+just like `M-x load-file',  errors that might arise are put in the
+`*haskell-compilation*' buffer. This is done with the help of
+`:load' and `:reload' functionality that comes with ghci"
   (interactive)
   (save-buffer)
   (let ((filename (buffer-file-name)))
     (cond ((in-set-p interactive-haskell-loaded-files filename)
-           (inferior-haskell-get-result ":reload!")
-           (message (format "Reloading %s" filename)))
+           (haskell-compile-load (inferior-haskell-get-result ":reload!"))
+           (message (format "Reloaded %s" filename)))
           (t
-           (inferior-haskell-get-result (format ":load \"%s\"" (buffer-file-name)))
+           (haskell-compile-load (inferior-haskell-get-result (format ":load \"%s\"" (buffer-file-name))))
            (add-to-set interactive-haskell-loaded-files filename)
-           (message (format "Loading %s" filename))))))
+           (message (format "Loaded %s" filename))))))
+
+(defun haskell-compile-load (haskell-load-traceback)
+  "In *haskell-compilation* buffer exists, the traceback from GHCi
+while loading is displayed, else the buffer is created"
+  (pop-to-buffer "*haskell-compilation*")
+  (with-current-buffer "*haskell-compilation*"
+    (setq inhibit-read-only t)
+    (erase-buffer)
+    (insert haskell-load-traceback)
+    (haskell-compilation-mode)))
 
 (make-obsolete 'haskell-process-load-or-reload 'haskell-process-load-file
                "2015-11-14")
