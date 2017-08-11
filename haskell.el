@@ -377,7 +377,14 @@ while loading is displayed, else the buffer is created"
     (setq inhibit-read-only t)
     (erase-buffer)
     (insert haskell-load-traceback)
-    (haskell-compilation-mode)))
+    (haskell-compilation-mode)
+    (save-excursion
+      (goto-char (point-min))
+      (cond ((search-forward-regexp "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:"
+                                                     nil
+                                                     (lambda () nil)
+                                                     1) (compilation-handle-exit 'exit 1 "failed"))
+            (t (compilation-handle-exit 'exit 0 "finished"))))))
 
 (make-obsolete 'haskell-process-load-or-reload 'haskell-process-load-file
                "2015-11-14")
