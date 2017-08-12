@@ -244,7 +244,7 @@ it will be used as exit code for `kill-emacs' function, otherwise
         (kill-buffer)))
      (t
       (make-directory (car entry))
-      (let ((default-directory (concat default-directory (car entry) "/")))
+      (let ((default-directory (file-name-as-directory (concat default-directory (car entry)))))
         (create-directory-structure (cdr entry)))))))
 
 (defmacro with-temp-dir-structure (entries &rest body)
@@ -264,11 +264,18 @@ Whole hierarchy is removed after BODY finishes and value of
   `(let ((tmpdir (make-temp-name "haskell-mode-test-dir")))
      (make-directory tmpdir)
      (unwind-protect
-         (let ((default-directory (concat default-directory tmpdir "/")))
+         (let ((default-directory (file-name-as-directory (concat default-directory tmpdir))))
            (create-directory-structure ',entries)
-           ,@body)
-       (delete-directory tmpdir t))))
+           ,@body))
+     (delete-directory tmpdir t)))
 
+(ert-deftest haskell-with-temp-dir-structure ()
+  (setq cur-haskell-dir default-directory)
+  (with-temp-dir-structure
+   (("a.hs" . "-- Empty file")
+    ("faza" . (("b.hs" . "-- Empty file"))))
+   (cd "faza"))
+  (should (eq default-directory cur-haskell-dir)))
 
 (defun haskell-bypass-confirmation (function &rest args)
   "Call FUNCTION with ARGS, bypassing all prompts.
