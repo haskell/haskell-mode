@@ -400,6 +400,7 @@ on `haskell-completions-sync-repl-completion-at-point'."
   ;;; Tests
   (unwind-protect
       (let (expected)
+        (haskell-unconditional-kill-buffer "*haskell*")
         (switch-to-haskell)
         (with-temp-buffer
           (haskell-mode)
