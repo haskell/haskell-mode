@@ -35,9 +35,9 @@
   (run-haskell)
   (should (buffer-live-p inferior-haskell-buffer)))
 
-;; (ert-deftest test-inferior-haskell-root-dir ()
-;;   "Check if the root dir of the loaded file/project is not nil
-;; This way we test is the file is loaded or not"
-;;   (haskell-unconditional-kill-buffer "*haskell*")
-;;   (run-haskell)
-;;   (should (file-directory-p inferior-haskell-root-dir)))
+(ert-deftest test-inferior-haskell-root-dir ()
+  "Check if the root dir of the loaded file/project is not nil
+This way we test is the file is loaded or not"
+  (haskell-unconditional-kill-buffer "*haskell*")
+  (run-haskell)
+  (should (file-directory-p inferior-haskell-root-dir)))

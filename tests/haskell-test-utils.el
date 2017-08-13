@@ -306,7 +306,8 @@ event of an error or nonlocal exit."
                  adlist))))
 
 (defun haskell-unconditional-kill-buffer (buffer)
-  (when (buffer-live-p buffer)
+  "Buffer names are passed"
+  (when (buffer-live-p (get-buffer buffer))
     (haskell-bypass-confirmation #'kill-buffer buffer)))
 
 (provide 'haskell-test-utils)
