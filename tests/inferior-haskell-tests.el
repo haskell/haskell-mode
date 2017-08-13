@@ -26,6 +26,8 @@
 (ert-deftest test-run-haskell ()
   (haskell-unconditional-kill-buffer "*haskell*")
   (run-haskell)
+  (inferior-haskell-get-result "\n")
+  (goto-char (point-max))
   (should (equal (inferior-haskell-get-result "1 + 1")
                  "2")))
 
