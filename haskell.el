@@ -372,7 +372,7 @@ just like `M-x load-file',  errors that might arise are put in the
 
 (defun haskell-compile-error-p ()
   "Returns `t' if an error (ghci's) is found in the buffer"
-  (search-forward-regexp "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:"
+  (search-forward-regexp "^\\(\\(?:[A-Z]:\\)?[^ \r\n:][^\r\n:]*\\):\\([0-9()-:]+\\):?"
                          nil
                          (lambda () nil)
                          1))
