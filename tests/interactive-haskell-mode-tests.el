@@ -1,6 +1,7 @@
 ;;; interactive-haskell-mode-tests.el --- Tests for Haskell Interactive Mode  -*- lexical-binding: t -*-
 
 ;; Copyright © 2016 Athur Fayzrakhmanov. All rights reserved.
+;; Copyright © 2017 Vasantha Ganesh Kanniappan <vasanthaganesh.k@tuta.io>
 
 ;; This file is part of haskell-mode package.
 ;; You can contact the authors using GitHub issue tracker:
@@ -70,7 +71,6 @@
 (ert-deftest test-haskell-process-load-file ()
   (haskell-unconditional-kill-buffer "*haskell-compilation*")
   (haskell-unconditional-kill-buffer "*haskell*")
-  (message (format "Default dir: %s" default-directory))
   (find-file-literally (concat default-directory
                                (file-name-as-directory "tests")
                                (file-name-as-directory "sample-code")

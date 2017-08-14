@@ -27,6 +27,7 @@
   (with-temp-dir-structure
       (("README.md" . "Hello world")
        ("Main.hs" . "-- Empty file")
+       ("abc.cabal" . "-- Empty File")
        ("stack.yaml" . "# Empty file")
        ("src" . (("moduleA.hs" . "-- Empty file")
                  ("moduleB.hs" . "-- Empty file")))
@@ -53,10 +54,21 @@
   (with-temp-dir-structure
       (("README.md" . "Hello world")
        ("Main.hs" . "-- Empty file")
-       ("stack.yaml" . "# Empty file")
+       ("abc.cabal" . "-- Empty file")
        ("src" . (("moduleA.hs" . "-- Empty file")
                  ("moduleB.hs" . "-- Empty file")))
        ("tests" . (("test1.hs" . "-- Empty file")
                    ("test2.hs" . "-- Empty file"))))
       (progn
-        (should (eq 'stack (haskell-process-type))))))
+        (should (eq 'cabal (haskell-process-type))))))
+
+(ert-deftest haskell-process-type-test-3 ()
+  (with-temp-dir-structure
+      (("README.md" . "Hello world")
+       ("Main.hs" . "-- Empty file")
+       ("src" . (("moduleA.hs" . "-- Empty file")
+                 ("moduleB.hs" . "-- Empty file")))
+       ("tests" . (("test1.hs" . "-- Empty file")
+                   ("test2.hs" . "-- Empty file"))))
+      (progn
+        (should (eq 'ghc (haskell-process-type))))))
