@@ -266,27 +266,6 @@ The process PROC should be associated to a comint buffer."
                          (line-beginning-position 2))
          (point))))))
 
-(defun inferior-haskell-get-result-list (prefix)
-  "Get the completions from ghci using `:complete' and split by \n (and trim white spaces)"
-  (haskell-string-split-to-lines
-   (inferior-haskell-get-result
-    (concat
-     (format  ":complete repl \"%s\""
-              prefix)))))
-
-(defun inferior-haskell-get-completions (unsanitized-completions)
-  "gets the completions result list sanitizes and returns it, the first result
-is meta data so we remove it"
-  (cdr (cl-mapcar #'inferior-haskell-sanitize
-             (inferior-haskell-get-result-list unsanitized-completions))))
-
-(defun inferior-haskell-sanitize (txt)
-  "the completions from ghci (using `:complete') are of the form
-\"SomeCompletion1\"
-\"SomeCompletion2\"
-etc. So we trim the double quotes from the completion to get the string"
-  (haskell-string-trim-prefix "\"" (haskell-string-trim-suffix "\"" txt)))
-
 (provide 'inf-haskell)
 
 ;;; inf-haskell.el ends here
