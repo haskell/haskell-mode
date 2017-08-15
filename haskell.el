@@ -1,4 +1,4 @@
-;;; haskell.el --- Top-level Haskell package -*- lexical-binding: t -*-
+;; haskell.el --- Top-level Haskell package -*- lexical-binding: t -*-
 
 ;; Copyright © 2014 Chris Done.  All rights reserved.
 ;;             2016 Arthur Fayzrakhmanov
@@ -23,12 +23,7 @@
 
 (require 'cl-lib)
 (require 'haskell-hoogle)
-(require 'haskell-process)
-(require 'haskell-interactive-mode)
-(require 'haskell-repl)
-(require 'haskell-load)
 (require 'haskell-commands)
-(require 'haskell-modules)
 (require 'haskell-string)
 (require 'haskell-completions)
 (require 'haskell-utils)
@@ -58,224 +53,6 @@
             #'haskell-completions-sync-repl-completion-at-point
             nil
             t))
-
-;;;###autoload
-(defun haskell-interactive-mode-return ()
-  "Handle the return key."
-  (interactive)
-  (cond
-   ;; At a compile message, jump to the location of the error in the
-   ;; source.
-   ((haskell-interactive-at-compile-message)
-    (next-error-internal))
-   ;; At the input prompt, handle the expression in the usual way.
-   ((haskell-interactive-at-prompt)
-    (haskell-interactive-handle-expr))
-   ;; At any other location in the buffer, copy the line to the
-   ;; current prompt.
-   (t
-    (haskell-interactive-copy-to-prompt))))
-
-;;;###autoload
-(defun haskell-session-kill (&optional leave-interactive-buffer)
-  "Kill the session process and buffer, delete the session.
-0. Prompt to kill all associated buffers.
-1. Kill the process.
-2. Kill the interactive buffer unless LEAVE-INTERACTIVE-BUFFER is not given.
-3. Walk through all the related buffers and set their haskell-session to nil.
-4. Remove the session from the sessions list."
-  (interactive)
-  (haskell-mode-toggle-interactive-prompt-state)
-  (unwind-protect
-      (let* ((session (haskell-session))
-             (name (haskell-session-name session))
-             (also-kill-buffers
-              (and haskell-ask-also-kill-buffers
-                   (y-or-n-p
-                    (format "Killing `%s'. Also kill all associated buffers?"
-                            name)))))
-        (haskell-kill-session-process session)
-        (unless leave-interactive-buffer
-          (kill-buffer (haskell-session-interactive-buffer session)))
-        (cl-loop for buffer in (buffer-list)
-                 do (with-current-buffer buffer
-                      (when (and (boundp 'haskell-session)
-                                 (string= (haskell-session-name haskell-session)
-                                          name))
-                        (setq haskell-session nil)
-                        (when also-kill-buffers
-                          (kill-buffer)))))
-        (setq haskell-sessions
-              (cl-remove-if (lambda (session)
-                              (string= (haskell-session-name session)
-                                       name))
-                            haskell-sessions)))
-    (haskell-mode-toggle-interactive-prompt-state t)))
-
-;;;###autoload
-(defun haskell-interactive-kill ()
-  "Kill the buffer and (maybe) the session."
-  (interactive)
-  (when (eq major-mode 'haskell-interactive-mode)
-    (haskell-mode-toggle-interactive-prompt-state)
-    (unwind-protect
-        (when (and (boundp 'haskell-session)
-                   haskell-session
-                   (y-or-n-p "Kill the whole session?"))
-          (haskell-session-kill t)))
-    (haskell-mode-toggle-interactive-prompt-state t)))
-
-(defun haskell-session-make (name)
-  "Make a Haskell session."
-  (when (haskell-session-lookup name)
-    (error "Session of name %s already exists!" name))
-  (let ((session (setq haskell-session
-                       (list (cons 'name name)))))
-    (add-to-list 'haskell-sessions session)
-    (haskell-process-start session)
-    session))
-
-(defun haskell-session-new-assume-from-cabal ()
-  "Prompt to create a new project based on a guess from the nearest Cabal file.
-If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
-  (let ((name (haskell-session-default-name)))
-    (unless (haskell-session-lookup name)
-      (haskell-mode-toggle-interactive-prompt-state)
-      (unwind-protect
-          (if (or (not haskell-process-load-or-reload-prompt)
-                  (y-or-n-p (format "Start a new project named “%s”? " name)))
-              (haskell-session-make name))
-        (haskell-mode-toggle-interactive-prompt-state t)))))
-
-;;;###autoload
-(defun haskell-session ()
-  "Get the Haskell session, prompt if there isn't one or fail."
-  (or (haskell-session-maybe)
-      (haskell-session-assign
-       (or (haskell-session-from-buffer)
-           (haskell-session-new-assume-from-cabal)
-           (haskell-session-choose)
-           (haskell-session-new)))))
-
-;;;###autoload
-(defun haskell-interactive-switch ()
-  "Switch to the interactive mode for this session."
-  (interactive)
-  (let ((initial-buffer (current-buffer))
-        (buffer (haskell-session-interactive-buffer (haskell-session))))
-    (with-current-buffer buffer
-      (setq haskell-interactive-previous-buffer initial-buffer))
-    (unless (eq buffer (window-buffer))
-      (switch-to-buffer-other-window buffer))))
-
-(defun haskell-session-new ()
-  "Make a new session."
-  (let ((name (read-from-minibuffer "Project name: " (haskell-session-default-name))))
-    (when (not (string= name ""))
-      (let ((session (haskell-session-lookup name)))
-        (haskell-mode-toggle-interactive-prompt-state)
-        (unwind-protect
-            (if session
-                (when
-                    (y-or-n-p
-                     (format "Session %s already exists. Use it?" name))
-                  session)
-              (haskell-session-make name)))
-        (haskell-mode-toggle-interactive-prompt-state t)))))
-
-;;;###autoload
-(defun haskell-session-change ()
-  "Change the session for the current buffer."
-  (interactive)
-  (haskell-session-assign (or (haskell-session-new-assume-from-cabal)
-                              (haskell-session-choose)
-                              (haskell-session-new))))
-
-(defun haskell-process-prompt-restart (process)
-  "Prompt to restart the died PROCESS."
-  (let ((process-name (haskell-process-name process))
-        (cursor-in-echo-area t))
-    (if haskell-process-suggest-restart
-        (progn
-          (haskell-mode-toggle-interactive-prompt-state)
-          (unwind-protect
-              (cond
-               ((string-match "You need to re-run the 'configure' command."
-                              (haskell-process-response process))
-                (cl-case (read-char-choice
-                          (concat
-                           "The Haskell process ended. Cabal wants you to run "
-                           (propertize "cabal configure"
-                                       'face
-                                       'font-lock-keyword-face)
-                           " because there is a version mismatch. Re-configure (y, n, l: view log)?"
-                           "\n\n"
-                           "Cabal said:\n\n"
-                           (propertize (haskell-process-response process)
-                                       'face
-                                       'font-lock-comment-face))
-                          '(?l ?n ?y))
-                  (?y (let ((default-directory
-                              (haskell-session-cabal-dir
-                               (haskell-process-session process))))
-                        (message "%s"
-                                 (shell-command-to-string "cabal configure"))))
-                  (?l (let* ((response (haskell-process-response process))
-                             (buffer (get-buffer "*haskell-process-log*")))
-                        (if buffer
-                            (switch-to-buffer buffer)
-                          (progn (switch-to-buffer
-                                  (get-buffer-create "*haskell-process-log*"))
-                                 (insert response)))))
-                  (?n)))
-               (t
-                (cl-case (read-char-choice
-                          (propertize
-                           (format "The Haskell process `%s' has died. Restart? (y, n, l: show process log) "
-                                   process-name)
-                           'face
-                           'minibuffer-prompt)
-                          '(?l ?n ?y))
-                  (?y (haskell-process-start (haskell-process-session process)))
-                  (?l (let* ((response (haskell-process-response process))
-                             (buffer (get-buffer "*haskell-process-log*")))
-                        (if buffer
-                            (switch-to-buffer buffer)
-                          (progn (switch-to-buffer
-                                  (get-buffer-create "*haskell-process-log*"))
-                                 (insert response)))))
-                  (?n))))
-            ;; unwind
-            (haskell-mode-toggle-interactive-prompt-state t)))
-      (message "The Haskell process `%s' is dearly departed." process-name))))
-
-(defun haskell-process ()
-  "Get the current process from the current session."
-  (haskell-session-process (haskell-session)))
-
-;;;###autoload
-(defun haskell-kill-session-process (&optional session)
-  "Kill the process."
-  (interactive)
-  (let* ((session (or session (haskell-session)))
-         (existing-process (get-process (haskell-session-name session))))
-    (when (processp existing-process)
-      (haskell-interactive-mode-echo session "Killing process ...")
-      (haskell-process-set (haskell-session-process session) 'is-restarting t)
-      (delete-process existing-process))))
-
-;;;###autoload
-(defun haskell-interactive-mode-visit-error ()
-  "Visit the buffer of the current (or last) error message."
-  (interactive)
-  (with-current-buffer (haskell-session-interactive-buffer (haskell-session))
-    (if (progn (goto-char (line-beginning-position))
-               (looking-at haskell-interactive-mode-error-regexp))
-        (progn (forward-line -1)
-               (haskell-interactive-jump-to-error-line))
-      (progn (goto-char (point-max))
-             (haskell-interactive-mode-error-backward)
-             (haskell-interactive-jump-to-error-line)))))
 
 (defvar xref-prompt-for-identifier nil)
 
@@ -321,21 +98,12 @@ Give optional NEXT-P parameter to override value of
                     (1- (progn (forward-char 1)
                                (search-forward-regexp "\"" (line-end-position) nil 1))))))
          (fp (expand-file-name string
-                               (haskell-session-cabal-dir (haskell-session)))))
+                               inferior-haskell-root-dir)))
     (find-file
      (read-file-name
       ""
       fp
       fp))))
-
-;;;###autoload
-(defun haskell-interactive-bring ()
-  "Bring up the interactive mode for this session."
-  (interactive)
-  (let* ((session (haskell-session))
-         (buffer (haskell-session-interactive-buffer session)))
-    (pop-to-buffer buffer)))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Set functionalities
@@ -371,7 +139,7 @@ just like `M-x load-file',  errors that might arise are put in the
            (message (format "Loaded %s" filename))))))
 
 (defun haskell-compile-error-p ()
-  "Returns `t' if an error (ghci's) is found in the buffer"
+  "Returns `t' if an error (ghci's) is found in current buffer"
   (search-forward-regexp "^\\(\\(?:[A-Z]:\\)?[^ \r\n:][^\r\n:]*\\):\\([0-9()-:]+\\):?"
                          nil
                          (lambda () nil)
@@ -391,15 +159,11 @@ then the traceback from GHCi is displayed"
       (cond ((haskell-compile-error-p) (compilation-handle-exit 'exit 1 "failed"))
             (t (compilation-handle-exit 'exit 0 "finished"))))))
 
-(make-obsolete 'haskell-process-load-or-reload 'haskell-process-load-file
-               "2015-11-14")
-
 ;;;###autoload
 (defun haskell-process-cabal-build ()
   "Build the Cabal project."
   (interactive)
-  (haskell-process-do-cabal "build")
-  (haskell-process-add-cabal-autogen))
+  (haskell-process-do-cabal "build"))
 
 ;;;###autoload
 (defun haskell-process-cabal (p)
@@ -413,52 +177,12 @@ then the traceback from GHCi is displayed"
               (append haskell-cabal-commands
                       (list "build --ghc-options=-fforce-recomp"))))))
 
-;;;###autoload
-(defun haskell-process-minimal-imports ()
-  "Dump minimal imports."
-  (interactive)
-  (unless (> (save-excursion
-               (goto-char (point-min))
-               (haskell-navigate-imports-go)
-               (point))
-             (point))
-    (goto-char (point-min))
-    (haskell-navigate-imports-go))
-  (haskell-process-queue-sync-request (haskell-process)
-                                      ":set -ddump-minimal-imports")
-  (haskell-process-load-file)
-  (insert-file-contents-literally
-   (concat (haskell-session-current-dir (haskell-session))
-           "/"
-           (haskell-guess-module-name-from-file-name (buffer-file-name))
-           ".imports")))
-
-(defun haskell-interactive-jump-to-error-line ()
-  "Jump to the error line."
-  (let ((orig-line (buffer-substring-no-properties (line-beginning-position)
-                                                   (line-end-position))))
-    (and (string-match "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)\\(-[0-9]+\\)?:" orig-line)
-         (let* ((file (match-string 1 orig-line))
-                (line (match-string 2 orig-line))
-                (col (match-string 3 orig-line))
-                (session (haskell-interactive-session))
-                (cabal-path (haskell-session-cabal-dir session))
-                (src-path (haskell-session-current-dir session))
-                (cabal-relative-file (expand-file-name file cabal-path))
-                (src-relative-file (expand-file-name file src-path)))
-           (let ((file (cond ((file-exists-p cabal-relative-file)
-                              cabal-relative-file)
-                             ((file-exists-p src-relative-file)
-                              src-relative-file))))
-             (when file
-               (other-window 1)
-               (find-file file)
-               (haskell-interactive-bring)
-               (goto-char (point-min))
-               (forward-line (1- (string-to-number line)))
-               (goto-char (+ (point) (string-to-number col) -1))
-               (haskell-mode-message-line orig-line)
-               t))))))
+(defun haskell-process-do-cabal (command)
+  "Run a Cabal command."
+  (shell-command (concat "cabal " command)
+                 (get-buffer-create "*haskell-process-log*")
+                 (get-buffer-create "*haskell-process-log*"))
+  (switch-to-buffer-other-window (get-buffer "*haskell-process-log*")))
 
 (provide 'haskell)
 ;;; haskell.el ends here
