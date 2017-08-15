@@ -174,6 +174,11 @@ See also `haskell-string-take'."
 (defun haskell-string-split-to-lines (str)
   (cl-mapcar #'haskell-string-chomp (split-string str "\n")))
 
+(defun haskell-string-prompt-trim (str)
+  (substring str (with-temp-buffer
+                   (insert str)
+                   (search-backward "\n" nil t 1))))
+
 (defun haskell-string-trim-prefix (prefix str)
   "if prefix is present in string, the string is trimmed"
   (if (string-prefix-p prefix str)

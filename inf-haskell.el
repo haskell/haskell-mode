@@ -151,7 +151,6 @@ The format should be the same as for `compilation-error-regexp-alist'.")
 
   (add-hook 'comint-preoutput-filter-functions
             'inferior-haskell-send-decl-post-filter)
-  (add-hook 'comint-output-filter-functions 'inferior-haskell-spot-prompt nil t)
   ;; Setup directory tracking.
   (setq-local shell-cd-regexp ":cd")
   (condition-case nil
@@ -214,57 +213,36 @@ setting up the inferior-haskell buffer."
   (let ((proc (inferior-haskell-process)))
     (pop-to-buffer-same-window (process-buffer proc))))
 
-(defvar-local inferior-haskell-seen-prompt nil)
+(defvar inferior-haskell-result-history nil)
 
-(defun inferior-haskell-spot-prompt (_string)
-  (let ((proc (get-buffer-process (current-buffer))))
-    (when proc
-      (save-excursion
-        (goto-char (process-mark proc))
-        (if (re-search-backward comint-prompt-regexp
-                                (line-beginning-position) t)
-            (setq inferior-haskell-seen-prompt t))))))
+(defun inferior-haskell-no-result-return (strg)
+  (let ((proc (inferior-haskell-process)))
+    (with-local-quit
+      (with-current-buffer (process-buffer proc)
+        (goto-char (point-max))
+        (progn
+          (add-to-list 'comint-preoutput-filter-functions
+                       (lambda (output)
+                         (push (haskell-string-prompt-trim
+                                (replace-regexp-in-string comint-prompt-regexp
+                                                          ""
+                                                          output))
+                               inferior-haskell-result-history)
+                         ""))
+          (process-send-string proc strg)
+          (accept-process-output proc)
+          (sit-for 0.1 t)
+          (setq comint-preoutput-filter-functions nil))))))
 
-(defun inferior-haskell-wait-for-prompt (proc &optional timeout)
-  "Wait until PROC sends us a prompt.
-The process PROC should be associated to a comint buffer."
-  (with-current-buffer (process-buffer proc)
-    (while (with-local-quit
-             (goto-char comint-last-input-end)
-             (not (or inferior-haskell-seen-prompt
-                      (setq inferior-haskell-seen-prompt
-                            (re-search-forward comint-prompt-regexp nil t))
-                      (not (accept-process-output proc timeout))))))
-    (unless inferior-haskell-seen-prompt
-      (error "Can't find the prompt"))))
-
-(defun inferior-haskell-send-command (proc str)
-  (setq str (concat str "\n"))
-  (with-current-buffer (process-buffer proc)
-    (inferior-haskell-wait-for-prompt proc)
-    (goto-char (process-mark proc))
-    (insert-before-markers str)
-    (move-marker comint-last-input-end (point))
-    (setq inferior-haskell-seen-prompt nil)
-    (comint-send-string proc str)))
+(defun inferior-haskell-vasa ()
+  (interactive)
+  (comint-proc-query (get-buffer-process inferior-haskell-buffer) ":! pwd\n"))
 
 (defun inferior-haskell-get-result (inf-expr)
   "Submit the expression `inf-expr' to ghci and read the result."
-  (let ((proc (inferior-haskell-process)))
-    (with-current-buffer (process-buffer proc)
-      (let ((parsing-end                ; Remember previous spot.
-             (marker-position (process-mark proc))))
-        (inferior-haskell-send-command proc inf-expr)
-        ;; Find new point.
-        (inferior-haskell-wait-for-prompt proc)
-        (goto-char (point-max))
-        ;; Back up to the previous end-of-line.
-        (end-of-line 0)
-        ;; Extract the output
-        (buffer-substring-no-properties
-         (save-excursion (goto-char parsing-end)
-                         (line-beginning-position 2))
-         (point))))))
+  (inferior-haskell-no-result-return (concat inf-expr "\n"))
+  (message (prin1-to-string inferior-haskell-result-history))
+  (car inferior-haskell-result-history))
 
 (defun inferior-haskell-get-result-list (prefix)
   "Get the completions from ghci using `:complete' and split by \n (and trim white spaces)"
