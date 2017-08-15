@@ -53,8 +53,8 @@
   :group 'haskell)
 
 (defun haskell-program-name-with-args ()
-  "returns what command to run based on the situation with the arguments
-for repl"
+  "Return the command with the arguments to start the repl based on the
+directory structure."
   (cl-ecase (haskell-process-type)
     ('ghc       (cond ((eq system-type 'cygwin) (nconc "ghcii.sh"
                                                        haskell-process-args-ghci))
@@ -116,7 +116,7 @@ The format should be the same as for `compilation-error-regexp-alist'.")
 (defvar-local inferior-haskell-send-decl-post-filter-on nil)
 
 (defun inferior-haskell-send-decl-post-filter (string)
-  "Detect multiline prompt"
+  "Detect multiline prompt."
   (when (and inferior-haskell-send-decl-post-filter-on
              (string-match inferior-haskell-multiline-prompt-re string))
     ;; deleting sequence of `%s|' multiline promts
@@ -198,7 +198,7 @@ setting up the inferior-haskell buffer."
       (run-hooks 'inferior-haskell-hook))))
 
 (defun inferior-haskell-process ()
-  "restart if not present"
+  "Restart if not present."
   (cond ((and (buffer-live-p inferior-haskell-buffer)
               (comint-check-proc inferior-haskell-buffer))
          (get-buffer-process inferior-haskell-buffer))

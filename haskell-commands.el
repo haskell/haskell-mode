@@ -47,7 +47,7 @@
   "History list for session targets.")
 
 (defun haskell-process-hayoo-ident (ident)
-  "Hayoo for IDENT, return a list of modules"
+  "Hayoo for IDENT, return a list of modules."
   ;; We need a real/simulated closure, because otherwise these
   ;; variables will be unbound when the url-retrieve callback is
   ;; called.
@@ -326,7 +326,7 @@ Requires the :loc-at command from GHCi."
   "Apply stylish-haskell to the current buffer.
 
 Use `haskell-mode-stylish-haskell-path' to know where to find
-stylish-haskell executable. This function tries to preserve
+stylish-haskell executable.  This function tries to preserve
 cursor position and markers by using
 `haskell-mode-buffer-apply-command'."
   (interactive)

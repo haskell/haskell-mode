@@ -189,5 +189,27 @@ expression bounds."
 If given DISABLED argument sets variable value to nil, otherwise to t."
   (setq haskell-mode-interactive-prompt-state (not disabled)))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Set functionalities
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun make-set ()
+  "Create a Set data structure (behind the scenes it is a hash-table)."
+  (make-hash-table))
+
+(defun add-to-set (set element)
+  "Add an element to the set.
+SET, the first argument is the set object.
+ELEMENT, the second argument is the element to be pushed into the set."
+  (puthash element t set))
+
+(defun in-set-p (set element)
+  "Return t if the SET data structure has the ELEMENT."
+  (gethash element set nil))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 (provide 'haskell-utils)
 ;;; haskell-utils.el ends here

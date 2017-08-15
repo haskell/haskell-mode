@@ -105,27 +105,13 @@ Give optional NEXT-P parameter to override value of
       fp
       fp))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Set functionalities
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defun make-set ()
-  (make-hash-table))
-(defun add-to-set (set element)
-  (puthash element t set))
-(defun in-set-p (set element)
-  (gethash element set nil))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (defvar interactive-haskell-loaded-files (make-set))
 
 ;;;###autoload
 (defun haskell-process-load-file ()
-  "Load or reload the current buffer file based on comint,
-just like `M-x load-file',  errors that might arise are put in the
-`*haskell-compilation*' buffer. This is done with the help of
-`:load' and `:reload' functionality that comes with ghci"
+  "Load or reload the file in current buffer with the help of `:load' or
+`:reload' functionality that comes with ghci.
+Errors that might arise are put in the `*haskell-compilation*' buffer."
   (interactive)
   (save-some-buffers (not compilation-ask-about-save)
                      compilation-save-buffers-predicate)
@@ -139,15 +125,15 @@ just like `M-x load-file',  errors that might arise are put in the
            (message (format "Loaded %s" filename))))))
 
 (defun haskell-compile-error-p ()
-  "Returns `t' if an error (ghci's) is found in current buffer"
+  "Return t if an error (ghci's) is found in current buffer."
   (search-forward-regexp "^\\(\\(?:[A-Z]:\\)?[^ \r\n:][^\r\n:]*\\):\\([0-9()-:]+\\):?"
                          nil
                          (lambda () nil)
                          1))
 
 (defun haskell-compile-load (haskell-load-traceback)
-  "`*haskell-compilation*' buffer is created if it does not exist,
-then the traceback from GHCi is displayed"
+  "A `*haskell-compilation*' buffer is created if it does not exist,
+then the traceback from GHCi is displayed."
   (pop-to-buffer "*haskell-compilation*")
   (with-current-buffer "*haskell-compilation*"
     (setq inhibit-read-only t)
@@ -167,7 +153,8 @@ then the traceback from GHCi is displayed"
 
 ;;;###autoload
 (defun haskell-process-cabal (p)
-  "Prompts for a Cabal command to run."
+  "Prompts for a Cabal command to run.
+Argument P is the command to run."
   (interactive "P")
   (if p
       (haskell-process-do-cabal
@@ -178,7 +165,7 @@ then the traceback from GHCi is displayed"
                       (list "build --ghc-options=-fforce-recomp"))))))
 
 (defun haskell-process-do-cabal (command)
-  "Run a Cabal command."
+  "Run a Cabal COMMAND."
   (shell-command (concat "cabal " command)
                  (get-buffer-create "*haskell-process-log*")
                  (get-buffer-create "*haskell-process-log*"))
