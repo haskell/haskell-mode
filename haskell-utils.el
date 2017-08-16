@@ -29,7 +29,7 @@
 ;; When possible, functions in this module shall be accompanied by
 ;; ERT-based unit tests.
 ;;
-;; See also `haskell-str.el' for string utility functions.
+;; See also `haskell-string.el' for string utility functions.
 ;;
 ;; All symbols in this module have a `haskell-utils-' prefix.
 

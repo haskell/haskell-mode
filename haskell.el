@@ -120,7 +120,7 @@ Errors that might arise are put in the `*haskell-compilation*' buffer."
            (haskell-compile-load (inferior-haskell-get-result ":reload!"))
            (message (format "Reloaded %s" filename)))
           (t
-           (haskell-compile-load (inferior-haskell-get-result (format ":load \"%s\"" (buffer-file-name))))
+           (haskell-compile-load (inferior-haskell-get-result (format ":load \"%s\"" filename)))
            (haskell-add-to-set interactive-haskell-loaded-files filename)
            (message (format "Loaded %s" filename))))))
 
