@@ -113,7 +113,10 @@ Give optional NEXT-P parameter to override value of
       fp
       fp))))
 
-(defvar interactive-haskell-loaded-files (haskell-make-set))
+(defvar haskell-process-loaded-file-status (cons "" nil)
+  "cons with CAR as the name of the file loaded and
+the CDR is the status of the loaded file; i.e. t for success and nil
+for failure.")
 
 ;;;###autoload
 (defun haskell-process-load-file ()
@@ -124,13 +127,20 @@ Errors that might arise are put in the `*haskell-compilation*' buffer."
   (save-some-buffers (not compilation-ask-about-save)
                      compilation-save-buffers-predicate)
   (let ((filename (buffer-file-name)))
-    (cond ((haskell-in-set-p interactive-haskell-loaded-files filename)
-           (haskell-compile-load (inferior-haskell-get-result ":reload!"))
-           (message (format "Reloaded %s" filename)))
+    (cond ((equal filename (car haskell-process-loaded-file-status))
+           (let ((load-status (haskell-compile-load
+                               (inferior-haskell-get-result
+                                ":reload!"))))
+             (setq haskell-process-loaded-file-status
+                   (cons filename load-status))
+             (message (format "Reloaded %s" filename))))
           (t
-           (haskell-compile-load (inferior-haskell-get-result (format ":load \"%s\"" filename)))
-           (haskell-add-to-set interactive-haskell-loaded-files filename)
-           (message (format "Loaded %s" filename))))))
+           (let ((load-status (haskell-compile-load
+                               (inferior-haskell-get-result
+                                (format ":load \"%s\"" filename)))))
+             (setq haskell-process-loaded-file-status
+                   (cons filename load-status ))
+             (message (format "Loaded %s" filename)))))))
 
 (defun haskell-compile-error-p ()
   "Return t if an error (ghci's) is found in current buffer."
@@ -141,7 +151,8 @@ Errors that might arise are put in the `*haskell-compilation*' buffer."
 
 (defun haskell-compile-load (haskell-load-traceback)
   "A `*haskell-compilation*' buffer is created if it does not exist,
-then the traceback from GHCi is displayed."
+then the traceback from GHCi is displayed. Returns t if no errors else
+returns nil."
   (pop-to-buffer "*haskell-compilation*")
   (with-current-buffer "*haskell-compilation*"
     (setq inhibit-read-only t)
@@ -150,8 +161,10 @@ then the traceback from GHCi is displayed."
     (haskell-compilation-mode)
     (save-excursion
       (goto-char (point-min))
-      (cond ((haskell-compile-error-p) (compilation-handle-exit 'exit 1 "failed"))
-            (t (compilation-handle-exit 'exit 0 "finished"))))))
+      (cond ((haskell-compile-error-p) (compilation-handle-exit 'exit 1 "failed")
+             nil)
+            (t (compilation-handle-exit 'exit 0 "finished")
+               t)))))
 
 ;;;###autoload
 (defun haskell-process-cabal-build ()
