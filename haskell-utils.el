@@ -151,7 +151,7 @@ Returns one of the following symbols:
 (defun haskell-utils-compose-type-at-command (pos)
   "Prepare :type-at command to be send to haskell process.
 POS is a cons cell containing min and max positions, i.e. target
-expression bounds."
+expression bounds. Must use `:set +c' in ghci for this to work."
   (save-excursion
     (let ((start-p (car pos))
           (end-p (cdr pos))

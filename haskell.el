@@ -30,6 +30,14 @@
 (require 'haskell-customize)
 (require 'haskell-compile)
 
+(defvar haskell-set+c-p nil
+  "t if `:set +c` else nil")
+
+(defun haskell-set+c ()
+  "set `:set +c` is not already set"
+  (if (not haskell-set+c-p)
+      (inferior-haskell-get-result ":set +c")))
+
 (defvar interactive-haskell-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-l") 'haskell-process-load-file)
