@@ -2,7 +2,7 @@
 
 ;;; Commentary:
 
-;;; This module provides varoius `haskell-mode' and `haskell-interactive-mode'
+;;; This module provides varoius `haskell-mode'
 ;;; specific commands such as show type signature, show info, haskell process
 ;;; commands and etc.
 
@@ -406,7 +406,7 @@ Requires :set +c to be set"
                  (haskell-ident-pos-at-point)
                  (cons (point)
                        (point)))))
-    (inferior-haskell-get-result ":set +c")
+    (haskell-set+c)
     (when pos
       (let ((reply (inferior-haskell-get-result
                     (save-excursion

@@ -31,42 +31,8 @@
 
 
 (require 'ert)
+(require 'haskell-utils)
 (require 'haskell-test-utils)
-
-(ert-deftest haskell-interactive-error-regexp-test-1 ()
-  "Tests the regexp `haskell-interactive-mode-error-regexp'"
-  (with-temp-buffer
-    (insert "/home/user/Test.hs:24:30:")
-    (goto-char (point-min))
-    (should (haskell-compile-error-p))))
-
-(ert-deftest haskell-interactive-error-regexp-test-2 ()
-  "Tests the regexp `haskell-interactive-mode-error-regexp'"
-  (with-temp-buffer
-    (insert " Test.hs:8:9:")
-    (goto-char (point-min))
-    (should (not (haskell-compile-error-p)))))
-
-(ert-deftest haskell-interactive-error-regexp-test-3 ()
-  "Tests the regexp `haskell-interactive-mode-error-regexp'"
-  (with-temp-buffer
-    (insert "Test.hs:5:18:")
-    (goto-char (point-min))
-    (should (haskell-compile-error-p))))
-
-(ert-deftest haskell-interactive-error-regexp-test-4 ()
-  "Tests the regexp `haskell-interactive-mode-error-regexp'"
-  (with-temp-buffer
-    (insert "Test.hs:7:6: Not in scope: type constructor or class ‘Ty’")
-    (goto-char (point-min))
-    (should (haskell-compile-error-p))))
-
-(ert-deftest haskell-interactive-error-regexp-test-5 ()
-  "Tests the regexp `haskell-interactive-mode-error-regexp'"
-  (with-temp-buffer
-    (insert "Test.hs:9:5: Not in scope: ‘c’")
-    (goto-char (point-min))
-    (should (haskell-compile-error-p))))
 
 (ert-deftest test-haskell-process-load-file ()
   (haskell-unconditional-kill-buffer "*haskell-compilation*")
@@ -92,4 +58,4 @@
     (haskell-process-load-file)
     (with-current-buffer "*haskell-compilation*"
       (goto-char (point-min))
-      (should (haskell-compile-error-p)))))
+      (should (haskell-utils-compile-error-p)))))

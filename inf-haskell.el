@@ -266,6 +266,14 @@ The process PROC should be associated to a comint buffer."
                          (line-beginning-position 2))
          (point))))))
 
+(defvar haskell-set+c-p nil
+  "t if `:set +c` else nil")
+
+(defun haskell-set+c ()
+  "set `:set +c` is not already set"
+  (if (not haskell-set+c-p)
+      (inferior-haskell-get-result ":set +c")))
+
 (provide 'inf-haskell)
 
 ;;; inf-haskell.el ends here

@@ -30,14 +30,6 @@
 (require 'haskell-customize)
 (require 'haskell-compile)
 
-(defvar haskell-set+c-p nil
-  "t if `:set +c` else nil")
-
-(defun haskell-set+c ()
-  "set `:set +c` is not already set"
-  (if (not haskell-set+c-p)
-      (inferior-haskell-get-result ":set +c")))
-
 (defvar interactive-haskell-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-l") 'haskell-process-load-file)
@@ -142,13 +134,6 @@ Errors that might arise are put in the `*haskell-compilation*' buffer."
                    (cons filename load-status ))
              (message (format "Loaded %s" filename)))))))
 
-(defun haskell-compile-error-p ()
-  "Return t if an error (ghci's) is found in current buffer."
-  (search-forward-regexp "^\\(\\(?:[A-Z]:\\)?[^ \r\n:][^\r\n:]*\\):\\([0-9()-:]+\\):?"
-                         nil
-                         (lambda () nil)
-                         1))
-
 (defun haskell-compile-load (haskell-load-traceback)
   "A `*haskell-compilation*' buffer is created if it does not exist,
 then the traceback from GHCi is displayed. Returns t if no errors else
@@ -161,7 +146,7 @@ returns nil."
     (haskell-compilation-mode)
     (save-excursion
       (goto-char (point-min))
-      (cond ((haskell-compile-error-p) (compilation-handle-exit 'exit 1 "failed")
+      (cond ((haskell-utils-compile-error-p) (compilation-handle-exit 'exit 1 "failed")
              nil)
             (t (compilation-handle-exit 'exit 0 "finished")
                t)))))
