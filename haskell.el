@@ -105,7 +105,7 @@ Give optional NEXT-P parameter to override value of
       fp
       fp))))
 
-(defvar interactive-haskell-loaded-files (make-set))
+(defvar interactive-haskell-loaded-files (haskell-make-set))
 
 ;;;###autoload
 (defun haskell-process-load-file ()
@@ -116,12 +116,12 @@ Errors that might arise are put in the `*haskell-compilation*' buffer."
   (save-some-buffers (not compilation-ask-about-save)
                      compilation-save-buffers-predicate)
   (let ((filename (buffer-file-name)))
-    (cond ((in-set-p interactive-haskell-loaded-files filename)
+    (cond ((haskell-in-set-p interactive-haskell-loaded-files filename)
            (haskell-compile-load (inferior-haskell-get-result ":reload!"))
            (message (format "Reloaded %s" filename)))
           (t
            (haskell-compile-load (inferior-haskell-get-result (format ":load \"%s\"" (buffer-file-name))))
-           (add-to-set interactive-haskell-loaded-files filename)
+           (haskell-add-to-set interactive-haskell-loaded-files filename)
            (message (format "Loaded %s" filename))))))
 
 (defun haskell-compile-error-p ()

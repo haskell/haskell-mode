@@ -194,17 +194,17 @@ If given DISABLED argument sets variable value to nil, otherwise to t."
 ;; Set functionalities
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun make-set ()
+(defun haskell-make-set ()
   "Create a Set data structure (behind the scenes it is a hash-table)."
   (make-hash-table))
 
-(defun add-to-set (set element)
+(defun haskell-add-to-set (set element)
   "Add an element to the set.
 SET, the first argument is the set object.
 ELEMENT, the second argument is the element to be pushed into the set."
   (puthash element t set))
 
-(defun in-set-p (set element)
+(defun haskell-in-set-p (set element)
   "Return t if the SET data structure has the ELEMENT."
   (gethash element set nil))
 
