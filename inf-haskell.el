@@ -53,6 +53,9 @@
   :prefix "haskell-"
   :group 'haskell)
 
+(defcustom inferior-haskell-hook nil
+  "there is something in it")
+
 (defun haskell-program-name-with-args ()
   "returns what command to run based on the situation with the arguments
 for repl"
@@ -114,21 +117,6 @@ The format should be the same as for `compilation-error-regexp-alist'.")
   ;; Why the backslash in [\\._[:alnum:]]?
   "^\\*?[[:upper:]][\\._[:alnum:]]*\\(?: \\*?[[:upper:]][\\._[:alnum:]]*\\)*\\( λ\\)?> \\|^λ?> $")
 
-(defvar-local inferior-haskell-send-decl-post-filter-on nil)
-
-(defun inferior-haskell-send-decl-post-filter (string)
-  "Detect multiline prompt"
-  (when (and inferior-haskell-send-decl-post-filter-on
-             (string-match inferior-haskell-multiline-prompt-re string))
-    ;; deleting sequence of `%s|' multiline promts
-    (while (string-match inferior-haskell-multiline-prompt-re string)
-      (setq string (substring string (match-end 0))))
-    ;; deleting regular prompts
-    (setq string (replace-regexp-in-string comint-prompt-regexp "" string)
-          ;; turning off this post-filter
-          inferior-haskell-send-decl-post-filter-on nil))
-  string)
-
 ;;; TODO
 ;;; -> Make font lock work for strings, directories, hyperlinks
 ;;; -> Make font lock work for key words???
@@ -150,8 +138,6 @@ The format should be the same as for `compilation-error-regexp-alist'.")
   (setq-local comint-input-autoexpand nil)
   (setq-local comint-prompt-read-only t)
 
-  (add-hook 'comint-preoutput-filter-functions
-            'inferior-haskell-send-decl-post-filter)
   ;; Setup directory tracking.
   (setq-local shell-cd-regexp ":cd")
   (condition-case nil
@@ -230,7 +216,7 @@ setting up the inferior-haskell buffer."
                                (re-search-backward "^ghci> " nil t 1))))
               inferior-haskell-result-history)
         (setq haskell-next-input ""))
-    nil))
+    ""))
 
 (defun inferior-haskell-no-result-return (strg)
   (let ((proc (inferior-haskell-process)))
@@ -240,16 +226,16 @@ setting up the inferior-haskell buffer."
         (progn
           (add-to-list 'comint-preoutput-filter-functions
                        (lambda (output)
-                         (haskell-string-chomp
-                          (haskell-extract-exp output))))
+                         (haskell-extract-exp output)))
           (process-send-string proc strg)
           (accept-process-output proc)
+          (sit-for 0.1)
           (setq comint-preoutput-filter-functions nil))))))
 
 (defun inferior-haskell-get-result (inf-expr)
   "Submit the expression `inf-expr' to ghci and read the result."
   (inferior-haskell-no-result-return (concat inf-expr "\n"))
-  (car inferior-haskell-result-history))
+  (haskell-string-chomp (car inferior-haskell-result-history)))
 
 (defun inferior-haskell-get-result-list (prefix)
   "Get the completions from ghci using `:complete' and split by \n (and trim white spaces)"
