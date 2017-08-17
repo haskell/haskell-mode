@@ -40,6 +40,7 @@
 (require 'haskell-cabal)
 (require 'haskell-customize)
 (require 'cl-lib)
+(require 'haskell-string)
 
 ;; Dynamically scoped variables.
 (defvar find-tag-marker-ring)
@@ -215,6 +216,22 @@ setting up the inferior-haskell buffer."
 
 (defvar inferior-haskell-result-history nil)
 
+(defvar haskell-next-input "")
+(defun haskell-extract-exp (str)
+  (setq haskell-next-input (concat haskell-next-input str))
+  (if (with-temp-buffer
+        (insert haskell-next-input)
+        (re-search-backward "^ghci> " nil t 1))
+      (progn
+        (push (substring haskell-next-input
+                         nil
+                         (1- (with-temp-buffer
+                               (insert haskell-next-input)
+                               (re-search-backward "^ghci> " nil t 1))))
+              inferior-haskell-result-history)
+        (setq haskell-next-input ""))
+    nil))
+
 (defun inferior-haskell-no-result-return (strg)
   (let ((proc (inferior-haskell-process)))
     (with-local-quit
@@ -223,25 +240,15 @@ setting up the inferior-haskell buffer."
         (progn
           (add-to-list 'comint-preoutput-filter-functions
                        (lambda (output)
-                         (push (haskell-string-prompt-trim
-                                (replace-regexp-in-string comint-prompt-regexp
-                                                          ""
-                                                          output))
-                               inferior-haskell-result-history)
-                         ""))
+                         (haskell-string-chomp
+                          (haskell-extract-exp output))))
           (process-send-string proc strg)
           (accept-process-output proc)
-          (sit-for 0.1 t)
           (setq comint-preoutput-filter-functions nil))))))
-
-(defun inferior-haskell-vasa ()
-  (interactive)
-  (comint-proc-query (get-buffer-process inferior-haskell-buffer) ":! pwd\n"))
 
 (defun inferior-haskell-get-result (inf-expr)
   "Submit the expression `inf-expr' to ghci and read the result."
   (inferior-haskell-no-result-return (concat inf-expr "\n"))
-  (message (prin1-to-string inferior-haskell-result-history))
   (car inferior-haskell-result-history))
 
 (defun inferior-haskell-get-result-list (prefix)
