@@ -304,6 +304,8 @@
 (require 'haskell-mode)
 (require 'haskell-utils)
 (require 'inf-haskell)
+(require 'haskell-collapse)
+(require 'haskell)
 (require 'imenu)
 (require 'eldoc)
 
@@ -1496,13 +1498,20 @@ will be returned directly."
                          (not (string-match-p "\n" expr)))))
     ;; No newlines in expressions, and surround with parens if it
     ;; might be a slice expression
-    (when (and expr-okay inferior-haskell-buffer)
-      (inferior-haskell-get-result
-       (format (if (or (string-match-p "\\`(" expr)
-                       (string-match-p "\\`[_[:alpha:]]" expr))
-                   ":type %s"
-                 ":type (%s)")
-               expr)))))
+    (when (and expr-okay
+               inferior-haskell-buffer)
+      (cond ((and (equal (buffer-file-name)
+                         (car haskell-process-loaded-file-status))
+                  (cdr haskell-process-loaded-file-status))
+             (inferior-haskell-get-result
+              (format (if (or (string-match-p "\\`(" expr)
+                              (string-match-p "\\`[_[:alpha:]]" expr))
+                          ":type %s"
+                        ":type (%s)")
+                      expr)))
+            (t (inferior-haskell-get-result
+                (haskell-utils-compose-type-at-command
+                 (haskell-indented-block))))))))
 
 (defun haskell-process-get-type (expr-string)
   "synchronously get the type of a given string.
