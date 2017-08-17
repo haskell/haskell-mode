@@ -304,6 +304,8 @@
 (require 'haskell-mode)
 (require 'haskell-utils)
 (require 'inf-haskell)
+(require 'haskell-collapse)
+(require 'haskell)
 (require 'imenu)
 (require 'eldoc)
 
@@ -1496,13 +1498,20 @@ will be returned directly."
                          (not (string-match-p "\n" expr)))))
     ;; No newlines in expressions, and surround with parens if it
     ;; might be a slice expression
-    (when (and expr-okay inferior-haskell-buffer)
-      (inferior-haskell-get-result
-       (format (if (or (string-match-p "\\`(" expr)
-                       (string-match-p "\\`[_[:alpha:]]" expr))
-                   ":type %s"
-                 ":type (%s)")
-               expr)))))
+    (when (and expr-okay
+               inferior-haskell-buffer)
+      (cond ((and (equal (buffer-file-name)
+                         (car haskell-process-loaded-file-status))
+                  (cdr haskell-process-loaded-file-status))
+             (inferior-haskell-get-result
+              (format (if (or (string-match-p "\\`(" expr)
+                              (string-match-p "\\`[_[:alpha:]]" expr))
+                          ":type %s"
+                        ":type (%s)")
+                      expr)))
+            (t (inferior-haskell-get-result
+                (haskell-utils-compose-type-at-command
+                 (haskell-indented-block))))))))
 
 (defun haskell-process-get-type (expr-string)
   "synchronously get the type of a given string.
@@ -1510,10 +1519,8 @@ EXPR-STRING should be an expression passed to `:type' in ghci.
 prettifies the type output if `haskell-doc-prettify-types' is set"
   (if inferior-haskell-buffer
       (let ((response (haskell-process-do-type expr-string)))
-        ;; usually when ghci throws an error, the first line is empty/blank (temporary hack)
-        ;; TODO: identify if (response) is actually an error message
-        (unless (string-prefix-p "\n" response)
-          response))))
+        (unless (haskell-utils-repl-response-error-p response)
+            response))))
 
 (defun haskell-doc-sym-doc (sym)
   "Show the type of given symbol SYM.
