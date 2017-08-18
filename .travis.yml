@@ -22,10 +22,10 @@ matrix:
 install: |
     case "$TARGET" in
       emacs24)
-        docker build -t haskell-mode:24 ./emacs-24 --env "BRANCH=$(TRAVIS_COMMIT)";
+        docker build -t haskell-mode:24 ./emacs-24;
         ;;
       emacs25)
-        docker build -t haskell-mode:25 ./emacs-25;
+        docker build -t haskell-mode:25 ./emacs-25 --env "BRANCH=$TRAVIS_COMMIT";
         ;;
       emacs-snapshot)
         docker build -t haskell-mode:snapshot ./emacs-snapshot;

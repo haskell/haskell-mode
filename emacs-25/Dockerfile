@@ -11,7 +11,7 @@ RUN apt-get update \
     && apt-get install -y ghc \
     && apt-get install -y git \
     && git clone https://github.com/vasanthaganeshk/haskell-interactive-mode \
-    && git checkout $(BRANCH)
+    && git checkout $BRANCH
 
 WORKDIR ./haskell-interactive-mode
 
