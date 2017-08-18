@@ -25,7 +25,7 @@ install: |
         docker build -t haskell-mode:24 ./emacs-24;
         ;;
       emacs25)
-        docker build -t haskell-mode:25 ./emacs-25 --env "BRANCH=$TRAVIS_COMMIT";
+        docker build -t haskell-mode:25 ./emacs-25;
         ;;
       emacs-snapshot)
         docker build -t haskell-mode:snapshot ./emacs-snapshot;
@@ -48,7 +48,7 @@ script: |
         docker run -it haskell-mode:24;
         ;;
       emacs25)
-        docker run -it haskell-mode:25;
+        docker run -it haskell-mode:25 --env "BRANCH=$TRAVIS_COMMIT";
         ;;
       emacs-snapshot)
         docker run -it haskell-mode:snapshot;
