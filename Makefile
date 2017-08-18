@@ -44,6 +44,7 @@ PKG_DIST_FILES = $(ELFILES) logo.svg NEWS haskell-mode.info dir
 all: check-emacs-version compile $(AUTOLOADS) info
 
 check-emacs-version :
+	git branch
 	$(BATCH) --eval "(when (version< emacs-version \"24.3\")				\
                             (message \"Error: haskell-mode requires Emacs 24.3 or later\")	\
                             (message \"Your version of Emacs is %s\" emacs-version)		\
