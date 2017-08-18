@@ -16,4 +16,4 @@ ENV BRANCH=$BRANCH
 
 ENTRYPOINT ["/bin/bash", "-c", "git checkout $BRANCH"]
 
-CMD ["/bin/make", "check"]
+CMD ["/bin/bash", "-c", "make check"]
