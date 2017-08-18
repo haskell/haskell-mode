@@ -79,10 +79,7 @@ build-$(EMACS_VERSION)/build-flag : build-$(EMACS_VERSION) $(patsubst %.el,build
 check-%: tests/%-tests.el
 	$(BATCH) -l "$<" -f ert-run-tests-batch-and-exit;
 
-check: gitbranch compile $(AUTOLOADS) check-ert
-
-gitbranch:
-	git branch
+check: compile $(AUTOLOADS) check-ert
 
 check-ert: $(ELCHECKS)
 	$(BATCH) --eval "(when (= emacs-major-version 24)					\
