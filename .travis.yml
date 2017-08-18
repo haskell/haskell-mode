@@ -23,15 +23,15 @@ install: |
     case "$TARGET" in
       emacs24)
         docker build -t haskell-mode:24 ./emacs-24 &&
-        docker cp $PWD haskell-mode:24/root/haskell-interactive-mode;
+        docker cp $PWD haskell-mode:24/root;
         ;;
       emacs25)
         docker build -t haskell-mode:25 ./emacs-25 &&
-        docker cp $PWD haskell-mode:25/root/haskell-interactive-mode;
+        docker cp $PWD haskell-mode:25/root;
         ;;
       emacs-snapshot)
         docker build -t haskell-mode:snapshot ./emacs-snapshot &&
-        docker cp $PWD haskell-mode:snapshot/root/haskell-interactive-mode;
+        docker cp $PWD haskell-mode:snapshot/root;
         ;;
       deploy-manual)
         sudo apt-get update &&
