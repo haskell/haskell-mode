@@ -3,8 +3,6 @@ FROM phusion/baseimage
 
 USER root
 
-ENV BRANCH
-
 RUN apt-get update \
     && apt-get install -y build-essential \
     && apt-get install -y emacs-nox \
@@ -13,6 +11,8 @@ RUN apt-get update \
     && git clone https://github.com/vasanthaganeshk/haskell-interactive-mode
 
 WORKDIR ./haskell-interactive-mode
+
+ENV BRANCH=$BRANCH
 
 ENTRYPOINT ["/bin/git", "checkout $BRANCH"]
 
