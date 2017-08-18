@@ -14,5 +14,6 @@ WORKDIR ./haskell-interactive-mode
 
 ENV BRANCH=$BRANCH
 
-ENTRYPOINT git checkout $BRANCH \
+ENTRYPOINT echo $BRANCH \
+           && git checkout $BRANCH \
            && make check
