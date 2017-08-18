@@ -22,13 +22,16 @@ matrix:
 install: |
     case "$TARGET" in
       emacs24)
-        docker build -t haskell-mode:24 ./emacs-24;
+        docker build -t haskell-mode:24 ./emacs-24 &&
+        docker cp $PWD haskell-mode:24/root/haskell-mode;
         ;;
       emacs25)
-        docker build -t haskell-mode:25 ./emacs-25;
+        docker build -t haskell-mode:25 ./emacs-25 &&
+        docker cp $PWD haskell-mode:24/root/haskell-mode;
         ;;
       emacs-snapshot)
-        docker build -t haskell-mode:snapshot ./emacs-snapshot;
+        docker build -t haskell-mode:snapshot ./emacs-snapshot &&
+        docker cp $PWD haskell-mode:24/root/haskell-mode;
         ;;
       deploy-manual)
         sudo apt-get update &&
@@ -48,7 +51,7 @@ script: |
         docker run -it haskell-mode:24;
         ;;
       emacs25)
-        docker run -it haskell-mode:25 --env BRANCH=$TRAVIS_COMMIT;
+        docker run -it haskell-mode:25;
         ;;
       emacs-snapshot)
         docker run -it haskell-mode:snapshot;

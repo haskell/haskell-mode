@@ -39,12 +39,11 @@ AUTOLOADS = haskell-mode-autoloads.el
 
 PKG_DIST_FILES = $(ELFILES) logo.svg NEWS haskell-mode.info dir
 
-.PHONY: all compile info clean check check-emacs-version
+.PHONY: all compile info clean check check-emacs-version gitbranch
 
 all: check-emacs-version compile $(AUTOLOADS) info
 
 check-emacs-version :
-	git branch
 	$(BATCH) --eval "(when (version< emacs-version \"24.3\")				\
                             (message \"Error: haskell-mode requires Emacs 24.3 or later\")	\
                             (message \"Your version of Emacs is %s\" emacs-version)		\
@@ -80,7 +79,10 @@ build-$(EMACS_VERSION)/build-flag : build-$(EMACS_VERSION) $(patsubst %.el,build
 check-%: tests/%-tests.el
 	$(BATCH) -l "$<" -f ert-run-tests-batch-and-exit;
 
-check: compile $(AUTOLOADS) check-ert
+check: gitbranch compile $(AUTOLOADS) check-ert
+
+gitbranch:
+	git branch
 
 check-ert: $(ELCHECKS)
 	$(BATCH) --eval "(when (= emacs-major-version 24)					\

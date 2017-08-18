@@ -1,19 +1,13 @@
 # For Emacs 25.x
-FROM phusion/baseimage
+FROM ubuntu:latest
 
 USER root
 
 RUN apt-get update \
     && apt-get install -y build-essential \
     && apt-get install -y emacs-nox \
-    && apt-get install -y ghc \
-    && apt-get install -y git \
-    && git clone https://github.com/vasanthaganeshk/haskell-interactive-mode
+    && apt-get install -y ghc
 
-WORKDIR ./haskell-interactive-mode
+WORKDIR /root/haskell-mode
 
-ENV BRANCH=$BRANCH
-
-ENTRYPOINT echo $BRANCH \
-           && git checkout $BRANCH \
-           && make check
+CMD make check
