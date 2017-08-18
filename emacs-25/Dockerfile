@@ -10,9 +10,10 @@ RUN apt-get update \
     && apt-get install -y emacs-nox \
     && apt-get install -y ghc \
     && apt-get install -y git \
-    && git clone https://github.com/vasanthaganeshk/haskell-interactive-mode \
-    && git checkout $BRANCH
+    && git clone https://github.com/vasanthaganeshk/haskell-interactive-mode
 
 WORKDIR ./haskell-interactive-mode
 
-CMD [ "make", "check" ]
+ENTRYPOINT ["/bin/git", "checkout $BRANCH"]
+
+CMD ["/bin/make", "check"]
