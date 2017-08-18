@@ -48,7 +48,7 @@ script: |
         docker run -it haskell-mode:24;
         ;;
       emacs25)
-        docker run -it haskell-mode:25 --env "BRANCH=$TRAVIS_COMMIT";
+        docker run -it haskell-mode:25 --env BRANCH=$TRAVIS_COMMIT;
         ;;
       emacs-snapshot)
         docker run -it haskell-mode:snapshot;
