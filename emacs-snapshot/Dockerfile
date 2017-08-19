@@ -10,8 +10,7 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install --no-install-suggests --no-install-recommends -y emacs-snapshot \
     && apt-get install -y ghc \
-    && apt-get install -y haskell-stack \
-    && stack upgrade
+    && apt-get install -y haskell-stack
 
 WORKDIR /root/haskell-interactive-mode
 

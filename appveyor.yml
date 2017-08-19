@@ -8,7 +8,6 @@ init:
 install:
   - choco install emacs
   - choco install ghc
-  - choco install cabal
   - choco install haskell-stack
   - refreshenv
 

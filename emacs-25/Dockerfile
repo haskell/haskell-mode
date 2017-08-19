@@ -7,8 +7,7 @@ RUN apt-get update \
     && apt-get install -y build-essential \
     && apt-get install -y emacs-nox \
     && apt-get install -y ghc \
-    && apt-get install -y haskell-stack \
-    && stack upgrade
+    && apt-get install -y haskell-stack
 
 WORKDIR /root/haskell-interactive-mode
 
