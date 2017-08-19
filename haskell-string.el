@@ -198,8 +198,10 @@ Given string is shrinken to single line, multiple lines just
 disturbs the programmer."
   (message "%s" (haskell-mode-one-line str (frame-width))))
 
-(defun haskell-mode-one-line (str width)
+(defun haskell-mode-one-line (str &optional width)
   "Try to fit STR as much as possible on one line according to given WIDTH."
+  (unless width
+    (setq width (length str)))
   (let* ((long-line (replace-regexp-in-string "\n" " " str))
          (condensed  (replace-regexp-in-string
                       " +" " " (haskell-string-trim long-line))))

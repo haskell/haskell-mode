@@ -1408,7 +1408,7 @@ Meant for `eldoc-documentation-function'."
     (let* ((msg (or (haskell-doc-sym-doc (haskell-ident-at-point))
                     (haskell-doc-current-info--interaction)))
            (sanitized-msg (if (stringp msg)
-                              (haskell-mode-one-line msg (string-width msg)))))
+                              (haskell-mode-one-line msg))))
       (unless (symbolp sanitized-msg)
         (if haskell-doc-prettify-types
             (haskell-doc-prettify-types sanitized-msg)
@@ -1445,7 +1445,7 @@ current buffer."
   (unless (string= sym (car haskell-doc-last-data))
     (let* ((doc (or (haskell-doc-sym-doc sym)
                     (haskell-doc-current-info--interaction)))
-           (sanitized-doc (haskell-mode-one-line doc (string-width doc))))
+           (sanitized-doc (haskell-mode-one-line doc)))
       (when (and doc (haskell-doc-in-code-p))
         ;; In Emacs 19.29 and later, and XEmacs 19.13 and later, all
         ;; messages are recorded in a log.  Do not put haskell-doc messages

@@ -224,16 +224,14 @@ setting up the inferior-haskell buffer."
 (defun inferior-haskell-no-result-return (strg)
   (let ((proc (inferior-haskell-process)))
     (with-local-quit
-      (with-current-buffer (process-buffer proc)
-        (goto-char (point-max))
-        (progn
-          (add-to-list 'comint-preoutput-filter-functions
-                       (lambda (output)
-                         (haskell-extract-exp output)))
-          (process-send-string proc strg)
-          (accept-process-output proc)
-          (sit-for 0.1)
-          (setq comint-preoutput-filter-functions nil))))))
+      (progn
+        (add-to-list 'comint-preoutput-filter-functions
+                     (lambda (output)
+                       (haskell-extract-exp output)))
+        (process-send-string proc strg)
+        (accept-process-output proc)
+        (sit-for 0.1)
+        (setq comint-preoutput-filter-functions nil)))))
 
 (defun inferior-haskell-get-result (inf-expr)
   "Submit the expression `inf-expr' to ghci and read the result."
