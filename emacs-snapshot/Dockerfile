@@ -9,7 +9,9 @@ RUN apt-get update \
     && add-apt-repository -y ppa:ubuntu-elisp/ppa \
     && apt-get update \
     && apt-get install --no-install-suggests --no-install-recommends -y emacs-snapshot \
-    && apt-get install -y ghc
+    && apt-get install -y ghc \
+    && apt-get install -y haskell-stack \
+    && stack upgrade
 
 WORKDIR /root/haskell-interactive-mode
 
