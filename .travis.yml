@@ -22,13 +22,19 @@ matrix:
 install: |
     case "$TARGET" in
       emacs24)
-        docker build -t haskell-mode-24 ./emacs-24;
+        docker build -t haskell-mode-24 ./emacs-24 &&
+        docker create --name haskell-mode-24 haskell-mode-24 &&
+        docker cp $PWD haskell-mode-24:/root;
         ;;
       emacs25)
-        docker build -t haskell-mode-25 ./emacs-25;
+        docker build -t haskell-mode-25 ./emacs-25 &&
+        docker create --name haskell-mode-25 haskell-mode-25 &&
+        docker cp $PWD haskell-mode-25:/root;
         ;;
       emacs-snapshot)
-        docker build -t haskell-mode-snapshot ./emacs-snapshot;
+        docker build -t haskell-mode-snapshot ./emacs-snapshot &&
+        docker create --name haskell-mode-snapshot haskell-mode-snapshot &&
+        docker cp $PWD haskell-mode-snapshot:/root;
         ;;
       deploy-manual)
         sudo apt-get update &&
@@ -45,16 +51,13 @@ install: |
 script: |
     case "$TARGET" in
       emacs24)
-        docker cp $PWD haskell-mode-24:/root &&
-        docker run -it haskell-mode-24;
+        docker start -i haskell-mode-24;
         ;;
       emacs25)
-        docker cp $PWD haskell-mode-25:/root &&
-        docker run -it haskell-mode-25;
+        docker start -i haskell-mode-25;
         ;;
       emacs-snapshot)
-        docker cp $PWD haskell-mode-snapshot:/root &&
-        docker run -it haskell-mode-snapshot;
+        docker start -i haskell-mode-snapshot;
         ;;
       deploy-manual)
         EMACS=emacs24 make deploy-manual;
