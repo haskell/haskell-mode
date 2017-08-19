@@ -8,9 +8,9 @@ init:
 install:
   - choco install emacs
   - choco install ghc
+  - choco install cabal
+  - choco install haskell-stack
   - refreshenv
-  - ps: emacs --version
-  - ps: ghci --version
 
 build_script:
   - C:\msys64\usr\bin\bash -l -c "cd ${APPVEYOR_BUILD_FOLDER} && make check"
