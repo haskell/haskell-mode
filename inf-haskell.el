@@ -210,13 +210,13 @@ setting up the inferior-haskell buffer."
   (setq haskell-next-input (concat haskell-next-input str))
   (if (with-temp-buffer
         (insert haskell-next-input)
-        (re-search-backward "^ghci> " nil t 1))
+        (re-search-backward haskell-prompt-regexp nil t 1))
       (progn
         (push (substring haskell-next-input
                          nil
                          (1- (with-temp-buffer
                                (insert haskell-next-input)
-                               (re-search-backward "^ghci> " nil t 1))))
+                               (re-search-backward haskell-prompt-regexp nil t 1))))
               inferior-haskell-result-history)
         (setq haskell-next-input ""))
     ""))
