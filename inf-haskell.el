@@ -233,9 +233,15 @@ setting up the inferior-haskell buffer."
         (sit-for 0.1)
         (setq comint-preoutput-filter-functions nil)))))
 
-(defun inferior-haskell-get-result (inf-expr)
+(defun inferior-haskell-get-result (inf-expr &optional times)
   "Submit the expression `inf-expr' to ghci and read the result."
+  (unless times
+    (setq times 5))
   (inferior-haskell-no-result-return (concat inf-expr "\n"))
+  (while (and (> times 0)
+              (not (stringp (car inferior-haskell-result-history))))
+    (setq times (1- times))
+    (inferior-haskell-no-result-return (concat inf-expr "\n")))
   (haskell-string-chomp (car inferior-haskell-result-history)))
 
 (defvar haskell-set+c-p nil
