@@ -1,5 +1,5 @@
 # For Emacs snapshot
-FROM ubuntu:latest
+FROM ubuntu:rolling
 
 USER root
 
