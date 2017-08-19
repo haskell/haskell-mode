@@ -54,7 +54,7 @@
   :group 'haskell)
 
 (defcustom inferior-haskell-hook nil
-  "there is something in it")
+  "The hook that is called after starting inf-haskell.")
 
 (defun haskell-program-name-with-args ()
   "Return the command with the arguments to start the repl based on the
@@ -202,7 +202,10 @@ setting up the inferior-haskell buffer."
 
 (defvar inferior-haskell-result-history nil)
 
-(defvar haskell-next-input "")
+(defvar haskell-next-input ""
+  "This is a temporary variable to store the intermediate results while
+`accecpt-process-output' with `haskell-extract-exp'")
+
 (defun haskell-extract-exp (str)
   (setq haskell-next-input (concat haskell-next-input str))
   (if (with-temp-buffer
