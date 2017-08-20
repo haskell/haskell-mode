@@ -402,7 +402,9 @@ on `haskell-completions-sync-repl-completion-at-point'."
       (let (expected)
         (haskell-unconditional-kill-buffer "*haskell*")
         (switch-to-haskell)
-        (inferior-haskell-get-result "\n")
+        ;; Dry run
+        (inferior-haskell-get-result ":! pwd")
+        (sit-for 0.1)
         (with-temp-buffer
           (haskell-mode)
           (insert "import qualified Data.List as L\n\n")
