@@ -213,7 +213,7 @@ setting up the inferior-haskell buffer."
         (re-search-backward haskell-prompt-regexp nil t 1))
       (progn
         (push (substring haskell-next-input
-                         nil
+                         0
                          (1- (with-temp-buffer
                                (insert haskell-next-input)
                                (re-search-backward haskell-prompt-regexp nil t 1))))
