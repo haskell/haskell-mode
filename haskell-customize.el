@@ -439,19 +439,23 @@ This function also sets the `inferior-haskell-root-dir'"
     (if (eq 'auto haskell-process-type)
         (cond
          ;; User has explicitly initialized this project with cabal
-         (cabal-sandbox
+         ((and cabal-sandbox
+               (executable-find "cabal"))
           (setq inferior-haskell-root-dir cabal-sandbox)
           'cabal)
          ((and stack
                (executable-find "stack"))
           (setq inferior-haskell-root-dir stack)
           'stack)
-         (cabal
+         ((and cabal
+               (executable-find "cabal"))
           (setq inferior-haskell-root-dir cabal)
           'cabal)
-         (t
+         ((executable-find "ghc")
           (setq inferior-haskell-root-dir default-directory)
-          'ghc))
+          'ghc)
+         (t
+          (error "Could not find any installation of GHC.")))
       haskell-process-type)))
 
 (provide 'haskell-customize)
