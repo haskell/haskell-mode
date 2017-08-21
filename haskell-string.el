@@ -177,13 +177,17 @@ See also `haskell-string-take'."
 
 (defun haskell-string-trim-prefix (prefix str)
   "if prefix is present in string, the string is trimmed"
-  (if (string-prefix-p prefix str)
-      (substring str (length prefix))))
+  (when (and (stringp prefix)
+             (stringp str))
+    (if (string-prefix-p prefix str)
+        (substring str (length prefix)))))
 
 (defun haskell-string-trim-suffix (suffix str)
   "if suffix is present, the string is trimmed"
-  (if (string-suffix-p suffix str)
-      (substring str 0 (* -1 (length suffix)))))
+  (when (and (stringp suffix)
+             (stringp str))
+    (if (string-suffix-p suffix str)
+        (substring str 0 (* -1 (length suffix))))))
 
 (defun haskell-string-drop-qualifier (ident)
   "Drop qualifier from given identifier IDENT.
