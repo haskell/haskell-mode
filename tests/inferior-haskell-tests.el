@@ -1,5 +1,5 @@
 ;;; inferior-haskell-tests.el --- tests for collapse module  -*- lexical-binding: t -*-
-
+1;4803;0c
 ;; Copyright © 2017 Vasantha Ganesh K. <vasanthaganesh.k@tuta.io>
 
 ;; This file is not part of GNU Emacs.
@@ -26,11 +26,15 @@
 (ert-deftest test-run-haskell ()
   (haskell-unconditional-kill-buffer "*haskell*")
   (run-haskell)
-  ;; Dry run
-  (inferior-haskell-get-result ":! pwd")
-  (inferior-haskell-get-result ":! pwd")
-  (should (equal (inferior-haskell-get-result "1 + 1")
-                 "2")))
+  (let* ((times 5)
+         (ans nil))
+    (setq ans (inferior-haskell-get-result "1 + 1"))
+    (while (and (> times 0)
+                (not (equal ans "2")))
+      (setq times (1- times))
+      (setq ans (inferior-haskell-get-result "1 + 1")))
+    (should (equal ans
+                   "2"))))
 
 (ert-deftest test-inferior-haskell-buffer ()
   "Check if the inferior haskell buffer has been started"
