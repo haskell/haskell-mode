@@ -36,11 +36,11 @@
     (define-key map (kbd "C-c C-r") 'haskell-process-load-file)
     (define-key map (kbd "C-c C-i") 'haskell-process-do-info)
     (define-key map (kbd "M-.")     'haskell-mode-jump-to-def-or-tag)
-    (define-key map (kbd "C-c C-c") 'haskell-process-cabal-build)
     (define-key map (kbd "C-c v c") 'haskell-cabal-visit-file)
     (define-key map (kbd "C-c C-x") 'haskell-process-cabal)
     (define-key map (kbd "C-c C-b") 'switch-to-haskell)
     (define-key map (kbd "C-c C-z") 'switch-to-haskell)
+    (define-key map (kbd "C-c C-c") 'haskell-compile)
     map)
   "Keymap for using `interactive-haskell-mode'.")
 
