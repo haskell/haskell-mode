@@ -28,7 +28,7 @@
   (run-haskell)
   ;; Dry run
   (inferior-haskell-get-result ":! pwd")
-  (sit-for 1.0)
+  (inferior-haskell-get-result ":! pwd")
   (should (equal (inferior-haskell-get-result "1 + 1")
                  "2")))
 

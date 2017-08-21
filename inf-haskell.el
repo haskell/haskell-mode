@@ -181,6 +181,7 @@ setting up the inferior-haskell buffer."
           (apply 'make-comint "haskell" (car command) nil (cdr command)))
     (with-current-buffer inferior-haskell-buffer
       (inferior-haskell-mode)
+      (inferior-haskell-init)
       (run-hooks 'inferior-haskell-hook))))
 
 (defun inferior-haskell-process ()
@@ -242,6 +243,17 @@ setting up the inferior-haskell buffer."
       (setq times (1- times))
       (inferior-haskell-no-result-return (concat inf-expr "\n")))
     (haskell-string-chomp (car inferior-haskell-result-history))))
+
+(defvar inferior-haskell-init nil
+  "To be run as the first thing all the times")
+(defun inferior-haskell-init ()
+  (with-local-quit
+    (unless inferior-haskell-init
+      (with-current-buffer inferior-haskell-buffer
+        (process-send-string (inferior-haskell-process) "\n")
+        (accept-process-output (inferior-haskell-process))
+        (sit-for 0.1)
+        (setq inferior-haskell-init nil)))))
 
 (defvar haskell-set+c-p nil
   "t if `:set +c` else nil")
