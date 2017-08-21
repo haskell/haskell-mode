@@ -390,15 +390,17 @@ function is supposed for internal use."
 (defun inferior-haskell-get-completions (unsanitized-completions)
   "gets the completions result list sanitizes and returns it, the first result
 is meta data so we remove it"
-  (cdr (cl-mapcar #'inferior-haskell-sanitize
-                  (inferior-haskell-get-result-list unsanitized-completions))))
+  (when (stringp unsanitized-completions)
+    (cdr (cl-mapcar #'inferior-haskell-sanitize
+                    (inferior-haskell-get-result-list unsanitized-completions)))))
 
 (defun inferior-haskell-sanitize (txt)
   "the completions from ghci (using `:complete') are of the form
 \"SomeCompletion1\"
 \"SomeCompletion2\"
 etc. So we trim the double quotes from the completion to get the string"
-  (haskell-string-trim-prefix "\"" (haskell-string-trim-suffix "\"" txt)))
+  (when (stringp txt)
+    (haskell-string-trim-prefix "\"" (haskell-string-trim-suffix "\"" txt))))
 
 (provide 'haskell-completions)
 ;;; haskell-completions.el ends here
