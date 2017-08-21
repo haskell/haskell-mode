@@ -352,8 +352,8 @@ Returns nil if no completions available."
           (if (cl-member
                typ
                '(haskell-completions-pragma-name-prefix
-                   haskell-completions-ghc-option-prefix
-                   haskell-completions-language-extension-prefix))
+                 haskell-completions-ghc-option-prefix
+                 haskell-completions-language-extension-prefix))
               ;; provide simple completions
               (haskell-completions--simple-completions prefix-data)
             ;; only two cases left: haskell-completions-module-name-prefix
@@ -391,7 +391,7 @@ function is supposed for internal use."
   "gets the completions result list sanitizes and returns it, the first result
 is meta data so we remove it"
   (cdr (cl-mapcar #'inferior-haskell-sanitize
-             (inferior-haskell-get-result-list unsanitized-completions))))
+                  (inferior-haskell-get-result-list unsanitized-completions))))
 
 (defun inferior-haskell-sanitize (txt)
   "the completions from ghci (using `:complete') are of the form

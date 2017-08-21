@@ -182,7 +182,7 @@ See also `haskell-string-take'."
 (defun haskell-string-trim-suffix (suffix str)
   "if suffix is present, the string is trimmed"
   (if (string-suffix-p suffix str)
-      (substring str nil (* -1 (string-width suffix)))))
+      (substring str 0 (* -1 (string-width suffix)))))
 
 (defun haskell-string-drop-qualifier (ident)
   "Drop qualifier from given identifier IDENT.
