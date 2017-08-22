@@ -5,9 +5,7 @@ clone_depth: 1
 
 matrix:
   - emacs: "24"
-    platform: x64
   - emacs: "25"
-    platform: x64
 
 install:
   - ps : switch($emacs){ "24" {choco install emacs} "25" {choco install emacs64} default {echo "Emacs install fail"}}
