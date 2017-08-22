@@ -13,20 +13,9 @@ body {
     margin: 0 auto;
 }
 
-table, th, td {
-    border-collapse: collapse;
-    border: 1px solid #ddd;
-    padding: 15px;
-    text-align: left;
-}
-
 table.menu {
     width: 700px;
     margin-left: 50px;
-    border: none;
-    border-collpase: none;
-    padding: none;
-    text-align: none;
 }
 /* makeinfo 5.2 */
 div.header p {
