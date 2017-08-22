@@ -3,15 +3,17 @@
 
 clone_depth: 1
 
-init:
+matrix:
+  - emacs: "24"
+    platform: x64
+  - emacs: "25"
+    platform: x64
 
 install:
-  - choco install emacs
+  - ps : switch($emacs){ "24" {choco install emacs} "25" {choco install emacs64} default {echo "Emacs install fail"}}
   - choco install ghc
   - choco install haskell-stack
   - refreshenv
 
 build_script:
   - C:\msys64\usr\bin\bash -l -c "cd ${APPVEYOR_BUILD_FOLDER} && make check"
-
-test_script:
