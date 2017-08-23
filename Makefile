@@ -39,7 +39,7 @@ AUTOLOADS = haskell-mode-autoloads.el
 
 PKG_DIST_FILES = $(ELFILES) logo.svg NEWS haskell-mode.info dir
 
-.PHONY: all compile info clean check check-emacs-version
+.PHONY: all compile info clean check check-emacs-version gitbranch
 
 all: check-emacs-version compile $(AUTOLOADS) info
 

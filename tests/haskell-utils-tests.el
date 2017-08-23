@@ -171,28 +171,21 @@ strings will change in future."
       (should (string-prefix-p ":type-at nil 7 3 8 16" test-b-result)))))
 
 (ert-deftest parse-repl-response ()
-  "Test `haskell-utils-repl-response-error-status' function."
+  "Test `haskell-utils-repl-response-error-p' function."
   (let* ((t1-str "unknown command ':type-at'\nuse :? for help.")
          (t2-str "\n<interactive>:3:5: Not in scope: ‘x’")
          (t3-str "Couldn't guess that module name. Does it exist?")
          (t4-str "Hello World!")
-         (t5-str " ")
-         (t6-str "")
+         (t5-str "")
+         (t6-str " ")
          (t7-str "\n\n\n\n")
-         (r1 (haskell-utils-repl-response-error-status t1-str))
-         (r2 (haskell-utils-repl-response-error-status t2-str))
-         (r3 (haskell-utils-repl-response-error-status t3-str))
-         (r4 (haskell-utils-repl-response-error-status t4-str))
-         (r5 (haskell-utils-repl-response-error-status t5-str))
-         (r6 (haskell-utils-repl-response-error-status t6-str))
-         (r7 (haskell-utils-repl-response-error-status t7-str)))
-    (should (equal r1 'unknown-command))
-    (should (equal r2 'interactive-error))
-    (should (equal r3 'option-missing))
-    (should (equal r4 'no-error))
-    (should (equal r5 'no-error))
-    (should (equal r6 'no-error))
-    (should (equal r7 'no-error))))
+         (should (haskell-utils-repl-response-error-p t1-str))
+         (should (haskell-utils-repl-response-error-p t2-str))
+         (should (haskell-utils-repl-response-error-p t3-str))
+         (should (not (haskell-utils-repl-response-error-p t4-str)))
+         (should (not (haskell-utils-repl-response-error-p t5-str)))
+         (should (not (haskell-utils-repl-response-error-p t6-str)))
+         (should (not (haskell-utils-repl-response-error-p t7-str))))))
 
 (ert-deftest reduce-strign ()
   "Test `haskell-utils-reduce-strign' command.
@@ -243,5 +236,40 @@ Tests flag updates and `post-command-hook' cleanup."
     (should (not (cl-member #'haskell-utils-async-update-post-command-flag
                             post-command-hook
                             :test #'equal)))))
+
+(ert-deftest haskell-interactive-error-regexp-test-1 ()
+  "Tests the regexp `haskell-interactive-mode-error-regexp'"
+  (with-temp-buffer
+    (insert "/home/user/Test.hs:24:30:")
+    (goto-char (point-min))
+    (should (haskell-utils-compile-error-p))))
+
+(ert-deftest haskell-interactive-error-regexp-test-2 ()
+  "Tests the regexp `haskell-utils-compile-error-p'"
+  (with-temp-buffer
+    (insert " Test.hs:8:9:")
+    (goto-char (point-min))
+    (should (not (haskell-utils-compile-error-p)))))
+
+(ert-deftest haskell-interactive-error-regexp-test-3 ()
+  "Tests the regexp `haskell-utils-compile-error-p'"
+  (with-temp-buffer
+    (insert "Test.hs:5:18:")
+    (goto-char (point-min))
+    (should (haskell-utils-compile-error-p))))
+
+(ert-deftest haskell-interactive-error-regexp-test-4 ()
+  "Tests the regexp `haskell-utils-compile-error-p'"
+  (with-temp-buffer
+    (insert "Test.hs:7:6: Not in scope: type constructor or class ‘Ty’")
+    (goto-char (point-min))
+    (should (haskell-utils-compile-error-p))))
+
+(ert-deftest haskell-interactive-error-regexp-test-5 ()
+  "Tests the regexp `haskell-utils-compile-error-p'"
+  (with-temp-buffer
+    (insert "Test.hs:9:5: Not in scope: ‘c’")
+    (goto-char (point-min))
+    (should (haskell-utils-compile-error-p))))
 
 ;;; haskell-utils-tests.el ends here

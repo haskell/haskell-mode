@@ -27,6 +27,8 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
 (defun haskell-string-trim (string)
   "Remove whitespace around STRING.
 
@@ -162,6 +164,31 @@ See also `haskell-string-take'."
    ((< n 1) "")
    (t (concat (substring string 0 (1- n)) "…"))))
 
+(defun haskell-string-chomp (str)
+  "Chomp leading and tailing whitespace from STR."
+  (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'"
+                       str)
+    (setq str (replace-match "" t t str)))
+  str)
+
+(defun haskell-string-split-to-lines (str)
+  (when (stringp str)
+    (cl-mapcar #'haskell-string-chomp (split-string str "\n"))))
+
+(defun haskell-string-trim-prefix (prefix str)
+  "if prefix is present in string, the string is trimmed"
+  (when (and (stringp prefix)
+             (stringp str))
+    (if (string-prefix-p prefix str)
+        (substring str (length prefix)))))
+
+(defun haskell-string-trim-suffix (suffix str)
+  "if suffix is present, the string is trimmed"
+  (when (and (stringp suffix)
+             (stringp str))
+    (if (string-suffix-p suffix str)
+        (substring str 0 (* -1 (length suffix))))))
+
 (defun haskell-string-drop-qualifier (ident)
   "Drop qualifier from given identifier IDENT.
 
@@ -169,6 +196,21 @@ If the identifier is not qualified return it unchanged."
   (or (and (string-match "^\\([^.]*\\.\\)*\\(?1:[^.]+\\)$" ident)
            (match-string 1 ident))
       ident))
+
+(defun haskell-mode-message-line (str)
+  "Echo STR in mini-buffer.
+Given string is shrinken to single line, multiple lines just
+disturbs the programmer."
+  (message "%s" (haskell-mode-one-line str (frame-width))))
+
+(defun haskell-mode-one-line (str &optional width)
+  "Try to fit STR as much as possible on one line according to given WIDTH."
+  (unless width
+    (setq width (length str)))
+  (let* ((long-line (replace-regexp-in-string "\n" " " str))
+         (condensed  (replace-regexp-in-string
+                      " +" " " (haskell-string-trim long-line))))
+    (truncate-string-to-width condensed width nil nil "…")))
 
 (provide 'haskell-string)
 

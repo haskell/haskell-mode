@@ -29,7 +29,7 @@
 ;; When possible, functions in this module shall be accompanied by
 ;; ERT-based unit tests.
 ;;
-;; See also `haskell-str.el' for string utility functions.
+;; See also `haskell-string.el' for string utility functions.
 ;;
 ;; All symbols in this module have a `haskell-utils-' prefix.
 
@@ -113,14 +113,12 @@ characters."
   (let ((s (replace-regexp-in-string "^\s+" " " str)))
     (replace-regexp-in-string "\r?\n" "" s)))
 
-(defun haskell-utils-repl-response-error-status (response)
+(defun haskell-utils-repl-response-error-p (response)
   "Parse response REPL's RESPONSE for errors.
 Returns one of the following symbols:
 
-+ unknown-command
-+ option-missing
-+ interactive-error
-+ no-error
+t if no error
+nil if error exists
 
 *Warning*: this funciton covers only three kind of responses:
 
@@ -129,29 +127,19 @@ Returns one of the following symbols:
 * \"<interactive>:3:5: …\"
   interactive REPL error
 * \"Couldn't guess that module name. Does it exist?\"
-  (:type-at and maybe some other commands error)
-* *all other reposnses* are treated as success reposneses and
-  'no-error is returned."
+  (:type-at and maybe some other commands error)"
   (if response
-      (let ((first-line (car (split-string response "\n" t))))
-        (cond
-         ((null first-line) 'no-error)
-         ((string-match-p "^unknown command" first-line)
-          'unknown-command)
-         ((string-match-p
-           "^Couldn't guess that module name. Does it exist?"
-           first-line)
-          'option-missing)
-         ((string-match-p "^<interactive>:" first-line)
-          'interactive-error)
-         (t 'no-error)))
-    ;; in case of nil-ish reponse it's not clear is it error response or not
-    'no-error))
+      (when (or (string-match-p "^unknown command" response)
+                (string-match-p
+                 "^Couldn't guess that module name. Does it exist?"
+                 response)
+                  (string-match-p "^<interactive>:" response))
+        t)))
 
 (defun haskell-utils-compose-type-at-command (pos)
   "Prepare :type-at command to be send to haskell process.
 POS is a cons cell containing min and max positions, i.e. target
-expression bounds."
+expression bounds. Must use `:set +c' in ghci for this to work."
   (save-excursion
     (let ((start-p (car pos))
           (end-p (cdr pos))
@@ -188,6 +176,34 @@ expression bounds."
   "Set `haskell-mode-interactive-prompt-state' to t.
 If given DISABLED argument sets variable value to nil, otherwise to t."
   (setq haskell-mode-interactive-prompt-state (not disabled)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Set functionalities
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun haskell-make-set ()
+  "Create a Set data structure (behind the scenes it is a hash-table)."
+  (make-hash-table))
+
+(defun haskell-add-to-set (set element)
+  "Add an element to the set.
+SET, the first argument is the set object.
+ELEMENT, the second argument is the element to be pushed into the set."
+  (puthash element t set))
+
+(defun haskell-in-set-p (set element)
+  "Return t if the SET data structure has the ELEMENT."
+  (gethash element set nil))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun haskell-utils-compile-error-p ()
+  "Return t if an error (ghci's) is found in current buffer."
+  (search-forward-regexp "^\\(\\(?:[A-Z]:\\)?[^ \r\n:][^\r\n:]*\\):\\([0-9()-:]+\\):?"
+                         nil
+                         (lambda () nil)
+                         1))
 
 (provide 'haskell-utils)
 ;;; haskell-utils.el ends here
