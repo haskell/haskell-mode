@@ -11,4 +11,4 @@ RUN apt-get update \
 
 WORKDIR /root/haskell-mode
 
-CMD ["make", "check"]
+CMD [ "make", "check" ]
