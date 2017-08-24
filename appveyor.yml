@@ -15,4 +15,7 @@ install:
   - refreshenv
 
 build_script:
+  - C:\msys64\usr\bin\bash -l -c "cd ${APPVEYOR_BUILD_FOLDER} && make"
+
+test_Script:
   - C:\msys64\usr\bin\bash -l -c "cd ${APPVEYOR_BUILD_FOLDER} && make check"
