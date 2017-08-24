@@ -35,7 +35,7 @@
 (require 'haskell-font-lock)
 (require 'haskell-presentation-mode)
 (require 'haskell-utils)
-
+(require 'haskell-string)
 (require 'ansi-color)
 (require 'cl-lib)
 (require 'etags)
