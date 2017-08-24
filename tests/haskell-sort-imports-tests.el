@@ -77,6 +77,46 @@ import A
 import B
 "))))
 
+(ert-deftest two-rev-with-comment ()
+  (with-temp-buffer
+    (insert "-- A descriptive comment
+import B
+import A
+")
+    (goto-char (point-min))
+    (forward-line)
+    (haskell-sort-imports)
+    (should
+     (equal
+      (buffer-substring-no-properties (point-min) (point-max))
+      "-- A descriptive comment
+import A
+import B
+"))))
+
+(ert-deftest two-rev-block-with-comment ()
+  (with-temp-buffer
+    (insert "import Misc1
+import Misc2
+
+-- A descriptive comment
+import B
+import A
+")
+    (goto-char (point-max))
+    (forward-line -2)
+    (haskell-sort-imports)
+    (should
+     (equal
+      (buffer-substring-no-properties (point-min) (point-max))
+      "import Misc1
+import Misc2
+
+-- A descriptive comment
+import A
+import B
+"))))
+
 (ert-deftest file-structure ()
   (should (with-temp-buffer
             (insert "module A where
