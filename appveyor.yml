@@ -9,9 +9,9 @@ environment:
   - emacs: 25
 
 install:
-  - ps: switch($env:emacs){ 24 {choco install emacs -ry} 25 {choco install emacs64 -ry} default {throw "Emacs install fail"}}
-  - choco install ghc -ry
-  - choco install haskell-stack
+  - ps: switch($env:emacs){ 24 {choco install emacs --no-progress} 25 {choco install emacs64 --no-progress} default {throw "Emacs install fail"}}
+  - choco install ghc --no-progress
+  - choco install haskell-stack --no-progress
   - refreshenv
 
 build_script:
