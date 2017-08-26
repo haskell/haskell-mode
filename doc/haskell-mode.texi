@@ -74,6 +74,7 @@ interpreter (e.g. GHCi).
 * Spell checking strings and comments::  Using @code{flyspell-prog-mode}
 * Aligning code::                        Aligning code using @code{align-regexp}
 * Rectangular commands::                 Manage indentation manually
+* REPL::                                 GHCi REPL
 * Collapsing Haskell code::              View more code on screen
 * Getting Help and Reporting Bugs::      How to improve Haskell Mode
 * Concept index::                        Index of Haskell Mode concepts
@@ -2592,6 +2593,128 @@ This will insert the contents of the last killed rectangle.
 
 As with all Emacs modifier combos, you can type @kbd{C-x r C-h} to find
 out what keys are bound beginning with the @kbd{C-x r} prefix.
+
+@node REPL
+@chapter Using GHCi REPL within Emacs
+
+To start the REPL you can run one of the following:
+
+@itemize
+@item @kbd{M-x run-haskell}
+@item @kbd{M-x switch-to-haskell}
+@end itemize
+
+This repl works with @uref{https://www.emacswiki.org/emacs/ComintMode, Comint}.
+So you will feel at home if you are already using @kbd{M-x Shell} or @kbd{M-x ielm}.
+
+@code{Inf-Haskell} is a Major mode for running GHCi, with comint.
+
+Important key bindings in @code{Inf-haskell}:
+
+@table @kbd
+@item RET
+invokes @kbd{comint-send-input}. Sends the input to the GHCi process, evaluates
+the line and returns the output.
+
+@item C-d or <delete>
+deletes the forward character
+
+@item <C-up> or M-p
+invokes @kbd{comint-previous-input}. Cycle backwards through input history,
+saving input.
+
+@item <C-down> or M-n
+invokes @kbd{comint-next-input}. Cycle forwards through input history.
+
+@item C-c C-c
+invokes @kbd{comint-interrupt-subjob}. Sends KeyboardInterrupt signal.
+
+@item C-c C-\
+invokes @kbd{comint-quit-subjob}. Sends KeyboardInterrupt signal.
+
+@item C-c C-z
+invokes @kbd{comint-stop-subjob}. Kills the GHCi process.
+
+@item C-c M-r
+invokes @kbd{comint-previous-matching-input-from-input}. If you are familiar
+with @kbd{C-r} in bash. This is the same as that. Searches backwards through
+input history for match for current input.
+
+@item C-c M-s
+invokes @kbd{comint-next-matching-input-from-input}. Searches forwards through
+input history for match for current input.
+
+@item C-c C-l
+invokes @kbd{comint-dynamic-list-input-ring}. Displays a list of recent inputs
+entered into the current buffer.
+
+@item C-c M-o
+invokes @kbd{comint-clear-buffer}. Clears the buffer (Only with Emacs 25.X and above)
+
+@item C-c C-n
+invokes @kbd{comint-next-prompt}. Goes to the start of the previous REPL prompt.
+
+@item C-c C-p
+invokes @kbd{comint-previous-prompt}. Goes to the start of the next REPL prompt.
+
+@item C-c C-o
+invokes @kbd{comint-delete-output}. Clears the output of the most recently evaluated
+expression.
+
+@item C-c C-e
+invokes @kbd{comint-show-maximum-output}. Moves the point to the end of the buffer.
+
+@item C-c C-u
+invokes @kbd{comint-kill-input}. Kills backward, the line at point. (Use this when you have typed in an expression into the prompt
+but you dont want to evaluate it.)
+
+@item C-c C-w
+invokes @kbd{backward-kill-word}. Kills backward, the word at point
+
+@item C-c C-s
+invokes @kbd{comint-write-output}. Write output from interpreter since last
+input to FILENAME. Any prompt at the end of the output is not written.
+@end table
+
+@section Relevant defcustoms:
+
+@multitable @columnfractions .40 .20 .40
+@headitem Interpreter (defcustom) @tab Default Value @tab Possible Values
+@item @code{haskell-process-type} @tab @code{'auto} @tab @code{'stack-ghci, 'cabal-repl, 'ghci, 'auto}
+@item @code{inferior-haskell-hook} @tab @code{nil} @tab -
+@item @code{haskell-process-path-ghci} @tab @code{ghci} @tab -
+@item @code{haskell-process-args-ghci} @tab @code{-ferror-spans} @tab -
+@item @code{haskell-process-path-cabal} @tab @code{cabal} @tab -
+@item @code{haskell-process-args-cabal-repl} @tab @code{--ghc-option=-ferror-spans} @tab -
+@item @code{haskell-process-path-stack} @tab @code{stack} @tab -
+@item @code{haskell-process-args-stack-ghci} @tab @code{--ghci-options=-ferror-spans --no-build --no-load} @tab -
+@end multitable
+
+@section More on @code{haskell-process-type}
+
+The Haskell interpreter used by @code{Inf-Haskell} is auto-detected by default,
+but is customizable with defcustom @code{haskell-process-type}. The values
+recognized by it are (default is 'auto):
+
+@itemize
+@item @code{'stack-ghci}
+@item @code{'cabal-repl}
+@item @code{'ghci}
+@item @code{'auto}
+@end itemize
+
+if the @code{haskell-process-type} is @code{'auto}, the directories are searched for
+@code{cabal.sandbox.config} or @code{stack.yaml} or  @code{*.cabal} file.
+If the file is present, then appropriate process is started.
+
+When @code{cabal.sandbox.config} is found @code{haskell-process-type} is @code{'cabal-repl}.
+Similarly, when @code{stack.yaml} is found @code{haskell-process-type} is @code{'stack-ghci}.
+Similarly, when @code{xyz.cabal} is found @code{haskell-process-type} is @code{'cabal-repl}.
+When nothing is found @code{haskell-process-type} is @code{'ghci}. When more than one
+file such as @code{cabal.sandbox.config} and @code{stack.yaml} are found the following
+preference is followed.
+
+@code{cabal.sandbox.config} > @code{stack.yaml} >  @code{*.cabal}
 
 @node Collapsing Haskell code
 @chapter Collapsing Haskell code
