@@ -1218,8 +1218,6 @@ directory.
 @tab @code{--ghc-options=\"-ferror-spans -Wall\"}
 @end multitable
 
-@item @code{}
-
 @section Hooks
 
 None
