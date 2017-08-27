@@ -67,8 +67,7 @@ interpreter (e.g. GHCi).
 * Module templates::                     Module templates
 * Declaration scanning::                 How to navigate in a source file
 * Compilation::                          How to compile
-* Inferior Haskell interpreter::         How to interact with GHCi (1)
-* Interactive Haskell::                  How to interact with GHCi (2)
+* Interactive Haskell::                  How to interact with GHCi
 * Editing Cabal files::                  Cabal support
 * Browsing Haddocks::                    Using @code{w3m} to browse documentation
 * Spell checking strings and comments::  Using @code{flyspell-prog-mode}
@@ -1148,49 +1147,6 @@ temporarily by invoking @code{haskell-compile} with a prefix argument
 (e.g. @kbd{C-u C-c C-c}). If later-on you want to recompile using the
 same customized compile command, invoke @code{recompile} (bound to
 @kbd{g}) inside the @samp{*haskell-compilation*} buffer.
-
-@node Inferior Haskell interpreter
-@chapter Inferior Haskell interpreter
-
-@findex inferior-haskell-find-definition
-@findex inferior-haskell-find-haddock
-@findex inferior-haskell-info
-@findex inferior-haskell-load-and-run
-@findex inferior-haskell-load-file
-@findex inferior-haskell-mode
-@findex inferior-haskell-reload-file
-@findex inferior-haskell-start-process
-@findex inferior-haskell-type
-@vindex haskell-program-name
-@vindex inferior-haskell-mode-hook
-
-The major mode @code{inferior-haskell-mode} provides support for
-interacting with an inferior Haskell process based on
-@code{comint-mode}.
-
-By default the @code{haskell-mode-map} keymap is setup to use this mode:
-
-@table @kbd
-@item C-c C-z
-is bound to @code{switch-to-haskell}
-@item C-c C-b
-is bound to @code{switch-to-haskell}
-@item C-c C-l
-is bound to @code{inferior-haskell-load-file}
-@item C-c C-t
-is bound to @code{inferior-haskell-type}
-@item C-c C-i
-is bound to @code{inferior-haskell-info}
-@end table
-
-The Haskell interpreter used by the inferior Haskell mode is
-auto-detected by default, but is customizable via the
-@code{haskell-program-name} variable.
-
-Currently, GHCi and Hugs are support as Haskell interpreter.
-
-TODO/WRITEME
-@c write about supported features
 
 @node Interactive Haskell
 @chapter Interactive Haskell
