@@ -189,5 +189,12 @@ expression bounds."
 If given DISABLED argument sets variable value to nil, otherwise to t."
   (setq haskell-mode-interactive-prompt-state (not disabled)))
 
+(defun haskell-utils-compile-error-p ()
+  "Return t if an error (ghci's) is found in current buffer."
+  (search-forward-regexp "^\\(\\(?:[A-Z]:\\)?[^ \r\n:][^\r\n:]*\\):\\([0-9()-:]+\\):?"
+                         nil
+                         (lambda () nil)
+                         1))
+
 (provide 'haskell-utils)
 ;;; haskell-utils.el ends here
