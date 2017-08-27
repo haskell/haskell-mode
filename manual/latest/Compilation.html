@@ -22,7 +22,7 @@ Front-Cover Texts and no Back-Cover Texts. -->
 <link href="index.html#Top" rel="start" title="Top">
 <link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
 <link href="index.html#Top" rel="up" title="Top">
-<link href="Interactive-Haskell.html#Interactive-Haskell" rel="next" title="Interactive Haskell">
+<link href="Inferior-Haskell-interpreter.html#Inferior-Haskell-interpreter" rel="next" title="Inferior Haskell interpreter">
 <link href="Declaration-scanning.html#Declaration-scanning" rel="prev" title="Declaration scanning">
 <style type="text/css">
 <!--
@@ -62,85 +62,92 @@ ul.no-bullet {list-style: none}
 <div class="background"> </div><a name="Compilation"></a>
 <div class="header">
 <p>
-Next: <a href="Interactive-Haskell.html#Interactive-Haskell" accesskey="n" rel="next">Interactive Haskell</a>, Previous: <a href="Declaration-scanning.html#Declaration-scanning" accesskey="p" rel="prev">Declaration scanning</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Inferior-Haskell-interpreter.html#Inferior-Haskell-interpreter" accesskey="n" rel="next">Inferior Haskell interpreter</a>, Previous: <a href="Declaration-scanning.html#Declaration-scanning" accesskey="p" rel="prev">Declaration scanning</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
 <a name="Compilation-1"></a>
 <h2 class="chapter">12 Compilation</h2>
 
-<a name="index-haskell_002dcompile"></a>
-
-<p>Haskell mode comes equipped with a specialized <em>Compilation mode</em>
-tailored to GHC&rsquo;s compiler messages with optional support for Cabal
-projects. See <a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Compilation-Mode.html#Compilation-Mode">(emacs)Compilation Mode</a>, for more information about
-the basic commands provided by the Compilation mode which are available
-in the Haskell compilation sub-mode as well. The additional features
-provided compared to Emacs&rsquo; basic Compilation mode are:
+<p>Haskell Mode comes with an intelligent Major mode for compilation named
+<code>HsCompilation</code> defined in <code>haskell-compile.el</code>. This mode is
+derived from <code>compilation-mode</code> defined in <code>compile.el</code>.
 </p>
-<ul>
-<li> DWIM-style auto-detection of compile command (including support for
-CABAL projects)
-</li><li> Support for GHC&rsquo;s compile messages and recognizing error, warning and
-info source locations (including <samp>-ferror-spans</samp> syntax)
-</li><li> Support for filtering out GHC&rsquo;s uninteresting &lsquo;<samp>Loading package...</samp>&rsquo;
-linker messages
-</li></ul>
-
-<p>In order to use it, invoke the <code>haskell-compile</code> command instead of
-<code>compile</code> as you would for the ordinary Compilation mode. It&rsquo;s
-recommended to bind <code>haskell-compile</code> to a convenient key
-binding. For instance, you can add the following to your Emacs
-initialization to bind <code>haskell-compile</code> to <kbd>C-c C-c</kbd>.
+<p>First the compilation mode tries to find the project&rsquo;s root directory.
+This is done by searching for files such as <code>cabal.sandbox.config</code>,
+<code>stack.yaml</code>, and <code>something.cabal</code> in that order.
 </p>
-<div class="lisp">
-<pre class="lisp">(eval-after-load &quot;haskell-mode&quot;
-    '(define-key haskell-mode-map (kbd &quot;C-c C-c&quot;) 'haskell-compile))
-
-(eval-after-load &quot;haskell-cabal&quot;
-    '(define-key haskell-cabal-mode-map (kbd &quot;C-c C-c&quot;) 'haskell-compile))
-</pre></div>
-
-<p>The following description assumes that <code>haskell-compile</code> has been
-bound to <kbd>C-c C-c</kbd>.
+<p>If you have both <code>cabal.sandbox.config</code> and <code>stack.yaml</code> files
+defined, in your project&rsquo;s root directory, <code>cabal.sandbox.config</code>
+takes precedence over <code>stack.yaml</code> and similary <code>stack.yaml</code>
+takes precedence over <code>something.cabal</code>.
 </p>
-<a name="index-haskell_002dcompile_002dcabal_002dbuild_002dcommand"></a>
-<a name="index-haskell_002dcompile_002dcabal_002dbuild_002dcommand_002dalt"></a>
-<a name="index-haskell_002dcompile_002dcommand"></a>
+<p>You can start the compilation by <kbd>M-x haskell-compile</kbd>. The intelligent
+thing about this mode is that like it sets the project&rsquo;s root directory.
+It will run the appropriate compilation command from the project&rsquo;s root
+directory.
+</p>
+<table>
+<thead><tr><th width="25%">Dominant file</th><th width="25%">Build command</th><th width="50%">Commandline Options</th></tr></thead>
+<tr><td width="25%"><code>cabal.sandbox.config</code></td><td width="25%"><code>cabal build</code></td><td width="50%"><code>--ghc-options=\&quot;-ferror-spans -Wall -fforce-recomp\&quot;</code></td></tr>
+<tr><td width="25%"><code>stack.yaml</code></td><td width="25%"><code>stack build</code></td><td width="50%"><code>--ghc-options=\&quot;-ferror-spans -Wall\&quot;</code></td></tr>
+<tr><td width="25%"><code>something.cabal</code></td><td width="25%"><code>cabal build</code></td></tr>
+<tr><td width="25%">default</td><td width="25%"><code>ghc &lt;name-of-file-in-buffer&gt;</code></td><td width="50%"><code>--make -ferror-spans -Wall -fforce-recomp</code></td></tr>
+</table>
 
-<p>When invoked, <code>haskell-compile</code> tries to guess how to compile the
-Haskell program your currently visited buffer belongs to, by searching
-for a <samp>.cabal</samp> file in the current of enclosing parent folders. If
-a <samp>.cabal</samp> file was found, the command defined in the
-<code>haskell-compile-cabal-build-command</code> option is used. Note that to
-compile a <code>stack</code> based project you will need to set this variable to
-<code>stack build</code>. As usual you can do it using <code>M-x customize-variable</code>
-or with:
-</p>
-<div class="lisp">
-<pre class="lisp">(setq haskell-compile-cabal-build-command &quot;stack build&quot;)
-</pre></div>
+<a name="Keybindings"></a>
+<h3 class="section">12.1 Keybindings</h3>
 
-<p>Moreover, when requesting to compile a <samp>.cabal</samp>-file is detected and
-a negative prefix argument (e.g. <kbd>C-- C-c C-c</kbd>) was given, the
-alternative <code>haskell-compile-cabal-build-command-alt</code> is
-invoked. By default, <code>haskell-compile-cabal-build-command-alt</code>
-contains a &lsquo;<samp>cabal clean -s</samp>&rsquo; command in order to force a full
-rebuild.
-</p>
-<p>Otherwise if no <samp>.cabal</samp> could be found, a single-module
-compilation is assumed and <code>haskell-compile-command</code> is used
-(<em>if</em> the currently visited buffer contains Haskell source code).
-</p>
-<p>You can also inspect and modify the compile command to be invoked
-temporarily by invoking <code>haskell-compile</code> with a prefix argument
-(e.g. <kbd>C-u C-c C-c</kbd>). If later-on you want to recompile using the
-same customized compile command, invoke <code>recompile</code> (bound to
-<kbd>g</kbd>) inside the &lsquo;<samp>*haskell-compilation*</samp>&rsquo; buffer.
+<table>
+<thead><tr><th width="30%">Key binding</th><th width="70%">Function</th></tr></thead>
+<tr><td width="30%">TAB</td><td width="70%">compilation-next-error</td></tr>
+<tr><td width="30%">RET</td><td width="70%">compile-goto-error</td></tr>
+<tr><td width="30%">C-o</td><td width="70%">compilation-display-error</td></tr>
+<tr><td width="30%">SPC</td><td width="70%">scroll-up-command</td></tr>
+<tr><td width="30%">-</td><td width="70%">negative-argument</td></tr>
+<tr><td width="30%">0 .. 9</td><td width="70%">digit-argument</td></tr>
+<tr><td width="30%">&lt;</td><td width="70%">beginning-of-buffer</td></tr>
+<tr><td width="30%">&gt;</td><td width="70%">end-of-buffer</td></tr>
+<tr><td width="30%">?</td><td width="70%">describe-mode</td></tr>
+<tr><td width="30%">g</td><td width="70%">recompile</td></tr>
+<tr><td width="30%">h</td><td width="70%">describe-mode</td></tr>
+<tr><td width="30%">q</td><td width="70%">quit-window</td></tr>
+<tr><td width="30%">DEL</td><td width="70%">scroll-down-command</td></tr>
+<tr><td width="30%">S-SPC</td><td width="70%">scroll-down-command</td></tr>
+<tr><td width="30%">&lt;backtab&gt;</td><td width="70%">compilation-previous-error</td></tr>
+<tr><td width="30%">&lt;follow-link&gt;</td><td width="70%">mouse-face</td></tr>
+<tr><td width="30%">&lt;mouse-2&gt;</td><td width="70%">compile-goto-error</td></tr>
+<tr><td width="30%">&lt;remap&gt;</td><td width="70%">Prefix Command</td></tr>
+<tr><td width="30%">M-n</td><td width="70%">compilation-next-error</td></tr>
+<tr><td width="30%">M-p</td><td width="70%">compilation-previous-error</td></tr>
+<tr><td width="30%">M-{</td><td width="70%">compilation-previous-file</td></tr>
+<tr><td width="30%">M-}</td><td width="70%">compilation-next-file</td></tr>
+<tr><td width="30%">C-c C-c</td><td width="70%">compile-goto-error</td></tr>
+<tr><td width="30%">C-c C-f</td><td width="70%">next-error-follow-minor-mode</td></tr>
+<tr><td width="30%">C-c C-k</td><td width="70%">kill-compilation</td></tr>
+</table>
+
+<a name="Related-Defcustoms"></a>
+<h3 class="section">12.2 Related Defcustoms</h3>
+
+<table>
+<thead><tr><th width="30%">Defcustom</th><th width="70%">Default Value</th></tr></thead>
+<tr><td width="30%"><code>haskell-process-path-ghc</code></td><td width="70%"><code>ghc</code></td></tr>
+<tr><td width="30%"><code>haskell-process-args-ghc</code></td><td width="70%"><code>--make -ferror-spans -Wall -fforce-recomp</code></td></tr>
+<tr><td width="30%"><code>haskell-process-path-cabal</code></td><td width="70%"><code>cabal</code></td></tr>
+<tr><td width="30%"><code>haskell-process-args-cabal-build</code></td><td width="70%"><code>--ghc-options=\&quot;-ferror-spans -Wall -fforce-recomp\&quot;</code></td></tr>
+<tr><td width="30%"><code>haskell-process-path-stack</code></td><td width="70%"><code>stack</code></td></tr>
+<tr><td width="30%"><code>haskell-process-args-stack-build</code></td><td width="70%"><code>--ghc-options=\&quot;-ferror-spans -Wall\&quot;</code></td></tr>
+</table>
+
+<a name="Hooks"></a>
+<h3 class="section">12.3 Hooks</h3>
+
+<p>None
 </p>
 <hr>
 <div class="header">
 <p>
-Next: <a href="Interactive-Haskell.html#Interactive-Haskell" accesskey="n" rel="next">Interactive Haskell</a>, Previous: <a href="Declaration-scanning.html#Declaration-scanning" accesskey="p" rel="prev">Declaration scanning</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Inferior-Haskell-interpreter.html#Inferior-Haskell-interpreter" accesskey="n" rel="next">Inferior Haskell interpreter</a>, Previous: <a href="Declaration-scanning.html#Declaration-scanning" accesskey="p" rel="prev">Declaration scanning</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
 </div>
 
 
