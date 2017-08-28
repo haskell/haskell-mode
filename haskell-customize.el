@@ -64,7 +64,11 @@ be located, then stack-ghci will be used.
 Otherwise if there's a *.cabal file, cabal-repl will be used.
 
 If none of the above apply, ghci will be used."
-  :type '(choice (const auto) (const ghci) (const cabal-repl) (const stack-ghci) (const cabal-new-repl))
+  :type '(choice (const auto)
+                 (const ghci)
+                 (const cabal-repl)
+                 (const stack-ghci)
+                 (const cabal-new-repl))
   :group 'haskell-interactive)
 
 (defcustom haskell-process-wrapper-function
@@ -176,6 +180,22 @@ pass additional flags to `ghc'."
   "Additional arguments for `stack ghci' invocation."
   :group 'haskell-interactive
   :type '(repeat (string :tag "Argument")))
+
+(defcustom haskell-process-path-ghc
+  "ghc"
+  "Path for The Glorious Glasgow Haskell Compiler")
+
+(defcustom haskell-process-args-ghc
+  "--make -ferror-spans -Wall -fforce-recomp"
+  "Any arguments for starting ghc.")
+
+(defcustom haskell-process-args-cabal-build
+  "--ghc-options=\"-ferror-spans -Wall -fforce-recomp\""
+  "Arguments while doing cabal build.")
+
+(defcustom haskell-process-args-stack-build
+  "--ghc-options=\"-ferror-spans -Wall\""
+  "Additional arguments for `stack build' invocation.")
 
 (defcustom haskell-process-do-cabal-format-string
   ":!cd %s && %s"
@@ -415,22 +435,43 @@ imports."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Accessor functions
 
+(defvar inferior-haskell-root-dir nil
+  "The path which is considered as project root, this is determined by the
+presence of a *.cabal file or stack.yaml file or something similar.")
+
 (defun haskell-process-type ()
-  "Return `haskell-process-type', or a guess if that variable is 'auto."
-  (if (eq 'auto haskell-process-type)
-      (cond
-       ;; User has explicitly initialized this project with cabal
-       ((locate-dominating-file default-directory "cabal.sandbox.config")
-        'cabal-repl)
-       ((and (locate-dominating-file default-directory "stack.yaml")
-             (executable-find "stack"))
-        'stack-ghci)
-       ((locate-dominating-file
-         default-directory
-         (lambda (d)
-           (cl-find-if (lambda (f) (string-match-p ".\\.cabal\\'" f)) (directory-files d))))
-        'cabal-repl)
-       (t 'ghci))
-    haskell-process-type))
+  "Return `haskell-process-type', or a guess if that variable is 'auto.
+This function also sets the `inferior-haskell-root-dir'"
+  (let ((cabal-sandbox (locate-dominating-file default-directory
+                                               "cabal.sandbox.config"))
+        (stack         (locate-dominating-file default-directory
+                                               "stack.yaml"))
+        (cabal         (locate-dominating-file default-directory
+                                               (lambda (d)
+                                                 (cl-find-if
+                                                  (lambda (f)
+                                                    (string-match-p ".\\.cabal\\'" f))
+                                                  (directory-files d))))))
+    (if (eq 'auto haskell-process-type)
+        (cond
+         ;; User has explicitly initialized this project with cabal
+         ((and cabal-sandbox
+               (executable-find "cabal"))
+          (setq inferior-haskell-root-dir cabal-sandbox)
+          'cabal-repl)
+         ((and stack
+               (executable-find "stack"))
+          (setq inferior-haskell-root-dir stack)
+          'stack-ghci)
+         ((and cabal
+               (executable-find "cabal"))
+          (setq inferior-haskell-root-dir cabal)
+          'cabal-repl)
+         ((executable-find "ghc")
+          (setq inferior-haskell-root-dir default-directory)
+          'ghci)
+         (t
+          (error "Could not find any installation of GHC.")))
+      haskell-process-type)))
 
 (provide 'haskell-customize)

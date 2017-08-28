@@ -1848,6 +1848,14 @@ This function switches to and potentially loads many buffers."
         ;; return the result
         doc ))))
 
+(defun inferior-haskell-kind (sym)
+  "Find the kind of SYM with `:kind' ghci feature."
+  (inferior-haskell-get-result (format ":kind %s" sym)))
+
+(defun inferior-haskell-type (sym)
+  "Find the type of SYM with `:type' ghci feature."
+  (inferior-haskell-get-result (format ":type (%s)" sym)))
+
 (provide 'haskell-doc)
 
 ;;; haskell-doc.el ends here
