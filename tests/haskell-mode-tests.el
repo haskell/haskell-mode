@@ -19,6 +19,7 @@
 
 (require 'ert)
 (require 'haskell-mode)
+(require 'haskell)
 (require 'haskell-test-utils)
 
 (ert-deftest haskell-mode-ident-at-point-empty ()

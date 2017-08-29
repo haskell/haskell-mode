@@ -396,52 +396,39 @@ on `haskell-completions-sync-repl-completion-at-point'."
                                                                  (prefix &optional import))
     nil)
   (ad-activate 'haskell-completions-sync-complete-repl-mock)
-
-  ;; Mock `haskell-session-maybe'
-  (defadvice haskell-session-maybe-mock (around haskell-session-maybe)
-    t)
-  (ad-activate 'haskell-session-maybe-mock)
-
-  ;; Mock `haskell-process-cmd'
-  (defadvice haskell-process-cmd-mock (around haskell-process-cmd
-                                          (P))
-    nil)
-  (ad-activate 'haskell-process-cmd-mock)
-
-  ;; Mock `haskell-interactive-process'
-  (defadvice haskell-interactive-process-mock (around haskell-interactive-process)
-    nil)
-  (ad-activate 'haskell-interactive-process-mock)
-
+  (haskell-unconditional-kill-buffer "*haskell*")
+  (switch-to-haskell)
   ;;; Tests
-  (unwind-protect
-      (let (expected)
-        (with-temp-buffer
-          (haskell-mode)
+  (let* ((ans nil)
+         (times 5))
+    (while (and (not ans)
+                (> times 0))
+      (unwind-protect
+          (let (expected)
+            (setq ans t)
+            (setq times (1- times))
+            (with-temp-buffer
+              (haskell-mode)
+              (insert "import qualified Data.List as L\n\n")
+              (insert "test = L")
+              (let* ((haskell-completions-complete-operators nil))
+                (setq expected (nth 2 (haskell-completions-sync-repl-completion-at-point)))
+                (setq ans (and ans expected)))
+              (let* ((haskell-completions-complete-operators t))
+                (setq expected (nth 2 (haskell-completions-sync-repl-completion-at-point)))
+                (setq ans (and ans expected)))
 
-          (insert "import qualified Data.List as L\n\n")
-          (insert "test = L")
-          (let* ((haskell-completions-complete-operators nil))
-            (setq expected (nth 2 (haskell-completions-sync-repl-completion-at-point)))
-            (should expected))
-          (let* ((haskell-completions-complete-operators t))
-            (setq expected (nth 2 (haskell-completions-sync-repl-completion-at-point)))
-            (should expected))
-
-          (insert ".")
-          (let* ((haskell-completions-complete-operators nil))
-            (setq expected (nth 2 (haskell-completions-sync-repl-completion-at-point)))
-            (should-not expected))
-          (let* ((haskell-completions-complete-operators t))
-            (setq expected (nth 2 (haskell-completions-sync-repl-completion-at-point)))
-            (should expected))))
-    (progn
-      ;; Remove mocks
-      (ad-deactivate 'haskell-completions-sync-complete-repl-mock)
-      (ad-deactivate 'haskell-session-maybe-mock)
-      (ad-deactivate 'haskell-process-cmd-mock)
-      (ad-deactivate 'haskell-interactive-process-mock))))
-
+              (insert ".")
+              (let* ((haskell-completions-complete-operators nil))
+                (setq expected (nth 2 (haskell-completions-sync-repl-completion-at-point)))
+                (setq ans (and ans (not expected))))
+              (let* ((haskell-completions-complete-operators t))
+                (setq expected (nth 2 (haskell-completions-sync-repl-completion-at-point)))
+                (setq ans (and ans expected)))))
+        (progn
+          ;; Remove mocks
+          (ad-deactivate 'haskell-completions-sync-complete-repl-mock))))
+    (should ans)))
 
 (provide 'haskell-completions-tests)
 ;;; haskell-completions-tests.el ends here

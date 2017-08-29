@@ -37,8 +37,7 @@
 ;;; Code:
 
 (require 'haskell-mode)
-(require 'haskell-process)
-(require 'haskell-interactive-mode)
+(require 'inf-haskell)
 
 ;;;###autoload
 (defgroup haskell-completions nil
@@ -361,16 +360,9 @@ Returns nil if no completions available."
             ;; and haskell-completions-identifier-prefix
             (let* ((is-import (eql typ 'haskell-completions-module-name-prefix))
                    (candidates
-                    (when (and (haskell-session-maybe)
-                               (not (haskell-process-cmd
-                                     (haskell-interactive-process)))
-                               ;; few possible extra checks would be:
-                               ;; (haskell-process-get 'is-restarting)
-                               ;; (haskell-process-get 'evaluating)
-                               )
-                      ;; if REPL is available and not busy try to query it for
-                      ;; completions list in case of module name or identifier
-                      ;; prefixes
+                    (progn
+                      (if (not inferior-haskell-buffer)
+                          (switch-to-haskell))
                       (haskell-completions-sync-complete-repl pfx is-import))))
               ;; append candidates with keywords
               (list beg end (append
@@ -382,11 +374,33 @@ Returns nil if no completions available."
 When optional IMPORT argument is non-nil complete PREFIX
 prepending \"import \" keyword (useful for module names).  This
 function is supposed for internal use."
-  (haskell-process-get-repl-completions
-   (haskell-interactive-process)
-   (if import
-       (concat "import " prefix)
-     prefix)))
+  (inferior-haskell-get-completions
+         (if import
+             (concat "import " prefix)
+           prefix)))
+
+(defun inferior-haskell-get-result-list (prefix)
+  "Get the completions from ghci using `:complete' and split by \n (and trim white spaces)"
+  (haskell-string-split-to-lines
+   (inferior-haskell-get-result
+    (concat
+     (format  ":complete repl \"%s\""
+              prefix)))))
+
+(defun inferior-haskell-get-completions (unsanitized-completions)
+  "gets the completions result list sanitizes and returns it, the first result
+is meta data so we remove it"
+  (when (stringp unsanitized-completions)
+    (cdr (cl-mapcar #'inferior-haskell-sanitize
+                    (inferior-haskell-get-result-list unsanitized-completions)))))
+
+(defun inferior-haskell-sanitize (txt)
+  "the completions from ghci (using `:complete') are of the form
+\"SomeCompletion1\"
+\"SomeCompletion2\"
+etc. So we trim the double quotes from the completion to get the string"
+  (when (stringp txt)
+    (haskell-string-trim-prefix "\"" (haskell-string-trim-suffix "\"" txt))))
 
 (provide 'haskell-completions)
 ;;; haskell-completions.el ends here

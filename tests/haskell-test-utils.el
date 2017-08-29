@@ -269,6 +269,14 @@ Whole hierarchy is removed after BODY finishes and value of
            ,@body))
      (delete-directory tmpdir t)))
 
+(ert-deftest haskell-with-temp-dir-structure ()
+  (setq cur-haskell-dir default-directory)
+  (with-temp-dir-structure
+   (("a.hs" . "-- Empty file")
+    ("faza" . (("b.hs" . "-- Empty file"))))
+   (cd "faza"))
+  (should (eq default-directory cur-haskell-dir)))
+
 (defun haskell-bypass-confirmation (function &rest args)
   "Call FUNCTION with ARGS, bypassing all prompts.
 This includes both `y-or-n-p' and `yes-or-no-p'.

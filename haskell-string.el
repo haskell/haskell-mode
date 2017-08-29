@@ -172,20 +172,18 @@ See also `haskell-string-take'."
   str)
 
 (defun haskell-string-split-to-lines (str)
-  "Split STR to lines and return a list of strings with preceeding and
-succeding space removed."
   (when (stringp str)
     (cl-mapcar #'haskell-string-chomp (split-string str "\n"))))
 
 (defun haskell-string-trim-prefix (prefix str)
-  "If PREFIX is prefix of STR, the string is trimmed."
+  "if prefix is present in string, the string is trimmed"
   (when (and (stringp prefix)
              (stringp str))
     (if (string-prefix-p prefix str)
         (substring str (length prefix)))))
 
 (defun haskell-string-trim-suffix (suffix str)
-  "If SUFFIX is suffix of STR, the string is trimmed."
+  "if suffix is present, the string is trimmed"
   (when (and (stringp suffix)
              (stringp str))
     (if (string-suffix-p suffix str)

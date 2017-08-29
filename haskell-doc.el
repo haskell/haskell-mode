@@ -3,6 +3,7 @@
 ;; Copyright © 2004, 2005, 2006, 2007, 2009, 2016  Free Software Foundation, Inc.
 ;; Copyright © 1997  Hans-Wolfgang Loidl
 ;;             2016  Arthur Fayzrakhmanov
+;; Copyright © 2017 Vasantha Ganesh Kanniappan <vasanthaganesh.k@tuta.io>
 
 ;; Author: Hans-Wolfgang Loidl <hwloidl@dcs.glasgow.ac.uk>
 ;; Temporary Maintainer and Hacker: Graeme E Moss <gem@cs.york.ac.uk>
@@ -301,10 +302,10 @@
 ;;; Code:
 
 (require 'haskell-mode)
-(require 'haskell-process)
-(require 'haskell)
 (require 'haskell-utils)
 (require 'inf-haskell)
+(require 'haskell-collapse)
+(require 'haskell)
 (require 'imenu)
 (require 'eldoc)
 
@@ -313,7 +314,6 @@
   "Show Haskell function types in echo area."
   :group 'haskell
   :prefix "haskell-doc-")
-
 
 (defvar-local haskell-doc-mode nil
   "*If non-nil, show the type of the function near point or a related comment.
@@ -398,11 +398,6 @@ This variable is buffer-local."
   :group 'haskell-doc
   :type 'boolean)
 
-(defcustom haskell-doc-use-inf-haskell nil
-  "If non-nil use inf-haskell.el to get type and kind information."
-  :group 'haskell-doc
-  :type 'boolean)
-
 (defvar haskell-doc-search-distance 40  ; distance in characters
   "*How far to search when looking for the type declaration of fct under cursor.")
 
@@ -413,12 +408,6 @@ If user input arrives before this interval of time has elapsed after the
 last input, no documentation will be printed.
 
 If this variable is set to 0, no idle time is required.")
-
-(defvar haskell-doc-argument-case 'identity ; 'upcase
-  "Case in which to display argument names of functions, as a symbol.
-This has two preferred values: `upcase' or `downcase'.
-Actually, any name of a function which takes a string as an argument and
-returns another string is acceptable.")
 
 (defvar haskell-doc-mode-message-commands nil
   "*Obarray of command names where it is appropriate to print in the echo area.
@@ -1416,10 +1405,14 @@ Meant for `eldoc-documentation-function'."
   ;; There are a number of possible documentation functions.
   ;; Some of them are asynchronous.
   (when (haskell-doc-in-code-p)
-    (let ((msg (or
-                (haskell-doc-current-info--interaction)
-                (haskell-doc-sym-doc (haskell-ident-at-point)))))
-      (unless (symbolp msg) msg))))
+    (let* ((msg (or (haskell-doc-sym-doc (haskell-ident-at-point))
+                    (haskell-doc-current-info--interaction)))
+           (sanitized-msg (if (stringp msg)
+                              (haskell-mode-one-line msg))))
+      (unless (symbolp sanitized-msg)
+        (if haskell-doc-prettify-types
+            (haskell-doc-prettify-types sanitized-msg)
+          sanitized-msg)))))
 
 (defun haskell-doc-ask-mouse-for-type (event)
   "Read the identifier under the mouse and echo its type.
@@ -1450,123 +1443,92 @@ current buffer."
   (unless sym (setq sym (haskell-ident-at-point)))
   ;; if printed before do not print it again
   (unless (string= sym (car haskell-doc-last-data))
-    (let ((doc (or (haskell-doc-current-info--interaction t)
-                  (haskell-doc-sym-doc sym))))
+    (let* ((doc (or (haskell-doc-sym-doc sym)
+                    (haskell-doc-current-info--interaction)))
+           (sanitized-doc (haskell-mode-one-line doc)))
       (when (and doc (haskell-doc-in-code-p))
         ;; In Emacs 19.29 and later, and XEmacs 19.13 and later, all
         ;; messages are recorded in a log.  Do not put haskell-doc messages
         ;; in that log since they are legion.
         (let ((message-log-max nil))
-          (message "%s" doc))))))
+          (message
+           (format "%s" (if haskell-doc-prettify-types
+                            (haskell-doc-prettify-types sanitized-doc)
+                          sanitized-doc))))))))
 
-(defvar haskell-doc-current-info--interaction-last nil
-  "Async message stack.
-If non-nil, a previous eldoc message from an async call, that
-hasn't been displayed yet.")
-
-(defun haskell-doc-current-info--interaction (&optional sync)
-  "Asynchronous call to `haskell-process-get-type'.
-Suitable for use in the eldoc function `haskell-doc-current-info'.
-
-If SYNC is non-nil, the call will be synchronous instead, and
-instead of calling `eldoc-print-current-symbol-info', the result
+(defun haskell-doc-current-info--interaction ()
+  "call will be synchronous, and, the result
 will be returned directly."
-  ;; Return nil if nothing is available, or 'async if something might
-  ;; be available, but asynchronously later. This will call
-  ;; `eldoc-print-current-symbol-info' later.
   (when (haskell-doc-in-code-p)
     ;; do nothing when inside string or comment
     (let (sym prev-message)
       (cond
-       ((setq prev-message haskell-doc-current-info--interaction-last)
-        (setq haskell-doc-current-info--interaction-last nil)
-        (cdr prev-message))
+       ((cdr prev-message))
        ((setq sym
               (if (use-region-p)
                   (buffer-substring-no-properties
                    (region-beginning) (region-end))
                 (haskell-ident-at-point)))
-        (if sync
-            (haskell-process-get-type sym #'identity t)
-          (haskell-process-get-type
-           sym (lambda (response)
-                 (setq haskell-doc-current-info--interaction-last
-                       (cons 'async response))
-                 (eldoc-print-current-symbol-info)))))))))
+        (haskell-process-get-type sym))))))
 
-(defun haskell-process-get-type (expr-string &optional callback sync)
-  "Asynchronously get the type of a given string.
+(defun haskell-doc-prettify-types (response)
+  "Prettify the output in the minibuffer while printing the types"
+  (if (string-match-p (rx string-start line-end) response)
+      (setq response nil)
+    ;; Remove a newline at the end
+    (setq response (replace-regexp-in-string "\n\\'" "" response))
+    ;; Propertize for eldoc
+    (save-match-data
+      (when (string-match " :: " response)
+        ;; Highlight type
+        (let ((name (substring response 0 (match-end 0)))
+              (type (propertize
+                     (substring response (match-end 0))
+                     'face 'eldoc-highlight-function-argument)))
+          (setq response (concat name type)))))
+    (dolist (re '(("::" . "∷") ("=>" . "⇒") ("->" . "→")))
+      (setq response
+            (replace-regexp-in-string (car re) (cdr re) response)))
+    response))
 
-EXPR-STRING should be an expression passed to :type in ghci.
+(defun haskell-process-do-type (expr)
+  "return type of the given expression."
+  (let* ((expr-okay (and expr
+                         (not (string-match-p "\\`[[:space:]]*\\'" expr))
+                         (not (string-match-p "\n" expr)))))
+    ;; No newlines in expressions, and surround with parens if it
+    ;; might be a slice expression
+    (when (and expr-okay
+               inferior-haskell-buffer)
+      (cond ((and (equal (buffer-file-name)
+                         (car haskell-process-loaded-file-status))
+                  (cdr haskell-process-loaded-file-status))
+             (inferior-haskell-get-result
+              (format (if (or (string-match-p "\\`(" expr)
+                              (string-match-p "\\`[_[:alpha:]]" expr))
+                          ":type %s"
+                        ":type (%s)")
+                      expr)))
+            (t (inferior-haskell-get-result
+                (haskell-utils-compose-type-at-command
+                 (haskell-indented-block))))))))
 
-CALLBACK will be called with a formatted type string.
-
-If SYNC is non-nil, make the call synchronously instead."
-  (unless callback (setq callback (lambda (response) (message "%s" response))))
-  (let ((process (and (haskell-session-maybe)
-                    (haskell-session-process (haskell-session-maybe))))
-        ;; Avoid passing bad strings to ghci
-        (expr-okay
-         (and (not (string-match-p "\\`[[:space:]]*\\'" expr-string))
-            (not (string-match-p "\n" expr-string))))
-        (ghci-command (concat ":type " expr-string))
-        (process-response
-         (lambda (response)
-           ;; Responses with empty first line are likely errors
-           (if (string-match-p (rx string-start line-end) response)
-               (setq response nil)
-             ;; Remove a newline at the end
-             (setq response (replace-regexp-in-string "\n\\'" "" response))
-             ;; Propertize for eldoc
-             (save-match-data
-               (when (string-match " :: " response)
-                 ;; Highlight type
-                 (let ((name (substring response 0 (match-end 0)))
-                       (type (propertize
-                              (substring response (match-end 0))
-                              'face 'eldoc-highlight-function-argument)))
-                   (setq response (concat name type)))))
-             (when haskell-doc-prettify-types
-               (dolist (re '(("::" . "∷") ("=>" . "⇒") ("->" . "→")))
-                 (setq response
-                       (replace-regexp-in-string (car re) (cdr re) response))))
-             response))))
-    (when (and process expr-okay)
-      (if sync
-          (let ((response (haskell-process-queue-sync-request process ghci-command)))
-            (funcall callback (funcall process-response response)))
-        (haskell-process-queue-command
-         process
-         (make-haskell-command
-          :go (lambda (_) (haskell-process-send-string process ghci-command))
-          :complete
-          (lambda (_ response)
-            (funcall callback (funcall process-response response)))))
-        'async))))
+(defun haskell-process-get-type (expr-string)
+  "synchronously get the type of a given string.
+EXPR-STRING should be an expression passed to `:type' in ghci.
+prettifies the type output if `haskell-doc-prettify-types' is set"
+  (if inferior-haskell-buffer
+      (let ((response (haskell-process-do-type expr-string)))
+        (unless (haskell-utils-repl-response-error-p response)
+            response))))
 
 (defun haskell-doc-sym-doc (sym)
   "Show the type of given symbol SYM.
 For the function under point, show the type in the echo area.
 This information is extracted from the `haskell-doc-prelude-types' alist
 of prelude functions and their types, or from the local functions in the
-current buffer.
-If `haskell-doc-use-inf-haskell' is non-nil, this function will consult
-the inferior Haskell process for type/kind information, rather than using
-the haskell-doc database."
-  (if haskell-doc-use-inf-haskell
-      (unless (or (null sym) (string= "" sym))
-        (let* ((message-log-max nil)
-               (result (ignore-errors
-                         (unwind-protect
-                             (inferior-haskell-type sym)
-                           (message "")))))
-          (if (and result (string-match " :: " result))
-              result
-            (setq result (unwind-protect
-                             (inferior-haskell-kind sym)
-                           (message "")))
-            (and result (string-match " :: " result) result))))
-    (let ((i-am-prelude nil)
+current buffer."
+  (let ((i-am-prelude nil)
           (i-am-fct nil)
           (type nil)
           (is-reserved (haskell-doc-is-of sym haskell-doc-reserved-ids))
@@ -1616,8 +1578,7 @@ the haskell-doc database."
                               (format "%s" type)))) )
              (if i-am-prelude
                  (add-text-properties 0 (length str) '(face bold) str))
-             str)))))
-
+             str))))
 
 ;; ToDo: define your own notion of `near' to find surrounding fct
 ;;(defun haskell-doc-fnsym-in-current-sexp ()
@@ -1847,14 +1808,6 @@ This function switches to and potentially loads many buffers."
             (setq doc `(,docstring . "Data"))) ; (setq doc `(,(match-string 0 docstring) . "Data")) )
         ;; return the result
         doc ))))
-
-(defun inferior-haskell-kind (sym)
-  "Find the kind of SYM with `:kind' ghci feature."
-  (inferior-haskell-get-result (format ":kind %s" sym)))
-
-(defun inferior-haskell-type (sym)
-  "Find the type of SYM with `:type' ghci feature."
-  (inferior-haskell-get-result (format ":type (%s)" sym)))
 
 (provide 'haskell-doc)
 
