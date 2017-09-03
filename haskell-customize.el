@@ -181,22 +181,6 @@ pass additional flags to `ghc'."
   :group 'haskell-interactive
   :type '(repeat (string :tag "Argument")))
 
-(defcustom haskell-process-path-ghc
-  "ghc"
-  "Path for The Glorious Glasgow Haskell Compiler")
-
-(defcustom haskell-process-args-ghc
-  "--make -ferror-spans -Wall -fforce-recomp"
-  "Any arguments for starting ghc.")
-
-(defcustom haskell-process-args-cabal-build
-  "--ghc-options=\"-ferror-spans -Wall -fforce-recomp\""
-  "Arguments while doing cabal build.")
-
-(defcustom haskell-process-args-stack-build
-  "--ghc-options=\"-ferror-spans -Wall\""
-  "Additional arguments for `stack build' invocation.")
-
 (defcustom haskell-process-do-cabal-format-string
   ":!cd %s && %s"
   "The way to run cabal comands. It takes two arguments -- the directory and the command.
