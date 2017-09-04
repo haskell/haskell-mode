@@ -74,6 +74,7 @@ interpreter (e.g. GHCi).
 * Aligning code::                        Aligning code using @code{align-regexp}
 * Rectangular commands::                 Manage indentation manually
 * REPL::                                 GHCi REPL
+* Global-Eldoc::                         Shows documentation at point
 * Collapsing Haskell code::              View more code on screen
 * Getting Help and Reporting Bugs::      How to improve Haskell Mode
 * Concept index::                        Index of Haskell Mode concepts
@@ -2671,6 +2672,68 @@ file such as @code{cabal.sandbox.config} and @code{stack.yaml} are found the fol
 preference is followed.
 
 @code{cabal.sandbox.config} > @code{stack.yaml} >  @code{*.cabal}
+
+@node Global-Eldoc
+@chapter Shows documentation at point
+
+@code{haskell-doc-mode} shows the Type of an identifier at point (if it exists).
+The type of functions/operators in Prelude are shown by default. Other information
+such as the structure of @code{import}, @code{if}, @code{do} etc. is also shown.
+
+If you want this to work with other imported modules as well, then
+load the file into the repl. This can be done by pressing @kbd{C-c C-l}
+from the the current buffer, provided you have @code{interactive-haskell}
+minor mode enabled. Then when you place the point
+on a text for more than 0.5 seconds, the type information or other
+documentation information is shown.
+
+To show type information for modules other than @code{Prelude}, we
+query the comint based @code{GHCi} process for type information.
+
+@section Related defcustoms
+
+@multitable @columnfractions .40 .20 .40
+@headitem Defcustom @tab Default value @tab Description
+
+@item @code{haskell-doc-prettify-types}
+@tab t
+@tab Replace some parts of types with Unicode characters like @code{::} with
+@code{∷} when showing type information about symbols.
+
+@item @code{haskell-doc-show-global-types}
+@tab nil
+@tab If non-nil, search for the types of global functions by loading the files.
+This variable is buffer-local.
+
+@item @code{haskell-doc-show-reserved}
+@tab t
+@tab If non-nil, show a documentation string for reserved ids.
+This variable is buffer-local.
+
+@item @code{haskell-doc-show-strategy}
+@tab t
+@tab If non-nil, show a documentation string for strategies.
+This variable is buffer-local.
+
+@item @code{haskell-doc-show-user-defined}
+@tab t
+@tab If non-nil, show a documentation string for user defined ids.
+This variable is buffer-local.
+
+@item @code{haskell-doc-chop-off-context}
+@tab t
+@tab If non-nil eliminate the context part in a Haskell type.
+
+@item @code{haskell-doc-chop-off-fctname}
+@tab nil
+@tab If non-nil omit the function name and show only the type.
+
+@end multitable
+
+@section Adding hook
+
+Add your hooks to @code{haskell-doc-mode-hook}. By default, nothing is
+hooked to @code{haskell-doc-mode-hook}.
 
 @node Collapsing Haskell code
 @chapter Collapsing Haskell code
