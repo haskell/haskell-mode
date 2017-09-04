@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual is for Haskell mode, version 16.1-git
+
+Copyright (C) 2013-2017 Haskell Mode contributors.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the http://www.gnu.org/licenses/fdl.html (GNU
+Free Documentation License), Version 1.3 or any later version published
+by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts and no Back-Cover Texts. -->
+<!-- Created by GNU Texinfo 5.2, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>Haskell Mode 16.1-git: Global-Eldoc</title>
+
+<meta name="description" content="Haskell Mode 16.1-git: Global-Eldoc">
+<meta name="keywords" content="Haskell Mode 16.1-git: Global-Eldoc">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="index.html#Top" rel="start" title="Top">
+<link href="Concept-index.html#Concept-index" rel="index" title="Concept index">
+<link href="index.html#Top" rel="up" title="Top">
+<link href="Collapsing-Haskell-code.html#Collapsing-Haskell-code" rel="next" title="Collapsing Haskell code">
+<link href="REPL.html#REPL" rel="prev" title="REPL">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.indentedblock {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smallindentedblock {margin-left: 3.2em; font-size: smaller}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style:oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nocodebreak {white-space:nowrap}
+span.nolinebreak {white-space:nowrap}
+span.roman {font-family:serif; font-weight:normal}
+span.sansserif {font-family:sans-serif; font-weight:normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+<link rel="stylesheet" type="text/css" href="haskell-mode.css">
+
+<link rel="shortcut icon" href="haskell-mode-32x32.png">
+<script src="../../index.js"> </script>
+</head>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+<div class="background"> </div><a name="Global_002dEldoc"></a>
+<div class="header">
+<p>
+Next: <a href="Collapsing-Haskell-code.html#Collapsing-Haskell-code" accesskey="n" rel="next">Collapsing Haskell code</a>, Previous: <a href="REPL.html#REPL" accesskey="p" rel="prev">REPL</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<a name="Shows-documentation-at-point"></a>
+<h2 class="chapter">20 Shows documentation at point</h2>
+
+<p><code>haskell-doc-mode</code> shows the Type of an identifier at point (if it exists).
+The type of functions/operators in Prelude are shown by default. Other information
+such as the structure of <code>import</code>, <code>if</code>, <code>do</code> etc. is also shown.
+</p>
+<p>If you want this to work with other imported modules as well, then
+load the file into the repl. This can be done by pressing <kbd>C-c C-l</kbd>
+from the the current buffer, provided you have <code>interactive-haskell</code>
+minor mode enabled. Then when you place the point
+on a text for more than 0.5 seconds, the type information or other
+documentation information is shown.
+</p>
+<p>To show type information for modules other than <code>Prelude</code>, we
+query the comint based <code>GHCi</code> process for type information.
+</p>
+<a name="Related-defcustoms"></a>
+<h3 class="section">20.1 Related defcustoms</h3>
+
+<table>
+<thead><tr><th width="40%">Defcustom</th><th width="20%">Default value</th><th width="40%">Description</th></tr></thead>
+<tr><td width="40%"><code>haskell-doc-prettify-types</code></td><td width="20%">t</td><td width="40%">Replace some parts of types with Unicode characters like <code>::</code> with
+<code>∷</code> when showing type information about symbols.</td></tr>
+<tr><td width="40%"><code>haskell-doc-show-global-types</code></td><td width="20%">nil</td><td width="40%">If non-nil, search for the types of global functions by loading the files.
+This variable is buffer-local.</td></tr>
+<tr><td width="40%"><code>haskell-doc-show-reserved</code></td><td width="20%">t</td><td width="40%">If non-nil, show a documentation string for reserved ids.
+This variable is buffer-local.</td></tr>
+<tr><td width="40%"><code>haskell-doc-show-strategy</code></td><td width="20%">t</td><td width="40%">If non-nil, show a documentation string for strategies.
+This variable is buffer-local.</td></tr>
+<tr><td width="40%"><code>haskell-doc-show-user-defined</code></td><td width="20%">t</td><td width="40%">If non-nil, show a documentation string for user defined ids.
+This variable is buffer-local.</td></tr>
+<tr><td width="40%"><code>haskell-doc-chop-off-context</code></td><td width="20%">t</td><td width="40%">If non-nil eliminate the context part in a Haskell type.</td></tr>
+<tr><td width="40%"><code>haskell-doc-chop-off-fctname</code></td><td width="20%">nil</td><td width="40%">If non-nil omit the function name and show only the type.</td></tr>
+</table>
+
+<a name="Adding-hook"></a>
+<h3 class="section">20.2 Adding hook</h3>
+
+<p>Add your hooks to <code>haskell-doc-mode-hook</code>. By default, nothing is
+hooked to <code>haskell-doc-mode-hook</code>.
+</p>
+<hr>
+<div class="header">
+<p>
+Next: <a href="Collapsing-Haskell-code.html#Collapsing-Haskell-code" accesskey="n" rel="next">Collapsing Haskell code</a>, Previous: <a href="REPL.html#REPL" accesskey="p" rel="prev">REPL</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="Concept-index.html#Concept-index" title="Index" rel="index">Index</a>]</p>
+</div>
+
+
+
+</body>
+</html>
