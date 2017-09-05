@@ -1152,7 +1152,118 @@ same customized compile command, invoke @code{recompile} (bound to
 @node Interactive Haskell
 @chapter Interactive Haskell
 
+@code{interactive-haskell-mode} is the minor mode that provides interactive
+editing features. Most of these features are provided by querying the haskell
+REPL processes.
 
+@section Enable this mode
+
+Run the function @kbd{M-x interactive-haskell-mode}
+
+If you want to enable this mode permanently, then hook this mode to @code{haskell-mode} by
+putting this line in your @code{.emacs} file:
+
+@example
+(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+@end example
+
+@section Related key binding
+
+@multitable @columnfractions 0.3 0.2 0.2 0.3
+@headitem Function @tab Args @tab Key bindings @tab Description
+
+@item @code{haskell-process-load-file}
+@tab nil
+@tab @kbd{C-c C-l}, @kbd{C-c C-r}
+@tab Load or reload the file in current buffer, errors that might arise are put in the `*haskell-compilation*' buffer.
+
+@item @code{haskell-mode-jump-to-def-or-tag}
+@tab nil
+@tab @kbd{M-.}
+@tab Jump to the definition.
+
+@item @code{haskell-cabal-visit-file}
+@tab nil
+@tab @kbd{C-c v c}
+@tab Locate and visit package description file for file visited by current buffer.
+
+@item @code{haskell-process-cabal}
+@tab nil
+@tab @kbd{C-c C-x}
+@tab Prompts for a Cabal command to run.
+
+@item @code{run-haskell}, @code{switch-to-haskell}
+@tab nil
+@tab @kbd{C-c C-b}, @kbd{C-c C-z}
+@tab Show the inf-haskell buffer. Start the process if needed.
+
+@item @code{haskell-compile}
+@tab nil
+@tab @kbd{C-c C-c}
+@tab Compile the Haskell program including the current buffer.
+
+@item @code{haskell-process-cabal-build}
+@tab nil
+@tab nil
+@tab Run the command @code{cabal build}
+@end multitable
+
+@section More on @code{M-.}
+
+The @code{M-.} functionality works if the file in the buffer is loaded into
+the REPL (@kbd{C-c C-l}). The file in the current buffer can only be loaded
+if the code doesn't contain errors. When we can succesfully load the file in
+the current buffer into REPL, we can get accurate go-to function definition
+with @kbd{M-.}
+
+@subsection @code{M-.} with hasktags
+
+Sometimes we might want to use the @kbd{M-.} functionality even when the
+code doesn't compile. This is when we use TAGS.
+
+First install @code{hasktags}.
+
+You can run either
+
+@example
+$ cabal install hasktags
+@end example
+
+or
+
+@example
+$ stack install hasktags
+@end example
+
+Then we run @kbd{M-x haskell-mode-generate-tags} to generate tags. Now
+we can use @kbd{M-.} functionality even when the code doesn't compile.
+
+But running @kbd{M-x haskell-mode-generate-tags} everytime can be a too much
+typing to do just a @kbd{M-.}. We set @code{haskell-tags-on-save} to @code{t}
+and the TAGS will be generated on saving the file in buffer.
+
+@section Related defcustoms
+
+@multitable @columnfractions
+@headitem Defcustom @tab Default value @tab Possible values
+
+@item @code{haskell-tags-on-save} @tab nil @tab @code{nil}, @code{t}
+@item @code{haskell-process-type} @tab @code{'auto} @tab @code{'stack-ghci, 'cabal-repl, 'ghci, 'auto}
+@item @code{haskell-process-path-ghci} @tab @code{ghci} @tab -
+@item @code{haskell-process-args-ghci} @tab @code{-ferror-spans} @tab -
+@item @code{haskell-process-path-cabal} @tab @code{cabal} @tab -
+@item @code{haskell-process-args-cabal-repl} @tab @code{--ghc-option=-ferror-spans} @tab -
+@item @code{haskell-process-path-stack} @tab @code{stack} @tab -
+@item @code{haskell-process-args-stack-ghci} @tab @code{--ghci-options=-ferror-spans --no-build --no-load} @tab -
+
+@end multitable
+
+
+@section Add Hooks
+
+None
+
+@end multitable
 
 @node Editing Cabal files
 @chapter Editing Cabal files
@@ -1486,7 +1597,7 @@ invokes @kbd{comint-write-output}. Write output from interpreter since last
 input to FILENAME. Any prompt at the end of the output is not written.
 @end table
 
-@section Relevant defcustoms:
+@section Relevant defcustoms
 
 @multitable @columnfractions .40 .20 .40
 @headitem Interpreter (defcustom) @tab Default Value @tab Possible Values
