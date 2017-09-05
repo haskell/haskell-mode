@@ -177,27 +177,6 @@ expression bounds. Must use `:set +c' in ghci for this to work."
 If given DISABLED argument sets variable value to nil, otherwise to t."
   (setq haskell-mode-interactive-prompt-state (not disabled)))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Set functionalities
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defun haskell-make-set ()
-  "Create a Set data structure (behind the scenes it is a hash-table)."
-  (make-hash-table))
-
-(defun haskell-add-to-set (set element)
-  "Add an element to the set.
-SET, the first argument is the set object.
-ELEMENT, the second argument is the element to be pushed into the set."
-  (puthash element t set))
-
-(defun haskell-in-set-p (set element)
-  "Return t if the SET data structure has the ELEMENT."
-  (gethash element set nil))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (defun haskell-utils-compile-error-p ()
   "Return t if an error (ghci's) is found in current buffer."
   (search-forward-regexp "^\\(\\(?:[A-Z]:\\)?[^ \r\n:][^\r\n:]*\\):\\([0-9()-:]+\\):?"
