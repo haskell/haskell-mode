@@ -68,9 +68,10 @@ Next: <a href="Collapsing-Haskell-code.html#Collapsing-Haskell-code" accesskey="
 <a name="Shows-documentation-at-point"></a>
 <h2 class="chapter">20 Shows documentation at point</h2>
 
-<p><code>haskell-doc-mode</code> shows the Type of an identifier at point (if it exists).
-The type of functions/operators in Prelude are shown by default. Other information
-such as the structure of <code>import</code>, <code>if</code>, <code>do</code> etc. is also shown.
+<p><code>haskell-doc-mode</code> (enabled by default) shows the Type of an identifier at
+point (if it exists). The type of functions/operators in Prelude are shown by
+default. Other information such as the structure of <code>import</code>, <code>if</code>,
+<code>do</code> etc. is also shown.
 </p>
 <p>If you want this to work with other imported modules as well, then
 load the file into the repl. This can be done by pressing <kbd>C-c C-l</kbd>
@@ -82,7 +83,7 @@ documentation information is shown.
 <p>To show type information for modules other than <code>Prelude</code>, we
 query the comint based <code>GHCi</code> process for type information.
 </p>
-<a name="Related-defcustoms"></a>
+<a name="Related-defcustoms-1"></a>
 <h3 class="section">20.1 Related defcustoms</h3>
 
 <table>
