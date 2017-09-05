@@ -1244,7 +1244,7 @@ and the TAGS will be generated on saving the file in buffer.
 
 @section Related defcustoms
 
-@multitable @columnfractions
+@multitable @columnfractions .40 .20 .40
 @headitem Defcustom @tab Default value @tab Possible values
 
 @item @code{haskell-tags-on-save} @tab nil @tab @code{nil}, @code{t}
@@ -1262,8 +1262,6 @@ and the TAGS will be generated on saving the file in buffer.
 @section Add Hooks
 
 None
-
-@end multitable
 
 @node Editing Cabal files
 @chapter Editing Cabal files
