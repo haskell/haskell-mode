@@ -1148,6 +1148,87 @@ temporarily by invoking @code{haskell-compile} with a prefix argument
 same customized compile command, invoke @code{recompile} (bound to
 @kbd{g}) inside the @samp{*haskell-compilation*} buffer.
 
+@section Keybindings
+
+@multitable 0.3 0.7
+@headitem Key binding @tab Function
+@item TAB
+@tab compilation-next-error
+
+@item RET
+@tab compile-goto-error
+
+@item C-o
+@tab compilation-display-error
+
+@item SPC
+@tab scroll-up-command
+
+@item -
+@tab negative-argument
+
+@item 0 .. 9
+@tab digit-argument
+
+@item <
+@tab beginning-of-buffer
+
+@item >
+@tab end-of-buffer
+
+@item ?
+@tab describe-mode
+
+@item g
+@tab recompile
+
+@item h
+@tab describe-mode
+
+@item q
+@tab quit-window
+
+@item DEL
+@tab scroll-down-command
+
+@item S-SPC
+@tab scroll-down-command
+
+@item <backtab>
+@tab compilation-previous-error
+
+@item <follow-link>
+@tab mouse-face
+
+@item <mouse-2>
+@tab compile-goto-error
+
+@item <remap>
+@tab Prefix Command
+
+@item M-n
+@tab compilation-next-error
+
+@item M-p
+@tab compilation-previous-error
+
+@item M-@{
+@tab compilation-previous-file
+
+@item M-@}
+@tab compilation-next-file
+
+@item C-c C-c
+@tab compile-goto-error
+
+@item C-c C-f
+@tab next-error-follow-minor-mode
+
+@item C-c C-k
+@tab kill-compilation
+
+@end multitable
+
 @node Interactive Haskell
 @chapter Interactive Haskell
 
