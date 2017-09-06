@@ -785,12 +785,7 @@ inferior GHCi process."
   "Set the build TARGET for cabal REPL."
   (interactive
    (list
-    (completing-read "New build target: "
-                     (haskell-session-get-targets (haskell-process-type))
-                     nil
-                     nil
-                     nil
-                     'haskell-cabal-targets-history)))
+    (haskell-session-choose-target "New build target: " nil 'haskell-cabal-targets-history)))
   (let* ((session haskell-session)
          (old-target (haskell-session-get session 'target)))
     (when session
@@ -801,25 +796,6 @@ inferior GHCi process."
             (when (y-or-n-p "Target changed, restart haskell process? ")
               (haskell-process-start session)))
         (haskell-mode-toggle-interactive-prompt-state t)))))
-
-(defun haskell-session-get-targets (process-type)
-  "Return a list of available targets."
-  (case process-type
-    ('stack-ghci
-     (haskell-session-get-targets-command haskell-process-path-stack "ide" "targets"))
-    (t
-     (haskell-cabal-enum-targets (haskell-process-type)))))
-
-(defun haskell-session-get-targets-command (command &rest args)
-  "Run an external command to obtain a list of available targets."
-  (with-temp-buffer
-    (case (apply #'process-file command nil (current-buffer) t args)
-      (0
-       (cl-remove-if
-        (lambda (line)
-          (string= "" line))
-        (split-string (buffer-string))))
-      (1 nil))))
 
 ;;;###autoload
 (defun haskell-mode-stylish-buffer ()
