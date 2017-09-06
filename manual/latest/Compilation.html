@@ -137,6 +137,38 @@ temporarily by invoking <code>haskell-compile</code> with a prefix argument
 same customized compile command, invoke <code>recompile</code> (bound to
 <kbd>g</kbd>) inside the &lsquo;<samp>*haskell-compilation*</samp>&rsquo; buffer.
 </p>
+<a name="Keybindings"></a>
+<h3 class="section">12.1 Keybindings</h3>
+
+<table>
+<thead><tr><th>Key binding</th><th>Function</th></tr></thead>
+<tr><td>TAB</td><td>compilation-next-error</td></tr>
+<tr><td>RET</td><td>compile-goto-error</td></tr>
+<tr><td>C-o</td><td>compilation-display-error</td></tr>
+<tr><td>SPC</td><td>scroll-up-command</td></tr>
+<tr><td>-</td><td>negative-argument</td></tr>
+<tr><td>0 .. 9</td><td>digit-argument</td></tr>
+<tr><td>&lt;</td><td>beginning-of-buffer</td></tr>
+<tr><td>&gt;</td><td>end-of-buffer</td></tr>
+<tr><td>?</td><td>describe-mode</td></tr>
+<tr><td>g</td><td>recompile</td></tr>
+<tr><td>h</td><td>describe-mode</td></tr>
+<tr><td>q</td><td>quit-window</td></tr>
+<tr><td>DEL</td><td>scroll-down-command</td></tr>
+<tr><td>S-SPC</td><td>scroll-down-command</td></tr>
+<tr><td>&lt;backtab&gt;</td><td>compilation-previous-error</td></tr>
+<tr><td>&lt;follow-link&gt;</td><td>mouse-face</td></tr>
+<tr><td>&lt;mouse-2&gt;</td><td>compile-goto-error</td></tr>
+<tr><td>&lt;remap&gt;</td><td>Prefix Command</td></tr>
+<tr><td>M-n</td><td>compilation-next-error</td></tr>
+<tr><td>M-p</td><td>compilation-previous-error</td></tr>
+<tr><td>M-{</td><td>compilation-previous-file</td></tr>
+<tr><td>M-}</td><td>compilation-next-file</td></tr>
+<tr><td>C-c C-c</td><td>compile-goto-error</td></tr>
+<tr><td>C-c C-f</td><td>next-error-follow-minor-mode</td></tr>
+<tr><td>C-c C-k</td><td>kill-compilation</td></tr>
+</table>
+
 <hr>
 <div class="header">
 <p>
