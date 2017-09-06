@@ -13,7 +13,7 @@
              (or (symbol-file 'haskell-cabal-enum-targets-1)
                  (buffer-file-name)))))
       (setq default-directory (expand-file-name "test-data" scriptDir)))
-    (should (equal '("Test" "test:test-1" "bench:bench-1" "exe:bin-1")
+    (should (equal '("lib:Test" "test:test-1" "bench:bench-1" "exe:bin-1")
                    (haskell-cabal-enum-targets)))))
 
 (ert-deftest haskell-cabal-enum-targets-2 ()
@@ -25,7 +25,7 @@
             (or (symbol-file 'haskell-cabal-enum-targets-2)
                 (buffer-file-name)))))
       (setq default-directory (expand-file-name "test-data" scriptDir)))
-    (should (equal '("Test" "Test:test:test-1" "Test:bench:bench-1" "Test:exe:bin-1")
+    (should (equal '("Test:lib" "Test:test:test-1" "Test:bench:bench-1" "Test:exe:bin-1")
                    (haskell-cabal-enum-targets 'stack-ghci)))))
 
 (ert-deftest haskell-cabal-get-field-1 ()
