@@ -49,6 +49,12 @@
   :group 'haskell-interactive
   :type 'boolean)
 
+(defcustom haskell-interactive-set-multiline-prompt
+  t
+  "Issue ':set prompt2' in interactive session. Not supported by ghci >= 8.2"
+  :group 'haskell-interactive
+  :type 'boolean)
+
 ;;;###autoload
 (defun haskell-process-restart ()
   "Restart the inferior Haskell process."
@@ -114,9 +120,9 @@ You can create new session using function `haskell-session-make'."
                                                             '(":set +c"))) ; :type-at in GHC 8+
                                                   "\n"))
           (haskell-process-send-string process ":set prompt \"\\4\"")
-          (haskell-process-send-string process (format ":set prompt2 \"%s\""
-                                                       haskell-interactive-prompt2)))
-
+          (when haskell-interactive-set-multiline-prompt
+            (haskell-process-send-string process (format ":set prompt2 \"%s\""
+                                                         haskell-interactive-prompt2))))
     :live (lambda (process buffer)
             (when (haskell-process-consume
                    process
