@@ -134,6 +134,8 @@ This is the case if the \".\" is part of a \"forall <tvar> . <type>\"."
     ("r" . ess-mode)
     ("rChan" . ess-mode)
     ("sql" . sql-mode)
+    ("json" . json-mode)
+    ("aesonQQ" . json-mode)
     ("parseRoutes" . haskell-yesod-parse-routes-mode))
   "Mapping from quasi quoter token to fontification mode.
 
