@@ -368,7 +368,7 @@ list of modules where missed IDENT was found."
   (with-current-buffer buffer
     (remove-overlays (point-min) (point-max) 'haskell-check t)))
 
-(defmacro with-overlay-properties (proplist ovl &rest body)
+(defmacro haskell-with-overlay-properties (proplist ovl &rest body)
   "Evaluate BODY with names in PROPLIST bound to the values of
 correspondingly-named overlay properties of OVL."
   (let ((ovlvar (cl-gensym "OVL-")))
@@ -376,21 +376,21 @@ correspondingly-named overlay properties of OVL."
             ,@(mapcar (lambda (p) `(,p (overlay-get ,ovlvar ',p))) proplist))
        ,@body)))
 
-(defun overlay-start> (o1 o2)
+(defun haskell-overlay-start> (o1 o2)
   (> (overlay-start o1) (overlay-start o2)))
-(defun overlay-start< (o1 o2)
+(defun haskell-overlay-start< (o1 o2)
   (< (overlay-start o1) (overlay-start o2)))
 
-(defun first-overlay-in-if (test beg end)
+(defun haskell-first-overlay-in-if (test beg end)
   (let ((ovls (cl-remove-if-not test (overlays-in beg end))))
-    (cl-first (sort (cl-copy-list ovls) 'overlay-start<))))
+    (cl-first (sort (cl-copy-list ovls) 'haskell-overlay-start<))))
 
-(defun last-overlay-in-if (test beg end)
+(defun haskell-last-overlay-in-if (test beg end)
   (let ((ovls (cl-remove-if-not test (overlays-in beg end))))
-    (cl-first (sort (cl-copy-list ovls) 'overlay-start>))))
+    (cl-first (sort (cl-copy-list ovls) 'haskell-overlay-start>))))
 
 (defun haskell-error-overlay-briefly (ovl)
-  (with-overlay-properties
+  (haskell-with-overlay-properties
    (haskell-msg haskell-msg-type) ovl
    (cond
     ((not (eq haskell-msg-type 'warning))
@@ -412,7 +412,7 @@ correspondingly-named overlay properties of OVL."
 (defun haskell-goto-first-error ()
   (interactive)
   (haskell-goto-error-overlay
-   (first-overlay-in-if 'haskell-check-overlay-p
+   (haskell-first-overlay-in-if 'haskell-check-overlay-p
                         (buffer-end 0) (buffer-end 1))))
 
 (defun haskell-goto-prev-error ()
@@ -420,7 +420,7 @@ correspondingly-named overlay properties of OVL."
   (haskell-goto-error-overlay
    (let ((ovl-at
           (cl-first (haskell-check-filter-overlays (overlays-at (point))))))
-     (or (last-overlay-in-if 'haskell-check-overlay-p
+     (or (haskell-last-overlay-in-if 'haskell-check-overlay-p
                              (point-min)
                              (if ovl-at (overlay-start ovl-at) (point)))
          ovl-at))))
@@ -430,7 +430,7 @@ correspondingly-named overlay properties of OVL."
   (haskell-goto-error-overlay
    (let ((ovl-at
           (cl-first (haskell-check-filter-overlays (overlays-at (point))))))
-     (or (first-overlay-in-if
+     (or (haskell-first-overlay-in-if
           'haskell-check-overlay-p
           (if ovl-at (overlay-end ovl-at) (point)) (point-max))
          ovl-at))))
