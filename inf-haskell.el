@@ -50,7 +50,8 @@
   :group 'haskell)
 
 (defcustom inferior-haskell-hook nil
-  "The hook that is called after starting inf-haskell.")
+  "The hook that is called after starting inf-haskell."
+  :type 'hook)
 
 (defun haskell-program-name-with-args ()
   "Return the command with the arguments to start the repl based on the
