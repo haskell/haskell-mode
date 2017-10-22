@@ -1020,11 +1020,6 @@ list marker of some kind), and end of the obstacle."
 (defvar haskell-saved-check-command nil
   "Internal use.")
 
-(defcustom haskell-indent-spaces 2
-  "Number of spaces to indent inwards."
-  :group 'haskell
-  :type 'integer)
-
 ;; Like Python.  Should be abstracted, sigh.
 (defun haskell-check (command)
   "Check a Haskell file (default current buffer's file).

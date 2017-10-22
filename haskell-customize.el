@@ -411,8 +411,7 @@ properties; such as an indentation mode) that don't know what
 extensions to use can use this variable. Examples: hlint,
 hindent, structured-haskell-mode, tool-de-jour, etc.
 
-You can set this per-project with a .dir-locals.el file, in the
-same vein as `haskell-indent-spaces'."
+You can set this per-project with a .dir-locals.el file"
   :group 'haskell
   :type '(repeat 'string))
 
