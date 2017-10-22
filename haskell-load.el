@@ -107,11 +107,11 @@ actual Emacs buffer of the module being loaded."
   (let* ((ok (cond
               ((haskell-process-consume
                 process
-                "Ok, \\([0-9]+\\) modules? loaded\\.$")
+                "Ok, \\(?:[0-9]+\\) modules? loaded\\.$")
                t)
               ((haskell-process-consume
                 process
-                "Failed, \\([0-9]+\\) modules? loaded\\.$")
+                "Failed, \\(?:[0-9]+\\) modules? loaded\\.$")
                nil)
               ((haskell-process-consume
                 process
