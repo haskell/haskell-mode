@@ -766,9 +766,6 @@ Interaction modes:
       Interact with per-project GHCi processes through a REPL and
       directory-aware sessions.
 
-    `inf-haskell-mode'
-      Interact with a GHCi process using comint-mode. Deprecated.
-
 Other modes:
 
     `haskell-decl-scan-mode', Graeme E Moss
@@ -857,9 +854,8 @@ Minor modes that work well with `haskell-mode':
 Use to enable minor modes coming with `haskell-mode' or run an
 arbitrary function.
 
-Note that `inf-haskell-mode' should not be enabled at the same
-time as `haskell-interactive-mode', same exclusion principle
-applies to `haskell-indentation-mode' and `haskell-indent-mode'."
+Note that  `haskell-indentation-mode' and `haskell-indent-mode' should not be
+run at the same time."
   :group 'haskell
   :type 'hook
   :options '(capitalized-words-mode
@@ -869,7 +865,6 @@ applies to `haskell-indentation-mode' and `haskell-indent-mode'."
              haskell-indentation-mode
              highlight-uses-mode
              imenu-add-menubar-index
-             inf-haskell-mode
              interactive-haskell-mode
              turn-on-haskell-unicode-input-method))
 
