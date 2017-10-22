@@ -200,6 +200,13 @@ See `haskell-process-do-cabal' for more details."
   :type 'boolean
   :group 'haskell-interactive)
 
+(defcustom haskell-process-show-overlays
+  t
+  "Show in-buffer overlays for errors/warnings.
+Flycheck users might like to disable this."
+  :type 'boolean
+  :group 'haskell-interactive)
+
 (defcustom haskell-notify-p
   nil
   "Notify using notifications.el (if loaded)?"
