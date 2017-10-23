@@ -1232,10 +1232,13 @@ same customized compile command, invoke @code{recompile} (bound to
 @node Interactive Haskell
 @chapter Interactive Haskell
 
-An alternative mode providing a @acronym{REPL,read–eval–print loop} via
-GHCi sessions is called @code{haskell-interactive-mode}, which
-effectively replaces @code{inferior-haskell-mode}, but comes with a
-different set of features:
+@acronym{REPL, read–eval–print loop} is provided both via Comint
+(@code{inferior-haskell-mode}) and an adhoc way called
+@code{haskell-interactive-mode}. The Comint based
+@code{inferior-haskell-mode} is just the REPL, it comes with the standard
+key bindings(like @code{ielm} or @code{eshell}).
+
+@code{haskell-interactive-mode} comes with a different set of features:
 
 @itemize
 @item
