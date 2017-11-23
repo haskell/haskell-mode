@@ -332,7 +332,7 @@ list of modules where missed IDENT was found."
 (defun haskell-process-extract-modules (buffer)
   "Extract the modules from the process buffer."
   (let* ((modules-string (match-string 1 buffer))
-         (modules (split-string modules-string ", ")))
+         (modules (and modules-string (split-string modules-string ", "))))
     (cons modules modules-string)))
 
 ;;;###autoload
