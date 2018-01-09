@@ -832,7 +832,11 @@ output.  If CMD fails the buffer remains unchanged."
                   (insert-file-contents out-file nil nil nil t))
               (progn
                 ;; non-null stderr, command must have failed
-                (message "Error: %s ended with errors, leaving buffer alone" cmd)
+                (with-current-buffer
+                    (get-buffer-create "*haskell-mode*")
+                  (insert-file-contents err-file)
+                  (buffer-string))
+                (message "Error: %s ended with errors, leaving buffer alone, see *haskell-mode* buffer for stderr" cmd)
                 (with-temp-buffer
                   (insert-file-contents err-file)
                   ;; use (warning-minimum-level :debug) to see this
