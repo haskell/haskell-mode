@@ -89,11 +89,15 @@ within that region."
 
 (defun haskell-sort-imports-goto-group-start ()
   "Go to the start of the import group."
-  (or (and (search-backward "\n\n" nil t 1)
-           (goto-char (+ 2 (line-end-position))))
-      (when (search-backward-regexp "^module " nil t 1)
-        (goto-char (1+ (line-end-position))))
-      (goto-char (point-min))))
+  (when (or (and (search-backward "\n\n" nil t 1)
+                 (goto-char (+ 2 (line-end-position))))
+            (when (search-backward-regexp "^module " nil t 1)
+              (goto-char (1+ (line-end-position))))
+            (goto-char (point-min)))
+    (beginning-of-line)
+    (while (looking-at-p "^[ \t]*--")
+      (forward-line))
+    t))
 
 (defun haskell-sort-imports-at-import ()
   "Are we at an import?"
