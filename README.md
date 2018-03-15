@@ -106,6 +106,19 @@ make EMACS=/path/to/your/emacs
 (add-to-list 'Info-default-directory-list "~/lib/emacs/haskell-mode/")
 ```
 
+### Building on macOS
+
+- The version of makeinfo that is installed by
+  default in /usr/bin is quite old and will cause the above make 
+  command to exit with an error. Installing the texinfo package using
+  [Homebrew](https://brew.sh) will fix this. Be sure to follow the post-install instructions
+  to add its bin directory to your shell's PATH variable.
+
+- If you are running an Emacs distribution packaged as a macOS application. such as
+  the one available at https://emacsformacosx.com/, you'll need to add its executable
+  to your PATH before the system's default Emacs version. That project's
+  [Tips and Tricks](https://emacsformacosx.com/tips) page has detailed instructions.
+
 ## Contributing
 
 If you followed the above you are just a couple of steps away from
