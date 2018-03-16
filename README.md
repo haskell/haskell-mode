@@ -106,7 +106,10 @@ make EMACS=/path/to/your/emacs
 (add-to-list 'Info-default-directory-list "~/lib/emacs/haskell-mode/")
 ```
 
-### Building on macOS
+### Installation from git repository on macOS
+
+There are a couple of things to note if you want to install directly from
+git on macOS systems, as of version 10.13 High Sierra: 
 
 - The version of makeinfo that is installed by
   default in /usr/bin is quite old and will cause the above make 
