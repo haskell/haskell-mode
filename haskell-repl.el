@@ -20,6 +20,7 @@
 (require 'cl-lib)
 (require 'haskell-interactive-mode)
 (require 'haskell-collapse)
+(require 'haskell-svg)
 
 (defun haskell-interactive-handle-expr ()
   "Handle an inputted expression at the REPL."
@@ -116,7 +117,7 @@
     (let ((inhibit-read-only t))
       (delete-region (1+ haskell-interactive-mode-prompt-start) (point))
       (goto-char (point-max))
-      (insert (haskell-fontify-as-mode text
+      (insert (haskell-fontify-as-mode (haskell-svg-maybe-render-images text)
                                        haskell-interactive-mode-eval-mode))
       (when haskell-interactive-mode-collapse
         (haskell-hide-toggle)))))
