@@ -56,6 +56,15 @@
   :group 'haskell
   :type 'string)
 
+(defcustom haskell-hasktags-arguments '("-e" "-x")
+  "Additional arguments for `hasktags' executable.
+By default these are:
+
+-e - generate ETAGS file
+-x - generate additional information in CTAGS file."
+  :group 'haskell
+  :type '(list string))
+
 (defconst haskell-cabal-general-fields
   ;; Extracted with (haskell-cabal-extract-fields-from-doc "general-fields")
   '("name" "version" "cabal-version" "license" "license-file" "copyright"
@@ -1122,13 +1131,12 @@ buffer not visiting a file returns nil."
 
 (defun haskell-cabal--compose-hasktags-command (dir)
   "Prepare command to execute `hasktags` command in DIR folder.
-By default following parameters are passed to Hasktags
-executable:
--e - generate ETAGS file
--x - generate additional information in CTAGS file.
 
-This function takes into account user's operation system: in case
-of Windows it generates simple command, relying on Hasktags
+To customise the command executed, see `haskell-hasktags-path'
+and `haskell-hasktags-arguments'.
+
+This function takes into account the user's operating system: in case
+of Windows it generates a simple command, relying on Hasktags
 itself to find source files:
 
 hasktags --output=DIR\TAGS -x -e DIR
@@ -1138,9 +1146,10 @@ recursively avoiding visiting unnecessary heavy directories like
 .git, .svn, _darcs and build directories created by
 cabal-install, stack, etc and passes list of found files to Hasktags."
   (if (eq system-type 'windows-nt)
-      (format "%s --output=%s -x -e %s"
+      (format "%s --output=%s %s %s"
               haskell-hasktags-path
               (shell-quote-argument (expand-file-name "TAGS" dir))
+              (mapconcat #'identity haskell-hasktags-arguments " ")
               (shell-quote-argument dir))
     (format "cd %s && %s | %s"
             (shell-quote-argument dir)
@@ -1161,7 +1170,9 @@ cabal-install, stack, etc and passes list of found files to Hasktags."
                     "-name '#*' "
                     "-or -name '.*' "
                     "\\) -print0")
-            (format "xargs -0 %s -e -x" (shell-quote-argument haskell-hasktags-path)))))
+            (format "xargs -0 %s %s"
+                    (shell-quote-argument haskell-hasktags-path)
+                    (mapconcat #'identity haskell-hasktags-arguments " ")))))
 
 (provide 'haskell-cabal)
 ;;; haskell-cabal.el ends here
