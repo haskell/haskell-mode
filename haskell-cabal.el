@@ -1138,9 +1138,12 @@ recursively avoiding visiting unnecessary heavy directories like
 .git, .svn, _darcs and build directories created by
 cabal-install, stack, etc and passes list of found files to Hasktags."
   (if (eq system-type 'windows-nt)
-      (format "%s --output=\"%s\\TAGS\" -x -e \"%s\"" haskell-hasktags-path dir dir)
+      (format "%s --output=%s -x -e %s"
+              haskell-hasktags-path
+              (shell-quote-argument (expand-file-name "TAGS" dir))
+              (shell-quote-argument dir))
     (format "cd %s && %s | %s"
-            dir
+            (shell-quote-argument dir)
             (concat "find . "
                     "-type d \\( "
                     "-path ./.git "
@@ -1158,7 +1161,7 @@ cabal-install, stack, etc and passes list of found files to Hasktags."
                     "-name '#*' "
                     "-or -name '.*' "
                     "\\) -print0")
-            (format "xargs -0 %s -e -x" haskell-hasktags-path))))
+            (format "xargs -0 %s -e -x" (shell-quote-argument haskell-hasktags-path)))))
 
 (provide 'haskell-cabal)
 ;;; haskell-cabal.el ends here
