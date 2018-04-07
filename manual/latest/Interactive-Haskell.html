@@ -68,13 +68,10 @@ Next: <a href="Editing-Cabal-files.html#Editing-Cabal-files" accesskey="n" rel="
 <a name="Interactive-Haskell-1"></a>
 <h2 class="chapter">13 Interactive Haskell</h2>
 
-<p><acronym title="read–eval–print loop">REPL</acronym> (read–eval–print loop) is provided both via Comint
-(<code>inferior-haskell-mode</code>) and an adhoc way called
-<code>haskell-interactive-mode</code>. The Comint based
-<code>inferior-haskell-mode</code> is just the REPL, it comes with the standard
-key bindings(like <code>ielm</code> or <code>eshell</code>).
-</p>
-<p><code>haskell-interactive-mode</code> comes with a different set of features:
+<p>An alternative mode providing a <acronym title="read–eval–print loop">REPL</acronym> (read–eval–print loop) via
+GHCi sessions is called <code>haskell-interactive-mode</code>, which
+effectively replaces <code>inferior-haskell-mode</code>, but comes with a
+different set of features:
 </p>
 <ul>
 <li> Separate sessions per Cabal project <samp>haskell-session.el</samp>.
