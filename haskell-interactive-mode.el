@@ -47,6 +47,19 @@
 (defvar-local haskell-interactive-mode-old-prompt-start nil
   "Mark used for the old beginning of the prompt.")
 
+(defun ar-haskell-show-output ()
+  "Equivalent to ‘comint-show-output’."
+  (interactive)
+  (let ((orig (point))
+	(lbp (line-beginning-position)))
+    (search-backward haskell-interactive-prompt nil t 1)
+    (if (< (point) lbp)
+	(goto-char (match-end 0))
+      (if
+	  (search-backward haskell-interactive-prompt nil t 1)
+	  (goto-char (match-end 0))
+	(goto-char orig)))))
+
 (defun haskell-interactive-prompt-regex ()
   "Generate a regex for searching for any occurence of the prompt\
 at the beginning of the line.  This should prevent any
