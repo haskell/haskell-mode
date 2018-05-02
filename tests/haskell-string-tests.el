@@ -129,3 +129,10 @@
                  (haskell-string-trim "\r\n saf \t  sdsaf \t\v\n   \f")))
   (should (haskell-string-only-spaces-p "\r\n \t  \t\v\n   \f"))
   (should-not (haskell-string-only-spaces-p "\r\n \t  x  \t\v\n   \f")))
+
+(ert-deftest haskell-string-test-identifier ()
+  (should (equal "abc" (haskell-string-drop-qualifier "abc")))
+  (should (equal "xyz.abc" (haskell-string-drop-qualifier "abc")))
+  (should (equal ".abc" (haskell-string-drop-qualifier "abc")))
+  (should (equal "abc." (haskell-string-drop-qualifier "abc")))
+  (should (equal "abc.." (haskell-string-drop-qualifier "abc"))))
