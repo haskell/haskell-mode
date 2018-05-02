@@ -375,9 +375,13 @@ position with `xref-pop-marker-stack'."
   (if (haskell-session-maybe)
         (let ((initial-loc (point-marker))
             (loc (haskell-mode-find-def (haskell-ident-at-point))))
-          (haskell-mode-handle-generic-loc loc)
-          (unless (equal initial-loc (point-marker))
-            (xref-push-marker-stack initial-loc)))
+          (if (null loc)
+              ;; If we the repl didn't actually have the tag loaded
+              ;; try the TAGS file.
+              (call-interactively 'haskell-mode-tag-find)
+            (haskell-mode-handle-generic-loc loc)
+            (unless (equal initial-loc (point-marker))
+              (xref-push-marker-stack initial-loc))))
       (call-interactively 'haskell-mode-tag-find)))
 
 ;;;###autoload
