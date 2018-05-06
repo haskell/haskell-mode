@@ -214,7 +214,7 @@ NOFAIL is non-NIL."
     (error "haskell-indentation-next-indentation called with empty list"))
   (or (cl-find-if (lambda (i) (> i col)) indentations)
       (when nofail
-        (first indentations))))
+        (car indentations))))
 
 (defun haskell-indentation-previous-indentation (col indentations &optional nofail)
   "Find the rightmost indentation less than COL from INDENTATIONS.
