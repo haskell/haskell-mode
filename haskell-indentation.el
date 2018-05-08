@@ -444,7 +444,7 @@ and indent when all of the following are true:
           (throw 'return nil))))))
   (beginning-of-line)
   (when (bobp)
-    (forward-comment (buffer-size)))))
+    (forward-comment (buffer-size))))
 
 (defun haskell-indentation-parse-to-indentations ()
   "" ; FIXME
