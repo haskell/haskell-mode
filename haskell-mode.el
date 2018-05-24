@@ -989,6 +989,8 @@ list marker of some kind), and end of the obstacle."
 ;;;###autoload
 (add-to-list 'auto-mode-alist        '("\\.[gh]s\\'" . haskell-mode))
 ;;;###autoload
+(add-to-list 'auto-mode-alist        '("\\.hsig\\'" . haskell-mode))
+;;;###autoload
 (add-to-list 'auto-mode-alist        '("\\.l[gh]s\\'" . literate-haskell-mode))
 ;;;###autoload
 (add-to-list 'auto-mode-alist        '("\\.hsc\\'" . haskell-mode))
