@@ -518,7 +518,7 @@ and indent when all of the following are true:
 
 (defconst haskell-indentation-toplevel-list
   `(("module"    . haskell-indentation-module)
-    ("signature" . haskell-indentationmodule)
+    ("signature" . haskell-indentation-module)
     ("data"      . haskell-indentation-data)
     ("type"      . haskell-indentation-data)
     ("newtype"   . haskell-indentation-data)
