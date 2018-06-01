@@ -1075,78 +1075,151 @@ line in the right file when clicked/selected.
 @node Compilation
 @chapter Compilation
 
-@findex haskell-compile
+Haskell Mode comes with an intelligent Major mode for compilation named
+@code{HsCompilation} defined in @code{haskell-compile.el}. This mode is
+derived from @code{compilation-mode} defined in @code{compile.el}.
 
-Haskell mode comes equipped with a specialized @dfn{Compilation mode}
-tailored to GHC's compiler messages with optional support for Cabal
-projects. @xref{Compilation Mode,,,emacs}, for more information about
-the basic commands provided by the Compilation mode which are available
-in the Haskell compilation sub-mode as well. The additional features
-provided compared to Emacs' basic Compilation mode are:
+First the compilation mode tries to find the project's root directory.
+This is done by searching for files such as @code{cabal.sandbox.config},
+@code{stack.yaml}, and @code{something.cabal} in that order.
 
-@itemize
-@item
-DWIM-style auto-detection of compile command (including support for
-CABAL projects)
-@item
-Support for GHC's compile messages and recognizing error, warning and
-info source locations (including @option{-ferror-spans} syntax)
-@item
-Support for filtering out GHC's uninteresting @samp{Loading package...}
-linker messages
-@end itemize
+If you have both @code{cabal.sandbox.config} and @code{stack.yaml} files
+defined, in your project's root directory, @code{cabal.sandbox.config}
+takes precedence over @code{stack.yaml} and similary @code{stack.yaml}
+takes precedence over @code{something.cabal}.
 
-In order to use it, invoke the @code{haskell-compile} command instead of
-@code{compile} as you would for the ordinary Compilation mode. It's
-recommended to bind @code{haskell-compile} to a convenient key
-binding. For instance, you can add the following to your Emacs
-initialization to bind @code{haskell-compile} to @kbd{C-c C-c}.
+You can start the compilation by @kbd{M-x haskell-compile}. The intelligent
+thing about this mode is that like it sets the project's root directory.
+It will run the appropriate compilation command from the project's root
+directory.
 
-@lisp
-(eval-after-load "haskell-mode"
-    '(define-key haskell-mode-map (kbd "C-c C-c") 'haskell-compile))
+@multitable @columnfractions 0.25 0.25 0.50
+@headitem Dominant file @tab Build command @tab Commandline Options
 
-(eval-after-load "haskell-cabal"
-    '(define-key haskell-cabal-mode-map (kbd "C-c C-c") 'haskell-compile))
-@end lisp
+@item @code{cabal.sandbox.config}
+@tab @code{cabal build}
+@tab @code{--ghc-options=\"-ferror-spans -Wall -fforce-recomp\"}
 
-@noindent
-The following description assumes that @code{haskell-compile} has been
-bound to @kbd{C-c C-c}.
+@item @code{stack.yaml}
+@tab @code{stack build}
+@tab @code{--ghc-options=\"-ferror-spans -Wall\"}
 
-@vindex haskell-compile-cabal-build-command
-@vindex haskell-compile-cabal-build-command-alt
-@vindex haskell-compile-command
+@item @code{something.cabal}
+@tab @code{cabal build}
 
-When invoked, @code{haskell-compile} tries to guess how to compile the
-Haskell program your currently visited buffer belongs to, by searching
-for a @file{.cabal} file in the current of enclosing parent folders. If
-a @file{.cabal} file was found, the command defined in the
-@code{haskell-compile-cabal-build-command} option is used. Note that to
-compile a @code{stack} based project you will need to set this variable to
-@code{stack build}. As usual you can do it using @code{M-x customize-variable}
-or with:
+@item default
+@tab @code{ghc <name-of-file-in-buffer>}
+@tab @code{--make -ferror-spans -Wall -fforce-recomp}
+@end multitable
 
-@lisp
-(setq haskell-compile-cabal-build-command "stack build")
-@end lisp
+@section Keybindings
 
-Moreover, when requesting to compile a @file{.cabal}-file is detected and
-a negative prefix argument (e.g. @kbd{C-- C-c C-c}) was given, the
-alternative @code{haskell-compile-cabal-build-command-alt} is
-invoked. By default, @code{haskell-compile-cabal-build-command-alt}
-contains a @samp{cabal clean -s} command in order to force a full
-rebuild.
+@multitable @columnfractions 0.3 0.7
+@headitem Key binding @tab Function
+@item TAB
+@tab compilation-next-error
 
-Otherwise if no @file{.cabal} could be found, a single-module
-compilation is assumed and @code{haskell-compile-command} is used
-(@emph{if} the currently visited buffer contains Haskell source code).
+@item RET
+@tab compile-goto-error
 
-You can also inspect and modify the compile command to be invoked
-temporarily by invoking @code{haskell-compile} with a prefix argument
-(e.g. @kbd{C-u C-c C-c}). If later-on you want to recompile using the
-same customized compile command, invoke @code{recompile} (bound to
-@kbd{g}) inside the @samp{*haskell-compilation*} buffer.
+@item C-o
+@tab compilation-display-error
+
+@item SPC
+@tab scroll-up-command
+
+@item -
+@tab negative-argument
+
+@item 0 .. 9
+@tab digit-argument
+
+@item <
+@tab beginning-of-buffer
+
+@item >
+@tab end-of-buffer
+
+@item ?
+@tab describe-mode
+
+@item g
+@tab recompile
+
+@item h
+@tab describe-mode
+
+@item q
+@tab quit-window
+
+@item DEL
+@tab scroll-down-command
+
+@item S-SPC
+@tab scroll-down-command
+
+@item <backtab>
+@tab compilation-previous-error
+
+@item <follow-link>
+@tab mouse-face
+
+@item <mouse-2>
+@tab compile-goto-error
+
+@item <remap>
+@tab Prefix Command
+
+@item M-n
+@tab compilation-next-error
+
+@item M-p
+@tab compilation-previous-error
+
+@item M-@{
+@tab compilation-previous-file
+
+@item M-@}
+@tab compilation-next-file
+
+@item C-c C-c
+@tab compile-goto-error
+
+@item C-c C-f
+@tab next-error-follow-minor-mode
+
+@item C-c C-k
+@tab kill-compilation
+
+@end multitable
+
+@section Related Defcustoms
+
+@multitable @columnfractions 0.3 0.7
+@headitem Defcustom @tab Default Value
+
+@item @code{haskell-process-path-ghc}
+@tab @code{ghc}
+
+@item @code{haskell-process-args-ghc}
+@tab @code{--make -ferror-spans -Wall -fforce-recomp}
+
+@item @code{haskell-process-path-cabal}
+@tab @code{cabal}
+
+@item @code{haskell-process-args-cabal-build}
+@tab @code{--ghc-options=\"-ferror-spans -Wall -fforce-recomp\"}
+
+@item @code{haskell-process-path-stack}
+@tab @code{stack}
+
+@item @code{haskell-process-args-stack-build}
+@tab @code{--ghc-options=\"-ferror-spans -Wall\"}
+@end multitable
+
+@section Hooks
+
+None
 
 @section Keybindings
 
