@@ -126,7 +126,7 @@
 (defconst haskell-indent-start-keywords-re
   (concat "\\<"
           (regexp-opt '("class" "data" "import" "infix" "infixl" "infixr"
-                        "instance" "module" "newtype" "primitive" "type") t)
+                        "instance" "module" "newtype" "primitive" "signature" "type") t)
           "\\>")
   "Regexp for keywords to complete when standing at the first word of a line.")
 
