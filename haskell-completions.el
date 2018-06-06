@@ -118,6 +118,7 @@ This list comes from GHC documentation (URL
    "proc"
    "qualified"
    "rec"
+   "signature"
    "then"
    "type family"
    "type instance"
