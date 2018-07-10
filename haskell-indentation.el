@@ -214,7 +214,7 @@ NOFAIL is non-NIL."
     (error "haskell-indentation-next-indentation called with empty list"))
   (or (cl-find-if (lambda (i) (> i col)) indentations)
       (when nofail
-        (car (last indentations)))))
+        (car indentations))))
 
 (defun haskell-indentation-previous-indentation (col indentations &optional nofail)
   "Find the rightmost indentation less than COL from INDENTATIONS.
@@ -421,30 +421,30 @@ and indent when all of the following are true:
           (forward-line -1)))
     ;; not bird style
     (catch 'return
-      (while (not (bobp))
-        (let ((point (point)))
-          ;; (forward-comment -1) gets lost if there are unterminated
-          ;; string constants and does not move point anywhere. We fix
-          ;; that case with (forward-line -1)
-          (forward-comment (- (buffer-size)))
-          (if (equal (point) point)
-              (forward-line -1)
-            (beginning-of-line)))
-        (let* ((ps (syntax-ppss))
-              (start-of-comment-or-string (nth 8 ps))
-              (start-of-list-expression (nth 1 ps)))
-          (cond
-           (start-of-comment-or-string
-            ;; inside comment or string
-            (goto-char start-of-comment-or-string))
-           (start-of-list-expression
-            ;; inside a parenthesized expression
-            (goto-char start-of-list-expression))
-           ((= 0 (haskell-indentation-current-indentation))
-             (throw 'return nil))))))
-    (beginning-of-line)
-    (when (bobp)
-      (forward-comment (buffer-size)))))
+      (let ((point (point))
+	    done)
+	(while (and (not done) (not (bobp)))
+          ;; https://github.com/haskell/haskell-mode/issues/1473#issuecomment-387474201
+	  ;; honor comments indent
+          ;; (forward-comment (- (buffer-size)))
+          (when (equal (point) point)
+            (forward-line -1)
+	    (setq done t))
+          ;; (beginning-of-line)
+	  (back-to-indentation)))
+      (let* ((ps (syntax-ppss))
+             (start-of-comment-or-string (or (looking-at comment-start)(nth 8 ps)))
+             (start-of-list-expression (nth 1 ps)))
+        (cond
+         (start-of-comment-or-string)
+         (start-of-list-expression
+          ;; inside a parenthesized expression
+          (goto-char start-of-list-expression))
+         ((= 0 (haskell-indentation-current-indentation))
+          (throw 'return nil))))))
+  (beginning-of-line)
+  (when (bobp)
+    (forward-comment (buffer-size))))
 
 (defun haskell-indentation-parse-to-indentations ()
   "" ; FIXME
