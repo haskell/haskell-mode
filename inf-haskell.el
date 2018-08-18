@@ -59,8 +59,11 @@ directory structure."
   (cl-ecase (haskell-process-type)
     ('ghci       (cond ((eq system-type 'cygwin) (nconc "ghcii.sh"
                                                         haskell-process-args-ghci))
-                       (t (nconc `(,haskell-process-path-ghci)
-                                 haskell-process-args-ghci))))
+                       (t (append
+                           (if (listp haskell-process-path-ghci)
+                               haskell-process-path-ghci
+                             (list haskell-process-path-ghci))
+                           haskell-process-args-ghci))))
     ('cabal-repl (nconc `(,haskell-process-path-cabal
                           "repl")
                         haskell-process-args-cabal-repl))
