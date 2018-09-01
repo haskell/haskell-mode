@@ -28,6 +28,7 @@
 
 (require 'compile)
 (require 'haskell-cabal)
+(require 'ansi-color)
 
 ;;;###autoload
 (defgroup haskell-compile nil
@@ -59,6 +60,11 @@ The `%s' placeholder is replaced by the current buffer's filename."
 (defcustom haskell-compile-ghc-filter-linker-messages
   t
   "Filter out unremarkable \"Loading package...\" linker messages during compilation."
+  :group 'haskell-compile
+  :type 'boolean)
+
+(defcustom haskell-compile-color nil
+  "When non-nil will render ANSI color sequences correctly."
   :group 'haskell-compile
   :type 'boolean)
 
@@ -100,7 +106,12 @@ This is a child of `compilation-mode-map'.")
     (delete-matching-lines "^ *Loading package [^ \t\r\n]+ [.]+ linking [.]+ done\\.$"
                            (save-excursion (goto-char compilation-filter-start)
                                            (line-beginning-position))
-                           (point))))
+                           (point)))
+
+  (when haskell-compile-color
+    (read-only-mode -1)
+    (ansi-color-apply-on-region compilation-filter-start (point-max))
+    (read-only-mode 1)))
 
 (define-compilation-mode haskell-compilation-mode "HsCompilation"
   "Haskell/GHC specific `compilation-mode' derivative.
