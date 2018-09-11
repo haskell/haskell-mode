@@ -1939,6 +1939,43 @@ Or @kbd{C-c C-v}:
 There you can choose `haskell-mode`, for example, to pretty print the
 output as Haskell.
 
+@subsection @acronym{SVG} images rendering
+
+@cindex Rendering SVG images
+@cindex SVG images, rendering
+@cindex Images, rendering SVG images
+
+If you are working on @acronym{SVG} images, you can instruct Emacs to
+render the image as the output of an image producing command at the
+@acronym{REPL}@.
+
+The following example uses the @code{diamgrams} library with the default
+@acronym{SVG} backend to produce a circle:
+
+@example
+    @{-# LANGUAGE OverloadedStrings #-@}
+
+    import Diagrams.Prelude
+    import Diagrams.Backend.SVG
+
+    myCircle :: Diagram B
+    myCircle = circle 1 # lc purple # fc yellow
+
+    circle = renderDia SVG (SVGOptions (mkWidth 250) Nothing "" [] True) myCircle
+@end example
+
+@findex haskell-svg-toggle-render-images
+
+After enabling @acronym{SVG} rendering with @kbd{M-x
+haskell-svg-toggle-render-images}, if you load the above code and type
+@code{circle} at the @acronym{REPL}, you will see the rendered circle
+instead of the @acronym{XML} representation of the image.
+
+@vindex haskell-svg-render-images
+
+This feature can be enabled by default by setting the customization
+variable @code{haskell-svg-render-images} to a non-nil value.
+
 @subsection Presentations
 
 If you have the @file{present} package installed, you can use the following
