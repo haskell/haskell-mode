@@ -63,11 +63,6 @@ The `%s' placeholder is replaced by the current buffer's filename."
   :group 'haskell-compile
   :type 'boolean)
 
-(defcustom haskell-compile-color nil
-  "When non-nil will render ANSI color sequences correctly."
-  :group 'haskell-compile
-  :type 'boolean)
-
 (defconst haskell-compilation-error-regexp-alist
   `((,(concat
        "^ *\\(?1:[^\t\r\n]+?\\):"
@@ -108,10 +103,8 @@ This is a child of `compilation-mode-map'.")
                                            (line-beginning-position))
                            (point)))
 
-  (when haskell-compile-color
-    (read-only-mode -1)
-    (ansi-color-apply-on-region compilation-filter-start (point-max))
-    (read-only-mode 1)))
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region compilation-filter-start (point-max))))
 
 (define-compilation-mode haskell-compilation-mode "HsCompilation"
   "Haskell/GHC specific `compilation-mode' derivative.
