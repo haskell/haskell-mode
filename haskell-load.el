@@ -109,6 +109,10 @@ actual Emacs buffer of the module being loaded."
                 process
                 "Ok, \\(?:[0-9]+\\) modules? loaded\\.$")
                t)
+               ((haskell-process-consume
+                process
+                "Ok, \\(?:[a-z]+\\) module loaded\\.$") ;; for ghc 8.4
+               t)
               ((haskell-process-consume
                 process
                 "Failed, \\(?:[0-9]+\\) modules? loaded\\.$")
