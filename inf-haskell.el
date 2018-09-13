@@ -177,7 +177,8 @@ otherwise uses `haskell-program-name-with-args'.
 It runs the hook `inferior-haskell-hook' after starting the process and
 setting up the inferior-haskell buffer."
   (let ((command (haskell-program-name-with-args)))
-    (setq default-directory inferior-haskell-root-dir)
+    (when inferior-haskell-root-dir
+      (setq default-directory inferior-haskell-root-dir))
     (setq inferior-haskell-buffer
           (apply 'make-comint "haskell" (car command) nil (cdr command)))
     (with-current-buffer inferior-haskell-buffer
