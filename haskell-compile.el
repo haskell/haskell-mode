@@ -28,6 +28,7 @@
 
 (require 'compile)
 (require 'haskell-cabal)
+(require 'ansi-color)
 
 ;;;###autoload
 (defgroup haskell-compile nil
@@ -100,7 +101,10 @@ This is a child of `compilation-mode-map'.")
     (delete-matching-lines "^ *Loading package [^ \t\r\n]+ [.]+ linking [.]+ done\\.$"
                            (save-excursion (goto-char compilation-filter-start)
                                            (line-beginning-position))
-                           (point))))
+                           (point)))
+
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region compilation-filter-start (point-max))))
 
 (define-compilation-mode haskell-compilation-mode "HsCompilation"
   "Haskell/GHC specific `compilation-mode' derivative.
