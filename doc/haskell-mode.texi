@@ -425,7 +425,7 @@ candidate list also includes symbols from imported modules.
 @image{anim/company-mode-import-statement}
 @end ifhtml
 
-Unfortunatelly, it is not possible to provide candidates for
+Unfortunately, it is not possible to provide candidates for
 identifiers defined locally in @code{let} and @code{where} blocks even
 in interactive mode.  But if you're using
 @url{http://company-mode.github.io/, company-mode} you can override
