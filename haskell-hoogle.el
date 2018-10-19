@@ -96,6 +96,18 @@ is asked to show extra info for the items matching QUERY.."
               "hoogle" "server" "-p" (number-to-string haskell-hoogle-port-number))))
     (error "\"hoogle\" executable not found")))
 
+(defun haskell-hoogle-start-stack-server ()
+  "Start hoogle local server using the local Stack configuration."
+  (interactive)
+  (if (executable-find "stack")
+      (unless (haskell-hoogle-server-live-p)
+        (set 'haskell-hoogle-server-process
+             (start-process
+              haskell-hoogle-server-process-name
+              (get-buffer-create haskell-hoogle-server-buffer-name)
+              "stack" "hoogle" "--setup" "--" "server" "-p" (number-to-string haskell-hoogle-port-number))))
+    (error "\"stack\" executable not found")))
+
 (defun haskell-hoogle-server-live-p ()
   "Whether the hoogle server process is live."
   (condition-case _err
