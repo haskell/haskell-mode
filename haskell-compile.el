@@ -159,48 +159,33 @@ node `(haskell-mode)compilation' for more details."
   (save-some-buffers (not compilation-ask-about-save)
                          compilation-save-buffers-predicate)
   (if-let ((stackdir (locate-dominating-file buffer-file-name "stack.yaml")))
-      (haskell-compile-stack stackdir edit-command)
+      (haskell--compile stackdir edit-command
+                        'haskell--compile-stack-last
+                        haskell-compile-stack-build-command
+                        haskell-compile-stack-build-alt-command)
     (if-let ((cabaldir (haskell-cabal-find-dir)))
-        (haskell-compile-cabal cabaldir edit-command)
+        (haskell--compile cabaldir edit-command
+                          'haskell--compile-cabal-last
+                          haskell-compile-cabal-build-command
+                          haskell-compile-cabal-build-alt-command)
       (let ((srcfile (buffer-file-name)))
-        (haskell-compile-ghc srcfile edit-command)))))
+        (haskell--compile srcfile edit-command
+                          'haskell--compile-ghc-last
+                          haskell-compile-command
+                          haskell-compile-command)))))
 
-(defvar haskell-compile-stack-last nil)
-(defun haskell-compile-stack (dir edit-command)
-  (let* ((default (or haskell-compile-stack-last
-                      haskell-compile-stack-build-command))
-         (template (pcase edit-command
+(defvar haskell--compile-stack-last nil)
+(defvar haskell--compile-cabal-last nil)
+(defvar haskell--compile-ghc-last nil)
+(defun haskell--compile (dir edit last-sym fallback alt)
+  (let* ((default (or (symbol-value last-sym) fallback))
+         (template (pcase edit
                      ('nil default)
-                     ('-  haskell-compile-stack-build-alt-command)
+                     ('-  alt)
                      (_   (compilation-read-command default))))
          (command (format template dir)))
-    (unless (eq edit-command '-)
-      (setq haskell-compile-stack-last template))
-    (compilation-start command 'haskell-compilation-mode)))
-
-(defvar haskell-compile-cabal-last nil)
-(defun haskell-compile-cabal (dir edit-command)
-  (let* ((default (or haskell-compile-cabal-last
-                      haskell-compile-cabal-build-command))
-         (template (pcase edit-command
-                     ('nil default)
-                     ('-  haskell-compile-cabal-build-alt-command)
-                     (_   (compilation-read-command default))))
-         (command (format template dir)))
-    (unless (eq edit-command '-)
-      (setq haskell-compile-cabal-last template))
-    (compilation-start command 'haskell-compilation-mode)))
-
-(defvar haskell-compile-ghc-last nil)
-(defun haskell-compile-ghc (dir edit-command)
-  (let* ((default (or haskell-compile-ghc-last
-                      haskell-compile-command))
-         (template (pcase edit-command
-                     ('nil default)
-                     (_   (compilation-read-command default))))
-         (command (format template dir)))
-    (unless (eq edit-command '-)
-      (setq haskell-compile-ghc-last template))
+    (unless (eq edit'-)
+      (set last-sym template))
     (compilation-start command 'haskell-compilation-mode)))
 
 (provide 'haskell-compile)
