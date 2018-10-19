@@ -52,14 +52,14 @@ The `%s' placeholder is replaced by the cabal package top folder."
   :type 'string)
 
 (defcustom haskell-compile-stack-build-command
-  "cd %s && stack build -j --fast"
+  "cd %s && stack build --fast"
   "Default build command to use for `haskell-stack-build' when a stack file is detected.
 The `%s' placeholder is replaced by the stack package top folder."
   :group 'haskell-compile
   :type 'string)
 
 (defcustom haskell-compile-stack-build-alt-command
-  "cd %s && stack clean && stack build -j --fast"
+  "cd %s && stack clean && stack build --fast"
   "Alternative build command to use when `haskell-stack-build' is called with a negative prefix argument.
 The `%s' placeholder is replaced by the stack package top folder."
   :group 'haskell-compile
