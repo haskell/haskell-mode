@@ -165,7 +165,7 @@ node `(haskell-mode)compilation' for more details."
       (let ((srcfile (buffer-file-name)))
         (haskell-compile-ghc srcfile edit-command)))))
 
-(setq haskell-compile-stack-last nil)
+(defvar haskell-compile-stack-last nil)
 (defun haskell-compile-stack (dir edit-command)
   (let* ((default (or haskell-compile-stack-last
                       haskell-compile-stack-build-command))
@@ -178,7 +178,7 @@ node `(haskell-mode)compilation' for more details."
       (setq haskell-compile-stack-last template))
     (compilation-start command 'haskell-compilation-mode)))
 
-(setq haskell-compile-cabal-last nil)
+(defvar haskell-compile-cabal-last nil)
 (defun haskell-compile-cabal (dir edit-command)
   (let* ((default (or haskell-compile-cabal-last
                       haskell-compile-cabal-build-command))
@@ -191,13 +191,12 @@ node `(haskell-mode)compilation' for more details."
       (setq haskell-compile-cabal-last template))
     (compilation-start command 'haskell-compilation-mode)))
 
-(setq haskell-compile-ghc-last nil)
+(defvar haskell-compile-ghc-last nil)
 (defun haskell-compile-ghc (dir edit-command)
   (let* ((default (or haskell-compile-ghc-last
-                      haskell-compile-build-command))
+                      haskell-compile-command))
          (template (pcase edit-command
                      ('nil default)
-                     ('-  haskell-compile-build-alt-command)
                      (_   (compilation-read-command default))))
          (command (format template dir)))
     (unless (eq edit-command '-)
