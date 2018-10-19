@@ -29,6 +29,7 @@
 (require 'compile)
 (require 'haskell-cabal)
 (require 'ansi-color)
+(eval-when-compile (require 'subr-x))
 
 ;;;###autoload
 (defgroup haskell-compile nil
@@ -157,14 +158,12 @@ node `(haskell-mode)compilation' for more details."
   (interactive "P")
   (save-some-buffers (not compilation-ask-about-save)
                          compilation-save-buffers-predicate)
-  (let ((stackdir (locate-dominating-file buffer-file-name "stack.yaml")))
-    (if stackdir
-        (haskell-compile-stack stackdir edit-command)
-      (let ((cabaldir (haskell-cabal-find-dir)))
-        (if cabaldir
-            (haskell-compile-cabal cabaldir edit-command)
-          (let ((srcfile (buffer-file-name)))
-            (haskell-compile-ghc srcfile edit-command)))))))
+  (if-let ((stackdir (locate-dominating-file buffer-file-name "stack.yaml")))
+      (haskell-compile-stack stackdir edit-command)
+    (if-let ((cabaldir (haskell-cabal-find-dir)))
+        (haskell-compile-cabal cabaldir edit-command)
+      (let ((srcfile (buffer-file-name)))
+        (haskell-compile-ghc srcfile edit-command)))))
 
 (setq haskell-compile-stack-last nil)
 (defun haskell-compile-stack (dir edit-command)
