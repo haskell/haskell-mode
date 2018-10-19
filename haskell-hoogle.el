@@ -2,6 +2,7 @@
 
 ;; Copyright © 2015 Steve Purcell
 ;;             2016 Arthur Fayzrakhmanov
+;;             2018 Torstein Sørnes
 
 ;; Author: Steve Purcell <steve@sanityinc.com>
 ;; Keywords: docs
@@ -46,6 +47,7 @@ If nil, use the Hoogle web-site."
           (const :tag "haskell-org" "http://haskell.org/hoogle/?q=%s")
           (const :tag "fp-complete" "https://www.stackage.org/lts/hoogle?q=%s")
           (const :tag "hayoo" "http://hayoo.fh-wedel.de/?query=%s")
+          (const :tag "local" (format "http://localhost:%i/?hoogle=%s" haskell-hoogle-port-number))
           string))
 
 ;;;###autoload
