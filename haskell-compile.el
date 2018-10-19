@@ -136,25 +136,28 @@ messages pointing to additional source locations."
 
 ;;;###autoload
 (defun haskell-compile (&optional edit-command)
-  "Compile the Haskell program including the current buffer.
-Tries to locate the next cabal description in current or parent
-folders via `haskell-cabal-find-dir' and if found, invoke
-`haskell-compile-cabal-build-command' from the cabal package root
-folder. If no cabal package could be detected,
-`haskell-compile-command' is used instead.
+  "Run a compile command for the current Haskell buffer.
+
+Locates stack or cabal definitions and, if found, invokes the
+default build command for that build tool.
 
 If prefix argument EDIT-COMMAND is non-nil (and not a negative
-prefix `-'), `haskell-compile' prompts for custom compile
-command.
+prefix `-'), prompt for a custom compile command.
 
-If EDIT-COMMAND contains the negative prefix argument `-',
-`haskell-compile' calls the alternative command defined in
-`haskell-compile-cabal-build-alt-command' if a cabal package was
-detected.
+If EDIT-COMMAND contains the negative prefix argument `-', call
+the alternative command defined in
+`haskell-compile-stack-build-alt-command' /
+`haskell-compile-cabal-build-alt-command'.
 
-`haskell-compile' uses `haskell-compilation-mode' which is
-derived from `compilation-mode'. See Info
-node `(haskell-mode)compilation' for more details."
+If there is no prefix argument, the most recent custom compile
+command is used, falling back to
+`haskell-compile-stack-build-command' for stack builds
+`haskell-compile-cabal-build-command' for cabal builds, and
+`haskell-compile-command' otherwise.
+
+'% characters in the `-command' templates are replaced by the
+base directory for build tools, or the current buffer for
+`haskell-compile-command'."
   (interactive "P")
   (save-some-buffers (not compilation-ask-about-save)
                          compilation-save-buffers-predicate)
