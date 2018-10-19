@@ -161,7 +161,9 @@ base directory for build tools, or the current buffer for
   (interactive "P")
   (save-some-buffers (not compilation-ask-about-save)
                          compilation-save-buffers-predicate)
-  (if-let ((stackdir (locate-dominating-file buffer-file-name "stack.yaml")))
+  (if-let ((stackdir (and
+                      (not haskell--compile-ignore-stack)
+                      (locate-dominating-file buffer-file-name "stack.yaml"))))
       (haskell--compile stackdir edit-command
                         'haskell--compile-stack-last
                         haskell-compile-stack-build-command
@@ -176,6 +178,12 @@ base directory for build tools, or the current buffer for
                           'haskell--compile-ghc-last
                           haskell-compile-command
                           haskell-compile-command)))))
+
+(defvar haskell--compile-ignore-stack nil
+  "Ignore `stack.yml' files for this buffer.
+This is useful if you would prefer to use the cabal build definition.")
+(make-variable-buffer-local 'haskell--compile-ignore-stack)
+(put 'haskell--compile-ignore-stack 'safe-local-variable #'booleanp)
 
 (defvar haskell--compile-stack-last nil)
 (defvar haskell--compile-cabal-last nil)
