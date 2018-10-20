@@ -190,16 +190,22 @@ base directory for build tools, or the current buffer for
 (defvar haskell--compile-stack-last nil)
 (defvar haskell--compile-cabal-last nil)
 (defvar haskell--compile-ghc-last nil)
-(defun haskell--compile (dir edit last-sym fallback alt)
+(defun haskell--compile (dir-or-file edit last-sym fallback alt)
   (let* ((default (or (symbol-value last-sym) fallback))
          (template (pcase edit
                      ('nil default)
                      ('-  alt)
                      (_   (compilation-read-command default))))
-         (command (format template dir)))
+         (command (format template dir-or-file))
+         (name (if (directory-name-p dir-or-file)
+                   (file-name-base (directory-file-name dir-or-file))
+                 (file-name-nondirectory dir-or-file))))
     (unless (eq edit'-)
       (set last-sym template))
-    (compilation-start command 'haskell-compilation-mode)))
+    (compilation-start
+     command
+     'haskell-compilation-mode
+     (lambda (mode) (format "*%s* <%s>" mode name)))))
 
 (provide 'haskell-compile)
 ;;; haskell-compile.el ends here
