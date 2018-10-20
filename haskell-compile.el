@@ -146,7 +146,8 @@ messages pointing to additional source locations."
   "Run a compile command for the current Haskell buffer.
 
 Locates stack or cabal definitions and, if found, invokes the
-default build command for that build tool.
+default build command for that build tool. Cabal is preferred
+but may be ignored with `haskell-compile-ignore-cabal'.
 
 If prefix argument EDIT-COMMAND is non-nil (and not a negative
 prefix `-'), prompt for a custom compile command.
