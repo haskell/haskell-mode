@@ -78,6 +78,13 @@ The `%s' placeholder is replaced by the current buffer's filename."
   :group 'haskell-compile
   :type 'boolean)
 
+(defcustom haskell-compile-ignore-cabal nil
+  "Ignore cabal build definitions files for this buffer when detecting the build tool."
+  :group 'haskell-compile
+  :type 'boolean)
+(make-variable-buffer-local 'haskell-compile-ignore-cabal)
+(put 'haskell-compile-ignore-cabal 'safe-local-variable #'booleanp)
+
 (defconst haskell-compilation-error-regexp-alist
   `((,(concat
        "^ *\\(?1:[^\t\r\n]+?\\):"
@@ -160,30 +167,24 @@ base directory for build tools, or the current buffer for
 `haskell-compile-command'."
   (interactive "P")
   (save-some-buffers (not compilation-ask-about-save)
-                         compilation-save-buffers-predicate)
-  (if-let ((stackdir (and
-                      (not haskell--compile-ignore-stack)
-                      (locate-dominating-file buffer-file-name "stack.yaml"))))
-      (haskell--compile stackdir edit-command
-                        'haskell--compile-stack-last
-                        haskell-compile-stack-build-command
-                        haskell-compile-stack-build-alt-command)
-    (if-let ((cabaldir (haskell-cabal-find-dir)))
-        (haskell--compile cabaldir edit-command
-                          'haskell--compile-cabal-last
-                          haskell-compile-cabal-build-command
-                          haskell-compile-cabal-build-alt-command)
+                     compilation-save-buffers-predicate)
+  (if-let ((cabaldir (and
+                      (not haskell-compile-ignore-cabal)
+                      (haskell-cabal-find-dir))))
+      (haskell--compile cabaldir edit-command
+                        'haskell--compile-cabal-last
+                        haskell-compile-cabal-build-command
+                        haskell-compile-cabal-build-alt-command)
+    (if-let ((stackdir (locate-dominating-file default-directory "stack.yaml")))
+        (haskell--compile stackdir edit-command
+                          'haskell--compile-stack-last
+                          haskell-compile-stack-build-command
+                          haskell-compile-stack-build-alt-command)
       (let ((srcfile (buffer-file-name)))
         (haskell--compile srcfile edit-command
                           'haskell--compile-ghc-last
                           haskell-compile-command
                           haskell-compile-command)))))
-
-(defvar haskell--compile-ignore-stack nil
-  "Ignore `stack.yml' files for this buffer.
-This is useful if you would prefer to use the cabal build definition.")
-(make-variable-buffer-local 'haskell--compile-ignore-stack)
-(put 'haskell--compile-ignore-stack 'safe-local-variable #'booleanp)
 
 (defvar haskell--compile-stack-last nil)
 (defvar haskell--compile-cabal-last nil)
