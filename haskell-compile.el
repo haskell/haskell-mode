@@ -38,30 +38,30 @@
   :group 'haskell)
 
 (defcustom haskell-compile-cabal-build-command
-  "cd %s && cabal build --ghc-option=-ferror-spans"
+  "cabal build --ghc-option=-ferror-spans"
   "Default build command to use for `haskell-cabal-build' when a cabal file is detected.
-The `%s' placeholder is replaced by the cabal package top folder."
+For legacy compat, `%s' is replaced by the cabal package top folder."
   :group 'haskell-compile
   :type 'string)
 
 (defcustom haskell-compile-cabal-build-alt-command
-  "cd %s && cabal clean -s && cabal build --ghc-option=-ferror-spans"
+  "cabal clean -s && cabal build --ghc-option=-ferror-spans"
   "Alternative build command to use when `haskell-cabal-build' is called with a negative prefix argument.
-The `%s' placeholder is replaced by the cabal package top folder."
+For legacy compat, `%s' is replaced by the cabal package top folder."
   :group 'haskell-compile
   :type 'string)
 
 (defcustom haskell-compile-stack-build-command
-  "cd %s && stack build --fast"
+  "stack build --fast"
   "Default build command to use for `haskell-stack-build' when a stack file is detected.
-The `%s' placeholder is replaced by the stack package top folder."
+For legacy compat, `%s' is replaced by the stack package top folder."
   :group 'haskell-compile
   :type 'string)
 
 (defcustom haskell-compile-stack-build-alt-command
-  "cd %s && stack clean && stack build --fast"
+  "stack clean && stack build --fast"
   "Alternative build command to use when `haskell-stack-build' is called with a negative prefix argument.
-The `%s' placeholder is replaced by the stack package top folder."
+For legacy compat, `%s' is replaced by the stack package top folder."
   :group 'haskell-compile
   :type 'string)
 
@@ -197,15 +197,19 @@ base directory for build tools, or the current buffer for
                      ('-  alt)
                      (_   (compilation-read-command default))))
          (command (format template dir-or-file))
+         (dir (if (directory-name-p dir-or-file)
+                  dir-or-file
+                default-directory))
          (name (if (directory-name-p dir-or-file)
                    (file-name-base (directory-file-name dir-or-file))
                  (file-name-nondirectory dir-or-file))))
     (unless (eq edit'-)
       (set last-sym template))
-    (compilation-start
-     command
-     'haskell-compilation-mode
-     (lambda (mode) (format "*%s* <%s>" mode name)))))
+    (let ((default-directory dir))
+      (compilation-start
+       command
+       'haskell-compilation-mode
+       (lambda (mode) (format "*%s* <%s>" mode name))))))
 
 (provide 'haskell-compile)
 ;;; haskell-compile.el ends here
