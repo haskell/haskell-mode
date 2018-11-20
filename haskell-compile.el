@@ -179,7 +179,7 @@ base directory for build tools, or the current buffer for
                         haskell-compile-cabal-build-command
                         haskell-compile-cabal-build-alt-command)
     (if-let ((stackdir (and haskell-compile-ignore-cabal
-                            locate-dominating-file default-directory "stack.yaml")))
+                            (locate-dominating-file default-directory "stack.yaml"))))
         (haskell--compile stackdir edit-command
                           'haskell--compile-stack-last
                           haskell-compile-stack-build-command
