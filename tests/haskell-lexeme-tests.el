@@ -184,6 +184,16 @@ buffer."
    '("'D'")
    '("'D'")))
 
+(ert-deftest haskell-lexeme-char-literal-5 ()
+  (check-lexemes
+   '("':'")
+   '("':'")))
+
+(ert-deftest haskell-lexeme-char-literal-6 ()
+  (check-lexemes
+   '("(':')")
+   '("(" "':'" ")")))
+
 (ert-deftest haskell-lexeme-string-literal-1 ()
   (check-lexemes
    '("\"\\   \\\"")
