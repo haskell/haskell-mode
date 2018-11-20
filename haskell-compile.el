@@ -171,7 +171,9 @@ base directory for build tools, or the current buffer for
                      compilation-save-buffers-predicate)
   (if-let ((cabaldir (and
                       (not haskell-compile-ignore-cabal)
-                      (haskell-cabal-find-dir))))
+                      (or (haskell-cabal-find-dir)
+                          (locate-dominating-file default-directory "cabal.project")
+                          (locate-dominating-file default-directory "cabal.project.local")))))
       (haskell--compile cabaldir edit-command
                         'haskell--compile-cabal-last
                         haskell-compile-cabal-build-command
