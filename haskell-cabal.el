@@ -104,7 +104,7 @@ By default these are:
     ("^\\(Library\\)[ \t]*\\({\\|$\\)" (1 font-lock-keyword-face))
     ("^\\(Executable\\|Test-Suite\\|Benchmark\\)[ \t]+\\([^\n \t]*\\)"
      (1 font-lock-keyword-face) (2 font-lock-function-name-face))
-    ("^\\(Flag\\)[ \t]+\\([^\n \t]*\\)"
+    ("^\\(Flag\\|Common\\)[ \t]+\\([^\n \t]*\\)"
      (1 font-lock-keyword-face) (2 font-lock-constant-face))
     ("^\\(Source-Repository\\)[ \t]+\\(head\\|this\\)"
      (1 font-lock-keyword-face) (2 font-lock-constant-face))
