@@ -704,7 +704,7 @@ on an uppercase identifier."
 (provide 'haskell-font-lock)
 
 ;; Local Variables:
-;; coding: utf-8-unix
+;; coding: utf-8
 ;; tab-width: 8
 ;; End:
 
