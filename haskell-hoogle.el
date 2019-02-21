@@ -39,11 +39,11 @@ If nil, use the Hoogle web-site."
   :type '(choice (const :tag "Use Web-site" nil)
                  string))
 
-(defcustom haskell-hoogle-url "http://haskell.org/hoogle/?q=%s"
+(defcustom haskell-hoogle-url "https://hoogle.haskell.org/?hoogle=%s"
   "Default value for hoogle web site."
   :group 'haskell
   :type '(choice
-          (const :tag "haskell-org" "http://haskell.org/hoogle/?q=%s")
+          (const :tag "haskell-org" "https://hoogle.haskell.org/?hoogle=%s")
           (const :tag "fp-complete" "https://www.stackage.org/lts/hoogle?q=%s")
           (const :tag "hayoo" "http://hayoo.fh-wedel.de/?query=%s")
           string))
