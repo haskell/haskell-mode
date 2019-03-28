@@ -48,6 +48,16 @@ If nil, use the Hoogle web-site."
           (const :tag "hayoo" "http://hayoo.fh-wedel.de/?query=%s")
           string))
 
+(defcustom haskell-hoogle-server-command (lambda (port)
+                                           (list "hoogle" "server"
+                                            "--local"
+                                            "-p"
+                                            (number-to-string port)))
+  "Command used to start the local hoogle server."
+  :group 'haskell
+  :type 'function
+  )
+
 ;;;###autoload
 (defun haskell-hoogle (query &optional info)
   "Do a Hoogle search for QUERY.
@@ -85,14 +95,14 @@ is asked to show extra info for the items matching QUERY.."
 (defun haskell-hoogle-start-server ()
   "Start hoogle local server."
   (interactive)
-  (if (executable-find "hoogle")
-      (unless (haskell-hoogle-server-live-p)
-        (set 'haskell-hoogle-server-process
-             (start-process
-              haskell-hoogle-server-process-name
-              (get-buffer-create haskell-hoogle-server-buffer-name)
-              "hoogle" "server" "-p" (number-to-string haskell-hoogle-port-number))))
-    (error "\"hoogle\" executable not found")))
+  (unless (haskell-hoogle-server-live-p)
+    (set 'haskell-hoogle-server-process
+         (apply 'start-process
+                (append (list haskell-hoogle-server-process-name
+                              (get-buffer-create haskell-hoogle-server-buffer-name))
+                        (funcall haskell-hoogle-server-command haskell-hoogle-port-number))))
+    )
+  )
 
 (defun haskell-hoogle-server-live-p ()
   "Whether the hoogle server process is live."
