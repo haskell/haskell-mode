@@ -93,7 +93,8 @@ be disabled at that position."
   '("case" "class" "data" "default" "deriving" "do"
     "else" "if" "import" "in" "infix" "infixl"
     "infixr" "instance" "let" "module" "mdo" "newtype" "of"
-    "rec" "pattern" "proc" "signature" "then" "type" "where" "_")
+    "rec" "pattern" "proc" "signature" "then" "type" "where" "_"
+    "anyclass" "stock" "via")
   "Identifiers treated as reserved keywords in Haskell."
   :group 'haskell-appearance
   :type '(repeat string))
