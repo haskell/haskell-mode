@@ -38,14 +38,14 @@
   :group 'haskell)
 
 (defcustom haskell-compile-cabal-build-command
-  "cabal build --ghc-option=-ferror-spans"
+  "cabal new-build --ghc-option=-ferror-spans"
   "Default build command to use for `haskell-cabal-build' when a cabal file is detected.
 For legacy compat, `%s' is replaced by the cabal package top folder."
   :group 'haskell-compile
   :type 'string)
 
 (defcustom haskell-compile-cabal-build-alt-command
-  "cabal clean -s && cabal build --ghc-option=-ferror-spans"
+  "cabal new-clean -s && cabal new-build --ghc-option=-ferror-spans"
   "Alternative build command to use when `haskell-cabal-build' is called with a negative prefix argument.
 For legacy compat, `%s' is replaced by the cabal package top folder."
   :group 'haskell-compile
