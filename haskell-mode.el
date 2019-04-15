@@ -845,8 +845,7 @@ Minor modes that work well with `haskell-mode':
   (add-hook 'completion-at-point-functions
             'haskell-completions-completion-at-point
             nil
-            t)
-  (haskell-indentation-mode))
+            t))
 
 (defcustom haskell-mode-hook '(haskell-indentation-mode interactive-haskell-mode)
   "List of functions to run after `haskell-mode' is enabled.
