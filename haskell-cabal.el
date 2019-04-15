@@ -70,7 +70,7 @@ By default these are:
   '("name" "version" "cabal-version" "license" "license-file" "copyright"
     "author" "maintainer" "stability" "homepage" "package-url" "synopsis"
     "description" "category" "tested-with" "build-depends" "data-files"
-    "extra-source-files" "extra-tmp-files"))
+    "extra-source-files" "extra-tmp-files" "import"))
 
 (defconst haskell-cabal-library-fields
   ;; Extracted with (haskell-cabal-extract-fields-from-doc "library")
@@ -102,7 +102,7 @@ By default these are:
   '(("^[ \t]*--.*" . font-lock-comment-face)
     ("^ *\\([^ \t:]+\\):" (1 font-lock-keyword-face))
     ("^\\(Library\\)[ \t]*\\({\\|$\\)" (1 font-lock-keyword-face))
-    ("^\\(Executable\\|Test-Suite\\|Benchmark\\)[ \t]+\\([^\n \t]*\\)"
+    ("^\\(Executable\\|Test-Suite\\|Benchmark\\|Common\\)[ \t]+\\([^\n \t]*\\)"
      (1 font-lock-keyword-face) (2 font-lock-function-name-face))
     ("^\\(Flag\\)[ \t]+\\([^\n \t]*\\)"
      (1 font-lock-keyword-face) (2 font-lock-constant-face))
@@ -153,6 +153,7 @@ it from list if one of the following conditions are hold:
     (define-key map (kbd "M-g l") 'haskell-cabal-goto-library-section)
     (define-key map (kbd "M-g e") 'haskell-cabal-goto-executable-section)
     (define-key map (kbd "M-g b") 'haskell-cabal-goto-benchmark-section)
+    (define-key map (kbd "M-g o") 'haskell-cabal-goto-common-section)
     (define-key map (kbd "M-g t") 'haskell-cabal-goto-test-suite-section)
     map))
 
@@ -1009,6 +1010,9 @@ Source names from main-is and c-sources sections are left untouched
   (interactive)
   (haskell-cabal-goto-section-type "benchmark"))
 
+(defun haskell-cabal-goto-common-section ()
+  (interactive)
+  (haskell-cabal-goto-section-type "common"))
 
 
 (defun haskell-cabal-line-entry-column ()
