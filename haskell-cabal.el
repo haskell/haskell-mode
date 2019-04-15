@@ -153,7 +153,7 @@ it from list if one of the following conditions are hold:
     (define-key map (kbd "M-g l") 'haskell-cabal-goto-library-section)
     (define-key map (kbd "M-g e") 'haskell-cabal-goto-executable-section)
     (define-key map (kbd "M-g b") 'haskell-cabal-goto-benchmark-section)
-    (define-key map (kbd "M-g c") 'haskell-cabal-goto-common-section)
+    (define-key map (kbd "M-g o") 'haskell-cabal-goto-common-section)
     (define-key map (kbd "M-g t") 'haskell-cabal-goto-test-suite-section)
     map))
 
