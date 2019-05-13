@@ -43,6 +43,11 @@
   :group 'haskell
   :type 'string)
 
+(defcustom haskell-mode-stylish-haskell-args nil
+  "Arguments to pass to program specified by haskell-mode-stylish-haskell-path."
+  :group 'haskell
+  :type 'list)
+
 (defcustom haskell-interactive-set-+c
   t
   "Issue ':set +c' in interactive session to support type introspection."
@@ -806,9 +811,9 @@ stylish-haskell executable. This function tries to preserve
 cursor position and markers by using
 `haskell-mode-buffer-apply-command'."
   (interactive)
-  (haskell-mode-buffer-apply-command haskell-mode-stylish-haskell-path))
+  (haskell-mode-buffer-apply-command haskell-mode-stylish-haskell-path haskell-mode-stylish-haskell-args))
 
-(defun haskell-mode-buffer-apply-command (cmd)
+(defun haskell-mode-buffer-apply-command (cmd &optional args)
   "Execute shell command CMD with current buffer as input and output.
 Use buffer as input and replace the whole buffer with the
 output.  If CMD fails the buffer remains unchanged."
@@ -817,9 +822,9 @@ output.  If CMD fails the buffer remains unchanged."
          (err-file (make-temp-file "stylish-error")))
         (unwind-protect
           (let* ((_errcode
-                  (call-process-region (point-min) (point-max) cmd nil
-                                       `((:file ,out-file) ,err-file)
-                                       nil))
+                  (apply 'call-process-region (point-min) (point-max) cmd nil
+                         `((:file ,out-file) ,err-file)
+                         nil args))
                  (err-file-empty-p
                   (equal 0 (nth 7 (file-attributes err-file))))
                  (out-file-empty-p
