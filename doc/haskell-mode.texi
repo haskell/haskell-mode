@@ -1895,6 +1895,7 @@ You can disable this behaviour by disabling the customization option:
   '(haskell-interactive-types-for-show-ambiguous nil))
 @end lisp
 
+@anchor{printing mode}
 @subsection Printing mode
 
 You can choose between printing modes used for the results of
@@ -1972,6 +1973,10 @@ haskell-svg-toggle-render-images}, if you load the above code and type
 instead of the @acronym{XML} representation of the image.
 
 @vindex haskell-svg-render-images
+
+For this feature to work, it is required that the variable
+@code{haskell-interactive-mode-eval-mode} be set to a value different
+from @code{nil}, @pxref{printing mode}.
 
 This feature can be enabled by default by setting the customization
 variable @code{haskell-svg-render-images} to a non-nil value.
