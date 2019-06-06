@@ -203,7 +203,8 @@ If the identifier is not qualified return it unchanged."
   "Echo STR in mini-buffer.
 Given string is shrinken to single line, multiple lines just
 disturbs the programmer."
-  (message "%s" (haskell-mode-one-line str (frame-width))))
+  (unless (active-minibuffer-window)
+    (message "%s" (haskell-mode-one-line str (frame-width)))))
 
 (defun haskell-mode-one-line (str &optional width)
   "Try to fit STR as much as possible on one line according to given WIDTH."
