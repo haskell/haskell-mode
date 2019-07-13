@@ -64,6 +64,7 @@ interference with prompts that look like haskell expressions."
     (define-key map (kbd "SPC") 'haskell-interactive-mode-space)
     (define-key map (kbd "C-j") 'haskell-interactive-mode-newline-indent)
     (define-key map (kbd "<home>") 'haskell-interactive-mode-beginning)
+    (define-key map (kbd "C-a") 'haskell-interactive-beginning-of-line)
     (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
     (define-key map (kbd "C-c C-c") 'haskell-process-interrupt)
     (define-key map (kbd "C-c C-f") 'next-error-follow-minor-mode)
@@ -269,6 +270,17 @@ do the
   (if (haskell-interactive-at-prompt)
       (goto-char haskell-interactive-mode-prompt-start)
     (move-beginning-of-line nil)))
+
+(defun haskell-interactive-beginning-of-line ()
+  "If after prompt on current line, stop after prompt.
+
+Otherwise go to beginning-of-line"
+  (interactive)
+  (cond ((haskell-interactive-at-prompt)
+	 (if (< (line-beginning-position) (haskell-interactive-at-prompt))
+	   (goto-char haskell-interactive-mode-prompt-start)
+	   (beginning-of-line)))
+	(t (beginning-of-line))))
 
 (defun haskell-interactive-mode-input-partial ()
   "Get the interactive mode input up to point."
