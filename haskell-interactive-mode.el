@@ -63,6 +63,7 @@ interference with prompts that look like haskell expressions."
     (define-key map (kbd "RET") 'haskell-interactive-mode-return)
     (define-key map (kbd "SPC") 'haskell-interactive-mode-space)
     (define-key map (kbd "C-j") 'haskell-interactive-mode-newline-indent)
+    (define-key map [remap move-beginning-of-line] 'haskell-interactive-mode-bol)
     (define-key map (kbd "<home>") 'haskell-interactive-mode-beginning)
     (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
     (define-key map (kbd "C-c C-c") 'haskell-process-interrupt)
@@ -213,6 +214,15 @@ is at the prompt."
           haskell-interactive-mode-prompt-start)
       haskell-interactive-mode-prompt-start
     nil))
+
+(defun haskell-interactive-mode-bol ()
+  "Go to beginning of current line, but after current prompt if any."
+  (interactive)
+  (let ((beg (line-beginning-position))
+        (end (line-end-position)))
+    (goto-char (if (>= end haskell-interactive-mode-prompt-start beg)
+                   haskell-interactive-mode-prompt-start
+                 beg))))
 
 (define-derived-mode haskell-error-mode
   special-mode "Error"
