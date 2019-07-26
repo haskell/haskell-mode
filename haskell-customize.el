@@ -182,7 +182,7 @@ pass additional flags to `ghc'."
 
 (defcustom haskell-process-do-cabal-format-string
   ":!cd %s && %s"
-  "The way to run cabal comands. It takes two arguments -- the directory and the command.
+  "The way to run cabal commands. It takes two arguments -- the directory and the command.
 See `haskell-process-do-cabal' for more details."
   :group 'haskell-interactive
   :type 'string)
