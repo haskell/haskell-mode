@@ -57,19 +57,14 @@
   "Return the command with the arguments to start the repl based on the
 directory structure."
   (cl-ecase (haskell-process-type)
-    ('ghci       (cond ((eq system-type 'cygwin) (nconc "ghcii.sh"
-                                                        haskell-process-args-ghci))
+    ('ghci       (cond ((eq system-type 'cygwin) `("ghcii.sh" ,@haskell-process-args-ghci))
                        (t (append
                            (if (listp haskell-process-path-ghci)
                                haskell-process-path-ghci
                              (list haskell-process-path-ghci))
                            haskell-process-args-ghci))))
-    ('cabal-repl (nconc `(,haskell-process-path-cabal
-                          "repl")
-                        haskell-process-args-cabal-repl))
-    ('stack-ghci (nconc `(,haskell-process-path-stack
-                          "ghci")
-                        haskell-process-args-stack-ghci))))
+    ('cabal-repl `(,haskell-process-path-cabal "repl" ,@haskell-process-args-cabal-repl))
+    ('stack-ghci `(,haskell-process-path-stack "ghci" ,@haskell-process-args-stack-ghci))))
 
 (defconst inferior-haskell-info-xref-re
   "-- Defined at \\(.+\\):\\([0-9]+\\):\\([0-9]+\\)\\(?:-\\([0-9]+\\)\\)?$")
