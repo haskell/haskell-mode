@@ -1467,7 +1467,7 @@ And make sure @file{hasktags} is in your @code{$PATH} which Emacs can see.
 @subsection Generating tags
 
 Now, every time you run @code{save-buffer} (@kbd{C-x C-s}), there is a
-hook that will run and generate Emacs @xref{Tags,,,emacs} for the whole
+hook that will run and generate Emacs @xref{Tags,,,emacs}, for the whole
 project directory. The resulting file will be called @file{TAGS}.
 
 WARNING: You should be careful that your project root isn't your
