@@ -4,15 +4,20 @@
 (require 'ert)
 (require 'haskell-cabal)
 
+(defconst haskell-cabal-test-data-dir
+  (file-name-as-directory
+   (expand-file-name "test-data" (if load-file-name
+                                     (file-name-directory load-file-name)
+                                   default-directory))))
+
+(unless (file-directory-p haskell-cabal-test-data-dir)
+  (error "Couldn't find tests/test-data subdir"))
+
 (ert-deftest haskell-cabal-enum-targets-1 ()
   "Test enumerating .cabal targets for use by cabal-install."
   (with-temp-buffer
     (haskell-cabal-mode)
-    (let ((scriptDir
-           (file-name-directory
-             (or (symbol-file 'haskell-cabal-enum-targets-1)
-                 (buffer-file-name)))))
-      (setq default-directory (expand-file-name "test-data" scriptDir)))
+    (setq default-directory haskell-cabal-test-data-dir)
     (should (equal '("lib:Test" "test:test-1" "bench:bench-1" "exe:bin-1")
                    (haskell-cabal-enum-targets)))))
 
@@ -20,47 +25,31 @@
   "Test enumerating .cabal targets for use by stack."
   (with-temp-buffer
     (haskell-cabal-mode)
-    (let ((scriptDir
-           (file-name-directory
-            (or (symbol-file 'haskell-cabal-enum-targets-2)
-                (buffer-file-name)))))
-      (setq default-directory (expand-file-name "test-data" scriptDir)))
+    (setq default-directory haskell-cabal-test-data-dir)
     (should (equal '("Test:lib" "Test:test:test-1" "Test:bench:bench-1" "Test:exe:bin-1")
                    (haskell-cabal-enum-targets 'stack-ghci)))))
 
 (ert-deftest haskell-cabal-get-field-1 ()
   (with-temp-buffer
-    (let ((scriptDir
-           (file-name-directory
-             (or (symbol-file 'haskell-cabal-get-field-1)
-                 (buffer-file-name)))))
-      (set-visited-file-name (expand-file-name "test-data/Source.hs" scriptDir) t t))
+    (setq default-directory haskell-cabal-test-data-dir)
+    (set-visited-file-name (expand-file-name "Source.hs") t t)
     (should (equal "Simple"
                    (haskell-cabal-get-field "build-type")))))
 
 (ert-deftest haskell-cabal-compute-checksum-1 ()
-  (let ((scriptDir
-         (file-name-directory
-          (or (symbol-file 'haskell-cabal-get-field-1)
-              (buffer-file-name)))))
-
-    (should (equal "263e67082326a27585639420f4d42c8b"
-                   (haskell-cabal-compute-checksum (expand-file-name "test-data" scriptDir))))))
+  (should (equal "263e67082326a27585639420f4d42c8b"
+                 (haskell-cabal-compute-checksum haskell-cabal-test-data-dir))))
 
 (ert-deftest haskell-cabal-compute-next-prev-section-1 ()
-  (let ((scriptDir
-         (file-name-directory
-          (or (symbol-file 'haskell-cabal-get-field-1)
-              (buffer-file-name)))))
-
-    (with-temp-buffer
-      (insert-file-contents (expand-file-name "test-data/Test.cabal" scriptDir))
-      (haskell-cabal-mode)
-      (goto-char (point-min))
-      (haskell-cabal-next-section)
-      (haskell-cabal-next-subsection)
-      (haskell-cabal-previous-subsection)
-      (haskell-cabal-previous-section))))
+  (with-temp-buffer
+    (setq default-directory haskell-cabal-test-data-dir)
+    (insert-file-contents (expand-file-name "Test.cabal"))
+    (haskell-cabal-mode)
+    (goto-char (point-min))
+    (haskell-cabal-next-section)
+    (haskell-cabal-next-subsection)
+    (haskell-cabal-previous-subsection)
+    (haskell-cabal-previous-section)))
 
 (ert-deftest haskell-cabal-period-is-a-word-break ()
   (with-temp-buffer
