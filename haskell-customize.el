@@ -459,6 +459,9 @@ This function also sets the `inferior-haskell-root-dir'"
          ((executable-find "ghc")
           (setq inferior-haskell-root-dir default-directory)
           'ghci)
+         ((executable-find "stack")
+          (setq inferior-haskell-root-dir default-directory)
+          'stack-ghci)
          (t
           (error "Could not find any installation of GHC.")))
       haskell-process-type)))
