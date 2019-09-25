@@ -462,8 +462,11 @@ OTHER-WINDOW use `find-file-other-window'."
             :beginning (match-end 0)
             :end (save-match-data (haskell-cabal-subsection-end))
             :data-start-column (save-excursion (goto-char (match-end 0))
-                                               (current-column)
-                                               )))))
+                                               (current-column))
+            :data-indent-column (save-excursion (goto-char (match-end 0))
+                                                (when (looking-at "\n  +\\(\\w*\\)") (goto-char (match-beginning 1)))
+                                                (current-column)
+                                                )))))
 
 
 (defun haskell-cabal-section-name (section)
@@ -477,6 +480,9 @@ OTHER-WINDOW use `find-file-other-window'."
 
 (defun haskell-cabal-section-data-start-column (section)
   (plist-get section :data-start-column))
+
+(defun haskell-cabal-section-data-indent-column (section)
+  (plist-get section :data-indent-column))
 
 (defun haskell-cabal-map-component-type (component-type)
   "Map from cabal file COMPONENT-TYPE to build command component-type."
@@ -1039,7 +1045,7 @@ Source names from main-is and c-sources sections are left untouched
   (cl-case (haskell-cabal-classify-line)
     (section-data
      (save-excursion
-       (let ((indent (haskell-cabal-section-data-start-column
+       (let ((indent (haskell-cabal-section-data-indent-column
                       (haskell-cabal-subsection))))
          (indent-line-to indent)
          (beginning-of-line)
