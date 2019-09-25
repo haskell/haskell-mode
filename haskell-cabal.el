@@ -460,13 +460,12 @@ OTHER-WINDOW use `find-file-other-window'."
       (list :name (match-string-no-properties 2)
             :beginning (match-end 0)
             :end (save-match-data (haskell-cabal-subsection-end))
-	    :data-start-column (save-excursion (goto-char (match-end 0))
-					       (current-column)
-                                               )
+            :data-start-column (save-excursion (goto-char (match-end 0))
+                                               (current-column))
             :data-indent-column (save-excursion (goto-char (match-end 0))
-						(when (looking-at "\n  +\\(\\w*\\)") (goto-char (match-beginning 1)))
-						(current-column)
-						)))))
+                                                (when (looking-at "\n  +\\(\\w*\\)") (goto-char (match-beginning 1)))
+                                                (current-column)
+                                                )))))
 
 
 (defun haskell-cabal-section-name (section)
