@@ -169,26 +169,28 @@ base directory for build tools, or the current buffer for
   (interactive "P")
   (save-some-buffers (not compilation-ask-about-save)
                      compilation-save-buffers-predicate)
-  (if-let ((cabaldir (and
-                      (not haskell-compile-ignore-cabal)
-                      (or (haskell-cabal-find-dir)
-                          (locate-dominating-file default-directory "cabal.project")
-                          (locate-dominating-file default-directory "cabal.project.local")))))
-      (haskell--compile cabaldir edit-command
-                        'haskell--compile-cabal-last
-                        haskell-compile-cabal-build-command
-                        haskell-compile-cabal-build-alt-command)
-    (if-let ((stackdir (and haskell-compile-ignore-cabal
-                            (locate-dominating-file default-directory "stack.yaml"))))
-        (haskell--compile stackdir edit-command
-                          'haskell--compile-stack-last
-                          haskell-compile-stack-build-command
-                          haskell-compile-stack-build-alt-command)
-      (let ((srcfile (buffer-file-name)))
-        (haskell--compile srcfile edit-command
-                          'haskell--compile-ghc-last
-                          haskell-compile-command
-                          haskell-compile-command)))))
+  (let ((cabaldir (and
+                   (not haskell-compile-ignore-cabal)
+                   (or (haskell-cabal-find-dir)
+                       (locate-dominating-file default-directory "cabal.project")
+                       (locate-dominating-file default-directory "cabal.project.local")))))
+    (if cabaldir
+        (haskell--compile cabaldir edit-command
+                          'haskell--compile-cabal-last
+                          haskell-compile-cabal-build-command
+                          haskell-compile-cabal-build-alt-command)
+      (let ((stackdir (and haskell-compile-ignore-cabal
+                           (locate-dominating-file default-directory "stack.yaml"))))
+        (if stackdir
+            (haskell--compile stackdir edit-command
+                              'haskell--compile-stack-last
+                              haskell-compile-stack-build-command
+                              haskell-compile-stack-build-alt-command)
+          (let ((srcfile (buffer-file-name)))
+            (haskell--compile srcfile edit-command
+                              'haskell--compile-ghc-last
+                              haskell-compile-command
+                              haskell-compile-command)))))))
 
 (defvar haskell--compile-stack-last nil)
 (defvar haskell--compile-cabal-last nil)
