@@ -1,7 +1,6 @@
 language: nix
 
 env:
-  - EMACS_CI=emacs-24-3 TARGET=check
   - EMACS_CI=emacs-24-4 TARGET=check
   - EMACS_CI=emacs-24-5 TARGET=check
   - EMACS_CI=emacs-25-1 TARGET=check
@@ -10,9 +9,9 @@ env:
   - EMACS_CI=emacs-26-1 TARGET=check
   - EMACS_CI=emacs-26-2 TARGET=check
   - EMACS_CI=emacs-26-3 TARGET=check
+  - EMACS_CI=emacs-snapshot TARGET=check
   - EMACS_CI=emacs-26-3 TARGET=deploy-manual
   - EMACS_CI=emacs-26-3 TARGET=check-external
-  - EMACS_CI=emacs-snapshot
 
 matrix:
   allow_failures:
