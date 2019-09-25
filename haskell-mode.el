@@ -1033,14 +1033,20 @@ See `haskell-check-command' for the default."
   (save-some-buffers (not compilation-ask-about-save) nil)
   (compilation-start command))
 
+;; This function was renamed and deprecated, but we want clean
+;; byte compilation in all versions.
+(defalias 'haskell-flymake-create-temp-buffer-copy
+  (if (fboundp 'flymake-proc-init-create-temp-buffer-copy)
+      'flymake-proc-init-create-temp-buffer-copy
+    'flymake-init-create-temp-buffer-copy))
+
 (defun haskell-flymake-init ()
-  "Flymake init function for Haskell.
-To be added to `flymake-proc-init-create-temp-buffer-copy'."
+  "Flymake init function for Haskell."
   (let ((checker-elts (and haskell-saved-check-command
                            (split-string haskell-saved-check-command))))
     (list (car checker-elts)
           (append (cdr checker-elts)
-                  (list (flymake-proc-init-create-temp-buffer-copy
+                  (list (haskell-flymake-create-temp-buffer-copy
                          'flymake-create-temp-inplace))))))
 
 (add-to-list 'flymake-allowed-file-name-masks '("\\.l?hs\\'" haskell-flymake-init))
