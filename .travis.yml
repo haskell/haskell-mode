@@ -21,6 +21,9 @@ matrix:
 install: |
     sh <(curl https://get.haskellstack.org/)
     bash <(curl https://raw.githubusercontent.com/purcell/nix-emacs-ci/master/travis-install)
+    if  [ "$TARGET" = "deploy-manual "]; then
+      apt install texinfo
+    fi
 
 script: |
     make $TARGET
