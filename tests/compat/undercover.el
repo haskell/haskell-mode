@@ -1,4 +1,4 @@
-;;; undercover.el --- Test coverage library for Emacs -*- lexical-binding: t -*-
+;;; undercover.el --- Test coverage library for Emacs Lisp -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2014 Sviridov Alexander
 
@@ -6,7 +6,7 @@
 ;; URL: https://github.com/sviridov/undercover.el
 ;; Created: Sat Sep 27 2014
 ;; Keywords: lisp, tests, coverage, tools
-;; Version: 0.5.0
+;; Version: 0.6.1
 ;; Package-Requires: ((emacs "24") (dash "2.0.0") (shut-up "0.3.2"))
 
 ;;; Commentary:
@@ -22,7 +22,7 @@
 (require 'dash)
 (require 'shut-up)
 
-(defconst undercover-version "0.5.0")
+(defconst undercover-version "0.6.1")
 
 (defvar undercover-force-coverage nil
   "If nil, test coverage check will be done only under continuous integration service.")
@@ -126,14 +126,14 @@ Example of WILDCARDS: (\"*.el\" \"subdir/*.el\" (:exclude \"exclude-*.el\"))."
 
 (setf (symbol-function 'undercover--stop-point-after)
       (cons 'macro
-        (lambda (before-index after-index form)
-          "Increase number of times that stop point at AFTER-INDEX was covered."
-         `(let ((before-index ,before-index)
-                (after-index ,after-index))
-            (unwind-protect ,form
-              (when (boundp 'edebug-freq-count)
-                (aset edebug-freq-count after-index (+ 1 (aref edebug-freq-count after-index)))
-                (undercover--align-counts-between-stop-points before-index after-index)))))))
+            (lambda (before-index after-index form)
+              "Increase number of times that stop point at AFTER-INDEX was covered."
+              `(let ((before-index ,before-index)
+                     (after-index ,after-index))
+                 (unwind-protect ,form
+                   (when (boundp 'edebug-freq-count)
+                     (aset edebug-freq-count after-index (+ 1 (aref edebug-freq-count after-index)))
+                     (undercover--align-counts-between-stop-points before-index after-index)))))))
 
 (setf (symbol-function 'undercover--align-counts-between-stop-points)
       (lambda (before-index after-index)
@@ -206,7 +206,7 @@ Values of that hash are number of covers."
     (find-file file)
     (if edebug-form-data
         (undercover--fill-hash-table undercover--files-coverage-statistics
-          file (undercover--file-coverage-statistics))
+                                     file (undercover--file-coverage-statistics))
       (setq undercover--files (delq file undercover--files)))))
 
 (defun undercover--collect-files-coverage (files)
@@ -226,7 +226,10 @@ Values of that hash are number of covers."
 
 (defun undercover--under-ci-p ()
   "Check that `undercover' running under continuous integration service."
-  (or (undercover--coveralls-repo-token) (undercover--under-travic-ci-p)))
+  (or
+   (undercover--coveralls-repo-token)
+   (undercover--under-travic-ci-p)
+   (getenv "UNDERCOVER_FORCE")))
 
 ;;; Reports related functions:
 
@@ -271,31 +274,31 @@ Values of that hash are number of covers."
   "Update test coverage REPORT for coveralls.io with Shippable service information."
   (when (getenv "SHIPPABLE")
     (undercover--fill-hash-table report
-      "service_name"   "shippable"
-      "service_job_id" (getenv "BUILD_NUMBER"))
+                                 "service_name"   "shippable"
+                                 "service_job_id" (getenv "BUILD_NUMBER"))
     (unless (string-equal "false" (getenv "PULL_REQUEST"))
       (undercover--fill-hash-table report
-        "service_pull_request" (getenv "PULL_REQUEST")))))
+                                   "service_pull_request" (getenv "PULL_REQUEST")))))
 
 (defun undercover--update-coveralls-report-with-travis-ci (report)
   "Update test coverage REPORT for coveralls.io with Travis CI service information."
   (undercover--fill-hash-table report
-    "service_name"   "travis-ci"
-    "service_job_id" (getenv "TRAVIS_JOB_ID")))
+                               "service_name"   "travis-ci"
+                               "service_job_id" (getenv "TRAVIS_JOB_ID")))
 
 (defun undercover--update-coveralls-report-with-git (report)
   "Update test coverage REPORT for coveralls.io with Git information."
   (undercover--fill-hash-table report
-    "git" (undercover--make-hash-table
-           "branch"  (undercover--get-git-info "rev-parse" "--abbrev-ref" "HEAD")
-           "remotes" (undercover--get-git-remotes)
-           "head"    (undercover--make-hash-table
-                      "id"              (undercover--get-git-info-from-log "H")
-                      "author_name"     (undercover--get-git-info-from-log "aN")
-                      "author_email"    (undercover--get-git-info-from-log "ae")
-                      "committer_name"  (undercover--get-git-info-from-log "cN")
-                      "committer_email" (undercover--get-git-info-from-log "ce")
-                      "message"         (undercover--get-git-info-from-log "s")))))
+                               "git" (undercover--make-hash-table
+                                      "branch"  (undercover--get-git-info "rev-parse" "--abbrev-ref" "HEAD")
+                                      "remotes" (undercover--get-git-remotes)
+                                      "head"    (undercover--make-hash-table
+                                                 "id"              (undercover--get-git-info-from-log "H")
+                                                 "author_name"     (undercover--get-git-info-from-log "aN")
+                                                 "author_email"    (undercover--get-git-info-from-log "ae")
+                                                 "committer_name"  (undercover--get-git-info-from-log "cN")
+                                                 "committer_email" (undercover--get-git-info-from-log "ce")
+                                                 "message"         (undercover--get-git-info-from-log "s")))))
 
 (defun undercover--coveralls-file-coverage-report (statistics)
   "Translate file coverage STATISTICS into coveralls.io format."
@@ -320,7 +323,7 @@ Values of that hash are number of covers."
 (defun undercover--fill-coveralls-report (report)
   "Fill test coverage REPORT for coveralls.io."
   (undercover--fill-hash-table report
-    "source_files" (mapcar #'undercover--coveralls-file-report undercover--files)))
+                               "source_files" (mapcar #'undercover--coveralls-file-report undercover--files)))
 
 (defun undercover--merge-coveralls-report-file-lines-coverage (old-coverage new-coverage)
   "Merge test coverage for lines from OLD-COVERAGE and NEW-COVERAGE."
@@ -339,8 +342,8 @@ Values of that hash are number of covers."
                                  source-files-report)))
     (if new-file-hash
         (undercover--fill-hash-table new-file-hash
-          "coverage" (undercover--merge-coveralls-report-file-lines-coverage
-                      old-coverage (gethash "coverage" new-file-hash)))
+                                     "coverage" (undercover--merge-coveralls-report-file-lines-coverage
+                                                 old-coverage (gethash "coverage" new-file-hash)))
       (rplacd (last source-files-report)
               (cons old-file-hash nil)))))
 
@@ -364,7 +367,8 @@ Values of that hash are number of covers."
       (undercover--update-coveralls-report-with-repo-token report)
       (undercover--try-update-coveralls-report-with-shippable report))
      ((undercover--under-travic-ci-p) (undercover--update-coveralls-report-with-travis-ci report))
-     (t (error "Unsupported coveralls.io report")))
+     (t (unless (getenv "UNDERCOVER_FORCE")
+          (error "Unsupported coveralls.io report"))))
     (undercover--update-coveralls-report-with-git report)
     (undercover--fill-coveralls-report report)
     (undercover--merge-coveralls-reports report)
@@ -374,10 +378,10 @@ Values of that hash are number of covers."
   "Save JSON-REPORT to `undercover--report-file-path'."
   (save-excursion
     (shut-up
-      (find-file undercover--report-file-path)
-      (erase-buffer)
-      (insert json-report)
-      (save-buffer))))
+     (find-file undercover--report-file-path)
+     (erase-buffer)
+     (insert json-report)
+     (save-buffer))))
 
 (defun undercover--send-coveralls-report ()
   "Send report to coveralls.io."
@@ -385,7 +389,7 @@ Values of that hash are number of covers."
     (message "Sending: report to coveralls.io")
     (shut-up
      (shell-command
-      (format "curl -v -include --form json_file=@%s %s" undercover--report-file-path coveralls-url)))
+      (format "curl -v --include --form json_file=@%s %s" undercover--report-file-path coveralls-url)))
     (message "Sending: OK")))
 
 (defun undercover--coveralls-report ()
@@ -414,10 +418,21 @@ Values of that hash are number of covers."
 (defun undercover-report (&optional report-type)
   "Create and submit (if needed) test coverage report based on REPORT-TYPE.
 Posible values of REPORT-TYPE: coveralls."
-  (when undercover--files
-    (case (or report-type (undercover--determine-report-type))
-      (coveralls (undercover--coveralls-report))
-      (t (error "Unsupported report-type")))))
+  (if undercover--files
+      (case (or report-type (undercover--determine-report-type))
+        (coveralls (undercover--coveralls-report))
+        (t (error "Unsupported report-type")))
+    (message
+     "UNDERCOVER: No coverage information. Make sure that your files are not compiled?")))
+
+(defun undercover--env-configuration ()
+  "Read configuration from UNDERCOVER_CONFIG."
+  (let ((configuration (getenv "UNDERCOVER_CONFIG")))
+    (when configuration
+      (condition-case nil
+          (car (read-from-string configuration))
+        (error
+         (error "UNDERCOVER: error while parsing configuration"))))))
 
 (defun undercover--set-options (configuration)
   "Read CONFIGURATION.
@@ -429,15 +444,24 @@ Return wildcards."
       (case (car-safe option)
         (:report-file (setq undercover--report-file-path (cadr option)))
         (:send-report (setq undercover--send-report (cadr option)))
+        (:report-type (case (cadr option)
+                        (:coveralls)
+                        (:codecov (setq undercover--report-file-path "coverage-final.json")
+                                  (setq undercover--send-report nil))
+                        (otherwise (error "Unsupported report-type: %s" (cadr option)))))
         (otherwise (error "Unsupported option: %s" option))))))
 
 (defun undercover--setup (configuration)
   "Enable test coverage for files matched by CONFIGURATION."
   (when (undercover--coverage-enabled-p)
-    (undercover--set-edebug-handlers)
-    (undercover-report-on-kill)
-    (let ((wildcards (undercover--set-options configuration)))
-      (undercover--edebug-files (undercover--wildcards-to-files wildcards)))))
+    (let ((env-configuration (undercover--env-configuration))
+          (default-configuration '("*.el")))
+      (undercover--set-edebug-handlers)
+      (undercover-report-on-kill)
+      (let ((wildcards (undercover--set-options
+                        (or (append configuration env-configuration)
+                            default-configuration))))
+        (undercover--edebug-files (undercover--wildcards-to-files wildcards))))))
 
 ;;;###autoload
 (defmacro undercover (&rest configuration)
