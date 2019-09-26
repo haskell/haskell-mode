@@ -195,17 +195,22 @@ base directory for build tools, or the current buffer for
 (defvar haskell--compile-stack-last nil)
 (defvar haskell--compile-cabal-last nil)
 (defvar haskell--compile-ghc-last nil)
+
+(defun haskell--directory-name-p (name)
+  "Version of `directory-name-p', which is unavailable in Emacs 24.4."
+  (string= (file-name-as-directory name) name))
+
 (defun haskell--compile (dir-or-file edit last-sym fallback alt)
   (let* ((default (or (symbol-value last-sym) fallback))
-         (template (pcase edit
-                     ('nil default)
-                     ('-  alt)
-                     (_   (compilation-read-command default))))
+         (template (cond
+                    ((null edit) default)
+                    ((< edit 0) alt)
+                    (t (compilation-read-command default))))
          (command (format template dir-or-file))
-         (dir (if (directory-name-p dir-or-file)
+         (dir (if (haskell--directory-name-p dir-or-file)
                   dir-or-file
                 default-directory))
-         (name (if (directory-name-p dir-or-file)
+         (name (if (haskell--directory-name-p dir-or-file)
                    (file-name-base (directory-file-name dir-or-file))
                  (file-name-nondirectory dir-or-file))))
     (unless (eq edit'-)
