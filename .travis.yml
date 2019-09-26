@@ -15,8 +15,7 @@ env:
 
 matrix:
   allow_failures:
-    - env: EMACS_CI=emacs-snapshot
-    - env: TARGET=check-external
+    - env: EMACS_CI=emacs-snapshot TARGET=check
 
 install: |
     sh <(curl https://get.haskellstack.org/)
