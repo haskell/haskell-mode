@@ -82,11 +82,7 @@ check-%: tests/%-tests.el
 check: compile $(AUTOLOADS) check-ert
 
 check-ert: $(ELCHECKS)
-	$(BATCH) --eval "(when (= emacs-major-version 24)					\
-                           (require 'undercover)						\
-                           (undercover \"*.el\"							\
-                              (:exclude \"haskell-mode-pkg.el\" \"haskell-compat.el\")))"	\
-                 -L tests									\
+	$(BATCH) -L tests									\
                  $(patsubst %,-l %,$(ELCHECKS))							\
                  -f ert-run-tests-batch-and-exit
 	@echo "checks passed!"
