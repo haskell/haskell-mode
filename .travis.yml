@@ -19,6 +19,7 @@ matrix:
     - env: TARGET=check-external
 
 install: |
+    sh <(curl https://get.haskellstack.org/)
     bash <(curl https://raw.githubusercontent.com/purcell/nix-emacs-ci/master/travis-install)
 
 script: |
