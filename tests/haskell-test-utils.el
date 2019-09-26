@@ -266,8 +266,8 @@ Whole hierarchy is removed after BODY finishes and value of
      (unwind-protect
          (let ((default-directory (file-name-as-directory (concat default-directory tmpdir))))
            (create-directory-structure ',entries)
-           ,@body))
-     (delete-directory tmpdir t)))
+           ,@body)
+       (delete-directory tmpdir t))))
 
 (defun haskell-bypass-confirmation (function &rest args)
   "Call FUNCTION with ARGS, bypassing all prompts.
