@@ -798,7 +798,7 @@ inferior GHCi process."
       (when (not (string= old-target target))
         (haskell-mode-toggle-interactive-prompt-state)
         (unwind-protect
-            (when (y-or-n-p "Target changed, restart haskell process?")
+            (when (y-or-n-p "Target changed, restart haskell process? ")
               (haskell-process-start session)))
         (haskell-mode-toggle-interactive-prompt-state t)))))
 
@@ -807,14 +807,14 @@ inferior GHCi process."
   "Apply stylish-haskell to the current buffer.
 
 Use `haskell-mode-stylish-haskell-path' to know where to find
-stylish-haskell executable. This function tries to preserve
+stylish-haskell executable.  This function tries to preserve
 cursor position and markers by using
 `haskell-mode-buffer-apply-command'."
   (interactive)
   (haskell-mode-buffer-apply-command haskell-mode-stylish-haskell-path haskell-mode-stylish-haskell-args))
 
 (defun haskell-mode-buffer-apply-command (cmd &optional args)
-  "Execute shell command CMD with current buffer as input and output.
+  "Execute shell command CMD with ARGS and current buffer as input and output.
 Use buffer as input and replace the whole buffer with the
 output.  If CMD fails the buffer remains unchanged."
   (set-buffer-modified-p t)
