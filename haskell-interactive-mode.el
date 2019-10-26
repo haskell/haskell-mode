@@ -192,8 +192,8 @@ be nil.")
        (save-excursion
          (backward-word)
          (setq backward-word-point (point)))
-       (cond ((< backward-word-point bol-point) (delete-backward-char
-                                                 (- (point) haskell-interactive-mode-prompt-start)))
+       (cond ((< backward-word-point bol-point) (delete-char
+                                                 (- haskell-interactive-mode-prompt-start (point))))
              ((>= backward-word-point bol-point) (backward-kill-word 1)))))))
 
 (defun haskell-interactive-switch-back ()
