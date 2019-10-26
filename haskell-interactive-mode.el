@@ -178,6 +178,7 @@ be nil.")
                (line-end-position)))
 
 (defun haskell-interactive-mode-backward-kill-word ()
+  "Kill word backward, stopping at the REPL prompt."
   (interactive)
   (let ((cur-point (point))
         (bol-point)
