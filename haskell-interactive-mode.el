@@ -65,6 +65,8 @@ interference with prompts that look like haskell expressions."
     (define-key map (kbd "C-j") 'haskell-interactive-mode-newline-indent)
     (define-key map [remap move-beginning-of-line] 'haskell-interactive-mode-bol)
     (define-key map (kbd "<home>") 'haskell-interactive-mode-beginning)
+    (define-key map (kbd "M-<backspace>") 'haskell-interactive-mode-backward-kill-word)
+    (define-key map (kbd "C-<backspace>") 'haskell-interactive-mode-backward-kill-word)
     (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
     (define-key map (kbd "C-c C-c") 'haskell-process-interrupt)
     (define-key map (kbd "C-c C-f") 'next-error-follow-minor-mode)
@@ -174,6 +176,20 @@ be nil.")
   (interactive)
   (kill-region haskell-interactive-mode-prompt-start
                (line-end-position)))
+
+(defun haskell-interactive-mode-backward-kill-word ()
+  (interactive)
+  (let ((cur-point (point))
+        (bol-point)
+        (backward-word-point))
+    (save-excursion
+      (haskell-interactive-mode-bol)
+      (setq bol-point (point)))
+    (save-excursion
+      (backward-word)
+      (setq backward-word-point (point)))
+    (cond ((< backward-word-point bol-point) (haskell-interactive-mode-bol))
+          ((>= backward-word-point bol-point) (backward-kill-word 1)))))
 
 (defun haskell-interactive-switch-back ()
   "Switch back to the buffer from which this interactive buffer was reached."
