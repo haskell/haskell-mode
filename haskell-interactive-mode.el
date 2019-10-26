@@ -177,23 +177,24 @@ be nil.")
                (line-end-position)))
 
 (defun haskell-interactive-mode-backward-kill-word (n)
+  "Kill word behind point, stopping at the REPL prompt."
   (interactive "p")
   (let ((n (or n 1))
         (bol-point)
         (backward-word-point))
     (cl-loop
      repeat n do
-     (save-excursion
-       (haskell-interactive-mode-bol)
-       (setq bol-point (point)))
-     (save-excursion
-       (backward-word)
-       (setq backward-word-point (point)))
      (if (not (haskell-interactive-at-prompt))
-         (backward-kill-word 1))
-     (cond ((< backward-word-point bol-point) (delete-backward-char
-                                               (- (point) haskell-interactive-mode-prompt-start)))
-           ((>= backward-word-point bol-point) (backward-kill-word 1))))))
+         (backward-kill-word 1)
+       (save-excursion
+         (haskell-interactive-mode-bol)
+         (setq bol-point (point)))
+       (save-excursion
+         (backward-word)
+         (setq backward-word-point (point)))
+       (cond ((< backward-word-point bol-point) (delete-backward-char
+                                                 (- (point) haskell-interactive-mode-prompt-start)))
+             ((>= backward-word-point bol-point) (backward-kill-word 1)))))))
 
 (defun haskell-interactive-switch-back ()
   "Switch back to the buffer from which this interactive buffer was reached."
