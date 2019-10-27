@@ -179,8 +179,7 @@ be nil.")
 (defun haskell-interactive-mode-backward-kill-word (n)
   "Kill word behind point, stopping at the REPL prompt."
   (interactive "p")
-  (let ((bol-point)
-        (backward-word-point))
+  (let ((backward-word-point))
     (cl-loop
      repeat (or n 1) do
      ;; if point is not after prompt, fall back on backward-kill-word
