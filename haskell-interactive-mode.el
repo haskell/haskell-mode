@@ -194,15 +194,14 @@ be nil.")
               haskell-interactive-mode-prompt-start
               (point)))
             (backward-kill-word 1))
-           ;; else
+           ;; else, compare point at beginning of line with prompt-start
            (t
-            (save-excursion
-              (haskell-interactive-mode-bol)
-              (setq bol-point (point)))
             (save-excursion
               (backward-word)
               (setq backward-word-point (point)))
-            (cond ((< backward-word-point bol-point)
+            ;; if backward-kill-word would take point behind prompt, kill to
+            ;; prompt-start, else fall back on backward-kill-word
+            (cond ((< backward-word-point haskell-interactive-mode-prompt-start)
                    (delete-char
                     (- haskell-interactive-mode-prompt-start (point))))
                   ((>= backward-word-point bol-point)
