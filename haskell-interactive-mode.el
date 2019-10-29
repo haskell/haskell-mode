@@ -188,7 +188,7 @@ be nil.")
            ;; if there's any non-whitespace between the prompt and point,
            ;; fall back on backward-kill-word
            ((string-match
-             "[^[:space:]]"
+             "[^[:space:]^[^M]]"
              (buffer-substring-no-properties
               haskell-interactive-mode-prompt-start
               (point)))
@@ -203,7 +203,7 @@ be nil.")
             (cond ((< backward-word-point haskell-interactive-mode-prompt-start)
                    (delete-char
                     (- haskell-interactive-mode-prompt-start (point))))
-                  ((>= backward-word-point bol-point)
+                  ((>= backward-word-point haskell-interactive-mode-prompt-start)
                    (backward-kill-word 1))))))))
 
 (defun haskell-interactive-switch-back ()
