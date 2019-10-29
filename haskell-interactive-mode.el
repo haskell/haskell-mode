@@ -188,7 +188,7 @@ be nil.")
            ;; if there's any non-whitespace between the prompt and point,
            ;; fall back on backward-kill-word
            ((string-match
-             "[^[:space:]^[^M]]"
+             "[^[:space:^M]]"
              (buffer-substring-no-properties
               haskell-interactive-mode-prompt-start
               (point)))
