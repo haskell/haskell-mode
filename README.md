@@ -35,8 +35,8 @@ Make sure you have this in your [init file](http://www.gnu.org/software/emacs/ma
  ;; If there is more than one, they won't work right.
  '(package-archives
    (quote
-    (("gnu" . "http://elpa.gnu.org/packages/")
-     ("melpa-stable" . "http://stable.melpa.org/packages/")))))
+    (("gnu" . "https://elpa.gnu.org/packages/")
+     ("melpa-stable" . "https://stable.melpa.org/packages/")))))
 (package-initialize)
 ```
 
