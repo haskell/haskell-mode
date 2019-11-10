@@ -736,6 +736,11 @@ Returns beginning position of qualified part or nil if no qualified part found."
 
 (defvar eldoc-print-current-symbol-info-function)
 
+(defun haskell-mode--inhibit-bracket-inside-comment-or-default (ch)
+  "An `electric-pair-mode' inhibit function for character CH."
+  (or (nth 4 (syntax-ppss))
+      (funcall #'electric-pair-default-inhibit ch)))
+
 ;; The main mode functions
 ;;;###autoload
 (define-derived-mode haskell-mode prog-mode "Haskell"
@@ -846,6 +851,11 @@ Minor modes that work well with `haskell-mode':
             'haskell-completions-completion-at-point
             nil
             t)
+
+  ;; Avoid Emacs 25 bug with electric-pair inside comments
+  (when (eq 25 emacs-major-version)
+    (setq-local electric-pair-inhibit-predicate 'haskell-mode--inhibit-bracket-inside-comment-or-default))
+
   (haskell-indentation-mode))
 
 (defcustom haskell-mode-hook '(haskell-indentation-mode interactive-haskell-mode)
