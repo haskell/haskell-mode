@@ -2075,7 +2075,7 @@ The output can be copied from the @code{*Messages*} buffer.
 
 There a few ways GHCi lets you query information about your code.
 
-@subsection Get identifer type
+@subsection Get identifier type
 
 To print the type of the top-level identifier at point in the REPL and
 in the message buffer, run the following command:

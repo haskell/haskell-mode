@@ -157,7 +157,7 @@ This is the dual operation to `haskell-string-literal-encode'."
 
 (defun haskell-string-ellipsize (string n)
   "Return STRING truncated to (at most) N characters.
-If truncation occured, last character in string is replaced by `…'.
+If truncation occurred, last character in string is replaced by `…'.
 See also `haskell-string-take'."
   (cond
    ((<= (length string) n) string) ;; no truncation needed
