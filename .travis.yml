@@ -1,8 +1,6 @@
 language: nix
 
 env:
-  - EMACS_CI=emacs-24-4 TARGET=check
-  - EMACS_CI=emacs-24-5 TARGET=check
   - EMACS_CI=emacs-25-1 TARGET=check
   - EMACS_CI=emacs-25-2 TARGET=check
   - EMACS_CI=emacs-25-3 TARGET=check
