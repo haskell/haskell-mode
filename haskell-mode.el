@@ -731,7 +731,8 @@ Returns beginning position of qualified part or nil if no qualified part found."
       pos)))
 
 (defun haskell-delete-indentation (&optional arg)
-  "Like `delete-indentation' but ignoring Bird-style \">\"."
+  "Like `delete-indentation' but ignoring Bird-style \">\".
+Prefix ARG is handled as per `delete-indentation'."
   (interactive "*P")
   (let ((fill-prefix (or fill-prefix (if (eq haskell-literate 'bird) ">"))))
     (delete-indentation arg)))
