@@ -146,6 +146,8 @@
 (require 'haskell-indentation)
 (require 'haskell-font-lock)
 (require 'haskell-cabal)
+(eval-when-compile
+  (require 'elec-pair))
 
 ;; All functions/variables start with `(literate-)haskell-'.
 
