@@ -146,8 +146,6 @@
 (require 'haskell-indentation)
 (require 'haskell-font-lock)
 (require 'haskell-cabal)
-(eval-when-compile
-  (require 'elec-pair))
 
 ;; All functions/variables start with `(literate-)haskell-'.
 
@@ -739,6 +737,7 @@ Prefix ARG is handled as per `delete-indentation'."
 
 (defvar eldoc-print-current-symbol-info-function)
 
+(defvar electric-pair-inhibit-predicate)
 (defun haskell-mode--inhibit-bracket-inside-comment-or-default (ch)
   "An `electric-pair-mode' inhibit function for character CH."
   (or (nth 4 (syntax-ppss))
