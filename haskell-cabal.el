@@ -924,7 +924,7 @@ resulting buffer-content.  Unmark line at the end."
 (defun haskell-cabal-line-filename ()
   "Expand filename in current line according to the subsection type
 
-Module names in exposed-modules and other-modules are expanded by replacing each dot (.) in the module name with a foward slash (/) and appending \".hs\"
+Module names in exposed-modules and other-modules are expanded by replacing each dot (.) in the module name with a forward slash (/) and appending \".hs\"
 
 Example: Foo.Bar.Quux ==> Foo/Bar/Quux.hs
 

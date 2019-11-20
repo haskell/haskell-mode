@@ -42,7 +42,7 @@ This file uses Org mode. Some useful (default) key-bindings:
 
 - Added support for full complexity of backtick syntax
 
-- Operators at the end or beggining of line force expression continuation in indentation
+- Operators at the end or beginning of line force expression continuation in indentation
 
 - Map haskell-mode-format-imports to C-c C-, to avoid conflict with haskell-indent
 

@@ -132,7 +132,7 @@ in this list.")
 (defun haskell-completions-can-grab-prefix ()
   "Check if the case is appropriate for grabbing completion prefix.
 Returns t if point is either at whitespace character, or at
-punctuation, or at line end and preceeding character is not a
+punctuation, or at line end and preceding character is not a
 whitespace or new line, otherwise returns nil.
 
   Returns nil in presence of active region."
@@ -253,7 +253,7 @@ identifier at point depending on result of function
                          t)
                     ;; but uppercase ident could occur after `as` keyword, or in
                     ;; module imports after opening parenthesis, in this case
-                    ;; restore identifier type again, it's neccessary to
+                    ;; restore identifier type again, it's necessary to
                     ;; distinguish the means of completions retrieval
                     (setq type 'haskell-completions-identifier-prefix))))))
           (when (nth 8 (syntax-ppss))

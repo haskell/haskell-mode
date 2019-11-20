@@ -372,7 +372,7 @@ and indent when all of the following are true:
 ;; When the scope of this function ends, the variable is automatically
 ;; reverted to its old value.
 
-;; This is basicly a performance hack.  It would have been possible to
+;; This is basically a performance hack.  It would have been possible to
 ;; thread this state using a association-list through the parsers, but it
 ;; would be probably more complicated and slower due to the lack of real
 ;; closures in Emacs Lisp.

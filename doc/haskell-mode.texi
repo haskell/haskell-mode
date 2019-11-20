@@ -434,7 +434,7 @@ completion candidates from completion-at-point function
 (@code{company-capf} backend) and dynamic abbrevs.
 @code{company-mode} provides special backend for dabbrev code
 completions, namely @code{company-dabbrev-code}.  To combine
-completions from diffrent backends you can create grouped backends, it
+completions from different backends you can create grouped backends, it
 is very easy — a grouped backend is just a list of backends, for
 example:
 
@@ -1246,7 +1246,7 @@ Separate sessions per Cabal project @file{haskell-session.el}.
 @item
 A new inferior Haskell process handling code @file{haskell-process.el}.
 @item
-New REPL implementation similiar to SLIME/IELM
+New REPL implementation similar to SLIME/IELM
 @item
 Navigatable error overlays
 @file{haskell-interactive-mode.el}.
@@ -2172,7 +2172,7 @@ The most common Cabal action is building, so that has a specific command:
     M-x haskell-process-cabal-build
 @end example
 
-Or @kbd{C-c C-c}. When building, it will hide unneccessary output.
+Or @kbd{C-c C-c}. When building, it will hide unnecessary output.
 
 For example, to build the `ace` package, the output is simply:
 
