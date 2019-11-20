@@ -97,7 +97,7 @@ buffer, point was not moved, etc.  To collect data `post-command-hook' is used."
   "Clean up after async operation finished.
 This function takes care about cleaning up things made by
 `haskell-utils-async-watch-changes'.  The BUFFER argument is a buffer where
-`post-command-hook' should be disabled.  This is neccessary, because
+`post-command-hook' should be disabled.  This is necessary, because
 it is possible that user will change buffer during async function
 execusion."
   (with-current-buffer buffer
@@ -145,7 +145,7 @@ Returns one of the following symbols:
          ((string-match-p "^<interactive>:" first-line)
           'interactive-error)
          (t 'no-error)))
-    ;; in case of nil-ish reponse it's not clear is it error response or not
+    ;; in case of nil-ish response it's not clear is it error response or not
     'no-error))
 
 (defun haskell-utils-compose-type-at-command (pos)
@@ -167,7 +167,7 @@ expression bounds."
       (setq end-l (line-number-at-pos))
       (setq end-c (1+ (current-column)))
       (setq value (buffer-substring-no-properties start-p end-p))
-      ;; supress multiline expressions
+      ;; suppress multiline expressions
       (let ((lines (split-string value "\n" t)))
         (when (and (cdr lines)
                    (stringp (car lines)))

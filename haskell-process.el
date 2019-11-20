@@ -324,7 +324,7 @@ Returns NIL when no completions found."
           (let ((cnt1 (match-string 1 h0))
                 (h1 (haskell-string-literal-decode (match-string 3 h0))))
             (unless (= (string-to-number cnt1) (length cs))
-              (error "Lengths inconsistent in `:complete' reponse"))
+              (error "Lengths inconsistent in `:complete' response"))
             (cons h1 cs)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -172,7 +172,7 @@ See also `haskell-string-take'."
   str)
 
 (defun haskell-string-split-to-lines (str)
-  "Split STR to lines and return a list of strings with preceeding and
+  "Split STR to lines and return a list of strings with preceding and
 succeding space removed."
   (when (stringp str)
     (cl-mapcar #'haskell-string-chomp (split-string str "\n"))))

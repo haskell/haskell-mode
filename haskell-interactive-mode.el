@@ -48,7 +48,7 @@
   "Mark used for the old beginning of the prompt.")
 
 (defun haskell-interactive-prompt-regex ()
-  "Generate a regex for searching for any occurence of the prompt\
+  "Generate a regex for searching for any occurrence of the prompt\
 at the beginning of the line.  This should prevent any
 interference with prompts that look like haskell expressions."
   (concat "^" (regexp-quote haskell-interactive-prompt)))
@@ -104,7 +104,7 @@ Key bindings:
 (defvar haskell-interactive-mode-result-end
   nil
   "Mark used to figure out where the end of the current result output is.
-Used to distinguish betwen user input.")
+Used to distinguish between user input.")
 
 (defvar-local haskell-interactive-previous-buffer nil
   "Records the buffer to which `haskell-interactive-switch-back' should jump.
