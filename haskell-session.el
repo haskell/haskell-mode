@@ -27,6 +27,8 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
+
 (require 'cl-lib)
 (require 'haskell-cabal)
 (require 'haskell-customize)
@@ -181,7 +183,7 @@ HISTORY provides the history to `completing-read'."
 (defun haskell-session-get-targets (process-type)
   "Return a list of available targets."
   (case process-type
-    ('stack-ghci
+    (stack-ghci
      (haskell-session-get-targets-command haskell-process-path-stack "ide" "targets"))
     (t
      (haskell-cabal-enum-targets (haskell-process-type)))))
