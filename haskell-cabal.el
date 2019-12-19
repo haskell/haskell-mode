@@ -140,7 +140,7 @@ it from list if one of the following conditions are hold:
   (haskell-cabal-buffers-clean (current-buffer)))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.cabal\\'\\|/cabal.project\\|/\\.cabal/config\\'" . haskell-cabal-mode))
+(add-to-list 'auto-mode-alist '("\\.cabal\\'\\|/cabal\\.project\\|/\\.cabal/config\\'" . haskell-cabal-mode))
 
 (defvar haskell-cabal-mode-map
   (let ((map (make-sparse-keymap)))
