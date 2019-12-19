@@ -102,12 +102,14 @@ By default these are:
   '(("^[ \t]*--.*" . font-lock-comment-face)
     ("^ *\\([^ \t:]+\\):" (1 font-lock-keyword-face))
     ("^\\(Library\\)[ \t]*\\({\\|$\\)" (1 font-lock-keyword-face))
-    ("^\\(Executable\\|Test-Suite\\|Benchmark\\|Common\\)[ \t]+\\([^\n \t]*\\)"
+    ("^\\(Executable\\|Test-Suite\\|Benchmark\\|Common\\|package\\)[ \t]+\\([^\n \t]*\\)"
      (1 font-lock-keyword-face) (2 font-lock-function-name-face))
-    ("^\\(Flag\\)[ \t]+\\([^\n \t]*\\)"
+    ("^\\(Flag\\|install-dirs\\|repository\\)[ \t]+\\([^\n \t]*\\)"
      (1 font-lock-keyword-face) (2 font-lock-constant-face))
     ("^\\(Source-Repository\\)[ \t]+\\(head\\|this\\)"
      (1 font-lock-keyword-face) (2 font-lock-constant-face))
+    ("^\\(haddock\\|source-repository-package\\|program-locations\\|program-default-options\\)\\([ \t]\\|$\\)"
+     (1 font-lock-keyword-face))
     ("^ *\\(if\\)[ \t]+.*\\({\\|$\\)" (1 font-lock-keyword-face))
     ("^ *\\(}[ \t]*\\)?\\(else\\)[ \t]*\\({\\|$\\)"
      (2 font-lock-keyword-face))
@@ -138,7 +140,7 @@ it from list if one of the following conditions are hold:
   (haskell-cabal-buffers-clean (current-buffer)))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.cabal\\'" . haskell-cabal-mode))
+(add-to-list 'auto-mode-alist '("\\.cabal\\'\\|/cabal\\.project\\|/\\.cabal/config\\'" . haskell-cabal-mode))
 
 (defvar haskell-cabal-mode-map
   (let ((map (make-sparse-keymap)))
