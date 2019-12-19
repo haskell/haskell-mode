@@ -136,7 +136,7 @@ be nil.")
   :group 'haskell-interactive)
 
 ;;;###autoload
-(define-obsolete-face-alias 'haskell-interactive-face-prompt2 'haskell-interactive-face-prompt-cont)
+(define-obsolete-face-alias 'haskell-interactive-face-prompt2 'haskell-interactive-face-prompt-cont "16.2")
 
 ;;;###autoload
 (defface haskell-interactive-face-compile-error
