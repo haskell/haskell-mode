@@ -130,10 +130,13 @@ be nil.")
   :group 'haskell-interactive)
 
 ;;;###autoload
-(defface haskell-interactive-face-prompt2
+(defface haskell-interactive-face-prompt-cont
   '((t :inherit font-lock-keyword-face))
-  "Face for the prompt2 in multi-line mode."
+  "Face for GHCi's prompt-cont in multi-line mode."
   :group 'haskell-interactive)
+
+;;;###autoload
+(define-obsolete-face-alias 'haskell-interactive-face-prompt2 'haskell-interactive-face-prompt-cont)
 
 ;;;###autoload
 (defface haskell-interactive-face-compile-error
@@ -266,7 +269,7 @@ do the
               ":{\n"
               (mapconcat #'identity lines "\n")
               "\n:}\n"
-              (format ":set prompt2 \"%s\"" haskell-interactive-prompt2)))))
+              (format ":set prompt-cont \"%s\"" haskell-interactive-prompt-cont)))))
 
 (defun haskell-interactive-mode-line-is-query (line)
   "Is LINE actually a :t/:k/:i?"
@@ -330,10 +333,10 @@ SESSION, otherwise operate on the current buffer."
                                  'result t)))
       (save-excursion
         (goto-char (point-max))
-        (when (string= text haskell-interactive-prompt2)
+        (when (string= text haskell-interactive-prompt-cont)
           (setq prop-text
                 (propertize prop-text
-                            'font-lock-face 'haskell-interactive-face-prompt2
+                            'font-lock-face 'haskell-interactive-face-prompt-cont
                             'read-only haskell-interactive-prompt-read-only)))
         (insert (ansi-color-apply prop-text))
         (haskell-interactive-mode-handle-h)

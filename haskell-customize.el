@@ -332,14 +332,16 @@ ambiguous class constraint."
   :type 'string
   :group 'haskell-interactive)
 
-(defcustom haskell-interactive-prompt2 (replace-regexp-in-string
-                                        "> $"
-                                        "| "
-                                        haskell-interactive-prompt)
+(defcustom haskell-interactive-prompt-cont (replace-regexp-in-string
+                                            "> $"
+                                            "| "
+                                            haskell-interactive-prompt)
   "The multi-line prompt to use.
 The default is `haskell-interactive-prompt' with the last > replaced with |."
   :type 'string
   :group 'haskell-interactive)
+
+(define-obsolete-variable-alias 'haskell-interactive-prompt2 'haskell-interactive-prompt-cont)
 
 (defcustom haskell-interactive-mode-eval-mode
   nil
