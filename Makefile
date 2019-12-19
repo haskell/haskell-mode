@@ -23,13 +23,13 @@ INSTALL_INFO = install-info
 #
 # This is particularly useful when EMACS is set in ~/.bash_profile
 #
-EMACS := $(shell which "$${EMACS}" 2> /dev/null || which "emacs" 2> /dev/null)
+EMACS ?= emacs
 EMACS_VERSION := $(shell "$(EMACS)" -Q --batch --eval '(princ emacs-version)')
 
 EFLAGS = --eval "(add-to-list 'load-path (expand-file-name \"tests/compat\") 'append)" \
 	 --eval "(when (boundp 'load-prefer-newer) (setq load-prefer-newer t))"
 
-BATCH = @echo EMACS $@; $(EMACS) $(EFLAGS) --batch -Q -L .
+BATCH = @echo EMACS $@; "$(EMACS)" $(EFLAGS) --batch -Q -L .
 
 ELFILES := $(filter-out haskell-mode-autoloads.el haskell-mode-pkg.el,$(wildcard *.el))
 
