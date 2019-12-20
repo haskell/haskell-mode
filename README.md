@@ -130,10 +130,3 @@ contributing to `haskell-mode`.
 [the wiki page on contributing](https://github.com/haskell/haskell-mode/wiki/Contributing).
 
 
-## Getting in contact
-
-- [Mailing list](http://projects.haskell.org/cgi-bin/mailman/listinfo/haskellmode-emacs)
-- [Github homepage](https://github.com/haskell/haskell-mode)
-- IRC: #haskell-emacs on irc.freenode.net
-
-Have fun!
