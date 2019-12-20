@@ -1,5 +1,4 @@
-;;; -*- lexical-binding: t -*-
-;;; w3m-haddock.el --- Make browsing haddocks with w3m-mode better.
+;;; w3m-haddock.el --- Make browsing haddocks with w3m-mode better  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014 Chris Done
 
@@ -21,6 +20,10 @@
 ;; along with GNU Emacs; see the file COPYING.  If not, write to
 ;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
+
+;;; Commentary:
+
+;;; Code:
 
 (require 'cl-lib)
 (require 'haskell-mode)
@@ -188,3 +191,4 @@ You can rebind this if you're using hsenv by adding it to your
   (search-forward-regexp "\n[ \n]"))
 
 (provide 'w3m-haddock)
+;;; w3m-haddock.el ends here
