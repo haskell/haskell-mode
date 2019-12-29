@@ -27,7 +27,6 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'haskell-compat)
 (require 'haskell-lexeme)
 (require 'font-lock)
 

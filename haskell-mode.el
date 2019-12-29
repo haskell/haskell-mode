@@ -138,7 +138,6 @@
 (require 'cl-lib)
 (require 'haskell-ghc-support)
 (require 'haskell-complete-module)
-(require 'haskell-compat)
 (require 'haskell-align-imports)
 (require 'haskell-lexeme)
 (require 'haskell-sort-imports)

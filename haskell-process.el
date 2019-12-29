@@ -26,7 +26,6 @@
 (require 'cl-lib)
 (require 'json)
 (require 'url-util)
-(require 'haskell-compat)
 (require 'haskell-session)
 (require 'haskell-customize)
 (require 'haskell-string)

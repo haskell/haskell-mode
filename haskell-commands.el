@@ -27,7 +27,6 @@
 (require 'cl-lib)
 (require 'etags)
 (require 'haskell-mode)
-(require 'haskell-compat)
 (require 'haskell-process)
 (require 'haskell-font-lock)
 (require 'haskell-interactive-mode)

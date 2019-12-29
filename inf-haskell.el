@@ -33,7 +33,6 @@
 (require 'comint)
 (require 'shell)             ; For directory tracking.
 (require 'etags)
-(require 'haskell-compat)
 (require 'compile)
 (require 'haskell-decl-scan)
 (require 'haskell-cabal)
