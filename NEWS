@@ -6,6 +6,14 @@ This file uses Org mode. Some useful (default) key-bindings:
  - Use "<backtab>" to cycle visibility of all nodes
  - Use "C-c C-o" to open links
 
+* Changes in 17.1
+
+- Require at least Emacs 25.1
+
+- Many fixes and minor improvements
+
+- Improved compatibility with newer GHC and Cabal versions
+
 * Changes in 16.1
 
 - Require at least Emacs 24.3
