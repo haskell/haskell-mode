@@ -4,17 +4,13 @@
 (require 'haskell-font-lock)
 (require 'haskell-mode)
 
-;; Emacs 24.3 has sql-mode that runs without a product and therefore
-;; without font lock initially and needs to be extra enabled
-(add-hook 'sql-mode-hook (lambda () (sql-set-product 'ansi)))
-
 (ert-deftest haskell-syntactic-test-1 ()
   "Simple keywords fontified"
   (check-properties
-    '("module Test where")
-    '(("module" "w" haskell-keyword-face)
-      ("Test" "w" haskell-constructor-face)
-      ("where" "w" haskell-keyword-face))))
+   '("module Test where")
+   '(("module" "w" haskell-keyword-face)
+     ("Test" "w" haskell-constructor-face)
+     ("where" "w" haskell-keyword-face))))
 
 (ert-deftest haskell-syntactic-test-4 ()
   "Apostrophe as part of a contructor token."

@@ -13,9 +13,7 @@ function checks if officially released versions still compile."
         ;; where to install temporary packages
         (package-user-dir (concat command-line-default-directory "/external/elpa"))
         ;; use haskell-mode directly from sources, it takes priority
-        ;; over haskell-mode in packages. note that this works from
-        ;; Emacs 24.4 onward, there is something wrong about this
-        ;; variable in Emacs 24.3
+        ;; over haskell-mode in packages.
         (package-directory-list (list command-line-default-directory))
         ;; packages depending on haskell-mode are in melpa
         (package-archives (cons '("melpa" . "http://melpa.milkbox.net/packages/") package-archives)))
