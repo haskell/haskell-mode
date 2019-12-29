@@ -332,6 +332,8 @@ ambiguous class constraint."
   :type 'string
   :group 'haskell-interactive)
 
+(define-obsolete-variable-alias 'haskell-interactive-prompt2 'haskell-interactive-prompt-cont "17.1")
+
 (defcustom haskell-interactive-prompt-cont (replace-regexp-in-string
                                             "> $"
                                             "| "
@@ -340,8 +342,6 @@ ambiguous class constraint."
 The default is `haskell-interactive-prompt' with the last > replaced with |."
   :type 'string
   :group 'haskell-interactive)
-
-(define-obsolete-variable-alias 'haskell-interactive-prompt2 'haskell-interactive-prompt-cont "16.2")
 
 (defcustom haskell-interactive-mode-eval-mode
   nil
