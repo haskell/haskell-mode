@@ -26,8 +26,7 @@ INSTALL_INFO = install-info
 EMACS ?= emacs
 EMACS_VERSION := $(shell "$(EMACS)" -Q --batch --eval '(princ emacs-version)')
 
-EFLAGS = --eval "(add-to-list 'load-path (expand-file-name \"tests/compat\") 'append)" \
-	 --eval "(when (boundp 'load-prefer-newer) (setq load-prefer-newer t))"
+EFLAGS = --eval "(when (boundp 'load-prefer-newer) (setq load-prefer-newer t))"
 
 BATCH = @echo EMACS $@; "$(EMACS)" $(EFLAGS) --batch -Q -L .
 
