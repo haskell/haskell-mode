@@ -12,7 +12,6 @@
 ;;          2003      Dave Love <fx@gnu.org>
 ;;          2016      Arthur Fayzrakhmanov
 ;; Keywords: faces files Haskell
-;; Version: 16.2-git
 ;; URL: https://github.com/haskell/haskell-mode
 
 ;; This file is not part of GNU Emacs.
