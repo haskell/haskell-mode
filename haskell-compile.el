@@ -200,7 +200,7 @@ base directory for build tools, or the current buffer for
   (let* ((default (or (symbol-value last-sym) fallback))
          (template (cond
                     ((null edit) default)
-                    ((< edit 0) alt)
+                    ((eq edit '-) alt)
                     (t (compilation-read-command default))))
          (command (format template dir-or-file))
          (dir (if (directory-name-p dir-or-file)
