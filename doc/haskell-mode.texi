@@ -1255,15 +1255,9 @@ associate with.
 In a Haskell source buffer associated with a GHCi session, errors that
 prevent the file from loading are highlighted with
 @code{haskell-error-face}.  You can move between these error lines with
-
-@table @kbd
-@item M-n
-is bound to @code{haskell-goto-next-error}
-@item M-p
-is bound to @code{haskell-goto-prev-error}
-@item C-c M-p
-is bound to @code{haskell-goto-first-error}
-@end table
+with the commands @code{haskell-goto-next-error}, @code{haskell-goto-prev-error}
+and @code{haskell-goto-first-error}, which you might like to bind to
+convenient keys in @code{interactive-haskell-mode-map}.
 
 @section Using GHCi 8+ or GHCi-ng
 
