@@ -464,7 +464,7 @@ be set to the preferred literate style."
 
     (modify-syntax-entry ?\{  "(}1nb" table)
     (modify-syntax-entry ?\}  "){4nb" table)
-    (modify-syntax-entry ?-  ". 123" table)
+    (modify-syntax-entry ?-  "< 123" table)
     (modify-syntax-entry ?\n ">" table)
 
     (modify-syntax-entry ?\` "$`" table)
