@@ -63,7 +63,7 @@ interpreter (e.g. GHCi).
 * Unicode support::                      How to use Unicode
 * Indentation::                          Notes about indentation
 * External indentation::                 Other ways to indent code
-* Autoformating::                        Using external formatters
+* Autoformatting::                       Using external formatters
 * Module templates::                     Module templates
 * Declaration scanning::                 How to navigate in a source file
 * Compilation::                          How to compile
@@ -902,7 +902,7 @@ Another alternative is to install
 which indents code by parsing the code with a full Haskell parser and
 deciding where to indent based on that.
 
-@node Autoformating
+@node Autoformatting
 @chapter Using external formatters
 
 You can enable @uref{https://github.com/jaspervdj/stylish-haskell,stylish-haskell} by
