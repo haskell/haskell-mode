@@ -373,6 +373,7 @@ names according to Template Haskell specification."
   (let ((match-data-old (match-data)))
     (if (and
          (looking-at (rx-to-string `(: "[" (optional "$")
+                                       (regexp ,haskell-lexeme-modid-opt-prefix)
                                        (group (regexp ,haskell-lexeme-id))
                                        (group "|"))))
          (equal (haskell-lexeme-classify-by-first-char (char-after (match-beginning 1)))
