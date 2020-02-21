@@ -28,6 +28,7 @@
 
 (require 'cl-lib)
 (require 'haskell-lexeme)
+(require 'haskell-string)
 (require 'font-lock)
 
 ;;;###autoload
@@ -539,7 +540,8 @@ on an uppercase identifier."
                         (goto-char (nth 8 state))
                         (skip-syntax-backward "w._")
                         (buffer-substring-no-properties (point) (nth 8 state))))
-               (lang-mode (cdr (assoc qqname haskell-font-lock-quasi-quote-modes))))
+               (lang-mode (cdr (assoc (haskell-string-drop-qualifier qqname)
+                                      haskell-font-lock-quasi-quote-modes))))
 
           (if (and lang-mode
                    (fboundp lang-mode))

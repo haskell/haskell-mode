@@ -292,6 +292,26 @@ buffer."
    "[xml| <xml />"
    '("[xml| <xml />")))
 
+(ert-deftest haskell-lexeme-quasi-quote-qual-1 ()
+  (check-lexemes
+   '("[Mod.xml| <xml /> |]")
+   '("[Mod.xml| <xml /> |]")))
+
+(ert-deftest haskell-lexeme-quasi-quote-qual-2 ()
+  (check-lexemes
+   '("[Mod.xml| <xml /> |] |]")
+   '("[Mod.xml| <xml /> |]" "|" "]")))
+
+(ert-deftest haskell-lexeme-quasi-quote-qual-3 ()
+  (check-lexemes
+   "[Mod.xml| <xml /> |"
+   '("[Mod.xml| <xml /> |")))
+
+(ert-deftest haskell-lexeme-quasi-quote-qual-4 ()
+  (check-lexemes
+   "[Mod.xml| <xml />"
+   '("[Mod.xml| <xml />")))
+
 (ert-deftest haskell-lexeme-literate-1 ()
   (check-lexemes
    '("no code"

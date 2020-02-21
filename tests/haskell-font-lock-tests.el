@@ -471,6 +471,15 @@
    '(("Title" t default)
      ("Books" t default))))
 
+(ert-deftest haskell-syntactic-test-quasiquoter-sql-3 ()
+  "Embedded SQL statements"
+  (check-properties
+   '("sql = [Mod.sql| SELECT title FROM books; |]")
+   '(("SELECT" t font-lock-keyword-face)
+     ("title" t default)
+     ("FROM" t font-lock-keyword-face)
+     ("books" t default))))
+
 
 (ert-deftest haskell-syntactic-test-special-not-redefined ()
   "QuasiQuote should not conflict with TemplateHaskell"
