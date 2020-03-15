@@ -39,8 +39,7 @@
            (optional (group "qualified" space))
            (optional (seq (* space) (group (char ?\") (+ (not (any ?\"))) (char ?\") space)))
            (* space)
-           (group (+? (or (syntax word) (syntax symbol))))
-           (* nonl))))
+           (group (+? (or (syntax word) (syntax symbol))) (* nonl)))))
 
 ;;;###autoload
 (defun haskell-sort-imports ()
