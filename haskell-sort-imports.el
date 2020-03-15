@@ -37,9 +37,9 @@
            "import"
            (+ space)
            (optional (group "qualified" space))
-           (optional (seq (* space) (group (char ?\?) (+ (not (any ?\"))) (char ?\?) space)))
+           (optional (seq (* space) (group (char ?\") (+ (not (any ?\"))) (char ?\") space)))
            (* space)
-           (group (+? (syntax symbol)))
+           (group (+? (or (syntax word) (syntax symbol))))
            (* nonl))))
 
 ;;;###autoload
