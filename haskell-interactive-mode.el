@@ -778,7 +778,7 @@ Will automatically import it qualified as Present."
                           (mapconcat 'identity (mapcar 'number-to-string id) ",")
                           hash)))
            (reply
-            (if (string-match "^*** " text)
+            (if (string-prefix-p "*** " text)
                 '((rep nil))
               (read text))))
       ;; Not necessary, but nice to restore it to the expression that
