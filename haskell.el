@@ -131,7 +131,6 @@
 ;;;###autoload
 (defun haskell-session-kill (&optional leave-interactive-buffer)
   "Kill the session process and buffer, delete the session.
-0. Prompt to kill all associated buffers.
 1. Kill the process.
 2. Kill the interactive buffer unless LEAVE-INTERACTIVE-BUFFER is not given.
 3. Walk through all the related buffers and set their haskell-session to nil.
@@ -140,12 +139,7 @@
   (haskell-mode-toggle-interactive-prompt-state)
   (unwind-protect
       (let* ((session (haskell-session))
-             (name (haskell-session-name session))
-             (also-kill-buffers
-              (and haskell-ask-also-kill-buffers
-                   (y-or-n-p
-                    (format "Killing `%s'. Also kill all associated buffers?"
-                            name)))))
+             (name (haskell-session-name session)))
         (haskell-kill-session-process session)
         (unless leave-interactive-buffer
           (kill-buffer (haskell-session-interactive-buffer session)))
@@ -154,15 +148,17 @@
                       (when (and (boundp 'haskell-session)
                                  (string= (haskell-session-name haskell-session)
                                           name))
-                        (setq haskell-session nil)
-                        (when also-kill-buffers
-                          (kill-buffer)))))
+                        (setq haskell-session nil))))
         (setq haskell-sessions
               (cl-remove-if (lambda (session)
                               (string= (haskell-session-name session)
                                        name))
-                            haskell-sessions)))
+                            haskell-sessions))
+        (run-hooks 'haskell-session-kill-hook))
     (haskell-mode-toggle-interactive-prompt-state t)))
+
+
+
 
 ;;;###autoload
 (defun haskell-interactive-kill ()
@@ -173,12 +169,12 @@
     (unwind-protect
         (when (and (boundp 'haskell-session)
                    haskell-session
-                   (y-or-n-p "Kill the whole session?"))
+                   (y-or-n-p "Kill the whole session? "))
           (haskell-session-kill t)))
     (haskell-mode-toggle-interactive-prompt-state t)))
 
 (defun haskell-session-make (name)
-  "Make a Haskell session."
+  "Make a Haskell session called NAME."
   (when (haskell-session-lookup name)
     (error "Session of name %s already exists!" name))
   (let ((session (setq haskell-session

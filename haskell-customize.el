@@ -91,12 +91,11 @@ a per-project basis."
           (function-item :tag "None" :value identity)
           (function :tag "Custom function")))
 
-(defcustom haskell-ask-also-kill-buffers
-  t
-  "Ask whether to kill all associated buffers when a session
- process is killed."
-  :type 'boolean
-  :group 'haskell-interactive)
+(defcustom haskell-session-kill-hook nil
+  "Hook called when the interactive session is killed.
+You might like to call `projectile-kill-buffers' here."
+  :group 'haskell-interactive
+  :type 'hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configuration

@@ -1533,9 +1533,6 @@ To kill a session you can run
     M-x haskell-session-kill
 @end example
 
-Which will prompt to kill all associated buffers, too. Hit `n` to
-retain them.
-
 Alternatively, you can switch to the REPL and just kill the buffer
 normally with @kbd{C-x k RET}. It will prompt
 
@@ -1546,6 +1543,9 @@ normally with @kbd{C-x k RET}. It will prompt
 You can choose @kbd{y} to kill the session itself, or @kbd{n} to just
 kill the REPL buffer. You can bring it back with @kbd{M-x}
 @code{haskell-interactive-bring}.
+
+If you would like to be prompted to kill the associated buffers, you can
+add @code{projectile-kill-buffers} to @code{haskell-kill-session-hook}.
 
 @subsection Menu
 
