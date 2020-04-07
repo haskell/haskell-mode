@@ -569,11 +569,11 @@ Cabal file is selected using SESSION's name, module matching is done in MSG."
     (haskell-mode-toggle-interactive-prompt-state)
     (unwind-protect
         (when (y-or-n-p
-               (format "Add `%s' to %s?"
+               (format "Add `%s' to %s? "
                        package-name
                        cabal-file))
           (haskell-cabal-add-dependency package-name version nil t)
-          (when (y-or-n-p (format "Enable -package %s in the GHCi session?" package-name))
+          (when (y-or-n-p (format "Enable -package %s in the GHCi session? " package-name))
             (haskell-process-queue-without-filters
              (haskell-session-process session)
              (format ":set -package %s" package-name))))
