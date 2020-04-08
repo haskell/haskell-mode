@@ -42,7 +42,7 @@ INIT_PACKAGES="(progn \
   (require 'package) \
   (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) \
   (package-initialize) \
-  (dolist (pkg '(package-lint relint)) \
+  (dolist (pkg '(package-lint)) \
     (unless (package-installed-p pkg) \
       (unless (assoc pkg package-archive-contents) \
         (package-refresh-contents)) \
@@ -98,12 +98,9 @@ check-ert: $(ELCHECKS)
                  -f ert-run-tests-batch-and-exit
 	@echo "checks passed!"
 
+# TODO: fix issues, then enforce build failure if this fails
 check-package-lint:
-	# TODO: fix issues, then enforce build failure if this fails
 	$(BATCH) --eval $(INIT_PACKAGES) --eval '(setq package-lint-main-file "haskell-mode-pkg.el")' -f package-lint-batch-and-exit $(ELFILES) || true
-
-check-relint:
-	$(BATCH) --eval $(INIT_PACKAGES) -f relint-batch $(ELFILES)
 
 clean:
 	$(RM) -r build-$(EMACS_VERSION) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) haskell-mode.info dir
