@@ -220,7 +220,7 @@ any function to the list.
 Haskell Mode as one of its components provides a major mode for editing
 Haskell source code called @code{haskell-mode}, which gave the name to
 the whole project. There is a derived mode provided called
-@code{literate-haskell-mode} that support Literate Haskell source code
+@code{haskell-literate-mode} that support Literate Haskell source code
 both in Bird and in Latex forms.
 
 Haskell Mode supports files with the following extensions:
@@ -2603,19 +2603,19 @@ about Haskell. Once you evaluate this, you can just use @kbd{M-x}
 (add-to-list 'align-rules-list
              '(haskell-types
                (regexp . "\\(\\s-+\\)\\(::\\|∷\\)\\s-+")
-               (modes quote (haskell-mode literate-haskell-mode))))
+               (modes quote (haskell-mode haskell-literate-mode))))
 (add-to-list 'align-rules-list
              '(haskell-assignment
                (regexp . "\\(\\s-+\\)=\\s-+")
-               (modes quote (haskell-mode literate-haskell-mode))))
+               (modes quote (haskell-mode haskell-literate-mode))))
 (add-to-list 'align-rules-list
              '(haskell-arrows
                (regexp . "\\(\\s-+\\)\\(->\\|→\\)\\s-+")
-               (modes quote (haskell-mode literate-haskell-mode))))
+               (modes quote (haskell-mode haskell-literate-mode))))
 (add-to-list 'align-rules-list
              '(haskell-left-arrows
                (regexp . "\\(\\s-+\\)\\(<-\\|←\\)\\s-+")
-               (modes quote (haskell-mode literate-haskell-mode))))
+               (modes quote (haskell-mode haskell-literate-mode))))
 @end lisp
 
 @node Rectangular commands

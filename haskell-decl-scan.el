@@ -658,7 +658,7 @@ declaration.  Therefore, using Haskell font locking with comments
 coloured in `font-lock-comment-face' improves declaration scanning.
 
 Literate Haskell scripts are supported: If the value of
-`haskell-literate' (set automatically by `literate-haskell-mode')
+`haskell-literate' (set automatically by `haskell-literate-mode')
 is `bird', a Bird-style literate script is assumed.  If it is nil
 or `tex', a non-literate or LaTeX-style literate script is
 assumed, respectively.

@@ -23,7 +23,7 @@ order."
     ;; Note that all of this should work both in haskell-mode and
     ;; outside of it. Currently we test only haskell-mode setup.
     (if literate
-        (literate-haskell-mode)
+        (haskell-literate-mode)
       (haskell-mode))
 
     (if (consp lines-or-contents)
@@ -70,7 +70,7 @@ buffer."
     ;; Note that all of this should work both in haskell-mode and
     ;; outside of it. Currently we test only haskell-mode setup.
     (if literate
-        (literate-haskell-mode)
+        (haskell-literate-mode)
       (haskell-mode))
 
     (font-lock-fontify-buffer)

@@ -553,7 +553,7 @@
      ("Comment2" t haskell-literate-comment-face)
      ("code3" t haskell-definition-face)
      ("Comment3" t haskell-literate-comment-face))
-   'literate-haskell-mode))
+   'haskell-literate-mode))
 
 (ert-deftest haskell-literate-bird-2 ()
   ;; Haskell Report requires empty line before bird code block. So it
@@ -575,7 +575,7 @@
      ("Comment2" t haskell-literate-comment-face)
      ("code3" t haskell-definition-face)
      ("Comment3" t haskell-literate-comment-face))
-   'literate-haskell-mode))
+   'haskell-literate-mode))
 
 (ert-deftest haskell-literate-latex-1 ()
   (check-properties
@@ -597,7 +597,7 @@
      ("Comment2" t haskell-literate-comment-face)
      ("code3" t haskell-definition-face)
      ("Comment3" t haskell-literate-comment-face))
-   'literate-haskell-mode))
+   'haskell-literate-mode))
 
 (ert-deftest haskell-literate-mixed-1 ()
   ;; Although Haskell Report does not advice mixing modes, it is a
@@ -620,7 +620,7 @@
      ("Comment2" t haskell-literate-comment-face)
      ("code3" t haskell-definition-face)
      ("Comment3" t haskell-literate-comment-face))
-   'literate-haskell-mode))
+   'haskell-literate-mode))
 
 (ert-deftest haskell-type-instance ()
   "Fontify \"instance\" after \"type\""
