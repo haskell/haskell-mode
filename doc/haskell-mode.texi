@@ -2665,11 +2665,10 @@ out what keys are bound beginning with the @kbd{C-x r} prefix.
 @node REPL
 @chapter Using GHCi REPL within Emacs
 
-To start the REPL you can run one of the following:
+To start the REPL you can run the following:
 
 @itemize
 @item @kbd{M-x run-haskell}
-@item @kbd{M-x switch-to-haskell}
 @end itemize
 
 This repl works with @uref{https://www.emacswiki.org/emacs/ComintMode, Comint}.

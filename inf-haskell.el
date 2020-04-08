@@ -188,9 +188,7 @@ setting up the inferior-haskell buffer."
            (inferior-haskell-process))))
 
 ;;;###autoload
-(defalias 'run-haskell 'switch-to-haskell)
-;;;###autoload
-(defun switch-to-haskell ()
+(defun run-haskell ()
   "Show the inferior-haskell buffer.  Start the process if needed."
   (interactive)
   (let ((proc (inferior-haskell-process)))
