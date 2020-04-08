@@ -26,10 +26,13 @@
 (require 'quail)
 
 ;;;###autoload
-(defun turn-on-haskell-unicode-input-method ()
+(defun haskell-unicode-input-method-enable ()
   "Set input method `haskell-unicode'."
   (interactive)
   (set-input-method "haskell-unicode"))
+
+;;;###autoload
+(define-obsolete-function-alias 'turn-on-haskell-unicode-input-method 'haskell-unicode-input-method-enable "2020-04")
 
 (quail-define-package
  "haskell-unicode" ;; name
