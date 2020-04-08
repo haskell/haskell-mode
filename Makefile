@@ -38,7 +38,19 @@ AUTOLOADS = haskell-mode-autoloads.el
 
 PKG_DIST_FILES = $(ELFILES) logo.svg NEWS haskell-mode.info dir
 
-.PHONY: all compile info clean check check-emacs-version
+INIT_PACKAGES="(progn \
+  (require 'package) \
+  (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) \
+  (package-initialize) \
+  (dolist (pkg '(package-lint relint)) \
+    (unless (package-installed-p pkg) \
+      (unless (assoc pkg package-archive-contents) \
+        (package-refresh-contents)) \
+      (package-install pkg))) \
+  )"
+
+
+.PHONY: all compile info clean check check-emacs-version check-ert check-package-lint check-relint
 
 all: check-emacs-version compile $(AUTOLOADS) info
 
@@ -78,13 +90,19 @@ build-$(EMACS_VERSION)/build-flag : build-$(EMACS_VERSION) $(patsubst %.el,build
 check-%: tests/%-tests.el
 	$(BATCH) -l "$<" -f ert-run-tests-batch-and-exit;
 
-check: compile $(AUTOLOADS) check-ert
+check: compile $(AUTOLOADS) check-package-lint check-relint check-ert
 
 check-ert: $(ELCHECKS)
 	$(BATCH) -L tests									\
                  $(patsubst %,-l %,$(ELCHECKS))							\
                  -f ert-run-tests-batch-and-exit
 	@echo "checks passed!"
+
+check-package-lint:
+	$(BATCH) --eval $(INIT_PACKAGES) --eval '(setq package-lint-main-file "haskell-mode-pkg.el")' -f package-lint-batch-and-exit $(ELFILES)
+
+check-relint:
+	$(BATCH) --eval $(INIT_PACKAGES) -f relint-batch $(ELFILES)
 
 clean:
 	$(RM) -r build-$(EMACS_VERSION) $(AUTOLOADS) $(AUTOLOADS:.el=.elc) haskell-mode.info dir
