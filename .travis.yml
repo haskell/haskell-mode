@@ -1,19 +1,8 @@
 language: nix
 
 env:
-  - EMACS_CI=emacs-25-1 TARGET=check
-  - EMACS_CI=emacs-25-2 TARGET=check
-  - EMACS_CI=emacs-25-3 TARGET=check
-  - EMACS_CI=emacs-26-1 TARGET=check
-  - EMACS_CI=emacs-26-2 TARGET=check
-  - EMACS_CI=emacs-26-3 TARGET=check
-  - EMACS_CI=emacs-snapshot TARGET=check
   - EMACS_CI=emacs-26-3 TARGET=deploy-manual
   - EMACS_CI=emacs-26-3 TARGET=check-external
-
-matrix:
-  allow_failures:
-    - env: EMACS_CI=emacs-snapshot TARGET=check
 
 install: |
     sh <(curl https://get.haskellstack.org/)
