@@ -1057,12 +1057,12 @@ See `haskell-check-command' for the default."
 
 (defun haskell-flymake-init ()
   "Flymake init function for Haskell."
-  (let ((checker-elts (and haskell-saved-check-command
-                           (split-string haskell-saved-check-command))))
-    (list (car checker-elts)
-          (append (cdr checker-elts)
-                  (list (haskell-flymake-create-temp-buffer-copy
-                         'flymake-create-temp-inplace))))))
+  (when haskell-saved-check-command
+    (let ((checker-elts (split-string haskell-saved-check-command)))
+      (list (car checker-elts)
+            (append (cdr checker-elts)
+                    (list (haskell-flymake-create-temp-buffer-copy
+                           'flymake-create-temp-inplace)))))))
 
 (add-to-list 'flymake-allowed-file-name-masks '("\\.l?hs\\'" haskell-flymake-init))
 
