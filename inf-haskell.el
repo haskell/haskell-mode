@@ -108,8 +108,10 @@ directory structure."
 The format should be the same as for `compilation-error-regexp-alist'.")
 
 (defconst haskell-prompt-regexp
-  ;; Why the backslash in [\\._[:alnum:]]?
-  "^\\*?[[:upper:]][\\._[:alnum:]]*\\(?: \\*?[[:upper:]][\\._[:alnum:]]*\\)*\\( λ\\)?> \\|^λ?> $")
+  "^[[:alnum:].*_() |λ]*> "
+  "Ignore everything before the first '> '.  This allows us to
+correctly interpret multi-line input even when modules are
+imported.")
 
 ;;; TODO
 ;;; -> Make font lock work for strings, directories, hyperlinks
