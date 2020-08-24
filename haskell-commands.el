@@ -376,7 +376,7 @@ If the definition or tag is found, the location from which you jumped
 will be pushed onto `xref--marker-ring', so you can return to that
 position with `xref-pop-marker-stack'."
   (interactive "P")
-  (if-let ((_ (haskell-session-maybe))
+  (if-let ((session (haskell-session-maybe))
            (initial-loc (point-marker))
            (loc (haskell-mode-find-def (haskell-ident-at-point))))
       (progn
