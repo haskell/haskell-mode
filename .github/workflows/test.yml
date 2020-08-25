@@ -23,8 +23,6 @@ jobs:
         include:
           - emacs_version: 26.3
             target: deploy-manual
-          - emacs_version: 26.3
-            target: check-external
     steps:
     - uses: cachix/install-nix-action@v10
     - uses: purcell/setup-emacs@master
