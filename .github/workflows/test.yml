@@ -21,7 +21,7 @@ jobs:
           - 27.1
           - snapshot
         include:
-          - emacs_version: 26.3
+          - emacs_version: 27.1
             target: deploy-manual
     steps:
     - uses: cachix/install-nix-action@v10
