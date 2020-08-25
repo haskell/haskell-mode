@@ -376,13 +376,14 @@ If the definition or tag is found, the location from which you jumped
 will be pushed onto `xref--marker-ring', so you can return to that
 position with `xref-pop-marker-stack'."
   (interactive "P")
-  (if (haskell-session-maybe)
-        (let ((initial-loc (point-marker))
-            (loc (haskell-mode-find-def (haskell-ident-at-point))))
-          (haskell-mode-handle-generic-loc loc)
-          (unless (equal initial-loc (point-marker))
-            (xref-push-marker-stack initial-loc)))
-      (call-interactively 'haskell-mode-tag-find)))
+  (if-let ((session (haskell-session-maybe))
+           (initial-loc (point-marker))
+           (loc (haskell-mode-find-def (haskell-ident-at-point))))
+      (progn
+        (haskell-mode-handle-generic-loc loc)
+        (unless (equal initial-loc (point-marker))
+          (xref-push-marker-stack)))
+    (call-interactively 'haskell-mode-tag-find)))
 
 ;;;###autoload
 (defun haskell-mode-goto-loc ()
