@@ -16,7 +16,7 @@ function checks if officially released versions still compile."
         ;; over haskell-mode in packages.
         (package-directory-list (list command-line-default-directory))
         ;; packages depending on haskell-mode are in melpa
-        (package-archives (cons '("melpa" . "http://melpa.milkbox.net/packages/") package-archives)))
+        (package-archives (cons '("melpa" . "https://melpa.org/packages/") package-archives)))
 
     (unwind-protect
         (progn
