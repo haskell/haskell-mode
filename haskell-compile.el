@@ -209,12 +209,20 @@ base directory for build tools, or the current buffer for
         haskell-compile-command
         haskell-compile-command)))))
 
+;; Save commands for reuse, but only when in same context.
+;; Hence save a pair (COMMAND . DIR); or nil.
 (defvar haskell--compile-stack-last nil)
 (defvar haskell--compile-cabal-last nil)
 (defvar haskell--compile-ghc-last nil)
 
+;; called only by (haskell-compile):
 (defun haskell--compile (dir-or-file edit last-sym fallback alt)
-  (let* ((default (or (symbol-value last-sym) fallback))
+  (let* ((dir-or-file (or dir-or-file default-directory))
+         (last-pair (symbol-value last-sym))
+         (last-command (car last-pair))
+         (last-dir (cdr last-pair))
+         (default (or (and last-dir (eq last-dir dir-or-file) last-command)
+                      fallback))
          (template (cond
                     ((null edit) default)
                     ((eq edit '-) alt)
@@ -227,7 +235,7 @@ base directory for build tools, or the current buffer for
                    (file-name-base (directory-file-name dir-or-file))
                  (file-name-nondirectory dir-or-file))))
     (unless (eq edit'-)
-      (set last-sym template))
+      (set last-sym (cons template dir-or-file)))
     (let ((default-directory dir))
       (compilation-start
        command

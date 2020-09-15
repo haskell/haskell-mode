@@ -54,16 +54,18 @@ Used for locating additional package data files.")
 
 When set to 'auto (the default), the directory contents and
 available programs will be used to make a best guess at the
-process type:
+process type and the project directory.
 
-If the project directory or one of its parents contains a
-\"cabal.sandbox.config\" file, then cabal-repl will be used.
+Emacs looks in the current directory and then in its parents for
+a file \"cabal.sandbox.config\" or \"cabal.project\". its
+location is the project directory, and \"cabal\" will be used.
 
-If there's a \"stack.yaml\" file and the \"stack\" executable can
-be located, then stack-ghci will be used.
+Otherwise if a file \"stack.yaml\" is found, its location is the
+project directory, and stack will be used
+Otherwise if a file \"*.cabal\" is found, its location is the
+project directory, and cabal will be used.
+If none of the above apply, ghc will be used.
 
-Otherwise if there's a *.cabal file, cabal-repl will be used.
-If none of the above apply, ghci will be used.
 (The value cabal-new-repl is obsolete, equivalent to cabal-repl)."
   :type '(choice (const auto)
                  (const ghci)
@@ -423,7 +425,7 @@ presence of a *.cabal file or stack.yaml file or something similar.")
    When found, returns a pair (TAG . DIR) 
    where TAG is 'cabal-project, 'cabal-sandbox. 'cabal, or 'stack; 
    and DIR is the directory containing cabal or stack file.
-   When none found, DIR is nil, and TAG is 'cabal, 'stack. or 'ghc"
+   When none found, DIR is nil, and TAG is 'ghc"
   ;; REVIEW maybe just 'cabal is enough.
   (let ((cabal-project (locate-dominating-file default-directory "cabal.project"))
         (cabal-sandbox (locate-dominating-file default-directory "cabal.sandbox.config"))
@@ -438,7 +440,7 @@ presence of a *.cabal file or stack.yaml file or something similar.")
      ((and cabal-project (executable-find "cabal"))
       (cons 'cabal-project cabal-project))
      ((and cabal-sandbox (executable-find "cabal"))
-      (cons 'cabal cabal-sandbox))
+      (cons 'cabal-sandbox cabal-sandbox))
      ((and stack (executable-find "stack"))
       (cons 'stack stack))
      ((and cabal (executable-find "cabal"))
