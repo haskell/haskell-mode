@@ -30,6 +30,17 @@
 (require 'haskell-mode)
 (require 'haskell-utils)
 
+(defun hoogle-prompt (&optional hayoo?)
+  "Prompt for Hoogle query."
+  (let ((def (haskell-ident-at-point))
+        (hoogle-or-hayoo "Hoogle"))
+    (if (and def (symbolp def)) (setq def (symbol-name def)))
+    (if hayoo? (setq hoogle-or-hayoo "Hayoo"))
+    (list (read-string (if def
+                           (format "%s query (default %s): " hoogle-or-hayoo def)
+                         (format "%s query: " hoogle-or-hayoo))
+                       nil nil def)
+          )))
 
 (defcustom haskell-hoogle-command
   (if (executable-find "hoogle") "hoogle")
@@ -119,12 +130,12 @@ is asked to show extra info for the items matching QUERY.."
 
 ;;;###autoload
 (defun haskell-hoogle-lookup-from-local ()
-  "Lookup by local hoogle."
+  "Lookup QUERY on local hoogle server."
   (interactive)
   (if (haskell-hoogle-server-live-p)
       (browse-url (format "http://localhost:%i/?hoogle=%s"
                           haskell-hoogle-port-number
-                          (read-string "hoogle: " (haskell-ident-at-point))))
+                          (car (hoogle-prompt))))
     (haskell-mode-toggle-interactive-prompt-state)
     (unwind-protect
         (when (y-or-n-p "Hoogle server not running, start hoogle server? ")
@@ -142,13 +153,7 @@ is asked to show extra info for the items matching QUERY.."
 ;;;###autoload
 (defun haskell-hayoo (query)
   "Do a Hayoo search for QUERY."
-  (interactive
-   (let ((def (haskell-ident-at-point)))
-     (if (and def (symbolp def)) (setq def (symbol-name def)))
-     (list (read-string (if def
-                            (format "Hayoo query (default %s): " def)
-                          "Hayoo query: ")
-                        nil nil def))))
+  (interactive (hoogle-prompt t))
   (browse-url (format haskell-hayoo-url (url-hexify-string query))))
 
 ;;;###autoload
