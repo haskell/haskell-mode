@@ -246,9 +246,6 @@ list of modules where missed IDENT was found."
                (haskell-process-suggest-imports session file modules ident)))
            (when haskell-process-suggest-haskell-docs-imports
              (let ((modules (haskell-process-haskell-docs-ident ident)))
-               (haskell-process-suggest-imports session file modules ident)))
-           (when haskell-process-suggest-hayoo-imports
-             (let ((modules (haskell-process-hayoo-ident ident)))
                (haskell-process-suggest-imports session file modules ident)))))
         ((string-match "^[ ]+It is a member of the hidden package [‘`‛]\\([^@\r\n]+\\).*['’].$" msg)
          (when haskell-process-suggest-add-package

@@ -1,4 +1,4 @@
-;;; haskell-hoogle.el --- Look up Haskell documentation via hoogle or hayoo  -*- lexical-binding: t; -*-
+;;; haskell-hoogle.el --- Look up Haskell documentation via hoogle -*- lexical-binding: t; -*-
 
 ;; Copyright © 2015 Steve Purcell
 ;;             2016 Arthur Fayzrakhmanov
@@ -21,7 +21,7 @@
 
 ;;; Commentary:
 
-;; Functions for looking up documentation with hayoo or hoogle, via
+;; Functions for looking up documentation with hoogle, via
 ;; either local or remote servers.
 
 ;;; Code:
@@ -30,15 +30,13 @@
 (require 'haskell-mode)
 (require 'haskell-utils)
 
-(defun hoogle-prompt (&optional hayoo?)
+(defun hoogle-prompt ()
   "Prompt for Hoogle query."
-  (let ((def (haskell-ident-at-point))
-        (hoogle-or-hayoo "Hoogle"))
+  (let ((def (haskell-ident-at-point)))
     (if (and def (symbolp def)) (setq def (symbol-name def)))
-    (if hayoo? (setq hoogle-or-hayoo "Hayoo"))
     (list (read-string (if def
-                           (format "%s query (default %s): " hoogle-or-hayoo def)
-                         (format "%s query: " hoogle-or-hayoo))
+                           (format "Hoogle query (default %s): " def)
+                         "Hoogle query: ")
                        nil nil def)
           )))
 
@@ -67,7 +65,6 @@ is asked to show extra info for the items matching QUERY.."
   :type '(choice
           (const :tag "haskell-org" "https://hoogle.haskell.org/?hoogle=%s")
           (const :tag "fp-complete" "https://www.stackage.org/lts/hoogle?q=%s")
-          (const :tag "hayoo" "http://hayoo.fh-wedel.de/?query=%s")
           string))
 
 ;;;###autoload
@@ -129,26 +126,6 @@ is asked to show extra info for the items matching QUERY.."
         (when (y-or-n-p "Hoogle server not running, start hoogle server? ")
           (haskell-hoogle-start-server))
       (haskell-mode-toggle-interactive-prompt-state t))))
-
-
-(defcustom haskell-hayoo-url "http://hayoo.fh-wedel.de/?query=%s"
-  "Default value for hayoo web site."
-  :group 'haskell
-  :type '(choice
-          (const :tag "fh-wedel.de" "http://hayoo.fh-wedel.de/?query=%s")
-          string))
-
-;;;###autoload
-(defun haskell-hayoo (query)
-  "Do a Hayoo search for QUERY."
-  (interactive (hoogle-prompt t))
-  (browse-url (format haskell-hayoo-url (url-hexify-string query))))
-
-;;;###autoload
-(defalias 'hayoo 'haskell-hayoo)
-
-
-
 
 (provide 'haskell-hoogle)
 ;;; haskell-hoogle.el ends here

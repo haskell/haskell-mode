@@ -214,18 +214,6 @@ Flycheck users might like to disable this."
   :type 'boolean
   :group 'haskell-interactive)
 
-(defcustom haskell-process-suggest-hayoo-imports
-  nil
-  "Suggest to add import statements using Hayoo as a backend."
-  :type 'boolean
-  :group 'haskell-interactive)
-
-(defcustom haskell-process-hayoo-query-url
-  "http://hayoo.fh-wedel.de/json/?query=%s"
-  "Query url for json hayoo results."
-  :type 'string
-  :group 'haskell-interactive)
-
 (defcustom haskell-process-suggest-haskell-docs-imports
   nil
   "Suggest to add import statements using haskell-docs as a backend."
