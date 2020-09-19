@@ -192,29 +192,6 @@ MODULE-BUFFER is the actual Emacs buffer of the module being loaded."
 (defvar haskell-cabal-targets-history nil
   "History list for session targets.")
 
-(defun haskell-process-hayoo-ident (ident)
-  "Hayoo for IDENT, return a list of modules"
-  ;; We need a real/simulated closure, because otherwise these
-  ;; variables will be unbound when the url-retrieve callback is
-  ;; called.
-  ;; TODO: Remove when this code is converted to lexical bindings by
-  ;; default (Emacs 24.1+)
-  (let ((url (format haskell-process-hayoo-query-url (url-hexify-string ident))))
-    (with-current-buffer (url-retrieve-synchronously url)
-      (if (= 200 url-http-response-status)
-          (progn
-            (goto-char url-http-end-of-headers)
-            (let* ((res (json-read))
-                   (results (assoc-default 'result res)))
-              ;; TODO: gather packages as well, and when we choose a
-              ;; given import, check that we have the package in the
-              ;; cabal file as well.
-              (cl-mapcan (lambda (r)
-                           ;; append converts from vector -> list
-                           (append (assoc-default 'resultModules r) nil))
-                         results)))
-        (warn "HTTP error %s fetching %s" url-http-response-status url)))))
-
 (defun haskell-process-hoogle-ident (ident)
   "Hoogle for IDENT, return a list of modules."
   (with-temp-buffer
