@@ -42,13 +42,24 @@
                        nil nil def)
           )))
 
-(defcustom haskell-hoogle-command
-  (if (executable-find "hoogle") "hoogle")
-  "Name of the command to use to query Hoogle.
-If nil, use the Hoogle web-site."
-  :group 'haskell
-  :type '(choice (const :tag "Use Web-site" nil)
-                 string))
+;;;###autoload
+(defun haskell-hoogle (query &optional info)
+  "Do a Hoogle search for QUERY.
+
+If prefix argument INFO is given, then `haskell-hoogle-command'
+is asked to show extra info for the items matching QUERY.."
+  (interactive (append (hoogle-prompt) current-prefix-arg))
+  (let* ((command (concat (executable-find "hoogle")
+                          (if info " -i " "")
+                          " --color " (shell-quote-argument query)))
+         (output (shell-command-to-string command)))
+    (with-help-window "*hoogle*"
+      (with-current-buffer standard-output
+        (insert output)
+        (ansi-color-apply-on-region (point-min) (point-max))))))
+
+;;;###autoload
+(defalias 'hoogle 'haskell-hoogle)
 
 (defcustom haskell-hoogle-url "https://hoogle.haskell.org/?hoogle=%s"
   "Default value for hoogle web site."
@@ -59,6 +70,12 @@ If nil, use the Hoogle web-site."
           (const :tag "hayoo" "http://hayoo.fh-wedel.de/?query=%s")
           string))
 
+;;;###autoload
+(defun haskell-hoogle-lookup-from-website (query)
+  "Lookup QUERY at `haskell-hoogle-url'."
+  (interactive (hoogle-prompt))
+  (browse-url (format haskell-hoogle-url (url-hexify-string query))))
+
 (defcustom haskell-hoogle-server-command (lambda (port)
                                            (list "hoogle" "server"
                                             "--local"
@@ -68,35 +85,6 @@ If nil, use the Hoogle web-site."
   :group 'haskell
   :type 'function
   )
-
-;;;###autoload
-(defun haskell-hoogle (query &optional info)
-  "Do a Hoogle search for QUERY.
-When `haskell-hoogle-command' is non-nil, this command runs
-that.  Otherwise, it opens a hoogle search result in the browser.
-
-If prefix argument INFO is given, then `haskell-hoogle-command'
-is asked to show extra info for the items matching QUERY.."
-  (interactive
-   (let ((def (haskell-ident-at-point)))
-     (if (and def (symbolp def)) (setq def (symbol-name def)))
-     (list (read-string (if def
-                            (format "Hoogle query (default %s): " def)
-                          "Hoogle query: ")
-                        nil nil def)
-           current-prefix-arg)))
-  (if (null haskell-hoogle-command)
-      (browse-url (format haskell-hoogle-url (url-hexify-string query)))
-    (let ((command (concat haskell-hoogle-command
-                           (if info " -i " "")
-                           " --color " (shell-quote-argument query))))
-      (with-help-window "*hoogle*"
-        (with-current-buffer standard-output
-          (insert (shell-command-to-string command))
-          (ansi-color-apply-on-region (point-min) (point-max)))))))
-
-;;;###autoload
-(defalias 'hoogle 'haskell-hoogle)
 
 (defvar haskell-hoogle-server-process-name "emacs-local-hoogle")
 (defvar haskell-hoogle-server-buffer-name (format "*%s*" haskell-hoogle-server-process-name))
