@@ -24,7 +24,7 @@ jobs:
           - emacs_version: 27.1
             target: deploy-manual
     steps:
-    - uses: cachix/install-nix-action@v10
+    - uses: cachix/install-nix-action@v12
     - uses: purcell/setup-emacs@master
       with:
         version: ${{ matrix.emacs_version }}
