@@ -340,6 +340,13 @@ should be inserted."
           expr))))))
 
 ;;;###autoload
+(defun haskell-insert-type-signature ()
+  "Insert type signature of the given expression."
+  (interactive)
+  (let ((current-prefix-arg 1))
+    (call-interactively 'haskell-process-do-type)))
+
+;;;###autoload
 (defun haskell-mode-jump-to-def-or-tag (&optional _next-p)
   ;; FIXME NEXT-P arg is not used
   "Jump to the definition.

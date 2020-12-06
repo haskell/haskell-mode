@@ -40,6 +40,7 @@
     (define-key map (kbd "C-c C-l") 'haskell-process-load-file)
     (define-key map (kbd "C-c C-r") 'haskell-process-reload)
     (define-key map (kbd "C-c C-t") 'haskell-process-do-type)
+    (define-key map (kbd "C-u C-c C-t") 'haskell-insert-type-signature)
     (define-key map (kbd "C-c C-i") 'haskell-process-do-info)
     (define-key map (kbd "M-.") 'haskell-mode-jump-to-def-or-tag)
     (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
