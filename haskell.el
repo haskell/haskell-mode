@@ -334,16 +334,20 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
 Give optional NEXT-P parameter to override value of
 `xref-prompt-for-identifier' during definition search."
   (interactive "P")
-  (let ((ident (haskell-string-drop-qualifier (haskell-ident-at-point)))
-        (tags-file-dir (haskell-cabal--find-tags-dir))
-        (tags-revert-without-query t))
-    (when (and ident
-               (not (string= "" (haskell-string-trim ident)))
+  (let* ((ident-detected (haskell-ident-at-point))
+         (ident (and ident-detected
+                     (haskell-string-drop-qualifier ident-detected)))
+         (tags-file-dir (haskell-cabal--find-tags-dir))
+         (tags-revert-without-query t))
+    (when (and (or (null ident)
+                   (not (string= "" (haskell-string-trim ident))))
                tags-file-dir)
       (let ((tags-file-name (concat tags-file-dir "TAGS")))
         (cond ((file-exists-p tags-file-name)
                (let ((xref-prompt-for-identifier next-p))
-                 (xref-find-definitions ident)))
+                 (if ident
+                     (xref-find-definitions ident)
+                   (call-interactively #'xref-find-definitions))))
               (t (haskell-mode-generate-tags ident)))))))
 
 ;;;###autoload

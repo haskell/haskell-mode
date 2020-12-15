@@ -554,6 +554,8 @@ moves over sexps."
     (save-buffer)
     (kill-buffer)))
 
+(defun haskell-generate-tags-test-helper-process-fail () 1)
+
 (ert-deftest haskell-generate-tags ()
   ;; this test is special for Unix because under Windows the
   ;; invocation is different
@@ -571,7 +573,10 @@ moves over sexps."
      (haskell-mode-generate-tags)
      (with-current-buffer (find-file-noselect "TAGS-test-format")
        (should (equal "-e\n-x\n./T1.hs\n./src/T2.hs\n"
-                      (buffer-substring (point-min) (point-max))))))))
+                      (buffer-substring (point-min) (point-max))))))
+    (with-script-path
+     haskell-hasktags-path haskell-generate-tags-test-helper-process-fail
+     (should-error (haskell-mode-generate-tags)))))
 
 (defun haskell-stylish-haskell-add-first-line ()
   (message-stdout "-- HEADER")

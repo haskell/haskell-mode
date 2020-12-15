@@ -345,7 +345,8 @@ Returns nil if no completions available."
   (let ((prefix-data (haskell-completions-grab-prefix)))
     (when prefix-data
       (cl-destructuring-bind (beg end pfx typ) prefix-data
-        (when (and (not (eql typ 'haskell-completions-general-prefix))
+        (when (and (not (string-empty-p pfx))
+                   (not (eql typ 'haskell-completions-general-prefix))
                    (or haskell-completions-complete-operators
                        (not (save-excursion
                               (goto-char (1- end))

@@ -77,7 +77,7 @@ build-$(EMACS_VERSION) :
 # an .el file to be dependent on all other files because we do not do
 # proper dependency tracking (yet).
 build-$(EMACS_VERSION)/%.elc : %.el $(ELFILES)
-	$(BATCH) --eval '(setq byte-compile-error-on-warn t)'						\
+	$(BATCH) --eval '(setq byte-compile-error-on-warn nil)'						\
 	         --eval "(setq byte-compile-dest-file-function (lambda (filename)					\
 	               	       (concat (file-name-directory filename) \"build-\" emacs-version \"/\"	\
 	                      	    (file-name-nondirectory filename) \"c\")))"				\
