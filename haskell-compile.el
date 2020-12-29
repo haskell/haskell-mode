@@ -2,6 +2,7 @@
 
 ;; Copyright (C) 2013  Herbert Valerio Riedel
 ;;               2020  Marc Berkowitz <mberkowitz@github.com>
+;;               2020  Jacob Ilsø
 
 ;; Author: Herbert Valerio Riedel <hvr@gnu.org>
 
@@ -170,7 +171,7 @@ base directory for build tools, or the current buffer for
   (interactive "P")
   (save-some-buffers (not compilation-ask-about-save)
                      compilation-save-buffers-predicate)
-  (let (htype dir)                      
+  (let (htype dir)
     ;;test haskell-compiler-type to set htype and dir
     (cond
      ((eq haskell-compiler-type 'cabal)
@@ -180,8 +181,7 @@ base directory for build tools, or the current buffer for
       (setq htype 'stack)
       (setq dir (locate-dominating-file default-directory "stack.yaml")))
      ((eq haskell-compiler-type 'ghc)
-      (setq htype 'ghc)
-      (setq dir (buffer-file-name)))
+      (setq htype 'ghc))
      ((eq haskell-compiler-type 'auto)
       (let ((r (haskell-build-type)))
         (setq htype (car r))
@@ -204,7 +204,7 @@ base directory for build tools, or the current buffer for
         haskell-compile-stack-build-command
         haskell-compile-stack-build-alt-command))
      ((eq htype 'ghc)
-      (haskell--compile dir edit-command
+      (haskell--compile (buffer-file-name) edit-command
         'haskell--compile-ghc-last
         haskell-compile-command
         haskell-compile-command)))))

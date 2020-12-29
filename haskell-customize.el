@@ -409,9 +409,9 @@ imports."
 presence of a *.cabal file or stack.yaml file or something similar.")
 
 (defun haskell-build-type ()
-  "Looks for cabal and stack spec files. 
-   When found, returns a pair (TAG . DIR) 
-   where TAG is 'cabal-project, 'cabal-sandbox. 'cabal, or 'stack; 
+  "Looks for cabal and stack spec files.
+   When found, returns a pair (TAG . DIR)
+   where TAG is 'cabal-project, 'cabal-sandbox. 'cabal, or 'stack;
    and DIR is the directory containing cabal or stack file.
    When none found, DIR is nil, and TAG is 'ghc"
   ;; REVIEW maybe just 'cabal is enough.
