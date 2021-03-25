@@ -219,24 +219,25 @@ base directory for build tools, or the current buffer for
 ;; called only by (haskell-compile):
 (defun haskell--compile (dir-or-file edit last-sym fallback alt)
   (let* ((dir-or-file (or dir-or-file default-directory))
+         (local-dir-or-file (or (file-remote-p dir-or-file 'localname) dir-or-file))
          (last-pair (symbol-value last-sym))
          (last-command (car last-pair))
          (last-dir (cdr last-pair))
-         (default (or (and last-dir (eq last-dir dir-or-file) last-command)
+         (default (or (and last-dir (eq last-dir local-dir-or-file) last-command)
                       fallback))
          (template (cond
                     ((null edit) default)
                     ((eq edit '-) alt)
                     (t (compilation-read-command default))))
-         (command (format template dir-or-file))
-         (dir (if (directory-name-p dir-or-file)
-                  dir-or-file
+         (command (format template local-dir-or-file))
+         (dir (if (directory-name-p local-dir-or-file)
+                  local-dir-or-file
                 default-directory))
-         (name (if (directory-name-p dir-or-file)
-                   (file-name-base (directory-file-name dir-or-file))
-                 (file-name-nondirectory dir-or-file))))
+         (name (if (directory-name-p local-dir-or-file)
+                   (file-name-base (directory-file-name local-dir-or-file))
+                 (file-name-nondirectory local-dir-or-file))))
     (unless (eq edit'-)
-      (set last-sym (cons template dir-or-file)))
+      (set last-sym (cons template local-dir-or-file)))
     (let ((default-directory dir))
       (compilation-start
        command
