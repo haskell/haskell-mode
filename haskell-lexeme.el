@@ -475,7 +475,7 @@ See `haskell-lexeme-classify-by-first-char' for details."
        (point (point-marker)))
     (or
      (and
-      (equal (string-to-syntax "<")
+      (equal (string-to-syntax "!")
              (get-char-property (point) 'syntax-table))
       (progn
         (set-match-data (list point (set-marker (make-marker) (line-end-position))))
