@@ -586,10 +586,10 @@ on an uppercase identifier."
               (goto-char (1+ (point)))))))
       ;; must return nil here so that it is not fontified again as string
       nil))
-   ;; Detect literate comment lines starting with syntax class '<'
+   ;; Detect literate comment lines starting with syntax class '!'
    ((save-excursion
       (goto-char (nth 8 state))
-      (equal (string-to-syntax "<") (syntax-after (point))))
+      (equal (string-to-syntax "!") (syntax-after (point))))
     'haskell-literate-comment-face)
    ;; Detect pragmas. A pragma is enclosed in special comment
    ;; delimiters {-# .. #-}.
