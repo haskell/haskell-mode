@@ -137,6 +137,14 @@ which will be prepended to `haskell-process-args-cabal-repl'."
   :group 'haskell-interactive
   :type '(choice string (repeat string)))
 
+(defcustom haskell-process-cabal-repl-command
+  'repl
+  "The repl command for starting ghci with cabal.
+This can either be repl or new-repl."
+  :group 'haskell-interactive
+  :type '(choice (const repl)
+                 (const new-repl)))
+
 (defcustom haskell-process-path-stack
   "stack"
   "The path for starting stack.
