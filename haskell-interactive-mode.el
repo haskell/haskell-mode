@@ -652,6 +652,7 @@ wrapped in compiler directive at the top of FILE."
         (with-current-buffer buf
 
           (haskell-error-mode)
+          (run-hooks 'haskell-error-mode-hook)
           (let ((inhibit-read-only t))
             (erase-buffer)
             (insert (propertize response
