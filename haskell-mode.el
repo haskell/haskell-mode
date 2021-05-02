@@ -505,7 +505,6 @@ be set to the preferred literate style."
                    (or
                     (and
                      (not (equal (string-to-syntax "<") (syntax-after (point))))
-                     (not (equal (string-to-syntax "!") (syntax-after (point))))
                      (not (looking-at-p "^>")))
                     (looking-at-p "^\\\\begin{code}[\t ]*$")))))))
         (while (< (point) end)
@@ -513,10 +512,7 @@ be set to the preferred literate style."
             (if previous-line-latex-code
                 (if (looking-at-p "^\\\\end{code}[\t ]*$")
                     (progn
-                      (put-text-property (point) (1+ (point)) 'syntax-table (string-to-syntax "!"))
-                      (save-excursion
-                       (end-of-line)
-                       (put-text-property (point) (1+ (point)) 'syntax-table (string-to-syntax "!")))
+                      (put-text-property (point) (1+ (point)) 'syntax-table (string-to-syntax "<"))
                       (setq previous-line-latex-code nil))
                   ;; continue latex-code
                   )
@@ -525,10 +521,7 @@ be set to the preferred literate style."
                   (put-text-property (point) (1+ (point)) 'syntax-table (string-to-syntax "-"))
                 ;; this is a literate comment
                 (progn
-                  (put-text-property (point) (1+ (point)) 'syntax-table (string-to-syntax "!"))
-                  (save-excursion
-                   (end-of-line)
-                   (put-text-property (point) (1+ (point)) 'syntax-table (string-to-syntax "!")))
+                  (put-text-property (point) (1+ (point)) 'syntax-table (string-to-syntax "<"))
                   (when (looking-at-p "^\\\\begin{code}[\t ]*$")
                     (setq previous-line-latex-code t))))))
           (forward-line 1))))
