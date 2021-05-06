@@ -20,7 +20,7 @@
 
 ;;; Commentary:
 
-;; This file containt GHC specific constants and information.
+;; This file contains GHC specific constants and information.
 
 ;;; Code:
 
