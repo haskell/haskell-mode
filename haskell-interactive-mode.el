@@ -264,8 +264,8 @@ do the
           (lines (split-string expr "\n")))
       (cl-loop for elt on (cdr lines) do
                (setcar elt (replace-regexp-in-string pre "" (car elt))))
-      ;; Temporarily set prompt2 to be empty to avoid unwanted output
-      (concat ":set prompt2 \"\"\n"
+      ;; Temporarily set prompt-cont to be empty to avoid unwanted output
+      (concat ":set prompt-cont \"\"\n"
               ":{\n"
               (mapconcat #'identity lines "\n")
               "\n:}\n"
