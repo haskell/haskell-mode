@@ -62,7 +62,7 @@ directory structure."
                                haskell-process-path-ghci
                              (list haskell-process-path-ghci))
                            haskell-process-args-ghci))))
-    ('cabal-repl `(,haskell-process-path-cabal "repl" ,@haskell-process-args-cabal-repl))
+    ('cabal-repl `(,haskell-process-path-cabal (symbol-name ,haskell-process-cabal-repl-command) ,@haskell-process-args-cabal-repl))
     ('stack-ghci `(,haskell-process-path-stack "ghci" ,@haskell-process-args-stack-ghci))))
 
 (defconst inferior-haskell-info-xref-re
