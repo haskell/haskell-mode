@@ -69,7 +69,7 @@ For legacy compat, `%s' is replaced by the stack package top folder."
   :type 'string)
 
 (defcustom haskell-compile-command
-  "ghc -Wall -ferror-spans -fforce-recomp -c %s"
+  "ghc -Wall -ferror-spans -fforce-recomp -c \"%s\""
   "Default build command to use for `haskell-cabal-build' when no cabal or stack file is detected.
 The `%s' placeholder is replaced by the current buffer's filename."
   :group 'haskell-compile
