@@ -229,7 +229,7 @@ base directory for build tools, or the current buffer for
                     ((null edit) default)
                     ((eq edit '-) alt)
                     (t (compilation-read-command default))))
-         (command (format template local-dir-or-file))
+         (command (format template (shell-quote-argument local-dir-or-file)))
          (dir (if (directory-name-p local-dir-or-file)
                   local-dir-or-file
                 default-directory))
