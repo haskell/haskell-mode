@@ -50,7 +50,9 @@ Used for locating additional package data files.")
 
 (defcustom haskell-process-type
   'auto
-  "The inferior Haskell process type to use: ghci, stack, cabal, or auto.
+  "The inferior Haskell process type to use.
+
+Customize this variable to see the supported symbol values.
 
 When set to 'auto (the default), the directory contents and
 available programs will be used to make a best guess at the
