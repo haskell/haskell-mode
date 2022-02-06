@@ -426,7 +426,7 @@ on an uppercase identifier."
 
             ;; Special case for `foreign import'
             ;; keywords in foreign import statements but are not otherwise reserved.
-            ("\\<\\(foreign\\)[ \t]+\\(import\\)[ \t]+\\(?:\\(ccall\\|stdcall\\|cplusplus\\|jvm\\|dotnet\\)[ \t]+\\)?\\(?:\\(safe\\|unsafe\\|interruptible\\)[ \t]+\\)?"
+            ("\\<\\(foreign\\)[ \t]+\\(import\\)[ \t]+\\(?:\\(ccall\\|capi\\|stdcall\\|cplusplus\\|jvm\\|dotnet\\)[ \t]+\\)?\\(?:\\(safe\\|unsafe\\|interruptible\\)[ \t]+\\)?"
              (1 'haskell-keyword-face nil lax)
              (2 'haskell-keyword-face nil lax)
              (3 'haskell-keyword-face nil lax)
