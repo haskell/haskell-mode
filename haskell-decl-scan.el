@@ -107,7 +107,6 @@
 (require 'syntax)
 (require 'imenu)
 
-;;;###autoload
 (defgroup haskell-decl-scan nil
   "Haskell declaration scanning (`imenu' support)."
   :link '(custom-manual "(haskell-mode)haskell-decl-scan-mode")

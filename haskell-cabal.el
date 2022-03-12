@@ -348,7 +348,6 @@ OTHER-WINDOW use `find-file-other-window'."
     "help"
     "run"))
 
-;;;###autoload
 (defgroup haskell-cabal nil
   "Haskell cabal files"
   :group 'haskell

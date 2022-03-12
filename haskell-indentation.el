@@ -43,7 +43,6 @@
 (require 'cl-lib)
 (require 'haskell-lexeme)
 
-;;;###autoload
 (defgroup haskell-indentation nil
   "Haskell indentation."
   :link '(custom-manual "(haskell-mode)Indentation")
