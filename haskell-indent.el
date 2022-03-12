@@ -92,7 +92,6 @@
 
 (defvar haskell-literate)
 
-;;;###autoload
 (defgroup haskell-indent nil
   "Haskell indentation."
   :group 'haskell

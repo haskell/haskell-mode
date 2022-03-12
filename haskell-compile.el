@@ -34,7 +34,6 @@
 (require 'ansi-color)
 (eval-when-compile (require 'subr-x))
 
-;;;###autoload
 (defgroup haskell-compile nil
   "Settings for Haskell compilation mode"
   :link '(custom-manual "(haskell-mode)compilation")

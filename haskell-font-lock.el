@@ -31,7 +31,6 @@
 (require 'haskell-string)
 (require 'font-lock)
 
-;;;###autoload
 (defgroup haskell-appearance nil
   "Haskell Appearance."
   :group 'haskell)
@@ -145,19 +144,16 @@ font faces assigned as if respective mode was enabled."
   :group 'haskell-appearance
   :type '(repeat (cons string symbol)))
 
-;;;###autoload
 (defface haskell-keyword-face
   '((t :inherit font-lock-keyword-face))
   "Face used to highlight Haskell keywords."
   :group 'haskell-appearance)
 
-;;;###autoload
 (defface haskell-type-face
   '((t :inherit font-lock-type-face))
   "Face used to highlight Haskell types"
   :group 'haskell-appearance)
 
-;;;###autoload
 (defface haskell-constructor-face
   '((t :inherit font-lock-type-face))
   "Face used to highlight Haskell constructors."
@@ -174,25 +170,21 @@ font faces assigned as if respective mode was enabled."
 ;; This is probably just wrong, but it used to use
 ;; `font-lock-function-name-face' with a result that was not consistent with
 ;; other major modes, so I just exchanged with `haskell-definition-face'.
-;;;###autoload
 (defface haskell-operator-face
   '((t :inherit font-lock-variable-name-face))
   "Face used to highlight Haskell operators."
   :group 'haskell-appearance)
 
-;;;###autoload
 (defface haskell-pragma-face
   '((t :inherit font-lock-preprocessor-face))
   "Face used to highlight Haskell pragmas ({-# ... #-})."
   :group 'haskell-appearance)
 
-;;;###autoload
 (defface haskell-liquid-haskell-annotation-face
   '((t :inherit haskell-pragma-face))
   "Face used to highlight LiquidHaskell annotations ({-@ ... @-})."
   :group 'haskell-appearance)
 
-;;;###autoload
 (defface haskell-literate-comment-face
   '((t :inherit font-lock-doc-face))
   "Face with which to fontify literate comments.

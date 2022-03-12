@@ -40,7 +40,6 @@
 (require 'cl-lib)
 (require 'haskell-string)
 
-;;;###autoload
 (defgroup inferior-haskell nil
   "Settings for REPL interaction via `inferior-haskell-mode'"
   :link '(custom-manual "(haskell-mode)inferior-haskell-mode")

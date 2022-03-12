@@ -130,7 +130,7 @@ actual Emacs buffer of the module being loaded."
                 process
                 "Failed, modules loaded: \\(.+\\)\\.$")
                nil)
-	      ((haskell-process-consume
+              ((haskell-process-consume
                 process
                 "Failed, no modules loaded\\.$") ;; for ghc 8.4
                nil)
@@ -336,7 +336,6 @@ list of modules where missed IDENT was found."
          (modules (and modules-string (split-string modules-string ", "))))
     (cons modules modules-string)))
 
-;;;###autoload
 (defface haskell-error-face
   '((((supports :underline (:style wave)))
      :underline (:style wave :color "#dc322f"))
@@ -345,7 +344,6 @@ list of modules where missed IDENT was found."
   "Face used for marking error lines."
   :group 'haskell-mode)
 
-;;;###autoload
 (defface haskell-warning-face
   '((((supports :underline (:style wave)))
      :underline (:style wave :color "#b58900"))
@@ -354,7 +352,6 @@ list of modules where missed IDENT was found."
   "Face used for marking warning lines."
   :group 'haskell-mode)
 
-;;;###autoload
 (defface haskell-hole-face
   '((((supports :underline (:style wave)))
      :underline (:style wave :color "#6c71c4"))
