@@ -799,8 +799,8 @@ Minor modes that work well with `haskell-mode':
     (error "haskell-mode requires at least Emacs 25.1"))
 
   ;; paragraph-{start,separate} should treat comments as paragraphs as well.
-  (setq-local paragraph-start (concat " *{-\\| *-- |\\|" page-delimiter))
-  (setq-local paragraph-separate (concat " *$\\| *\\({-\\|-}\\) *$\\|" page-delimiter))
+  (setq-local paragraph-start (concat " *{-\\([^#]\\|$\\)\\| *-- |\\|" page-delimiter))
+  (setq-local paragraph-separate (concat " *$\\| *\\({-\\([^#]\\|$\\)\\|\\([^#]\\|^\\)-}\\) *$\\|" page-delimiter))
   (setq-local fill-paragraph-function 'haskell-fill-paragraph)
   ;; (setq-local adaptive-fill-function 'haskell-adaptive-fill)
   (setq-local comment-start "--")
