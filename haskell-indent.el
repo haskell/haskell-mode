@@ -1232,7 +1232,7 @@ START if non-nil is a presumed start pos of the current definition."
                    (setq open (haskell-indent-offset-after-info)))
           (list (list (haskell-indent-after-keyword-column open start))))))
 
-     ;; open structure? ie  ( { [
+     ;; open structure? i.e.  ( { [
      ((setq open (haskell-indent-open-structure start (point)))
       (haskell-indent-inside-paren open))
 
@@ -1434,7 +1434,7 @@ TYPE is either 'guard or 'rhs."
 
 (defun haskell-indent-align-guards-and-rhs (_start _end)
   "Align the guards and rhs of functions in the region, which must be active."
-  ;; The `start' and `end' args are dummys right now: they're just there so
+  ;; The `start' and `end' args are dummies right now: they're just there so
   ;; we can use the "r" interactive spec which properly signals an error.
   (interactive "*r")
   (haskell-indent-align-def t 'guard)

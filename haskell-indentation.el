@@ -241,9 +241,9 @@ indentation points to the right, we switch going to the left."
   ;; try to repeat
   (when (not (haskell-indentation-indent-line-repeat))
     (setq haskell-indentation-dyn-last-direction nil)
-    ;; parse error is intentionally not cought here, it may come from
+    ;; parse error is intentionally not caught here, it may come from
     ;; `haskell-indentation-find-indentations', but escapes the scope
-    ;; and aborts the opertaion before any moving happens
+    ;; and aborts the operation before any moving happens
     (let* ((cc (current-column))
            (ci (haskell-indentation-current-indentation))
            (inds (save-excursion

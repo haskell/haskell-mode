@@ -122,7 +122,7 @@ Returns one of the following symbols:
 + interactive-error
 + no-error
 
-*Warning*: this funciton covers only three kind of responses:
+*Warning*: this function covers only three kind of responses:
 
 * \"unknown command …\"
   REPL missing requested command
