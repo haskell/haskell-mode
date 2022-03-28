@@ -161,7 +161,7 @@ font faces assigned as if respective mode was enabled."
 
 ;; This used to be `font-lock-variable-name-face' but it doesn't result in
 ;; a highlighting that's consistent with other modes (it's mostly used
-;; for function defintions).
+;; for function definitions).
 (defface haskell-definition-face
   '((t :inherit font-lock-function-name-face))
   "Face used to highlight Haskell definitions."
