@@ -671,7 +671,7 @@ moves over sexps."
     (haskell-mode)
     (insert "module Main where\n")
     (end-of-buffer)
-    (haskell-mode-add-language-pragma "ViewPatterns")
+    (haskell-command-insert-language-pragma "ViewPatterns")
     (should (string= (buffer-string)
                      "{-# LANGUAGE ViewPatterns #-}\nmodule Main where\n"))))
 

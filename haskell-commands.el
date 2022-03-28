@@ -936,13 +936,13 @@ newlines and extra whitespace in signature before insertion."
         (insert sig "\n")
         (indent-to col)))))
 
-(defun haskell-mode-add-language-pragma (extension)
+(defun haskell-command-insert-language-pragma (extension)
   "Insert a {-# LANGUAGE _ #-} pragma at the top of the current
 buffer for the given extension."
   (interactive
    (list (completing-read "Extension: " haskell-ghc-supported-extensions)))
   (save-excursion
-    (beginning-of-buffer)
+    (goto-char (point-min))
     (insert (format "{-# LANGUAGE %s #-}\n" extension))))
 
 (provide 'haskell-commands)
