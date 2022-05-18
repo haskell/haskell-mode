@@ -73,7 +73,8 @@ directory structure."
 
 (defvar inferior-haskell-multiline-prompt-re
   "^\\*?[[:upper:]][\\._[:alnum:]]*\\(?: \\*?[[:upper:]][\\._[:alnum:]]*\\)*| "
-  "Regular expression for matching multiline prompt (the one inside :{ ... :} blocks).")
+  "Regular expression for matching multiline prompt
+(the one inside :{ ... :} blocks).")
 
 (defconst inferior-haskell-error-regexp-alist
   `(;; Format of error messages used by GHCi.

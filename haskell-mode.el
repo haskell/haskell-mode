@@ -1142,7 +1142,8 @@ successful, nil otherwise."
  "2015-11-11")
 
 (defun haskell-mode-toggle-scc-at-point ()
-  "If point is in an SCC annotation, kill the annotation.  Otherwise, try to insert a new annotation."
+  "If point is in an SCC annotation, kill the annotation.
+Otherwise, try to insert a new annotation."
   (interactive)
   (if (not (haskell-mode-try-kill-scc-at-point))
       (if (not (haskell-mode-try-insert-scc-at-point))
@@ -1181,7 +1182,8 @@ Uses `haskell-guess-module-name-from-file-name'."
 
 (defvar haskell-auto-insert-module-format-string
   "-- | \n\nmodule %s where\n\n"
-  "Template string that will be inserted in new haskell buffers via `haskell-auto-insert-module-template'.")
+  "Template string that will be inserted in new haskell buffers via
+`haskell-auto-insert-module-template'.")
 
 (defun haskell-auto-insert-module-template ()
   "Insert a module template for the newly created buffer."
