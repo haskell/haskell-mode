@@ -453,9 +453,9 @@ Possible results are:
 - 'char: for char literals
 - 'number: for decimal, float, hexadecimal and octal number literals
 - 'template-haskell-quote: for a string of apostrophes for template
-  haskell
-- 'template-haskell-quasi-quote: for a string of apostrophes for
-  template haskell
+   haskell
+- 'template-haskell-quasi-quote: for a string of apostrophes for template
+   haskell
 
 Note that for qualified symbols (match-string 1) returns the
 unqualified identifier or symbol.  Further qualification for

@@ -1182,7 +1182,8 @@ Uses `haskell-guess-module-name-from-file-name'."
 
 (defvar haskell-auto-insert-module-format-string
   "-- | \n\nmodule %s where\n\n"
-  "Template string that will be inserted in new haskell buffers via
+  "Template string for the `haskell-auto-insert-module-template' command.
+It will be inserted in new haskell buffers via
 `haskell-auto-insert-module-template'.")
 
 (defun haskell-auto-insert-module-template ()

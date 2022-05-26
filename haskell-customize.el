@@ -172,8 +172,8 @@ pass additional flags to `ghc'."
 
 (defcustom haskell-process-do-cabal-format-string
   ":!cd %s && %s"
-  "The way to run cabal commands. It takes two arguments -- the
-directory and the command.
+  "The way to run cabal commands.
+It takes two arguments -- the directory and the command.
 See `haskell-process-do-cabal' for more details."
   :group 'haskell-interactive
   :type 'string)
@@ -242,8 +242,8 @@ is a member of the hidden package, blah blah."
 
 (defcustom haskell-process-suggest-overloaded-strings
   t
-  "Suggest adding OverloadedStrings pragma to file when getting type
-mismatches with [Char]."
+  "Suggest adding OverloadedStrings pragma to file.
+It is used when getting type mismatches with [Char]."
   :type 'boolean
   :group 'haskell-interactive)
 

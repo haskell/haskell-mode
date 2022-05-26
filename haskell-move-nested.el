@@ -34,7 +34,8 @@
 
 ;;;###autoload
 (defun haskell-move-nested (cols)
-  "Shift the nested off-side-rule block adjacent to point by COLS
+  "Shift the nested off-side-rule block adjacent to point.
+It shift the nested off-side-rule block adjacent to point by COLS
 columns to the right.
 
 In Transient Mark mode, if the mark is active, operate on the contents
