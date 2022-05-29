@@ -232,8 +232,9 @@ file), then this function returns nil."
 
 ;;;###autoload
 (defun haskell-cabal-get-dir (&optional use-defaults)
-  "Get the Cabal dir for a new project. Various ways of figuring this out,
-   and indeed just prompting the user. Do them all."
+  "Get the Cabal dir for a new project.
+Various ways of figuring this out, and indeed just prompting the user.  Do them
+all."
   (let* ((file (haskell-cabal-find-file))
          (dir (if file (file-name-directory file) default-directory)))
     (if use-defaults
@@ -360,7 +361,9 @@ OTHER-WINDOW use `find-file-other-window'."
 (defconst haskell-cabal-conditional-regexp "^[ \t]*\\(\\if\\|else\\|}\\)")
 
 (defun haskell-cabal-classify-line ()
-  "Classify the current line into 'section-header 'subsection-header 'section-data 'comment and 'empty '"
+  "Classify the current line's type.
+Possible results are 'section-header 'subsection-header 'section-data 'comment
+and 'empty '"
   (save-excursion
     (beginning-of-line)
     (cond
@@ -493,7 +496,8 @@ OTHER-WINDOW use `find-file-other-window'."
           ((equal component-type "benchmark")  "bench"))))
 
 (defun haskell-cabal-enum-targets (&optional process-type)
-  "Enumerate .cabal targets. PROCESS-TYPE determines the format of the returned target."
+  "Enumerate .cabal targets.
+PROCESS-TYPE determines the format of the returned target."
   (let ((cabal-file (haskell-cabal-find-file))
         (process-type (if process-type process-type 'ghci)))
     (when (and cabal-file (file-readable-p cabal-file))
@@ -923,9 +927,10 @@ resulting buffer-content.  Unmark line at the end."
                     haskell-cabal-source-bearing-sections))))
 
 (defun haskell-cabal-line-filename ()
-  "Expand filename in current line according to the subsection type
+  "Expand filename in current line according to the subsection type.
 
-Module names in exposed-modules and other-modules are expanded by replacing each dot (.) in the module name with a forward slash (/) and appending \".hs\"
+Module names in exposed-modules and other-modules are expanded by replacing each
+dot (.) in the module name with a forward slash (/) and appending \".hs\"
 
 Example: Foo.Bar.Quux ==> Foo/Bar/Quux.hs
 

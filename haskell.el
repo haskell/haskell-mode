@@ -446,8 +446,9 @@ Give optional NEXT-P parameter to override value of
                       (list "build --ghc-options=-fforce-recomp"))))))
 
 (defun haskell-process-file-loadish (command reload-p module-buffer)
-  "Run a loading-ish COMMAND that wants to pick up type errors\
-and things like that.  RELOAD-P indicates whether the notification
+  "Run a loading-ish COMMAND.
+For example, a COMMAND that wants to pick up type errors and things like that.
+RELOAD-P indicates whether the notification
 should say 'reloaded' or 'loaded'.  MODULE-BUFFER may be used
 for various things, but is optional."
   (let ((session (haskell-session)))
