@@ -50,6 +50,7 @@
 ;;  `haskell-doc-show-prelude'      (default: t)
 ;;  `haskell-doc-show-strategy'     (default: t)
 ;;  `haskell-doc-show-user-defined' (default: t)
+;;  `haskell-doc-show-ghci'         (default: nil)
 
 ;; If you want to define your own strings for some identifiers define an
 ;; alist of (ID . STRING) and set `haskell-doc-show-user-defined' to t.
@@ -86,6 +87,7 @@
 ;;  `haskell-doc-show-prelude'      ... toggle echoing of prelude id's types
 ;;  `haskell-doc-show-strategy'     ... toggle echoing of strategy id's types
 ;;  `haskell-doc-show-user-defined' ... toggle echoing of user def id's types
+;;  `haskell-doc-show-ghci'         ... toggle echoing of GHCI type output
 ;;  `haskell-doc-check-active' ... check whether haskell-doc is active;
 ;;                                 Key: CTRL-c ESC-/
 
@@ -341,6 +343,9 @@ If the identifier near point is a user defined function that occurs as key
 in the alist `haskell-doc-user-defined-ids' and the variable
 `haskell-doc-show-user-defined' is non-nil show the type of the function.
 
+If `haskell-doc-show-ghci' is non-nil, lookup in GHCI the type of the identifier
+near point and show it.
+
 This variable is buffer-local.")
 
 (defvar haskell-doc-mode-hook nil
@@ -386,6 +391,13 @@ This variable is buffer-local."
   :group 'haskell-doc
   :type 'boolean)
 (make-variable-buffer-local 'haskell-doc-show-user-defined)
+
+(defcustom haskell-doc-show-ghci nil
+  "If non-nil, show a documentation string for ids that GHCI can find.
+This variable is buffer-local."
+  :group 'haskell-doc
+  :type 'boolean)
+(make-variable-buffer-local 'haskell-doc-show-ghci)
 
 (defcustom haskell-doc-chop-off-context t
   "If non-nil eliminate the context part in a Haskell type."
@@ -1232,6 +1244,8 @@ URL is the URL of the online doc."
       '("Toggle display of strategy ids" . haskell-doc-show-strategy))
     (define-key map [user-defined-on]
       '("Toggle display of user defined ids" . haskell-doc-show-user-defined))
+    (define-key map [ghci-on]
+      '("Toggle display of ids GHCI can find" . haskell-doc-show-ghci))
     (define-key map [prelude-on]
       '("Toggle display of prelude functions" . haskell-doc-show-prelude))
     (define-key map [reserved-ids-on]
@@ -1347,6 +1361,11 @@ See variable docstring."
   "Toggle the automatic display of a doc string for user defined ids."
   (interactive "P")
   (haskell-doc-toggle-var haskell-doc-show-user-defined prefix))
+
+(defun haskell-doc-show-ghci (&optional prefix)
+  "Toggle the automatic display of a ids GHCI can lookup."
+  (interactive "P")
+  (haskell-doc-toggle-var haskell-doc-show-ghci prefix))
 
 
 ;;;###autoload
@@ -1844,6 +1863,33 @@ This function switches to and potentially loads many buffers."
         (if (not (null docstring))
             ;; (string-match (format "^\\s-*data.*%s.*$" fn) docstring))
             (setq doc `(,docstring . "Data"))) ; (setq doc `(,(match-string 0 docstring) . "Data")) )
+        ;; Let GHCI search for types
+        ;; Note that this is VERY slow (0.5 seconds for 700 lines of code)
+        (when (and haskell-doc-show-ghci (null doc) (not (null fn)))
+          (let ((fname (buffer-file-name)))
+            (with-temp-buffer
+              (shell-command (concat "bash -c \"ghci " fname " <<< ':t " fn "'\"") t)
+              (when (save-excursion
+                      (goto-char (point-min))
+                      (forward-line 1)
+                      ;; found module
+                      (looking-at-p "\\["))
+                (unless (save-excursion (search-forward "error:" nil t))
+                  (delete-region (point-min)
+                                 (save-excursion (search-forward-regexp "^Ok")
+                                                 (forward-line 1)
+                                                 (point)))
+                  (delete-region (save-excursion (goto-char (point-max))
+                                                 (forward-line -1)
+                                                 (backward-char)
+                                                 (point))
+                                 (point-max))
+                  (delete-region (point-min)
+                                 (save-excursion (goto-char (point-min))
+                                                 (search-forward ":: ")
+                                                 (point)))
+                  (message "Message: '%s'" (buffer-substring-no-properties (point-min) (point-max)))
+                  (setq doc `(,(buffer-substring-no-properties (point-min) (point-max)) . "Variables")))))))
         ;; return the result
         doc ))))
 
