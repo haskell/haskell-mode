@@ -27,6 +27,7 @@
 ;;; Code:
 
 (require 'ansi-color)
+(require 'view)
 (require 'haskell-mode)
 (require 'haskell-utils)
 
@@ -58,6 +59,11 @@ If nil, use the Hoogle web-site."
           (const :tag "fp-complete" "https://www.stackage.org/lts/hoogle?q=%s")
           string))
 
+(defcustom haskell-hoogle-colorize-with-haskell-mode t
+  "Whether to use haskell-mode to colorize hoogles's CLI output."
+  :group 'haskell
+  :type 'boolean)
+
 ;;;###autoload
 (defun haskell-hoogle (query &optional info)
   "Do a Hoogle search for QUERY.
@@ -73,10 +79,21 @@ is asked to show extra info for the items matching QUERY.."
                           (if info " -i " "")
                           " --color " (shell-quote-argument query)))
          (output (shell-command-to-string command)))
-    (with-help-window "*hoogle*"
-      (with-current-buffer standard-output
-        (insert output)
-        (ansi-color-apply-on-region (point-min) (point-max)))))))
+      (with-help-window "*hoogle*"
+        (with-current-buffer standard-output
+          (if haskell-hoogle-colorize-with-haskell-mode
+              (let ((outs (ansi-color-filter-apply output)))
+                (delay-mode-hooks (haskell-mode))
+                (if info
+                    (let ((lns (split-string output "\n" t " ")))
+                      (insert (car lns) "\n\n")
+                      (dolist (ln (cdr lns)) (insert "-- " ln "\n")))
+                  (insert outs)
+                  (forward-line -1)
+                  (when (looking-at-p "^plus more results") (insert "\n-- ")))
+              (view-mode))
+          (insert output)
+          (ansi-color-apply-on-region (point-min) (point-max))))))))
 
 ;;;###autoload
 (defalias 'hoogle 'haskell-hoogle)
