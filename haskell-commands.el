@@ -677,9 +677,9 @@ happened since function invocation)."
                             (cdr (reverse haskell-utils-async-post-command-flag))))
                ;; Present the result only when response is valid and not asked
                ;; to insert result
-               (haskell-command-echo-or-present response)))
+               (haskell-command-echo-or-present response))))
 
-            (haskell-utils-async-stop-watching-changes init-buffer))))))))
+          (haskell-utils-async-stop-watching-changes init-buffer)))))))
 
 (make-obsolete 'haskell-process-generate-tags
                'haskell-mode-generate-tags
