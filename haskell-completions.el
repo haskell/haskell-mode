@@ -308,11 +308,11 @@ PREFIX should be a list such one returned by
     (when (not (eql typ 'haskell-completions-general-prefix))
       (let ((candidates
              (cl-case typ
-               ('haskell-completions-pragma-name-prefix
+               (haskell-completions-pragma-name-prefix
                 haskell-completions--pragma-names)
-               ('haskell-completions-ghc-option-prefix
+               (haskell-completions-ghc-option-prefix
                 haskell-ghc-supported-options)
-               ('haskell-completions-language-extension-prefix
+               (haskell-completions-language-extension-prefix
                 haskell-ghc-supported-extensions)
                (otherwise
                 (append (when (bound-and-true-p haskell-tags-on-save)
