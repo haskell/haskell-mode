@@ -43,7 +43,7 @@
   "Returns `t' if line is empty or composed only of whitespace."
   (save-excursion
     (beginning-of-line)
-    (= (point-at-eol)
+    (= (line-end-position)
        (progn (skip-chars-forward "[:blank:]") (point)))))
 
 (defun haskell-indented-block ()
@@ -92,7 +92,7 @@ indentation if dir=-1"
   (save-excursion
     (goto-char (point-max))
     (while (zerop (forward-line -1))
-      (goto-char (point-at-bol))
+      (goto-char (line-beginning-position))
       (when (= (current-indentation) 0) (haskell-hide-toggle)))))
 
 (defvar haskell-collapse-mode-map
