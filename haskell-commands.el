@@ -653,11 +653,11 @@ happened since function invocation)."
           (cl-case res-type
             ;; neither popup presentation buffer
             ;; nor insert response in error case
-            ('unknown-command
+            (unknown-command
              (message "This command requires GHCi 8+ or GHCi-ng. Please read command description for details."))
-            ('option-missing
+            (option-missing
              (message "Could not infer type signature. You need to load file first. Also :set +c is required, see customization `haskell-interactive-set-+c'. Please read command description for details."))
-            ('interactive-error (message "Wrong REPL response: %s" sig))
+            (interactive-error (message "Wrong REPL response: %s" sig))
             (otherwise
              (if insert-value
                  ;; Only insert type signature and do not present it

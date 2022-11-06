@@ -265,9 +265,9 @@ list of modules where missed IDENT was found."
                      (get-buffer-create "*haskell-process-log*"))
       (switch-to-buffer-other-window (get-buffer "*haskell-process-log*")))
      (t (let ((app-name (cl-ecase (haskell-process-type)
-                          ('ghci haskell-process-path-cabal)
-                          ('cabal-repl haskell-process-path-cabal)
-                          ('stack-ghci haskell-process-path-stack))))
+                          (ghci haskell-process-path-cabal)
+                          (cabal-repl haskell-process-path-cabal)
+                          (stack-ghci haskell-process-path-stack))))
           (haskell-process-queue-command
            process
            (make-haskell-command
@@ -566,12 +566,12 @@ When MODULE-BUFFER is non-NIL, paint error overlays."
   "Show the '(Compiling|Loading) X' message."
   (let ((msg (concat
               (cl-ecase type
-                ('compiling
+                (compiling
                  (if haskell-interactive-mode-include-file-name
                      (format "Compiling: %s (%s)" module-name file-name)
                    (format "Compiling: %s" module-name)))
-                ('loading (format "Loading: %s" module-name))
-                ('import-cycle
+                (loading (format "Loading: %s" module-name))
+                (import-cycle
                  (format "Module has an import cycle: %s" module-name)))
               (if th " [TH]" ""))))
     (haskell-mode-message-line msg)
