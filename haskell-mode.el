@@ -788,7 +788,7 @@ your Emacs configuration. To do that you can customize
 `haskell-mode-hook' or add lines to your .emacs file. For
 example, to enable `interactive-haskell-mode', use the following:
 
-    (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+    (add-hook \\='haskell-mode-hook \\='interactive-haskell-mode)
 
 Minor modes that work well with `haskell-mode':
 

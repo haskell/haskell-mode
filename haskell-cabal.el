@@ -362,8 +362,8 @@ OTHER-WINDOW use `find-file-other-window'."
 
 (defun haskell-cabal-classify-line ()
   "Classify the current line's type.
-Possible results are 'section-header 'subsection-header 'section-data 'comment
-and 'empty '"
+Possible results are \\='section-header \\='subsection-header \\='section-data
+\\='comment and \\='empty"
   (save-excursion
     (beginning-of-line)
     (cond

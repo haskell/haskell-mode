@@ -793,7 +793,7 @@ For example
          (throw 'parse-end nil))))))
 
 (defun haskell-indentation-toplevel-where ()
-  "Parse 'where' that we may hit as a standalone in module declaration."
+  "Parse \\='where\\=' that we may hit as a standalone in module declaration."
   (haskell-indentation-read-next-token)
 
   (when (eq current-token 'end-tokens)
@@ -1160,13 +1160,13 @@ yet. Keep the list in ascending order."
 
 The following symbols are used as pseudo tokens:
 
-'layout-item: A new item in a layout list.  The next token
+\\='layout-item: A new item in a layout list.  The next token
               will be the first token from the item.
 
-'layout-end:  the end of a layout list.  Next token will be
+\\='layout-end:  the end of a layout list.  Next token will be
               the first token after the layout list.
 
-'end-tokens:  back at point where we started, following-token
+\\='end-tokens:  back at point where we started, following-token
               will be set to the next token.
 
 Pseudo tokens are used only when implicit-layout-active is

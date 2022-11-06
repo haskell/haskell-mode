@@ -1324,7 +1324,7 @@ of the regions to move."
 (defun haskell-indent-align-def (p-arg type)
   "Align guards or rhs within the current definition before point.
 If P-ARG is t align all defs up to the mark.
-TYPE is either 'guard or 'rhs."
+TYPE is either \\='guard or \\='rhs."
   (save-excursion
     (let (start-block end-block
                       (maxcol (if (eq type 'rhs) haskell-indent-rhs-align-column 0))

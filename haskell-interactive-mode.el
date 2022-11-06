@@ -396,7 +396,7 @@ SESSION, otherwise operate on the current buffer."
                           'rear-nonsticky t)))))
 
 (defun haskell-interactive-mode-goto-end-point ()
-  "Go to the 'end' of the buffer (before the prompt)."
+  "Go to the \\='end\\=' of the buffer (before the prompt)."
   (goto-char haskell-interactive-mode-prompt-start)
   (goto-char (line-beginning-position)))
 
