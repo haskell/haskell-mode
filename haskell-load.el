@@ -563,7 +563,7 @@ When MODULE-BUFFER is non-NIL, paint error overlays."
                  t)))))))
 
 (defun haskell-interactive-show-load-message (session type module-name file-name echo th)
-  "Show the '(Compiling|Loading) X' message."
+  "Show the \\='(Compiling|Loading) X\\=' message."
   (let ((msg (concat
               (cl-ecase type
                 (compiling

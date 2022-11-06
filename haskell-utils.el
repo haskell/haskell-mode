@@ -114,7 +114,7 @@ characters."
     (replace-regexp-in-string "\r?\n" "" s)))
 
 (defun haskell-utils-repl-response-error-status (response)
-  "Parse response REPL's RESPONSE for errors.
+  "Parse response REPL\\='s RESPONSE for errors.
 Returns one of the following symbols:
 
 + unknown-command
@@ -128,10 +128,10 @@ Returns one of the following symbols:
   REPL missing requested command
 * \"<interactive>:3:5: …\"
   interactive REPL error
-* \"Couldn't guess that module name. Does it exist?\"
+* \"Couldn\\='t guess that module name. Does it exist?\"
   (:type-at and maybe some other commands error)
 * *all other reposnses* are treated as success reposneses and
-  'no-error is returned."
+  \\='no-error is returned."
   (if response
       (let ((first-line (car (split-string response "\n" t))))
         (cond

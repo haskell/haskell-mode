@@ -53,7 +53,7 @@ Used for locating additional package data files.")
 
 Customize this variable to see the supported symbol values.
 
-When set to 'auto (the default), the directory contents and
+When set to \\='auto (the default), the directory contents and
 available programs will be used to make a best guess at the
 process type and the project directory.
 
@@ -86,7 +86,7 @@ The following example function arranges for all haskell process
 commands to be started in the current nix-shell environment:
 
   (lambda (argv) (append (list \"nix-shell\" \"-I\" \".\" \"--command\" )
-                    (list (mapconcat 'identity argv \" \"))))
+                    (list (mapconcat \\='identity argv \" \"))))
 
 See Info Node `(emacs)Directory Variables' for a way to set this option on
 a per-project basis."
@@ -367,7 +367,7 @@ read-only property."
   '()
   "Support a mapping from module to import lines.
 
-E.g. '((\"Data.Map\" . \"import qualified Data.Map as M
+E.g. \\='((\"Data.Map\" . \"import qualified Data.Map as M
 import Data.Map (Map)
 \"))
 
@@ -413,9 +413,9 @@ presence of a *.cabal file or stack.yaml file or something similar.")
 (defun haskell-build-type ()
   "Looks for cabal and stack spec files.
    When found, returns a pair (TAG . DIR)
-   where TAG is 'cabal-project, 'cabal-sandbox. 'cabal, or 'stack;
+   where TAG is \\='cabal-project, \\='cabal-sandbox. \\='cabal, or \\='stack;
    and DIR is the directory containing cabal or stack file.
-   When none found, DIR is nil, and TAG is 'ghc"
+   When none found, DIR is nil, and TAG is \\='ghc"
   ;; REVIEW maybe just 'cabal is enough.
   (let ((cabal-project (locate-dominating-file default-directory "cabal.project"))
         (cabal-sandbox (locate-dominating-file default-directory "cabal.sandbox.config"))
@@ -439,8 +439,8 @@ presence of a *.cabal file or stack.yaml file or something similar.")
      (t (error "Could not find any installation of GHC.")))))
 
 (defun haskell-process-type ()
-  "Return `haskell-process-type', or a guess if that variable is 'auto.
-   Converts the obsolete 'cabal-new-repl to its equivalent 'cabal-repl.
+  "Return `haskell-process-type', or a guess if that variable is \\='auto.
+   Converts the obsolete \\='cabal-new-repl to its equivalent \\='cabal-repl.
    May also set `inferior-haskell-root-dir'"
   (cond
    ((eq 'cabal-new-repl haskell-process-type)
