@@ -743,6 +743,26 @@ Prefix ARG is handled as per `delete-indentation'."
       (funcall #'electric-pair-default-inhibit ch)))
 
 ;; The main mode functions
+(defcustom haskell-mode-hook '(haskell-indentation-mode interactive-haskell-mode)
+  "List of functions to run after `haskell-mode' is enabled.
+
+Use to enable minor modes coming with `haskell-mode' or run an
+arbitrary function.
+
+Note that  `haskell-indentation-mode' and `haskell-indent-mode' should not be
+run at the same time."
+  :group 'haskell
+  :type 'hook
+  :options '(capitalized-words-mode
+             flyspell-prog-mode
+             haskell-decl-scan-mode
+             haskell-indent-mode
+             haskell-indentation-mode
+             highlight-uses-mode
+             imenu-add-menubar-index
+             interactive-haskell-mode
+             turn-on-haskell-unicode-input-method))
+
 ;;;###autoload
 (define-derived-mode haskell-mode prog-mode "Haskell"
   "Major mode for editing Haskell programs.
@@ -858,26 +878,6 @@ Minor modes that work well with `haskell-mode':
     (setq-local electric-pair-inhibit-predicate 'haskell-mode--inhibit-bracket-inside-comment-or-default))
 
   (haskell-indentation-mode))
-
-(defcustom haskell-mode-hook '(haskell-indentation-mode interactive-haskell-mode)
-  "List of functions to run after `haskell-mode' is enabled.
-
-Use to enable minor modes coming with `haskell-mode' or run an
-arbitrary function.
-
-Note that  `haskell-indentation-mode' and `haskell-indent-mode' should not be
-run at the same time."
-  :group 'haskell
-  :type 'hook
-  :options '(capitalized-words-mode
-             flyspell-prog-mode
-             haskell-decl-scan-mode
-             haskell-indent-mode
-             haskell-indentation-mode
-             highlight-uses-mode
-             imenu-add-menubar-index
-             interactive-haskell-mode
-             turn-on-haskell-unicode-input-method))
 
 (defun haskell-fill-paragraph (justify)
   (save-excursion
