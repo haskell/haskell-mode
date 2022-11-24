@@ -1112,11 +1112,13 @@ If there is one, pop that up in a buffer, similar to `debug-on-error'."
                           'rear-nonsticky t)))))
 
 ;;;###autoload
-(defun haskell-process-show-repl-response (line)
+(defun haskell-process-show-repl-response (line &optional single-line-p)
   "Send LINE to the GHCi process and echo the result in some fashion.
 Result will be printed in the minibuffer or presented using
 function `haskell-presentation-present', depending on variable
-`haskell-process-use-presentation-mode'."
+`haskell-process-use-presentation-mode'.  With SINGLE-LINE-P as
+nil, it will echos the response as is.  This allows the response
+to remain multi-lined, which is better for error messages."
   (let ((process (haskell-interactive-process)))
     (haskell-process-queue-command
      process
@@ -1129,7 +1131,9 @@ function `haskell-presentation-present', depending on variable
                       (haskell-presentation-present
                        (haskell-process-session (car state))
                        response)
-                    (haskell-mode-message-line response)))))))
+                    (if single-line-p
+						(haskell-mode-message-line response)
+                      (message "%s" response))))))))
 
 (provide 'haskell-interactive-mode)
 
