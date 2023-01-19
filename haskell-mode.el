@@ -832,8 +832,6 @@ Minor modes that work well with `haskell-mode':
   (setq-local parse-sexp-ignore-comments nil)
   (setq-local syntax-propertize-function #'haskell-syntax-propertize)
 
-  ;; Set things up for eldoc-mode.
-  (setq-local eldoc-documentation-function 'haskell-doc-current-info)
   ;; Set things up for imenu.
   (setq-local imenu-create-index-function 'haskell-ds-create-imenu-index)
   ;; Set things up for font-lock.
