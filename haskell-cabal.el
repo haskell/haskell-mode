@@ -515,7 +515,9 @@ PROCESS-TYPE determines the format of the returned target."
                        (val (car (split-string
                                   (haskell-cabal-section-value section)))))
                   (if (equal (downcase component-type) "library")
-                      (let* ((lib-name (if (eq 'val "") package-name val))
+                      (let* ((lib-name (if (not val)
+                                           (if (eq 'stack-ghci process-type) "lib" package-name)
+                                           val))
                              (lib-target (concat package-name ":" lib-name))
                              )
                         (push lib-target matches))
