@@ -1252,8 +1252,6 @@ URL is the URL of the online doc."
             (define-key-after hugsmap [haskell-doc]
               (cons "Haskell-doc" haskell-doc-keymap)
               [Haskell-doc mode]))))
-  ;; Add shortcuts for these commands.
-  (local-set-key "\C-c\e/" 'haskell-doc-check-active)
   ;; Conflicts with the binding of haskell-insert-otherwise.
   ;; (local-set-key "\C-c\C-o" 'haskell-doc-mode)
   (local-set-key [(control shift meta mouse-3)]
