@@ -44,13 +44,13 @@
     (forward-line)
     (should (string=
              "import [qualified] modid [as modid] [impspec]"
-             (haskell-doc-mode-print-current-symbol-info)))
+             (haskell-doc-eldoc-function)))
     (haskell-mode-toggle-interactive-prompt-state)
     (should (eq nil
-                   (haskell-doc-mode-print-current-symbol-info)))
+                (haskell-doc-eldoc-function)))
     (haskell-mode-toggle-interactive-prompt-state t)
     (should (string=
              "import [qualified] modid [as modid] [impspec]"
-             (haskell-doc-mode-print-current-symbol-info)))))
+             (haskell-doc-eldoc-function)))))
 
 ;;; haskell-doc-tests.el ends here

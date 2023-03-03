@@ -314,38 +314,6 @@
   :prefix "haskell-doc-")
 
 
-(defvar-local haskell-doc-mode nil
-  "*If non-nil, show the type of the function near point or a related comment.
-
-If the identifier near point is a Haskell keyword and the variable
-`haskell-doc-show-reserved' is non-nil show a one line summary
-of the syntax.
-
-If the identifier near point is a Prelude or one of the standard library
-functions and `haskell-doc-show-prelude' is non-nil show its type.
-
-If the identifier near point is local \(i.e. defined in this module\) check
-the `imenu' list of functions for the type.  This obviously requires that
-your language mode uses `imenu'.
-
-If the identifier near point is global \(i.e. defined in an imported module\)
-and the variable `haskell-doc-show-global-types' is non-nil show the type of its
-function.
-
-If the identifier near point is a standard strategy or a function, type related
-related to strategies and `haskell-doc-show-strategy' is non-nil show the type
-of the function.  Strategies are special to the parallel execution of Haskell.
-If you're not interested in that just turn it off.
-
-If the identifier near point is a user defined function that occurs as key
-in the alist `haskell-doc-user-defined-ids' and the variable
-`haskell-doc-show-user-defined' is non-nil show the type of the function.
-
-This variable is buffer-local.")
-
-(defvar haskell-doc-mode-hook nil
-  "Hook invoked when entering `haskell-doc-mode'.")
-
 (defvar-local haskell-doc-index nil
   "Variable holding an alist matching file names to fct-type alists.
 The function `haskell-doc-make-global-fct-index' rebuilds this variables
@@ -404,14 +372,6 @@ This variable is buffer-local."
 
 (defvar haskell-doc-search-distance 40  ; distance in characters
   "*How far to search when looking for the type declaration of fct under cursor.")
-
-
-(defvar haskell-doc-idle-delay 0.50
-  "*Number of seconds of idle time to wait before printing.
-If user input arrives before this interval of time has elapsed after the
-last input, no documentation will be printed.
-
-If this variable is set to 0, no idle time is required.")
 
 (defvar haskell-doc-argument-case 'identity ; 'upcase
   "Case in which to display argument names of functions, as a symbol.
@@ -1238,81 +1198,56 @@ URL is the URL of the online doc."
       '("Toggle display of reserved ids" . haskell-doc-show-reserved))
     (define-key map [haskell-doc-on]
       '("Toggle haskell-doc mode" . haskell-doc-mode))
+    (define-key map  [(control shift meta mouse-3)]
+      'haskell-doc-ask-mouse-for-type)
     map))
 
-(defun haskell-doc-install-keymap ()
-  "Install a menu for `haskell-doc-mode' as a submenu of \"Hugs\"."
-  (interactive)
-  ;; Add the menu to the hugs menu as last entry.
-  (let ((hugsmap (lookup-key (current-local-map) [menu-bar Hugs])))
-    (if (not (or (featurep 'xemacs) ; XEmacs has problems here
-                 (not (keymapp hugsmap))
-                 (lookup-key hugsmap [haskell-doc])))
-        (if (functionp 'define-key-after)
-            (define-key-after hugsmap [haskell-doc]
-              (cons "Haskell-doc" haskell-doc-keymap)
-              [Haskell-doc mode]))))
-  ;; Add shortcuts for these commands.
-  (local-set-key "\C-c\e/" 'haskell-doc-check-active)
-  ;; Conflicts with the binding of haskell-insert-otherwise.
-  ;; (local-set-key "\C-c\C-o" 'haskell-doc-mode)
-  (local-set-key [(control shift meta mouse-3)]
-                 'haskell-doc-ask-mouse-for-type))
-
-
-(defvar haskell-doc-timer nil)
-(defvar haskell-doc-buffers nil)
 
 ;;;###autoload
-(defun haskell-doc-mode (&optional arg)
+(define-minor-mode haskell-doc-mode
   "Enter `haskell-doc-mode' for showing fct types in the echo area.
-See variable docstring."
-  (interactive (list (or current-prefix-arg 'toggle)))
 
-  (setq haskell-doc-mode
-        (cond
-         ((eq arg 'toggle) (not haskell-doc-mode))
-         (arg (> (prefix-numeric-value arg) 0))
-         (t)))
+When enabled, shows the type of the function near point or a related comment.
 
-  ;; First, unconditionally turn the mode OFF.
+If the identifier near point is a Haskell keyword and the variable
+`haskell-doc-show-reserved' is non-nil show a one line summary
+of the syntax.
 
-  (setq haskell-doc-buffers (delq (current-buffer) haskell-doc-buffers))
-  ;; Refresh the buffers list.
-  (dolist (buf haskell-doc-buffers)
-    (unless (and (buffer-live-p buf)
-                 (with-current-buffer buf haskell-doc-mode))
-      (setq haskell-doc-buffers (delq buf haskell-doc-buffers))))
-  ;; Turn off the idle timer (or idle post-command-hook).
-  (when (and haskell-doc-timer (null haskell-doc-buffers))
-    (cancel-timer haskell-doc-timer)
-    (setq haskell-doc-timer nil))
-  (remove-hook 'post-command-hook
-               'haskell-doc-mode-print-current-symbol-info 'local)
+If the identifier near point is a Prelude or one of the standard library
+functions and `haskell-doc-show-prelude' is non-nil show its type.
 
+If the identifier near point is local \(i.e. defined in this module\) check
+the `imenu' list of functions for the type.  This obviously requires that
+your language mode uses `imenu'.
+
+If the identifier near point is global \(i.e. defined in an imported module\)
+and the variable `haskell-doc-show-global-types' is non-nil show the type of its
+function.
+
+If the identifier near point is a standard strategy or a function, type related
+related to strategies and `haskell-doc-show-strategy' is non-nil show the type
+of the function.  Strategies are special to the parallel execution of Haskell.
+If you're not interested in that just turn it off.
+
+If the identifier near point is a user defined function that occurs as key
+in the alist `haskell-doc-user-defined-ids' and the variable
+`haskell-doc-show-user-defined' is non-nil show the type of the function.
+
+This variable is buffer-local."
+  :global nil
+  :keymap haskell-doc-keymap
+
+  (and haskell-doc-show-global-types
+       (haskell-doc-make-global-fct-index)) ; build type index for global fcts
+  (if (boundp 'eldoc-documentation-functions)
+      (if haskell-doc-mode
+          (add-hook 'eldoc-documentation-functions 'haskell-doc-eldoc-function nil t)
+        (remove-hook 'eldoc-documentation-functions 'haskell-doc-eldoc-function t))
+    (if haskell-doc-mode
+        (setq-local eldoc-documentation-function 'haskell-doc-eldoc-function)
+      (kill-local-variable eldoc-documentation-function)))
   (when haskell-doc-mode
-    ;; Turning the mode ON.
-    (push (current-buffer) haskell-doc-buffers)
-
-    (if (fboundp 'run-with-idle-timer)
-        (unless haskell-doc-timer
-          (setq haskell-doc-timer
-                (run-with-idle-timer
-                 haskell-doc-idle-delay t
-                 'haskell-doc-mode-print-current-symbol-info)))
-      (add-hook 'post-command-hook
-                'haskell-doc-mode-print-current-symbol-info nil 'local))
-    (and haskell-doc-show-global-types
-         (haskell-doc-make-global-fct-index)) ; build type index for global fcts
-
-    (haskell-doc-install-keymap)
-
-    (run-hooks 'haskell-doc-mode-hook))
-
-  (and (called-interactively-p 'any)
-       (message "haskell-doc-mode is %s"
-                (if haskell-doc-mode "enabled" "disabled")))
-  haskell-doc-mode)
+    (eldoc-mode)))
 
 (defmacro haskell-doc-toggle-var (id prefix)
   ;; toggle variable or set it based on prefix value
@@ -1367,46 +1302,22 @@ See variable docstring."
   "Unequivocally turn off `haskell-doc-mode' (which see)."
   (haskell-doc-mode 0))
 
-(defun haskell-doc-check-active ()
-  "Check whether the print function is hooked in.
-Should be the same as the value of `haskell-doc-mode' but alas currently it
-is not."
-  (interactive)
-  (message "%s"
-           (if (or (and haskell-doc-mode haskell-doc-timer)
-                   (memq 'haskell-doc-mode-print-current-symbol-info
-                         post-command-hook))
-               "haskell-doc is ACTIVE"
-             (substitute-command-keys
-              "haskell-doc is not ACTIVE \(Use \\[haskell-doc-mode] to turn it on\)"))))
+;;;###autoload
+(defun haskell-doc-eldoc-function (&optional callback)
+  "Function for use by eldoc.
 
-
-;; This is the function hooked into the elisp command engine
-(defun haskell-doc-mode-print-current-symbol-info ()
-  "Print the type of the symbol under the cursor.
-
-This function is run by an idle timer to print the type
- automatically if `haskell-doc-mode' is turned on."
-  (and haskell-doc-mode
-       (haskell-doc-in-code-p)
-       (not haskell-mode-interactive-prompt-state)
-       (not (eobp))
-       (not executing-kbd-macro)
-       ;; Having this mode operate in the minibuffer makes it impossible to
-       ;; see what you're doing.
-       (not (eq (selected-window) (minibuffer-window)))
-       ;; not in string or comment
-       ;; take a nap, if run straight from post-command-hook.
-       (if (fboundp 'run-with-idle-timer) t
-         (sit-for haskell-doc-idle-delay))
-       ;; good morning! read the word under the cursor for breakfast
-       (haskell-doc-show-type)))
-;; ;; ToDo: find surrounding fct
-;; (cond ((eq current-symbol current-fnsym)
-;;        (haskell-doc-show-type current-fnsym))
-;;       (t
-;;        (or nil ; (haskell-doc-print-var-docstring current-symbol)
-;;            (haskell-doc-show-type current-fnsym)))))))
+By accepting CALLBACK, it is designed to be used in
+`eldoc-documentation-functions' in Emacs >= 28.1, but by making
+that argument optional it can also be set directly as
+`eldoc-documentation-function' in older Emacsen."
+  (when (and haskell-doc-mode
+             (haskell-doc-in-code-p)
+             (not haskell-mode-interactive-prompt-state)
+             (not (eobp))
+             (not executing-kbd-macro))
+    (if callback
+        (funcall callback (haskell-doc-current-info))
+      (haskell-doc-current-info))))
 
 ;;;###autoload
 (defun haskell-doc-current-info ()
@@ -1450,7 +1361,7 @@ current buffer."
   ;; if printed before do not print it again
   (unless (string= sym (car haskell-doc-last-data))
     (let ((doc (or (haskell-doc-current-info--interaction t)
-                  (haskell-doc-sym-doc sym))))
+                   (haskell-doc-sym-doc sym))))
       (when (and doc (haskell-doc-in-code-p))
         ;; In Emacs 19.29 and later, and XEmacs 19.13 and later, all
         ;; messages are recorded in a log.  Do not put haskell-doc messages
