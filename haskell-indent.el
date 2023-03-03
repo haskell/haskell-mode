@@ -92,7 +92,6 @@
 
 (defvar haskell-literate)
 
-;;;###autoload
 (defgroup haskell-indent nil
   "Haskell indentation."
   :group 'haskell
@@ -435,7 +434,8 @@ Returns the location of the start of the comment, nil otherwise."
         (haskell-indent-skip-blanks-and-newlines-forward end))))
 
 (defun haskell-indent-next-symbol-safe (end)
-  "Puts point to the next following symbol, or to end if there are no more symbols in the sexp."
+  "Puts point if there are no more symbols in the sexp.
+The point is put to the next following symbol, or to end."
   (condition-case _errlist (haskell-indent-next-symbol end)
     (error (goto-char end))))
 
@@ -1233,7 +1233,7 @@ START if non-nil is a presumed start pos of the current definition."
                    (setq open (haskell-indent-offset-after-info)))
           (list (list (haskell-indent-after-keyword-column open start))))))
 
-     ;; open structure? ie  ( { [
+     ;; open structure? i.e.  ( { [
      ((setq open (haskell-indent-open-structure start (point)))
       (haskell-indent-inside-paren open))
 
@@ -1324,7 +1324,7 @@ of the regions to move."
 (defun haskell-indent-align-def (p-arg type)
   "Align guards or rhs within the current definition before point.
 If P-ARG is t align all defs up to the mark.
-TYPE is either 'guard or 'rhs."
+TYPE is either \\='guard or \\='rhs."
   (save-excursion
     (let (start-block end-block
                       (maxcol (if (eq type 'rhs) haskell-indent-rhs-align-column 0))
@@ -1435,7 +1435,7 @@ TYPE is either 'guard or 'rhs."
 
 (defun haskell-indent-align-guards-and-rhs (_start _end)
   "Align the guards and rhs of functions in the region, which must be active."
-  ;; The `start' and `end' args are dummys right now: they're just there so
+  ;; The `start' and `end' args are dummies right now: they're just there so
   ;; we can use the "r" interactive spec which properly signals an error.
   (interactive "*r")
   (haskell-indent-align-def t 'guard)

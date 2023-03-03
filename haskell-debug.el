@@ -28,43 +28,36 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configuration
 
-;;;###autoload
 (defgroup haskell-debug nil
   "Settings for debugging support."
   :link '(custom-manual "(haskell-mode)haskell-debug")
   :group 'haskell)
 
-;;;###autoload
 (defface haskell-debug-warning-face
   '((t :inherit 'compilation-warning))
   "Face for warnings."
   :group 'haskell-debug)
 
-;;;###autoload
 (defface haskell-debug-trace-number-face
   '((t :weight bold :background "#f5f5f5"))
   "Face for numbers in backtrace."
   :group 'haskell-debug)
 
-;;;###autoload
 (defface haskell-debug-newline-face
   '((t :weight bold :background "#f0f0f0"))
   "Face for newlines in trace steps."
   :group 'haskell-debug)
 
-;;;###autoload
 (defface haskell-debug-keybinding-face
   '((t :inherit 'font-lock-type-face :weight bold))
   "Face for keybindings."
   :group 'haskell-debug)
 
-;;;###autoload
 (defface haskell-debug-heading-face
   '((t :inherit 'font-lock-keyword-face))
   "Face for headings."
   :group 'haskell-debug)
 
-;;;###autoload
 (defface haskell-debug-muted-face
   '((t :foreground "#999"))
   "Face for muteds."

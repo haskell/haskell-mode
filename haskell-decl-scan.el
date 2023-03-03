@@ -107,7 +107,6 @@
 (require 'syntax)
 (require 'imenu)
 
-;;;###autoload
 (defgroup haskell-decl-scan nil
   "Haskell declaration scanning (`imenu' support)."
   :link '(custom-manual "(haskell-mode)haskell-decl-scan-mode")
@@ -514,7 +513,7 @@ positions and the type is one of the symbols \"variable\", \"datatype\",
                             (skip-chars-backward " \t")
                             (point))))))
           ;; If we did not manage to extract a name, cancel this
-          ;; declaration (eg. when line ends in "=> ").
+          ;; declaration (e.g. when line ends in "=> ").
           (if (string-match "^[ \t]*$" name) (setq name nil))
           (setq type 'instance)))
         ;; Move past start of current declaration.

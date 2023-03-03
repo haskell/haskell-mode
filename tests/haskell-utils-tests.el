@@ -222,7 +222,7 @@ removed."
   "Test commands related `haskell-utils-async-post-command-flag'.
 Tests flag updates and `post-command-hook' cleanup."
   (with-temp-switch-to-buffer
-    ;; set some random value to flag to test that it will be reseted
+    ;; set some random value to flag to test that it will be reset
     (setq haskell-utils-async-post-command-flag "non nil")
     (haskell-utils-async-watch-changes)
     ;; now flag should be empty

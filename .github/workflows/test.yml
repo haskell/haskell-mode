@@ -13,19 +13,19 @@ jobs:
       matrix:
         emacs_version:
           - 25.1
-          - 25.2
           - 25.3
           - 26.1
-          - 26.2
           - 26.3
           - 27.1
           - 27.2
+          - 28.1
+          - 28.2
           - snapshot
         include:
-          - emacs_version: 27.2
+          - emacs_version: 28.2
             target: deploy-manual
     steps:
-    - uses: cachix/install-nix-action@v12
+    - uses: cachix/install-nix-action@v20
       with:
         nix_path: nixpkgs=channel:nixos-unstable
     - uses: purcell/setup-emacs@master

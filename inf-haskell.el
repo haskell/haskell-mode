@@ -40,7 +40,6 @@
 (require 'cl-lib)
 (require 'haskell-string)
 
-;;;###autoload
 (defgroup inferior-haskell nil
   "Settings for REPL interaction via `inferior-haskell-mode'"
   :link '(custom-manual "(haskell-mode)inferior-haskell-mode")
@@ -56,14 +55,14 @@
   "Return the command with the arguments to start the repl based on the
 directory structure."
   (cl-ecase (haskell-process-type)
-    ('ghci       (cond ((eq system-type 'cygwin) `("ghcii.sh" ,@haskell-process-args-ghci))
-                       (t (append
-                           (if (listp haskell-process-path-ghci)
-                               haskell-process-path-ghci
-                             (list haskell-process-path-ghci))
-                           haskell-process-args-ghci))))
-    ('cabal-repl `(,haskell-process-path-cabal "repl" ,@haskell-process-args-cabal-repl))
-    ('stack-ghci `(,haskell-process-path-stack "ghci" ,@haskell-process-args-stack-ghci))))
+    (ghci       (cond ((eq system-type 'cygwin) `("ghcii.sh" ,@haskell-process-args-ghci))
+                      (t (append
+                          (if (listp haskell-process-path-ghci)
+                              haskell-process-path-ghci
+                            (list haskell-process-path-ghci))
+                          haskell-process-args-ghci))))
+    (cabal-repl `(,haskell-process-path-cabal "repl" ,@haskell-process-args-cabal-repl))
+    (stack-ghci `(,haskell-process-path-stack "ghci" ,@haskell-process-args-stack-ghci))))
 
 (defconst inferior-haskell-info-xref-re
   "-- Defined at \\(.+\\):\\([0-9]+\\):\\([0-9]+\\)\\(?:-\\([0-9]+\\)\\)?$")
@@ -74,7 +73,8 @@ directory structure."
 
 (defvar inferior-haskell-multiline-prompt-re
   "^\\*?[[:upper:]][\\._[:alnum:]]*\\(?: \\*?[[:upper:]][\\._[:alnum:]]*\\)*| "
-  "Regular expression for matching multiline prompt (the one inside :{ ... :} blocks).")
+  "Regular expression for matching multiline prompt.
+the one inside :{ ... :} blocks.")
 
 (defconst inferior-haskell-error-regexp-alist
   `(;; Format of error messages used by GHCi.

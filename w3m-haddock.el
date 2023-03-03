@@ -35,7 +35,6 @@
 
 (add-hook 'w3m-display-hook 'w3m-haddock-display)
 
-;;;###autoload
 (defface w3m-haddock-heading-face
   '((((class color)) :inherit highlight))
   "Face for quarantines."
@@ -43,13 +42,15 @@
 
 (defcustom haskell-w3m-haddock-dirs
   '("~/.cabal/share/doc/")
-  "The path to your cabal documentation dir. It should contain
-directories of package-name-x.x.
+  "The path to your cabal documentation dir.
+It should contain directories of package-name-x.x.
 
 You can rebind this if you're using hsenv by adding it to your
 .dir-locals.el in your project root. E.g.
 
-    ((haskell-mode . ((haskell-w3m-haddock-dirs . (\"/home/chris/Projects/foobar/.hsenv/cabal/share/doc\")))))
+    ((haskell-mode .
+      ((haskell-w3m-haddock-dirs .
+        (\"/home/chris/Projects/foobar/.hsenv/cabal/share/doc\")))))
 
 "
   :group 'haskell

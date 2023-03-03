@@ -91,11 +91,11 @@ Using this function is more efficient than matching against the
 regexp `haskell-lexeme-qid-or-qsym'.
 
 Returns:
-  'qid - if matched a qualified id: 'Data.Map' or 'Map'
-  'qsym - if matched a qualified id: 'Monad.>>=' or '>>='
-  'qprefix - if matched only modid prefix: 'Data.'
+  \\='qid - if matched a qualified id: \\='Data.Map\\=' or \\='Map\\='
+  \\='qsym - if matched a qualified id: \\='Monad.>>=\\=' or \\='>>=\\='
+  \\='qprefix - if matched only modid prefix: \\='Data.\\='
 
-After successful 'qid or 'qsym match (match-string 1) will return
+After successful \\='qid or \\='qsym match (match-string 1) will return
 the unqualified part (if any)."
   (let ((begin (point))
         (match-data-old (match-data t)))
@@ -354,8 +354,8 @@ After successful match:
   "Non-nil when point is just in front of Template Haskell
 quaisquote literal.
 
-Quasi quotes start with '[xxx|' or '[$xxx|' sequence and end with
-  '|]'. The 'xxx' is a quoter name. There is no escaping mechanism
+Quasi quotes start with \\='[xxx|\\=' or \\='[$xxx|\\=' sequence and end with
+  \\='|]\\='. The \\='xxx\\=' is a quoter name. There is no escaping mechanism
 provided for the ending sequence.
 
 Regexp has subgroup expressions:
@@ -365,8 +365,8 @@ Regexp has subgroup expressions:
  (match-text 4) matches the closing vertical bar
                 or nil if at the end of the buffer.
 
-Note that this function excludes 'e', 't', 'd', 'p' as quoter
-names according to Template Haskell specification."
+Note that this function excludes \\='e\\=', \\='t\\=', \\='d'\\=, \\='p\\='
+as quoter names according to Template Haskell specification."
   (let ((match-data-old (match-data t)))
     (if (and
          (looking-at (rx-to-string `(: "[" (optional "$")
@@ -442,15 +442,17 @@ type of Haskell token recognized.  Use `match-string',
 result.
 
 Possible results are:
-- 'special: for chars [](){}`,;
-- 'comment: for single line comments
-- 'nested-comment: for multiline comments
-- 'qsymid: for qualified identifiers or symbols
-- 'string: for strings literals
-- 'char: for char literals
-- 'number: for decimal, float, hexadecimal and octal number literals
-- 'template-haskell-quote: for a string of apostrophes for template haskell
-- 'template-haskell-quasi-quote: for a string of apostrophes for template haskell
+- \\='special: for chars [](){}`,;
+- \\='comment: for single line comments
+- \\='nested-comment: for multiline comments
+- \\='qsymid: for qualified identifiers or symbols
+- \\='string: for strings literals
+- \\='char: for char literals
+- \\='number: for decimal, float, hexadecimal and octal number literals
+- \\='template-haskell-quote: for a string of apostrophes for template
+   haskell
+- \\='template-haskell-quasi-quote: for a string of apostrophes for template
+   haskell
 
 Note that for qualified symbols (match-string 1) returns the
 unqualified identifier or symbol.  Further qualification for

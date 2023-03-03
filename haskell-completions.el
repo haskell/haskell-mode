@@ -31,7 +31,7 @@
 ;;
 ;; For major use function `haskell-completions-grab-prefix' is supposed, and
 ;; other prefix grabbing functions are used internally by it.  So, only this
-;; funciton have prefix minimal length functionality and invokes predicate
+;; function have prefix minimal length functionality and invokes predicate
 ;; function `haskell-completions-can-grab-prefix'.
 
 ;;; Code:
@@ -40,7 +40,6 @@
 (require 'haskell-process)
 (require 'haskell-interactive-mode)
 
-;;;###autoload
 (defgroup haskell-completions nil
   "Settings for completions provided by `haskell-mode'"
   :link '(custom-manual "(haskell-mode)Completion support")
@@ -145,7 +144,7 @@ whitespace or new line, otherwise returns nil.
 
 (defun haskell-completions-grab-pragma-prefix ()
   "Grab completion prefix for pragma completions.
-Returns a list of form '(prefix-start-position
+Returns a list of form \\='(prefix-start-position
 prefix-end-position prefix-value prefix-type) for pramga names
 such as WARNING, DEPRECATED, LANGUAGE etc.  Also returns
 completion prefixes for options in case OPTIONS_GHC pragma, or
@@ -215,7 +214,7 @@ pragma is supported also."
 
 (defun haskell-completions-grab-identifier-prefix ()
   "Grab completion prefix for identifier at point.
-Returns a list of form '(prefix-start-position
+Returns a list of form \\='(prefix-start-position
 prefix-end-position prefix-value prefix-type) for haskell
 identifier at point depending on result of function
 `haskell-ident-pos-at-point'."
@@ -227,7 +226,7 @@ identifier at point depending on result of function
              (type 'haskell-completions-identifier-prefix)
              (case-fold-search nil)
              value)
-        ;; we need end position of result, becase of
+        ;; we need end position of result, because of
         ;; `haskell-ident-pos-at-point' ignores trailing whitespace, e.g. the
         ;; result will be same for `map|` and `map  |` invocations.
         (when (<= p end)
@@ -266,7 +265,7 @@ identifier at point depending on result of function
 
 (defun haskell-completions-grab-prefix (&optional minlen)
    "Grab prefix at point for possible completion.
-Returns a list of form '(prefix-start-position
+Returns a list of form \\='(prefix-start-position
 prefix-end-position prefix-value prefix-type) depending on
 situation, e.g. is it needed to complete pragma, module name,
 arbitrary identifier, etc.  Returns nil in case it is
@@ -309,11 +308,11 @@ PREFIX should be a list such one returned by
     (when (not (eql typ 'haskell-completions-general-prefix))
       (let ((candidates
              (cl-case typ
-               ('haskell-completions-pragma-name-prefix
+               (haskell-completions-pragma-name-prefix
                 haskell-completions--pragma-names)
-               ('haskell-completions-ghc-option-prefix
+               (haskell-completions-ghc-option-prefix
                 haskell-ghc-supported-options)
-               ('haskell-completions-language-extension-prefix
+               (haskell-completions-language-extension-prefix
                 haskell-ghc-supported-extensions)
                (otherwise
                 (append (when (bound-and-true-p haskell-tags-on-save)

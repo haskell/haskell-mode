@@ -150,6 +150,7 @@ $(AUTOLOADS): $(ELFILES)
 	$(BATCH) \
 		--eval '(setq make-backup-files nil)' \
 		--eval "(setq generated-autoload-file (concat command-line-default-directory \"/\" \"$@\"))" \
+		--eval "(require 'autoload)" \
 		-f batch-update-autoloads "."
 # check if autoloads will really load
 	$(BATCH) -l "$@"

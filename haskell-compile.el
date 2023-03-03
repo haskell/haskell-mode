@@ -34,7 +34,6 @@
 (require 'ansi-color)
 (eval-when-compile (require 'subr-x))
 
-;;;###autoload
 (defgroup haskell-compile nil
   "Settings for Haskell compilation mode"
   :link '(custom-manual "(haskell-mode)compilation")
@@ -42,35 +41,40 @@
 
 (defcustom haskell-compile-cabal-build-command
   "cabal build --ghc-option=-ferror-spans"
-  "Default build command to use for `haskell-cabal-build' when a cabal file is detected.
+  "Default build command to use for `haskell-cabal-build'.
+It is used when a cabal file is detected.
 For legacy compat, `%s' is replaced by the cabal package top folder."
   :group 'haskell-compile
   :type 'string)
 
 (defcustom haskell-compile-cabal-build-alt-command
   "cabal clean -s && cabal build --ghc-option=-ferror-spans"
-  "Alternative build command to use when `haskell-cabal-build' is called with a negative prefix argument.
+  "Alternative build command to use when `haskell-cabal-build'.
+It is used when `haskell-cabal-build' is called with a negative prefix argument.
 For legacy compat, `%s' is replaced by the cabal package top folder."
   :group 'haskell-compile
   :type 'string)
 
 (defcustom haskell-compile-stack-build-command
   "stack build --fast"
-  "Default build command to use for `haskell-stack-build' when a stack file is detected.
+  "Default build command to use for `haskell-stack-build'.
+It is used when a stack file is detected.
 For legacy compat, `%s' is replaced by the stack package top folder."
   :group 'haskell-compile
   :type 'string)
 
 (defcustom haskell-compile-stack-build-alt-command
   "stack clean && stack build --fast"
-  "Alternative build command to use when `haskell-stack-build' is called with a negative prefix argument.
+  "Alternative build command to use when `haskell-stack-build'.
+It is used when `haskell-stack-build' is called with a negative prefix argument.
 For legacy compat, `%s' is replaced by the stack package top folder."
   :group 'haskell-compile
   :type 'string)
 
 (defcustom haskell-compile-command
   "ghc -Wall -ferror-spans -fforce-recomp -c %s"
-  "Default build command to use for `haskell-cabal-build' when no cabal or stack file is detected.
+  "Default build command to use for `haskell-cabal-build'.
+It is used when no cabal or stack file is detected.
 The `%s' placeholder is replaced by the current buffer's filename."
   :group 'haskell-compile
   :type 'string)
@@ -84,8 +88,8 @@ The `%s' placeholder is replaced by the current buffer's filename."
 (defcustom haskell-compiler-type
   'auto
   "Controls whether to use cabal, stack, or ghc to compile.
-   Auto (the default) means infer from the presence of a cabal or stack spec file,
-   following same rules as haskell-process-type."
+Auto (the default) means infer from the presence of a cabal or stack spec file,
+following same rules as haskell-process-type."
     :type '(choice (const auto) (const ghc) (const stack) (const cabal))
     :group 'haskell-compile)
 (make-variable-buffer-local 'haskell-compiler-type)
@@ -229,7 +233,7 @@ base directory for build tools, or the current buffer for
                     ((null edit) default)
                     ((eq edit '-) alt)
                     (t (compilation-read-command default))))
-         (command (format template local-dir-or-file))
+         (command (format template (shell-quote-argument local-dir-or-file)))
          (dir (if (directory-name-p local-dir-or-file)
                   local-dir-or-file
                 default-directory))

@@ -36,6 +36,7 @@
 (require 'haskell-utils)
 (require 'highlight-uses-mode)
 (require 'haskell-cabal)
+(require 'haskell-ghc-support)
 
 (defcustom haskell-mode-stylish-haskell-path "stylish-haskell"
   "Path to `stylish-haskell' executable."
@@ -652,11 +653,11 @@ happened since function invocation)."
           (cl-case res-type
             ;; neither popup presentation buffer
             ;; nor insert response in error case
-            ('unknown-command
+            (unknown-command
              (message "This command requires GHCi 8+ or GHCi-ng. Please read command description for details."))
-            ('option-missing
+            (option-missing
              (message "Could not infer type signature. You need to load file first. Also :set +c is required, see customization `haskell-interactive-set-+c'. Please read command description for details."))
-            ('interactive-error (message "Wrong REPL response: %s" sig))
+            (interactive-error (message "Wrong REPL response: %s" sig))
             (otherwise
              (if insert-value
                  ;; Only insert type signature and do not present it
@@ -676,9 +677,9 @@ happened since function invocation)."
                             (cdr (reverse haskell-utils-async-post-command-flag))))
                ;; Present the result only when response is valid and not asked
                ;; to insert result
-               (haskell-command-echo-or-present response)))
+               (haskell-command-echo-or-present response))))
 
-            (haskell-utils-async-stop-watching-changes init-buffer))))))))
+          (haskell-utils-async-stop-watching-changes init-buffer)))))))
 
 (make-obsolete 'haskell-process-generate-tags
                'haskell-mode-generate-tags
@@ -934,6 +935,15 @@ newlines and extra whitespace in signature before insertion."
       (let ((col (current-column)))
         (insert sig "\n")
         (indent-to col)))))
+
+(defun haskell-command-insert-language-pragma (extension)
+  "Insert a {-# LANGUAGE _ #-} pragma at the top of the current
+buffer for the given extension."
+  (interactive
+   (list (completing-read "Extension: " haskell-ghc-supported-extensions)))
+  (save-excursion
+    (goto-char (point-min))
+    (insert (format "{-# LANGUAGE %s #-}\n" extension))))
 
 (provide 'haskell-commands)
 ;;; haskell-commands.el ends here

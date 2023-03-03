@@ -666,4 +666,13 @@ moves over sexps."
          (goto-char (point-min))
          (should (looking-at-p "main = return ()")))))))
 
+(ert-deftest haskell-mode-add-language-pragma-with-existing-text ()
+  (with-temp-buffer
+    (haskell-mode)
+    (insert "module Main where\n")
+    (end-of-buffer)
+    (haskell-command-insert-language-pragma "ViewPatterns")
+    (should (string= (buffer-string)
+                     "{-# LANGUAGE ViewPatterns #-}\nmodule Main where\n"))))
+
 (provide 'haskell-mode-tests)

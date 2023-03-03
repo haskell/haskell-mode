@@ -111,7 +111,7 @@
                        (opt (+ ,ws)
                             (group-n 3
                                      "as")))
-                  ;; TODO: fun hook highlighting is incompelete
+                  ;; TODO: fun hook highlighting is incomplete
                   (seq (group-n 2
                                 (or "call"
                                     "fun")
