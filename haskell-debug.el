@@ -531,15 +531,13 @@ some old history, then display that."
                             (point-max)))))))))
 
 (defun haskell-debug-parse-stopped-at (string)
-  "Parse the location stopped at from the given string.
+  "Parse the location stopped at from the given STRING.
 
-For example:
+For examples:
 
 Stopped at /home/foo/project/src/x.hs:6:25-36
-
-"
-  (let ((index (string-match "Stopped at \\([^:]+\\):\\(.+\\)\n?"
-                             string)))
+Stopped in X.test, /home/foo/project/src/x.hs:6:25-36"
+  (let ((index (string-match "Stopped \\(?:at\\|in [^,]+,\\) \\([^:]+\\):\\(.+\\)\n?" string)))
     (when index
       (list :path (match-string 1 string)
             :span (haskell-debug-parse-span (match-string 2 string))
