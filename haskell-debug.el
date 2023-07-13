@@ -100,13 +100,13 @@
 (defmacro haskell-debug-with-breakpoints (&rest body)
   "Breakpoints need to exist to start stepping."
   `(if (haskell-debug-get-breakpoints)
-       ,@body
+       (progn ,@body)
      (error "No breakpoints to step into!")))
 
 (defmacro haskell-debug-with-modules (&rest body)
   "Modules need to exist to do debugging stuff."
   `(if (haskell-debug-get-modules)
-       ,@body
+       (progn ,@body)
      (error "No modules loaded!")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
