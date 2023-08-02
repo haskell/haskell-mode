@@ -282,29 +282,6 @@ Executable bin-1
                       -- Foo, bar
 "))))
 
-(ert-deftest haskell-cabal-subsection-arrange-lines-comma-in-commment ()
-  (with-temp-buffer
-    (insert "
-Executable bin-1
-    Main-Is:          TestParsing.hs
-    Other-Modules:    Some.Module
-                      Some.Other.Other.Module
-                      Some.Other.Module
-                      -- Foo, bar
-")
-    (haskell-cabal-mode)
-    (goto-char (point-min))
-    (search-forward "Other-Modules:")
-    (haskell-cabal-subsection-arrange-lines)
-    (should (string= (buffer-string) "
-Executable bin-1
-    Main-Is:          TestParsing.hs
-    Other-Modules:    Some.Module
-                      Some.Other.Module
-                      Some.Other.Other.Module
-                      -- Foo, bar
-"))))
-
 (ert-deftest haskell-cabal-subsection-arrange-lines-dependencies ()
   (with-temp-buffer
     (insert "
@@ -346,22 +323,6 @@ Executable bin-1
 Executable bin-1
     Main-Is:          TestParsing.hs
     Build-Depends:    bytestring
-"))))
-
-(ert-deftest haskell-cabal-add-dependency-02 ()
-  (with-temp-buffer
-    (insert "
-Executable bin-1
-    Main-Is:          TestParsing.hs
-    Build-Depends:    base
-")
-    (haskell-cabal-mode)
-    (haskell-cabal-add-build-dependency "bytestring" nil t)
-    (should (string= (buffer-string) "
-Executable bin-1
-    Main-Is:          TestParsing.hs
-    Build-Depends:    bytestring,
-                      base
 "))))
 
 (ert-deftest haskell-cabal-add-dependency-02 ()
