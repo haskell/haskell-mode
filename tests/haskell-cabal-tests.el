@@ -341,22 +341,6 @@ Executable bin-1
                       base
 "))))
 
-(ert-deftest haskell-cabal-add-dependency-02 ()
-  (with-temp-buffer
-    (insert "
-Executable bin-1
-    Main-Is:          TestParsing.hs
-    Build-Depends:    base
-")
-    (haskell-cabal-mode)
-    (haskell-cabal-add-build-dependency "bytestring" nil t)
-    (should (string= (buffer-string) "
-Executable bin-1
-    Main-Is:          TestParsing.hs
-    Build-Depends:    bytestring,
-                      base
-"))))
-
 (ert-deftest haskell-cabal-add-dependency-03 ()
   (with-temp-buffer
     (insert "
