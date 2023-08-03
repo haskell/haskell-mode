@@ -69,7 +69,7 @@ buffer. Returns list of tokens."
    '(")" "(" "}" "{" "]" "[" "," ";" ";")))
 
 (ert-deftest haskell-lexeme-qid-1 ()
-  "Indentifiers"
+  "Identifiers"
   (check-lexemes
    '("head,at_first,safeHead;Data")
    '("head" "," "at_first" "," "safeHead" ";" "Data")))
@@ -81,7 +81,7 @@ buffer. Returns list of tokens."
    '(">>=" "," "---->" "," "<-" ";" "::::")))
 
 (ert-deftest haskell-lexeme-qid-3 ()
-  "Qualified Indentifiers"
+  "Qualified Identifiers"
   (check-lexemes
    '("Data.List.head,Modu.at_first,Zonk.safeHead;Data.Data")
    '("Data.List.head" "," "Modu.at_first" "," "Zonk.safeHead" ";" "Data.Data")))
