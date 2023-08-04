@@ -11,47 +11,14 @@
 LINES is a list of strings that will be inserted to a new
 buffer. Then LEXEMES is a list of lexemes that should be found in
 order."
-  (when (get-buffer "*haskell-mode-buffer*")
-    (kill-buffer "*haskell-mode-buffer*"))
-  (save-current-buffer
-    (set-buffer (get-buffer-create "*haskell-mode-buffer*"))
-
-    (when (fboundp 'jit-lock-debug-mode)
-      ;; to see stack traces from inside font-lock
-      (jit-lock-debug-mode))
-
-    ;; Note that all of this should work both in haskell-mode and
-    ;; outside of it. Currently we test only haskell-mode setup.
-    (if literate
-        (haskell-literate-mode)
-      (haskell-mode))
-
-    (if (consp lines-or-contents)
-        (dolist (line lines-or-contents)
-          (insert line)
-          (insert "\n"))
-      (insert lines-or-contents))
-
-    (font-lock-fontify-buffer)
-
-    (goto-char (point-min))
-    (let (current-token
-          (left-lexemes lexemes))
-      (while (haskell-lexeme-looking-at-token)
-        (setq current-token (match-string-no-properties 0))
-        ;; it should be in the list of lexemes at all
-        (should (member current-token lexemes))
-        ;; it should be next in the list
-        (should (equal (car left-lexemes) current-token))
-        (setq left-lexemes (cdr left-lexemes))
-        (goto-char (match-end 0)))
-      (should (equal nil left-lexemes)))))
+  (should (equal (check-lexemes-nocheck lines-or-contents literate)
+                 lexemes)))
 
 (defun check-lexemes-nocheck (lines-or-contents &optional literate)
   "Checks if tokenization works as expected.
 
 LINES is a list of strings that will be inserted to a new
-buffer."
+buffer. Returns list of tokens."
   (when (get-buffer "*haskell-mode-buffer*")
     (kill-buffer "*haskell-mode-buffer*"))
   (save-current-buffer
@@ -77,8 +44,12 @@ buffer."
 
     ;; here we check only if tokenization did not end in exception thrown
     (goto-char (point-min))
-    (while (haskell-lexeme-looking-at-token)
-      (goto-char (match-end 0)))))
+    (let ((rtokens nil))
+      (while (haskell-lexeme-looking-at-token)
+        (push (buffer-substring-no-properties (point) (match-end 0))
+              rtokens)
+        (goto-char (match-end 0)))
+      (nreverse rtokens))))
 
 (ert-deftest haskell-lexeme-classify-chars-1 ()
   (should (equal 'varsym (haskell-lexeme-classify-by-first-char ?=)))
@@ -98,7 +69,7 @@ buffer."
    '(")" "(" "}" "{" "]" "[" "," ";" ";")))
 
 (ert-deftest haskell-lexeme-qid-1 ()
-  "Indentifiers"
+  "Identifiers"
   (check-lexemes
    '("head,at_first,safeHead;Data")
    '("head" "," "at_first" "," "safeHead" ";" "Data")))
@@ -110,7 +81,7 @@ buffer."
    '(">>=" "," "---->" "," "<-" ";" "::::")))
 
 (ert-deftest haskell-lexeme-qid-3 ()
-  "Qualified Indentifiers"
+  "Qualified Identifiers"
   (check-lexemes
    '("Data.List.head,Modu.at_first,Zonk.safeHead;Data.Data")
    '("Data.List.head" "," "Modu.at_first" "," "Zonk.safeHead" ";" "Data.Data")))
