@@ -10,7 +10,6 @@ programs. [Home page](http://haskell.github.io/haskell-mode/).
 [![Melpa Stable Status](http://stable.melpa.org/packages/haskell-mode-badge.svg)](http://stable.melpa.org/#/haskell-mode)
 [![Non-GNU ELPA Status](https://elpa.nongnu.org/nongnu/haskell-mode.svg)](https://elpa.nongnu.org/nongnu/haskell-mode.html)
 [![License GPL3](https://img.shields.io/badge/license-GPL3-blue.svg)](https://github.com/haskell/haskell-mode/blob/master/COPYING)
-[![Twitter Follow](https://img.shields.io/twitter/follow/HaskellMode.svg?style=social)](https://twitter.com/HaskellMode)
 
 > I just want to thank everybody involved in one way or another with the Haskell Emacs tooling.
 > It is one of the best language experiences I had in Emacs.
