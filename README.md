@@ -8,6 +8,7 @@ programs. [Home page](http://haskell.github.io/haskell-mode/).
 [![Build Status](https://github.com/haskell/haskell-mode/workflows/CI/badge.svg)](https://github.com/haskell/haskell-mode/actions)
 [![Melpa Status](http://melpa.org/packages/haskell-mode-badge.svg)](http://melpa.org/#/haskell-mode)
 [![Melpa Stable Status](http://stable.melpa.org/packages/haskell-mode-badge.svg)](http://stable.melpa.org/#/haskell-mode)
+[![Non-GNU ELPA Status](https://elpa.nongnu.org/nongnu/haskell-mode.svg)](https://elpa.nongnu.org/nongnu/haskell-mode.html)
 [![License GPL3](https://img.shields.io/badge/license-GPL3-blue.svg)](https://github.com/haskell/haskell-mode/blob/master/COPYING)
 [![Twitter Follow](https://img.shields.io/twitter/follow/HaskellMode.svg?style=social)](https://twitter.com/HaskellMode)
 
