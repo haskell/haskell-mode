@@ -40,11 +40,13 @@
 ;;                    (haskell-indent-put-region-in-literate (point-min) (point-max) -1)
 ;;                    (buffer-substring-no-properties (point-min) (point-max))))))
 
-(defsubst string-trim-left (string)
-  "Remove leading whitespace from STRING."
-  (if (string-match "\\`[ \t\n\r]+" string)
-      (replace-match "" t t string)
-    string))
+(if (fboundp 'string-trim-left)
+    (defalias haskell--string-trim-left 'string-trim-left)
+  (defun haskell--string-trim-left (string &optional regexp)
+    "Remove leading whitespace from STRING."
+    (if (string-match (concat "\\`\\(?:" (or regexp "[ \t\n\r]+") "\\)") string)
+        (substring string (match-end 0))
+      string)))
 
 (defun haskell-indent-format-info (info)
   (if (cdr info)
@@ -128,7 +130,7 @@ macro quotes them for you."
          :expected-result
          ,(if allow-failure :failed :passed)
          (haskell-indent-check
-          ,(string-trim-left source)
+          ,(haskell--string-trim-left source)
           ,@(mapcar (lambda (x)
                       (list 'quote x))
                     test-cases))))))

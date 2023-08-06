@@ -33,11 +33,13 @@
 
 ;;; Code:
 
-(defsubst string-trim-left (string)
-  "Remove leading whitespace from STRING."
-  (if (string-match "\\`[ \t\n\r]+" string)
-      (replace-match "" t t string)
-    string))
+(if (fboundp 'string-trim-left)
+    (defalias haskell--string-trim-left 'string-trim-left)
+  (defun haskell--string-trim-left (string &optional regexp)
+    "Remove leading whitespace from STRING."
+    (if (string-match (concat "\\`\\(?:" (or regexp "[ \t\n\r]+") "\\)") string)
+        (substring string (match-end 0))
+      string)))
 
 (defun haskell-indentation-check (source &rest test-cases)
   "Check if `haskell-indentation-find-indentations' returns expected results.
@@ -115,7 +117,7 @@ macro quotes them for you."
          :expected-result
          ,(if allow-failure :failed :passed)
          (haskell-indentation-check
-          ,(string-trim-left source)
+          ,(haskell--string-trim-left source)
           ,@(mapcar (lambda (x)
                       (list 'quote x))
                     test-cases))))))
