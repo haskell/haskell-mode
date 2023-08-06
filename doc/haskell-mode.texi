@@ -2,7 +2,7 @@
 @c %**start of header
 @setfilename haskell-mode.info
 @documentencoding UTF-8
-@settitle Haskell Mode 17.3
+@settitle Haskell Mode 17.4
 @c %**end of header
 
 @c Macro used to mark references of defcustom variables
@@ -17,7 +17,7 @@
 @end direntry
 
 @copying
-This manual is for Haskell mode, version 17.3
+This manual is for Haskell mode, version 17.4
 
 Copyright @copyright{} 2013-2017 Haskell Mode contributors.
 

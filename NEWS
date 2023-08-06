@@ -6,6 +6,10 @@ This file uses Org mode. Some useful (default) key-bindings:
  - Use "<backtab>" to cycle visibility of all nodes
  - Use "C-c C-o" to open links
 
+* Changes in 17.4
+
+- See [[https://github.com/haskell/haskell-mode/compare/v17.3...v17.4][Git history]]
+
 * Changes in 17.3
 
 - See [[https://github.com/haskell/haskell-mode/compare/v17.2...v17.3][Git history]]
