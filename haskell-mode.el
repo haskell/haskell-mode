@@ -5,13 +5,9 @@
 
 ;; Copyright © 1992, 1997-1998  Simon Marlow, Graeme E Moss, and Tommy Thorn
 
-;; Author:  1992      Simon Marlow
-;;          1997-1998 Graeme E Moss <gem@cs.york.ac.uk> and
-;;                    Tommy Thorn <thorn@irisa.fr>,
-;;          2001-2002 Reuben Thomas (>=v1.4)
-;;          2003      Dave Love <fx@gnu.org>
-;;          2016      Arthur Fayzrakhmanov
-;; Keywords: faces files Haskell
+;; Version: 17.3
+;; Package-Requires: ((emacs "25.1"))
+;; Keywords: haskell cabal ghc repl languages
 ;; URL: https://github.com/haskell/haskell-mode
 
 ;; This file is not part of GNU Emacs.
