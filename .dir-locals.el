@@ -3,4 +3,4 @@
 
 ((emacs-lisp-mode
   (indent-tabs-mode)
-  (package-lint-main-file . "haskell-mode-pkg.el")))
+  (package-lint-main-file . "haskell-mode.el")))
