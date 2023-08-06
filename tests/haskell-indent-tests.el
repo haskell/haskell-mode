@@ -41,7 +41,7 @@
 ;;                    (buffer-substring-no-properties (point-min) (point-max))))))
 
 (if (fboundp 'string-trim-left)
-    (defalias haskell--string-trim-left 'string-trim-left)
+    (defalias 'haskell--string-trim-left 'string-trim-left)
   (defun haskell--string-trim-left (string &optional regexp)
     "Remove leading whitespace from STRING."
     (if (string-match (concat "\\`\\(?:" (or regexp "[ \t\n\r]+") "\\)") string)
