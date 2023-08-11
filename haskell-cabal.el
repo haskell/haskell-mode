@@ -99,22 +99,29 @@ By default these are:
 (defvar haskell-cabal-font-lock-keywords
   ;; The comment syntax can't be described simply in syntax-table.
   ;; We could use font-lock-syntactic-keywords, but is it worth it?
-  '(("^[ \t]*--.*" . font-lock-comment-face)
-    ("^ *\\([^ \t:]+\\):" (1 font-lock-keyword-face))
-    ("^\\(Library\\)[ \t]*\\({\\|$\\)" (1 font-lock-keyword-face))
-    ("^\\(Library\\|Executable\\|Test-Suite\\|Benchmark\\|Common\\|package\\)[ \t]+\\([^\n \t]*\\)"
+  '(;; comments
+    ("^[ \t]*--.*" . font-lock-comment-face)
+    ;; fields ending in colon
+    ("^ *\\([^ \t:]+\\):\\( +\\|$\\)" (1 font-lock-keyword-face))
+    ;; stanzas that start a line, followed by an identifier
+    ("^\\(Library\\|Executable\\|Test-Suite\\|Benchmark\\|Common\\|Package\\|Flag\\|Repository\\)[ \t]+\\([^\n \t]*\\)"
      (1 font-lock-keyword-face) (2 font-lock-function-name-face))
-    ("^\\(Flag\\|install-dirs\\|repository\\)[ \t]+\\([^\n \t]*\\)"
-     (1 font-lock-keyword-face) (2 font-lock-constant-face))
-    ("^\\(Source-Repository\\)[ \t]+\\(head\\|this\\)"
-     (1 font-lock-keyword-face) (2 font-lock-constant-face))
-    ("^\\(haddock\\|source-repository-package\\|program-options\\|program-locations\\|program-default-options\\)\\([ \t]\\|$\\)"
-     (1 font-lock-keyword-face))
-    ("^ *\\(if\\)[ \t]+.*\\({\\|$\\)" (1 font-lock-keyword-face))
-    ("^ *\\(}[ \t]*\\)?\\(else\\)[ \t]*\\({\\|$\\)"
-     (2 font-lock-keyword-face))
-    ("\\<\\(?:True\\|False\\)\\>"
-     (0 font-lock-constant-face))))
+    ;; stanzas that start a line, followed by a constant
+    ("^\\(Source-Repository\\)[ \t]+\\(head\\|this\\)" (1 font-lock-keyword-face) (2 font-lock-constant-face))
+    ;; stanzas that start a line, followed by a constant in cabal config
+    ("^\\(install-dirs\\)[ \t]+\\(global\\|user\\)" (1 font-lock-keyword-face) (2 font-lock-constant-face))
+    ;; stanzas that start a line
+    ("^\\(Library\\|Custom-Setup\\|source-repository-package\\)[ \t]*$" (1 font-lock-keyword-face))
+    ;; stanzas that start a line in cabal config
+    ("^\\(haddock\\|init\\|program-locations\\|program-default-options\\)[ \t]*$" (1 font-lock-keyword-face))
+    ;; stanzas that can live inside if-blocks
+    ("^[ \t]*\\(program-options\\)$" (1 font-lock-keyword-face))
+    ;; if clause
+    ("^ *\\(if\\|elif\\)[ \t]+.*$" (1 font-lock-keyword-face))
+    ;; else clause
+    ("^ *\\(else\\)[ \t]*$" (1 font-lock-keyword-face))
+    ;; True/False
+    ("\\<\\(?:True\\|False\\)\\>" (0 font-lock-constant-face))))
 
 (defvar haskell-cabal-buffers nil
   "List of Cabal buffers.")
