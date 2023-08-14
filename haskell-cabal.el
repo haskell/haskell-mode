@@ -160,7 +160,7 @@ it from list if one of the following conditions are hold:
     map))
 
 ;;;###autoload
-(define-derived-mode haskell-cabal-mode fundamental-mode "Haskell-Cabal"
+(define-derived-mode haskell-cabal-mode text-mode "Haskell-Cabal"
   "Major mode for Cabal package description files."
   (setq-local font-lock-defaults
               '(haskell-cabal-font-lock-keywords t t nil nil))
