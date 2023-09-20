@@ -55,9 +55,9 @@
 (defun ghci-script-mode-load ()
   "Load the current script file into the GHCi session."
   (interactive)
-  (let ((buffer (haskell-session-interactive-buffer (haskell-session)))
-        (filename (buffer-file-name)))
-    (save-buffer)
+  (save-buffer)
+  (let ((filename (buffer-file-name))
+        (buffer (haskell-session-interactive-buffer (haskell-session))))
     (with-current-buffer buffer
       (set-marker haskell-interactive-mode-prompt-start (point-max))
       (haskell-interactive-mode-run-expr
