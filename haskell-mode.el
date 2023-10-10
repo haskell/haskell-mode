@@ -129,6 +129,7 @@
 (require 'compile)
 (require 'etags)
 (require 'flymake)
+(require 'flymake-proc nil 'noerror)
 (require 'outline)
 (require 'cl-lib)
 (require 'haskell-ghc-support)
