@@ -126,6 +126,14 @@ set and deleted as if they were real tabs."
   "Return t if this is a literate Haskell buffer in bird style, NIL otherwise."
   (eq haskell-literate 'bird))
 
+(defun haskell-indentation-tex-p ()
+  "Return t if this is a literate Haskell buffer in tex style, NIL otherwise."
+  (eq haskell-literate 'tex))
+
+(defun haskell-indentation-literate-p ()
+  "Return t if this is a literate Haskell buffer, NIL otherwise."
+  (or (haskell-indentation-bird-p) (haskell-indentation-tex-p)))
+
 ;;----------------------------------------------------------------------------
 ;; UI starts here
 
@@ -179,12 +187,26 @@ negative ARG.  Handles bird style literate Haskell too."
              (beginning-of-line)
              (not (eq (char-after) ?>))))))
 
+(defun haskell-indentation-tex-outside-code-p ()
+  "Non-NIL if we are in tex literate mode, but outside of code."
+  (and (haskell-indentation-tex-p)
+       (if (save-excursion
+             (re-search-forward "\\(\\\\end\{code\}\\|\\\\begin\{code\}\\)" nil t))
+           (cond ((equal "\\end{code}" (match-string-no-properties 0)) nil)
+                 ((equal "\\begin{code}" (match-string-no-properties 0)) t))
+         (save-excursion (re-search-backward "\\\\end\{code\}" nil t)))))
+
+(defun haskell-indentation-literate-outside-code-p ()
+  "Non-NIL if we are in literate mode, but outside of code."
+  (or (haskell-indentation-bird-outside-code-p)
+      (haskell-indentation-tex-outside-code-p)))
+
 (defun haskell-indentation-newline-and-indent ()
   "Insert newline and indent."
   (interactive "*")
   ;; On RET (or C-j), we:
   ;;   - just jump to the next line if literate haskell, but outside code
-  (if (haskell-indentation-bird-outside-code-p)
+  (if (haskell-indentation-literate-outside-code-p)
       (progn
         (delete-horizontal-space)
         (newline))
