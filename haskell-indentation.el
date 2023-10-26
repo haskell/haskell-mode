@@ -190,11 +190,10 @@ negative ARG.  Handles bird style literate Haskell too."
 (defun haskell-indentation-tex-outside-code-p ()
   "Non-NIL if we are in tex literate mode, but outside of code."
   (and (haskell-indentation-tex-p)
-       (if (save-excursion
-             (re-search-forward "\\(\\\\end\{code\}\\|\\\\begin\{code\}\\)" nil t))
-           (cond ((equal "\\end{code}" (match-string-no-properties 0)) nil)
-                 ((equal "\\begin{code}" (match-string-no-properties 0)) t))
-         (save-excursion (re-search-backward "\\\\end\{code\}" nil t)))))
+       (not (and (save-excursion
+                   (re-search-backward "\\\\end{code}\\|\\\\begin{code}\\(\\)"
+                                       nil t))
+                 (match-end 1)))))
 
 (defun haskell-indentation-literate-outside-code-p ()
   "Non-NIL if we are in literate mode, but outside of code."
