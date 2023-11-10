@@ -4,7 +4,7 @@
 This is an Emacs mode for editing, developing and debugging Haskell
 programs. [Home page](http://haskell.github.io/haskell-mode/).
 
-[![Build Status](https://github.com/haskell/haskell-mode/workflows/CI/badge.svg)](https://github.com/haskell/haskell-mode/actions)
+[![Build Status](https://github.com/haskell/haskell-mode/actions/workflows/test.yml/badge.svg)](https://github.com/haskell/haskell-mode/actions/workflows/test.yml)
 [![Melpa Status](http://melpa.org/packages/haskell-mode-badge.svg)](http://melpa.org/#/haskell-mode)
 [![Melpa Stable Status](http://stable.melpa.org/packages/haskell-mode-badge.svg)](http://stable.melpa.org/#/haskell-mode)
 [![Non-GNU ELPA Status](https://elpa.nongnu.org/nongnu/haskell-mode.svg)](https://elpa.nongnu.org/nongnu/haskell-mode.html)
