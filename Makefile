@@ -10,7 +10,7 @@
 # We should have a script that changes it everywhere it is needed and
 # syncs it with current git tag.
 #
-VERSION = 17.4
+VERSION = 17.5
 
 INSTALL_INFO = install-info
 
