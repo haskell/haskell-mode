@@ -205,7 +205,13 @@ list of modules where missed IDENT was found."
             (string-match
              "Use \\([A-Z][A-Za-z]+\\) if you want to disable this"
              msg)
-            (string-match "use \\([A-Z][A-Za-z]+\\)" msg)
+            ;; Andreas Abel, 2024-01-10, https://github.com/haskell/haskell-mode/issues/1834
+            ;; The following regex also matches the new x-partial warning
+            ;; "Consider refactoring to use Data.List.NonEmpty"
+            ;; which would result in a suggestion to
+            ;; "Add {-# LANGUAGE Data #-} to the top of the file?"
+            ;; Thus, we disable it.
+            ;; (string-match "use \\([A-Z][A-Za-z]+\\)" msg)
             (string-match "You need \\([A-Z][A-Za-z]+\\)" msg)))
          (when haskell-process-suggest-language-pragmas
            (haskell-process-suggest-pragma
