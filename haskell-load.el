@@ -205,7 +205,8 @@ list of modules where missed IDENT was found."
             (string-match
              "Use \\([A-Z][A-Za-z]+\\) if you want to disable this"
              msg)
-            (string-match "use \\([A-Z][A-Za-z]+\\)" msg)
+            (and (string-match "use \\([A-Z][A-Za-z]+\\)" msg)
+                 (not (string-match "refactoring to use" msg)))
             (string-match "You need \\([A-Z][A-Za-z]+\\)" msg)))
          (when haskell-process-suggest-language-pragmas
            (haskell-process-suggest-pragma
