@@ -66,6 +66,7 @@ haskell expressions."
     (define-key map (kbd "C-j") 'haskell-interactive-mode-newline-indent)
     (define-key map [remap move-beginning-of-line] 'haskell-interactive-mode-bol)
     (define-key map (kbd "<home>") 'haskell-interactive-mode-beginning)
+    (define-key map [remap backward-kill-word] 'haskell-interactive-mode-backward-kill-word)
     (define-key map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
     (define-key map (kbd "C-c C-c") 'haskell-process-interrupt)
     (define-key map (kbd "C-c C-f") 'next-error-follow-minor-mode)
@@ -171,6 +172,36 @@ be nil.")
   (interactive)
   (kill-region haskell-interactive-mode-prompt-start
                (line-end-position)))
+
+(defun haskell-interactive-mode-backward-kill-word (n)
+  "Kill word behind point, stopping at the REPL prompt."
+  (interactive "p")
+  (let ((backward-word-point))
+    (cl-loop
+     repeat (or n 1) do
+     ;; if point is not after prompt, fall back on backward-kill-word
+     (cond ((not (haskell-interactive-at-prompt))
+            (backward-kill-word 1))
+           ;; if there's any non-whitespace between the prompt and point,
+           ;; fall back on backward-kill-word
+           ((string-match
+             "[^[:space:^M]]"
+             (buffer-substring-no-properties
+              haskell-interactive-mode-prompt-start
+              (point)))
+            (backward-kill-word 1))
+           ;; else, compare point at beginning of line with prompt-start
+           (t
+            (save-excursion
+              (backward-word)
+              (setq backward-word-point (point)))
+            ;; if backward-kill-word would take point behind prompt, kill to
+            ;; prompt-start, else fall back on backward-kill-word
+            (cond ((< backward-word-point haskell-interactive-mode-prompt-start)
+                   (delete-char
+                    (- haskell-interactive-mode-prompt-start (point))))
+                  ((>= backward-word-point haskell-interactive-mode-prompt-start)
+                   (backward-kill-word 1))))))))
 
 (defun haskell-interactive-switch-back ()
   "Switch back to the buffer from which this interactive buffer was reached."
