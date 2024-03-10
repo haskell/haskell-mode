@@ -84,7 +84,7 @@ indexCtx posts blogconfig =  listField \"posts\" (postCtx blogconfig) (return (t
   (should (test-haskell-indented-block
            haskell-code-block-1
            1
-           (lambda () (test-haskell-collapse-start-end 1 9)))))
+           (lambda () (test-haskell-collapse-start-end 1 8)))))
 
 (ert-deftest test-haskell-indented-block-2 ()
   (should (test-haskell-indented-block
@@ -97,7 +97,7 @@ indexCtx posts blogconfig =  listField \"posts\" (postCtx blogconfig) (return (t
   (should (test-haskell-indented-block
            haskell-code-block-1
            2
-           (lambda () (test-haskell-collapse-start-end 1 9)))))
+           (lambda () (test-haskell-collapse-start-end 1 8)))))
 
 (ert-deftest test-haskell-indented-block-4 ()
   (should (test-haskell-indented-block
@@ -121,4 +121,4 @@ indexCtx posts blogconfig =  listField \"posts\" (postCtx blogconfig) (return (t
   (should (test-haskell-indented-block
            haskell-code-block-3
            0
-           (lambda () (test-haskell-collapse-start-end 0 5)))))
+           (lambda () (test-haskell-collapse-start-end 0 2)))))
