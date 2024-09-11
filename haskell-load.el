@@ -134,6 +134,10 @@ actual Emacs buffer of the module being loaded."
                 process
                 "Failed, no modules loaded\\.$") ;; for ghc 8.4
                nil)
+              ((haskell-process-consume
+                process
+                "Failed, unloaded all modules\\.$") ;; for ghc 9.10
+               nil)
               (t
                (error (message "Unexpected response from haskell process.")))))
          (modules (haskell-process-extract-modules buffer))
