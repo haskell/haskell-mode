@@ -106,38 +106,8 @@ actual Emacs buffer of the module being loaded."
     (with-current-buffer (haskell-interactive-mode-splices-buffer session)
       (erase-buffer)))
   (let* ((ok (cond
-              ((haskell-process-consume
-                process
-                "Ok, \\(?:[0-9]+\\) modules? loaded\\.$")
-               t)
-               ((haskell-process-consume
-                process
-                "Ok, \\(?:[a-z]+\\) modules? loaded\\.$") ;; for ghc 8.4
-               t)
-              ((haskell-process-consume
-                process
-                "Failed, \\(?:[0-9]+\\) modules? loaded\\.$")
-               nil)
-              ((haskell-process-consume
-                process
-                "Failed, \\(?:[a-z]+\\) modules? loaded\\.$") ;; ghc 8.6.3 says so
-               nil)
-              ((haskell-process-consume
-                process
-                "Ok, modules loaded: \\(.+\\)\\.$")
-               t)
-              ((haskell-process-consume
-                process
-                "Failed, modules loaded: \\(.+\\)\\.$")
-               nil)
-              ((haskell-process-consume
-                process
-                "Failed, no modules loaded\\.$") ;; for ghc 8.4
-               nil)
-              ((haskell-process-consume
-                process
-                "Failed, unloaded all modules\\.$") ;; for ghc 9.10
-               nil)
+              ((haskell-process-consume process "Ok, .*$") t)
+              ((haskell-process-consume process "Failed, .*$") nil)
               (t
                (error (message "Unexpected response from haskell process.")))))
          (modules (haskell-process-extract-modules buffer))
