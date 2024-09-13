@@ -23,9 +23,10 @@ jobs:
           - 28.1
           - 28.2
           - 29.1
+          - 29.4
           - snapshot
         include:
-          - emacs_version: 29.1
+          - emacs_version: 29.4
             target: deploy-manual
     steps:
     - uses: cachix/install-nix-action@V27
