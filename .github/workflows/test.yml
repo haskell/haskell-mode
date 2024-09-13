@@ -29,7 +29,7 @@ jobs:
           - emacs_version: 29.4
             target: deploy-manual
     steps:
-    - uses: cachix/install-nix-action@V27
+    - uses: cachix/install-nix-action@V28
       with:
         nix_path: nixpkgs=channel:nixos-unstable
     - uses: purcell/setup-emacs@master
