@@ -854,7 +854,7 @@ Minor modes that work well with `haskell-mode':
   (setq-local dabbrev-case-fold-search nil)
   (setq-local dabbrev-case-distinction nil)
   (setq-local dabbrev-case-replace nil)
-  (setq-local dabbrev-abbrev-char-regexp "\\sw\\|[.]")
+  (setq-local dabbrev-abbrev-char-regexp "\\sw\\|\\s_\\|[.]")
   (setq haskell-literate nil)
   (add-hook 'before-save-hook 'haskell-mode-before-save-handler nil t)
   (add-hook 'after-save-hook 'haskell-mode-after-save-handler nil t)
