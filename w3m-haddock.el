@@ -26,6 +26,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+;; (require 'f)
 (require 'haskell-mode)
 (require 'haskell-font-lock)
 
@@ -39,6 +40,23 @@
   '((((class color)) :inherit highlight))
   "Face for quarantines."
   :group 'haskell)
+
+(defun w3m-haddock-discover-ref ()
+  "Return path form \".haddock-ref\" file or nil.
+
+The file is picked up from the closest parent directory
+relative to current file.  If GHC is provided via nix-shell then path
+to haddocks can be discovered in a shell hook and persisted in the project root:
+\"echo $(dirname $(dirname $(which ghc)))/share/doc > .haddock-ref\"."
+  (let ((ap (buffer-file-name))
+        (r nil))
+    (while (and (null r) (setq ap (and ap (f-dirname ap))))
+      (let ((href (concat ap "/.haddock-ref")))
+        (when (file-exists-p href)
+          (setq href (string-trim (f-read-text href)))
+          (when (f-directory-p href)
+            (setq r href)))))
+    r))
 
 (defcustom haskell-w3m-haddock-dirs
   '("~/.cabal/share/doc/")
@@ -54,7 +72,7 @@ You can rebind this if you're using hsenv by adding it to your
 
 "
   :group 'haskell
-  :type 'list)
+  :type '(list string))
 
 (defvar w3m-haddock-entry-regex "^\\(\\(data\\|type\\) \\|[a-z].* :: \\)"
   "Regex to match entry headings.")
@@ -62,18 +80,23 @@ You can rebind this if you're using hsenv by adding it to your
 (defun haskell-w3m-open-haddock ()
   "Open a haddock page in w3m."
   (interactive)
-  (let* ((entries (cl-remove-if (lambda (s) (string= s ""))
+  (let* (
+         (haddock-ref (w3m-haddock-discover-ref))
+         (haddock-dirs (if (null haddock-ref)
+                           haskell-w3m-haddock-dirs
+                         (cons haddock-ref haskell-w3m-haddock-dirs)))
+         (entries (cl-remove-if (lambda (s) (string= s ""))
                                 (apply 'append (mapcar (lambda (dir)
                                                          (split-string (shell-command-to-string (concat "ls -1 " dir))
 
                                                                        "\n"))
-                                                       haskell-w3m-haddock-dirs))))
+                                                       haddock-dirs))))
          (package-dir (ido-completing-read
                        "Package: "
                        entries)))
     (cond
      ((member package-dir entries)
-      (unless (cl-loop for dir in haskell-w3m-haddock-dirs
+      (unless (cl-loop for dir in haddock-dirs
                        when (w3m-haddock-find-index dir package-dir)
                        do (progn (w3m-browse-url (w3m-haddock-find-index dir package-dir)
                                                  t)
