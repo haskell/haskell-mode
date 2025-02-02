@@ -70,34 +70,35 @@
   "Run the given expression."
   (let ((session (haskell-interactive-session))
         (process (haskell-interactive-process)))
-    (haskell-process-queue-command
-     process
-     (make-haskell-command
-      :state (list session process expr 0)
-      :go (lambda (state)
-            (goto-char (point-max))
-            (insert "\n")
-            (setq haskell-interactive-mode-result-end
-                  (point-max))
-            (haskell-process-send-string (cadr state)
-                                         (haskell-interactive-mode-multi-line (cl-caddr state)))
-            (haskell-process-set-evaluating (cadr state) t))
-      :live (lambda (state buffer)
-              (unless (and (string-prefix-p ":q" (cl-caddr state))
-                           (string-prefix-p (cl-caddr state) ":quit"))
-                (let* ((cursor (cl-cadddr state))
-                       (next (replace-regexp-in-string
-                              haskell-process-prompt-regex
-                              ""
-                              (substring buffer cursor))))
-                  (haskell-interactive-mode-eval-result (car state) next)
-                  (setf (cl-cdddr state) (list (length buffer)))
-                  nil)))
-      :complete
-      (lambda (state response)
-        (haskell-process-set-evaluating (cadr state) nil)
-        (unless (haskell-interactive-mode-trigger-compile-error state response)
-          (haskell-interactive-mode-expr-result state response)))))))
+    (with-current-buffer (haskell-session-interactive-buffer session)
+      (haskell-process-queue-command
+       process
+       (make-haskell-command
+        :state (list session process expr 0)
+        :go (lambda (state)
+              (goto-char (point-max))
+              (insert "\n")
+              (setq haskell-interactive-mode-result-end
+                    (point-max))
+              (haskell-process-send-string (cadr state)
+                                           (haskell-interactive-mode-multi-line (cl-caddr state)))
+              (haskell-process-set-evaluating (cadr state) t))
+        :live (lambda (state buffer)
+                (unless (and (string-prefix-p ":q" (cl-caddr state))
+                             (string-prefix-p (cl-caddr state) ":quit"))
+                  (let* ((cursor (cl-cadddr state))
+                         (next (replace-regexp-in-string
+                                haskell-process-prompt-regex
+                                ""
+                                (substring buffer cursor))))
+                    (haskell-interactive-mode-eval-result (car state) next)
+                    (setf (cl-cdddr state) (list (length buffer)))
+                    nil)))
+        :complete
+        (lambda (state response)
+          (haskell-process-set-evaluating (cadr state) nil)
+          (unless (haskell-interactive-mode-trigger-compile-error state response)
+            (haskell-interactive-mode-expr-result state response))))))))
 
 (defun haskell-interactive-mode-expr-result (state response)
   "Print the result of evaluating the expression."
