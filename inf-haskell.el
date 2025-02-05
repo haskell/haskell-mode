@@ -113,6 +113,25 @@ The format should be the same as for `compilation-error-regexp-alist'.")
 correctly interpret multi-line input even when modules are
 imported.")
 
+(defconst inferior-haskell-cont-prompt-regexp
+  "^[[:alnum:].*_() |λ]*| "
+  "Continuation prompt rexep.
+Used to remove them from the output by the comint preoutput filter.  See
+`inferior-haskell-remove-extra-prompts'.
+
+This should be a similar regexp as `haskell-prompt-regexp', but it usually
+ends with \"| \" instead of \"> \".")
+
+(defconst inferior-haskell-maybe-cont-prompt-regexp
+  "^[[:alnum:].*_() |λ]*[>|] "
+  "A continuation or non-continuation prompt regexp.
+This should match any prompt, a continuation or a common prompt.  This regexp
+should be similar to `haskell-prompt-regexp' and
+`inferior-haskell-cont-prompt-regex' as it should match both.
+
+It is used to remove multiple prompts on the comint preoutput filter.  See
+`inferior-haskell-remove-extra-prompts'.")
+
 ;;; TODO
 ;;; -> Make font lock work for strings, directories, hyperlinks
 ;;; -> Make font lock work for key words???
@@ -161,7 +180,40 @@ imported.")
         (define-key map keys (lookup-key compilation-minor-mode-map keys)))
       (add-to-list 'minor-mode-overriding-map-alist
                    (cons 'compilation-minor-mode map))))
-  (add-hook 'inferior-haskell-hook 'inferior-haskell-init))
+  (add-hook 'inferior-haskell-hook 'inferior-haskell-init)
+  
+  ;; Avoid multiple prompts at the end of the output
+  (add-hook 'comint-preoutput-filter-functions
+            #'inferior-haskell-remove-extra-prompts nil t))
+
+(defun inferior-haskell-remove-extra-prompts (str)
+  "Remove any extra Haskell-prompts from STR.
+Remove multiple prompts from STR.  All prompts indicating continuation are
+completely removed.  Only remain the last non-continuantion prompt.
+
+Examples:
+The input \"Prelude> Prelude> \" will return \"Prelude> \".
+The input \"Prelude| Prelude| \" will return \"\".
+
+These kind of output are usually produced by the multiple line input (i.e. when
+using \":{ ... :}\" code in the GHCi interpreter).  Sometimes, comint would note
+filter the prompts out.  For this reason, this function shoud be added to the
+hook `comint-preoutput-filter-functions', to be executed before comint insert
+STR to the buffer.
+
+Some libraries, such as ob-haskell.el, considers the multilple prompts as part
+of the evaluation output.  Moreover, it does not provide any information to the
+user. Removing these prompts provides a better reading and less code for parsing
+the output."
+  (let ((last-match nil))
+    (while (string-match inferior-haskell-maybe-cont-prompt-regexp str)
+      (setq last-match (match-string 0 str))
+      (setq str (substring str (match-end 0))))
+    ;; Remove prompt-cont if it is the last one.
+    (if (or (null last-match)
+            (string-match inferior-haskell-cont-prompt-regexp last-match))
+        str
+      (concat last-match str))))
 
 (defvar inferior-haskell-buffer nil
   "The buffer in which the inferior process is running.")
