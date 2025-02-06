@@ -398,11 +398,16 @@ Give optional NEXT-P parameter to override value of
                                 nil
                                 (current-buffer)))
 
-(defun haskell-load-and-run ()
-  "Loads the current buffer and runs the main function."
-  (interactive)
+(defvar haskell-load-and-run-expr-history nil
+  "History of expressions used in `haskell-load-and-run'.")
+
+(defun haskell-load-and-run (expr)
+  "Load the current buffer and run EXPR, e.g. \"main\"."
+  (interactive (list (read-string "Run expression: "
+                                  (car haskell-load-and-run-expr-history)
+                                  'haskell-load-and-run-expr-history)))
   (haskell-process-load-file)
-  (haskell-interactive-mode-run-expr "main"))
+  (haskell-interactive-mode-run-expr expr))
 
 ;;;###autoload
 (defun haskell-process-reload ()
