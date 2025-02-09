@@ -38,6 +38,7 @@
 (defvar interactive-haskell-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-l") 'haskell-process-load-file)
+    (define-key map (kbd "C-c RET") 'haskell-load-and-run)  ;; == C-c C-m
     (define-key map (kbd "C-c C-r") 'haskell-process-reload)
     (define-key map (kbd "C-c C-t") 'haskell-process-do-type)
     (define-key map (kbd "C-c C-i") 'haskell-process-do-info)
@@ -396,6 +397,17 @@ Give optional NEXT-P parameter to override value of
                                                        (buffer-file-name)))
                                 nil
                                 (current-buffer)))
+
+(defvar haskell-load-and-run-expr-history nil
+  "History of expressions used in `haskell-load-and-run'.")
+
+(defun haskell-load-and-run (expr)
+  "Load the current buffer and run EXPR, e.g. \"main\"."
+  (interactive (list (read-string "Run expression: "
+                                  (car haskell-load-and-run-expr-history)
+                                  'haskell-load-and-run-expr-history)))
+  (haskell-process-load-file)
+  (haskell-interactive-mode-run-expr expr))
 
 ;;;###autoload
 (defun haskell-process-reload ()
