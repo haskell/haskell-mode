@@ -124,6 +124,11 @@
   :group 'haskell-decl-scan
   :type 'boolean)
 
+(defcustom haskell-decl-scan-sort-imenu t
+  "Whether to sort the candidates in imenu."
+  :group 'haskell-decl-scan
+  :type 'boolean)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General declaration scanning functions.
 
@@ -562,15 +567,21 @@ datatypes) in a Haskell file for the `imenu' package."
                     (import   . "Imports")   (class    . "Classes")))
       (when-let ((curr-alist (gethash (car type) imenu)))
         (push (cons (cdr type)
-                    (sort curr-alist 'haskell-ds-imenu-label-cmp))
+                    (if haskell-decl-scan-sort-imenu
+                        (sort curr-alist 'haskell-ds-imenu-label-cmp)
+                      (reverse curr-alist)))
               index-alist)))
     (when-let ((var-alist (gethash 'variable imenu)))
       (if haskell-decl-scan-bindings-as-variables
           (push (cons "Variables"
-                      (sort var-alist 'haskell-ds-imenu-label-cmp))
+                      (if haskell-decl-scan-sort-imenu
+                          (sort var-alist 'haskell-ds-imenu-label-cmp)
+                        (reverse var-alist)))
                 index-alist)
         (setq index-alist (append index-alist
-                                  (sort var-alist 'haskell-ds-imenu-label-cmp)))))
+                                  (if haskell-decl-scan-sort-imenu
+                                      (sort var-alist 'haskell-ds-imenu-label-cmp)
+                                    (reverse var-alist))))))
     ;; Return the alist.
     index-alist))
 
