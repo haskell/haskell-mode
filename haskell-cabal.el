@@ -474,8 +474,20 @@ Possible results are \\='section-header \\='subsection-header \\='section-data
             :end (save-match-data (haskell-cabal-subsection-end))
             :data-start-column (save-excursion (goto-char (match-end 0))
                                                (current-column))
+            ;; Note: Redundant leading commas are allowed since Cabal 2.2.
+            ;; Example:
+            ;; build-depends:
+            ;;      , base
+            ;;      , text
+            ;;
+            ;; Note: More than one newlines are allowed after the subsection name.
+            ;; Example:
+            ;; build-depends:
+            ;;
+            ;;
+            ;;      base
             :data-indent-column (save-excursion (goto-char (match-end 0))
-                                                (when (looking-at "\n  +\\(\\w*\\)") (goto-char (match-beginning 1)))
+                                                (when (looking-at "\n[\n\t ]*  +\\([\\w,]*\\)") (goto-char (match-beginning 1)))
                                                 (current-column)
                                                 )))))
 
@@ -1058,11 +1070,24 @@ Source names from main-is and c-sources sections are left untouched
   (cl-case (haskell-cabal-classify-line)
     (section-data
      (save-excursion
-       (let ((indent (haskell-cabal-section-data-indent-column
-                      (haskell-cabal-subsection))))
-         (indent-line-to indent)
+       (let* ((subsection (haskell-cabal-subsection))
+              (beginning (haskell-cabal-section-start subsection))
+              (indent-column (haskell-cabal-section-data-indent-column subsection))
+              (subsection-leading-comma-p (save-excursion
+                                            (goto-char beginning)
+                                            (looking-at ",\\|\n[ \t\n]*,"))))
+         (indent-line-to indent-column)
          (beginning-of-line)
-         (when (looking-at "[ ]*\\([ ]\\{2\\},[ ]*\\)")
+         ;; Only do extra adjustment if the first item is not comma leading.
+         ;; Example of the two cases:
+         ;;
+         ;; |  aaa     |    aaa
+         ;; |  , bbb   |  , bbb
+         ;;
+         ;; |  , aaa |  , aaa
+         ;; |  , bbb |  , bbb
+         (when (and (not subsection-leading-comma-p)
+                    (looking-at "[ ]*\\([ ]\\{2\\},[ ]*\\)"))
            (replace-match ", " t t nil 1)))))
     (empty
      (indent-relative)))
