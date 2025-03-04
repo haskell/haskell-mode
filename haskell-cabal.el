@@ -174,7 +174,7 @@ it from list if one of the following conditions are hold:
   (add-to-list 'haskell-cabal-buffers (current-buffer))
   (add-hook 'change-major-mode-hook 'haskell-cabal-unregister-buffer nil 'local)
   (add-hook 'kill-buffer-hook 'haskell-cabal-unregister-buffer nil 'local)
-  (setq-local comment-start "-- ")
+  (setq-local comment-start "--")
   (setq-local comment-start-skip "\\(^[ \t]*\\)--[ \t]*")
   (setq-local comment-end "")
   (setq-local comment-end-skip "[ \t]*\\(\\s>\\|\n\\)")
