@@ -46,7 +46,7 @@
 (defcustom haskell-mode-stylish-haskell-args nil
   "Arguments to pass to program specified by haskell-mode-stylish-haskell-path."
   :group 'haskell
-  :type 'list)
+  :type '(list string))
 
 (defcustom haskell-interactive-set-+c
   t

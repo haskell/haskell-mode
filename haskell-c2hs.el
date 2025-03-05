@@ -34,12 +34,12 @@
 (add-to-list 'auto-mode-alist '("\\.chs\\'" . haskell-c2hs-mode))
 
 (defface haskell-c2hs-hook-pair-face
-  '((t (:inherit 'font-lock-preprocessor-face)))
+  '((t (:inherit font-lock-preprocessor-face)))
   "Face for highlighting {#...#} pairs."
   :group 'haskell)
 
 (defface haskell-c2hs-hook-name-face
-  '((t (:inherit 'font-lock-keyword-face)))
+  '((t (:inherit font-lock-keyword-face)))
   "Face for highlighting c2hs hook names."
   :group 'haskell)
 
