@@ -1135,8 +1135,7 @@ layout starts."
           (haskell-indentation-add-indentation
            (+ left-indent haskell-indentation-starter-offset))
           (throw 'parse-end nil))
-        (setq phrase1 (cddr phrase)))
-       ((string= (cadr phrase) "in"))))))
+        (setq phrase1 (cddr phrase)))))))
 
 (defun haskell-indentation-add-indentation (indent)
   "" ; FIXME

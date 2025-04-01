@@ -54,7 +54,7 @@ You can rebind this if you're using hsenv by adding it to your
 
 "
   :group 'haskell
-  :type 'list)
+  :type '(list string))
 
 (defvar w3m-haddock-entry-regex "^\\(\\(data\\|type\\) \\|[a-z].* :: \\)"
   "Regex to match entry headings.")
