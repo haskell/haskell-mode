@@ -394,7 +394,7 @@ hindent, structured-haskell-mode, tool-de-jour, etc.
 
 You can set this per-project with a .dir-locals.el file"
   :group 'haskell
-  :type '(repeat 'string))
+  :type '(repeat string))
 
 (defcustom haskell-stylish-on-save nil
   "Whether to run stylish-haskell on the buffer before saving.
