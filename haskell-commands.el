@@ -769,9 +769,8 @@ inferior GHCi process."
       (haskell-session-set-target session target)
       (when (not (string= old-target target))
         (haskell-mode-toggle-interactive-prompt-state)
-        (unwind-protect
-            (when (y-or-n-p "Target changed, restart haskell process? ")
-              (haskell-process-start session)))
+        (when (y-or-n-p "Target changed, restart haskell process? ")
+          (haskell-process-start session))
         (haskell-mode-toggle-interactive-prompt-state t)))))
 
 ;;;###autoload

@@ -167,11 +167,10 @@
   (interactive)
   (when (eq major-mode 'haskell-interactive-mode)
     (haskell-mode-toggle-interactive-prompt-state)
-    (unwind-protect
-        (when (and (boundp 'haskell-session)
-                   haskell-session
-                   (y-or-n-p "Kill the whole session? "))
-          (haskell-session-kill t)))
+    (when (and (boundp 'haskell-session)
+               haskell-session
+               (y-or-n-p "Kill the whole session? "))
+      (haskell-session-kill t))
     (haskell-mode-toggle-interactive-prompt-state t)))
 
 (defun haskell-session-make (name)
@@ -223,13 +222,12 @@ If `haskell-process-load-or-reload-prompt' is nil, accept `default'."
     (when (not (string= name ""))
       (let ((session (haskell-session-lookup name)))
         (haskell-mode-toggle-interactive-prompt-state)
-        (unwind-protect
-            (if session
-                (when
-                    (y-or-n-p
-                     (format "Session %s already exists. Use it?" name))
-                  session)
-              (haskell-session-make name)))
+        (if session
+            (when
+                (y-or-n-p
+                 (format "Session %s already exists. Use it?" name))
+              session)
+          (haskell-session-make name))
         (haskell-mode-toggle-interactive-prompt-state t)))))
 
 ;;;###autoload
