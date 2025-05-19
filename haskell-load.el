@@ -252,7 +252,7 @@ list of modules where missed IDENT was found."
               (haskell-process-send-string
                (cadr state)
                (format haskell-process-do-cabal-format-string
-                       (haskell-session-cabal-dir (car state))
+                       (shell-quote-argument (haskell-session-cabal-dir (car state)))
                        (format "%s %s" app-name (cl-caddr state)))))
             :live
             (lambda (state buffer)
