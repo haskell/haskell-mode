@@ -410,6 +410,24 @@ imports."
   "The path which is considered as project root, this is determined by the
 presence of a *.cabal file or stack.yaml file or something similar.")
 
+(defun haskell-projectile-build-type ()
+  (if (and (fboundp 'projectile-project-root) (bound-and-true-p projectile-mode))
+      (let* ((d (projectile-project-root))
+            (cabal (cl-find-if
+                    (lambda (f) (string-match-p ".\\.cabal\\'" f))
+                    (directory-files d))))
+        (cond
+         ((and (file-exists-p (concat d "cabal.project")) (executable-find "cabal"))
+          (cons 'cabal-project d))
+         ((and (file-exists-p (concat d "cabal.sandbox")) (executable-find "cabal"))
+          (cons 'cabal-sandbox d))
+         ((and (file-exists-p (concat d "stack.yaml")) (executable-find "stack"))
+          (cons 'stack d))
+         ((and cabal (file-exists-p (concat d cabal)) (executable-find "cabal"))
+          (cons 'cabal d))
+         ((executable-find "ghc") (cons 'ghc nil))))
+      nil))
+
 (defun haskell-build-type ()
   "Looks for cabal and stack spec files.
    When found, returns a pair (TAG . DIR)
@@ -417,26 +435,27 @@ presence of a *.cabal file or stack.yaml file or something similar.")
    and DIR is the directory containing cabal or stack file.
    When none found, DIR is nil, and TAG is \\='ghc"
   ;; REVIEW maybe just 'cabal is enough.
-  (let ((cabal-project (locate-dominating-file default-directory "cabal.project"))
-        (cabal-sandbox (locate-dominating-file default-directory "cabal.sandbox.config"))
-        (stack         (locate-dominating-file default-directory "stack.yaml"))
-        (cabal         (locate-dominating-file
-                        default-directory
-                        (lambda (d)
-                          (cl-find-if
-                           (lambda (f) (string-match-p ".\\.cabal\\'" f))
-                           (directory-files d))))))
-    (cond
-     ((and cabal-project (executable-find "cabal"))
-      (cons 'cabal-project cabal-project))
-     ((and cabal-sandbox (executable-find "cabal"))
-      (cons 'cabal-sandbox cabal-sandbox))
-     ((and stack (executable-find "stack"))
-      (cons 'stack stack))
-     ((and cabal (executable-find "cabal"))
-      (cons 'cabal cabal))
-     ((executable-find "ghc") (cons 'ghc nil))
-     (t (error "Could not find any installation of GHC.")))))
+  (or (haskell-projectile-build-type)
+    (let ((cabal-project (locate-dominating-file default-directory "cabal.project"))
+          (cabal-sandbox (locate-dominating-file default-directory "cabal.sandbox.config"))
+          (stack         (locate-dominating-file default-directory "stack.yaml"))
+          (cabal         (locate-dominating-file
+                          default-directory
+                          (lambda (d)
+                            (cl-find-if
+                             (lambda (f) (string-match-p ".\\.cabal\\'" f))
+                             (directory-files d))))))
+      (cond
+       ((and cabal-project (executable-find "cabal"))
+        (cons 'cabal-project cabal-project))
+       ((and cabal-sandbox (executable-find "cabal"))
+        (cons 'cabal-sandbox cabal-sandbox))
+       ((and stack (executable-find "stack"))
+        (cons 'stack stack))
+       ((and cabal (executable-find "cabal"))
+        (cons 'cabal cabal))
+       ((executable-find "ghc") (cons 'ghc nil))
+       (t (error "Could not find any installation of GHC."))))))
 
 (defun haskell-process-type ()
   "Return `haskell-process-type', or a guess if that variable is \\='auto.
