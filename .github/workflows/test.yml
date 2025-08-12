@@ -37,7 +37,7 @@ jobs:
       with:
         version: ${{ matrix.emacs_version }}
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Install stack and ghc
       run: nix profile install 'nixpkgs#stack' 'nixpkgs#ghc'
     - name: Install texinfo
