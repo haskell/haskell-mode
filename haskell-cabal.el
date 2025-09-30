@@ -100,7 +100,8 @@ By default these are:
   ;; The comment syntax can't be described simply in syntax-table.
   ;; We could use font-lock-syntactic-keywords, but is it worth it?
   '(;; comments
-    ("^[ \t]*--.*" . font-lock-comment-face)
+    ("^[ \t]*\\(--\\)\\(.*\\)"
+     (1 font-lock-comment-delimiter-face) (2 font-lock-comment-face))
     ;; fields ending in colon
     ("^ *\\([^ \t:]+\\):\\( +\\|$\\)" (1 font-lock-keyword-face))
     ;; stanzas that start a line, followed by an identifier
