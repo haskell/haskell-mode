@@ -59,6 +59,11 @@ If nil, use the Hoogle web-site."
           (const :tag "fp-complete" "https://www.stackage.org/lts/hoogle?q=%s")
           string))
 
+(defcustom haskell-hoogle-use-eww nil
+  "Whether to use Eww for viewing hoogle results."
+  :group 'haskell
+  :type 'hooolean)
+
 ;;;###autoload
 (defun haskell-hoogle (query &optional info)
   "Do a Hoogle search for QUERY.
@@ -66,26 +71,27 @@ If nil, use the Hoogle web-site."
 If prefix argument INFO is given, then `haskell-hoogle-command'
 is asked to show extra info for the items matching QUERY.."
   (interactive (append (hoogle-prompt) current-prefix-arg))
-  (if (null haskell-hoogle-command)
-      (browse-url (format haskell-hoogle-url (url-hexify-string query)))
-    (let* ((command (concat (if (functionp haskell-hoogle-command)
-                                (funcall haskell-hoogle-command)
-                              haskell-hoogle-command)
-                            (if info " -i " "")
-                            " --color " (shell-quote-argument query)))
-           (output (shell-command-to-string command)))
-      (with-help-window "*hoogle*"
-        (with-current-buffer standard-output
-          (let ((outs (ansi-color-filter-apply output)))
-            (delay-mode-hooks (haskell-mode))
-            (if info
-                (let ((lns (split-string output "\n" t " ")))
-                  (insert (car lns) "\n\n")
-                  (dolist (ln (cdr lns)) (insert "-- " ln "\n")))
-              (insert outs)
-              (forward-line -1)
-              (when (looking-at-p "^plus more results") (insert "\n-- ")))
-            (view-mode)))))))
+  (cond
+   (haskell-hoogle-use-eww (eww (format haskell-hoogle-url (url-hexify-string query))))
+   ((null haskell-hoogle-command) (browse-url (format haskell-hoogle-url (url-hexify-string query))))
+   (t (let* ((command (concat (if (functionp haskell-hoogle-command)
+                                 (funcall haskell-hoogle-command)
+                               haskell-hoogle-command)
+                             (if info " -i " "")
+                             " --color " (shell-quote-argument query)))
+            (output (shell-command-to-string command)))
+       (with-help-window "*hoogle*"
+         (with-current-buffer standard-output
+           (let ((outs (ansi-color-filter-apply output)))
+             (delay-mode-hooks (haskell-mode))
+             (if info
+                 (let ((lns (split-string output "\n" t " ")))
+                   (insert (car lns) "\n\n")
+                   (dolist (ln (cdr lns)) (insert "-- " ln "\n")))
+               (insert outs)
+               (forward-line -1)
+               (when (looking-at-p "^plus more results") (insert "\n-- ")))
+             (view-mode))))))))
 
 ;;;###autoload
 (defalias 'hoogle 'haskell-hoogle)
