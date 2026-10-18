@@ -30,6 +30,7 @@
 (require 'haskell-lexeme)
 (require 'haskell-string)
 (require 'font-lock)
+(require 'haskell-utils)
 
 (defgroup haskell-appearance nil
   "Haskell Appearance."
@@ -97,6 +98,14 @@ be disabled at that position."
   "Identifiers treated as reserved keywords in Haskell."
   :group 'haskell-appearance
   :type '(repeat string))
+
+(defun haskell-font-lock-keyword-p (word)
+  "Return non-nil if WORD is a reserved keyword in the current buffer.
+`signature' is reserved only in Backpack signature files, hence the
+exception below; see `haskell-utils-hsig-buffer-p'."
+  (and (member word haskell-font-lock-keywords)
+       (or (not (equal word "signature"))
+           (haskell-utils-hsig-buffer-p))))
 
 
 (defun haskell-font-lock-dot-is-not-composition (start)
@@ -282,7 +291,7 @@ like ::, class, instance, data, newtype, type."
         (setq last-token-was-newline nil))
        ((and (or (member (match-string-no-properties 0)
                          '("<-" "=" "←"))
-                 (member (match-string-no-properties 0) haskell-font-lock-keywords))
+                 (haskell-font-lock-keyword-p (match-string-no-properties 0)))
              (not (member (match-string-no-properties 0) ignore)))
         (setq cont nil)
         (setq last-token-was-newline nil))
@@ -319,7 +328,7 @@ on an uppercase identifier."
   (cl-case (haskell-lexeme-classify-by-first-char (char-after (match-beginning 1)))
     (varid (let ((word (match-string-no-properties 0)))
              (cond
-              ((member word haskell-font-lock-keywords)
+              ((haskell-font-lock-keyword-p word)
                ;; Note: keywords parse as keywords only when not qualified.
                ;; GHC parses Control.let as a single but illegal lexeme.
                (when (member word '("class" "instance" "type" "data" "newtype"))
@@ -445,11 +454,11 @@ on an uppercase identifier."
 
             ;; Toplevel Declarations.
             ;; Place them *before* generic id-and-op highlighting.
-            (,topdecl-var  (1 (unless (member (match-string 1) haskell-font-lock-keywords)
+            (,topdecl-var  (1 (unless (haskell-font-lock-keyword-p (match-string 1))
                                 'haskell-definition-face)))
-            (,topdecl-var2 (2 (unless (member (match-string 2) haskell-font-lock-keywords)
+            (,topdecl-var2 (2 (unless (haskell-font-lock-keyword-p (match-string 2))
                                 'haskell-definition-face)))
-            (,topdecl-bangpat  (1 (unless (member (match-string 1) haskell-font-lock-keywords)
+            (,topdecl-bangpat  (1 (unless (haskell-font-lock-keyword-p (match-string 1))
                                 'haskell-definition-face)))
             (,topdecl-sym  (2 (unless (member (match-string 2) '("\\" "=" "->" "→" "<-" "←" "::" "∷" "," ";" "`"))
                                 'haskell-definition-face)))

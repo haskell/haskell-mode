@@ -1080,3 +1080,18 @@
      ("pattern" t haskell-keyword-face)
      ("pattern" t haskell-keyword-face)
      ("pattern" t haskell-keyword-face))))
+
+(ert-deftest haskell-syntactic-test-signature-is-not-a-keyword ()
+  "`signature' is not highlighted as a keyword outside of .hsig files."
+  (check-properties
+   '("f = R { signature = 1 }")
+   '(("signature" "w" nil))))
+
+(ert-deftest haskell-syntactic-test-signature-is-a-keyword-in-hsig ()
+  "`signature' is highlighted as a keyword in Backpack signature files."
+  (check-properties
+   '("signature Test where")
+   '(("signature" "w" haskell-keyword-face))
+   (lambda ()
+     (setq buffer-file-name (expand-file-name "Test.hsig" temporary-file-directory))
+     (haskell-mode))))

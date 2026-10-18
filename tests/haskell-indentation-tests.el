@@ -1060,3 +1060,31 @@ two"
     (should (equal 3 (- (point) (line-beginning-position))))))
 
 ;;; haskell-indentation-tests.el ends here
+
+(hindent-test "signature-1 `signature' Used as a Record Field""
+f = R
+  { a = 1
+  , signature = 2
+  }"
+              (4 2))
+
+(hindent-test "signature-2 `signature' Used as a Variable""
+f signature = do
+  g signature"
+              (3 0 2 4))
+
+(ert-deftest haskell-indentation-signature-is-not-a-keyword-in-hs ()
+  "`signature' is an ordinary identifier outside of .hsig files."
+  (with-temp-buffer
+    (setq buffer-file-name (expand-file-name "Test.hs" temporary-file-directory))
+    (insert "signature Test where")
+    (goto-char (point-min))
+    (should (eq 'value (haskell-indentation-peek-token)))))
+
+(ert-deftest haskell-indentation-signature-is-a-keyword-in-hsig ()
+  "`signature' is still a keyword in Backpack signature files."
+  (with-temp-buffer
+    (setq buffer-file-name (expand-file-name "Test.hsig" temporary-file-directory))
+    (insert "signature Test where")
+    (goto-char (point-min))
+    (should (equal "signature" (haskell-indentation-peek-token)))))

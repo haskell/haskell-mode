@@ -50,6 +50,12 @@
 (defvar haskell-mode-interactive-prompt-state nil
   "Special variable indicating a state of user input waiting.")
 
+(defun haskell-utils-hsig-buffer-p ()
+  "Return non-nil if the current buffer visits a Backpack signature file.
+`signature' is a keyword only in `.hsig' files; everywhere else it is
+an ordinary identifier."
+  (and buffer-file-name (string-suffix-p ".hsig" buffer-file-name)))
+
 (defun haskell-utils-read-directory-name (prompt default)
   "Read directory name and normalize to true absolute path.
 Refer to `read-directory-name' for the meaning of PROMPT and
