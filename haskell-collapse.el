@@ -46,6 +46,17 @@
     (= (line-end-position)
        (progn (skip-chars-forward "[:blank:]") (point)))))
 
+(defun haskell-blank-lines-block (cmp dir indent)
+  "Return non-nil if sequence of blank lines in direction DIR fits given INDENT level."
+  (let ((initial-pos (point)))
+    (when (haskell-blank-line-p)
+      (while (and (zerop (forward-line dir))
+                  (haskell-blank-line-p)))
+      (unless (funcall cmp (current-indentation) indent)
+        (progn
+          (goto-char initial-pos)
+          nil)))))
+
 (defun haskell-indented-block ()
   "return (start-of-indentation . end-of-indentation)"
   (let ((cur-indent (current-indentation))
@@ -80,7 +91,7 @@ indentation if dir=-1"
     (let ((start-indent (current-indentation)))
       (progn
         (while (and (zerop (forward-line direction))
-                    (or (haskell-blank-line-p)
+                    (or (haskell-blank-lines-block comparison direction start-indent)
                         (funcall comparison (current-indentation) start-indent))))
         (when (= direction 1) (forward-line -1))
         (end-of-line)
