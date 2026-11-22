@@ -88,7 +88,7 @@ build-$(EMACS_VERSION)/build-flag : build-$(EMACS_VERSION) $(patsubst %.el,build
 	touch $@
 
 check-%: tests/%-tests.el
-	$(BATCH) -l "$<" -f ert-run-tests-batch-and-exit;
+	$(BATCH) --eval $(INIT_PACKAGES) -l "$<" -f ert-run-tests-batch-and-exit;
 
 check: compile $(AUTOLOADS) check-package-lint check-relint check-ert
 
